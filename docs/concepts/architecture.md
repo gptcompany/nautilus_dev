@@ -500,6 +500,88 @@ flowchart TB
     trader -->|"C API"| core
 ```
 
+### Rust crates
+
+The `crates/` directory contains the Rust implementation organized into focused crates with clear dependency boundaries.
+Feature flags control optional functionality - for example, `streaming` enables persistence for catalog-based data streaming,
+and `cloud` enables cloud storage backends (S3, Azure, GCP).
+
+Dependency flow (arrows point to dependencies):
+
+```mermaid
+flowchart BT
+    subgraph Foundation
+        core
+        model
+        common
+        system
+        trading
+    end
+
+    subgraph Infrastructure
+        serialization
+        network
+        cryptography
+        persistence
+    end
+
+    subgraph Engines
+        data
+        execution
+        portfolio
+        risk
+    end
+
+    subgraph Runtime
+        live
+        backtest
+    end
+
+    adapters
+    pyo3
+
+    model --> core
+    common --> core
+    common --> model
+    system --> common
+    trading --> common
+    serialization --> model
+    network --> common
+    network --> cryptography
+    persistence --> serialization
+    data --> common
+    execution --> common
+    portfolio --> common
+    risk --> portfolio
+    live --> system
+    live --> trading
+    backtest --> system
+    backtest --> persistence
+    adapters --> live
+    adapters --> network
+    pyo3 --> adapters
+```
+
+**Crate categories:**
+
+| Category       | Crates                                                    | Purpose                                                  |
+|----------------|-----------------------------------------------------------|----------------------------------------------------------|
+| Foundation     | `core`, `model`, `common`, `system`, `trading`            | Primitives, domain model, kernel, actor & strategy base. |
+| Engines        | `data`, `execution`, `portfolio`, `risk`                  | Core trading engine components.                          |
+| Infrastructure | `serialization`, `network`, `cryptography`, `persistence` | Encoding, networking, signing, storage.                  |
+| Runtime        | `live`, `backtest`                                        | Environment-specific node implementations.               |
+| External       | `adapters/*`                                              | Venue and data integrations.                             |
+| Bindings       | `pyo3`                                                    | Python bindings.                                         |
+
+**Feature flags:**
+
+| Feature     | Crates                     | Effect                                                     |
+|-------------|----------------------------|------------------------------------------------------------|
+| `streaming` | `data`, `system`, `live`   | Enables `persistence` dependency for catalog streaming.    |
+| `cloud`     | `persistence`              | Enables cloud storage backends (S3, Azure, GCP, HTTP).     |
+| `python`    | most crates                | Enables PyO3 bindings (auto-enables `streaming`, `cloud`). |
+| `defi`      | `common`, `model`, `data`  | Enables DeFi/blockchain data types.                        |
+
 :::note
 Both Rust and Cython are build dependencies. The binary wheels produced from a build do not require
 Rust or Cython to be installed at runtime.

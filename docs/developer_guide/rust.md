@@ -240,11 +240,55 @@ The `check_error_conventions.sh` and `check_anyhow_usage.sh` pre-commit hooks en
 Use consistent async/await patterns:
 
 1. **Async function naming**: No special suffix is required; prefer natural names.
-2. **Tokio usage**: Use `tokio::spawn` for fire-and-forget work, and document when that background task is expected to finish.
+2. **Tokio usage**: Fully qualify tokio types (e.g., `tokio::time::timeout`). See [Adapter runtime patterns](#adapter-runtime-patterns) for spawn rules.
 3. **Error handling**: Return `anyhow::Result` from async functions to match the synchronous conventions.
 4. **Cancellation safety**: Call out whether the function is cancellation-safe and what invariants still hold when it is cancelled.
 5. **Stream handling**: Use `tokio_stream` (or `futures::Stream`) for async iterators to make back-pressure explicit.
 6. **Timeout patterns**: Wrap network or long-running awaits with timeouts (`tokio::time::timeout`) and propagate or handle the timeout error.
+
+### Adapter runtime patterns
+
+Adapter crates (under `crates/adapters/`) require special handling for spawning async tasks due to Python FFI compatibility:
+
+1. **Use `get_runtime().spawn()` instead of `tokio::spawn()`**: When called from Python threads (which have no Tokio context), `tokio::spawn()` panics because it relies on thread-local storage. The global runtime pattern provides an explicit reference accessible from any thread.
+
+   ```rust
+   use nautilus_common::live::get_runtime;
+
+   // Correct - works from Python threads
+   get_runtime().spawn(async move {
+       // async work
+   });
+
+   // Incorrect - panics from Python threads
+   tokio::spawn(async move {
+       // async work
+   });
+   ```
+
+2. **Use the shorter import path**: Import `get_runtime` from the `live` module re-export, not the full path:
+
+   ```rust
+   // Preferred - shorter path via re-export
+   use nautilus_common::live::get_runtime;
+
+   // Avoid - unnecessarily verbose
+   use nautilus_common::live::runtime::get_runtime;
+   ```
+
+3. **Use `get_runtime().block_on()` for sync-to-async bridges**: When synchronous code needs to call async functions in adapters:
+
+   ```rust
+   fn sync_method(&self) -> anyhow::Result<()> {
+       get_runtime().block_on(self.async_implementation())
+   }
+   ```
+
+4. **Tests are exempt**: Test code using `#[tokio::test]` creates its own runtime context, so `tokio::spawn()` works correctly. The enforcement hook skips test files and test modules.
+
+:::info Automated enforcement
+The `check_tokio_usage.sh` pre-commit hook enforces these adapter runtime patterns automatically.
+:::
 
 ### Attribute patterns
 
@@ -643,29 +687,6 @@ The `check_pyo3_conventions.sh` pre-commit hook enforces the `py_` prefix for Py
 The `check_testing_conventions.sh` pre-commit hook enforces the use of `#[rstest]` over `#[test]`.
 :::
 
-#### Test organization
-
-Use consistent test module structure with section separators:
-
-```rust
-////////////////////////////////////////////////////////////////////////////////
-// Tests
-////////////////////////////////////////////////////////////////////////////////
-
-#[cfg(test)]
-mod tests {
-    use rstest::rstest;
-    use super::*;
-    use crate::identifiers::{Symbol, stubs::*};
-
-    #[rstest]
-    fn test_string_reprs(symbol_eth_perp: Symbol) {
-        assert_eq!(symbol_eth_perp.as_str(), "ETH-PERP");
-        assert_eq!(format!("{symbol_eth_perp}"), "ETH-PERP");
-    }
-}
-```
-
 #### Parameterized testing
 
 Use the `rstest` attribute consistently, and for parameterized tests:
@@ -916,27 +937,20 @@ This feature is opt-in to avoid requiring the Cap'n Proto compiler for standard 
 
 ### Installing Cap'n Proto
 
-Install the Cap'n Proto compiler before working with schemas:
+Install the Cap'n Proto compiler before working with schemas. The required version is
+specified in the `capnp-version` file in the repository root.
 
-**macOS:**
+See the [Environment Setup](environment_setup.md#capn-proto) guide for detailed installation
+instructions for each platform.
 
-```bash
-brew install capnp
-```
-
-**Linux (Debian/Ubuntu):**
-
-```bash
-sudo apt-get install capnproto
-```
-
-**Windows:**
-See the [Cap'n Proto installation guide](https://capnproto.org/install.html).
+:::warning
+Ubuntu's default `capnproto` package is too old. Linux users must install from source.
+:::
 
 Verify installation:
 
 ```bash
-capnp --version  # Should show version 1.0.0 or later
+capnp --version  # Should match the version in capnp-version
 ```
 
 ### Schema development workflow

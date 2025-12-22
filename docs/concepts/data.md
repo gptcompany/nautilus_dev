@@ -487,6 +487,44 @@ of the Nautilus core, currently in development.
 **These PyO3 provided data objects are not compatible where the legacy Cython objects are currently used (e.g., adding directly to a `BacktestEngine`).**
 :::
 
+### Fixed-point precision and raw values
+
+NautilusTrader uses fixed-point arithmetic for `Price` and `Quantity` types to ensure precise financial calculations without floating-point errors. Understanding how raw values work is essential when creating data or working with catalogs.
+
+#### Raw value requirements
+
+When constructing `Price` or `Quantity` using `from_raw()`, the raw value **must** be a valid multiple of the scale factor for the given precision. Valid raw values should come from:
+
+- Accessing the `.raw` field of an existing value (e.g., `price.raw`).
+- Using the Nautilus fixed-point conversion functions.
+- Values from Nautilus-produced Arrow data.
+
+:::warning
+Raw values that are not valid multiples will cause a panic. The raw value must be divisible by `10^(FIXED_PRECISION - precision)` where `FIXED_PRECISION` is 9 (standard mode) or 16 (high-precision mode).
+:::
+
+#### Legacy catalog data and floating-point errors
+
+Data written to catalogs using V2 wranglers before 16th December 2025 may contain raw values with floating-point precision errors. This occurred because the wranglers used:
+
+```python
+int(value * FIXED_SCALAR)  # Introduces floating-point errors
+```
+
+For example, `int(0.67068 * 1e9)` produces `670680000000001` instead of the expected `670680000000000`. The correct approach is:
+
+```python
+round(value * 10**precision) * scale  # Correct precision-aware conversion
+```
+
+#### Automatic correction during catalog reads
+
+To maintain backward compatibility with existing catalog data, the Arrow decode path automatically corrects raw values by rounding them to the nearest valid multiple. This ensures that legacy catalogs continue to work without requiring data migration.
+
+:::note
+This automatic correction adds a small amount of overhead during data decoding. In a future version, once catalogs have been repaired or migrated, this correction will become opt-in. A catalog repair/migration script may be provided to permanently fix legacy data.
+:::
+
 ### Transformation pipeline
 
 **Process flow**:

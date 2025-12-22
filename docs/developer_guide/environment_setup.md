@@ -9,6 +9,10 @@ For development we recommend using the PyCharm *Professional* edition IDE, as it
 NautilusTrader uses increasingly more [Rust](https://www.rust-lang.org), so Rust should be installed on your system as well
 ([installation guide](https://www.rust-lang.org/tools/install)).
 
+[Cap'n Proto](https://capnproto.org/) is required for serialization schema compilation. The required
+version is specified in the `capnp-version` file in the repository root. Ubuntu's default package
+is typically too old, so you may need to install from source (see below).
+
 :::info
 NautilusTrader *must* compile and run on **Linux, macOS, and Windows**. Please keep portability in
 mind (use `std::path::Path`, avoid Bash-isms in shell scripts, etc.).
@@ -53,13 +57,13 @@ make pre-commit
 
 Make sure the Rust compiler reports **zero errors** – broken builds slow everyone down.
 
-3. **Required for Rust/PyO3 (Linux only)**: When using Python installed via `uv` on Linux, set the following environment variables:
+3. **Required for Rust/PyO3 (Linux and macOS)**: When using Python installed via `uv` on Linux or macOS, set the following environment variables:
 
 ```bash
 # Add to your shell configuration (e.g., ~/.zshrc or ~/.bashrc)
 
 # Linux only: Set the library path for the Python interpreter
-export LD_LIBRARY_PATH="$HOME/.local/share/uv/python/cpython-3.13.4-linux-x86_64-gnu/lib:$LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH="$(python -c 'import sys; print(sys.base_prefix)')/lib:$LD_LIBRARY_PATH"
 
 # Set the Python executable path for PyO3
 export PYO3_PYTHON=$(pwd)/.venv/bin/python
@@ -70,7 +74,6 @@ export PYTHONHOME=$(python -c "import sys; print(sys.base_prefix)")
 
 :::note
 The `LD_LIBRARY_PATH` export is Linux-specific and not needed on macOS or Windows.
-Adjust the Python version in the path to match your system. Use `uv python list` to find the exact path.
 
 - `PYO3_PYTHON` tells PyO3 which Python interpreter to use, reducing unnecessary recompilation.
 - `PYTHONHOME` is required when running `make cargo-test` with a `uv`-installed Python.
@@ -106,6 +109,50 @@ To compile in debug mode, use:
 ```bash
 make build-debug
 ```
+
+## Cap'n Proto
+
+[Cap'n Proto](https://capnproto.org/) is required for serialization schema compilation.
+The required version is defined in the `capnp-version` file in the repository root.
+
+On **macOS**, install via Homebrew:
+
+```bash
+brew install capnp
+```
+
+Verify the installed version matches `capnp-version`. If Homebrew provides an older version,
+install from source using the Linux instructions below.
+
+On **Ubuntu/Linux**, the default package is typically too old. Install from source:
+
+```bash
+CAPNP_VERSION=$(cat capnp-version)
+cd ~
+wget https://capnproto.org/capnproto-c++-${CAPNP_VERSION}.tar.gz
+tar xzf capnproto-c++-${CAPNP_VERSION}.tar.gz
+cd capnproto-c++-${CAPNP_VERSION}
+./configure
+make -j$(nproc)
+sudo make install
+sudo ldconfig
+```
+
+Verify installation:
+
+```bash
+capnp --version
+```
+
+On **Windows**, install via Chocolatey:
+
+```bash
+choco install capnproto
+```
+
+Verify the installed version matches `capnp-version`. If Chocolatey provides an older version,
+see the [Cap'n Proto installation guide](https://capnproto.org/install.html) for alternative
+installation methods.
 
 ## Faster builds
 
@@ -211,6 +258,16 @@ CREATE DATABASE
 
 The Nautilus CLI is a command-line interface tool for interacting with the NautilusTrader ecosystem.
 It offers commands for managing the PostgreSQL database and handling various trading operations.
+
+:::warning
+On Linux systems with GNOME desktop, the `nautilus` command typically refers to the GNOME file manager (`/usr/bin/nautilus`).
+After installing the NautilusTrader CLI, you may need to ensure the Cargo binary takes precedence by either:
+
+- Adding an alias to your shell config: `alias nautilus="$HOME/.cargo/bin/nautilus"`
+- Using the full path: `~/.cargo/bin/nautilus`
+- Ensuring `~/.cargo/bin` appears before `/usr/bin` in your `PATH`
+
+:::
 
 :::note
 The Nautilus CLI command is only supported on UNIX-like systems.
