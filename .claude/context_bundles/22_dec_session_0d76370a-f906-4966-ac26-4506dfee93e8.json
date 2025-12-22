@@ -377,7 +377,312 @@
       "timestamp": "2025-12-22T18:14:43.187302",
       "url": "https://nautilustrader.io/docs/nightly/integrations/hyperliquid/",
       "prompt": "Extract all configuration options for Hyperliquid data client and execution client including Hyperli..."
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-22T18:15:49.500349",
+      "command": "ls -la /media/sam/1TB/nautilus_dev/.specify/ 2>/dev/null || echo \"No .specify directory\"",
+      "description": "Check SpecKit directory in repo"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-22T18:15:49.752863",
+      "command": "which speckit || npm list -g speckit 2>/dev/null || echo \"Checking pip...\" && pip show speckit 2>/dev/null || echo \"Not found in pip\"",
+      "description": "Check global SpecKit installation"
+    },
+    {
+      "operation": "glob",
+      "timestamp": "2025-12-22T18:15:53.792882",
+      "pattern": ".claude/commands/**/*.md",
+      "path": "/media/sam/1TB/nautilus_dev"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-22T18:16:01.385510",
+      "command": "ls -la ~/.claude/commands/speckit/ 2>/dev/null || echo \"No global speckit commands\"",
+      "description": "Check global SpecKit in user home"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-22T18:16:01.406520",
+      "command": "ls -la /media/sam/1TB/claude-hooks-shared/ 2>/dev/null | head -20",
+      "description": "Check shared hooks location"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-22T18:16:08.277874",
+      "file_path": "/media/sam/1TB/nautilus_dev/.claude/commands/speckit/speckit.specify.md"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-22T18:16:13.426734",
+      "command": "ls -la /media/sam/1TB/nautilus_dev/.specify/templates/",
+      "description": "Check templates directory content"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-22T18:16:13.462123",
+      "command": "ls -la /media/sam/1TB/nautilus_dev/.specify/scripts/",
+      "description": "Check scripts directory"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-22T18:16:18.339994",
+      "command": "ls -la /media/sam/1TB/nautilus_dev/.specify/scripts/bash/",
+      "description": "Check bash scripts"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-22T18:16:18.376034",
+      "file_path": "/media/sam/1TB/nautilus_dev/.specify/memory/constitution.md"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-22T18:16:27.916310",
+      "command": "ls -la ~/.claude/commands/ 2>/dev/null || mkdir -p ~/.claude/commands && echo \"Created ~/.claude/commands\"",
+      "description": "Check/create global commands dir"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-22T18:16:34.856097",
+      "command": "echo \"=== Global (home) ===\" && wc -l ~/.claude/commands/speckit.specify.md && echo \"\" && echo \"=== Repo (project) ===\" && wc -l /media/sam/1TB/nautilus_dev/.claude/commands/speckit/speckit.specify.md",
+      "description": "Compare specify.md versions"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-22T18:16:34.880782",
+      "command": "diff -q ~/.claude/commands/speckit.specify.md /media/sam/1TB/nautilus_dev/.claude/commands/speckit/speckit.specify.md 2>/dev/null && echo \"Files are identical\" || echo \"Files differ\"",
+      "description": "Check if files differ"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-22T18:16:43.502240",
+      "command": "echo \"=== Global commands (home) - date: $(stat -c %y ~/.claude/commands/speckit.specify.md | cut -d' ' -f1) ===\" && ls ~/.claude/commands/ | wc -l && echo \"\" && echo \"=== Repo commands - date: $(stat -c %y /media/sam/1TB/nautilus_dev/.claude/commands/speckit/speckit.specify.md | cut -d' ' -f1) ===\" && ls /media/sam/1TB/nautilus_dev/.claude/commands/speckit/ | wc -l",
+      "description": "Compare command counts and dates"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-22T18:18:00.668747",
+      "command": "cp /media/sam/1TB/nautilus_dev/.claude/commands/speckit/*.md ~/.claude/commands/ && echo \"Copied $(ls /media/sam/1TB/nautilus_dev/.claude/commands/speckit/*.md | wc -l) files\"",
+      "description": "Copy repo SpecKit to global"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-22T18:18:05.884057",
+      "command": "ls -la ~/.claude/commands/speckit.* | head -5",
+      "description": "Verify updated global commands"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-22T18:18:06.935464",
+      "command": "diff -q ~/.claude/commands/speckit.specify.md /media/sam/1TB/nautilus_dev/.claude/commands/speckit/speckit.specify.md && echo \"✅ Files synchronized\"",
+      "description": "Verify files match"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-22T18:19:06.466537",
+      "command": "ls -la /media/sam/1TB/UTXOracle/.claude/commands/ 2>/dev/null || echo \"No commands dir\"",
+      "description": "Check UTXOracle commands"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-22T18:19:06.505589",
+      "command": "ls -la /media/sam/1TB/UTXOracle/.specify/ 2>/dev/null || echo \"No .specify dir\"",
+      "description": "Check UTXOracle .specify"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-22T18:19:12.913109",
+      "command": "diff -q /media/sam/1TB/UTXOracle/.claude/commands/speckit.specify.md /media/sam/1TB/nautilus_dev/.claude/commands/speckit/speckit.specify.md && echo \"✅ Identical\" || echo \"⚠️ Different\"",
+      "description": "Compare UTXOracle vs nautilus_dev"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-22T18:19:12.945417",
+      "command": "wc -l /media/sam/1TB/UTXOracle/.claude/commands/speckit.specify.md /media/sam/1TB/nautilus_dev/.claude/commands/speckit/speckit.specify.md ~/.claude/commands/speckit.specify.md",
+      "description": "Compare line counts"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-22T18:19:42.274625",
+      "command": "cp ~/.claude/commands/speckit.*.md /media/sam/1TB/UTXOracle/.claude/commands/ && echo \"Copied $(ls ~/.claude/commands/speckit.*.md | wc -l) files to UTXOracle\"",
+      "description": "Sync global SpecKit to UTXOracle"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-22T18:19:48.477484",
+      "command": "diff -q ~/.claude/commands/speckit.specify.md /media/sam/1TB/UTXOracle/.claude/commands/speckit.specify.md && echo \"✅ UTXOracle sincronizzato\"",
+      "description": "Verify UTXOracle sync"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-22T18:20:58.138282",
+      "command": "git status --short",
+      "description": "Check nautilus_dev git status"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-22T18:20:58.162391",
+      "command": "cd /media/sam/1TB/UTXOracle && git status --short",
+      "description": "Check UTXOracle git status"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-22T18:21:07.132009",
+      "command": "cd /media/sam/1TB/UTXOracle && git add .claude/commands/speckit.*.md && git commit -m \"$(cat <<'EOF'\nsync: Update SpecKit commands to latest version\n\nSynchronized SpecKit commands from global ~/.claude/commands/ to maintain\nconsistency across all projects (nautilus_dev, UTXOracle).\n\nChanges:\n- Updated all 9 speckit.*.md command files\n- Version: 216 lines (simplified from 258)\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n)\"",
+      "description": "Commit SpecKit sync in UTXOracle"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-22T18:21:11.270017",
+      "command": "rm /media/sam/1TB/UTXOracle/.git/index.lock && echo \"Lock removed\"",
+      "description": "Remove stale git lock"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-22T18:21:15.851288",
+      "command": "cd /media/sam/1TB/UTXOracle && git add .claude/commands/speckit.*.md && git commit -m \"$(cat <<'EOF'\nsync: Update SpecKit commands to latest version\n\nSynchronized SpecKit commands from global ~/.claude/commands/ to maintain\nconsistency across all projects (nautilus_dev, UTXOracle).\n\nChanges:\n- Updated all 9 speckit.*.md command files\n- Version: 216 lines (simplified from 258)\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n)\"",
+      "description": "Commit SpecKit sync"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-22T18:21:22.480204",
+      "command": "cd /media/sam/1TB/UTXOracle && git remote -v",
+      "description": "Check UTXOracle remotes"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-22T18:21:27.004099",
+      "command": "cd /media/sam/1TB/UTXOracle && git push origin main",
+      "description": "Push UTXOracle to remote"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-22T18:21:57.938123",
+      "command": "mkdir -p /media/sam/1TB/nautilus_dev/scripts/data_recording",
+      "description": "Create data recording scripts dir"
+    },
+    {
+      "operation": "write",
+      "timestamp": "2025-12-22T18:21:58.269599",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/data_recording/record_binance_hyperliquid.py",
+      "content_length": 6073
+    },
+    {
+      "operation": "write",
+      "timestamp": "2025-12-22T18:22:16.662647",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/data_recording/README.md",
+      "content_length": 2486
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-22T18:22:21.802642",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -m py_compile /media/sam/1TB/nautilus_dev/scripts/data_recording/record_binance_hyperliquid.py && echo \"✅ Syntax OK\"",
+      "description": "Verify script syntax"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-22T18:22:26.257252",
+      "command": "git add scripts/data_recording/ && git status --short",
+      "description": "Stage data recording scripts"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-22T18:22:35.825950",
+      "command": "git commit -m \"$(cat <<'EOF'\nfeat: Add multi-exchange data recording scripts\n\nAdd data recording infrastructure for Binance Futures and Hyperliquid\nusing NautilusTrader nightly with native Rust adapters.\n\nFiles:\n- scripts/data_recording/record_binance_hyperliquid.py\n- scripts/data_recording/README.md\n\nFeatures:\n- Records trade ticks and quote ticks\n- Streams to ParquetDataCatalog (feather format)\n- Configurable instruments list\n- Graceful shutdown handling\n\nUsage:\n  source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate\n  python scripts/data_recording/record_binance_hyperliquid.py\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n)\"",
+      "description": "Commit data recording scripts"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-22T18:22:39.837884",
+      "command": "git remote -v",
+      "description": "Check nautilus_dev remote"
+    },
+    {
+      "operation": "task",
+      "timestamp": "2025-12-22T18:24:30.972580",
+      "subagent_type": "nautilus-coder",
+      "prompt": "Search Context7 for NautilusTrader documentation on:\n\n1. **OrderBook data types**: What orderbook da..."
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-22T18:24:36.657869",
+      "command": "head -50 docs/nautilus/nautilus-trader-changelog.md 2>/dev/null || echo \"Changelog not found\"",
+      "description": "Check version feed first"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-22T18:24:46.413506",
+      "command": "mcp__context7__get-library-docs --library-name \"/nautilustrader/latest\" --topic \"OrderBook OrderBookDelta OrderBookDepth L2 L3 order book data types\" 2>/dev/null || echo \"MCP not available via bash\"",
+      "description": "Search Context7 for orderbook docs"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-22T18:24:48.586182",
+      "command": "grep -rni \"orderbook\\|order_book\\|orderbookdelta\\|orderbookdepth\" /media/sam/1TB/nautilus_dev/docs/ --include=\"*.md\" 2>/dev/null | head -100",
+      "description": "Search local docs for orderbook"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-22T18:24:48.657889",
+      "command": "grep -rni \"open.interest\\|open_interest\\|funding.rate\\|funding_rate\\|mark.price\\|mark_price\\|liquidation\" /media/sam/1TB/nautilus_dev/docs/ --include=\"*.md\" 2>/dev/null | head -100",
+      "description": "Search local docs for OI, funding, mark price, liquidation"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-22T18:24:58.302839",
+      "command": "grep -rni \"liquidation\\|heatmap\\|open.interest\\|funding\" /media/sam/1TB/nautilus_dev/docs/discord/ --include=\"*.md\" 2>/dev/null | head -80",
+      "description": "Search Discord for liquidation, heatmap, OI, funding"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-22T18:24:58.363671",
+      "file_path": "/media/sam/1TB/nautilus_dev/docs/concepts/data.md"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-22T18:24:58.373790",
+      "file_path": "/media/sam/1TB/nautilus_dev/docs/concepts/actors.md"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-22T18:25:04.308901",
+      "file_path": "/media/sam/1TB/nautilus_dev/docs/integrations/binance.md"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-22T18:25:04.311861",
+      "file_path": "/media/sam/1TB/nautilus_dev/docs/integrations/tardis.md"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-22T18:25:11.905212",
+      "command": "grep -rni \"open.interest\\|openinterest\\|oi\\|liquidation\\|heatmap\" /media/sam/1TB/nautilus_dev/docs/discord/ --include=\"*.md\" 2>/dev/null | head -50",
+      "description": "Search Discord for OI and liquidation discussions"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-22T18:25:11.924730",
+      "command": "grep -rni \"mark.*price\\|markprice\\|funding.*rate\\|fundingrate\" /media/sam/1TB/nautilus_dev/docs/discord/ --include=\"*.md\" 2>/dev/null | head -50",
+      "description": "Search Discord for mark price and funding rate"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-22T18:25:18.637027",
+      "command": "ls -la /media/sam/1TB/nautilus_dev/docs/integrations/ 2>/dev/null",
+      "description": "List integration docs"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-22T18:25:18.668753",
+      "command": "grep -rni \"hyperliquid\\|mark.*price\\|MarkPriceUpdate\" /media/sam/1TB/nautilus_dev/docs/integrations/ --include=\"*.md\" 2>/dev/null | head -50",
+      "description": "Search for Hyperliquid and mark price"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-22T18:25:22.704071",
+      "file_path": "/media/sam/1TB/nautilus_dev/docs/integrations/hyperliquid.md"
     }
   ],
-  "last_updated": "2025-12-22T18:14:43.187317"
+  "last_updated": "2025-12-22T18:25:22.704089"
 }
