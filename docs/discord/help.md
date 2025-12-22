@@ -1,1993 +1,8 @@
 # NautilusTrader - #help
 
 **Period:** Last 90 days
-**Messages:** 309
-**Last updated:** 2025-10-23 04:00:15
-
----
-
-#### [2025-07-26 20:07:48] @melonenmann
-
-In https://nautilustrader.io/docs/latest/concepts/data#historical-data-requests-with-aggregation the example shows
-self.request_bars(BarType.from_str("6EH4.XCME-1-MINUTE-LAST-EXTERNAL"))
-
-In my strategy I create an aggregated 1W bartype
-self.bar_type_1week = BarType.from_str(f"{self.config.instrument_id}-1-WEEK-LAST-INTERNAL")
-
-And then I  want to request these
-self.request_bars(self.bar_type_1week)
-
---> ValueError: The actor has not been registered
-
-I also added the "@{instrument_id}-30-MINUTE-LAST-EXTERNAL" to the weekly bartype
-
-And I also tried
-self.request_aggregated_bars(self.bar_type_1week)
-
-But this is not working as I need a list_bar and not BarType, is the example wrong or outdated?
-
-**Links:**
-- NautilusTrader Documentation
-
----
-
-#### [2025-07-26 21:18:51] @faysou.
-
-Yes request_aggregated_bars requires a list as argument, I'll update the doc
-
----
-
-#### [2025-07-26 21:32:46] @faysou.
-
-There's an examples folder in the repository, I recommend you to have a look at it
-
----
-
-#### [2025-07-27 07:40:24] @melonenmann
-
-thanks, found it
-
----
-
-#### [2025-07-29 06:23:57] @melonenmann
-
-I guess I do not get the concept.
-Here is what I want: I have m30 data (2025-01-01 -> 7 month length) and load this in to the engine. 
-My simulation shall start 12 weeks after 2025-01-01.
-I aggregate to 1W bars and subscribe --> this is working and I receive all 1W bars from 2025-03-31
-Now the problem:
-I want to get the historical 1W bars beginning from 01.01.  (that I can calculate things an the 12 weeks of data)
-` 
-        self.bar_type_1week = BarType.from_str(f"{config.instrument_id}-1-WEEK-LAST-INTERNAL@30-MINUTE-EXTERNAL")
-        self.bar_type_1week_for_match = BarType.from_str(f"{config.instrument_id}-1-WEEK-LAST-INTERNAL")
-
-        self.request_aggregated_bars([self.bar_type_1week_for_match])
-`
-
-code is attached
-
-**Attachments:**
-- [barstrategy.py](https://cdn.discordapp.com/attachments/924499913386102834/1399638563313946705/barstrategy.py?ex=68fa72bd&is=68f9213d&hm=0d1d8f94f3bb0fa1f35245020d4131824b62348884bf2f61432cc8e87a31ab6c&)
-- [run_example.py](https://cdn.discordapp.com/attachments/924499913386102834/1399638563682779196/run_example.py?ex=68fa72bd&is=68f9213d&hm=0fe3b73047cfc77db10ddd0918007a135419a01630c2cc4a8172511453a81c4c&)
-
----
-
-#### [2025-07-29 09:28:13] @faysou.
-
-You need to request aggregated bars for self.bar_type_1week. Also self.bar_type_1week_for_match = self.bar_type_1week.standard()
-
----
-
-#### [2025-07-29 09:30:52] @faysou.
-
-If you subscribe or request aggregated bars for the match version it will generate aggregators for quote or trade ticks (quotes if bid or ask or mid, trades if last)
-
----
-
-#### [2025-07-29 09:32:02] @faysou.
-
-When the bar type contains an @ it's a syntax to define a bar type from another bar type. That's a functionality that was missing and I added it about a year ago.
-
----
-
-#### [2025-07-29 11:01:43] @melonenmann
-
-This is still not working
-`        self.request_aggregated_bars([self.bar_type_1week_for_match, self.bar_type_1week])  # , start=self.hist_start, end=self.config_now);
-
-        # Subscribe to market data
-        # This tells NautilusTrader what data we want to receive in our on_bar method
-        # Without this subscription, we won't receive any market data updates
-        self.subscribe_bars(self.bar_type_30min)
-        self.log.info(f"Subscribed to {self.bar_type_30min}")
-
-        # Aggregated 1-week bar data
-
-        # Start receiving 1-week bar updates (created from 30-minute external data)
-        self.subscribe_bars(self.bar_type_1week)
-        self.subscribe_bars(self.bar_type_1week_for_match)
-`
-
----
-
-#### [2025-07-29 11:01:46] @melonenmann
-
-Log:
-`2025-03-26T21:00:00.000000000Z [INFO] BACKTEST_TRADER-001.WHLStrategy: [REQ]--> RequestTradeTicks(instrument_id=EUR/USD.SIM, start=None, end=None, limit=0, client_id=None, venue=SIM, data_type=TradeTick, params={'bar_type': BarType(EUR/USD.SIM-1-WEEK-LAST-INTERNAL), 'bar_types': (BarType(EUR/USD.SIM-1-WEEK-LAST-INTERNAL), BarType(EUR/USD.SIM-1-WEEK-LAST-INTERNAL@30-MINUTE-EXTERNAL)), 'include_external_data': False, 'update_subscriptions': False, 'update_catalog': False, 'bars_market_data_type': 'trade_ticks'})
-2025-03-26T21:00:00.000000000Z [WARN] BACKTEST_TRADER-001.DataEngine: _handle_aggregated_bars: No data to aggregate
-2025-03-26T21:00:00.000000000Z [INFO] BACKTEST_TRADER-001.WHLStrategy: [CMD]--> SubscribeBars(bar_type=EUR/USD.SIM-30-MINUTE-LAST-EXTERNAL, await_partial=False, client_id=None, venue=SIM)
-2025-03-26T21:00:00.000000000Z [INFO] BACKTEST_TRADER-001.WHLStrategy: Subscribed to EUR/USD.SIM-30-MINUTE-LAST-EXTERNAL
-2025-03-26T21:00:00.000000000Z [INFO] BACKTEST_TRADER-001.WHLStrategy: [CMD]--> SubscribeBars(bar_type=EUR/USD.SIM-1-WEEK-LAST-INTERNAL@30-MINUTE-EXTERNAL, await_partial=False, client_id=None, venue=SIM)
-2025-03-26T21:00:00.000000000Z [INFO] BACKTEST_TRADER-001.WHLStrategy: [CMD]--> SubscribeBars(bar_type=EUR/USD.SIM-1-WEEK-LAST-INTERNAL, await_partial=False, client_id=None, venue=SIM)
-2025-03-26T21:00:00.000000000Z [INFO] BACKTEST_TRADER-001.WHLStrategy: Subscribed to EUR/USD.SIM-1-WEEK-LAST-INTERNAL@30-MINUTE-EXTERNAL`
-
----
-
-#### [2025-07-29 12:44:57] @faysou.
-
-Try to make an existing example work and then modify it until yours works.
-
----
-
-#### [2025-07-29 12:45:58] @faysou.
-
-You can also clone the repository and add some log statements to see which code is reached.
-
----
-
-#### [2025-07-29 12:46:28] @faysou.
-
-Use make build-debug to recompile cython code.
-
----
-
-#### [2025-07-29 12:54:07] @faysou.
-
-For request bars, you need to use a datacatalogconfig. I recommend you to use the high level api like in here https://github.com/nautechsystems/nautilus_trader/blob/develop/examples/backtest/notebooks/databento_test_request_bars.py
-
----
-
-#### [2025-07-29 14:36:52] @helo._.
-
-I noticed that many of the working codes are missing.
-For example, when i see PerContractFeeModel, get_commission() function is empty. In fact, the vast majority of functions just do "pass"
-Are they all supposed to be null function? If not, where can I see the actual code for those functions?
-
----
-
-#### [2025-07-29 14:50:33] @faysou.
-
-You must be using intellijidea and looking at some stub code from intellijidea. Make sure you open a pyx file.
-
----
-
-#### [2025-07-29 15:04:07] @colinshen
-
-Hi, Binance kline stream sends bar data during interval(1m), on_bar receives data after interval. Can I get the bar data when streaming?
-
----
-
-#### [2025-07-29 15:22:11] @faysou.
-
-No
-
----
-
-#### [2025-07-29 15:24:23] @helo._.
-
-Thanks for your answer!
-Is it possible for intellij to go to .pyx file definition instead? It would be very unfortunate if I have to manually search/open the .pyx file, then go to definition there.
-
----
-
-#### [2025-07-29 15:24:50] @faysou.
-
-I don't know, I don't think so
-
----
-
-#### [2025-07-29 15:32:27] @colinshen
-
-Thanks,I will use trade_tick
-
----
-
-#### [2025-07-30 18:36:42] @southwall01
-
-Hey guys, when I run run_tardis_machine_replay(), I got this error: 
-```
-thread 'tokio-runtime-worker' panicked at C:\Users\runneradmin\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\tokio-1.46.1\src\runtime\scheduler\multi_thread\mod.rs:86:9:
-Cannot start a runtime from within a runtime. This happens because a function (like `block_on`) attempted to block the current thread while the thread is being used to drive asynchronous tasks.
-```
-I'm wondering how to solve this. Here is my python code:
-```
-import asyncio
-
-from dotenv import load_dotenv
-
-from nautilus_trader.core import nautilus_pyo3
-
-
-async def run():
-    await nautilus_pyo3.run_tardis_machine_replay(
-        config_filepath="./config/tardis_config.json"
-    )
-
-
-if __name__ == "__main__":
-    load_dotenv()
-    asyncio.run(run())
-```
-
----
-
-#### [2025-07-31 03:30:51] @cjdsellers
-
-Hi <@1205331489328472064> 
-
-Which version are you on? I think this one was fixed recently
-
----
-
-#### [2025-07-31 04:38:21] @southwall01
-
-I’m using latest version 1.219.0
-
----
-
-#### [2025-07-31 07:38:33] @cjdsellers
-
-Understood, this is fixed on `develop` branch in 1.220.0, which will be release soon (possibly this week, but TBD)
-You could also install via a development wheel (see README)
-
----
-
-#### [2025-08-02 03:33:04] @k33gan_
-
-Hey everyone! I have a question on how to solve something that seems to be eluding me these past couple of days. I have been attempting to develop a market screener that utilizes 1-minute external bar types from the catalog to generate a correlation matrix. However, when I attempt to load all equity instruments from the XNAS venue, the process returns an error.
-```
-(field("bar_type") == "ZZZ.XNAS-1-MINUTE-LAST-EXTERNAL-EXTERNAL")': maximum recursion depth exceeded during compilation)
-Traceback (most recent call last):
-  File "/home/keegan/Strategy/.venv/lib/python3.12/site-packages/nautilus_trader/backtest/config.py", line 99, in parse_filters_expr
-    return eval(s, allowed_globals, {})  # noqa: S307
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-RecursionError: maximum recursion depth exceeded during compilation
-```
-
----
-
-#### [2025-08-02 03:33:12] @k33gan_
-
-```
-During handling of the above exception, another exception occurred:
-
-Traceback (most recent call last):
-  File "/home/keegan/Strategy/.venv/lib/python3.12/site-packages/nautilus_trader/backtest/node.py", line 455, in run
-    result = self._run(
-             ^^^^^^^^^^
-  File "/home/keegan/Strategy/.venv/lib/python3.12/site-packages/nautilus_trader/backtest/node.py", line 494, in _run
-    self._run_oneshot(
-  File "/home/keegan/Strategy/.venv/lib/python3.12/site-packages/nautilus_trader/backtest/node.py", line 594, in _run_oneshot
-    result: CatalogDataResult = self.load_data_config(config, start, end)
-                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/keegan/Strategy/.venv/lib/python3.12/site-packages/nautilus_trader/backtest/node.py", line 637, in load_data_config
-    config_query = config.query
-                   ^^^^^^^^^^^^
-  File "/home/keegan/Strategy/.venv/lib/python3.12/site-packages/nautilus_trader/backtest/config.py", line 315, in query
-    "filter_expr": parse_filters_expr(filter_expr),
-                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/keegan/Strategy/.venv/lib/python3.12/site-packages/nautilus_trader/backtest/config.py", line 102, in parse_filters_expr
-    raise ValueError(f"Failed to parse filter expression '{s}': {e}")
-```
-
----
-
-#### [2025-08-02 03:33:25] @k33gan_
-
-To give a little more information.
-```When I limit the number of instruments to load, my code works perfectly as intended. 
-I am running on WSL Ubuntu-24.04 for Windows 11
-I am running Python 3.12.3
-I am utilizing the latest version of NT```
-
-My best guess is:
-```A. I am implementing it wrong somehow (Most likely).
-
-B. It is a hard Python constraint, see https://stackoverflow.com/questions/14222416/recursion-in-python-runtimeerror-maximum-recursion-depth-exceeded-while-callin. 
-
-Though changing the sys.setrecursionlimit(n) to a high number does not seem to be working.```
-
-Any help is much appreciated! It's probably something simple I have overlooked, so sorry in advance if that is the case.
-
-**Attachments:**
-- [strategies.py](https://cdn.discordapp.com/attachments/924499913386102834/1401045199634829333/strategies.py?ex=68faf385&is=68f9a205&hm=149c3f5ab77e199346b8c71a8f5713f1f20302dbee07f8c30ec67af7114f6305&)
-- [run_strategy.py](https://cdn.discordapp.com/attachments/924499913386102834/1401045199953723414/run_strategy.py?ex=68faf385&is=68f9a205&hm=ce3b2dc8335139aa6c6c66baa59703d883fb8565355f944457e129d76526da81&)
-
----
-
-#### [2025-08-02 16:19:25] @captainahab10
-
-Two issues are stopping my strat from running.
-cant use perps on binance/okx/bybit (NZ regulation i think)
-binance spot fee: https://github.com/nautechsystems/nautilus_trader/issues/2689
-when close_all_positions is called the sizes are different becuase no fee is applied so it doesnt close becuase the spot amount is less than what NT thinks.
-That leaves dydx perps on fill i get the error: 
-Failed to parse subaccounts channel data: {"type":"channel_data","connection_id":"  Object contains unknown field builderFee - at $.contents.fills[0]
-
-**Links:**
-- Commission not applied to position for crypto spot exchanges · Iss...
-
----
-
-#### [2025-08-03 07:24:39] @.davidblom
-
-<@342191223282597889> the dYdX issue is fixed in pull request #2824
-
----
-
-#### [2025-08-05 06:21:45] @melonenmann
-
-Finally I found out why the aggregated request are not working. I had to add the catalog to the BacktestEngineConfig.
-But now there are a two questions.
-1.) in the catalog are M30 bars, why do I have to put the bars as data additionally (with engine.add_data(filtered_bars))?
-2.) one try was to add the W1 data also to the catalog (before I solved the problem), but when the aggregated data was working the external data was used instead of the internal/aggregated (-> with parameter include_external_data=False and True) -> not really a problem, I deleted the W1 data again
-
----
-
-#### [2025-08-05 06:25:09] @quantumgirly_25
-
-I am constantly getting this error
-symbol not found in flat namespace '_CFRelease'
-when I trying to run my option strategy. I have MacOS M4chip processor.
-
-please help
-even when i am installing nightly version
-
----
-
-#### [2025-08-05 08:41:07] @cjdsellers
-
-Hi <@1402154856294256701> 
-Try setting the `PYO3_PYTHON` env var per this: https://github.com/nautechsystems/nautilus_trader?tab=readme-ov-file#from-source
-I hope that helps!
-
----
-
-#### [2025-08-05 10:46:27] @haakonflaar
-
-When subscribing to and requesting aggregated bars in a strategy I receive bars for time periods where no trade was made (no existing bars for the underlying bar type). This includes bars when the market is closed as well as during weekends and holidays. All bars are single price (Open=High=Low=Close). Is there a way to only receive aggregated bars for periods with existing bars for the underlying bar type?
-Example:
-```
-bar_type_str = "MNQ.SIM-1-HOUR-LAST-INTERNAL@1-MINUTE-EXTERNAL"
-bar_type = BarType.from_str(bar_type_str)
-```
-Strategy code `on_start`:
-```
-# Warm up indicators with history data
-self.request_bars(
-    self.config.bar_type,
-    start=self._clock.utc_now() - pd.Timedelta(days=10),
-)
-# Subscribe to live bars
-self.subscribe_bars(self.config.bar_type)
-```
-
----
-
-#### [2025-08-05 10:48:05] @haakonflaar
-
-I am also wondering how to query aggregated bars from the catalog, as this does not work:
-```
-bar_type_str = "1-HOUR-LAST-INTERNAL@1-MINUTE-EXTERNAL"
-
-bar_data = catalog.query(
-    data_cls=Bar,
-    identifiers=["MNQ.SIM"],
-    metadata={"bar_type": bar_type_str},
-    start="2023-01-01",
-    end="2023-12-31",
-)
-```
-
----
-
-#### [2025-08-05 16:20:56] @backroom_moonshine
-
-I'm working through teh Backtest (low-level API)  getting started guide and hitting a snag `provider = TestDataProvider()
-trades_df = provider.read_csv_ticks("binance/ethusdt-trades.csv") Jupyter Labs returns `
-
-"Couldn't find test data directory, test data will be pulled from GitHub" i then get an error "FileNotFoundError: https://raw.githubusercontent.com/nautechsystems/nautilus_trader/develop/tests/test_data/binance/ethusdt-trades.csv" i have found the correct datafile but not in nautilus_trader/develop/. Is there a way to manually load this using TestDataProvider. Reading csv with pandas causes isuues with format later on
-
----
-
-#### [2025-08-05 16:22:44] @backroom_moonshine
-
-is there a reason its not looking here nautilus_trader/tests/test_data/binance/ethusdt-trades.csv
-
----
-
-#### [2025-08-05 23:08:59] @daws6561
-
-Did you experience a similar error on the previous tutorial, FX Bar Data? (asking because I did, and had the same question).
-
----
-
-#### [2025-08-06 01:02:38] @quantumgirly_25
-
-Thank you, I will try this approach
-
----
-
-#### [2025-08-06 06:55:51] @lpoems_86721_19126
-
-After enabling features such as historical order cleanup, NT continues to accumulate memory, though the growth is slower...
-
-**Attachments:**
-- [image.png](https://cdn.discordapp.com/attachments/924499913386102834/1402545692869656656/image.png?ex=68fa7a37&is=68f928b7&hm=f0adece1b7e7770aefe004193f84c26ba45d90591ed53ca44fb070ed869169ce&)
-
----
-
-#### [2025-08-06 07:03:07] @cjdsellers
-
-Hi <@1208715992122007564> 
-Thanks for the feedback, this could be account state events as we don't purge those yet. There are also some reference cycle type leaks as well, growth is much slower than it was and we continue to work to address them
-
----
-
-#### [2025-08-06 07:05:13] @lpoems_86721_19126
-
-Thank you for your reply🙏
-
----
-
-#### [2025-08-06 09:28:27] @backroom_moonshine
-
-no i havent done that one yet. I couldnt work it out, so i tired importing the data from csv as per the high level backtest in quickstart and it seems to be ok
-
----
-
-#### [2025-08-06 16:25:41] @premysl_22228
-
-What is your total amount of memory please, so we know, what total amount of leaks happens per day during live trading?
-
----
-
-#### [2025-08-06 16:35:45] @premysl_22228
-
-We are not aware (or at least me) of any circular dependency which are not cleaned during trading itself (if you are not doing some exotic things like repeatedly fetching historical trades during trading). There are lot of them, which aren't cleaned after, but I would rather account this to account state events, or some other type of leak. There is a possibility these will go away, after we go through Valgrind output debugging (which will be hopefully soon).
-
----
-
-#### [2025-08-06 20:39:39] @ido3936
-
-Hello smart people,
-
-I am puzzled by a seeming inconsistency:
-Shouldn't the realized PnL of a backtest run (as reported in the 'post run evaluation')  approx. equal the sum of PnLs in the positions report (assuming no open positions left)?
-
-When my data (bars) are aggregated internallly - I get exactly this. 
-
-When the data is aggregated externally - I get that this is not the case (and I mean **really** not the case) - the sum of position PnLs is much higher than the  realized PnL as reported in the 'post run evaluation'.
-
-What could be the reason for this?
-Any explanation would be most appreciated
-
----
-
-#### [2025-08-07 00:07:56] @premysl_22228
-
-Hi. No picture was attached. Can you send them? 
-
-If sum(PnL) != total_PnL, after all positions being closed, it seems like major bug. I guess basic functionality being unit tested (even I am not sure in the case), so there will be probably some deeper pathology - my guess would be, that Portfolio PnL got somehow diverged from PnL in positions in caches. Could you submit MRE to the GitHub please?
-
----
-
-#### [2025-08-07 00:12:49] @premysl_22228
-
-If this is true positive, it's great inspiration for future testing. Assert that sum(PnL) is equal to what is in portfolio PnL in acceptance tests and possibly more further tests in yet unknown location, because bad computed PnL is really something we want to avoid...nothing much matters if basic functionality like this doesn't works properly.
-
----
-
-#### [2025-08-07 07:24:24] @quantumgirly_25
-
-Hi, I want to do backtest for my Optionpricing strategy, and i have written the startegy.py file and a YAML cofig file, But i am not able to have CLI for Nautilius-trader installe,
-
-On running this command
-naut backtest run backtest_config.yaml
-i am getting error, naut command not found
-
-I checked the examples for backtest on github, they are done using .py files only, so please help me on this, should I follow the github examples or is there a way to setup CLI for Nautilis-Trader
-
----
-
-#### [2025-08-07 08:08:29] @ido3936
-
-Hi <@1353826739851362345> , here's what I could quickly gather in terms of logs and explanations. 
-
-```
-  VERSIONING
- =========================
- nautilus_trader: 1.219.0
- python: 3.12.7
- numpy: 2.3.1
- pandas: 2.3.1
- msgspec: 0.19.0
- pyarrow: 20.0.0
- pytz: 2025.2
- uvloop: 0.21.0
-```
-
-My strategies use dual time frames: hours and days.
-Hour bar types are the likes of  `ASX.NYSE-1-HOUR-LAST-EXTERNAL`
-Day bars are either the likes of `ASX.NYSE-1-DAY-LAST-EXTERNAL`, or `ASX.NYSE-1-DAY-LAST-INTERNAL@1-HOUR-EXTERNAL` , the latter based on the above mentioned hour bars.
-
-In both cases the sum of realized PnLs from the positions report is ~10_000$
-
-But the post run reports are:
-For the external hour bars:
-```
- Total positions: 3_334
- [36m==========================================
- [36m SimulatedVenue NYSE
- [36m==========================================
- CashAccount(id=NYSE-001, type=CASH, base=USD)
- [36m------------------------------------------
- Balances starting:
- 29_000.00 USD
- [36m------------------------------------------
- Balances ending:
- 29_713.89 USD
-```
-
-and for the internally aggregated bars it is:
-```
-Total positions: 3_343
-[36m==========================================
-[36m SimulatedVenue NYSE
-[36m==========================================
-CashAccount(id=NYSE-001, type=CASH, base=USD)
-[36m------------------------------------------
-Balances starting:
-29_000.00 USD
-[36m------------------------------------------
-Balances ending:
-39_034.21 USD
-```
-
-(note that the number of postiions is more or less the same)
-
-I hope this helps - I'm not sure how a minimally reproducible scenario would be devised here
-
----
-
-#### [2025-08-07 11:01:19] @premysl_22228
-
-Hi, I will try to extend the tests whether we can replicate this on acceptance testing (hopefully I get to this in few days, I am being very busy at the moment). And it looks like I there is furher bugs waiting for me in aggregation (I am currently working on a refactor with one unfinished test, which should catch exactly this kind of bug). But if I can't replicate it, there is nothing more I can do for you without the MRE at the moment.
-
----
-
-#### [2025-08-07 11:04:43] @premysl_22228
-
-(Out of the log it seems that ticks ->B -> C isn't equivalent to ticks -> C...I think the transformation at NYSE will be much more likely to be bugless then our own - are you running on official data without altering them any way just to be sure?)
-
----
-
-#### [2025-08-07 11:05:00] @premysl_22228
-
-<@1074995464316928071>
-
----
-
-#### [2025-08-07 16:19:53] @ido3936
-
-Hi, I will try to extend the tests
-
----
-
-#### [2025-08-09 00:34:01] @_missing
-
-So I still have a problem with market fills at weird prices like this when I run a backtest:
-`2024-03-08T12:48:21.700000000Z [DEBUG] BACKTEST-NQ-001.OrderMatchingEngine(CME): Market: bid=1 @ 18520.25, ask=1 @ 18520.25, last=73.51
-2024-03-08T12:48:21.700000000Z [DEBUG] BACKTEST-NQ-001.OrderMatchingEngine(CME): Applying fills to MarketOrder(SELL 1 NQM4.CME MARKET GTC, status=SUBMITTED, client_order_id=O-20240308-124821-001-001-36, venue_order_id=None, position_id=None, tags=None), venue_position_id=None, position=Position(LONG 1 NQM4.CME, id=NQM4.CME-OBStrat-001), fills=[(Price(73.51), Quantity(1))]`,  where there's no way the last trade price exists, and checking it against the tick data I generate, the value doesn't exist so not sure where its coming from since I have bar_execution disabled. 
-
-Not sure if what I'm missing in the config but idk how this state is even possible, am I missing a setting in the configuration or something?
-
-**Attachments:**
-- [Screenshot_From_2025-08-08_20-24-37.png](https://cdn.discordapp.com/attachments/924499913386102834/1403536766971150366/Screenshot_From_2025-08-08_20-24-37.png?ex=68fac979&is=68f977f9&hm=028b12f050ef305a379e5dd0611067d8003ce98d3da0a0816d6f98a31ad22b03&)
-
----
-
-#### [2025-08-09 00:35:10] @cjdsellers
-
-Hi <@160288448958300161> 
-Are you using latest `develop` branch? there was an unfortunate overflow bug found and fixed (next release will be soon)
-
----
-
-#### [2025-08-09 00:35:54] @_missing
-
-Uhhh no I think I'm still on 1.219, I can def swap over
-
----
-
-#### [2025-08-09 00:37:36] @cjdsellers
-
-This is an easier way of installing development wheels: https://github.com/nautechsystems/nautilus_trader?tab=readme-ov-file#installation-commands
-
----
-
-#### [2025-08-09 00:46:56] @_missing
-
-ah alright this seems to have fixed it, thank you so much!
-
----
-
-#### [2025-08-09 01:52:21] @eclipsephage
-
-Hai guys.  So I'm still devving on 1.219.  Are we at a place where we can go with the Rust implementation yet? (on windows and linux).  I dont want to go too far with .219 if we're fundamentally good with the newer stuff (production/live-trade-wise)
-
----
-
-#### [2025-08-09 02:07:35] @cjdsellers
-
-Hi <@307301397609840640> 
-The Rust core is being used by the current "production" `nautilus_trader` v1 package. A full cut-over is still months away, so you're not expending any wasted efforts building on top of 1.219.0. The API for v2 will be as similar as possible
-
----
-
-#### [2025-08-09 02:08:31] @eclipsephage
-
-roger. thanks
-
----
-
-#### [2025-08-09 13:19:25] @eclipsephage
-
-What do we lose by devving in Windows vs. Linux?  So far I can see I dont have uvloop.
-
----
-
-#### [2025-08-10 12:48:30] @ayoze5798
-
-Hello,
-
-I wanted to contribute to this project, and I found this issue: https://github.com/nautechsystems/nautilus_trader/issues/1082
-
-Since I didn't contribute to the project previously, I can't comment on the issues. Chris said here that a new field, price_protection / protection_points, should be added to the struct of the relevant order types.
-
-I checked the provided documentation and saw that this is not a value the user enters. This is something that the exchange sets as a limit stop limit and stop market. Because of that, when submitting an order, this parameter can't be entered. In the execution reports received from the exchange, this parameter is calculated and set in the limit price field.
-
-Can you check <@757548402689966131>
-
-**Links:**
-- Price protection for market and stop-market type orders · Issue #1...
-
----
-
-#### [2025-08-12 22:55:08] @neupsh
-
-hello, I am new to nautilus (and to algorithmic trading). Is there any good examples of using nautilus trader to backtest and live trade Futures contract? I was trying to find examples for popular ones like using ES historical data to backtest strategies, and then use it to live trade for MES. 
-What is the best way to do that with IBKR integration?
-So far, I was able to download the historical Bar data from IBKR, convert it to continuous back-adjusted data outside of nautilus.
-Then load the back-adjusted data with bar wrangler in nautilus and run through a simple strategy.  Is there a better way to do this? I saw some old discussions [here](https://github.com/nautechsystems/nautilus_trader/discussions/935) and [here](https://github.com/nautechsystems/nautilus_trader/issues/1105) but I could not figure out what was done to support Futures (continuous) since then.
-
-**Links:**
-- Continuous futures instrument · nautechsystems nautilus_trader · ...
-- Support for continuous futures contracts · Issue #1105 · nautechs...
-
----
-
-#### [2025-08-13 07:12:36] @cjdsellers
-
-Hi <@488137949838573568> 
-Welcome and thanks for reaching out.
-
-There are no good tutorials for futures outlining what you've figured out already. You're on the right track using wranglers to add data directly to a `BacktestEngine`. You could also consider using the high-level API where you can write Nautilus data to a Parquet data catalog https://nautilustrader.io/docs/latest/getting_started/backtest_high_level, this would be more efficient for repeated backtests on the same data.
-
-For continuous contracts, people are either leveraging Databento or rolling their own handling for that - there is nothing built in (yet). I say "yet", because it would definitely be valuable but would require community contribution at this stage. There are those GH discussions you have found already.
-
-I hope that helps a little!
-
----
-
-#### [2025-08-13 09:16:37] @cjdsellers
-
-Hi <@1012054021944656032> 
-
-Welcome and thanks for reaching out offering to help!
-
-This would be a great feature. I agree that the protection points are not "user-defined" but would be part of the venue configuration, e.g. `price_protection_points` being `None` by default.
-
-Then we could have some kind of `price_protection` boolean flag for the market orders. This could be passed through when orders are submitted live, and simulated for backtesting where venues support it. The CME MDP3.0 spec would be a good reference here I think?
-
----
-
-#### [2025-08-14 16:01:32] @qumn123
-
-I'm curious about how this issue was resolved. I've encountered similar problems myself, but haven't been able to fix them yet. thanks a lot 🙏
-
----
-
-#### [2025-08-15 03:37:05] @.xingtao
-
-who know why log this: data_queue at capacity (100_000/100000), scheduled asynchronous put() onto queue
-
----
-
-#### [2025-08-15 21:00:28] @ido3936
-
-I gave up on redis as a means for controlling NT. Instead I set up an http server that has access to the message bus.
-The server gets instructions from an http client, and distributes them to strategies using the bus
-
----
-
-#### [2025-08-16 00:51:41] @premysl_22228
-
-This is a little bit important for me, as I still want to control NT by Redis and message bus outside it... Why you gave up? What didn't work?
-
-I am not eager to run http server or do other hacks as GIL kills the trading during Python http server script execution. And I don't see all consequences of possible race conditions. Does it work fine? No long freezes in trading during page loading?
-
----
-
-#### [2025-08-16 01:30:22] @yfclark
-
-maybe HTTP server in rust？I am consider about expose web endpoint for Nautilus so that it can interact with other program
-
----
-
-#### [2025-08-16 02:16:25] @premysl_22228
-
-It is question, whether there will be API, which will enable user to avoid race conditions. Hopefully it will be addable (it will be necessary to lock the core during the other thread doing its staff).
-
----
-
-#### [2025-08-16 06:00:17] @ido3936
-
-as to why I gave upon it: see here https://discord.com/channels/924497682343550976/949809536108228609/1393145437007122483
-
-as to server blocking - I use `aiohttp` and the server is running on a different thread (not because it was slow, but due to event loop issues). I have not had an issue with this setting so far
-
----
-
-#### [2025-08-16 07:12:01] @premysl_22228
-
-This makes sense, but I am still worried a lot, something gets broken/corrupted/...when I see, how things are fragile. GIL is a friend in the current situation since it is locking the Python part of NT core, otherwise you would face race conditions, I think.
-
-I also saw setup, where synchronous requests to HDD were made out of backtest to control/get data of backtest/live environment. 
-
-These are all, I think, hacks to the current design. I was thinking a lot, whether there shouldn't be something like async actor, but it would complicate a lot of things a lot. I am trying to make get rid of all async behavior inside core (there are some cases, I described in RFCs), when you get async even through you would expect sync. I might have found a way (it will be one large ugly breaking change later, to get rid of request+subscribe combination to one command, which handles everything including buffering ticks/bars, which are now discarded, if Chris agrees). 
-
-I think the http should always run in other process, communicating by message bus, in the current design, to not get broken anything.
-
----
-
-#### [2025-08-16 15:37:57] @ido3936
-
-I did not know that the message bus provides cross processs communication. In my case I only made sure to be running the http client through a different process (to the one running NT+http server)
-
----
-
-#### [2025-08-16 15:40:44] @ido3936
-
-<@1353826739851362345> one more thing that I'm reminded of: try as I might, I could not get the redis->NT communication channel to operate. There are sopme specific requirements for the topic etc, and as documentation is missing, I tried to get it rightr by trial and error (and failed).
-In short - documentation for this possible approach is lacking (non existent AFAIK...)
-
----
-
-#### [2025-08-16 15:56:58] @gz00000
-
-Or you could try using a more lightweight solution like ZeroMQ instead of Redis?
-
----
-
-#### [2025-08-16 17:22:16] @premysl_22228
-
-Yes, documentation is unfortunately lacking. There are other subprojects which are prioritized over it.
-
-Could you send me, what error it shows? 
-
-I would also recommend to browse the source code with AI (or without it), it might tell you the requirements you are missing, if you give it the error and give it same information like you told me now.
-
----
-
-#### [2025-08-16 19:09:04] @ido3936
-
-`Could you send me, what error it shows? ` - no error message, it just wouldn't work
-
-`I would also recommend to browse the source code with AI (or without it),` - absolutely, I do this all the time
-
----
-
-#### [2025-08-17 19:43:44] @melonenmann
-
-I'm struggling again with some points, some hints would be nice. AI is generating always useless stuff.
-1. Is there a possibility to display the trades in a graphical way? 
-2. Is there a risk calculation helper? (Fixed risk amount, outcome: quantity)
-3. How can I create my custom reports?
-
----
-
-#### [2025-08-17 21:00:33] @premysl_22228
-
-Hi. To 1). Yes. If I get approval from <@416743722416472075>, I or him will share the code. Can I post it publicly? He has done a nice piece of work on this. (hopefully it will still work, it is few months old)
-I won't answer to 2., as I am not sure, what you mean. Could you elaborate?
-To 3., if I get approval, the code includes custom reports.
-
----
-
-#### [2025-08-17 21:25:54] @melonenmann
-
-1. Sounds nice, that would save me some time
-2. Perhaps it's too easy that something exists. I meant, input is risk($) and SL ticks and you will get the quantity for the instrument as output.
-3. I Found out that I can access, engine.trader._cache.orders but python makes it not very convenient to find all Infos, but I'll keep debugging
-
----
-
-#### [2025-08-17 22:27:10] @premysl_22228
-
-It's up to Stefan. Maybe he will DM you with it. 
-
-I will later create a similar thing inspired by Stefan code, that should be sharable. (As soon as I need it to do something) Search in the forum history if you want to know, how it looks like for an inspiration.
-
----
-
-#### [2025-08-18 04:15:40] @colinshen
-
-Hi, I'm trying to backtest the Binance tickdata, I already save to 2M data into catalog. However, loading data need a lot of memory. I tried to load 3 or 4 days data(the average data per day is about 200M-250M) and the memory usage was up to 16G. Is there a way to load the data on demand?
-
----
-
-#### [2025-08-18 04:27:27] @cjdsellers
-
-Hi <@175701522644992000> 
-Yes, try setting a `chunk_size` to enable streaming mode https://github.com/nautechsystems/nautilus_trader/blob/develop/nautilus_trader/backtest/config.py#L427. Which version are you on btw?
-
----
-
-#### [2025-08-18 04:28:48] @colinshen
-
-1.220.0a20250728
-
----
-
-#### [2025-08-19 15:33:06] @colinshen
-
-Hi, I just tried what you side..but I'm not sure why I get error `BACKTESTER-001.BacktestEngine: Requested instrument_ids=[InstrumentId('ETHUSDT.BINANCE'), InstrumentId('ETHUSDT-PERP.BINANCE_FUTURES')] from data_config not found in catalog` 
-```
-   data_configs = [
-        BacktestDataConfig(
-            catalog_path=str(CATALOG_PATH),
-            data_cls=TradeTick,
-            instrument_ids=[spot_instrument_id, futures_instrument_id],
-            start_time=start,
-            end_time=end,
-        )
-    ]
-```
-I could use ParquetDataCatalog.query to get data.
-
----
-
-#### [2025-08-19 15:56:00] @colinshen
-
-I found backtestengine.run also support stream `un(streaming=True)`, does this is as same as the chunk_size?
-
----
-
-#### [2025-08-19 22:00:06] @cjdsellers
-
-Hi <@175701522644992000> 
-Yes, instruments associated with your market data need to be persisted in the catalog.
-
-> I found backtestengine.run also support stream un(streaming=True), does this is as same as the chunk_size?
-Yes, the `BacktestNode` is using the `streaming` functionality of `BacktestEngine.run` under the hood, as per the docstring
-
----
-
-#### [2025-08-20 04:10:27] @colinshen
-
-Hi @colinshen
-
----
-
-#### [2025-08-20 09:53:12] @chaintrader
-
-I have custom indicators
-
----
-
-#### [2025-08-20 09:53:27] @chaintrader
-
-How can I implement into Nautilus trader
-
----
-
-#### [2025-08-20 12:11:35] @ido3936
-
-I want to have uv install the develop branch (using uv add, to have a proper pyproject.toml) 
-I tried `uv add git+https://github.com/nautechsystems/nautilus_trader --branch develop   ` and got an error:
-`FileNotFoundError: [Errno 2] No such file or directory: 'clang'`
-
-Using uv pip install I manage to install the branch w/o a problem. What am I doing wrong?
-
----
-
-#### [2025-08-21 07:40:37] @cjdsellers
-
-Hi <@1074995464316928071> 
-This first error is because you need the Clang compiler installed, probably because you're attempting to build from source with a direct dependency on head of `develop` branch.
-
-The `uv pip install` succeeds as it'll be grabbing the pre-compiled binary wheel from PyPI
-
----
-
-#### [2025-08-21 07:50:41] @ido3936
-
-the problem with `uv pip install`  is that the pyproject file does not reflect it
-I assume that there must be a way for `uv add` to mimic the `uv pip install` functionality no (i.e. avoiding the build)?
-
----
-
-#### [2025-08-21 08:01:18] @faysou.
-
-I suppose if you ask an LLM it will probably know the answer
-
----
-
-#### [2025-08-21 08:01:22] @faysou.
-
-for this
-
----
-
-#### [2025-08-21 14:10:05] @ido3936
-
-The question has been posed, and this is how the reply starts:
-```Yes, uv add can mimic uv pip install for installing packages from a Git branch without rebuilding, but the behavior depends on the specific use case and the package's configuration.```
-I suppose its one of those cases where dev inside knowledge can really help
-
----
-
-#### [2025-08-21 15:42:58] @premysl_22228
-
-What prompt did you exactly put into what LLM? After putting the conversation into mine, the hallucinations were pretty limited and told me exactly, what you are doing wrong in the conclusion. 
-
-You just need to build the project, the develop branch doesn't contain any build artifacts.
-
----
-
-#### [2025-08-21 15:45:51] @ido3936
-
-I don't really want to build it - it has a rather complex process
-I posed the question because I saw that uv pip install manages to install w/o building, but it is not as 'orderly' as uv add (which updates the pyproject file and maintains locks on package versions)
-
----
-
-#### [2025-08-21 15:47:22] @premysl_22228
-
-Then add there package itself from nightly or PyPI repo, if you don't want to rebuild.
-
----
-
-#### [2025-08-21 15:49:01] @faysou.
-
-You should build the develop branch, I do it all the time
-
----
-
-#### [2025-08-21 15:50:13] @faysou.
-
-https://gist.github.com/faysou/7f910b545d4881433649551afce69029
-
-**Links:**
-- Install nautilus_trader dev env from scratch, using pyenv and uv
-
----
-
-#### [2025-08-21 15:50:30] @faysou.
-
-Use this, it's my up to date instructions, I literally use this when needed
-
----
-
-#### [2025-08-21 15:50:45] @faysou.
-
-pyenv allows the setup to work well with a debugger
-
----
-
-#### [2025-08-21 15:51:35] @premysl_22228
-
-He probably adds it as a dependency to other project. Makes not much sense to do this by building it.
-
----
-
-#### [2025-08-21 15:52:05] @faysou.
-
-But it makes sense to get the develop branch faster
-
----
-
-#### [2025-08-21 15:54:18] @premysl_22228
-
-Yes, you get latest commits, but you skip the nightly build checks (if there are some extra already in place...there will probably be) You prefer stability before other things when using it as a dep.
-
----
-
-#### [2025-08-21 15:55:34] @premysl_22228
-
-There are also dead places in develop branch, when CI/CD don't passes. Develop branch is good for development.
-
----
-
-#### [2025-08-21 15:55:51] @premysl_22228
-
-Of NT.
-
----
-
-#### [2025-08-21 15:57:47] @premysl_22228
-
-<@1074995464316928071>, what is your usecase?
-
----
-
-#### [2025-08-21 15:58:53] @ido3936
-
-I'm just a humble user - trying to utilize a stratgey that I backtested endlessly, usingNT and IB
-
----
-
-#### [2025-08-21 16:01:51] @premysl_22228
-
-Could you more elaborate please?
-
----
-
-#### [2025-08-21 16:03:37] @premysl_22228
-
-Where do you put your strategy file to run it?
-
----
-
-#### [2025-08-21 16:05:44] @ido3936
-
-You mean where so I run my setup from? A cloud provider
-
----
-
-#### [2025-08-21 23:33:28] @cjdsellers
-
-<@1074995464316928071> It's good to have the option of building from source if you need to. The README notes on this should work, or reference faysou's gist.
-
-Otherwise, you can avoid that compile step by taking a dependency on [development wheels](https://github.com/nautechsystems/nautilus_trader?tab=readme-ov-file#development-wheels), although these are subject to a finite retention (only latest `dev` wheel and last 30 nightly wheels), and only recommended for testing and dev - not running in production.
-
-If you're using `uv` then you can specify the private package index:
-```
-[tool.uv.sources]
-nautilus_trader = { index = "nautechsystems" }
-
-[[tool.uv.index]]
-name = "nautechsystems"
-url = "https://packages.nautechsystems.io/simple"
-```
-
-Then in your dependencies:
-```
-dependencies = [
-    "nautilus_trader==1.220.0a20250821",
-```
-
----
-
-#### [2025-08-22 10:59:04] @ido3936
-
-Yay! I knew that there is a disciplined answer to  my question somewhere! Thanks <@757548402689966131>
-
----
-
-#### [2025-08-24 12:10:48] @.xingtao
-
-When I subscribe to many instruments, I’m already using a queue to send a request_bar every 200ms. However, Binance’s API rate limit still gets triggered. I suspect this might be because Nautilus’s message bus gets blocked when there are a large number of data reading tasks at the same time, which then causes the request tasks to be processed in batches, resulting in exceeding the API rate limit. How can I solve this problem?
-
----
-
-#### [2025-08-25 10:05:57] @vinc0930
-
-Hi, has anyone successfully installed the lib on Amazon Linux 2023 (EC2/AL2023)? 
-I tried the two install commands from the README (PyPI and the project index with --pre), but both failed on AL2023. If you’ve got it working, could you share the exact steps. Thanks!
-
----
-
-#### [2025-08-26 05:25:45] @haakonflaar
-
-I ran into this interesting error message while running multiple backtests in parallel using the low-level API. Any idea why and a fix?
-
-```
-Traceback (most recent call last):
-  File "/usr/lib/python3.12/concurrent/futures/process.py", line 263, in _process_worker
-    r = call_item.fn(*call_item.args, **call_item.kwargs)
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "src/utils/backtest_utils.py", line 467, in run_single_low_level_backtest
-    raise e
-  File "/src/utils/backtest_utils.py", line 390, in run_single_low_level_backtest
-    engine = BacktestEngine(config=engine_config)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "nautilus_trader/backtest/engine.pyx", line 250, in nautilus_trader.backtest.engine.BacktestEngine.__init__
-  File "/nautilus-algo-trading/libs/nautilus_trader/nautilus_trader/system/kernel.py", line 539, in __init__
-    build_time_ms = nanos_to_millis(time.time_ns() - ts_build)
-                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-OverflowError: can't convert negative int to unsigned
-```
-
----
-
-#### [2025-08-26 09:48:49] @vinc0930
-
-To specifically, on AWS (Amazon Linux 2023), `pip install -U nautilus_trader` in a clean venv fails with the error:
-```subprocess.CalledProcessError: Command '['/home/infra/myproject/nautilus/bin/python3.12', 'build.py']' returned non-zero exit status 1.
-      [end of output]
-
-  note: This error originates from a subprocess, and is likely not a problem with pip.
-  ERROR: Failed building wheel for nautilus_trader
-Failed to build nautilus_trader
-error: failed-wheel-build-for-install
-
-× Failed to build installable wheels for some pyproject.toml based projects
-╰─> nautilus_trader```
-
----
-
-#### [2025-08-26 13:10:29] @christian.andresen
-
-There must be more details in the error message that indicate the cause. 
-I am not familiar with the AWS linux distributions, but I am somewhat surprised that the linux wheels cannot be found and a manual installation is attempted instead, which of course fails because some prerequisites are presumably not met.
-Try `pip install --only-binary=:all: nautilus_trader` to enforce wheel installation.
-Edit: The naked amazonlinux docker image has no python installed, so you must have done something beforehand? Where does this amazonlinux come from?
-
----
-
-#### [2025-08-27 02:47:54] @vinc0930
-
-There must be more details in the error
-
----
-
-#### [2025-08-27 13:33:40] @d_dot_zk
-
-I've had to completely drop my project from the QuantConnect's LEAN engine upon hearing that their engine cannot process moniker-based 0-DTE/Weekly Futures Options contracts. An example of this would be CME E-Mini S&P 500 Futures Options - E1A... E1B... (0-dte), EW1... EW3... (weeklies), EWQ... EWU... (monthlies/EOM), ESU5... ESZ5... (quarterlies). This is a base requirement for me, is Nautilus Trader able to process and handle data on these moniker-based Futures Options contracts?
-
----
-
-#### [2025-08-27 15:00:52] @faysou.
-
-Yes with the interactive brokers adapter
-
----
-
-#### [2025-08-27 15:06:11] @helo._.
-
-Is it possible to accelerate backtesting by allocating more RAM or CPU cores?
-
----
-
-#### [2025-08-27 16:07:36] @d_dot_zk
-
-just to confirm that was an answer directed towards me? That Nautilus Trader can process this data as long as i'm sourcing it through IBKR?
-
----
-
-#### [2025-08-27 16:08:03] @faysou.
-
-Yes
-
----
-
-#### [2025-08-27 16:08:20] @d_dot_zk
-
-thank you for that, I appreciate it highly
-
----
-
-#### [2025-08-27 16:08:46] @faysou.
-
-You can get histo and live data from databento as well
-
----
-
-#### [2025-08-27 16:09:07] @faysou.
-
-For now the only execution adapter for usual markets, not crypto, is IB
-
----
-
-#### [2025-08-27 16:10:13] @faysou.
-
-It's actually one of the reasons I started being interested in nautilus, support for IB and historical data.
-
----
-
-#### [2025-08-27 16:10:58] @faysou.
-
-And also the possibility to improve something existing rather than starting from scratch. Also the ongoing migration to rust with python bindings.
-
----
-
-#### [2025-08-29 10:11:58] @faysou.
-
-I've actually worked on this over the last year, to have IB and databento histo data compatible with instruments ids common between the two.
-
----
-
-#### [2025-08-29 14:17:33] @d_dot_zk
-
-huge achievement to say the least, it's crazy to me that QC who claim to be the SOTA industry standard for open-source algorithmic trading openly refuse to consider Weeklies on Futures Options a worthy endeveavour, which in today's world is the only data with real intrinsic value when it comes to U.S Stock market analysis. With this I can firmly say Nautilus Trader can take the top spot for open-source algo trading development, not only that but the usage of the Rust programming language aswell is just the cherry on top
-
----
-
-#### [2025-08-29 14:24:07] @faysou.
-
-What's currently being used is mostly cython but there's an active effort mostly done by <@757548402689966131> with the help of a few contributors for migrating to rust, so the library will indeed become the best open source solution without question.
-
----
-
-#### [2025-08-29 14:25:58] @faysou.
-
-I can comment on what I've done in the last year, I've been adding features I need in nautilus for options on futures, but have touched at many other aspects of the library as well.
-
----
-
-#### [2025-08-29 14:26:39] @faysou.
-
-Most users of nautilus are dealing more with cryptos, but personally I'm more interested in futures markets.
-
----
-
-#### [2025-08-30 03:37:14] @yunshen8_47168
-
-Hi, I'm trying to use `nautilus_pyo3.run_tardis_machine_replay` to create data catalogs directly from tardis machine replay. I'm using `book_snapshot_25_0ms `which should become `OrderBookDepth10 `according to the doc. But the data was somehow saved into OrderbookDeltas. How can I get OrderbookDepth10 using tardis machine?
-
-I'm following this. https://nautilustrader.io/docs/latest/integrations/tardis#python-replays
-
----
-
-#### [2025-08-30 06:39:03] @haakonflaar
-
-<@757548402689966131>  Have you come across this one before? It doesn't happen all the time, and as of now it have only happened when I have run backtests in parallel.
-
----
-
-#### [2025-08-30 06:41:29] @cjdsellers
-
-Hi <@244099030156574730> 
-I wouldn't recommend running more than one backtest in the same process
-
----
-
-#### [2025-08-30 16:02:06] @zafaransari.
-
-Is there any updated video tutorial available for beginners, explaining NautilusTrader concepts and showing how to build and back test strategies?
-
----
-
-#### [2025-08-30 16:02:29] @zafaransari.
-
-Or an article explaining the whole process step by step?
-
----
-
-#### [2025-08-30 16:23:19] @d_dot_zk
-
-start here: https://nautilustrader.io/docs/nightly/concepts/overview
-
-**Links:**
-- NautilusTrader Documentation
-
----
-
-#### [2025-08-30 16:23:30] @d_dot_zk
-
-then work your way through
-
----
-
-#### [2025-08-30 16:25:47] @d_dot_zk
-
-we talked about the IB API, do you guys use REST API or FIX? Also for a high-frequency trading algorithm would you recommend coding in Rust over Python? How does that question play in the context of using the IBKR API like we talked about, pulling moniker-based weeklies on Futures Options?
-
----
-
-#### [2025-08-30 16:26:52] @d_dot_zk
-
-i feel like if I want performance I go with Rust but if I want complete and utter compatibility then I go with Python, but if I know I can make it work fine with Rust then that's one to go with right?
-
----
-
-#### [2025-08-30 16:28:25] @faysou.
-
-Tws api, there's an example in the repo for requesting es option instruments. It's not possible to write strategies in rust yet, the system is still in development for rust with some substantial progress, but not done yet.
-
----
-
-#### [2025-08-30 17:39:32] @d_dot_zk
-
-thanks for that answer, my entire project is currently in C# but originally in Python, do you reckon I need to port and refactor back to Python for Nautlius Trader to be able work with it? Since the IB API accepts C# i'm wondering if I could make it work already with what i've got
-
----
-
-#### [2025-08-30 18:01:39] @faysou.
-
-🙂 I guess it's up to you to see. You can continue with what you have or migrate to nautilus.
-
----
-
-#### [2025-08-30 18:02:59] @faysou.
-
-One advantage of nautilus is that it's open source with more contributors than just you, so things improve over time even without you doing something on the library.
-
----
-
-#### [2025-08-30 18:04:40] @faysou.
-
-But if you want some unsupported features the fastest way is for you to implement them and either share them so they become integrated with the library or you maintain your own version by rebasing regularly the develop branch on your branch. There are many things I've added to the library because I need them but it's useful that more people than me use it and test it. That's probably the biggest plus point of open source libraries, more users so more testers.
-
----
-
-#### [2025-08-31 00:11:14] @d_dot_zk
-
-yeah dude I feel that, I guess if Nautilus doesn't have any native support for C# i could clone the repo and see if I can adapt it, could be a useful pull request in the future if I get it to work
-
----
-
-#### [2025-08-31 00:12:42] @d_dot_zk
-
-thing is i'm not really a programmer so to speak, I know how to use some R and statistical mathematics in programming because of my background but i'm not a dev at all, I might give it a shot if it's not a huge challenge but no promises haha 🤙
-
----
-
-#### [2025-08-31 07:12:47] @faysou.
-
-How did you get a C# code base ? I don't think there's desire to combine the language with C#, it's all about Python and rust now. Interestingly I think an earlier version of nautilus was in C# but it's not maintained anymore.
-
----
-
-#### [2025-08-31 14:29:58] @rodguze
-
-
-
----
-
-#### [2025-08-31 21:09:05] @apercu_16113
-
-A few days ago I installed NT in a dev container using:
-`/usr/local/bin/python -m pip install -U pip 'nautilus-trader'`
-
-pip list is showing:
-`nautilus_trader           1.219.0`
-
-When I run the following example:
-`/nautilus_trader/examples/backtest/example_07_using_indicators/run_example.py `
-
-I receive this error:
-`Traceback (most recent call last):
-  File "/workspaces/nautilus-strategies/nautilus_trader/examples/backtest/example_07_using_indicators/run_example.py", line 19, in <module>
-    from strategy import DemoStrategy
-  File "/workspaces/nautilus-strategies/nautilus_trader/examples/backtest/example_07_using_indicators/strategy.py", line 20, in <module>
-    from nautilus_trader.indicators import MovingAverageFactory
-ImportError: cannot import name 'MovingAverageFactory' from 'nautilus_trader.indicators' (/home/vscode/.local/lib/python3.13/site-packages/nautilus_trader/indicators/__init__.py)`
-
-I'm new to NT and cannot find how to fix this - can anyone help?
-
----
-
-#### [2025-08-31 23:34:57] @cjdsellers
-
-Hi <@1342779375023554644> 
-There was a large refactoring which consolidated many indicator related modules together. Because of this import paths changed, examples were updated, but we have not yet released the new version (this is imminent within the next day or so)
-
----
-
-#### [2025-09-01 10:50:04] @haakonflaar
-
-Is it possible to have bars start at some arbitrary minute in an hour? For example, the US regular trading hours starts at 09:30 ET, so if I am running a strategy using for example 20 minute bars I want the first bar (within the trading hours) to go from 09:30-09:50 (normally you'd have a 09:20-09:40 and 09:40-10:00 bar). 
-
-I want to implement "Break at end of day" logic: https://ninjatrader.com/support/helpguides/nt8/NT%20HelpGuide%20English.html?break_at_eod.htm
-
----
-
-#### [2025-09-01 12:22:10] @faysou.
-
-Yes it's possible
-
----
-
-#### [2025-09-01 13:55:18] @haakonflaar
-
-Care to elaborate how? 🙂
-
----
-
-#### [2025-09-01 13:57:04] @faysou.
-
-Look at the code of the time bar aggregator and you'll see how
-
----
-
-#### [2025-09-01 14:19:44] @rodguze
-
-this might be helpful: https://nautilustrader.io/docs/latest/concepts/data/#aggregation-sources
-
-**Links:**
-- NautilusTrader Documentation
-
----
-
-#### [2025-09-01 14:20:56] @haakonflaar
-
-It can be done by including a params attribute with the key `time_bars_origin_offset` in `self.subscribe_bars` like so:
-
-```
-self.subscribe_bars(
-    self.config.bar_type,
-    params={"time_bars_origin_offset": pd.Timedelta(minutes=30)},
-)
-```
-
----
-
-#### [2025-09-01 14:23:09] @haakonflaar
-
-I assume you should add the same attribute to `self.request_bars`
-
----
-
-#### [2025-09-01 17:42:39] @faysou.
-
-There's also as global setting using a data engine config
-
----
-
-#### [2025-09-01 17:44:10] @faysou.
-
-Also  offset is from the start of a day, to allow more precise origins. You can still specificy like you did for periods that are periodic across one hour.
-
----
-
-#### [2025-09-01 17:45:25] @faysou.
-
-The offset from start of the day is in the develop branch, personally it's the only one I use, it gets updated faster (also I regularly contribute to it, so it allows to build on previous things I do, and other contributors do as well)
-
----
-
-#### [2025-09-01 20:32:24] @faysou.
-
-first time I contribute as much to an open source project, it's really interesting to see how much can be done with a few contributors contributing regularly and some additional less regular contributors, or even sometimes once, but any contribution is useful
-
----
-
-#### [2025-09-02 04:35:26] @ido3936
-
-I am trying to build a debug env (make-debug) of nautilus-trader, and then add it as an editable dependency to my main project, that will be used to recreate some issues.
-The problem is that even though I've built the NT package, when I add it as a  dependency uv starts to rebuild it - and most likely as a release build.
-
-Is it possible to have a debug build added as an editable dependency? Or is there some other way to enable quick code/test iterations on NT, when the code is in another project?
-
----
-
-#### [2025-09-02 07:23:30] @cjdsellers
-
-Hi <@1074995464316928071> 
-Yes, many of us are just using `make build-debug` from the active venv, which should give you what you're after.
-If you look at the make target, its the `--no-sync` flag which is preventing that behavior you're seeing where the full package starts building again on a sync.
-
-If you're adding `nautilus_trader` as a dependency to another project that might be trickier. If you're just putting together MRE's then that shouldn't be necessary though unless there are other things you're trying to achieve I'm not aware of.
-
----
-
-#### [2025-09-02 08:57:43] @ido3936
-
-Thanks <@757548402689966131> ,
-`If you're adding nautilus_trader as a dependency to another project that might be trickier.` - yes, thats what I'm trying to do - if its not possible then I'll try to set up my use case as a small temporary notebook in the nautilus_trader project - but it would be awesome to be able to set up the former approach
-
----
-
-#### [2025-09-03 16:59:52] @apercu_16113
-
-<@757548402689966131> , while waiting for the next release, can I unblock myself by installing the nightly build? Or can you/anyone provide a hint how to get the examples working or how to work with indicators in general, with version 1.219.0 ?
-
----
-
-#### [2025-09-04 03:23:41] @cjdsellers
-
-Hi <@1342779375023554644> 
-Yes, you could install a [development wheel](https://github.com/nautechsystems/nautilus_trader?tab=readme-ov-file#development-wheels) for now
-
----
-
-#### [2025-09-05 09:50:46] @veracious69_77345
-
-Is nautilus not supported on MacOS intel processors?
-
-**Attachments:**
-- [image.png](https://cdn.discordapp.com/attachments/924499913386102834/1413461350641827851/image.png?ex=68faa336&is=68f951b6&hm=886a0deae7c661987c31c77c16512c601ff17ae4e15ad47abbd3f7b6b87b7d92&)
-
----
-
-#### [2025-09-05 17:02:17] @bartoelli
-
-Hello, I was programming in Python and JS/TS but with some web development or creating APIs. Starting with  the Nautilus is overwhelming to me. Would be here a kind soul that could help to start?
-
----
-
-#### [2025-09-06 03:30:49] @rk2774
-
-NT Getting Started:
-https://nautilustrader.io/getting_started/
-
-NT Official Documentation:
-https://nautilustrader.io/docs/latest/
-
-NT Examples:
-https://github.com/nautechsystems/nautilus_trader/tree/develop/examples
-
-AI Generated Documentation:
-https://deepwiki.com/nautechsystems/nautilus_trader
-
-Class/Module Hierarchy:
-https://discord.com/channels/924497682343550976/924506736927334400/1363012698362613800
-
-**Links:**
-- NautilusTrader: The fastest, most reliable open-source trading plat...
-- NautilusTrader Documentation
-- nautilus_trader/examples at develop · nautechsystems/nautilus_trader
-- nautechsystems/nautilus_trader | DeepWiki
-
----
-
-#### [2025-09-06 10:41:06] @cjdsellers
-
-Hi <@1186669514394452098> 
-Correct, we chose not to support older x86 mac platforms because it adds 3 wheels for every CI nightly and release. You
-_should_ still be able to compile from source though, it’s just not officially tested and supported
-
----
-
-#### [2025-09-06 15:23:14] @apercu_16113
-
-<@757548402689966131> , as I'm not so experienced with dev environments, this gave me some homework 🙂 
-Now I have successfully installed nautilus_trader           1.220.0a20250905
-But I could only do it using: pip install -U --pre nautilus_trader --**extra**-index-url=https://packages.nautechsystems.io/simple
-Without the "extra-index-url" (instead of "index-url") I wasn't able to install the dependencies during dev container rebuild.
-
-Now, also in 1.220.0a20250905, the example in nautilus_trader/examples/backtest/example_07_using_indicators/run_example.py is not executing because of ModuleNotFoundError: No module named 'nautilus_trader.indicators.average'.
-
-Would it be possible for you or anyone to provide a working example on how to import/use an indicator in a strategy (1.219 or 1.220.*)? This seems so basic, but yet I don't see any way to get this working based on the documentation. Thanks!
-
----
-
-#### [2025-09-06 22:34:12] @cjdsellers
-
-Hi <@1342779375023554644> 
-Thanks for reaching out with the feedback. Using `index-url` instead of `extra-index-url` assumes a user has previously installed `nautilus_trader` and its core dependencies. It's a bit of a trade off because as you point out pip can still pull dependencies from PyPI, but it also risks installing a compatible released wheel instead of the intended dev wheel - which I suspect *may* be what’s causing your import issue.
-
-I’ve also scanned the codebase, and all example import paths are correct on the `develop` branch. A few were updated to use the cleaner re-exports we recently added.
-
-So for the import issue, that [example currently on develop branch](https://github.com/nautechsystems/nautilus_trader/blob/develop/examples/backtest/example_07_using_indicators/strategy.py#L20) is using the updated and correct path of `nautilus_trader.indicators` for that 1.220.0a20250905 version (we had to consolidate some modules together to optimize binary size). Are you able to `pip list` and confirm the version of nautilus you're running that examples script with? I hope that helps!
-
----
-
-#### [2025-09-09 05:21:53] @luochaobo
-
-"Can this platform provide video installation tutorials for the MAC system? I'm a newbie and don't know how to install it. MACMINI-M4 chip"
-
----
-
-#### [2025-09-09 17:15:50] @anderson.developer.sc
-
-How can I set up vscode to use nautilus trader in my own project?
-
----
-
-#### [2025-09-09 18:51:13] @jafu6506
-
-Hi, do you have an adapter for the options on Bybit, Binance or OKX?
-
----
-
-#### [2025-09-10 09:52:20] @ido3936
-
-Hello, I've run into positions in the positions report that are titled with `INTERNAL-DIFF`. What does this mean? Thanks
-
----
-
-#### [2025-09-10 12:42:57] @rmadanagopal_42070
-
-i’m evaluating the stable version of Nautilus. I use two DMA brokers—one for equities and one for futures—so I’ll create a Venue for each to send orders. I also subscribe to a market data vendor that streams quotes.
-
-For instruments, each one must be tied to a Venue. Do I need to create a separate Venue for every listing exchange?
-
-My goal is to consume market data from the vendor, and based on certain logic, route orders to either DMA_1 or DMA_2. The FIX message may also require me to include the instrument’s listing exchange. How can I retrieve the listing exchange for a given symbol in Nautilus?
-
----
-
-#### [2025-09-10 21:58:49] @bartoelli
-
-Still struggling with a quickstart 😄  - version 1.220@latest
-
-1) Main error
-```py
-from nautilus_trader.indicators import MovingAverageConvergenceDivergence
-
-class MACDStrategy(Strategy):
-    def __init__(self, config: MACDConfig):
-        super().__init__(config=config)
-        # Our "trading signal"
-        self.macd = MovingAverageConvergenceDivergence(
-            int_fast_period=config.fast_period,
-            int_slow_period=config.slow_period,
-            PriceType_price_type=PriceType.MID,
-        )
-```
-`2025-09-10T21:52:01.456967662Z [ERROR] BACKTESTER-001.BacktestNode: Error running backtest \n TypeError(__init__() got an unexpected keyword argument 'int_fast_period')`
-
-It seems like the: ```File "nautilus_trader/indicators/trend.pyx", line 377, in nautilus_trader.indicators.trend.MovingAverageConvergenceDivergence.__init__``` generates the problem?
-
-2) **Second error:**
-```py
-data = BacktestDataConfig(
-        catalog_path=str(catalog.path),
-        data_cls=QuoteTick,
-        instrument_id=instruments[0].id,
-        end_time="2020-01-10",
-    )
-```
-
-`Expected type 'str', got 'Type[QuoteTick]' instead `
-
----
-
-#### [2025-09-11 07:57:40] @mk27mk
-
-```
-             int_fast_period=config.fast_period,
-             int_slow_period=config.slow_period,
-             PriceType_price_type=PriceType.MID
-```
-Here you're prepending the type of the inputs to their parameter name, remove `int_` and `PriceType_`.
-
----
-
-#### [2025-09-11 12:38:34] @lisiyuan666
-
-Hi, when i use Redis to make the cache persistent, i got lots of warn and errors like the following image, the errors only appear if i run multiple instances of the strategy with different instruments or run one instance but change the instruments between different runs. Is there something wrong? I use this example here: https://github.com/nautechsystems/nautilus_trader/blob/develop/examples/live/binance/binance_futures_testnet_ema_cross.py
-
-**Attachments:**
-- [screenshot_1757593902.png](https://cdn.discordapp.com/attachments/924499913386102834/1415677905702486056/screenshot_1757593902.png?ex=68faca8a&is=68f9790a&hm=717cc5eed7cf1376d74ba632c63148d91cc4594285e739f4a42e9d6e9eb80402&)
-- [screenshot_1757594223.png](https://cdn.discordapp.com/attachments/924499913386102834/1415677906234900634/screenshot_1757594223.png?ex=68faca8a&is=68f9790a&hm=37544dd20e07217bb9ff968570742e6636288b4508f0f8139722966472a2def8&)
-- [screenshot_1757594257.png](https://cdn.discordapp.com/attachments/924499913386102834/1415677906939805717/screenshot_1757594257.png?ex=68faca8b&is=68f9790b&hm=21d6d913c999dd0d988d6d090c14d5b7676253c6d304af62614b2c02bfceef14&)
-
-**Links:**
-- nautilus_trader/examples/live/binance/binance_futures_testnet_ema_c...
-
----
-
-#### [2025-09-11 14:59:42] @bartoelli
-
-I was trying that, but there was information that no parameter was found such as fast_period. I have to check it again - maybe that was a pycharm's cache problem? 🤔
-
-**EDIT**:
-Okay you were right. It is a problem with IDEs (Pycharm CE, Pycharm PRO). They look at in *nautillus_trader.indicator.trend.py* line:
-```py
-def __init__(self, int_fast_period, int_slow_period, MovingAverageType_ma_type=None, PriceType_price_type=None): # real signature unknown; restored from __doc__
-        pass``` 
-
-So it seems that my second error is also not relevant. IDEs have a problem with reading Cython files. I wonder is there a way to manage it?
-
----
-
-#### [2025-09-14 09:37:51] @youdou24
-
-Hi, how can i get some now data of Binance  for backtest . Best Wishes to You
-
----
-
-#### [2025-09-17 13:43:09] @ido3936
-
-given that the kernel's init first creates the trader object, then tries to load initialized strategies, and only then adds (initializes) strategies - is there any way to have the kernel still load strategies when the run begins?
-
-```
-
-        if self._load_state:
-            self._trader.load()  #  at this point there are no strategies to load
-[and then later down]
-
-       # Create importable strategies
-        for strategy_config in config.strategies:
-            strategy: Strategy = StrategyFactory.create(strategy_config)
-            self._trader.add_strategy(strategy)
-```
-
----
-
-#### [2025-09-18 03:21:53] @tobias.p
-
-------------
-ImportError                               Traceback (most recent call last)
-Cell In[1], line 13
-     10 from nautilus_trader.persistence.catalog import ParquetDataCatalog
-     11 from nautilus_trader.test_kit.providers import TestInstrumentProvider
----> 13 from tradecore.strategy_v5.backtest import aggregate_ticks_to_bars
-
-File ~/trading/tradecore/strategy_v5/backtest.py:11
-      9 # Assuming this is available from your imports
-     10 import pandas as pd
----> 11 from nautilus_trader.backtest.engine import BacktestEngine, BacktestEngineConfig
-     12 from nautilus_trader.core.datetime import (
-     13     dt_to_unix_nanos,
-     14     unix_nanos_to_dt,
-     15 )
-     16 from nautilus_trader.examples.algorithms.twap import TWAPExecAlgorithm
-
-ImportError: /home/put/trading/.venv/lib/python3.13/site-packages/nautilus_trader/backtest/engine.cpython-313-x86_64-linux-gnu.so: cannot enable executable stack as shared object requires: Invalid argument
-
-----
-
-NEED HELP! tried everything. i am on the newest version of endeavourOS (arch) and this error comes up with every module i try to import. I cannot downgrade glibc, i tried reinstalling the os 2 times no change. fresh install. i just downloaded uv as always and ran my usual git projects pyproject.toml. I am grateful for any clues, otherwise i will go back to using ubuntu for now... or maybe i try the docker containers.
-
----
-
-#### [2025-09-18 03:30:35] @cjdsellers
-
-Hi <@211176121281019905> 
-This issue popped up recently, I believe its fixed here: https://github.com/nautechsystems/nautilus_trader/commit/ea18c2df32461448282377e15410dafc997996e2
-You could try a [development wheel](https://github.com/nautechsystems/nautilus_trader?tab=readme-ov-file#development-wheels) for now
-
----
-
-#### [2025-09-18 03:31:23] @tobias.p
-
-OMG thank you, i was about to reinstall a new distro nixos to finally fix this but i didnt think about the obvious thing to look at the github. I will try that and see
-
----
-
-#### [2025-09-18 03:31:50] @tobias.p
-
-i feel so dumb rn i spent 5 hours of my evening on this
-
----
-
-#### [2025-09-18 03:59:01] @tobias.p
-
-<@757548402689966131> As always, it worked. Thank you so much. Still gonna try nixos tho xD
-
----
-
-#### [2025-09-18 04:15:49] @cjdsellers
-
-I recommend nixos
-
----
-
-#### [2025-09-18 04:16:44] @tobias.p
-
-i will start with 25.05 and hopefully kde6 as i have Krohnkite tiling shortcuts already setup that i like. what are you using?
-
----
-
-#### [2025-09-18 05:27:32] @avihai0882_03319
-
-Hi guys, 
-Please advice if there is any issue installing Nautilus system over aarch Linux distro. Thanx
-
----
-
-#### [2025-09-18 07:06:36] @xcabel
-
-hi here, I am trying to load some L2 LOB data by using wrangler OrderBookDepth10DataWranglerV2 to do some backtest but every time I got an exception read as
-
-thread '<unnamed>' panicked at crates/model/src/types/price.rs:201:10:
-Condition failed: raw value outside valid range, was 1164857706881071640503489007336816640
-
-Stack backtrace:
-   0: _PyInit_core
-stack backtrace:
-   0:        0x116c3f6dc - _PyInit_core
-   1:        0x116c60870 - _PyInit_core
-   2:        0x116c3bf78 - _PyInit_core
-   3:        0x116c3f590 - _PyInit_core
-   4:        0x116c40e34 - _PyInit_core
-   5:        0x116c40c84 - _PyInit_core
-   6:        0x116c418bc - _PyInit_core
-   7:        0x116c414f0 - _PyInit_core
-   8:        0x116c3fb88 - _PyInit_core
-   9:        0x116c411cc - _PyInit_core
-  10:        0x116d2f548 - _PyInit_core
-  11:        0x116d2f880 - _PyInit_core
-  12:        0x1169fbd20 - _PyInit_indicators
-  13:        0x1147361c0 - _PyInit_persistence
-  14:        0x11473a5b0 - _PyInit_persistence
-  15:        0x114747cd4 - _PyInit_persistence
-  16:        0x1147327f4 - _PyInit_live
-  17:        0x1033425c8 - _method_vectorcall_FASTCALL_KEYWORDS
-  18:        0x103457f84 - __PyEval_EvalFrameDefault
-  19:        0x103449f7c - _PyEval_EvalCode
-  20:        0x1034c339c - _pyrun_file
-  21:        0x1034c2b6c - __PyRun_SimpleFileObject
-  22:        0x1034c20ec - __PyRun_AnyFileObject
-  23:        0x1034eb92c - _pymain_run_file_obj
-  24:        0x1034eb110 - _pymain_run_file
-  25:        0x1034ea924 - _Py_RunMain
-  26:        0x1034ebaa8 - _pymain_main
-  27:        0x1034ec2e0 - _Py_BytesMain
-
-It errors out only after py arrow table is constructed but getting casted to Rust data type by self.from_arrow()
-
-im not familiar with Rust. my package is 1.220 with arrow 55.2 and pyarrow 21.0.0.
-
----
-
-#### [2025-09-18 07:09:44] @xcabel
-
-I still need to transform it back to work with the cython engine so also open to any suggestion to use some v1 LOB wrangler to load the data to  work with cython engine directly.
-
-appreciate any suggestion.
-
----
-
-#### [2025-09-19 06:42:18] @maslovegor
-
-Hi guys, Im testing my strategy with Nautilus and have faced some strange behavior
-so Im placing limit spot order on binance and waiting for the filled event with
-    `def on_order_event(self, order: OrderEvent) -> None:
-        print(order)`
-I even tried `on_order_filled` but still no result - it looks like Im not getting the filled event
-However, I can see in the logs something like "reconciliation update" when the order fills, so I know its filled successfully, but I cant figure out whats wrong.
-
----
-
-#### [2025-09-19 07:08:40] @cjdsellers
-
-Hi <@259923289743425537> 
-I just tried [this example script](https://github.com/nautechsystems/nautilus_trader/blob/develop/examples/live/binance/binance_spot_exec_tester.py) and can see fills from limit orders when I set `tob_offset_ticks=0` (so orders are placed at the top of the book).
-- Which version are you on?
-- Are you loading all instruments for the venue?
-- Did you try debug logs to see if any message processing is being skipped for some reason?
-
----
-
-#### [2025-09-19 07:09:39] @cjdsellers
-
-It could also be a strategy mismatch, so the order events are not making it to the strategy you intended
-
----
-
-#### [2025-09-19 07:48:51] @maslovegor
-
-Thank you for your reply!
-version: 1.220.0
-instruments: yes, Im loading all instruments
-debug logs: nope, I will try
-~~so, I tryed test config and Im receiving 
-TESTER-001.ExecTester: <--[EVT] OrderFilled(instrument_id=ETHUSDT.BINANCE, ...)
-but how I can get this event inside strategy? I tried on_order_filled and it doesnt work~~
-
-thx so much for you help! just realized that there is a problem on my side since I modified ExampleScript with on_order_filled and it worked fine !
-
----
-
-#### [2025-09-19 10:29:14] @stringer408
-
-for newbie question ,how to add binance api to do backtesting .thanks~
-
----
-
-#### [2025-09-19 11:36:56] @projectmillen1507
-
-Hello, I tried to connect InteractiveBroker with Nautilus but I keeps gettting this error "Failed to receive server version information". I've tried everything
-
-On TWS
-- Enable ActiveX and socket : Checked
-- Read only API: unchecked
-- Socketport: 7497
-- Master Client ID: 999
-- Reset API order ID sequence: clicked mulitple times
-- Allow connections from localhost only: Checked
-
-
-On Nautilus:
-- IB_ACCOUNT_ID= my paper trade account
-- TWS_HOST=127.0.0.1
-- TWS_PORT=7497                    
-- IB_DATA_CLIENT_ID=105              
-- IB_EXEC_CLIENT_ID=106         
-- IB_TRADING_MODE=paper
-
-Is there anything else I can do?
-
----
-
-#### [2025-09-19 11:44:09] @projectmillen1507
-
-Here is the error
-
-**Attachments:**
-- [message.txt](https://cdn.discordapp.com/attachments/924499913386102834/1418563314195103764/message.txt?ex=68fabdc9&is=68f96c49&hm=b0cc1f0482cd8952d930b1c2443ccf5a57428cede5c7bd6112d4724320745d26&)
-
----
-
-#### [2025-09-19 12:01:47] @kasperlmc
-
-[ERROR] SYMMETRIC-MM-001.ExecEngine: Cannot execute command: no execution client configured for BINANCE or `client_id` None, SubmitOrder(order=LimitOrder(SELL 0.100 ETHUSDT-PERP.BINANCE LIMIT @ 4_523.29 GTC, status=INITIALIZED, client_order_id=O-20250919-115930-001-000-10, venue_order_id=None, position_id=None, tags=None), position_id=None)
-
-When I was using the sandbox, I encountered this error. Could you help me check what caused it? I’ve already set the client_id in the code.
-
----
-
-#### [2025-09-20 20:32:25] @anderson.developer.sc
-
-I gues the best way to connect to ib is using DockerizedIBGateway:
---dockerized_gateway.py--
-`from nautilus_trader.adapters.interactive_brokers.config import DockerizedIBGatewayConfig
-from nautilus_trader.adapters.interactive_brokers.gateway import DockerizedIBGateway
-from config import settings
-
-config = DockerizedIBGatewayConfig(
-    username=settings.IB_USERNAME,
-    password=settings.IB_PASSWORD,
-    trading_mode=settings.IB_TRADING_MODE,
-    read_only_api=False,
-)
-
-dockerized_gateway = DockerizedIBGateway(config=config)`
-
-
---main.py--
-`
-from common.dockerized_gateway import dockerized_gateway as gateway
-
-async def main():
-    # SECTION 1: Start and verify Dockerized IB Gateway
-    gateway.start()
-    await asyncio.sleep(5)  # Wait for the gateway to be fully up and running
-
-    # Ensure the gateway is logged in and running
-    assert gateway.is_logged_in(
-        gateway.container), "Dockerized IB Gateway is not running"`
-
----
-
-#### [2025-09-21 15:13:27] @faysou.
-
-I've only tested the feature with databento. You will need to debug your use case with other marktet data providers.
-
----
-
-#### [2025-09-21 15:13:55] @faysou.
-
-Are you able to download historical data with a live trading node ?
-
----
-
-#### [2025-09-21 15:14:14] @faysou.
-
-If yes then it should work with the backtestnode
-
----
-
-#### [2025-09-23 08:39:15] @cjdsellers
-
-Hi <@766386312038318091> 
-My initial impression is that you haven't written a `BTCUSDT.BINANCE` instrument to the catalog. I see this is using the newer download data feature so you might have to dig into the flow as faysou suggests.
-To do it manually you'd need something like `catalog.write_data([BTCUSDT_BINANCE])` with the instrument there obtained from a test provider or venue data. Hope that helps a bit
-
----
-
-#### [2025-09-23 13:23:42] @haakonflaar
-
-Install via pip or build from source: https://github.com/nautechsystems/nautilus_trader?tab=readme-ov-file#installation
-
-**Links:**
-- GitHub - nautechsystems/nautilus_trader: A high-performance algorit...
+**Messages:** 285
+**Last updated:** 2025-12-22 18:01:42
 
 ---
 
@@ -2313,7 +328,7 @@ That said, if you think this might be a bug, I can work on a minimal reproductio
 Thanks in advance!
 
 **Attachments:**
-- [LUV3.txt.zip](https://cdn.discordapp.com/attachments/924499913386102834/1422348659734876210/LUV3.txt.zip?ex=68faab6a&is=68f959ea&hm=a3eabcd515d2a1a39f190870c2537fb30764ab6baaa50ef129bf9d2e3b30043c&)
+- [LUV3.txt.zip](https://cdn.discordapp.com/attachments/924499913386102834/1422348659734876210/LUV3.txt.zip?ex=694a6e2a&is=69491caa&hm=b85b6c234f08d19b9b13e0b4941fc61d2718c5cffd6d9c2ff567831a287778b9&)
 
 ---
 
@@ -2415,7 +430,7 @@ I followed the strategy example code to submit a trailing stop market order. but
 this is from `cdef class BarSpecification:` in `nautilus_trader\model\data.pxd`
 
 **Attachments:**
-- [image.png](https://cdn.discordapp.com/attachments/924499913386102834/1424252592950870057/image.png?ex=68fa5857&is=68f906d7&hm=9e0499337d8630489a7f2f1ecb1990f34fd7ac17e85d5c089d482e60aabd1b58&)
+- [image.png](https://cdn.discordapp.com/attachments/924499913386102834/1424252592950870057/image.png?ex=694ac3d7&is=69497257&hm=51c13c350f1981772cb165f5d812fb35fa36f1da416050734dddd00a7bbcd0da&)
 
 ---
 
@@ -2482,7 +497,7 @@ I'm having a little issue with data loading. I have this code to load historical
 Thanks for the help !
 
 **Attachments:**
-- [message.txt](https://cdn.discordapp.com/attachments/924499913386102834/1425773664720261151/message.txt?ex=68fa9af3&is=68f94973&hm=d03f4e8fd6295c4e007c5e8eec81965941763a2be53c18c727595c7809cba33e&)
+- [message.txt](https://cdn.discordapp.com/attachments/924499913386102834/1425773664720261151/message.txt?ex=694a5db3&is=69490c33&hm=dbb0f89c86697d787ec6344c4335ce476b2db7660255048721e0fe4d9a4fe800&)
 
 ---
 
@@ -2531,9 +546,9 @@ Hope can help future dev with same error 🙂
 Special thanks to <@965894631017578537>, help much appreciated
 
 **Attachments:**
-- [image.png](https://cdn.discordapp.com/attachments/924499913386102834/1425793206624456764/image.png?ex=68faad26&is=68f95ba6&hm=80bf8dc554eefcd3f0f7a91cbe3255a741751872610547c1e063c4a17c522672&)
-- [image.png](https://cdn.discordapp.com/attachments/924499913386102834/1425793207010328698/image.png?ex=68faad26&is=68f95ba6&hm=1aa26040f885e6bfa0c9fa8fa07a2dd3e2daec71406f2436f597b4d59e429613&)
-- [image.png](https://cdn.discordapp.com/attachments/924499913386102834/1425793207433822299/image.png?ex=68faad26&is=68f95ba6&hm=8795a33637d64ef860adc6585d4cb15fe67e0a09f219255f77cc15c29b99a406&)
+- [image.png](https://cdn.discordapp.com/attachments/924499913386102834/1425793206624456764/image.png?ex=694a6fe6&is=69491e66&hm=8a0112e57e0f492dc730d84d15d900dd6f455cc5a4c82c725ccf857068ada150&)
+- [image.png](https://cdn.discordapp.com/attachments/924499913386102834/1425793207010328698/image.png?ex=694a6fe6&is=69491e66&hm=290aa5b3218bbe834437efec771c226ec267b8008b88eff7e0ec41c526de9015&)
+- [image.png](https://cdn.discordapp.com/attachments/924499913386102834/1425793207433822299/image.png?ex=694a6fe6&is=69491e66&hm=9848ebb8fbba01fb04a42249674807c95bef32b2fd3d5b373bc62fb2babd2b00&)
 
 ---
 
@@ -2596,7 +611,7 @@ it's a question that often comes up, it's out of scope. https://github.com/naute
 i did it 😄
 
 **Attachments:**
-- [image.png](https://cdn.discordapp.com/attachments/924499913386102834/1426653445313532004/image.png?ex=68fa828f&is=68f9310f&hm=6a5d2402d1770134ca81613090f826414f8094239c1d2da3112b2926e2725896&)
+- [image.png](https://cdn.discordapp.com/attachments/924499913386102834/1426653445313532004/image.png?ex=694a454f&is=6948f3cf&hm=63fec4695522d12a2a824ae29a6a9543aedd72a583db7e1e29a39e9988a47add&)
 
 ---
 
@@ -2779,7 +794,7 @@ Hello ! Is it true that bracket order on BacktestVenue are not working properly 
 
 
 **Attachments:**
-- [logs.rtf](https://cdn.discordapp.com/attachments/924499913386102834/1428392145982717953/logs.rtf?ex=68fae719&is=68f99599&hm=aa1303d2cb4fe99bff902d5e39b6cca38912d1f74aa59c8407969308acf7d46b&)
+- [logs.rtf](https://cdn.discordapp.com/attachments/924499913386102834/1428392145982717953/logs.rtf?ex=694aa9d9&is=69495859&hm=58b9d0a87382e49cccb218eba3696c06fe82643a17c38060a2f655480093383c&)
 
 ---
 
@@ -2794,7 +809,7 @@ I made some tests and it looks like that on TP (SELL LIMIT when LONG on futures)
 
 
 **Attachments:**
-- [logs.rtf](https://cdn.discordapp.com/attachments/924499913386102834/1428409601749028885/logs.rtf?ex=68faf75b&is=68f9a5db&hm=e65b6a7fdf4b76ccfdb8b51f06efa083e891e92e9f7334352b57c857e7a6d6d1&)
+- [logs.rtf](https://cdn.discordapp.com/attachments/924499913386102834/1428409601749028885/logs.rtf?ex=694aba1b&is=6949689b&hm=f54230ef19026d968041bbb0c0bdd77a3d1256f7a701c186be813007337d9660&)
 
 ---
 
@@ -2840,7 +855,7 @@ my platform is Python 3.13.9 on Ubuntu
 it seems my ubuntu version is not updated enough for dev version
 
 **Attachments:**
-- [image.png](https://cdn.discordapp.com/attachments/924499913386102834/1430081112419340308/image.png?ex=68fa7492&is=68f92312&hm=d73e9f7d10d12ca0eae84ef8c84441b7918d34dab1f7e18123db86f179fb6428&)
+- [image.png](https://cdn.discordapp.com/attachments/924499913386102834/1430081112419340308/image.png?ex=694a3752&is=6948e5d2&hm=d2be67e820c2440fa189429284e50f6b3f75346286e56e16d522845b05e0c147&)
 
 ---
 
@@ -2879,7 +894,7 @@ There should only be unrealized PnLs if you have open positions at the end of th
 can anyone help me with this error? i'm just running the example using default redis config, but when an order is submitted, this error occurs
 
 **Attachments:**
-- [image.png](https://cdn.discordapp.com/attachments/924499913386102834/1430490527274373182/image.png?ex=68faa05e&is=68f94ede&hm=bf361d42bfa1587f86a97aa54bfef6422b3a3c54477d0c53ad91dfcf5b7ba83b&)
+- [image.png](https://cdn.discordapp.com/attachments/924499913386102834/1430490527274373182/image.png?ex=694a631e&is=6949119e&hm=4105acdb8d0c5f851394b1155f39beaf6598f06e40df392f898f73d2b3fcd625&)
 
 ---
 
@@ -2900,6 +915,1911 @@ I need to backtest against data from a few years, when loading csv files that ca
 <#924499913386102834> im trying to to create a indian broker adapter, i observed a behaviour for REJECTED status orders , in  reports im not able to see venue_order_id. Is it expected or it should come. this i observed for mass reconciliation at startup.
 
 **Attachments:**
-- [image.png](https://cdn.discordapp.com/attachments/924499913386102834/1430582634265710592/image.png?ex=68faf626&is=68f9a4a6&hm=af3c0f04ec5ce15d7ae88443c3210e03cbe87b86b32e7f07fbbfa9769a8d1629&)
+- [image.png](https://cdn.discordapp.com/attachments/924499913386102834/1430582634265710592/image.png?ex=694ab8e6&is=69496766&hm=02e837bb870df739acda6a6e18892239a5693b479a232ed868dc04477a14e03b&)
+
+---
+
+#### [2025-10-23 07:08:15] @jst0478
+
+I'll try to run it in debug mode, but my first thought is maybe there are no prices in the cache when using MBO data?  Am looking at this code to calculate unrealized pnl for reference:
+https://github.com/nautechsystems/nautilus_trader/blob/develop/nautilus_trader/portfolio/portfolio.pyx#L1874
+
+---
+
+#### [2025-10-23 07:24:27] @faysou.
+
+I think something similar to this needs to be added when using L3 https://github.com/nautechsystems/nautilus_trader/blob/develop/nautilus_trader/data/engine.pyx#L1803
+
+---
+
+#### [2025-10-23 07:25:19] @faysou.
+
+ie. producing top of book bid and ask quotes
+
+---
+
+#### [2025-10-23 08:33:06] @faysou.
+
+fyi, just did a PR for it
+
+---
+
+#### [2025-10-24 03:26:53] @jst0478
+
+<@757548402689966131> , <@965894631017578537> 
+I confirmed that turning on `emit_quotes_from_book` fixed the Unrealized PnLs line in the report (at least, I assume that's what fixed it - I haven't touched anything else).  Thank you~
+
+It does have an impact on backtest performance, though I guess it can't be helped. L3 is a LOT of data...
+
+Before:
+
+> BACKTESTER-001.BacktestEngine: Run config ID:  ..snip...
+> BACKTESTER-001.BacktestEngine: Run ID:         ..snip...
+> BACKTESTER-001.BacktestEngine: Run started:    2025-10-24T03:05:56.877185000Z
+> BACKTESTER-001.BacktestEngine: Run finished:   2025-10-24T03:09:26.788867000Z
+> **BACKTESTER-001.BacktestEngine: Elapsed time:   0 days 00:03:29.911682**
+> BACKTESTER-001.BacktestEngine: Backtest start: 2025-08-01T07:04:56.980761114Z
+> BACKTESTER-001.BacktestEngine: Backtest end:   2025-10-20T23:57:01.111921735Z
+> BACKTESTER-001.BacktestEngine: Backtest range: 80 days 16:52:04.131160621
+> BACKTESTER-001.BacktestEngine: Iterations: 38_027_569
+> BACKTESTER-001.BacktestEngine: Total events: 4
+> BACKTESTER-001.BacktestEngine: Total orders: 2
+> BACKTESTER-001.BacktestEngine: Total positions: 2
+
+After:
+
+> BACKTESTER-001.BacktestEngine: Run config ID:  ..snip...
+> BACKTESTER-001.BacktestEngine: Run ID:         ..snip...
+> BACKTESTER-001.BacktestEngine: Run started:    2025-10-24T03:14:26.568665000Z
+> BACKTESTER-001.BacktestEngine: Run finished:   2025-10-24T03:19:42.839529000Z
+> **BACKTESTER-001.BacktestEngine: Elapsed time:   0 days 00:05:16.270864**
+> BACKTESTER-001.BacktestEngine: Backtest start: 2025-08-01T07:04:56.980761114Z
+> BACKTESTER-001.BacktestEngine: Backtest end:   2025-10-20T23:57:01.111921735Z
+> BACKTESTER-001.BacktestEngine: Backtest range: 80 days 16:52:04.131160621
+> BACKTESTER-001.BacktestEngine: Iterations: 38_027_569
+> BACKTESTER-001.BacktestEngine: Total events: 4
+> BACKTESTER-001.BacktestEngine: Total orders: 2
+> BACKTESTER-001.BacktestEngine: Total positions: 2
+
+---
+
+#### [2025-10-24 06:10:08] @faysou.
+
+it could be useful to avoid having portfolio.pyx update on every quote but on a timer interval instead which is what's useful practically
+
+---
+
+#### [2025-10-24 06:10:38] @faysou.
+
+I won't add this feature now, but if I was working on this, that's what I would do
+
+---
+
+#### [2025-10-24 17:43:14] @cgeneva
+
+Hi, I try to store in cache unrealized PNLs at each on_bar triggered. 
+That way, I can retrieve it once backtest is done and add it to account_report. I would like to create a complete equity curve.
+How can i store a timeserie in bytes into the cache ? I must add this code in each strategy implementation : Is it a good way to implement that feature? Many thanks
+
+---
+
+#### [2025-10-25 02:47:53] @cjdsellers
+
+Hi <@692775065586106378> 
+There are `add` and `get` methods for the cache that allow you to store arbitrary bytes. But you might also be interested in the position snapshots that automatically capture position state (including unrealized PnL) at regular intervals. This
+is configured through the `ExecutionEngineConfig`:
+
+```python
+  from nautilus_trader.config import ExecEngineConfig
+
+  config = ExecEngineConfig(
+      snapshot_positions=True,  # Enable position snapshots
+      snapshot_positions_interval_secs=5.0,  # Take snapshots every 5 seconds
+  )
+```
+I hope that helps!
+
+---
+
+#### [2025-10-25 09:33:54] @cgeneva
+
+Hi, thank you for feedback. I am able to call position.unrealized_pnl(current_price) , use cache.add in the strategy and retrieve all unrealized pnls to construct equity curves at the end of the backtest. This is working but it forces me to add same code in each strategies. LiveExecEngineConfig seems ideal for live as it is inside engine. Does this same config exist for backtests ?
+
+---
+
+#### [2025-10-25 09:52:33] @cjdsellers
+
+Hey <@692775065586106378> 
+Yes, it's actually part of the `ExecEngineConfig` which is common to all environment contexts including backtests (because it uses a timer which is agnostic to the env context):
+https://github.com/nautechsystems/nautilus_trader/blob/develop/nautilus_trader/execution/config.py#L45
+
+**Links:**
+- nautilus_trader/nautilus_trader/execution/config.py at develop · n...
+
+---
+
+#### [2025-10-25 10:25:47] @cgeneva
+
+I see. But using the option snapshot_positions_interval_secs=1 sec seems unsuitable if my backtest runs in 2 sec. I am probably missing an important point here.
+
+---
+
+#### [2025-10-25 10:36:17] @cjdsellers
+
+The timer would be simulated, so works the same way backtest and live relative to the passage of time
+
+---
+
+#### [2025-10-25 17:14:24] @cgeneva
+
+I try to reproduce a simple case with the following code. Where do i find the list of position snapshots done every 86400 Sec (for daily bars) ?  I have added exec_engine_config and quotes. So i am expecting to find somewhere a list of snapshot where i can get unrealized pnl for each bars with open positions. May be with "engine.portfolio.unrealized_pnls(venue)" but it is empty.
+
+**Attachments:**
+- [simple_test_run.py](https://cdn.discordapp.com/attachments/924499913386102834/1431692384483410101/simple_test_run.py?ex=694acdf0&is=69497c70&hm=216bff4e921233103bd7ef7ccd7a4811094d1fe7e7798f83fa6ba585973186a6&)
+
+---
+
+#### [2025-10-27 04:02:19] @kib5546
+
+Hi thanks for your work and it is amazing.
+
+I am looking at bybit orderbook backtesting tutorial using `BacktestingNode`. 
+
+it works fine but how do I see the report of my strategy including stats, trade history and its pnl 
+
+is using `node.get_engine` the only way to see it?
+
+---
+
+#### [2025-10-27 14:04:43] @jst0478
+
+I'm trying to get that latest dev version with visualization but it's not working for some reason:
+
+> $ uv pip install nautilus_trader==1.222.0.dev20251027 --index-url=https://packages.nautechsystems.io/simple
+> Resolved 15 packages in 3.96s
+>   × Failed to download `nautilus-trader==1.222.0.dev20251027+11620`
+>   ├─▶ Failed to extract archive:
+>   │   nautilus_trader-1.222.0.dev20251027+11620-cp312-cp312-manylinux_2_35_x86_64.whl
+>   ├─▶ I/O operation failed during extraction
+>   ╰─▶ Failed to download distribution due to network timeout. Try increasing UV_HTTP_TIMEOUT (current
+>       value: 30s).
+
+It always gets stuck about half-way through downloading (the first 49 MiB happens quickly, then it just stops)
+
+> Resolved 15 packages in 2.11s
+> ⠇ Preparing packages... (0/1)
+> nautilus-trader      ------------------------------ 49.12 MiB/98.09 MiB   
+
+Then times out after 30 sec. I tried clearing the uv cache but it still doesn't work.
+
+---
+
+#### [2025-10-27 14:07:32] @jst0478
+
+It also hangs at the same spot if I try to download the wheel from the browser at https://packages.nautechsystems.io/simple/nautilus-trader/index.html. Is there some way you can check if the wheel was created/uploaded properly and is complete?
+
+---
+
+#### [2025-10-27 14:09:35] @jst0478
+
+The cp313 wheel downloads fine. Seems like it's just the cp312 wheel for manylinux that's broken
+
+---
+
+#### [2025-10-27 15:40:02] @eldineros_33574
+
+Hi, quick question, how does the **Rust Decimal type** get exposed to Python through PyO3?
+I see it being used in the Rust structs (e.g Quantity), but I can’t find where the conversion or wrapper is actually defined (e.g. the FromPyObject / IntoPy mapping).
+Can you point me to the spot in the code where that’s handled?
+
+---
+
+#### [2025-10-27 16:33:08] @faysou.
+
+you shouldn't use the pyo3 types for now, use the cython types. pyo3 types are for the next version of the library mainly in rust that is not operational yet.
+
+---
+
+#### [2025-10-27 20:56:23] @cjdsellers
+
+Hi <@296261099630755841> 
+I was able to download it and inspected OK, maybe network related? the github action would fail if the upload does not complete successfully (and all greens)
+
+---
+
+#### [2025-10-28 01:49:43] @jst0478
+
+Yeah it works fine today 🤷‍♂️  Thanks~
+
+---
+
+#### [2025-10-28 16:27:38] @rgauny_74023
+
+Hi all...i found a bug in NautilisTrader where i cant connect to my minio with datafusion:  Summary of Findings
+Root cause: Nautilus Rust code registers the object store with s3://trademan-data (bucket-specific URL), but DataFusion expects s3:// (generic URL).
+Evidence:
+Rust pattern (s3://trademan-data): FAILS with "No suitable object store found"
+Python pattern (s3://): WORKS and returns 194,968 rows
+Nautilus Rust Code Location:
+File: nautilus_trader/crates/persistence/src/backend/catalog.rs lines 946-948
+Current (broken) code:
+Fix Required:
+Change line 946 to register with "s3://" instead of "s3://trademan-data"........Using NautilusTrader version 1.221.0
+
+---
+
+#### [2025-10-29 16:38:51] @one_lpb
+
+How unique the TradeId has to be unique ? "The unique ID assigned to the trade entity once it is received or matched by the exchange or central counterparty."
+
+It has to be unique for Nautilus OR by default unique because it comes from a venue so should be unique ? Can I create TradeTick with same id over different days, like if I put a counter as trade id and reset it every day
+
+---
+
+#### [2025-10-29 18:52:28] @faysou.
+
+TraderId identifies a trading node or backtest node, there's only one TraderId per process. The idea being that in theory you could have several nodes/traders interacting with each other. It was confusing with me as well what this TraderId means. I don't think that TradeTick and trader id are related.
+
+---
+
+#### [2025-10-29 18:52:39] @faysou.
+
+TradeTick is market data
+
+---
+
+#### [2025-10-29 18:59:51] @one_lpb
+
+Hi <@965894631017578537> ! Each TradeTick has a TradeId 🙂 not talking about TraderId
+
+---
+
+#### [2025-10-29 19:00:07] @faysou.
+
+Ah sorry
+
+---
+
+#### [2025-10-29 19:01:08] @faysou.
+
+Not sure about that, I suppose you could find the answer by using an AI agent. Augment code used to be good but it's getting overly expensive.
+
+---
+
+#### [2025-10-30 01:16:49] @sandesh_2027
+
+<#924506736927334400> 
+
+can we subscribe to external orders? using actors or strategies. 
+
+will this work? 
+from nautilus_trader.common.actor import Actor  
+from nautilus_trader.config import ActorConfig  
+from nautilus_trader.model.events import OrderEvent  
+  
+class OrderSpreadGuardConfig(ActorConfig):  
+    spread_threshold: float  
+
+  
+class OrderSpreadGuardActor(Actor):  # Use Actor, not Strategy  
+    def __init__(self, config: OrderSpreadGuardConfig):  
+        super().__init__(config)  
+          
+    def on_start(self):  
+        self.msgbus.subscribe(topic="events.order.*", handler=self.on_order_event)  
+          
+    def on_order_event(self, event: OrderEvent):  
+        self.log.info(f"Order event: {type(event).__name__}")
+
+
+im tried but its not working, only internal orders events im able to see, for external im able to see only OSR.
+
+**Attachments:**
+- [logs.txt](https://cdn.discordapp.com/attachments/924499913386102834/1433263344059551875/logs.txt?ex=694a9641&is=694944c1&hm=86a28534472f516c5a31cf00cf0ca3ef22f37d5c7b29a409a7183d81009b128a&)
+
+---
+
+#### [2025-10-30 18:23:15] @kvg1
+
+2025-10-30T18:14:55.684776224Z [INFO] TESTER-001.DYDXInstrumentProvider: Loading all instruments...
+2025-10-30T18:15:03.542972920Z [INFO] TESTER-001.DYDXInstrumentProvider: Loaded 2 instruments
+2025-10-30T18:15:03.542978930Z [INFO] TESTER-001.DYDXInstrumentProvider: Initialized instruments
+2025-10-30T18:15:03.543031400Z [INFO] TESTER-001.DataClient-DYDX: Initializing websocket connection
+2025-10-30T18:15:05.484219692Z [INFO] TESTER-001.DYDXWebsocketClient: Connected to wss://indexer.dydx.trade/v4/ws
+2025-10-30T18:15:05.484381702Z [INFO] TESTER-001.DataClient-DYDX: Websocket connected
+2025-10-30T18:15:05.484512392Z [INFO] TESTER-001.DataClient-DYDX: Connected
+2025-10-30T18:15:06.070151281Z [INFO] TESTER-001.DYDXInstrumentProvider: Loaded 284 instruments
+
+Dydx instrument provider ignores config load_all False
+Firstly it loads only 2, but later - more
+
+---
+
+#### [2025-11-01 00:16:20] @javdu10
+
+Hello there, while looking at the types and docs, I could only find on how to get the cumulative quantity (book.get_quantity_for_price), but I would like to get the exact quantity of a level
+
+is looping the only way ?
+
+**Attachments:**
+- [image.png](https://cdn.discordapp.com/attachments/924499913386102834/1433972894240870501/image.png?ex=694a8813&is=69493693&hm=8af2dd45cbe1d2e3cb8373b74d31699617d13d7fea6a3c9d15fb9aff17730f53&)
+
+---
+
+#### [2025-11-01 15:18:07] @jonathanbytesio
+
+pip install -U nautilus_trader
+
+---
+
+#### [2025-11-01 15:18:17] @jonathanbytesio
+
+hint: This usually indicates a problem with the package or the build environment.
+
+---
+
+#### [2025-11-01 15:18:25] @jonathanbytesio
+
+Someone know this issue?
+
+---
+
+#### [2025-11-02 10:56:14] @sinaatra
+
+Hey anyone has an idea of why isn't my callback called?
+```
+# Strategy
+class IntegrationTestStrategy(Strategy):
+    def __init__(self):
+        super().__init__()
+        self.logger = Logger("IntegrationTestStrategy")
+
+    def on_start(self) -> None:
+        self.request_instruments(Venue("Aster"), callback=self.on_instruments)
+
+    def on_instruments(self, request_id: UUID4) -> None:
+        self.logger.info(f"Instruments loaded, request ID: {request_id}")
+
+# Market Data Client
+    async def _request_instruments(self, command: RequestInstruments) -> None:
+        await self._instrument_provider.load_all_async()
+
+# Instrument Provider
+ async def load_all_async(self, filters: dict | None = None) -> None:
+        ...
+        self.add(instrument) # This is called for sure
+        ...
+        return
+```
+Thanks in advance
+
+---
+
+#### [2025-11-02 11:37:43] @sinaatra
+
+Found the answer for the next ones
+I had to call `self._handle_instruments_py(self.venue, instruments, request.id, request.start, request.end, request.params)`
+Inside MarketDataClient to resolve the request
+Then in my Strategy I could call `self.instruments = self.cache.instruments(venue=self.venue)`
+
+---
+
+#### [2025-11-03 02:29:17] @jonathanbytesio
+
+What's the strategy you are working on now
+
+---
+
+#### [2025-11-03 14:48:35] @one_lpb
+
+Hello ! 
+
+Does Nautilus can use  OHLCV bars while no open positions and use the Trades only to manage positions. This way it prevent going through all the millions Trades on each run?
+
+---
+
+#### [2025-11-03 20:39:04] @sinaatra
+
+i am just getting the field ready for some experimental strategies, probably arbitrage, also wanna plug some AI
+
+---
+
+#### [2025-11-04 08:00:57] @jonathanbytesio
+
+Good idea
+
+---
+
+#### [2025-11-04 08:01:27] @jonathanbytesio
+
+Have the exact plan or thinking for now
+
+---
+
+#### [2025-11-04 09:01:05] @jonathanbytesio
+
+cannot import name 'PolymarketDataLoader' from 'nautilus_trader.adapters.polymarket'
+
+---
+
+#### [2025-11-04 09:01:19] @jonathanbytesio
+
+Someone know this issue when importing 
+
+from nautilus_trader.adapters.polymarket import PolymarketDataLoader
+
+---
+
+#### [2025-11-04 09:02:47] @cjdsellers
+
+Hi <@756122725495472138> 
+This should help https://github.com/nautechsystems/nautilus_trader/blob/develop/examples/backtest/polymarket_simple_quoter.py#L39
+`from nautilus_trader.adapters.polymarket.loaders import PolymarketDataLoader`
+
+I'll update the docs and also add a re-export so it works without the nested `loaders`
+
+---
+
+#### [2025-11-04 09:06:50] @jonathanbytesio
+
+Ohhh. it's in the loader.py Class now, I tried whole day to handle this
+
+---
+
+#### [2025-11-04 09:07:05] @jonathanbytesio
+
+i thought It's problem from my UV env
+
+---
+
+#### [2025-11-04 09:07:59] @jonathanbytesio
+
+HI <@757548402689966131> I sending friend request, I saw your message before
+
+---
+
+#### [2025-11-04 09:40:42] @jonathanbytesio
+
+
+
+**Attachments:**
+- [image.png](https://cdn.discordapp.com/attachments/924499913386102834/1435202086034870292/image.png?ex=694a639a&is=6949121a&hm=07ce2262fc286b9d2f6491505adc06f80f584deec652c64cf6f438bfaf08fe7f&)
+
+---
+
+#### [2025-11-04 10:18:42] @cjdsellers
+
+It hasn’t been released yet, the docs are on nightly. You could install a recent development wheel though
+
+---
+
+#### [2025-11-04 10:22:07] @jonathanbytesio
+
+I see
+
+---
+
+#### [2025-11-04 10:22:12] @jonathanbytesio
+
+I m testing now
+
+---
+
+#### [2025-11-04 10:22:24] @jonathanbytesio
+
+
+
+**Attachments:**
+- [image.png](https://cdn.discordapp.com/attachments/924499913386102834/1435212583664615456/image.png?ex=694a6d60&is=69491be0&hm=a94e478b62c17615147bdaa338a48b55f474431ff35035b043706cdfa1309936&)
+
+---
+
+#### [2025-11-04 10:23:36] @jonathanbytesio
+
+And I ran the polymarket_data_tester.py on jupyterlab
+
+---
+
+#### [2025-11-04 10:23:44] @jonathanbytesio
+
+It suddenly closed
+
+---
+
+#### [2025-11-04 11:39:49] @jonathanbytesio
+
+
+
+**Attachments:**
+- [image.png](https://cdn.discordapp.com/attachments/924499913386102834/1435232063019028511/image.png?ex=694a7f85&is=69492e05&hm=13511f7a98f0862a605dee72fd1db54fec9a911d828365a1c00b2dc6085466f1&)
+
+---
+
+#### [2025-11-04 12:05:52] @jonathanbytesio
+
+from nautilus_trader.cache.cache import Cache
+  File "nautilus_trader/cache/cache.pyx", line 1, in init nautilus_trader.cache.cache
+KeyError: '__reduce_cython__'
+
+---
+
+#### [2025-11-04 21:23:55] @joebiden404
+
+Someone got this crash?
+
+... catalog = ParquetDataCatalog("./catalog/")
+... 
+... catalog_path = Path("./catalog/")
+... 
+... catalog.order_book_deltas()[0]
+... 
+
+thread 'tokio-runtime-worker' panicked at crates/model/src/types/price.rs:193:14:
+Condition failed: `precision` must be 0 when `raw` is PRICE_UNDEF
+
+Stack backtrace:
+   0: _PyInit_core
+stack backtrace:
+note: Some details are omitted, run with `RUST_BACKTRACE=full` for a verbose backtrace.
+
+thread 'tokio-runtime-worker' panicked at crates/model/src/types/price.rs:193:14:
+Condition failed: `precision` must be 0 when `raw` is PRICE_UNDEF
+
+Stack backtrace:
+   0: _PyInit_core
+fish: Job 1, 'python3.13' terminated by signal SIGABRT (Abort)
+
+I'm trying to figure out how to solve it
+
+---
+
+#### [2025-11-04 23:52:16] @cjdsellers
+
+Hey <@756122725495472138> 
+That Polymarket backtest example is now updated with cleaner imports and matches the example script: https://nautilustrader.io/docs/nightly/integrations/polymarket#complete-backtest-example
+It's not recommended to run a live trading node in a jupyter notebook, there can be event loop issues. Added a note to the `live.md` although will reduce that admonition level from "danger" to warning: https://nautilustrader.io/docs/nightly/concepts/live/
+
+---
+
+#### [2025-11-04 23:52:42] @cjdsellers
+
+Do you have any further context or information on when this happens?
+
+---
+
+#### [2025-11-04 23:53:51] @cjdsellers
+
+Hi <@789226697052258304> 
+Thanks for the report. That's an invariant where we expect an undefined price to have a precision of zero, anything else suggests a parsing issue or something which shouldn't be happening - so it fails fast with a panic. Do you have any further information on when this occurred, currently not enough information to debug this
+
+---
+
+#### [2025-11-05 00:01:15] @joebiden404
+
+Yep, so basically:
+Using latest version with Python;
+
+1. I’ve loaded the my past 3 days MBO data with the databento loader into the parquet catalog.
+
+2. Then every operation I’m doing it is just panicking for some reason..
+
+For example
+
+---
+
+#### [2025-11-05 00:01:17] @joebiden404
+
+```python
+from pathlib import Path
+
+DATA_DIR = Path("./daily/")
+trade_files = sorted(DATA_DIR.glob("glbx-mdp3-*.mbo.dbn.zst"))
+
+for f in trade_files:
+    trades_iter = loader.from_dbn_file(
+        path=f,
+        as_legacy_cython=False,      # trades are fine with Rust types
+        use_exchange_as_venue=False, # must match definitions
+    )
+    catalog.write_data(trades_iter)
+    print("Wrote mbo from:", f.name)
+```
+
+
+```python
+catalog = ParquetDataCatalog("./catalog/")
+
+catalog_path = Path("./catalog/")
+
+catalog.order_book_deltas()[0]
+```
+
+PANICKED!!!!!
+
+---
+
+#### [2025-11-05 00:02:12] @joebiden404
+
+not only 
+> catalog.order_book_deltas()[0]
+
+almost every function crushing it 🙁
+
+---
+
+#### [2025-11-05 00:06:14] @joebiden404
+
+Lmk if you need more info
+
+---
+
+#### [2025-11-05 02:54:25] @jonathanbytesio
+
+I see, you updated this, but it's in nightly version, right?
+
+**Attachments:**
+- [image.png](https://cdn.discordapp.com/attachments/924499913386102834/1435462231717580863/image.png?ex=694aad21&is=69495ba1&hm=7b8c18729f2a49198b546ddf1568ea93e5b6ac9991c0fe4cf2b3626f584dd509&)
+
+---
+
+#### [2025-11-05 02:58:36] @jonathanbytesio
+
+Actually, I am trying to market maker on polymarket, we are investment company, I am trying to find more examples to help me understand how to implement my strategy
+
+---
+
+#### [2025-11-05 03:09:53] @jonathanbytesio
+
+Yeah , I have ran on terminal instead of jupyter yesterday since I found the loop issue
+
+---
+
+#### [2025-11-05 03:15:21] @jonathanbytesio
+
+/nautilus_trader/adapters/polymarket/scripts/list_updown_markets.py
+Fetching active Polymarket markets...
+
+Found 200 total active markets
+
+================================================================================
+BTC UPDOWN MARKETS (0 found)
+================================================================================
+
+================================================================================
+ETH UPDOWN MARKETS (0 found)
+================================================================================
+
+This script seems also need to update
+
+---
+
+#### [2025-11-05 03:22:13] @jonathanbytesio
+
+2025-11-05T03:20:49.683243000Z [WARN] TESTER-001.RiskEngine: SubmitOrder for O-20251105-032049-001-000-421 DENIED: NOTIONAL_EXCEEDS_FREE_BALANCE: free=0.000000 USDC.e, balance_impact=-1.150000 USDC.e
+2025-11-05T03:20:49.683382000Z [WARN] TESTER-001.ExecTester: <--[EVT] OrderDenied(instrument_id=0x44dce36f5fe5d8a1554d402d5705eb5a837e8785a003c71bb92875a8c553d40b-110721708563829309626441524339337100777360025073350502319412072033397801403428.POLYMARKET, client_order_id=O-20251105-032049-001-000-421, reason='NOTIONAL_EXCEEDS_FREE_BALANCE: free=0.000000 USDC.e, balance_impact=-1.150000 USDC.e')
+
+
+And I ran the polymarket_exec_tester.py, it showed this error
+
+---
+
+#### [2025-11-05 03:22:39] @jonathanbytesio
+
+I have set allowances and deposited USDC on polygon also have POL
+
+---
+
+#### [2025-11-05 03:23:31] @cjdsellers
+
+<@756122725495472138> Thanks for all the feedback, this is useful. Any chance we could move this into a thread in the <#1332664677041442816> channel? then we can keep track of it and won't interleave with other users messaging in this channel 🙏 https://discord.com/channels/924497682343550976/1435469919612571758 (we could also copy into that thread if you like as well, up to you)
+
+---
+
+#### [2025-11-05 07:08:20] @jst0478
+
+As a next step I would try inspecting your catalog with a parquet file viewer and make sure the imported data looks good.  I'm using Databento MBO data as well and have no problem, but I'm using equities data
+
+---
+
+#### [2025-11-05 17:29:02] @joebiden404
+
+do you know what I should I look for? Undefined prices?
+
+---
+
+#### [2025-11-05 17:32:41] @joebiden404
+
+The data gets loaded, then boom...
+
+**Attachments:**
+- [image.png](https://cdn.discordapp.com/attachments/924499913386102834/1435683255675519128/image.png?ex=694ad239&is=694980b9&hm=3829219b8f0e2614d488ba6385bd3a6dc7f08e79b0b871fe8349320435bb8db8&)
+
+---
+
+#### [2025-11-05 18:28:19] @joebiden404
+
+breaks here
+
+**Attachments:**
+- [image.png](https://cdn.discordapp.com/attachments/924499913386102834/1435697255490519051/image.png?ex=694a3683&is=6948e503&hm=3e510b2488c4f00e7cbdd27708ce0c0d2a7a9182e7c522cc806ee4d4de846643&)
+
+---
+
+#### [2025-11-05 18:32:00] @joebiden404
+
+Got it friends, the issue was on the 29/10 NQ MBO file... just crashed everything... why there is no try-catch statement for this one tho hahaha <@757548402689966131> ?
+
+---
+
+#### [2025-11-06 13:52:31] @dxwil
+
+Hey all, I'm trying to follow these docs to create a tearsheet: https://github.com/nautechsystems/nautilus_trader/blob/develop/docs/concepts/visualization.md, but I can't import TearsheetConfig or create_tearsheet (they don't exist in my local instance), I have installed plotly. Edit: Seems like the feature is so new that it's not in the master branch yet.
+
+---
+
+#### [2025-11-07 01:21:35] @cjdsellers
+
+Hey <@789226697052258304> the reason is because a malformed `PRICE_UNDEF` like that indicates either data corruption or a decoder implementation issue, which should fail loudly and spectacularly. Later on we can improve the error handling ergonomics for these cases, especially as the API stabilized into v2
+
+---
+
+#### [2025-11-07 02:27:58] @wayne_92798
+
+hi, i am new to NautilusTrader and wish to create my own adapter to connect to other broker API, is there any tutorial guide or example on this topic? thanks!
+
+---
+
+#### [2025-11-07 04:31:14] @joebiden404
+
+Hey, Is there any way I can handle it myself?
+
+---
+
+#### [2025-11-07 04:32:30] @joebiden404
+
+I meant, on which row/col of the parquet may cause this dramatic fail
+
+---
+
+#### [2025-11-07 07:52:57] @javdu10
+
+In the github itself there are few adapters you can take example on under the « adapters » folder
+
+---
+
+#### [2025-11-07 12:13:40] @bre_n
+
+Does anyone use BacktestNode? I'm always getting the below error. All the examples use BacktestEngine, should I just go for that instead?
+
+**Attachments:**
+- [image.png](https://cdn.discordapp.com/attachments/924499913386102834/1436327744530157608/image.png?ex=694a8773&is=694935f3&hm=bd823552c377e581b352f3db8bab444c15914de72fbdac36d1fcd5df06c80f2e&)
+
+---
+
+#### [2025-11-07 13:45:25] @fudgemin
+
+```catalog_path = "/root/furtim_alpha/nautilis_catalog"
+    
+    # Define catalog config
+    catalog_config = DataCatalogConfig(
+        path=catalog_path,
+    )
+    
+    # Create backtest configuration with all settings nested
+    config = BacktestRunConfig(
+        engine=BacktestEngineConfig(
+            trader_id=TraderId("SIGNAL_STRATEGY-001"),
+            logging=FurtimLoggingConfig(),
+            catalogs=[catalog_config],  # Pass catalog here
+            cache=CacheConfig(
+                bar_capacity=10000,
+                tick_capacity=10000,
+            ),
+        ),
+        venues=[
+            BacktestVenueConfig(
+                name="TWELVEDATA",
+                oms_type=OmsType.HEDGING,
+                account_type=AccountType.MARGIN,
+                base_currency=USD,
+                starting_balances=[Money(20000, USD)],
+            )
+        ],
+        data=[
+            # Load bar data for specific instruments
+            BacktestDataConfig(
+                catalog_path=catalog_path,
+                data_cls="nautilus_trader.model.instruments:Equity",
+                client_id="TWELVEDATA",
+                instrument_ids=[],  # Specify instruments to load bars for
+            ),
+            # Load signal data
+            BacktestDataConfig(
+                catalog_path=catalog_path,
+                data_cls=StrikeProxsumSignal,
+                client_id="SIGNALS",
+                
+            ),
+        ],
+        start="2024-01-01T00:00:00Z",
+        end="2025-01-01T00:00:00Z",
+    )
+    
+    # Add strategy
+    strategy_config = ImportableStrategyConfig(
+        strategy_path=SignalDrivenStrategy.fully_qualified_name(),
+        config_path=StrategyConfig.fully_qualified_name(),
+        config={},  # No additional config needed
+    )
+    config.engine.strategies.append(strategy_config)
+  
+    node = BacktestNode(configs=[config])
+    node.run()```
+
+---
+
+#### [2025-11-07 16:03:33] @joebiden404
+
+This issue is critical for me because I love NT and want to use only it haaa<3 
+
+In every parquet file I bought from databento (specifically MBO futures), each day starts with `PRICE_UNDEF`.
+
+```python
+import pandas as pd
+
+# Load your parquet (as you already do)
+df = pd.read_parquet("./week/data/order_book_delta/NQZ5.GLBX/2025-10-19T11-10-43-318369482Z_2025-10-24T21-00-00-169480096Z.parquet")
+
+# i128::MAX in little-endian bytes: 15 x 0xFF then 0x7F
+PRICE_UNDEF_BYTES = b"\xff" * 15 + b"\x7f"
+
+# Boolean mask and indices where price equals PRICE_UNDEF
+mask = df["price"] == PRICE_UNDEF_BYTES
+undef_idx = df.index[mask]
+
+print("Count:", mask.sum())
+print("Indices:", undef_idx.to_list())
+
+#output:
+
+# Count: 6
+# Indices: [0, 389435, 12943941, 26782684, 48388754, 63209607]
+```
+
+**The crash only happens when I'm trying to backtest from one date to another:**
+
+for example:
+
+```python
+start = pd.Timestamp("2025-10-27T23:00:00.076602376Z").value
+end =  pd.Timestamp("2025-10-28T22:00:00.076602376Z").value
+```
+
+---
+
+#### [2025-11-07 16:04:55] @joebiden404
+
+<@757548402689966131> I really dont know how to solve this issue, I tried to change this price_undef thingy to something else but it keeps crushing it.
+
+I truly want this bug to be fixed, or at least fixed at my side (if the problem is in my data)
+
+---
+
+#### [2025-11-08 00:06:55] @cjdsellers
+
+Hey <@789226697052258304> this *should* be fixed now: https://github.com/nautechsystems/nautilus_trader/commit/8b55d43f8445df6ae5499890bdc644f4dc3a146d
+Available in [development wheels](https://github.com/nautechsystems/nautilus_trader#development-wheels) from build 11828+
+
+**Links:**
+- Fix Databento MBO data decoding of PRICE_UNDEF · nautechsystems/na...
+- GitHub - nautechsystems/nautilus_trader: A high-performance algorit...
+
+---
+
+#### [2025-11-08 00:26:10] @joebiden404
+
+Thank you sir!
+
+---
+
+#### [2025-11-08 02:19:04] @bre_n
+
+thanks will give it a go when i get home. i should be doing pretty much what you have shown
+
+---
+
+#### [2025-11-08 07:47:32] @arandott
+
+Has anyone seen this with aws EC2?
+After running fine for a while, SSH suddenly stops working. Port 22 is reachable (nc -vz <public-ip> 22 succeeds), but ssh -vvv ubuntu@<ip> fails with: kex_exchange_identification: read: Connection reset by peer🥲
+
+---
+
+#### [2025-11-08 12:19:11] @bre_n
+
+Nope it's still happening. Try running the below
+
+```python
+from nautilus_trader.config import LoggingConfig
+
+from nautilus_trader.backtest.node import BacktestDataConfig
+from nautilus_trader.backtest.node import BacktestEngineConfig
+from nautilus_trader.backtest.node import BacktestNode
+from nautilus_trader.backtest.node import BacktestRunConfig
+from nautilus_trader.backtest.node import BacktestVenueConfig
+from nautilus_trader.config import ImportableStrategyConfig
+from nautilus_trader.persistence.config import DataCatalogConfig
+
+catalog_path = "./catalog"
+
+catalog_config = DataCatalogConfig(
+    path=catalog_path,
+)
+
+data_configs = [
+    BacktestDataConfig(
+        catalog_path="./catalog",
+        data_cls="nautilus_trader.model.instruments:Equity",
+        client_id="SIGNALS"
+    )
+]
+
+venues_configs = [
+    BacktestVenueConfig(
+        name="ASX",
+        oms_type="NETTING",
+        account_type="CASH",
+        base_currency="AUD",
+        starting_balances=["1_000_000 AUD"]
+    )
+]
+
+strategies = [
+    ImportableStrategyConfig(
+        strategy_path="nautilus_trader.examples.strategies.blank:BlankStrategy",
+        config_path="nautilus_trader.examples.strategies.blank:BlankStrategyConfig",
+        config = {}
+    )
+]
+
+# Define multiple run configurations
+configs = [
+    BacktestRunConfig(
+        engine=BacktestEngineConfig(
+            strategies=strategies,
+            logging=LoggingConfig(log_level="ERROR"),
+            catalogs=[catalog_config]
+        ),
+        data=data_configs,
+        venues=venues_configs,
+        start="2025-01-04T00:00:00Z",
+        end="2025-06-01T00:00:00Z",
+    ),
+
+]
+
+node = BacktestNode(configs=configs)
+results = node.run()
+```
+
+---
+
+#### [2025-11-08 12:20:39] @bre_n
+
+<@391823539034128397> error is ```[ERROR] BACKTESTER-001.BacktestNode: Error running backtest
+AttributeError('NoneType' object has no attribute 'logger')```
+
+---
+
+#### [2025-11-08 17:36:26] @fudgemin
+
+not sure, but error seems clear to point to logger. that error reminds me of the default python logger module. Are you importing both? 
+
+NT internal logger should resolve with no errors on the config above. you may have a build or dependency issue?
+
+---
+
+#### [2025-11-08 17:43:57] @fudgemin
+
+try wrapping the strategy import class direct, not by file location. or add via factory, to the node after, like i had done.
+
+---
+
+#### [2025-11-10 06:11:36] @greenbone
+
+Hey folks I’m trying to expose some Rust functions to Cython and currently testing out orderbook_spread() under a new name. After running build.py, the function compiles correctly into the .so file, but it doesn’t show up in the generated header file.
+
+Has anyone run into this before? Any idea why a function would make it into the .so but get skipped during header generation? I could manually add it to the header, but I’m curious why cbindgen might be omitting it, even though the ffi feature flag is enabled during the build. 
+
+I’m still pretty new to Rust, so I’d really appreciate any insight!
+
+---
+
+#### [2025-11-10 06:44:06] @cjdsellers
+
+Hey <@1024150660519825418> 
+You're in some territory known to be occupied by dragons there, but some quick things I can suggest:
+- Make sure you have a `#[unsafe(no_mangle)]` attribute above the `pub extern "C" fn`
+- Make sure the function is actually used by Rust somewhere, even if it's `pub`, `cbindgen` might not generate headers unless it's used
+- Try exporting the `high_precision=true` env var, then building, *or* unsetting that if it was set already to force cargo to detect an environment change (sometimes that can trigger it)
+
+---
+
+#### [2025-11-10 15:29:00] @greenbone
+
+hey <@757548402689966131> thank you for your suggestions! I'll give these a shot
+
+---
+
+#### [2025-11-11 08:03:24] @jst0478
+
+Hi, I'm seeing something strange going on with reconciliation and Interactive Brokers (although it may not be directly related to IB).
+
+I'm paper trading and was using NT without a persistent cache for a while. Some orders were made during this time and filled, opening positions.
+
+Now I've enabled persistent caching with a Redis backend (https://nautilustrader.io/docs/latest/concepts/cache#database-configuration) and also enabled `external_order_claims` (https://nautilustrader.io/docs/latest/concepts/live#reconciliation-configuration).
+
+The strange behavior I see is this:
+
+---
+
+#### [2025-11-11 08:03:47] @jst0478
+
+1. When first starting after enabling persistent caching, I saw that NT created some orders/positions for me during reconciliation, matching the orders/positions made above (when persistent caching was off). The client order IDs for these orders are all set to simply the instrument ID (I guess it makes sense since the original ones were lost). The order types are set correctly. Order price is not set. Most of the other data looks okay. (I'm looking at the orders/positions reports generated by NT, as well as inspecting the data in Redis).
+
+2. I stop NT and restart it. Now I get some strange behavior -- NT creates some *additional* orders (but not positions) for me during reconciliation, matching the orders made originally (when persistent caching was off). This time, they are given some randomly generated client order IDs that look like "O-0c189d6b-73ff-4ef2-ba51-e7652e723bf5". The *order types are wrong* (original ones were MARKET orders but these are set to LIMIT for some reason). Some other fields are also wrong: time_in_force and liquidity_side (it's set to 'NO_LIQUIDITY_SIDE'). This time, price is set. I think other data looks okay, such as quantity, avg_px, etc. However, new values for init_id, last_trade_id, ts_init, etc. are all created for these new orders.
+
+So now I have a bunch of duplicate open (I guess?) orders in the reports/Redis data for all the orders.
+
+---
+
+#### [2025-11-11 08:04:05] @jst0478
+
+3. Every time I stop and start NT, another duplicate set of orders are created with new order IDs. This part also strikes me as odd. I expected NT to find the existing order IDs and use them instead. The duplicate orders with wrong type and such just keep piling up.
+
+I tried stopping NT and nuking everything in Redis, but the behavior persists and is reproducable.
+
+Is this a known problem, or am I just reading these reports/Redis data wrong? Any solution? Is it fine to ignore?
+
+Let me know if you need to see some more data.
+
+CC <@757548402689966131> as I think you're working on reconciliation now in a branch.
+
+---
+
+#### [2025-11-11 08:21:13] @jst0478
+
+I think what I'd expect is something like: during step 1 reconciliation above, NT generates new client order IDs for me like "O-..." instead of using instrument ID, and then use those order IDs from then on for those external orders instead of reconciling to new orders each time, but idk.. this is over my head
+
+---
+
+#### [2025-11-11 09:15:04] @faysou.
+
+That's typically the kind of complex case an AI agent is good to work with, if the agent has a case to work with and test, it will likely find the answer. If you send an MRE (minimum reproducible example) I could try to fix it.
+
+---
+
+#### [2025-11-11 09:36:47] @nobita0313
+
+Hi, newbie here, when i do 
+print(catalog.instruments()[0:5])
+
+[Equity(id=A.XNAS, raw_symbol=A, asset_class=EQUITY, instrument_class=SPOT, quote_currency=USD, is_inverse=False, price_precision=2, price_increment=0.01, size_precision=0, size_increment=1, multiplier=1, lot_size=100, margin_init=0, margin_maint=0, maker_fee=0, taker_fee=0, info={}), Equity(id=A.XNAS, raw_symbol=A, asset_class=EQUITY, instrument_class=SPOT, quote_currency=USD, is_inverse=False, price_precision=2, price_increment=0.01, size_precision=0, size_increment=1, multiplier=1, lot_size=100, margin_init=0, margin_maint=0, maker_fee=0, taker_fee=0, info={}), Equity(id=A.XNAS, raw_symbol=A, asset_class=EQUITY, instrument_class=SPOT, quote_currency=USD, is_inverse=False, price_precision=2, price_increment=0.01, size_precision=0, size_increment=1, multiplier=1, lot_size=100, margin_init=0, margin_maint=0, maker_fee=0, taker_fee=0, info={}), Equity(id=A.XNAS, raw_symbol=A, asset_class=EQUITY, instrument_class=SPOT, quote_currency=USD, is_inverse=False, price_precision=2, price_increment=0.01, size_precision=0, size_increment=1, multiplier=1, lot_size=100, margin_init=0, margin_maint=0, maker_fee=0, taker_fee=0, info={}), Equity(id=A.XNAS, raw_symbol=A, asset_class=EQUITY, instrument_class=SPOT, quote_currency=USD, is_inverse=False, price_precision=2, price_increment=0.01, size_precision=0, size_increment=1, multiplier=1, lot_size=100, margin_init=0, margin_maint=0, maker_fee=0, taker_fee=0, info={})]
+
+it return the same instrument multiple time, is it normal? should i do something to correct it?
+
+is it because my bar data is splited in multiple file? (see the image)
+
+**Attachments:**
+- [Screenshot_2025-11-11_at_09.33.53.png](https://cdn.discordapp.com/attachments/924499913386102834/1437737819064766515/Screenshot_2025-11-11_at_09.33.53.png?ex=694a62af&is=6949112f&hm=cf1ca3431ac07cd975352221b0c2ea085c523ae79e3cfe6b2cf66a631ab52f61&)
+
+---
+
+#### [2025-11-11 17:00:22] @ido3936
+
+Does this bug seem to describe the issue? https://github.com/nautechsystems/nautilus_trader/issues/3046
+
+**Links:**
+- [Reconciliation] Duplicate trade IDs and fill replay on node restar...
+
+---
+
+#### [2025-11-12 04:12:22] @jst0478
+
+I saw your ticket when I was investigating my problem, but I don't think it's the same. I don't see any duplicate trades or KeyErrors popping up in logs.
+
+---
+
+#### [2025-11-12 07:52:54] @jst0478
+
+https://github.com/nautechsystems/nautilus_trader/issues/3176
+I tried letting Claude figure it out.  CC <@757548402689966131> (related to reconciliation)
+
+---
+
+#### [2025-11-12 07:58:58] @faysou.
+
+Thanks for the report. I haven't used the redis cache before but trying to solve this could be a good way to learn about it.
+
+---
+
+#### [2025-11-12 08:09:40] @jst0478
+
+I hope it helps. And, this may be really low priority. Ideally I'd have persistent caching on from the start rather than turning it on after orders were made.  I'm going to check and make sure that is working next
+
+---
+
+#### [2025-11-12 16:34:07] @ido3936
+
+I don't know about the NT team's priorities - but note that issues with persistence could be relevant under multiple scenarios where the trading system is not running 24/7. It could be that it was stopped on purpose, or it could be that it crashed, etc. etc.
+
+Here's my (limited) understanding of what is going on:
+I think that the orders that you describe are 'artificial': they are made in order to align the NT's book keeping with whatever the client is telling it is the current state.
+I think that the use of LIMIT in place of MARKET is just a convenience
+But then - these orders should all be filled  -  if they are still open then that's a problem
+
+---
+
+#### [2025-11-13 06:04:02] @jst0478
+
+I noticed in my cache, and we can see from the NT code, that they're all marked as filled - it's making duplicated filled orders. So maybe it's not a big problem, but it does bloat the reports with duplicates and incorrect data. But could there be any other side effects to the trading system? It looks like NT associates the filled orders (the latest duplicated one) with open positions
+
+---
+
+#### [2025-11-13 07:39:00] @cjdsellers
+
+Hi <@296261099630755841> and <@1074995464316928071> just a quick note to say that I'm aware of this thread and associated issues in GitHub. My initial impression is there is some specific interactions with the IB adapter and recon. I'm unable to test with IB myself - and have not yet allocated bandwidth to looking at this next round of reconciliation fixes/improvements yet (also, there is no longer a separate `reconciliation` branch, that was merged already after the last release)
+
+---
+
+#### [2025-11-13 10:51:29] @henryc4053
+
+Greetings all, hope someone can help. I am using macos (on intel - yes, yes... will upgrade when the money's there) so cannot use: 
+
+```
+pip install --only-binary :all: nautilus_trader
+```
+since there are only binaries for M series (correct?).
+
+I have tried:
+```
+git clone --branch develop --depth 1 https://github.com/nautechsystems/nautilus_trader
+cd nautilus
+cd nautilus_trader/
+uv sync --all-extras
+```
+
+Which naturally downloads the source and attempts to compile. Currently trying:
+```
+pip install -U nautilus-trader --extra-index-url=https://packages.na
+utechsystems.io/simple
+```
+
+All fail to compile, presumably due to a dependency or other issue. I'm hoping for some guidance to get this to compile (fair disclosure: I'm familiar with C/C++/others, far less so with Python/Rust). The compilation log is attached. Using an anaconda3 env.
+
+More info:
+```
+      =====================================================================
+      Nautilus Builder 1.221.0
+      =====================================================================
+      System: Darwin x86_64
+      Clang:  17.0.0 (clang-1700.4.4.1)
+      Rust:   1.91.1 (ed61e7d7e 2025-11-07)
+      Python: 3.13.5 (/opt/anaconda3/envs/forexStrategies/bin/python3.13)
+      Cython: 3.1.6
+      NumPy:  2.3.4
+      
+      RUSTUP_TOOLCHAIN=stable
+      BUILD_MODE=release
+      BUILD_DIR=build/optimized
+      HIGH_PRECISION=True
+      PROFILE_MODE=False
+      ANNOTATION_MODE=False
+      PARALLEL_BUILD=True
+      COPY_TO_SOURCE=True
+      FORCE_STRIP=False
+      PYO3_ONLY=False
+      LDFLAGS=-L/usr/local/opt/readline/lib
+```
+
+Thanks
+
+**Attachments:**
+- [compile-fail.txt](https://cdn.discordapp.com/attachments/924499913386102834/1438481390680408114/compile-fail.txt?ex=694a7431&is=694922b1&hm=35a6d7cf2db37a0833489cf8acb0bf37d4d739387bb1ca31bc042c091afd4ed1&)
+
+---
+
+#### [2025-11-13 11:41:50] @cjdsellers
+
+Hi <@810430622128537600> welcome!
+Those linker issues can be tricky, it may just be a case of some env vars. The [CI for macos](https://github.com/nautechsystems/nautilus_trader/blob/develop/.github/actions/common-wheel-build/action.yml#L74) may offer some clues there (although it is building on an arm64 runner)
+
+---
+
+#### [2025-11-13 12:27:43] @henryc4053
+
+Thanks - I'll dig into that file and see what there is to see
+
+---
+
+#### [2025-11-13 13:45:46] @jst0478
+
+I'm a noob here too, but it looks like it's failing around stuff for pyo3.  Did you also do this part?
+
+> # Set the library path for the Python interpreter (in this case Python 3.13.4)
+> export LD_LIBRARY_PATH="$HOME/.local/share/uv/python/cpython-3.13.4-linux-x86_64-gnu/lib:$LD_LIBRARY_PATH"
+> 
+> # Set the Python executable path for PyO3
+> export PYO3_PYTHON=$(pwd)/.venv/bin/python
+
+It's listed after `uv sync --all-extras` in the docs, but I think when I compiled from source I had the same problem and it was because of this. Worth a try anyway
+
+---
+
+#### [2025-11-13 14:42:35] @henryc4053
+
+Hey @jst, yes I saw that too, but ```$HOME/.local/share/uv``` does not exist for me. I have no idea where it is.
+
+I'm starting to believe it's because I'm using Anaconda. I'm flailing about a bit now when there's abstraction involved and I don't know where stuff is... going to go back to basics without Anaconda and simplify things.
+
+---
+
+#### [2025-11-13 15:07:06] @faysou.
+
+don't use anaconda, I used to use it when I started with nautilus, it doesn't work
+
+---
+
+#### [2025-11-13 15:07:25] @faysou.
+
+https://gist.github.com/faysou/7f910b545d4881433649551afce69029
+
+---
+
+#### [2025-11-13 15:07:29] @faysou.
+
+I use this currently with pyenv and uv
+
+---
+
+#### [2025-11-13 15:07:48] @faysou.
+
+and this https://gist.github.com/faysou/c7adc018e99ac05c9a63ac092a06e7f5 for uv only
+
+**Links:**
+- Install nautilus_trader dev env from scratch using uv only
+
+---
+
+#### [2025-11-13 15:08:52] @faysou.
+
+uv only requires extra lines related to the compiler to make it compile, it's not clear to me which ones, everytime I try there are issues with uv only, and haven't spent the time to fix them, whereas pyenv with uv always works
+
+---
+
+#### [2025-11-13 15:09:46] @faysou.
+
+uv presents itself as a universal thing to replace everything, but it's not there yet
+
+---
+
+#### [2025-11-13 15:10:25] @faysou.
+
+being able to compile nautilus is a big plus as this allows to understand better how it works, or let someone or an AI agent try things
+
+---
+
+#### [2025-11-13 15:13:44] @henryc4053
+
+Thanks <@965894631017578537> - yes, I don't have time for complexity and issues. Just want to compile nautilus so I can focus on what's important. Going to take a step back and keep it simple.
+
+---
+
+#### [2025-11-13 15:24:20] @jst0478
+
+I think you just need to tell the compiler where the python development libraries are. I'm not so familiar with macos, but it sounds like if you install python with brew or something then the development libraries come with it? Then add the path where those headers are to LD_LIBRARY_PATH and try to compile again
+
+---
+
+#### [2025-11-14 07:10:00] @jst0478
+
+Update: https://github.com/nautechsystems/nautilus_trader/issues/3176#issuecomment-3531218556
+I think the problem is my fault. Beware of putting colons in the order ID tag! I'm going to rename my order ID tag and do some more testing to confirm.
+CC <@965894631017578537> , <@1074995464316928071>
+
+---
+
+#### [2025-11-14 17:13:31] @nuppsknss
+
+still didn't figure this one out, any help would be appreciated 
+https://discord.com/channels/924497682343550976/924506736927334400/1437861201261629490
+
+---
+
+#### [2025-11-14 21:09:51] @faysou.
+
+I've worked on this today and managed to reproduce it and likely fixed it. I need to review the code more and will do a PR when I think it's ready.
+
+---
+
+#### [2025-11-14 21:17:33] @faysou.
+
+This allowed me to learn about the redis cache, it's quite interesting, first time I've used it.
+
+---
+
+#### [2025-11-16 13:21:23] @toriarty
+
+Hi guys，I used (subscribed_order_book_at_interval) successfully on the live trading,  also could get orderbook snapshot on func (on_order_book) , but I cannot find the orderbook snapshot on my redis. Only have orderbook deltas, so are there any way to save the orderbook snapshot on redis persistently？
+
+---
+
+#### [2025-11-19 07:49:15] @jst0478
+
+Thanks for working on it. I'm trying `nautilus-trader==1.222.0a20251118` to see if my problems are fixed or not. I need some more time to check reconciliation.
+
+But in the meantime I noticed some new errors popping up in the logs with this new version of NT. It seems to be reaching IBKR's API limits when starting my strategies' subscriptions:
+
+> 2025-11-19T07:36:31.199307179Z [WARN] PAPER-TRADER-001.InteractiveBrokersClient-001: Unknown subscription error: 10190 for req_id 10009
+> 2025-11-19T07:36:31.199293827Z [ERROR] PAPER-TRADER-001.InteractiveBrokersClient-001: Max number of tick-by-tick requests has been reached. (code: 10190, req_id=10009)
+
+.. then on shutdown:
+> 2025-11-19T07:50:18.096910744Z [WARN] PAPER-TRADER-001.InteractiveBrokersClient-001: Unhandled error: 300 for req_id 10009
+> 2025-11-19T07:50:18.096901428Z [ERROR] PAPER-TRADER-001.InteractiveBrokersClient-001: Can't find EId with tickerId:10009 (code: 300, req_id=10009)
+(repeat this X times for most quote tick subscriptions in my NT strategies - emphasis on *most* of them, not all of them. The first handful seem to work fine)
+
+It's not doing this on the latest stable NT release `nautilus-trader==1.221.0` (I rolled back to confirm).  I don't really know what to do.
+
+Is new reconciliation code being more aggressive with the IBKR API or something? Or is it maybe caused by some other unrelated new changes?
+
+I'll start trying to investigate but let me know if anyone has any ideas
+
+---
+
+#### [2025-11-19 07:51:52] @faysou.
+
+I think a change was made to subscribe to the granular ticks by default. I think the default should be to subscribe to snapshot ticks by default. It's not from the reconciliation change, it's another change.
+
+---
+
+#### [2025-11-19 07:52:15] @faysou.
+
+I think this conversation should be in the IB channel
+
+---
+
+#### [2025-11-20 16:39:18] @dun02
+
+I'm trying to do multiple runs and have a separate log file get created, but instead it takes the first ticker in the list as the file name, then concatenates the 3 results into that one log file, is there anything I'm doing wrong?
+```
+LOG_DIR = os.getenv('LOG_DIR')
+
+tickers = []
+with open('mr_tickers.txt', 'r') as file:
+    for line in file:
+        ticker = line.strip()
+        if ticker: 
+            tickers.append(ticker)
+
+for ticker in tickers[:3]:
+    current_time = pd.Timestamp.now()
+    current_time_formatted = current_time.strftime('%Y-%m-%d-%H:%M:%S')
+    log_file_name = f"naut_bt_{ticker}_{current_time_formatted}.log"
+    print(log_file_name)
+    engine_config = BacktestEngineConfig(
+        logging=LoggingConfig(
+            log_level="ERROR",
+            log_level_file="INFO",
+            log_file_name=log_file_name,
+            log_directory=LOG_DIR
+        )
+    )
+    engine = BacktestEngine(
+        config=engine_config       
+    )
+    ....
+    engine.reset()
+```
+
+---
+
+#### [2025-11-21 06:24:22] @cjdsellers
+
+Hey <@966200006010863656> I'd suggest looking into the streaming feather writer for persisting market data
+
+---
+
+#### [2025-11-22 05:55:05] @wave8718
+
+<@1354119061407141922>  hi can you share the fyers adapter, is it open-source? How can I get it .
+
+
+ <@757548402689966131> if you have this pl show me the way to get it. 
+
+Thank you in advance..
+
+**Attachments:**
+- [image0.png](https://cdn.discordapp.com/attachments/924499913386102834/1441668289930461375/image0.png?ex=694ad779&is=694985f9&hm=1b82805ae70daf8d628a32431101aa95adff56351e4d3412b83d6b7c6f5857b2&)
+
+---
+
+#### [2025-11-23 11:05:06] @faysou.
+
+I've updated this gist so it works well with uv. There was a problem when running make cargo-test with a uv managed python installation, a PYTHONHOME env variable needs to exist, I've added an instruction to add it to .cargo/config.toml, I've also updated the documentation for this.
+
+---
+
+#### [2025-11-25 03:05:06] @zschei44
+
+Hey folks I'm trying to work my way through the examples but I'm getting the folloing error:
+
+---------------------------------------------------------------------------
+ModuleNotFoundError                       Traceback (most recent call last)
+File ~/anaconda_projects/nautilus_trader-develop/examples/backtest/example_03_bar_aggregation/run_example.py:21
+     17 from decimal import Decimal
+     19 from strategy import DemoStrategy
+---> 21 from examples.utils.data_provider import prepare_demo_data_eurusd_futures_1min
+     22 from nautilus_trader.backtest.engine import BacktestEngine
+     23 from nautilus_trader.config import BacktestEngineConfig
+
+ModuleNotFoundError: No module named 'examples'
+
+That module seems to be called in every backtesting example.  I would appreciate any help.
+
+---
+
+#### [2025-11-25 12:32:54] @dxwil
+
+Hey, I'm having a problem, when I request_bars (with the intention of them warming up the indicators for live trading), the historical bars come in order of newest to oldest (which from what I observed warms up the indicators in an incorrect order). Is this a bug? Or the correct behaviour, and I should warm up the indicators differently?
+
+```
+2025-11-25T12:43:35.815505000Z [INFO] TESTER-001.DistanceStrategy: Received historical bar: BTC-USD-PERP.DYDX-1-MINUTE-LAST-EXTERNAL, time=2025-11-25T12:43:00+00:00, O=87461, H=87582, L=87442, C=87582
+2025-11-25T12:43:35.815574000Z [INFO] TESTER-001.DistanceStrategy: Received historical bar: BTC-USD-PERP.DYDX-1-MINUTE-LAST-EXTERNAL, time=2025-11-25T12:42:00+00:00, O=87442, H=87469, L=87442, C=87469
+2025-11-25T12:43:35.815617000Z [INFO] TESTER-001.DistanceStrategy: Received historical bar: BTC-USD-PERP.DYDX-1-MINUTE-LAST-EXTERNAL, time=2025-11-25T12:41:00+00:00, O=87455, H=87479, L=87425, C=87436
+2025-11-25T12:44:02.828040000Z [INFO] TESTER-001.DistanceStrategy: Received bar: BTC-USD-PERP.DYDX-1-MINUTE-LAST-EXTERNAL, time=2025-11-25T12:44:00+00:00, O=87607, H=87731, L=87591, C=87731
+2025-11-25T12:45:04.253359000Z [INFO] TESTER-001.DistanceStrategy: Received bar: BTC-USD-PERP.DYDX-1-MINUTE-LAST-EXTERNAL, time=2025-11-25T12:45:00+00:00, O=87756, H=87799, L=87657, C=87661
+
+```
+
+---
+
+#### [2025-11-25 14:57:33] @conayuki
+
+is there a way to quickly clone a rejected order and resubmit it as a simulated one? it looks tedious to recreate the order using order_factory since each order type has its own method.
+
+---
+
+#### [2025-11-25 17:50:41] @to19
+
+Hello guys I'm trying this lib out. Anyone is using vscode based ides ? Using it with cython is weird there is no code navigation and stuff :/
+
+---
+
+#### [2025-11-25 18:08:54] @faysou.
+
+use intellijidea ultimate, that's what I use, it works well with cython, python and rust at the same time. at some point cython won't be used anymore, and vscode based IDEs will be more usable with nautilus. currently I use cursor for using an AI agent and look at the code and edit it manually in intellijidea
+
+---
+
+#### [2025-11-25 18:12:40] @to19
+
+what you mean by it won't be used anymore ? nautilus is going full rust ?
+
+---
+
+#### [2025-11-25 18:12:52] @faysou.
+
+yes, full rust and python
+
+---
+
+#### [2025-11-25 18:12:54] @faysou.
+
+no cython anymore
+
+---
+
+#### [2025-11-25 18:13:14] @faysou.
+
+but not yet, there's a migration in progress, for now what's usable is python + cython + rust
+
+---
+
+#### [2025-11-25 18:13:46] @faysou.
+
+but the rust side will have the same structure as cython, so what you learn with cython, it will be me mostly the same in rust
+
+---
+
+#### [2025-11-25 18:14:09] @faysou.
+
+but it will be easier to understand the whole code in rust and debug it, as cython can't be debugged
+
+---
+
+#### [2025-11-25 18:14:20] @to19
+
+I prefer to avoid intellij I used to be a intellij nerd but now it sucks. Any vim/neovim plugin alternative ?
+
+---
+
+#### [2025-11-25 18:15:13] @faysou.
+
+<@757548402689966131> knows about nvim, I've never managed to motivate myself to learn it, watched several videos about it, but preferred coding some new stuff than learn it
+
+---
+
+#### [2025-11-25 18:15:46] @faysou.
+
+especially as most code is written by agents now, I'm more reviewing the agent now, although still coding manually sometimes if it's really subtle
+
+---
+
+#### [2025-11-25 18:16:29] @faysou.
+
+I don't have the impression that intellijidea sucks, I prefer it to vscode
+
+---
+
+#### [2025-11-25 18:18:18] @to19
+
+you are using cursor agents ?
+
+---
+
+#### [2025-11-25 18:18:29] @faysou.
+
+yes
+
+---
+
+#### [2025-11-25 18:19:04] @to19
+
+do you have a link to pr/discussions about it please ?
+
+---
+
+#### [2025-11-25 18:21:49] @faysou.
+
+no I don't, it's a thing ongoing for several years that the maintainer of the project <@757548402689966131> is working on, as well as a few other people, but <@757548402689966131> is the main person working on this
+
+---
+
+#### [2025-11-25 18:24:12] @faysou.
+
+https://github.com/nautechsystems/nautilus_trader/blob/develop/ROADMAP.md
+
+---
+
+#### [2025-11-25 18:24:17] @to19
+
+they went from a banger ide to a slow ass shit 10min startup ide in like 2 years. I still prefer debugging and database tools from intellij tho
+
+---
+
+#### [2025-11-25 18:24:35] @faysou.
+
+maybe you are using windows
+
+---
+
+#### [2025-11-25 18:24:52] @faysou.
+
+it used to be the case for me on windows before switching to macbook
+
+---
+
+#### [2025-11-25 18:24:56] @faysou.
+
+on macbook it works well
+
+---
+
+#### [2025-11-25 18:25:07] @to19
+
+I used it with mostly linux and macos
+
+---
+
+#### [2025-11-25 18:26:05] @faysou.
+
+all I can say is that currently it works well for me on a macbook air m4
+
+---
+
+#### [2025-11-28 02:22:47] @falls7202
+
+I need to manually pause my running Strategy process. What is the standard best practice for this?
+
+I'm currently thinking of spawning a listener thread within the process that reads pause command from a pipe, and then pushes the pause command into the main process's msgbus.
+
+---
+
+#### [2025-11-28 03:36:28] @cauta
+
+hi <@965894631017578537> i created an issue: https://github.com/nautechsystems/nautilus_trader/issues/3233
+i believe this is missing while implementation `replace_existing` in `StreamingConfig`
+
+**Links:**
+- `replace_existing` is not using for setting up `StreamingFeatherWri...
+
+---
+
+#### [2025-11-28 08:05:40] @cauta
+
+i created a PR for fix this bug: https://github.com/nautechsystems/nautilus_trader/pull/3234
+
+**Links:**
+- Fix _setup_streaming with replace_existing config by cauta · Pull ...
+
+---
+
+#### [2025-12-01 21:49:31] @greenbone
+
+Hey everyone quick question. It's taking ~20s to query one days worth of orderbook deltas for a single instrument roughly 50m orderbook deltas. I'm calling query_typed_data from Rust. Is that in the right ballpark or should I expect much faster?
+
+---
+
+#### [2025-12-02 05:49:04] @cjdsellers
+
+Hey <@1024150660519825418> depends on a couple of factors such as exact hardware, I'd expect in that range up to about ~2x faster. DataFusion is very good at leveraging more cores to read in parallel, so maybe try scaling up a little and see if that helps
+
+---
+
+#### [2025-12-02 07:41:05] @kulig1985
+
+Hi, found this tutorial.. https://nautilustrader.io/docs/latest/tutorials/backtest_binance_orderbook but there isn’t even a word about that how to provide historical order book data for this… and how this data should look like.. can anyone help me?
+
+**Links:**
+- Backtest: Binance OrderBook data | NautilusTrader Documentation
+
+---
+
+#### [2025-12-02 20:42:25] @greenbone
+
+Thank you for the response! Could you clarify what you mean by "scaling up"? I thought DataFusion defaults to using all available cores.
+
+---
+
+#### [2025-12-03 02:35:26] @cjdsellers
+
+Hey <@1024150660519825418> I meant scaling vertically with even more cores, but it might be worth figuring out what the bottleneck actually is before that - I would expect more performance than what you're reporting
+
+---
+
+#### [2025-12-05 15:50:10] @ido3936
+
+Thanks <@965894631017578537> and <@757548402689966131> , I've been away for a while but I started to test again the possibility of running NT over multiple sessions with persistence and reconciliation in between.
+I think that for the most part it works!! 🙏 
+I did come upon this minor difficulty today (I thikn that there is a missing check in the line) but apart from that it has been running smoothly for several days
+
+```line 3570, in _find_matching_cached_order
+    if price is not None and cached_order.price is not None and cached_order.price != price:
+                             ^^^^^^^^^^^^^^^^^^
+AttributeError: 'nautilus_trader.model.orders.market.MarketOrder' object has no attribute 'price'```
+
+---
+
+#### [2025-12-05 16:27:04] @faysou.
+
+Good, over time all bugs get fixed as long as people use the library and report bugs.
+
+---
+
+#### [2025-12-05 16:28:57] @faysou.
+
+Note that better reproduction codes or reports allow to fix bugs more easily instead of interpreting an error message.
+
+---
+
+#### [2025-12-05 18:44:38] @faysou.
+
+Also better to log issues on GitHub
+
+---
+
+#### [2025-12-05 19:55:58] @ido3936
+
+link to my comment in GH (FWIW, as the PR is already merged)
+
+https://github.com/nautechsystems/nautilus_trader/pull/3185#issuecomment-3618384069
+
+**Links:**
+- Refactor execution engine reconciliation by faysou · Pull Request ...
+
+---
+
+#### [2025-12-05 23:48:03] @cjdsellers
+
+Thanks for the report <@1074995464316928071>, this should now be fixed: https://github.com/nautechsystems/nautilus_trader/commit/dc6cce9321574f4cd6b076d79e3d27d73ba53765
+
+**Links:**
+- Fix matching market order price AttributeError · nautechsystems/na...
+
+---
+
+#### [2025-12-06 01:42:33] @albert_09059
+
+I am sorry for the bother, I am a very very very junior to this repository (though it is the best I find so far), may I ask where I can obtain dataset similar to Binance`depth-snap.csv`  such that I can run `crypto_orderbook_imbalance.py`. I am mainly interested in modelling with regards to orderbook data instead of Kline because they have richer mathematical properties, but I am not sure the workflow of it, I will appreciate any advices and thank you very much for building such a good project.
+
+---
+
+#### [2025-12-06 13:51:22] @hadi_loo
+
+Hi everyone! I’m new to Nautilus Trader and am currently working through some examples to get familiar with the platform. I'm really enjoying the architecture so far!
+
+I’ve hit a stumbling block regarding how the BacktestEngine handles simulated fills against L3 data, and I’m hoping someone can point me in the right direction.
+
+The Scenario: I am running a backtest using a custom L3DataWrangler and a simple CSV data feed.
+
+```Python
+# Data Snippet
+("2024-01-01 09:00:00", 3.8, 100, "sell", "OID-1") 
+("2024-01-01 10:00:00", 3.5, 100, "buy", "OID-2")
+# No subsequent 'DELETE' or 'MATCH' event exists for OID-3 in the CSV.
+```
+
+My strategy submits a Limit Buy order (size 100 @ 3.8) every 10 minutes.
+
+The Expected Behavior:
+
+- At 09:10, the first Buy order matches with OID-3. 
+OID-3 is fully consumed/filled.
+
+- At 09:20, the second Buy order is submitted but should not fill (or should rest), because the liquidity at 3.8 was taken by my previous trade.
+
+The Actual Behavior: Every single Buy order I submit gets filled at 3.8. It seems like the simulated exchange "resets" the liquidity based on the Data Feed rather than persisting the state change caused by my strategy's execution.
+
+My Question: Is there a specific configuration for SimulatedExchange or BacktestEngine that enforces stateful liquidity consumption? I want my simulated fills to permanently remove orders from the internal simulation book, even if the Data Feed doesn't explicitly send a delete event for them.
+
+Thanks in advance for any help!
+
+---
+
+#### [2025-12-07 14:58:16] @thisisrahul.
+
+Hello, I’m using the nightly build, while plotting the tear sheet, the equity curve as well as the monthly returns seem start from 1970 (start of epoch) instead of the start of backtest
+
+I debugged the code and it seems that the problem is I have a open position at the end of the backrest ( this assigns the close time of the position to 0, equivalent to 1970 )
+
+Is there a way for me to close the position when backtest stops? 
+I already have close_all_positions inside on_stop
+
+---
+
+#### [2025-12-15 04:46:39] @even_27404
+
+When will the hybrid cloud be available? I'm willing to pay to use it <@757548402689966131>
+
+---
+
+#### [2025-12-15 07:22:47] @cjdsellers
+
+Hi <@1413850358488371271> thanks for your interest. We're working on it at the moment, too early to be giving concrete time frames but it will be one of the major themes of next year when the Rust port is out of the way (getting closer on that every day). More updates on the state of the Rust port in the next release announcement (likely this week)
+
+---
+
+#### [2025-12-15 07:58:35] @javdu10
+
+Nice I was going to put « release tag » on my wish list
+
+---
+
+#### [2025-12-16 03:31:21] @cjdsellers
+
+Hi <@692998608600956969> 
+Thanks for reaching out.
+We don’t yet simulate user-driven state changes against historical book data, so fills don’t persistently remove liquidity in the backtest engine (this would be more realistic though). This is planned after the Rust port 🦀
+
+---
+
+#### [2025-12-18 14:14:38] @redyarlukas
+
+Is there any simple configuration option I dont see which allows me to guarantee always complete fills even though the actual liquidity is not provided? I could manually overwrite the historical sizes during data load but this would take hours and I would lose the option to switch on partial fills.
+
+---
+
+#### [2025-12-18 14:19:27] @heliusdk
+
+Working on a new strategy and want to ask if anyone here have tried to optimize a mean reversion strategy before?
+
+I have a 75.9% win rate, however my avg win is $24.81 and my avg loss is -$85.38.
+Using bayesian optimization by point distance from signal to actual price I got the avg loss down to -$59.64, and the avg trade from -$1.73 down to -$0.67, at the cost of a 73.8% win rate instead.
+
+The backtest is for 1 year, where it generates 2532 orders.
+
+
+recipe:
+- Constantly in the market
+- Dynamic position scaling based on point distance and win/loss ratio over the last 200 trades with bayesian optimization
+- Stoploss, well none I do not have good experience with stoplosses and for this strategy it would probably be a killer for the winrate.
+- Base trigger classic vwap above and below
+- exit trigger the reverse
+- fill and transaction costs ofc included
+
+I've looked into:
+- large volume periods had a large say in this, hence given my dynamic position sizing.
+- Grouped by time of day to look for patterns, because the exchange open and close periods had a say
+
+
+Right now I am looking into to trying to do a regression over the z-score as well as strategy signals, which may or may not overfit it.
+Also doing market regime identification for better trade confidence together with Markov models.
+
+But overall I am asking for inspiration or ideas for new angels to look at the data from, would appricate if anyone would share a chunk or their experince in this area, or feedback or even just a sketchy technical paper they want to share 😀 👏
+
+**Attachments:**
+- [Screenshot_2025-12-18_at_14.55.16.png](https://cdn.discordapp.com/attachments/924499913386102834/1451217303021813830/Screenshot_2025-12-18_at_14.55.16.png?ex=694aa4ef&is=6949536f&hm=80390bd67e36748e04c78fb8d4a284f9e46bd70989de9897d885ababf4eb2158&)
+- [Screenshot_2025-12-18_at_15.05.23.png](https://cdn.discordapp.com/attachments/924499913386102834/1451217303365484574/Screenshot_2025-12-18_at_15.05.23.png?ex=694aa4ef&is=6949536f&hm=1e0cde645a3578914ec83600497fd4a03a27662b7ea35e96df5d4d89182dfb0f&)
+
+---
+
+#### [2025-12-19 07:55:50] @cjdsellers
+
+Hi <@1273010294033219642> 
+Seems like you have some avenues to investigate there - nice work on the progress and vis! My only comment would be that I’d still suggest having some way of expressing a point where the strategy is definitely wrong about the potential reversion, to manage risk. 
+
+Otherwise, you’re hoping that some huge Cauchy outlier doesn’t steamroll the last couple of months of profits with a sharp correction into a regime change
+
+---
+
+#### [2025-12-19 13:15:49] @heliusdk
+
+Thanks for the feedback, I will do that 🙂
+
+---
+
+#### [2025-12-19 14:27:30] @dun02
+
+I'm getting these errors on a backtest of EUR/CHF spot FX.  I assume I need to provide CHF/USD or USD/CHF daily prices so that it can do currency conversions?  How should I resolve?
+Bar:
+```
+Bar(EUR/CHF.SIM-1-MINUTE-LAST-EXTERNAL,0.96719,0.96720,0.96718,0.96719,5,1718234940000000000)
+```
+Error:
+```
+2024-06-13T05:03:00.000000000Z [ERROR] BACKTESTER-001.Cache: Cannot calculate exchange rate: ValueError('Quote maps must not be empty')
+2024-06-13T05:03:00.000000000Z [ERROR] BACKTESTER-001.Portfolio: Cannot calculate account state: insufficient data for CHF/USD
+```
+
+---
+
+#### [2025-12-21 13:02:00] @oikoikoik14
+
+I have a hard time understanding the matching logic in nautilus_trader
+
+I have level 2 data and TradeData for a instrument (being a option, but this should not matter)
+
+The scenario is that
+
+Level 2 data which has the following top of book (Snapshot):
+
+Best Bid: 1000 @ 0.27
+
+Best Ask: 100 @ 0.37
+
+My Orders (Accepted & Open):
+
+Limit Buy: 1 @ 0.28 (Better than best bid)
+
+Limit Sell: 1 @ 0.36 (Better than best ask)
+
+The Issue: A trade tick comes in as a SELLER at 0.27. Since my Buy order is sitting at 0.28, I would expect this to match and fill my order immediately.
+
+However, the tick is just passed through and filled with a order that is at 0.27. It doesn't seem to trigger any fill logic, and it looks like it doesn't even reach the FillModel.
+
+Has anyone experienced this behavior where price improvement inside the spread is ignored during simulation? Is there a configuration setting for matching logic or FillModel that I might be missing? I have already turned on trade_execution=True in the BacktestVenueConfig
+
+Thanks!
+
+---
+
+#### [2025-12-21 13:27:41] @oikoikoik14
+
+Running the 
+
+tests/unit_tests/backtest
+/test_matching_engine/TestOrderMatchingEngine.test_trade_execution_fills_better_priced_orders_for_buys 
+
+locally produces a error.... Has the logick changed since then? <@757548402689966131>
 
 ---

@@ -1,229 +1,276 @@
 # NautilusTrader - #bybit
 
 **Period:** Last 90 days
-**Messages:** 30
-**Last updated:** 2025-10-23 04:00:37
+**Messages:** 24
+**Last updated:** 2025-12-22 18:02:01
 
 ---
 
-#### [2025-07-26 02:19:47] @cjdsellers
+#### [2025-10-25 07:03:11] @cjdsellers
 
-Hi <@322841069366804491> 
-Thanks for reaching out. It looks like parsing `CryptoOption` instruments still needs to be completed [here](https://github.com/nautechsystems/nautilus_trader/blob/develop/nautilus_trader/adapters/bybit/providers.py#L262). I'd imagine that would be very similar to the others and adding `strike`, option `kind` etc.
+@everyone 🚀 **Call for Testing: Bybit Adapter Rust Port**
 
-Then it would just be a matter of attempting to use option instruments and incrementally fixing the issues. I'm unsure exactly what might be required beyond the instrument provider
+The Bybit adapter has been fully ported to Rust (with a thin Python layer for the legacy system like BitMEX and OKX) is available from the `rust-bybit` branch **and is ready for community testing!**
+This brings significant performance and reliability improvements.
+
+📦 Branch: **rust-bybit**
+
+```
+git checkout rust-bybit
+make build-debug
+```
+
+✨ **What's New**
+- Full Rust implementation of HTTP and WebSocket clients
+- Option support - trade Bybit options alongside SPOT/LINEAR/INVERSE
+- Cleaner architecture - WebSocket-based order routing (no HTTP/WS toggle)
+- Better performance - Native Rust HTTP client with built-in retry logic
+- Simplified configuration - Removed now redundant options when we transitioned from HTTP to the WS trade API
+
+🔧 **Breaking Changes**
+- Removed `use_ws_trade_api` - Orders now always use WebSocket (better performance)
+- Changed `from nautilus_trader.adapters.bybit import get_bybit_http_client` to  `from nautilus_trader.adapters.bybit import get_cached_bybit_http_client`
+
+🧪 **What to Test**
+
+**High Priority**
+- Option trading - Submit/modify/cancel option orders
+- Multi-product configs - Mix SPOT + LINEAR + OPTION
+- WebSocket stability - Long-running connections (24h+)
+- Order execution - All order types across all products
+- Account state - Balance updates, position tracking
+
+**Standard Testing**
+- Data streaming (orderbook deltas, trades, quotes, bars)
+- Instrument provider (loading instruments for all products)
+- Historical data requests
+ - Reconnection handling
+- Error handling and retries
+
+**Configuration Testing**
+- Single product type (SPOT, LINEAR, INVERSE, OPTION)
+- Mixed product types (SPOT, LINEAR, OPTION)
+- Testnet vs mainnet
+
+🐛 **Reporting issues**
+
+ Please report any issues found straight to this channel for fast turn around!
+
+🙏** Thank You!**
+
+Your testing helps ensure a smooth transition to a production release. All feedback welcome - from "works perfectly" to "broke everything" - it all helps!
+
+**Target merge:** Post the next release and once we've received sufficient feedback
 
 ---
 
-#### [2025-07-28 14:33:47] @baerenstein.
+#### [2025-10-26 03:02:11] @cjdsellers
 
-I just finished implementing the options support for Bybit and would be happy to push it onto the Nautilus repo. I also already created an issue where I would link my feature branch to. https://github.com/nautechsystems/nautilus_trader/issues/2818 Should I add someone specific as assignee? <@757548402689966131>
+Some important updates were just pushed to the `rust-bybit` branch that fix post-only rejects
+
+---
+
+#### [2025-10-27 05:01:18] @joker06326
+
+In new release, when I get my position from wallet  in spot margin mode, the debt is removed automatically, right?
+
+---
+
+#### [2025-10-27 07:34:36] @cjdsellers
+
+Hey <@1162973750787051560> 
+That is correct `walletBalance - spotBorrow = actual_balance`. This should be consistent for both the current `develop` Python-based version and the Rust-based version on `rust-bybit`
+
+---
+
+#### [2025-10-29 04:39:13] @cjdsellers
+
+⚠️ 🦀 ** Bybit port to Rust landed on develop branch** 🛬 
+
+After consulting with some Bybit power users, and in the interests of progress - the Bybit Rust port has now landed on `develop` branch.
+
+Theoretically there should be no breaking changes other than the removal of the `use_ws_trade_api` config option toggle (redundant now that we always use the WebSocket trade API).
+
+Please report any issues as they come up to this channel and we'll address them promptly!
+
+---
+
+#### [2025-11-28 19:56:02] @dxwil
+
+Hey, when using the bybit integration, my stop market order gets instantly filled (I'm trying to create a stop-loss).
+
+Edit: It doesn't matter if I set the stop market order trigger price to be above or below the current price, it still triggers on the same bar regardless.
+
+**Attachments:**
+- [message.txt](https://cdn.discordapp.com/attachments/1151424136283947028/1444054248324071625/message.txt?ex=694a4b12&is=6948f992&hm=9b674d45845d07fd74ef2c169a145badfc2b7960582e6fef986b64e97a28cf18&)
+
+---
+
+#### [2025-12-04 11:28:08] @violet.250
+
+hey anyone know if bybit exection support on_order callback
+
+---
+
+#### [2025-12-05 06:35:10] @cjdsellers
+
+Hey <@574471770720043010> 
+
+Looking at your logs, the stop BUY was set at trigger 91101.00 when price was ~91117.80. A STOP BUY triggers when price is at or above the trigger - since 91117.80 >= 91101.00, it triggers immediately. That's expected behavior.
+
+For a SHORT position stop-loss, set the trigger above your entry (e.g., 91200.00)
+
+Are you currently using the released Python-based Bybit adapter, or development wheels Rust-based?
+
+---
+
+#### [2025-12-05 06:38:32] @cjdsellers
+
+Hey <@1405497295683846165> if you're referring to the `on_order_event` handler then it's agnostic to a specific adapter or environment context - so should work backtest and live for all integrations
+
+---
+
+#### [2025-12-06 16:24:48] @dxwil
+
+I later looked through the source code and noticed that the specific "stop-loss" part was modified in the development wheel (Rust-based). So I tried with that and without changing any of my code, it placed the stop-loss order correctly.
+
+---
+
+#### [2025-12-06 16:30:42] @dxwil
+
+Another thing that I noticed in the development build, is that when I request_bars, it returns all full closed bars correctly except the last bar returned is the current bar that has not yet closed. When trading based on bars, I personally only care about bars that have fully closed, and this behaviour is messing with the indicators, so I don't know if this is expected behaviour or not. (In the logs, the time is the open of the bar) 
+
+```
+2025-12-06T16:19:39.587006000Z [INFO] TESTER-001.DistanceStrategy: Received historical bar: BTCUSDT-LINEAR.BYBIT-1-MINUTE-LAST-EXTERNAL, time=2025-12-06T16:17:00+00:00, O=89870.30, H=89883.60, L=89844.60, C=89872.80
+2025-12-06T16:19:39.587052000Z [INFO] TESTER-001.DistanceStrategy: Received historical bar: BTCUSDT-LINEAR.BYBIT-1-MINUTE-LAST-EXTERNAL, time=2025-12-06T16:18:00+00:00, O=89872.80, H=89881.30, L=89846.30, C=89846.30
+2025-12-06T16:19:39.587100000Z [INFO] TESTER-001.DistanceStrategy: Received historical bar: BTCUSDT-LINEAR.BYBIT-1-MINUTE-LAST-EXTERNAL, time=2025-12-06T16:19:00+00:00, O=89846.30, H=89897.00, L=89844.70, C=89881.00
+2025-12-06T16:19:39.587177000Z [INFO] TESTER-001.DistanceStrategy: Received <Bar[386]> data for BTCUSDT-LINEAR.BYBIT-1-MINUTE-LAST-EXTERNAL
+2025-12-06T16:20:00.468758000Z [INFO] TESTER-001.DistanceStrategy: Received bar: BTCUSDT-LINEAR.BYBIT-1-MINUTE-LAST-EXTERNAL, time=2025-12-06T16:19:00+00:00, O=89846.30, H=89897.00, L=89844.70, C=89871.40
+```
+
+---
+
+#### [2025-12-07 02:59:11] @cjdsellers
+
+Hi <@574471770720043010> thanks for the report on this. Should now be fixed and available soon in latest development wheels https://github.com/nautechsystems/nautilus_trader/commit/a15a0f295d0b3f4856066c7290a92045ae047267
 
 **Links:**
-- Bybit Options Support missing · Issue #2818 · nautechsystems/naut...
+- Fix Bybit historical bars requests partial bar filtering · nautech...
 
 ---
 
-#### [2025-07-28 20:15:00] @faysou.
+#### [2025-12-07 13:16:30] @violet.250
 
-You just need to create a PR. Ensure to run the pre commit checks before as explained is the nautilus developer guide.
-
----
-
-#### [2025-07-29 02:01:23] @cjdsellers
-
-Hi <@322841069366804491> 
-Thanks for the help on this! I can sort out ticketing and assignee once you open the PR
+Thanks for your answer you are right
 
 ---
 
-#### [2025-08-02 03:37:29] @valeratrades
+#### [2025-12-09 06:06:01] @lukeg_38673
 
-unless I'm missing something, this shouldn't be an error on `Inverse`, no?
-```
-Error during node operation: `free` amount was negative
-```
+<@224557998284996618>  <@757548402689966131> was positionIdx for hedge mode  included in the Rust new Bybit adapter? Or is it still something that needs to be implemented?
 
 ---
 
-#### [2025-08-04 02:59:30] @cjdsellers
+#### [2025-12-11 05:33:50] @gz00000
 
-Hi <@474661840735961089> 
-I'm unsure of the inputs / path which lead to this, so hard to comment on the cause. It's still possible to end up with a negative balance with inverse contracts though. Are you on 1.219.0 or later?
-
----
-
-#### [2025-08-04 12:00:47] @valeratrades
-
-yes, I'm on 1.219.0
-
-"ending up" is completely fine, but it erroring doesn't seem to make sense in the Inverse contracts case, unless I'm missing something?
+I'm not entirely sure either. Might need to check the code to confirm.
 
 ---
 
-#### [2025-08-04 12:41:04] @cjdsellers
+#### [2025-12-11 07:52:45] @_davidlin
 
-Hi <@474661840735961089> 
-I'm not following what you mean based on the information provided - what is the scenario which lead to the error?
+Partially - the infrastructure (enum, field) exists but is NOT wired up. The  submit_order() function does not set position_idx, so hedge mode orders cannot currently be placed.
 
 ---
 
-#### [2025-08-04 13:17:37] @valeratrades
+#### [2025-12-11 07:53:57] @_davidlin
 
-with UTA, if a perp position shows unrealized loss, the USDT amount here could go negative.
+- **Path**: `nautilus_trader/crates/adapters/bybit/src/http/client.rs`
+- **Lines**: 1920–1949 of 3761
 
-so new position can be easily opened against BTC on the account, but NT panics when it sees negative number for spot USDT
+---
+
+#### [2025-12-11 07:54:26] @_davidlin
+
+Missing for Hedge Mode:
+No parameter for position mode - Cannot specify:
+- One-way mode (positionIdx=0)
+- Long hedge (positionIdx=1)
+- Short hedge (positionIdx=2)
+
+---
+
+#### [2025-12-11 07:55:00] @_davidlin
+
+The current implementation only supports basic market/limit orders with no hedge mode, no stop orders, and no TP/SL.
+
+---
+
+#### [2025-12-20 18:25:14] @axelch97
+
+Hi,
+Bellow you will find details about a bug found inthe bybit adapter code.
+
+Bug Report: Bybit WebSocket Bar Timestamps Not Respecting bars_timestamp_on_close Configuration
+
+Summary
+WebSocket bar data from the Bybit adapter does not respect the bars_timestamp_on_close configuration option, causing a 1-bar timestamp offset between WebSocket-delivered bars and HTTP-requested bars.
+
+Affected Component
+nautilus_trader/adapters/bybit/data.py - BybitDataClient
+
+Severity
+High - Causes data inconsistency that affects backtesting accuracy and indicator calculations.
+
+Environment
+NautilusTrader version: Latest (as of Dec 2025)
+Exchange: Bybit (Linear perpetuals)
+Python: 3.11+
+
+Problem Description
+Expected Behavior
+When bars_timestamp_on_close=True (the default), all bars should have ts_event set to the bar's CLOSE time. For example, a 1-minute bar spanning 16:33:00-16:34:00 should have ts_event=16:34:00.
+This should apply consistently to:
+Bars requested via HTTP (request_bars)
+Bars received via WebSocket subscription (subscribe_bars)
+
+Actual Behavior
+HTTP bars: Correctly use CLOSE timestamps (the timestamp_on_close parameter is passed to request_bars)
+WebSocket bars: Use OPEN timestamps (the configuration is NOT applied)
+This creates a 1-bar offset where WebSocket bars have ts_event one bar duration earlier than HTTP bars for the same OHLCV data.
+Evidence
+
+Comparing bar data from the same instrument at the same moment:
+Source    ts_event    Open Price    Expected ts_event
+HTTP Bar    16:34:00    1.9286    16:34:00 ✓
+WebSocket Bar    16:33:00    1.9286    16:34:00 ✗
+The WebSocket bar has the same OHLCV data but timestamp is 1 minute earlier.
+
+---
+
+#### [2025-12-20 18:27:30] @axelch97
+
+Hi, <@757548402689966131> More details about the bybit adapter bug  here
 
 **Attachments:**
-- [image.png](https://cdn.discordapp.com/attachments/1151424136283947028/1401916991190859888/image.png?ex=68fad3b1&is=68f98231&hm=e0d49bfcb3320010e7cb033266937f1db27d20d80aece74c2b845c4c96b440d1&)
+- [IMG-20251220-WA0003.jpg](https://cdn.discordapp.com/attachments/1151424136283947028/1452004501702840513/IMG-20251220-WA0003.jpg?ex=694a3652&is=6948e4d2&hm=093bc2dca5eccf57025cbe84078513d6678fe4d56c91c34a0594f044ff6f8b88&)
 
 ---
 
-#### [2025-08-18 09:49:14] @joker06326
+#### [2025-12-21 23:41:40] @dxwil
 
-2025-08-18T09:47:10.001809489Z [WARN] zsg-bybit-02.RiskEngine: SubmitOrder for O-20250818-094710-02-MMtick-17 DENIED: NOTIONAL_EXCEEDS_FREE_BALANCE: free=0.41243685 USDC, balance_impact=-11.50789000 USDC
-2025-08-18T09:47:10.001991693Z [WARN] zsg-bybit-02.VolatilityMarketMaker: <--[EVT] OrderDenied(instrument_id=BTCUSDC-SPOT.BYBIT, client_order_id=O-20250818-094710-02-MMtick-17, reason='NOTIONAL_EXCEEDS_FREE_BALANCE: free=0.41243685 USDC, balance_impact=-11.50789000 USDC')
-
----
-
-#### [2025-08-18 09:50:04] @joker06326
-
-How can i close the balance check? Because i open "isLeverage=1", it will borrow coin automatically.
+I'm looking into how to add this now but need a suggestion. To set the positionIdx parameter, we need to know the order side and position mode. The former is already passed as a parameter to the `submit_order` function, so we only need to figure out if the order is hedged or not. But here I see 2 ways to go about it: 1. Figure this out in the http client itself (maybe make an api call or save a variable, don't know yet); 2. Pass `is_hedged` or similar through `params` of `submit_order` function (like how `'is_leverage` is done now). So my question, which way would be more correct for the architure? Then I can definitely implement it.
 
 ---
 
-#### [2025-08-18 09:52:05] @cjdsellers
+#### [2025-12-21 23:43:04] @lukeg_38673
 
-Hi <@1162973750787051560> 
-The latest `develop` version allows borrowing by default for Bybit. Which version are you using?
-
----
-
-#### [2025-08-18 10:06:52] @joker06326
-
-The latest pip version, not develop branch.
+Yeah I solved it using the same approach as is_leverage. Been testing it since I mentioned it. I can push a PR up with the change for you to use.
 
 ---
 
-#### [2025-08-18 11:16:34] @cjdsellers
+#### [2025-12-22 08:15:46] @dxwil
 
-Understood, we will release the next version soon after some issues are resolved
-
----
-
-#### [2025-09-15 03:25:12] @joker06326
-
-<@757548402689966131> Hi, I saw the isLeverage update in the latest version. But I don't know how to set this True in ```self.order_factory.limit```.
-
----
-
-#### [2025-09-15 03:33:18] @cjdsellers
-
-Hi <@1162973750787051560> 
-You can use the `params` dict to pass `is_leverage: True`. There are some docs here: https://nautilustrader.io/docs/nightly/integrations/bybit#order-parameters
-
----
-
-#### [2025-09-15 03:48:46] @joker06326
-
-
-
-**Attachments:**
-- [image.png](https://cdn.discordapp.com/attachments/1151424136283947028/1416994128398520400/image.png?ex=68faf71e&is=68f9a59e&hm=4ba5ac6a1fa738851b0d8cbdd209d20db82894409f0670b0afa7e8e85330e884&)
-
----
-
-#### [2025-09-15 03:49:04] @joker06326
-
-
-
-**Attachments:**
-- [image.png](https://cdn.discordapp.com/attachments/1151424136283947028/1416994202985693256/image.png?ex=68faf730&is=68f9a5b0&hm=eb6ab2937f24ef36df1d5a10c5d81f3150677a00e5c91c029300f98e4bb7af60&)
-
----
-
-#### [2025-09-15 03:49:40] @joker06326
-
-<@757548402689966131> There is no "params" in function param.
-
----
-
-#### [2025-09-15 04:13:10] @cjdsellers
-
-<@1162973750787051560> it's in the docs. The `params` dict is for `submit_order`
-
----
-
-#### [2025-09-15 04:48:13] @joker06326
-
-```
-2025-09-15T04:46:29.001409647Z [WARN] zsg-bybit-01.RiskEngine: SubmitOrder for O-20250915-044629-01-MMtick-2696 DENIED: CUM_NOTIONAL_EXCEEDS_FREE_BALANCE: free=0.00081761 BTC, cum_notional=0.02000000 BTC
-2025-09-15T04:46:29.001592689Z [INFO] zsg-bybit-01.ExecClient-BYBIT: Submit LimitOrder(BUY 0.020000 BTCUSDT-SPOT.BYBIT LIMIT @ 116_125.7 GTD 2025-09-15T04:46:44.000Z, status=INITIALIZED, client_order_id=O-20250915-044629-01-MMtick-2695, venue_order_id=None, position_id=None, tags=['MM'])
-2025-09-15T04:46:29.001655527Z [WARN] zsg-bybit-01.VolatilityMarketMaker: <--[EVT] OrderDenied(instrument_id=BTCUSDT-SPOT.BYBIT, client_order_id=O-20250915-044629-01-MMtick-2696, reason='CUM_NOTIONAL_EXCEEDS_FREE_BALANCE: free=0.00081761 BTC, cum_notional=0.02000000 BTC')
-```
-I have set is_leverage=True. But order was still denied when I tried selling BTC with margin.
-
----
-
-#### [2025-09-15 09:39:19] @cjdsellers
-
-Thanks for the feedback. This is an interesting case - the risk engine isn’t considering the leverage available. There’s not a quick solution here other than to bypass the risk engine or stay within those balance limits
-
----
-
-#### [2025-09-15 10:04:43] @joker06326
-
-How can I bypass the risk engine？
-
----
-
-#### [2025-09-15 21:04:10] @cjdsellers
-
-<@1162973750787051560> you can use the `RiskEngineConfig.bypass` to achieve this: https://github.com/nautechsystems/nautilus_trader/blob/develop/nautilus_trader/risk/config.py#L27
-
-**Links:**
-- nautilus_trader/nautilus_trader/risk/config.py at develop · nautec...
-
----
-
-#### [2025-09-17 12:38:02] @.islero
-
-Hi, is it ok I’m not getting open orders after application restart? But the positions syncs correctly. 
-
-reconciliation=True,
-reconciliation_lookback_mins=1440,
-        open_check_interval_secs=5.0,
-        open_check_open_only=True,
-
----
-
-#### [2025-09-17 13:11:09] @.islero
-
-It looks like the only option is to store the cache in Redis so that after a restart it can restore the entire state that existed before the restart, right?
-
----
-
-#### [2025-09-18 04:19:22] @cjdsellers
-
-Hi <@785499022567145523> 
-Which version are you on? there is currently a large overhaul/upgrade to reconciliation on `develop` branch (install from development wheels) which might fix this for you
-
----
-
-#### [2025-09-18 06:42:47] @.islero
-
-I’m using v1.220
-
----
-
-#### [2025-09-18 06:49:28] @.islero
-
-Ok, thanks. I think I’ve resolved the issue by completely disabling reconciliation and saving the cache to Redis.
-
----
-
-#### [2025-09-18 09:56:17] @cjdsellers
-
-<@785499022567145523> Understood. I do believe reconciliation is working for both v1.220.0 and the unreleased v1.221.0 (v1.221.0 has much more robust reconciliation though)
+That would be great
 
 ---

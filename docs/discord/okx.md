@@ -1,36 +1,8 @@
 # NautilusTrader - #okx
 
 **Period:** Last 90 days
-**Messages:** 10
-**Last updated:** 2025-10-23 04:00:41
-
----
-
-#### [2025-08-27 10:12:19] @joker06326
-
-If I want to trade btcusdt spot, how should I define instrumentId in okx adapter?
-
----
-
-#### [2025-08-28 06:24:28] @cjdsellers
-
-Hi <@1162973750787051560> 
-You'll find some clues in [this example](https://github.com/nautechsystems/nautilus_trader/blob/develop/examples/live/okx/okx_exec_tester.py#L45). Typically `{base}-{quote}` is the convention, the perps have a `-SWAP` suffix. I'll update the integration guide to provide more clarity around this
-
----
-
-#### [2025-09-09 17:28:52] @kmilesz
-
-I have a question about implementing the adaptor. Does it need to strictly adhere to the developer guide? For instance, I noticed that the type for _subscribe_order_book_deltas in the OKX data client is different from what's specified in the guide. Will this discrepancy cause some issues? Or does it not matter as long as the configuration is correct, and we don't need to be concerned with type uniformity? thanks!
-
----
-
-#### [2025-09-14 23:34:23] @cjdsellers
-
-Hi <@1288926845399732328> 
-I think the guide was outdated, it should be updated now for the actual method signature used. The main thing is that all of the parsing and API clients are implemented in Rust. The Python under `nautilus_trader/adapters/` is only a thin translation layer back into the legacy Cython system.
-
-[edit] The adapters guide has now been updated: https://nautilustrader.io/docs/nightly/developer_guide/adapters
+**Messages:** 18
+**Last updated:** 2025-12-22 18:02:05
 
 ---
 
@@ -91,5 +63,78 @@ I was just trying to set up a `OKXDataClientConfig` as a part of a `TradingNodeC
 ```
 I'll try building from source and see if that makes a difference.
 I am still learning how to use this tool so I am sure it is just something I have missed from the documentation.
+
+---
+
+#### [2025-11-01 05:05:19] @mk1ngzz
+
+Does anyone know if OKX support SWAP as instrument type for algo orders? I'm getting this error `Authentication failed: Wrong URL or channel:orders-algo,instType:SWAP doesn't exist. Please use the correct URL, channel and parameters referring to API document.`
+
+---
+
+#### [2025-11-01 07:00:43] @trueorfalse
+
+<@223930266207518721> they are recently making some big changes, I would suggest checking bussiness channel also
+
+---
+
+#### [2025-11-01 07:21:57] @mk1ngzz
+
+apparently their customer service doesn't even know if its supported or not lol
+
+---
+
+#### [2025-11-01 22:31:49] @trueorfalse
+
+that is interesting, could you share subscribe command 
+with type of data source (http api, ws api) <@223930266207518721>
+
+---
+
+#### [2025-11-02 01:44:10] @mk1ngzz
+
+their tech team reached out, and they do indeed support it
+
+---
+
+#### [2025-11-02 01:44:34] @mk1ngzz
+
+wondering why it doesn't work then
+
+---
+
+#### [2025-11-02 01:46:08] @mk1ngzz
+
+im using the rust adapter https://github.com/nautechsystems/nautilus_trader/blob/2a4e929e26a783375ac8d633c199433df1b1dc56/crates/adapters/okx/src/websocket/client.rs#L2136-L2147
+
+---
+
+#### [2025-11-02 11:29:03] @trueorfalse
+
+I think it is channel issue they did some changes. may be we should look at the change log.
+
+---
+
+#### [2025-11-02 13:14:26] @mk1ngzz
+
+yeah you're right. the business api has to be used
+
+---
+
+#### [2025-11-09 10:50:54] @mk1ngzz
+
+does anyone know how to submit bracket orders to okx?
+
+---
+
+#### [2025-11-09 10:56:10] @mk1ngzz
+
+i'm trying to use `attachAlgoOrds` when sending an order request, but it just fails with `invalid args`
+
+---
+
+#### [2025-11-10 11:57:55] @mk1ngzz
+
+ok, apparently `attachAlgoOrds` is not supported with the ws api
 
 ---

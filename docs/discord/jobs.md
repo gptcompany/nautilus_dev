@@ -1,21 +1,13 @@
 # NautilusTrader - #jobs
 
 **Period:** Last 90 days
-**Messages:** 2
-**Last updated:** 2025-10-18 04:01:27
+**Messages:** 1
+**Last updated:** 2025-12-22 18:02:08
 
 ---
 
-#### [2025-07-20 18:43:29] @saruman9490
+#### [2025-11-28 04:44:03] @saruman9490
 
-
-
----
-
-#### [2025-07-20 18:43:30] @saruman9490
-
-It was a pleasure working with you too! And thanks for the good words 🙂 
-
-Happy to share my appreciation of  Nautilus and the reasons why I like it every time I get a chance 🙂
+Hey all, just a reminder - I consult and help to configure and evolve your Nautilus Trader setups. Feel free to reach out to discuss!
 
 ---

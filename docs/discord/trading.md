@@ -1,90 +1,8 @@
 # NautilusTrader - #trading
 
 **Period:** Last 90 days
-**Messages:** 18
-**Last updated:** 2025-10-23 04:00:30
-
----
-
-#### [2025-09-16 14:58:24] @Wick
-
-
-
-**Links:**
-
-
----
-
-#### [2025-09-17 04:12:15] @saruman9490
-
-Hi guys, I'm debugging reconcilliation and my question is does Nautilus reconcile only the orders or also the positions?
-
----
-
-#### [2025-09-17 16:52:34] @dsalama345231
-
-Is there some kind of community-driven repository of strategies available, mainly for educational purposes? Mostly interested in learning how to be able to properly use NT for options trading. Thank you
-
----
-
-#### [2025-09-18 04:17:01] @cjdsellers
-
-Hi <@792981407122980875> 
-Not _yet_, but this has been mentioned a few times and I think it's a good idea. I'll consider this further
-
----
-
-#### [2025-09-18 21:52:46] @shuo.zheng
-
-also interested in this
-
----
-
-#### [2025-09-20 16:37:27] @eclipsephage
-
-I've thought about this myself. Really ends up being contingent on the community pushing to the /strategies sub-repo.  It's not a 'feature' per se, just a mode of action.  More on us.
-
----
-
-#### [2025-09-20 16:39:12] @eclipsephage
-
-... that said, we could also link that to a simple, slick infosite with ai interp of the strat (with example imagery). Could spin that up in an hr and make it two-way so folk could push thoughts from the UI rather than code.
-
----
-
-#### [2025-09-20 16:40:43] @eclipsephage
-
-And no, no other quant site or brokerage really does this yet. Not even TV., in that form. Though close.
-
----
-
-#### [2025-09-20 16:41:55] @eclipsephage
-
-Only reason I havent volunteered anything as of yet is I'm stuck building an AIML startup. lol Havent even been trading.
-
----
-
-#### [2025-09-20 16:44:16] @eclipsephage
-
-Github itself btw, just allowed Gemini Agent (release version of Jules) inside the site, not just connected.  Workflows, etc.  😉  Not sure why they kept it quiet, but it's there. Free, and better than copilot probs.
-
----
-
-#### [2025-09-20 16:47:35] @eclipsephage
-
-In essence you just have Gemini build the agentic flow from github hooked into pull requests.  It'll re-spin up the git site automatically, inform users, etc.  Whatever you want.
-
----
-
-#### [2025-09-20 18:10:36] @faysou.
-
-I think the idea behind not sharing strategies is to avoid overcrowding the space and making it too easy. Trading is a competitive field and there's no incentive in giving knowledge. Those who are motivated enough or knowledgeable enough will know how to piece together what's necessary to succeed. Building tools in nautilus and making strategies freely available are two different things. It's a bit like explaining the process of selling on Amazon and telling people which products should be sold. One is about the process the other is relatively private.
-
----
-
-#### [2025-09-20 18:12:58] @faysou.
-
-There are btw some example strategies in the repo, basic things like moving average crosses, it demonstrates the tools work, but then I don't think more needs to be done. It's just my opinion, anybody is free to create such repo for sharing ideas. The question is more does it make sense for people to share trading ideas.
+**Messages:** 13
+**Last updated:** 2025-12-22 18:01:52
 
 ---
 
@@ -93,7 +11,7 @@ There are btw some example strategies in the repo, basic things like moving aver
 <@757548402689966131> I use manage_gtd to push gtc order on bybit, but sometimes the cancel time was an error.
 
 **Attachments:**
-- [message.txt](https://cdn.discordapp.com/attachments/931763076930367608/1420268487250808872/message.txt?ex=68fa5a5a&is=68f908da&hm=1f22c383c3a3300d5fa5c93efc84f64783807401cf7589dbea565a1b74ba9820&)
+- [message.txt](https://cdn.discordapp.com/attachments/931763076930367608/1420268487250808872/message.txt?ex=694ac5da&is=6949745a&hm=0f9e5c6eb3772509ea6c1faf939ea6664fa18ca1373689da7b3f9d2ac4a50e9a&)
 
 ---
 
@@ -118,5 +36,58 @@ maybe not actually, all the common strategies would just become less profitable
 #### [2025-10-03 22:28:41] @donaldcuckman
 
 for the small fry
+
+---
+
+#### [2025-12-09 04:02:56] @saruman9490
+
+Can Nautilus strategy spawn another strategy? If so, could maybe someone give me an example?
+
+---
+
+#### [2025-12-10 01:01:24] @petioptrv
+
+You need to add the strategy to the Trader, and the strategy itself doesn’t have access to the trader. I usually create an overarching strategy that inherits from the NT strategy base class, subscribes to the necessary data, and then forwards the data to a map of subscribers that it maintains (the "spawned strategies")
+
+---
+
+#### [2025-12-10 01:05:46] @cjdsellers
+
+Thanks <@706300741270110330>, hey <@337157623352655873> also consider the `Controller` and its `create_strategy` method: https://github.com/nautechsystems/nautilus_trader/blob/develop/nautilus_trader/trading/controller.py#L123
+
+We reserve this capability for the `Controller` just so there is some hierarchy so that strategies can't just spawn other strategies and so on. It keeps the system simpler and easier to reason about this way
+
+---
+
+#### [2025-12-10 05:18:16] @saruman9490
+
+Exactly, how I've been doing as well 😄
+
+---
+
+#### [2025-12-10 05:18:46] @saruman9490
+
+I'll need to have a look into that controller! Thanks for the pointer 🙂
+
+---
+
+#### [2025-12-10 06:59:59] @saruman9490
+
+That looks pretty good, are there any examples with it by any chance/
+
+---
+
+#### [2025-12-10 15:13:12] @saruman9490
+
+Should I add the controller as an actor to the trader with add_actor?
+
+---
+
+#### [2025-12-10 15:48:47] @saruman9490
+
+Got this error - so it seems like I cant add strategies dynamically, right?
+```
+2025-12-10T15:47:54.318921193Z [ERROR] TEST-001.TEST-001: Cannot add a strategy to a running trader
+```
 
 ---

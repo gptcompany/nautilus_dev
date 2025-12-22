@@ -37,14 +37,15 @@ nautilus_dev/
 │   ├── api_reference/        # API documentation
 │   ├── concepts/             # Core concepts
 │   ├── developer_guide/      # Developer guides
-│   ├── discord/              # Discord community knowledge (572K)
-│   │   ├── general.md        # General discussions (1758 lines)
-│   │   ├── questions.md      # Q&A patterns (4237 lines)
-│   │   ├── help.md           # Help & troubleshooting (2905 lines)
-│   │   ├── data.md           # Data management (1821 lines)
+│   ├── discord/              # Discord community knowledge (420K, 90-day window)
+│   │   ├── questions.md      # Q&A patterns (2991 lines)
+│   │   ├── help.md           # Help & troubleshooting (2825 lines)
+│   │   ├── general.md        # General discussions (1203 lines)
+│   │   ├── data.md           # Data management (695 lines)
+│   │   ├── dev-rust.md       # Rust development (545 lines)
 │   │   ├── performance.md    # Performance tips
-│   │   ├── dev-rust.md       # Rust development
-│   │   └── binance.md, bybit.md, okx.md  # Exchange-specific
+│   │   ├── binance.md, bybit.md, okx.md, dydx.md  # Exchange-specific
+│   │   └── visualization.md  # Visualization discussions (NEW)
 │   ├── integrations/         # Exchange adapter docs
 │   ├── nautilus/             # Changelog & version tracking
 │   │   ├── nautilus-trader-changelog.md
