@@ -682,7 +682,89 @@
       "operation": "read",
       "timestamp": "2025-12-22T18:25:22.704071",
       "file_path": "/media/sam/1TB/nautilus_dev/docs/integrations/hyperliquid.md"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-22T18:26:29.166211",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/data_recording/record_binance_hyperliquid.py",
+      "old_string": "#!/usr/bin/env python3\n\"\"\"\nMulti-Exchange Data Recorder for Binance and Hyperliquid.\n\nRecords live m..."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-22T18:26:40.168731",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/data_recording/record_binance_hyperliquid.py",
+      "old_string": "    def subscribe_instruments(self) -> None:\n        \"\"\"Subscribe to market data for configured inst..."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-22T18:26:48.092653",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/data_recording/record_binance_hyperliquid.py",
+      "old_string": "def main() -> None:\n    \"\"\"Main entry point.\"\"\"\n    print(\"=\" * 60)\n    print(\"NautilusTrader Multi-..."
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-22T18:26:52.562261",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -m py_compile /media/sam/1TB/nautilus_dev/scripts/data_recording/record_binance_hyperliquid.py && echo \"✅ Syntax OK\"",
+      "description": "Verify updated script syntax"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-22T18:26:59.455766",
+      "command": "git add scripts/data_recording/record_binance_hyperliquid.py && git commit -m \"$(cat <<'EOF'\nfix: Update data recorder with orderbook and mark price\n\nChanges:\n- Remove SOL instruments (BTC/ETH only)\n- Add OrderBook deltas subscription (L2)\n- Add Mark Price subscription (Binance only)\n- Document OI and liquidation NOT available in NautilusTrader\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n)\"",
+      "description": "Commit updated recorder"
+    },
+    {
+      "operation": "task",
+      "timestamp": "2025-12-22T18:37:01.008669",
+      "subagent_type": "Explore",
+      "prompt": "Search for the latest CCXT documentation and capabilities for:\n\n1. **Binance Futures CCXT methods:**..."
+    },
+    {
+      "operation": "websearch",
+      "timestamp": "2025-12-22T18:37:07.960183",
+      "query": "CCXT Binance futures fetch_open_interest fetch_funding_rate 2025"
+    },
+    {
+      "operation": "websearch",
+      "timestamp": "2025-12-22T18:37:07.970628",
+      "query": "CCXT Pro vs CCXT difference WebSocket liquidations 2025"
+    },
+    {
+      "operation": "websearch",
+      "timestamp": "2025-12-22T18:37:08.002806",
+      "query": "CCXT watch_liquidations ccxt.pro Binance Bybit 2025"
+    },
+    {
+      "operation": "websearch",
+      "timestamp": "2025-12-22T18:37:38.962953",
+      "query": "\"fetch_open_interest_history\" CCXT Binance Bybit rate limits"
+    },
+    {
+      "operation": "websearch",
+      "timestamp": "2025-12-22T18:37:38.976823",
+      "query": "CCXT Hyperliquid fetch_funding_rate fetch_open_interest methods list"
+    },
+    {
+      "operation": "websearch",
+      "timestamp": "2025-12-22T18:37:39.007833",
+      "query": "CCXT Pro watchLiquidations Binance Bybit exact method names"
+    },
+    {
+      "operation": "websearch",
+      "timestamp": "2025-12-22T18:38:06.555462",
+      "query": "Binance futures API rate limits open interest funding rate 2025"
+    },
+    {
+      "operation": "webfetch",
+      "timestamp": "2025-12-22T18:38:06.564648",
+      "url": "https://docs.ccxt.com/",
+      "prompt": "Extract information about: 1) Binance futures methods for open interest and funding rates, 2) Bybit ..."
+    },
+    {
+      "operation": "websearch",
+      "timestamp": "2025-12-22T18:38:06.577959",
+      "query": "Bybit API rate limits open interest funding rate 2025"
     }
   ],
-  "last_updated": "2025-12-22T18:25:22.704089"
+  "last_updated": "2025-12-22T18:38:06.578001"
 }
