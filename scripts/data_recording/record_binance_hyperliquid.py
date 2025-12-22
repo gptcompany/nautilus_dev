@@ -2,8 +2,16 @@
 """
 Multi-Exchange Data Recorder for Binance and Hyperliquid.
 
-Records live market data (trades, quotes, orderbook) to ParquetDataCatalog.
+Records live market data to ParquetDataCatalog:
+- Trade ticks (every trade)
+- Quote ticks (bid/ask)
+- OrderBook deltas (L2 updates)
+- Mark Price (Binance only)
+
 Uses NautilusTrader nightly with native Rust adapters.
+
+NOTE: Open Interest and Liquidation streams are NOT available in NautilusTrader.
+      For those, use Tardis or direct exchange APIs.
 
 Usage:
     # Activate nightly environment first:
@@ -18,8 +26,6 @@ Environment Variables:
     HYPERLIQUID_PK       - Hyperliquid private key (optional for public data)
 """
 
-import asyncio
-import os
 import signal
 from datetime import datetime
 from pathlib import Path
@@ -28,6 +34,7 @@ from nautilus_trader.adapters.binance import BINANCE
 from nautilus_trader.adapters.binance import BinanceAccountType
 from nautilus_trader.adapters.binance import BinanceDataClientConfig
 from nautilus_trader.adapters.binance import BinanceLiveDataClientFactory
+from nautilus_trader.adapters.binance import BinanceFuturesMarkPriceUpdate
 from nautilus_trader.adapters.hyperliquid import HYPERLIQUID
 from nautilus_trader.adapters.hyperliquid import HyperliquidDataClientConfig
 from nautilus_trader.adapters.hyperliquid import HyperliquidLiveDataClientFactory
@@ -36,7 +43,8 @@ from nautilus_trader.config import LoggingConfig
 from nautilus_trader.config import StreamingConfig
 from nautilus_trader.config import TradingNodeConfig
 from nautilus_trader.live.node import TradingNode
-from nautilus_trader.model.data import BarType
+from nautilus_trader.model.data import DataType
+from nautilus_trader.model.identifiers import ClientId
 from nautilus_trader.model.identifiers import InstrumentId
 
 
@@ -44,17 +52,15 @@ from nautilus_trader.model.identifiers import InstrumentId
 CATALOG_PATH = Path("/media/sam/1TB/nautilus_dev/data/live_catalog")
 CATALOG_PATH.mkdir(parents=True, exist_ok=True)
 
-# Instruments to record
+# Instruments to record (BTC and ETH only)
 BINANCE_INSTRUMENTS = [
     "BTCUSDT-PERP.BINANCE",
     "ETHUSDT-PERP.BINANCE",
-    "SOLUSDT-PERP.BINANCE",
 ]
 
 HYPERLIQUID_INSTRUMENTS = [
     "BTC-USD-PERP.HYPERLIQUID",
     "ETH-USD-PERP.HYPERLIQUID",
-    "SOL-USD-PERP.HYPERLIQUID",
 ]
 
 
@@ -113,16 +119,31 @@ class DataRecorder:
         # Subscribe Binance instruments
         for symbol in BINANCE_INSTRUMENTS:
             instrument_id = InstrumentId.from_str(symbol)
+            # Core data
             self.node.subscribe_trade_ticks(instrument_id)
             self.node.subscribe_quote_ticks(instrument_id)
-            print(f"[INFO] Subscribed: {symbol}")
+            # OrderBook L2 deltas
+            self.node.subscribe_order_book_deltas(instrument_id)
+            # Mark Price (Binance-specific custom data type)
+            self.node.subscribe_data(
+                data_type=DataType(
+                    BinanceFuturesMarkPriceUpdate,
+                    metadata={"instrument_id": instrument_id},
+                ),
+                client_id=ClientId("BINANCE"),
+            )
+            print(f"[INFO] Subscribed (trades, quotes, orderbook, mark_price): {symbol}")
 
         # Subscribe Hyperliquid instruments
         for symbol in HYPERLIQUID_INSTRUMENTS:
             instrument_id = InstrumentId.from_str(symbol)
+            # Core data
             self.node.subscribe_trade_ticks(instrument_id)
             self.node.subscribe_quote_ticks(instrument_id)
-            print(f"[INFO] Subscribed: {symbol}")
+            # OrderBook L2 deltas
+            self.node.subscribe_order_book_deltas(instrument_id)
+            # Note: Mark Price NOT available for Hyperliquid yet
+            print(f"[INFO] Subscribed (trades, quotes, orderbook): {symbol}")
 
     def run(self) -> None:
         """Run the data recorder."""
@@ -155,9 +176,19 @@ def main() -> None:
     print("=" * 60)
     print("NautilusTrader Multi-Exchange Data Recorder")
     print("=" * 60)
-    print(f"Binance instruments: {len(BINANCE_INSTRUMENTS)}")
-    print(f"Hyperliquid instruments: {len(HYPERLIQUID_INSTRUMENTS)}")
+    print(f"Binance instruments: {BINANCE_INSTRUMENTS}")
+    print(f"Hyperliquid instruments: {HYPERLIQUID_INSTRUMENTS}")
     print(f"Catalog path: {CATALOG_PATH}")
+    print("")
+    print("Data types recorded:")
+    print("  - Trade ticks (every trade)")
+    print("  - Quote ticks (bid/ask)")
+    print("  - OrderBook deltas (L2 updates)")
+    print("  - Mark Price (Binance only)")
+    print("")
+    print("NOT available (use Tardis/Coinglass):")
+    print("  - Open Interest (OI)")
+    print("  - Liquidation stream")
     print("=" * 60)
 
     recorder = DataRecorder()
