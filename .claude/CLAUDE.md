@@ -4,17 +4,20 @@
 
 ## USE SUB-AGENTS FOR CONTEXT OPTIMIZATION
 
-### 1. Always use the file-analyzer sub-agent when asked to read files.
-The file-analyzer agent is an expert in extracting and summarizing critical information from files, particularly log files and verbose outputs.
+### 1. Always use the backtest-analyzer sub-agent for log analysis.
+The backtest-analyzer agent uses chunked processing to analyze large log files, identify errors, performance issues, and generate actionable insights.
 
-### 2. Always use the code-analyzer sub-agent when asked to search code, analyze code, research bugs, or trace logic flow.
-The code-analyzer agent provides concise, actionable summaries while dramatically reducing context usage.
+### 2. Always use the alpha-debug sub-agent for bug hunting and code analysis.
+The alpha-debug agent performs iterative rounds of analysis to find bugs, edge cases, and logic errors that tests might miss.
 
 ### 3. Always use the test-runner sub-agent to run tests and analyze the test results.
 Using the test-runner agent ensures full test output is captured, main conversation stays clean, and context usage is optimized.
 
 ### 4. Always use the nautilus-coder for NautilusTrader-specific implementations.
 The nautilus-coder knows best practices, native Rust implementations, and common pitfalls.
+
+### 5. Always use the nautilus-visualization-renderer for trading charts and dashboards.
+The visualization-renderer implements Canvas 2D/WebGL charts for equity curves, orderbook heatmaps, and real-time PnL dashboards.
 
 ## Philosophy
 
@@ -64,7 +67,7 @@ The nautilus-coder knows best practices, native Rust implementations, and common
 - Stream large datasets, never load entirely into memory
 
 ### Native Rust Usage
-- **ALWAYS search Context7/Gemini-CLI BEFORE implementing**
+- **ALWAYS search Context7 and Discord BEFORE implementing**
 - Use native Rust indicators (ExponentialMovingAverage, etc.)
 - Prefer Rust implementations over Python equivalents
 - Check docs for available native implementations
@@ -127,10 +130,10 @@ def calculate_ema(prices):
    task-master complete   # Mark done
    ```
 
-4. **Documentation Search** (Context7/Gemini):
-   - "Show me NautilusTrader order types"
-   - "How to implement stop loss in NautilusTrader"
-   - "Analyze this backtest performance log"
+4. **Documentation Search** (Context7/Discord):
+   - "Show me NautilusTrader order types" → Context7
+   - "How to implement stop loss in NautilusTrader" → Context7
+   - "Analyze this backtest performance log" → backtest-analyzer agent
 
 ## NautilusTrader Data Structure
 
@@ -156,4 +159,4 @@ def calculate_ema(prices):
 - **ALWAYS prefer editing** existing files to creating new ones
 - **NEVER proactively create documentation** unless explicitly requested
 - Do what has been asked; nothing more, nothing less
-- Always search Context7/Gemini before implementing NautilusTrader features
+- Always search Context7 and Discord before implementing NautilusTrader features

@@ -38,11 +38,13 @@ nautilus_dev/
 │   ├── concepts/             # Core concepts
 │   ├── developer_guide/      # Developer guides
 │   ├── discord/              # Discord community knowledge (572K)
-│   │   ├── general.md        # General discussions
-│   │   ├── strategies.md     # Strategy patterns
+│   │   ├── general.md        # General discussions (1758 lines)
+│   │   ├── questions.md      # Q&A patterns (4237 lines)
+│   │   ├── help.md           # Help & troubleshooting (2905 lines)
+│   │   ├── data.md           # Data management (1821 lines)
 │   │   ├── performance.md    # Performance tips
 │   │   ├── dev-rust.md       # Rust development
-│   │   └── bybit.md, okx.md  # Exchange-specific
+│   │   └── binance.md, bybit.md, okx.md  # Exchange-specific
 │   ├── integrations/         # Exchange adapter docs
 │   ├── nautilus/             # Changelog & version tracking
 │   │   ├── nautilus-trader-changelog.md
@@ -67,17 +69,17 @@ nautilus_dev/
 
 | Agent | Responsibility |
 |-------|----------------|
-| nautilus-coder | Strategy implementation |
+| nautilus-coder | Strategy implementation (Context7 for docs) |
 | nautilus-docs-specialist | Documentation search workflow |
 | nautilus-data-pipeline-operator | Data pipeline management |
 | nautilus-live-operator | Live trading operations |
-| code-analyzer | Bug hunting, logic tracing |
-| file-analyzer | Backtest log analysis |
-| test-generator | Test generation |
+| nautilus-visualization-renderer | Trading charts & dashboards |
+| backtest-analyzer | Log analysis with chunking strategy |
 | test-runner | Test execution (ALWAYS use for tests) |
 | tdd-guard | TDD enforcement (Red-Green-Refactor) |
 | alpha-debug | Iterative bug hunting (auto-triggered) |
 | alpha-evolve | Multi-implementation generator ([E] marker) |
+| alpha-visual | Visual validation with screenshots |
 
 ### Skills (3)
 
@@ -105,13 +107,15 @@ Finds bugs even when tests pass. Triggers automatically after implementation pha
 |------|---------|-------------|
 | **Context7 MCP** | NautilusTrader API docs | Quick lookups, specific API reference |
 | **Discord** (`docs/discord/`) | Community solutions | Best practices, real bugs/fixes |
-| **Gemini MCP** | Analyze YOUR code | Strategy review, backtest log analysis |
+| **backtest-analyzer** | Analyze backtest logs | Strategy review, performance analysis |
+| **alpha-debug** | Hunt bugs in code | Edge cases, logic errors |
 | **Serena MCP** | Search codebase | Find patterns, locate implementations |
 
-**CRITICAL - MCP Tool Limitations**:
-- Cannot chain MCP tools (Context7 -> Gemini not allowed)
-- Each MCP call must be independent
-- Use Context7 for docs, Gemini for YOUR code, Discord for community solutions
+**Analysis Workflow**:
+- Use Context7 for official documentation
+- Use Discord (`docs/discord/`) for community solutions
+- Use `backtest-analyzer` agent for log analysis (chunked processing)
+- Use `alpha-debug` agent for code bug hunting
 
 ## Architecture Principles
 
@@ -142,7 +146,7 @@ Finds bugs even when tests pass. Triggers automatically after implementation pha
 - Execute tests directly (use test-runner agent)
 
 #### ALWAYS
-- Search docs first (Context7, Discord, Gemini)
+- Search docs first (Context7, Discord)
 - Use native Rust indicators
 - Run tests via test-runner agent
 - Use `uv` for dependencies (not `pip`)
@@ -211,10 +215,10 @@ uv run pytest tests/test_module.py::test_new -v  # GREEN
 Task: Implement momentum strategy with risk management
 
 1. Context7: "Show BacktestNode configuration parameters"
-2. Discord: Grep "risk management" in docs/discord/strategies/
+2. Discord: Grep "risk management" in docs/discord/
 3. Serena: Search codebase for existing risk management utils
 4. Implement strategy using black box design
-5. Gemini: "@strategy.py analyze for edge cases"
+5. alpha-debug: Analyze strategy.py for edge cases
 6. TDD: test-runner agent for tests
 ```
 
