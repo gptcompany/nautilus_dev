@@ -1,0 +1,180 @@
+#!/usr/bin/env python3
+"""
+Multi-Exchange Data Recorder for Binance and Hyperliquid.
+
+Records live market data (trades, quotes, orderbook) to ParquetDataCatalog.
+Uses NautilusTrader nightly with native Rust adapters.
+
+Usage:
+    # Activate nightly environment first:
+    source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate
+
+    # Run recorder:
+    python record_binance_hyperliquid.py
+
+Environment Variables:
+    BINANCE_API_KEY      - Binance API key (optional for public data)
+    BINANCE_API_SECRET   - Binance API secret (optional for public data)
+    HYPERLIQUID_PK       - Hyperliquid private key (optional for public data)
+"""
+
+import asyncio
+import os
+import signal
+from datetime import datetime
+from pathlib import Path
+
+from nautilus_trader.adapters.binance import BINANCE
+from nautilus_trader.adapters.binance import BinanceAccountType
+from nautilus_trader.adapters.binance import BinanceDataClientConfig
+from nautilus_trader.adapters.binance import BinanceLiveDataClientFactory
+from nautilus_trader.adapters.hyperliquid import HYPERLIQUID
+from nautilus_trader.adapters.hyperliquid import HyperliquidDataClientConfig
+from nautilus_trader.adapters.hyperliquid import HyperliquidLiveDataClientFactory
+from nautilus_trader.config import InstrumentProviderConfig
+from nautilus_trader.config import LoggingConfig
+from nautilus_trader.config import StreamingConfig
+from nautilus_trader.config import TradingNodeConfig
+from nautilus_trader.live.node import TradingNode
+from nautilus_trader.model.data import BarType
+from nautilus_trader.model.identifiers import InstrumentId
+
+
+# Configuration
+CATALOG_PATH = Path("/media/sam/1TB/nautilus_dev/data/live_catalog")
+CATALOG_PATH.mkdir(parents=True, exist_ok=True)
+
+# Instruments to record
+BINANCE_INSTRUMENTS = [
+    "BTCUSDT-PERP.BINANCE",
+    "ETHUSDT-PERP.BINANCE",
+    "SOLUSDT-PERP.BINANCE",
+]
+
+HYPERLIQUID_INSTRUMENTS = [
+    "BTC-USD-PERP.HYPERLIQUID",
+    "ETH-USD-PERP.HYPERLIQUID",
+    "SOL-USD-PERP.HYPERLIQUID",
+]
+
+
+def create_config() -> TradingNodeConfig:
+    """Create TradingNode configuration for data recording."""
+    return TradingNodeConfig(
+        trader_id=f"DATA-RECORDER-{datetime.now().strftime('%Y%m%d')}",
+        logging=LoggingConfig(
+            log_level="INFO",
+            log_level_file="DEBUG",
+            log_directory=str(CATALOG_PATH / "logs"),
+            log_file_format="{trader_id}_{instance_id}",
+        ),
+        streaming=StreamingConfig(
+            catalog_path=str(CATALOG_PATH),
+            flush_interval_ms=1000,  # Flush every second
+        ),
+        data_clients={
+            BINANCE: BinanceDataClientConfig(
+                account_type=BinanceAccountType.USDT_FUTURES,
+                instrument_provider=InstrumentProviderConfig(load_all=False),
+            ),
+            HYPERLIQUID: HyperliquidDataClientConfig(
+                testnet=False,
+                instrument_provider=InstrumentProviderConfig(load_all=False),
+            ),
+        },
+        exec_clients={},  # No execution - data only
+    )
+
+
+class DataRecorder:
+    """Manages the data recording node."""
+
+    def __init__(self):
+        self.node: TradingNode | None = None
+        self._running = False
+
+    def build(self) -> None:
+        """Build the trading node."""
+        config = create_config()
+        self.node = TradingNode(config=config)
+
+        # Register data client factories
+        self.node.add_data_client_factory(BINANCE, BinanceLiveDataClientFactory)
+        self.node.add_data_client_factory(HYPERLIQUID, HyperliquidLiveDataClientFactory)
+
+        self.node.build()
+        print(f"[INFO] Node built. Catalog: {CATALOG_PATH}")
+
+    def subscribe_instruments(self) -> None:
+        """Subscribe to market data for configured instruments."""
+        if not self.node:
+            raise RuntimeError("Node not built")
+
+        # Subscribe Binance instruments
+        for symbol in BINANCE_INSTRUMENTS:
+            instrument_id = InstrumentId.from_str(symbol)
+            self.node.subscribe_trade_ticks(instrument_id)
+            self.node.subscribe_quote_ticks(instrument_id)
+            print(f"[INFO] Subscribed: {symbol}")
+
+        # Subscribe Hyperliquid instruments
+        for symbol in HYPERLIQUID_INSTRUMENTS:
+            instrument_id = InstrumentId.from_str(symbol)
+            self.node.subscribe_trade_ticks(instrument_id)
+            self.node.subscribe_quote_ticks(instrument_id)
+            print(f"[INFO] Subscribed: {symbol}")
+
+    def run(self) -> None:
+        """Run the data recorder."""
+        if not self.node:
+            raise RuntimeError("Node not built")
+
+        self._running = True
+        print(f"[INFO] Starting data recording at {datetime.now()}")
+        print(f"[INFO] Press Ctrl+C to stop")
+
+        try:
+            self.node.run()
+        except KeyboardInterrupt:
+            print("\n[INFO] Keyboard interrupt received")
+        finally:
+            self.stop()
+
+    def stop(self) -> None:
+        """Stop the data recorder gracefully."""
+        if self.node and self._running:
+            print("[INFO] Stopping node...")
+            self.node.dispose()
+            self._running = False
+            print(f"[INFO] Data recording stopped at {datetime.now()}")
+            print(f"[INFO] Data saved to: {CATALOG_PATH}")
+
+
+def main() -> None:
+    """Main entry point."""
+    print("=" * 60)
+    print("NautilusTrader Multi-Exchange Data Recorder")
+    print("=" * 60)
+    print(f"Binance instruments: {len(BINANCE_INSTRUMENTS)}")
+    print(f"Hyperliquid instruments: {len(HYPERLIQUID_INSTRUMENTS)}")
+    print(f"Catalog path: {CATALOG_PATH}")
+    print("=" * 60)
+
+    recorder = DataRecorder()
+
+    # Handle signals for graceful shutdown
+    def signal_handler(sig, frame):
+        print(f"\n[INFO] Signal {sig} received")
+        recorder.stop()
+
+    signal.signal(signal.SIGINT, signal_handler)
+    signal.signal(signal.SIGTERM, signal_handler)
+
+    # Build and run
+    recorder.build()
+    recorder.subscribe_instruments()
+    recorder.run()
+
+
+if __name__ == "__main__":
+    main()
