@@ -1,0 +1,18 @@
+{
+  "mcpServers": {
+    "gemini-cli": {
+      "command": "/home/sam/.local/bin/uvx",
+      "args": [
+        "--from",
+        "gemini-cli",
+        "gemini-cli"
+      ],
+      "env": {
+        "GEMINI_API_KEY": "${GEMINI_API_KEY}",
+        "DEFAULT_MODEL": "gemini-2.5-pro",
+        "MAX_TOKENS": "2000000",
+        "TEMPERATURE": "0.1"
+      }
+    }
+  }
+}

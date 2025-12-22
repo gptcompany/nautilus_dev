@@ -1,0 +1,42 @@
+{
+  "mcpServers": {
+    "motherduck": {
+      "command": "uvx",
+      "args": [
+        "--from",
+        "/media/sam/1TB1/mcpservers/mcp-database-tools/mcp-server-motherduck",
+        "mcp-server-motherduck",
+        "--db-path",
+        "/media/sam/1TB1/devteam1/database/local.duckdb",
+        "--transport",
+        "stdio",
+        "--read-only"
+      ]
+    },
+    "duckdb": {
+      "command": "uvx",
+      "args": [
+        "--from",
+        "/media/sam/1TB1/mcpservers/mcp-database-tools/mcp-server-duckdb",
+        "mcp-server-duckdb",
+        "--db-path",
+        "/media/sam/1TB1/devteam1/database/local.duckdb"
+      ]
+    },
+    "dbeaver": {
+      "command": "node",
+      "args": [
+        "/media/sam/1TB1/mcpservers/mcp-database-tools/dbeaver-mcp-server/dist/index.js"
+      ]
+    },
+    "influxdb": {
+      "command": "npx",
+      "args": ["influxdb-mcp-server"],
+      "env": {
+        "INFLUXDB_TOKEN": "7uv7e44oquCviOT4lJBjE79NygqqEpHgYdKibjToc0g=",
+        "INFLUXDB_URL": "http://localhost:8086",
+        "INFLUXDB_ORG": "production"
+      }
+    }
+  }
+}
