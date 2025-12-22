@@ -254,7 +254,130 @@
       "operation": "read",
       "timestamp": "2025-12-22T18:09:49.071663",
       "file_path": "/media/sam/1TB/nautilus_dev/docs/integrations/hyperliquid.md"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-22T18:10:20.224550",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -c \"import nautilus_trader; print(f'Version: {nautilus_trader.__version__}')\" 2>/dev/null",
+      "description": "Check nightly version"
+    },
+    {
+      "operation": "glob",
+      "timestamp": "2025-12-22T18:11:57.898169",
+      "pattern": "**/examples/**/*data*.py",
+      "path": "/media/sam/2TB-NVMe/prod/apps/nautilus_nightly"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-22T18:11:57.930011",
+      "file_path": "/media/sam/1TB/nautilus_dev/docs/integrations/binance.md"
+    },
+    {
+      "operation": "task",
+      "timestamp": "2025-12-22T18:12:05.021907",
+      "subagent_type": "nautilus-coder",
+      "prompt": "Search Context7 for NautilusTrader documentation on:\n1. StreamingConfig for live data recording\n2. P..."
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-22T18:12:05.027556",
+      "command": "ls -la /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/",
+      "description": "Check nightly installation structure"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-22T18:12:09.347850",
+      "file_path": "/media/sam/1TB/nautilus_dev/docs/nautilus/nautilus-trader-changelog.md"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-22T18:12:16.016433",
+      "command": "mcp__context7__get-library-docs --topic \"StreamingConfig live data recording ParquetDataCatalog persistence\" --context \"/nautilustrader/latest\" 2>/dev/null || echo \"MCP not available, checking local docs\"",
+      "description": "Search Context7 for StreamingConfig docs"
+    },
+    {
+      "operation": "websearch",
+      "timestamp": "2025-12-22T18:12:22.562619",
+      "query": "NautilusTrader StreamingConfig ParquetDataCatalog live data recording configuration 2025"
+    },
+    {
+      "operation": "websearch",
+      "timestamp": "2025-12-22T18:12:22.583006",
+      "query": "NautilusTrader TradingNode data-only mode configuration no strategy data recording"
+    },
+    {
+      "operation": "websearch",
+      "timestamp": "2025-12-22T18:12:22.597909",
+      "query": "NautilusTrader Binance Hyperliquid data client configuration live data"
+    },
+    {
+      "operation": "webfetch",
+      "timestamp": "2025-12-22T18:12:52.846824",
+      "url": "https://nautilustrader.io/docs/nightly/api_reference/config/",
+      "prompt": "Extract the complete StreamingConfig configuration options including all parameters, their types, an..."
+    },
+    {
+      "operation": "webfetch",
+      "timestamp": "2025-12-22T18:12:52.852551",
+      "url": "https://nautilustrader.io/docs/nightly/integrations/binance/",
+      "prompt": "Extract the complete BinanceDataClientConfig configuration options including all parameters, their t..."
+    },
+    {
+      "operation": "webfetch",
+      "timestamp": "2025-12-22T18:12:52.859299",
+      "url": "https://nautilustrader.io/docs/nightly/concepts/live/",
+      "prompt": "Extract complete configuration examples for TradingNode setup including StreamingConfig for data per..."
+    },
+    {
+      "operation": "websearch",
+      "timestamp": "2025-12-22T18:13:05.438358",
+      "query": "NautilusTrader StreamingConfig feather files catalog_path fs_protocol 2025"
+    },
+    {
+      "operation": "websearch",
+      "timestamp": "2025-12-22T18:13:05.463292",
+      "query": "site:github.com nautilus_trader StreamingConfig catalog_path"
+    },
+    {
+      "operation": "webfetch",
+      "timestamp": "2025-12-22T18:13:33.824290",
+      "url": "https://docs.nautilustrader.io/api_reference/config.html",
+      "prompt": "Extract the COMPLETE StreamingConfig class documentation including all parameters with types, defaul..."
+    },
+    {
+      "operation": "websearch",
+      "timestamp": "2025-12-22T18:13:33.829352",
+      "query": "NautilusTrader Hyperliquid adapter data client configuration HyperliquidDataClientConfig"
+    },
+    {
+      "operation": "webfetch",
+      "timestamp": "2025-12-22T18:13:59.075948",
+      "url": "https://nautilustrader.io/docs/nightly/integrations/",
+      "prompt": "Find the Hyperliquid integration documentation. Extract all configuration options for HyperliquidDat..."
+    },
+    {
+      "operation": "webfetch",
+      "timestamp": "2025-12-22T18:13:59.077774",
+      "url": "https://github.com/nautechsystems/nautilus_trader/blob/develop/RELEASES.md",
+      "prompt": "Extract any information about StreamingConfig parameters and configuration options, especially for l..."
+    },
+    {
+      "operation": "webfetch",
+      "timestamp": "2025-12-22T18:14:10.478194",
+      "url": "https://nautilustrader.io/docs/nightly/api_reference/persistence/",
+      "prompt": "Extract complete documentation for ParquetDataCatalog class including all methods for writing data, ..."
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-22T18:14:36.500451",
+      "file_path": "/media/sam/1TB/nautilus_dev/docs/discord/data.md"
+    },
+    {
+      "operation": "webfetch",
+      "timestamp": "2025-12-22T18:14:43.187302",
+      "url": "https://nautilustrader.io/docs/nightly/integrations/hyperliquid/",
+      "prompt": "Extract all configuration options for Hyperliquid data client and execution client including Hyperli..."
     }
   ],
-  "last_updated": "2025-12-22T18:09:49.071680"
+  "last_updated": "2025-12-22T18:14:43.187317"
 }
