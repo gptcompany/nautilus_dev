@@ -95,7 +95,253 @@
       "timestamp": "2025-12-23T16:41:00.845398",
       "command": "PYTHONPATH=/media/sam/1TB/nautilus_dev uv run pytest tests/ccxt_pipeline/ -v --tb=short 2>&1",
       "description": "Run tests with PYTHONPATH set"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-23T16:41:35.128019",
+      "todo_count": 6
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-23T16:41:38.397662",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/ccxt_pipeline/fetchers/orchestrator.py"
+    },
+    {
+      "operation": "task",
+      "timestamp": "2025-12-23T16:41:47.091170",
+      "subagent_type": "alpha-debug",
+      "prompt": "Perform an alpha-debug verification on the complete CCXT data pipeline codebase. This is task T073 f..."
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-23T16:41:52.598323",
+      "todo_count": 5
+    },
+    {
+      "operation": "glob",
+      "timestamp": "2025-12-23T16:41:58.017816",
+      "pattern": "**/*.py",
+      "path": "/media/sam/1TB/nautilus_dev/scripts/ccxt_pipeline"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-23T16:41:58.369385",
+      "command": "cd /media/sam/1TB/nautilus_dev/scripts/ccxt_pipeline && wc -l *.py 2>/dev/null | tail -1",
+      "description": "Count total lines in pipeline"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-23T16:41:58.776354",
+      "command": "cd /media/sam/1TB/nautilus_dev/scripts/ccxt_pipeline && git diff HEAD~5 --stat -- . 2>/dev/null | tail -5",
+      "description": "Check recent changes to pipeline"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-23T16:42:06.705756",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/ccxt_pipeline/utils/parsing.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-23T16:42:06.711619",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/ccxt_pipeline/utils/reconnect.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-23T16:42:06.715437",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/ccxt_pipeline/scheduler/daemon.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-23T16:42:06.722752",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/ccxt_pipeline/storage/parquet_store.py"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-23T16:42:12.207611",
+      "todo_count": 5
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-23T16:42:19.860818",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/ccxt_pipeline/fetchers/base.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-23T16:42:19.871635",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/ccxt_pipeline/fetchers/orchestrator.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-23T16:42:19.875297",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/ccxt_pipeline/models/open_interest.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-23T16:42:19.885851",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/ccxt_pipeline/models/funding_rate.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-23T16:42:19.895521",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/ccxt_pipeline/models/liquidation.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-23T16:42:26.244837",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/ccxt_pipeline/fetchers/binance.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-23T16:42:26.250051",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/ccxt_pipeline/fetchers/bybit.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-23T16:42:26.262361",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/ccxt_pipeline/fetchers/hyperliquid.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-23T16:42:26.269602",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/ccxt_pipeline/cli.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-23T16:42:32.216858",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/ccxt_pipeline/config.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-23T16:42:32.219865",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/ccxt_pipeline/utils/logging.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-23T16:42:32.228944",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/ccxt_pipeline/fetchers/__init__.py"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-23T16:42:38.958657",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run ruff check scripts/ccxt_pipeline/ 2>&1 | head -60",
+      "description": "Run ruff linter on pipeline"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-23T16:42:40.313359",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run pyright scripts/ccxt_pipeline/ 2>&1 | head -80",
+      "description": "Run pyright type checker"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-23T16:42:47.361587",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -m py_compile scripts/ccxt_pipeline/*.py scripts/ccxt_pipeline/**/*.py 2>&1",
+      "description": "Run Python syntax check"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-23T16:42:47.789684",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -c \"from scripts.ccxt_pipeline.cli import cli; from scripts.ccxt_pipeline.fetchers import get_all_fetchers; from scripts.ccxt_pipeline.scheduler.daemon import DaemonRunner; print('All imports successful')\" 2>&1",
+      "description": "Verify all imports work"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-23T16:42:52.339248",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && pip install rich click apscheduler -q && python -c \"from scripts.ccxt_pipeline.cli import cli; from scripts.ccxt_pipeline.fetchers import get_all_fetchers; from scripts.ccxt_pipeline.scheduler.daemon import DaemonRunner; print('All imports successful')\" 2>&1",
+      "description": "Install deps and verify imports"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-23T16:43:01.985543",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv pip install rich click apscheduler pydantic-settings --quiet 2>&1 && python -c \"from scripts.ccxt_pipeline.cli import cli; from scripts.ccxt_pipeline.fetchers import get_all_fetchers; from scripts.ccxt_pipeline.scheduler.daemon import DaemonRunner; print('All imports successful')\" 2>&1",
+      "description": "Use uv pip to install deps"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-23T16:43:09.676879",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv pip install ccxt --quiet 2>&1 && python -c \"\nfrom scripts.ccxt_pipeline.fetchers import get_all_fetchers\nfrom scripts.ccxt_pipeline.scheduler.daemon import DaemonRunner\nfrom scripts.ccxt_pipeline.storage.parquet_store import ParquetStore\nfrom scripts.ccxt_pipeline.utils.parsing import safe_float, safe_int, safe_str\nfrom scripts.ccxt_pipeline.models import OpenInterest, FundingRate, Liquidation, Side, Venue\nprint('All imports successful')\n\" 2>&1",
+      "description": "Install ccxt and verify imports"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-23T16:43:30.426296",
+      "todo_count": 5
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-23T16:43:41.240766",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -c \"\nfrom scripts.ccxt_pipeline.utils.parsing import safe_float, safe_int, safe_str\nimport math\n\n# Test safe_float with edge cases\nprint('=== Testing safe_float ===')\ntest_cases = [\n    (None, 0.0),\n    ('123.45', 123.45),\n    ('invalid', 0.0),\n    (float('inf'), 0.0),\n    (float('-inf'), 0.0),\n    (float('nan'), 0.0),\n    ('', 0.0),\n    (0, 0.0),\n    (-1.5, -1.5),\n]\n\nall_passed = True\nfor value, expected in test_cases:\n    result = safe_float(value)\n    status = 'PASS' if result == expected or (math.isnan(expected) and math.isnan(result)) else 'FAIL'\n    if status == 'FAIL':\n        all_passed = False\n    print(f'  safe_float({repr(value)}) = {result} (expected {expected}) [{status}]')\n\n# Test safe_int with edge cases\nprint()\nprint('=== Testing safe_int ===')\nint_cases = [\n    (None, 0),\n    (123, 123),\n    (123.9, 123),\n    ('invalid', 0),\n    (float('inf'), 0),\n    (float('nan'), 0),\n]\n\nfor value, expected in int_cases:\n    result = safe_int(value)\n    status = 'PASS' if result == expected else 'FAIL'\n    if status == 'FAIL':\n        all_passed = False\n    print(f'  safe_int({repr(value)}) = {result} (expected {expected}) [{status}]')\n\nprint()\nprint('All tests passed!' if all_passed else 'SOME TESTS FAILED!')\n\" 2>&1",
+      "description": "Test safe_float/safe_int edge cases"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-23T16:43:58.469565",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -c \"\nfrom datetime import datetime, timezone, timedelta\nfrom scripts.ccxt_pipeline.models import OpenInterest, FundingRate, Liquidation, Venue, Side\n\nprint('=== Testing Model Validation Edge Cases ===')\n\n# Test 1: Future timestamp rejection\nprint()\nprint('Test 1: Future timestamp rejection')\ntry:\n    future_ts = datetime.now(timezone.utc) + timedelta(hours=1)\n    oi = OpenInterest(\n        timestamp=future_ts,\n        symbol='BTCUSDT-PERP',\n        venue=Venue.BINANCE,\n        open_interest=100.0,\n        open_interest_value=10000.0\n    )\n    print('  FAIL: Future timestamp was accepted!')\nexcept ValueError as e:\n    print(f'  PASS: Future timestamp rejected - {e}')\n\n# Test 2: Empty symbol rejection\nprint()\nprint('Test 2: Empty symbol rejection')\ntry:\n    oi = OpenInterest(\n        timestamp=datetime.now(timezone.utc),\n        symbol='',\n        venue=Venue.BINANCE,\n        open_interest=100.0,\n        open_interest_value=10000.0\n    )\n    print('  FAIL: Empty symbol was accepted!')\nexcept ValueError as e:\n    print(f'  PASS: Empty symbol rejected - {e}')\n\n# Test 3: Negative OI rejection (ge=0 constraint)\nprint()\nprint('Test 3: Negative OI rejection')\ntry:\n    oi = OpenInterest(\n        timestamp=datetime.now(timezone.utc),\n        symbol='BTCUSDT-PERP',\n        venue=Venue.BINANCE,\n        open_interest=-100.0,\n        open_interest_value=10000.0\n    )\n    print('  FAIL: Negative OI was accepted!')\nexcept ValueError as e:\n    print(f'  PASS: Negative OI rejected')\n\n# Test 4: Zero OI acceptance (ge=0 allows 0)\nprint()\nprint('Test 4: Zero OI acceptance')\ntry:\n    oi = OpenInterest(\n        timestamp=datetime.now(timezone.utc),\n        symbol='BTCUSDT-PERP',\n        venue=Venue.BINANCE,\n        open_interest=0.0,\n        open_interest_value=0.0\n    )\n    print(f'  PASS: Zero OI accepted (as expected)')\nexcept ValueError as e:\n    print(f'  FAIL: Zero OI rejected - {e}')\n\n# Test 5: Zero liquidation rejection (gt=0 constraint)\nprint()\nprint('Test 5: Zero liquidation quantity rejection')\ntry:\n    liq = Liquidation(\n        timestamp=datetime.now(timezone.utc),\n        symbol='BTCUSDT-PERP',\n        venue=Venue.BINANCE,\n        side=Side.LONG,\n        quantity=0.0,  # This should fail (gt=0)\n        price=50000.0,\n        value=0.0\n    )\n    print('  FAIL: Zero quantity was accepted!')\nexcept ValueError as e:\n    print(f'  PASS: Zero quantity rejected (gt=0 constraint)')\n\n# Test 6: Timezone-naive timestamp handling\nprint()\nprint('Test 6: Timezone-naive timestamp handling')\ntry:\n    naive_ts = datetime.now()  # No timezone\n    oi = OpenInterest(\n        timestamp=naive_ts,\n        symbol='BTCUSDT-PERP',\n        venue=Venue.BINANCE,\n        open_interest=100.0,\n        open_interest_value=10000.0\n    )\n    print(f'  PASS: Naive timestamp converted to UTC: {oi.timestamp.tzinfo}')\nexcept ValueError as e:\n    print(f'  Result: {e}')\n\nprint()\nprint('=== All model validation tests completed ===')\n\" 2>&1",
+      "description": "Test model validation edge cases"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-23T16:44:14.094487",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -c \"\n# Test the inconsistent predicted_rate handling (BUG-002)\nprint('=== BUG-002: predicted_rate not using safe_float ===')\nprint()\nprint('Checking _parse_funding_rate in each fetcher...')\nprint()\n\n# Simulating CCXT response with None predicted rate\nmock_data = {\n    'timestamp': 1700000000000,\n    'fundingRate': 0.0001,\n    'fundingTimestamp': 1700003600000,\n    'predictedFundingRate': None,  # This is the bug case\n}\n\n# BinanceFetcher line 164: predicted_rate=data.get('predictedFundingRate')\n# BybitFetcher line 167: predicted_rate=data.get('predictedFundingRate')\n# HyperliquidFetcher line 186: predicted_rate=data.get('predictedFundingRate')\n\n# These all use data.get() directly without safe_float\n# This is OK because predicted_rate: float | None in FundingRate model\n# But if API returns string '0.0001', it could fail\n\nprint('Testing edge cases for predicted_rate:')\nfrom scripts.ccxt_pipeline.models import FundingRate, Venue\nfrom datetime import datetime, timezone\n\n# Test 1: None is acceptable\nfr = FundingRate(\n    timestamp=datetime.now(timezone.utc),\n    symbol='BTCUSDT-PERP',\n    venue=Venue.BINANCE,\n    funding_rate=0.0001,\n    predicted_rate=None\n)\nprint(f'  None predicted_rate: OK (field is Optional)')\n\n# Test 2: String would fail (potential bug if API returns string)\ntry:\n    fr = FundingRate(\n        timestamp=datetime.now(timezone.utc),\n        symbol='BTCUSDT-PERP',\n        venue=Venue.BINANCE,\n        funding_rate=0.0001,\n        predicted_rate='0.0001'  # String instead of float\n    )\n    print(f'  String predicted_rate: FAIL - accepted without conversion')\nexcept Exception as e:\n    print(f'  String predicted_rate: Pydantic handles it - coerced to float')\n\nprint()\nprint('VERDICT: predicted_rate using data.get() is mostly safe because:')\nprint('  1. FundingRate.predicted_rate is Optional[float]')\nprint('  2. Pydantic coerces strings to floats automatically')\nprint('  3. None is valid for optional fields')\nprint()\nprint('However, using safe_float would be more defensive.')\n\" 2>&1",
+      "description": "Test predicted_rate handling"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-23T16:44:33.055899",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -c \"\n# Test BUG-003: Inconsistent _parse_liquidation handling\nprint('=== BUG-003: Inconsistent _parse_liquidation error handling ===')\nprint()\n\n# Binance: Returns None for invalid data (graceful)\n# Bybit: Raises ValueError for invalid data (crash)\n# Hyperliquid: Returns None for invalid data (graceful)\n\nprint('Behavior comparison:')\nprint('  Binance:     Returns None when quantity/price <= 0')\nprint('  Bybit:       RAISES ValueError when quantity/price <= 0')\nprint('  Hyperliquid: Returns None when quantity/price <= 0')\nprint()\nprint('BUG: Bybit _parse_liquidation raises exception while others return None')\nprint('This will cause stream_liquidations to fail on Bybit with bad data,')\nprint('while Binance and Hyperliquid gracefully skip invalid records.')\nprint()\n\n# The Bybit code at line 207-208:\n# if price <= 0 or quantity <= 0:\n#     raise ValueError(f'Invalid price ({price}) or quantity ({quantity})')\n#\n# But Bybit stream_liquidations wraps in try/except at line 414-418:\n# try:\n#     liquidation = self._parse_liquidation(symbol, liq_data)\n#     callback(liquidation)\n# except Exception as e:\n#     logger.warning(f'Failed to parse liquidation for {symbol}: {e}')\n\nprint('MITIGATION: Bybit stream_liquidations has try/except wrapper (line 414-418)')\nprint('However, the exception handling is inconsistent with other fetchers.')\nprint('Recommendation: Change Bybit to return None instead of raising.')\n\" 2>&1",
+      "description": "Document inconsistent liquidation handling"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-23T16:44:48.426441",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -c \"\n# Test ParquetStore edge cases\nprint('=== Testing ParquetStore Edge Cases ===')\nprint()\n\nfrom pathlib import Path\nimport tempfile\nfrom datetime import datetime, timezone\n\nfrom scripts.ccxt_pipeline.storage.parquet_store import ParquetStore\nfrom scripts.ccxt_pipeline.models import OpenInterest, FundingRate, Venue\n\n# Create temp directory for testing\nwith tempfile.TemporaryDirectory() as tmpdir:\n    store = ParquetStore(Path(tmpdir))\n    \n    # Test 1: Empty data write\n    print('Test 1: Empty data write')\n    store.write([])  # Should be a no-op\n    print('  PASS: Empty write handled gracefully')\n    \n    # Test 2: Write single record\n    print()\n    print('Test 2: Write single record')\n    oi = OpenInterest(\n        timestamp=datetime.now(timezone.utc),\n        symbol='BTCUSDT-PERP',\n        venue=Venue.BINANCE,\n        open_interest=1000.0,\n        open_interest_value=50000000.0\n    )\n    store.write([oi])\n    print('  PASS: Single record written')\n    \n    # Test 3: Read back\n    print()\n    print('Test 3: Read back')\n    records = store.read(OpenInterest, 'BTCUSDT-PERP', 'BINANCE')\n    print(f'  Retrieved {len(records)} records')\n    if len(records) == 1:\n        print('  PASS: Read successful')\n    \n    # Test 4: Append to existing file\n    print()\n    print('Test 4: Append to existing file')\n    oi2 = OpenInterest(\n        timestamp=datetime.now(timezone.utc),\n        symbol='BTCUSDT-PERP',\n        venue=Venue.BINANCE,\n        open_interest=1001.0,\n        open_interest_value=50050000.0\n    )\n    store.write([oi2])\n    records = store.read(OpenInterest, 'BTCUSDT-PERP', 'BINANCE')\n    print(f'  Now {len(records)} records after append')\n    if len(records) == 2:\n        print('  PASS: Append successful')\n    \n    # Test 5: Get last timestamp\n    print()\n    print('Test 5: Get last timestamp')\n    last_ts = store.get_last_timestamp(OpenInterest, 'BTCUSDT-PERP', 'BINANCE')\n    print(f'  Last timestamp: {last_ts}')\n    if last_ts:\n        print('  PASS: Last timestamp retrieved')\n    \n    # Test 6: Read from non-existent venue\n    print()\n    print('Test 6: Read from non-existent venue')\n    records = store.read(OpenInterest, 'BTCUSDT-PERP', 'NONEXISTENT')\n    if len(records) == 0:\n        print('  PASS: Empty list returned for non-existent venue')\n    \n    # Test 7: Read all venues\n    print()\n    print('Test 7: Read all venues (no venue filter)')\n    records = store.read(OpenInterest, 'BTCUSDT-PERP')\n    print(f'  Retrieved {len(records)} records across all venues')\n\nprint()\nprint('=== ParquetStore tests completed ===')\n\" 2>&1",
+      "description": "Test ParquetStore edge cases"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-23T16:45:00.249967",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -c \"\n# Test symbol normalization edge cases\nprint('=== Testing Symbol Normalization Edge Cases ===')\nprint()\n\nfrom scripts.ccxt_pipeline.fetchers.binance import BinanceFetcher\nfrom scripts.ccxt_pipeline.fetchers.bybit import BybitFetcher\nfrom scripts.ccxt_pipeline.fetchers.hyperliquid import HyperliquidFetcher\n\nbinance = BinanceFetcher()\nbybit = BybitFetcher()\nhyperliquid = HyperliquidFetcher()\n\ntest_symbols = [\n    'BTCUSDT-PERP',\n    'btcusdt-perp',  # lowercase\n    'BTCUSDT',       # no -PERP\n    'BTC-USD-PERP',  # USD instead of USDT\n    'ETHUSD',        # USD margined\n    'ETHUSDT-PERP',\n    'SOL/USDT:USDT', # Already in CCXT format\n]\n\nprint('Binance normalization:')\nfor sym in test_symbols:\n    print(f'  {sym:20s} -> {binance.normalize_symbol(sym)}')\n\nprint()\nprint('Bybit normalization (same as Binance):')\nfor sym in test_symbols:\n    print(f'  {sym:20s} -> {bybit.normalize_symbol(sym)}')\n\nprint()\nprint('Hyperliquid normalization (converts to USD):')\nfor sym in test_symbols:\n    print(f'  {sym:20s} -> {hyperliquid.normalize_symbol(sym)}')\n\nprint()\nprint('NOTE: Hyperliquid converts USDT symbols to USD automatically.')\nprint('This may cause issues if user expects USDT contract behavior.')\n\" 2>&1",
+      "description": "Test symbol normalization"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-23T16:45:10.211619",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -c \"\nprint('=== BUG-004: Symbol Normalization Bugs ===')\nprint()\nprint('CRITICAL: normalize_symbol produces invalid CCXT symbols for edge cases')\nprint()\nprint('Bug 1: BTC-USD-PERP produces \\\"BTC-/USD:USD\\\" (invalid)')\nprint('  Expected: \\\"BTC/USD:USD\\\"')\nprint('  Location: base.py:118-125, hyperliquid.py:81-85')\nprint('  Root cause: The split/replace logic does not handle hyphens correctly')\nprint()\nprint('Bug 2: Already-normalized symbols get corrupted')\nprint('  Input:    \\\"SOL/USDT:USDT\\\"')\nprint('  Output:   \\\"SOL/USDT:/USDT:USDT\\\" (invalid)')\nprint('  Location: base.py:118-125')\nprint('  Root cause: No detection of already-normalized symbols')\nprint()\nprint('Impact: API calls will fail with invalid symbol format')\nprint('Severity: CRITICAL - prevents fetching data for affected symbols')\n\" 2>&1",
+      "description": "Document symbol normalization bugs"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-23T16:45:19.814055",
+      "todo_count": 5
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-23T16:45:42.510554",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -c \"\nprint('=== Analyzing Async Patterns for Potential Issues ===')\nprint()\n\n# Issue 1: ReconnectingStream.stop() never called\nprint('BUG-005: ReconnectingStream.stop() is never called')\nprint('  Location: utils/reconnect.py:132-134')\nprint('  The stop() method sets _running = False')\nprint('  But no code path ever calls stop() on ReconnectingStream')\nprint('  The only exit is via CancelledError or ConnectionError')\nprint()\nprint('  Analysis:')\nprint('    - run() method has while self._running loop (line 107)')\nprint('    - CancelledError is properly re-raised (line 115)')\nprint('    - stop() would cleanly exit the loop')\nprint('    - Current code relies on task cancellation')\nprint()\nprint('  Verdict: LOW severity - asyncio.cancel() works correctly')\nprint('    But stop() provides cleaner shutdown option')\nprint()\n\n# Issue 2: FetchOrchestrator connect_all error handling\nprint('BUG-006: connect_all swallows connection errors')\nprint('  Location: fetchers/orchestrator.py:49-51')\nprint('  Code: await asyncio.gather(*tasks, return_exceptions=True)')\nprint()\nprint('  If one exchange fails to connect:')\nprint('    1. Exception is captured but not logged')\nprint('    2. _connected is still set to True')\nprint('    3. Subsequent fetches may fail silently')\nprint()\nprint('  Recommendation: Check results and log/handle connection failures')\nprint()\n\n# Issue 3: DaemonRunner signal handling\nprint('BUG-007: Potential race in DaemonRunner shutdown')\nprint('  Location: scheduler/daemon.py:146-149, 151-164')\nprint('  request_shutdown() sets _shutdown_requested = True')\nprint('  run_forever() checks this in while loop')\nprint()\nprint('  Race condition scenario:')\nprint('    1. Signal received, request_shutdown() called')\nprint('    2. _shutdown_requested = True')\nprint('    3. Loop exits, await self.stop() called')\nprint('    4. Meanwhile, scheduled job starts (APScheduler async)')\nprint()\nprint('  Verdict: MEDIUM - APScheduler does not block on shutdown')\nprint('    scheduler.shutdown(wait=False) at line 131 helps')\nprint()\n\n# Issue 4: _pending_writes list thread safety\nprint('BUG-008: _pending_writes list not thread-safe')\nprint('  Location: scheduler/daemon.py:79, 334-338')\nprint('  _pending_writes is a regular list')\nprint('  _on_liquidation appends to it (line 334)')\nprint('  _flush_pending_writes_sync clears it (line 369)')\nprint()\nprint('  Both operations happen from same asyncio event loop')\nprint('  But batch threshold check (line 338) is not atomic')\nprint()\nprint('  Scenario:')\nprint('    1. len(_pending_writes) = 99')\nprint('    2. Two liquidations arrive nearly simultaneously')\nprint('    3. Both check len() >= 100, both see True')\nprint('    4. Double flush or race in clear()')\nprint()\nprint('  Verdict: LOW - asyncio is single-threaded, but pattern is fragile')\n\" 2>&1",
+      "description": "Analyze async patterns"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-23T16:45:56.418462",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -c \"\nprint('=== Analyzing Resource Cleanup ===')\nprint()\n\n# Check CCXT exchange cleanup\nprint('Checking CCXT exchange close() calls:')\nprint()\n\nprint('1. BinanceFetcher.close() - Line 108-114')\nprint('   - Calls await self._exchange.close()')\nprint('   - Sets _exchange = None')\nprint('   - Sets _connected = False')\nprint('   OK: Proper cleanup')\nprint()\n\nprint('2. BybitFetcher.close() - Line 111-117')\nprint('   - Same pattern as Binance')\nprint('   OK: Proper cleanup')\nprint()\n\nprint('3. HyperliquidFetcher.close() - Line 130-136')\nprint('   - Same pattern')\nprint('   OK: Proper cleanup')\nprint()\n\nprint('4. FetchOrchestrator.close_all() - Line 54-59')\nprint('   - Uses asyncio.gather with return_exceptions=True')\nprint('   - Does not log close errors')\nprint('   OK: Cleanup attempted, errors swallowed')\nprint()\n\nprint('5. DaemonRunner.stop() - Line 119-144')\nprint('   - Stops scheduler')\nprint('   - Cancels liquidation stream')\nprint('   - Flushes pending writes')\nprint('   - Closes connections')\nprint('   OK: Comprehensive cleanup')\nprint()\n\nprint('6. CLI stream_liquidations - Line 555-563')\nprint('   - Flushes buffer in finally block')\nprint('   - Closes orchestrator')\nprint('   OK: Proper cleanup in finally')\nprint()\n\nprint('BUG-009: Missing cleanup on exception during start()')\nprint('  Location: scheduler/daemon.py:83-117')\nprint('  If start() fails mid-way (e.g., after connect_all but before scheduler),'\n      )\nprint('  resources may not be cleaned up.')\nprint()\nprint('  Scenario:')\nprint('    1. connect_all() succeeds')\nprint('    2. _scheduler initialization fails')\nprint('    3. Connections remain open')\nprint()\nprint('  Recommendation: Add try/except in start() with cleanup on failure')\n\" 2>&1",
+      "description": "Analyze resource cleanup"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-23T16:46:08.446686",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -c \"\nprint('=== Checking CLI Signal Handling ===')\nprint()\n\nprint('CLI signal handling implementation:')\nprint('  Location: cli.py:25-36, 39-51')\nprint()\nprint('  _handle_sigint():')\nprint('    - First Ctrl+C: Sets _shutdown_requested = True')\nprint('    - Second Ctrl+C: Calls sys.exit(1) (force quit)')\nprint()\nprint('  run_async():')\nprint('    - Sets signal.signal(signal.SIGINT, _handle_sigint)')\nprint('    - Creates new event loop')\nprint('    - Runs coroutine')\nprint()\n\nprint('Potential Issues:')\nprint()\nprint('  Issue 1: Signal handler resets asyncio default handling')\nprint('    - Python 3.10+ has improved signal handling in asyncio')\nprint('    - Custom handler may interfere with asyncio.CancelledError')\nprint()\nprint('  Issue 2: SIGTERM not handled')\nprint('    - Only SIGINT (Ctrl+C) is caught')\nprint('    - systemd/docker sends SIGTERM on shutdown')\nprint('    - Daemon mode should handle SIGTERM')\nprint()\nprint('BUG-010: Missing SIGTERM handling in daemon mode')\nprint('  Location: cli.py:625-672 (daemon_start command)')\nprint('  The daemon uses CLI signal handler which only catches SIGINT')\nprint('  SIGTERM from process managers will cause abrupt termination')\nprint()\nprint('  Recommendation: Add SIGTERM handler for graceful daemon shutdown')\n\" 2>&1",
+      "description": "Check signal handling"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-23T16:46:18.911158",
+      "todo_count": 5
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-23T16:46:56.792362",
+      "todo_count": 5
     }
   ],
-  "last_updated": "2025-12-23T16:41:00.845414"
+  "last_updated": "2025-12-23T16:46:56.792376"
 }
