@@ -79,8 +79,22 @@ class TestBacktestEngineCompatibility:
         assert bars[0].bar_type == bar_type
 
         # Verify BacktestEngine compatibility
+        # v1.222.0 requires venue before instrument
+        from nautilus_trader.backtest.models import FillModel
+        from nautilus_trader.model.currencies import USDT
+        from nautilus_trader.model.enums import AccountType, OmsType
+        from nautilus_trader.model.objects import Money
+
         engine_config = BacktestEngineConfig(trader_id="TEST-001")
         engine = BacktestEngine(config=engine_config)
+        engine.add_venue(
+            venue=btcusdt_instrument.id.venue,
+            oms_type=OmsType.HEDGING,
+            account_type=AccountType.MARGIN,
+            base_currency=None,
+            starting_balances=[Money(1_000_000, USDT)],
+            fill_model=FillModel(),
+        )
         engine.add_instrument(btcusdt_instrument)
         engine.add_data(bars)  # Should not raise
 

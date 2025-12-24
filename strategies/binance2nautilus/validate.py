@@ -160,8 +160,25 @@ def _test_backtest_compatibility(
         True if compatible, False otherwise
     """
     try:
+        # Import here to avoid circular imports and unused import warnings
+        from nautilus_trader.backtest.models import FillModel
+        from nautilus_trader.model.currencies import USDT
+        from nautilus_trader.model.enums import AccountType, OmsType
+        from nautilus_trader.model.objects import Money
+
         config = BacktestEngineConfig(trader_id="VALIDATOR-001")
         engine = BacktestEngine(config=config)
+
+        # v1.222.0 requires venue to be added before instruments
+        engine.add_venue(
+            venue=instrument.id.venue,
+            oms_type=OmsType.HEDGING,
+            account_type=AccountType.MARGIN,
+            base_currency=None,
+            starting_balances=[Money(1_000_000, USDT)],
+            fill_model=FillModel(),
+        )
+
         engine.add_instrument(instrument)
         engine.add_data(bars)
         return True
