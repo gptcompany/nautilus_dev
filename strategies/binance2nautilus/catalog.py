@@ -6,11 +6,14 @@ Handles writing instruments and data to the catalog with proper ordering:
 """
 
 from pathlib import Path
-from typing import Sequence
+from typing import TYPE_CHECKING, Sequence
 
 from nautilus_trader.model.data import Bar, TradeTick
 from nautilus_trader.model.instruments import Instrument
 from nautilus_trader.persistence.catalog import ParquetDataCatalog
+
+if TYPE_CHECKING:
+    pass
 
 
 class CatalogWriter:
@@ -77,6 +80,18 @@ class CatalogWriter:
         """
         if data:
             self.catalog.write_data(list(data))
+
+    def write_funding_rates(self, funding_rates: "Sequence[FundingRate]") -> None:
+        """Write funding rate data to the catalog.
+
+        Stores funding rates as custom data type in the catalog.
+        Path: data/custom/funding_rate/{INSTRUMENT_ID}/
+
+        Args:
+            funding_rates: The funding rate records to write
+        """
+        if funding_rates:
+            self.catalog.write_data(list(funding_rates))
 
     def get_instruments(self) -> list[Instrument]:
         """Get all instruments from the catalog."""

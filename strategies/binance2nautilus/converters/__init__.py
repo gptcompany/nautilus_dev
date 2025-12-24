@@ -7,11 +7,14 @@ This module provides converters for:
 """
 
 from .base import BaseConverter
+from .funding import FundingRate, FundingRateConverter
 from .klines import KlinesConverter
 from .trades import TradesConverter
 
 __all__ = [
     "BaseConverter",
+    "FundingRate",
+    "FundingRateConverter",
     "KlinesConverter",
     "TradesConverter",
 ]

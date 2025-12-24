@@ -13,6 +13,7 @@ from tqdm import tqdm
 
 from .catalog import CatalogWriter
 from .config import ConverterConfig
+from .converters.funding import FundingRateConverter
 from .converters.klines import KlinesConverter
 from .converters.trades import TradesConverter
 from .instruments import get_instrument, list_supported_symbols
@@ -106,8 +107,7 @@ def convert(
     elif data_type == "trades":
         _convert_trades(config, state, symbol, dry_run, verbose)
     elif data_type == "funding":
-        click.echo("Funding rate conversion not yet implemented", err=True)
-        sys.exit(1)
+        _convert_funding(config, state, symbol, dry_run, verbose)
 
     # Save state
     if not dry_run:
@@ -233,6 +233,59 @@ def _convert_trades(
     click.echo(f"Converted {total_ticks:,} trade ticks from {len(files)} files")
 
 
+def _convert_funding(
+    config: ConverterConfig,
+    state,
+    symbol: str,
+    dry_run: bool,
+    verbose: bool,
+) -> None:
+    """Convert funding rate data."""
+    converter = FundingRateConverter(
+        symbol=symbol,
+        config=config,
+        state=state,
+    )
+
+    # Discover files
+    files = converter.get_pending_files()
+    if not files:
+        click.echo("No new files to process")
+        return
+
+    click.echo(f"Found {len(files)} files to process")
+
+    if dry_run:
+        for f in files[:10]:
+            click.echo(f"  Would process: {f.name}")
+        if len(files) > 10:
+            click.echo(f"  ... and {len(files) - 10} more")
+        return
+
+    # Initialize catalog and write instrument
+    catalog = CatalogWriter(config.output_dir)
+    instrument = get_instrument(symbol)
+    catalog.write_instrument(instrument)
+
+    # Process files with progress bar
+    total_rates = 0
+    with tqdm(files, desc=f"Converting {symbol} funding", unit="file") as pbar:
+        for file_path in pbar:
+            rates = converter.process_file(file_path)
+            if rates:
+                catalog.write_funding_rates(rates)
+                total_rates += len(rates)
+                converter.mark_processed(
+                    file_path=file_path,
+                    record_count=len(rates),
+                    first_ts=rates[0].ts_event,
+                    last_ts=rates[-1].ts_event,
+                )
+            pbar.set_postfix(rates=total_rates)
+
+    click.echo(f"Converted {total_rates:,} funding rates from {len(files)} files")
+
+
 @cli.command()
 @click.argument("symbol", type=str, required=False)
 @click.option("--force", is_flag=True, help="Reprocess already converted files")
@@ -263,6 +316,12 @@ def update(ctx: click.Context, symbol: str | None, force: bool) -> None:
         pending = converter.get_pending_files()
         if pending:
             click.echo(f"  trades: {len(pending)} new files")
+
+        # Update funding rates
+        converter = FundingRateConverter(sym, config, state if not force else None)
+        pending = converter.get_pending_files()
+        if pending:
+            click.echo(f"  funding: {len(pending)} new files")
 
     save_state(state, config.output_dir)
     click.echo("\nUpdate complete")
