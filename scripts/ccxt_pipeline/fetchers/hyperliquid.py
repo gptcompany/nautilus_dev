@@ -70,28 +70,30 @@ class HyperliquidFetcher(BaseFetcher):
     def normalize_symbol(self, symbol: str) -> str:
         """Normalize a symbol to CCXT format for Hyperliquid.
 
-        Hyperliquid uses USD instead of USDT for perpetuals.
+        Hyperliquid uses USDC for perpetual futures (BTC/USDC:USDC format).
 
         Args:
-            symbol: Trading pair symbol (e.g., 'BTC-USD-PERP' or 'BTCUSD-PERP')
+            symbol: Trading pair symbol (e.g., 'BTCUSDT-PERP', 'BTC-USD-PERP')
 
         Returns:
-            CCXT-compatible symbol (e.g., 'BTC/USD:USD')
+            CCXT-compatible symbol (e.g., 'BTC/USDC:USDC')
         """
         symbol = symbol.upper().replace("-PERP", "")
-        # Handle BTC-USD format
-        if "-USD" in symbol:
+
+        # Extract base asset
+        base = symbol
+        if "-" in symbol:
+            # Handle BTC-USD, BTC-USDT, BTC-USDC format
             base = symbol.split("-")[0]
-            return f"{base}/USD:USD"
-        # Handle BTCUSD format
-        if symbol.endswith("USD"):
-            base = symbol[:-3]
-            return f"{base}/USD:USD"
-        # Handle BTCUSDT format (convert to USD for Hyperliquid)
-        if symbol.endswith("USDT"):
+        elif symbol.endswith("USDC"):
             base = symbol[:-4]
-            return f"{base}/USD:USD"
-        return symbol
+        elif symbol.endswith("USDT"):
+            base = symbol[:-4]
+        elif symbol.endswith("USD"):
+            base = symbol[:-3]
+
+        # Hyperliquid perpetuals use USDC
+        return f"{base}/USDC:USDC"
 
     def _ensure_connected(self) -> ccxt.hyperliquid:
         """Ensure exchange is connected and return it.

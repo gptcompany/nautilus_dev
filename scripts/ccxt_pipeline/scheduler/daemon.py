@@ -17,6 +17,7 @@ from scripts.ccxt_pipeline.config import get_config
 from scripts.ccxt_pipeline.fetchers import FetchOrchestrator, get_all_fetchers
 from scripts.ccxt_pipeline.models import FundingRate, Liquidation, OpenInterest
 from scripts.ccxt_pipeline.storage.parquet_store import ParquetStore
+from scripts.ccxt_pipeline.streams import LiquidationStreamManager
 from scripts.ccxt_pipeline.utils.logging import get_logger
 
 logger = get_logger("daemon")
@@ -76,6 +77,7 @@ class DaemonRunner:
         self._running = False
         self._shutdown_requested = False
         self._liquidation_task: asyncio.Task | None = None
+        self._liquidation_manager: LiquidationStreamManager | None = None
         self._pending_writes: list[OpenInterest | FundingRate | Liquidation] = []
 
         self.stats = DaemonStats()
@@ -115,6 +117,12 @@ class DaemonRunner:
             f"Daemon started. OI interval: {self._oi_interval}m, "
             f"Funding interval: {self._funding_interval}m"
         )
+
+        # Immediate fetch on startup (don't wait for first interval)
+        logger.info("Performing initial fetch...")
+        await self._scheduled_oi_fetch()
+        await self._scheduled_funding_fetch()
+        logger.info("Initial fetch complete")
 
     async def stop(self) -> None:
         """Stop the daemon gracefully.
@@ -293,33 +301,33 @@ class DaemonRunner:
             logger.error(f"Error fetching funding for {symbol}: {e}")
 
     def _start_liquidation_stream(self) -> None:
-        """Start liquidation streaming in background task."""
-        if not self._orchestrator:
-            return
+        """Start native WebSocket liquidation streaming.
 
-        async def stream_all_symbols():
-            """Stream liquidations for all symbols."""
-            tasks = []
-            for symbol in self._symbols:
-                task = asyncio.create_task(
-                    self._orchestrator.stream_liquidations(symbol, self._on_liquidation)
-                )
-                tasks.append(task)
+        Uses direct exchange WebSocket connections (bypasses CCXT) for
+        real-time liquidation events from Binance, Bybit, and Hyperliquid.
+        """
+        # Create native liquidation stream manager
+        self._liquidation_manager = LiquidationStreamManager(
+            symbols=self._symbols,
+            callback=self._on_liquidation,
+            exchanges=self._exchanges,  # None means all exchanges
+        )
 
-            try:
-                await asyncio.gather(*tasks, return_exceptions=True)
-            except asyncio.CancelledError:
-                for task in tasks:
-                    task.cancel()
-                # Await cancelled tasks to allow cleanup
-                await asyncio.gather(*tasks, return_exceptions=True)
-                raise
-
-        self._liquidation_task = asyncio.create_task(stream_all_symbols())
-        logger.info(f"Started liquidation streaming for {self._symbols}")
+        # Start streams in background
+        self._liquidation_task = asyncio.create_task(self._liquidation_manager.start())
+        logger.info(
+            f"Started native WebSocket liquidation streaming for {self._symbols} "
+            f"on {self._liquidation_manager.exchanges}"
+        )
 
     async def _cancel_liquidation_stream(self) -> None:
         """Cancel the liquidation streaming task and await cleanup."""
+        # Stop the native stream manager
+        if self._liquidation_manager:
+            await self._liquidation_manager.stop()
+            self._liquidation_manager = None
+
+        # Cancel the background task
         if self._liquidation_task:
             self._liquidation_task.cancel()
             try:
@@ -327,7 +335,8 @@ class DaemonRunner:
             except asyncio.CancelledError:
                 pass  # Expected when cancelling
             self._liquidation_task = None
-            logger.info("Liquidation stream cancelled")
+
+        logger.info("Liquidation streams stopped")
 
     def _on_liquidation(self, liquidation: Liquidation) -> None:
         """Callback for liquidation events.
