@@ -1,63 +1,28 @@
-"""Funding rate converter for Binance CSV to NautilusTrader custom data.
+"""Funding rate converter for Binance CSV to NautilusTrader FundingRateUpdate.
 
-Converts Binance funding rate historical data to a NautilusTrader-compatible
-custom data type for accurate perpetual futures PnL calculation.
+Converts Binance funding rate historical data to NautilusTrader's native
+FundingRateUpdate type for accurate perpetual futures PnL calculation.
 """
 
-from dataclasses import dataclass
+from __future__ import annotations
+
 from decimal import Decimal
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import pandas as pd
-
-from nautilus_trader.core.data import Data
-from nautilus_trader.model.identifiers import InstrumentId
 
 from ..config import ConverterConfig
 from ..instruments import get_instrument
 from ..state import ConversionState
 from .base import BaseConverter
 
-
-@dataclass
-class FundingRate(Data):
-    """Custom data type for funding rate data.
-
-    Stores periodic funding rate for perpetual futures contracts.
-    Compatible with NautilusTrader's ParquetDataCatalog.
-
-    Attributes:
-        instrument_id: The instrument identifier
-        funding_rate: Funding rate as decimal (e.g., 0.0001 = 0.01%)
-        funding_interval_hours: Interval between funding (typically 8)
-        ts_event: Funding calculation timestamp (nanoseconds)
-        ts_init: Record initialization timestamp (nanoseconds)
-    """
-
-    instrument_id: InstrumentId
-    funding_rate: Decimal
-    funding_interval_hours: int
-    ts_event: int
-    ts_init: int
-
-    def __post_init__(self) -> None:
-        """Validate the funding rate data."""
-        if not isinstance(self.instrument_id, InstrumentId):
-            raise TypeError(
-                f"instrument_id must be InstrumentId, got {type(self.instrument_id)}"
-            )
-        if not isinstance(self.funding_rate, Decimal):
-            raise TypeError(
-                f"funding_rate must be Decimal, got {type(self.funding_rate)}"
-            )
-        if self.ts_event <= 0:
-            raise ValueError(f"ts_event must be positive, got {self.ts_event}")
-        if self.ts_init <= 0:
-            raise ValueError(f"ts_init must be positive, got {self.ts_init}")
+if TYPE_CHECKING:
+    from nautilus_trader.model.data import FundingRateUpdate
 
 
 class FundingRateConverter(BaseConverter):
-    """Converter for Binance funding rate CSV to FundingRate objects."""
+    """Converter for Binance funding rate CSV to FundingRateUpdate objects."""
 
     def __init__(
         self,
@@ -113,37 +78,85 @@ class FundingRateConverter(BaseConverter):
 
         Returns:
             DataFrame with columns: ts_event (ns), funding_interval_hours, funding_rate
+
+        Note:
+            Timestamps beyond year 2500 are filtered out as they exceed
+            NautilusTrader's uint64 nanosecond limit.
         """
+        # Max valid timestamp in milliseconds (year 2500, well under uint64 limit)
+        # uint64 max in ns = 18446744073709551615 ns = year ~2554
+        # We use year 2500 for safety margin
+        max_valid_ms = 16725225600000  # Year 2500
+
+        # Filter out invalid timestamps (beyond year 2500)
+        valid_mask = df["calc_time"] <= max_valid_ms
+        df_valid = df[valid_mask]
+
+        if len(df_valid) < len(df):
+            import logging
+
+            logger = logging.getLogger(__name__)
+            skipped = len(df) - len(df_valid)
+            logger.warning(
+                f"Skipped {skipped} records with timestamps beyond year 2500"
+            )
+
         return pd.DataFrame(
             {
-                "ts_event": (df["calc_time"] * 1_000_000).astype("int64"),  # ms -> ns
-                "funding_interval_hours": df["funding_interval_hours"].astype("int64"),
-                "funding_rate": df["last_funding_rate"].astype("float64"),
+                "ts_event": (df_valid["calc_time"] * 1_000_000).astype(
+                    "int64"
+                ),  # ms -> ns
+                "funding_interval_hours": df_valid["funding_interval_hours"].astype(
+                    "int64"
+                ),
+                "funding_rate": df_valid["last_funding_rate"].astype("float64"),
             }
         )
 
-    def wrangle(self, df: pd.DataFrame) -> list[FundingRate]:
-        """Convert DataFrame to FundingRate objects.
+    def wrangle(self, df: pd.DataFrame) -> list[FundingRateUpdate]:
+        """Convert DataFrame to FundingRateUpdate objects.
+
+        Uses vectorized operations for performance (avoids df.iterrows()).
 
         Args:
             df: Transformed DataFrame with funding rate data
 
         Returns:
-            List of FundingRate objects
+            List of FundingRateUpdate objects
         """
-        funding_rates = []
+        from nautilus_trader.model.data import FundingRateUpdate
+
         instrument_id = self._instrument.id
 
-        for _, row in df.iterrows():
-            ts_event = int(row["ts_event"])
-            funding_rate = FundingRate(
-                instrument_id=instrument_id,
-                funding_rate=Decimal(str(row["funding_rate"])),
-                funding_interval_hours=int(row["funding_interval_hours"]),
-                ts_event=ts_event,
-                ts_init=ts_event,  # Same as ts_event for historical data
+        # Vectorized extraction of arrays
+        ts_events = df["ts_event"].to_numpy()
+        funding_rates_raw = df["funding_rate"].to_numpy()
+        interval_hours = df["funding_interval_hours"].to_numpy()
+
+        # Max uint64 for nanosecond timestamps (approx year 2554)
+        max_uint64 = 18446744073709551615
+
+        # Build list using list comprehension (faster than iterrows)
+        funding_rates = []
+        for ts_event, rate, interval_hr in zip(
+            ts_events, funding_rates_raw, interval_hours, strict=True
+        ):
+            ts_event_int = int(ts_event)
+            next_funding = ts_event_int + int(interval_hr * 3600 * 1_000_000_000)
+
+            # Clamp next_funding to max uint64 to prevent overflow
+            if next_funding > max_uint64:
+                next_funding = max_uint64
+
+            funding_rates.append(
+                FundingRateUpdate(
+                    instrument_id=instrument_id,
+                    rate=Decimal(str(rate)),
+                    ts_event=ts_event_int,
+                    ts_init=ts_event_int,
+                    next_funding_ns=next_funding,
+                )
             )
-            funding_rates.append(funding_rate)
 
         return funding_rates
 
@@ -153,7 +166,7 @@ def convert_funding_rates(
     config: ConverterConfig | None = None,
     state: ConversionState | None = None,
     skip_processed: bool = True,
-) -> tuple[list[FundingRate], int]:
+) -> tuple[list["FundingRateUpdate"], int]:
     """Convert all funding rate files for a symbol.
 
     Args:
@@ -165,13 +178,14 @@ def convert_funding_rates(
     Returns:
         Tuple of (all_funding_rates, file_count)
     """
+
     converter = FundingRateConverter(
         symbol=symbol,
         config=config,
         state=state,
     )
 
-    all_rates: list[FundingRate] = []
+    all_rates: list[FundingRateUpdate] = []
     file_count = 0
 
     for file_path, rates in converter.process_all(skip_processed=skip_processed):

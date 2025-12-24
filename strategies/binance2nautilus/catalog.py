@@ -3,17 +3,101 @@
 Handles writing instruments and data to the catalog with proper ordering:
 1. Write instrument FIRST
 2. Then write data (bars, ticks, etc.)
+
+Note: FundingRateUpdate requires Arrow serialization registration.
 """
 
 from pathlib import Path
-from typing import TYPE_CHECKING, Sequence
+from typing import Sequence
 
-from nautilus_trader.model.data import Bar, TradeTick
+import pyarrow as pa
+
+from nautilus_trader.model.data import Bar, FundingRateUpdate, TradeTick
 from nautilus_trader.model.instruments import Instrument
 from nautilus_trader.persistence.catalog import ParquetDataCatalog
+from nautilus_trader.serialization.arrow.serializer import register_arrow
 
-if TYPE_CHECKING:
-    pass
+
+def _make_funding_rate_encoder(schema: pa.Schema):
+    """Create an encoder for FundingRateUpdate objects."""
+
+    def encoder(data):
+        if not isinstance(data, list):
+            data = [data]
+        # Convert to dicts - FundingRateUpdate.to_dict requires passing self
+        dicts = []
+        for item in data:
+            d = {
+                "ts_event": item.ts_event,
+                "ts_init": item.ts_init,
+                "rate": str(item.rate),  # Decimal to string
+                "next_funding_ns": item.next_funding_ns if item.next_funding_ns else 0,
+            }
+            dicts.append(d)
+        return pa.RecordBatch.from_pylist(dicts, schema=schema)
+
+    return encoder
+
+
+def _make_funding_rate_decoder():
+    """Create a decoder for FundingRateUpdate objects."""
+    from decimal import Decimal
+
+    from nautilus_trader.model.identifiers import InstrumentId
+
+    def decoder(table: pa.Table):
+        results = []
+        for row in table.to_pylist():
+            fr = FundingRateUpdate(
+                instrument_id=InstrumentId.from_str(
+                    row.get("instrument_id", "UNKNOWN")
+                ),
+                rate=Decimal(str(row["rate"])),
+                ts_event=row["ts_event"],
+                ts_init=row["ts_init"],
+                next_funding_ns=row.get("next_funding_ns"),
+            )
+            results.append(fr)
+        return results
+
+    return decoder
+
+
+def _register_funding_rate_arrow() -> None:
+    """Register FundingRateUpdate for Arrow serialization.
+
+    NautilusTrader v1.222.0 does not include FundingRateUpdate in the
+    default Arrow schema, so we register it manually with encoder/decoder.
+    """
+    from nautilus_trader.serialization.arrow.serializer import _ARROW_ENCODERS
+
+    # Skip if already registered
+    if FundingRateUpdate in _ARROW_ENCODERS:
+        return
+
+    # Build schema matching NautilusTrader's field definitions
+    # Fields from nautilus_pyo3.FundingRateUpdate.get_fields():
+    # {'ts_event': 'UInt64', 'next_funding_ns': 'UInt64', 'rate': 'Decimal128', 'ts_init': 'UInt64'}
+    schema = pa.schema(
+        [
+            ("ts_event", pa.uint64()),
+            ("ts_init", pa.uint64()),
+            ("rate", pa.string()),  # Store as string for Decimal precision
+            ("next_funding_ns", pa.uint64()),
+        ]
+    )
+
+    # Register with encoder and decoder
+    register_arrow(
+        FundingRateUpdate,
+        schema,
+        encoder=_make_funding_rate_encoder(schema),
+        decoder=_make_funding_rate_decoder(),
+    )
+
+
+# Register FundingRateUpdate on module import
+_register_funding_rate_arrow()
 
 
 class CatalogWriter:
@@ -81,14 +165,14 @@ class CatalogWriter:
         if data:
             self.catalog.write_data(list(data))
 
-    def write_funding_rates(self, funding_rates: "Sequence[FundingRate]") -> None:
+    def write_funding_rates(self, funding_rates: Sequence) -> None:
         """Write funding rate data to the catalog.
 
-        Stores funding rates as custom data type in the catalog.
-        Path: data/custom/funding_rate/{INSTRUMENT_ID}/
+        Stores FundingRateUpdate records in the catalog.
+        Uses NautilusTrader's native FundingRateUpdate type.
 
         Args:
-            funding_rates: The funding rate records to write
+            funding_rates: The FundingRateUpdate records to write
         """
         if funding_rates:
             self.catalog.write_data(list(funding_rates))

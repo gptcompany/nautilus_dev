@@ -3,17 +3,16 @@
 This module provides converters for:
 - Klines (OHLCV candlesticks) -> Bar objects
 - Trades (individual executions) -> TradeTick objects
-- Funding rates -> Custom data type
+- Funding rates -> FundingRateUpdate (native NautilusTrader type)
 """
 
 from .base import BaseConverter
-from .funding import FundingRate, FundingRateConverter
+from .funding import FundingRateConverter
 from .klines import KlinesConverter
 from .trades import TradesConverter
 
 __all__ = [
     "BaseConverter",
-    "FundingRate",
     "FundingRateConverter",
     "KlinesConverter",
     "TradesConverter",

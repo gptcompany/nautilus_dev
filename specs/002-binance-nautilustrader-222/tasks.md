@@ -165,15 +165,15 @@
 
 ### Implementation for User Story 4
 
-- [ ] T024 [P] [US4] Create funding rate converter in `strategies/binance2nautilus/converters/funding.py`
-  - Parse Binance funding rate CSV format (calcTime, fundingIntervalHours, lastFundingRate)
-  - Create custom data type compatible with NautilusTrader
+- [x] T024 [P] [US4] Create funding rate converter in `strategies/binance2nautilus/converters/funding.py`
+  - Parse Binance funding rate CSV format (calc_time, funding_interval_hours, last_funding_rate)
+  - Create custom FundingRate data type compatible with NautilusTrader
 
-- [ ] T025 [US4] Implement funding rate storage in `strategies/binance2nautilus/catalog.py`
-  - Store as custom data in ParquetDataCatalog
+- [x] T025 [US4] Implement funding rate storage in `strategies/binance2nautilus/catalog.py`
+  - Store as custom data in ParquetDataCatalog via `write_funding_rates()` method
   - Support timestamp range queries
 
-- [ ] T026 [US4] Add funding rate to CLI in `strategies/binance2nautilus/cli.py`
+- [x] T026 [US4] Add funding rate to CLI in `strategies/binance2nautilus/cli.py`
   - Support `binance2nautilus convert BTCUSDT funding` command
   - Include in update command
 
