@@ -209,7 +209,19 @@
       "timestamp": "2025-12-24T12:50:41.987164",
       "command": "PYTHONPATH=/media/sam/1TB/nautilus_dev uv run pytest tests/ccxt_pipeline/test_daemon_stability.py -v --tb=short 2>&1",
       "description": "Run daemon stability tests"
+    },
+    {
+      "operation": "task",
+      "timestamp": "2025-12-24T12:51:41.211625",
+      "subagent_type": "test-runner",
+      "prompt": "Run the complete CCXT pipeline test suite:\n\n```bash\nPYTHONPATH=/media/sam/1TB/nautilus_dev uv run py..."
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-24T12:51:46.783818",
+      "command": "PYTHONPATH=/media/sam/1TB/nautilus_dev uv run pytest tests/ccxt_pipeline/ -v --tb=short -q",
+      "description": "Run CCXT pipeline test suite"
     }
   ],
-  "last_updated": "2025-12-24T12:50:41.987179"
+  "last_updated": "2025-12-24T12:51:46.783849"
 }
