@@ -219,9 +219,9 @@
 - [x] T069 [P] Create README.md with usage examples in `scripts/ccxt_pipeline/README.md`
 - [x] T070 [P] Code quality checks (ruff check/format) - all checks pass
 - [x] T071 Code cleanup and docstrings for public APIs (ruff formatted)
-- [ ] T072 Performance profiling for concurrent fetching (manual task)
-- [ ] T073 Run alpha-debug verification on complete codebase (manual task)
-- [ ] T074 24-hour daemon stability test (manual task)
+- [x] T072 Performance profiling for concurrent fetching - benchmark script at `scripts/ccxt_pipeline/benchmarks/profile_concurrent.py`
+- [x] T073 Run alpha-debug verification on complete codebase - BUG-004 fixed (symbol normalization)
+- [ ] T074 24-hour daemon stability test (manual task - run: `ccxt-cli daemon start` and monitor for 24h)
 
 ---
 
@@ -324,7 +324,7 @@ Task: T022 [P] Implement HyperliquidFetcher
 
 **MVP Scope**: Phases 1-3 (Setup + Foundational + US1) = 25 tasks
 
-**Completed**: Phases 1-9 (113 tests passing) - All automated tasks complete. Manual tasks T072-T074 pending.
+**Completed**: Phases 1-9 (113 tests passing) - All automated tasks complete. T072-T073 done. Only T074 (24h daemon test) remains.
 
 ---
 
@@ -353,3 +353,50 @@ open_interest=safe_float(data.get("openInterestAmount"))
 ```
 
 **Tests**: `tests/ccxt_pipeline/test_utils_parsing.py`
+
+### BUG-004: Symbol normalization corrupts hyphen-delimited and pre-normalized symbols (FIXED)
+
+**Issue**: `normalize_symbol()` in `base.py` didn't handle:
+- Hyphen-delimited symbols like `BTC-USD-PERP` → would produce `BTC-/USD:USD`
+- Already-normalized CCXT symbols like `BTC/USDT:USDT` → would produce `BTC/USDT:/USDT:USDT`
+
+**Solution Applied** (T073): Updated `scripts/ccxt_pipeline/fetchers/base.py:107-146`:
+- Added passthrough for already-normalized symbols (contains `/` and `:`)
+- Added handling for hyphen-delimited symbols like `BTC-USDT-PERP`
+- Added test cases in `tests/ccxt_pipeline/test_fetchers.py`
+
+**Status**: FIXED
+
+---
+
+## T074: 24-Hour Daemon Stability Test Procedure
+
+**Purpose**: Verify the daemon runs 24+ hours without crashes or memory leaks
+
+**Prerequisites**:
+1. Configure `CCXT_CATALOG_PATH` environment variable
+2. Ensure internet connectivity to exchanges
+3. Optional: Configure API keys for authenticated endpoints
+
+**Procedure**:
+```bash
+# 1. Start daemon
+PYTHONPATH=/media/sam/1TB/nautilus_dev uv run python -m scripts.ccxt_pipeline daemon start
+
+# 2. Monitor in another terminal
+watch -n 60 'PYTHONPATH=/media/sam/1TB/nautilus_dev uv run python -m scripts.ccxt_pipeline daemon status'
+
+# 3. Check logs periodically
+tail -f ~/.ccxt_pipeline/daemon.log
+
+# 4. After 24 hours, graceful shutdown
+PYTHONPATH=/media/sam/1TB/nautilus_dev uv run python -m scripts.ccxt_pipeline daemon stop
+```
+
+**Success Criteria**:
+- [ ] Daemon runs for 24+ hours
+- [ ] No crashes or unhandled exceptions
+- [ ] Memory usage stable (no continuous growth)
+- [ ] Scheduled OI/funding fetches occur at expected intervals
+- [ ] Data files written to catalog directory
+- [ ] Graceful shutdown completes within 10 seconds

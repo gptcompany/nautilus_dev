@@ -109,13 +109,34 @@ class BaseFetcher(ABC):
 
         Override in subclass if exchange needs specific normalization.
 
+        Handles:
+        - BTCUSDT-PERP -> BTC/USDT:USDT
+        - BTC-USDT-PERP -> BTC/USDT:USDT
+        - BTC/USDT:USDT -> BTC/USDT:USDT (already normalized)
+
         Args:
             symbol: Trading pair symbol (e.g., 'BTCUSDT-PERP')
 
         Returns:
             CCXT-compatible symbol (e.g., 'BTC/USDT:USDT')
         """
-        symbol = symbol.upper().replace("-PERP", "")
+        # Already CCXT format (contains / and :)
+        if "/" in symbol and ":" in symbol:
+            return symbol
+
+        symbol = symbol.upper()
+
+        # Remove -PERP suffix
+        if symbol.endswith("-PERP"):
+            symbol = symbol[:-5]
+
+        # Handle hyphen-delimited: BTC-USDT -> BTCUSDT
+        if "-" in symbol:
+            parts = symbol.split("-")
+            if len(parts) == 2:
+                symbol = parts[0] + parts[1]
+
+        # Convert to CCXT format
         if symbol.endswith("USDT"):
             base = symbol[:-4]
             return f"{base}/USDT:USDT"

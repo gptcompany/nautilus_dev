@@ -30,8 +30,17 @@ class TestBinanceFetcher:
 
     def test_normalize_symbol(self, fetcher: BinanceFetcher) -> None:
         """Test symbol normalization."""
+        # Standard format
         assert fetcher.normalize_symbol("BTCUSDT-PERP") == "BTC/USDT:USDT"
         assert fetcher.normalize_symbol("ETHUSDT-PERP") == "ETH/USDT:USDT"
+        # Hyphen-delimited format
+        assert fetcher.normalize_symbol("BTC-USDT-PERP") == "BTC/USDT:USDT"
+        assert fetcher.normalize_symbol("ETH-USDT") == "ETH/USDT:USDT"
+        # Already normalized (passthrough)
+        assert fetcher.normalize_symbol("BTC/USDT:USDT") == "BTC/USDT:USDT"
+        assert fetcher.normalize_symbol("SOL/USDT:USDT") == "SOL/USDT:USDT"
+        # USD quote
+        assert fetcher.normalize_symbol("BTCUSD-PERP") == "BTC/USD:USD"
 
     @pytest.mark.asyncio
     async def test_fetch_open_interest(self, fetcher: BinanceFetcher) -> None:

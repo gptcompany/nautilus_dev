@@ -341,7 +341,114 @@
       "operation": "todowrite",
       "timestamp": "2025-12-23T16:46:56.792362",
       "todo_count": 5
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-23T16:47:10.367689",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/ccxt_pipeline/fetchers/base.py"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-23T16:47:20.574287",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/ccxt_pipeline/fetchers/base.py",
+      "old_string": "    def normalize_symbol(self, symbol: str) -> str:\n        \"\"\"Normalize a symbol to CCXT format.\n\n ..."
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-23T16:47:24.938944",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/ccxt_pipeline/test_fetchers.py"
+    },
+    {
+      "operation": "grep",
+      "timestamp": "2025-12-23T16:47:28.994695",
+      "pattern": "test_normalize_symbol",
+      "path": "/media/sam/1TB/nautilus_dev/tests/ccxt_pipeline/test_fetchers.py",
+      "output_mode": "content"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-23T16:47:32.829398",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/ccxt_pipeline/test_fetchers.py"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-23T16:47:39.994221",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/ccxt_pipeline/test_fetchers.py",
+      "old_string": "    def test_normalize_symbol(self, fetcher: BinanceFetcher) -> None:\n        \"\"\"Test symbol normali..."
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-23T16:47:43.939882",
+      "command": "PYTHONPATH=/media/sam/1TB/nautilus_dev uv run pytest tests/ccxt_pipeline/test_fetchers.py::TestBinanceFetcher::test_normalize_symbol -v",
+      "description": "Test symbol normalization fix"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-23T16:47:51.672859",
+      "command": "PYTHONPATH=/media/sam/1TB/nautilus_dev uv run pytest tests/ccxt_pipeline/ -v --tb=short 2>&1 | tail -40",
+      "description": "Run all CCXT pipeline tests"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-23T16:48:06.732694",
+      "todo_count": 7
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-23T16:48:11.624815",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/ccxt_pipeline/cli.py"
+    },
+    {
+      "operation": "write",
+      "timestamp": "2025-12-23T16:48:34.895303",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/ccxt_pipeline/benchmarks/profile_concurrent.py",
+      "content_length": 5449
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-23T16:48:39.366188",
+      "command": "mkdir -p /media/sam/1TB/nautilus_dev/scripts/ccxt_pipeline/benchmarks && touch /media/sam/1TB/nautilus_dev/scripts/ccxt_pipeline/benchmarks/__init__.py",
+      "description": "Create benchmarks package"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-23T16:48:49.245575",
+      "todo_count": 7
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-23T16:48:57.716295",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/001-ccxt-data-pipeline/tasks.md",
+      "old_string": "- [x] T070 [P] Code quality checks (ruff check/format) - all checks pass\n- [x] T071 Code cleanup and..."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-23T16:49:03.187868",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/001-ccxt-data-pipeline/tasks.md",
+      "old_string": "**Completed**: Phases 1-9 (113 tests passing) - All automated tasks complete. Manual tasks T072-T074..."
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-23T16:49:08.500654",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/001-ccxt-data-pipeline/tasks.md"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-23T16:49:21.142398",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/001-ccxt-data-pipeline/tasks.md",
+      "old_string": "**Tests**: `tests/ccxt_pipeline/test_utils_parsing.py`"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-23T16:49:26.034041",
+      "todo_count": 7
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-23T16:49:31.514099",
+      "command": "ruff check scripts/ccxt_pipeline/ --fix && ruff format scripts/ccxt_pipeline/",
+      "description": "Run ruff check and format"
     }
   ],
-  "last_updated": "2025-12-23T16:46:56.792376"
+  "last_updated": "2025-12-23T16:49:31.514118"
 }
