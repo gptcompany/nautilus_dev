@@ -498,7 +498,287 @@
       "timestamp": "2025-12-24T18:18:10.408445",
       "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -m pytest strategies/binance2nautilus/tests/ -v --tb=short 2>&1",
       "description": "Run all binance2nautilus tests with verbose output"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-24T18:18:35.250634",
+      "todo_count": 5
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-24T18:18:44.940238",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/002-binance-nautilustrader-222/tasks.md",
+      "old_string": "- [ ] T030 [P] Create `strategies/binance2nautilus/tests/test_klines.py`\n  - Test CSV parsing\n  - Te..."
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-24T18:18:50.994437",
+      "todo_count": 4
+    },
+    {
+      "operation": "task",
+      "timestamp": "2025-12-24T18:18:58.937515",
+      "subagent_type": "alpha-debug",
+      "prompt": "Run alpha-debug verification on the binance2nautilus module implementation.\n\nFocus on:\n1. Edge cases..."
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-24T18:19:07.195834",
+      "todo_count": 5
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-24T18:19:17.170364",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/binance2nautilus/converters/klines.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-24T18:19:17.174543",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/binance2nautilus/converters/trades.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-24T18:19:17.200122",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/binance2nautilus/catalog.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-24T18:19:17.206230",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/binance2nautilus/wrangler_factory.py"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-24T18:19:17.875235",
+      "command": "git -C /media/sam/1TB/nautilus_dev diff HEAD~3 --stat strategies/binance2nautilus/ 2>/dev/null | tail -20",
+      "description": "Check recent changes to binance2nautilus"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-24T18:19:26.816862",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/binance2nautilus/config.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-24T18:19:26.827447",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/binance2nautilus/state.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-24T18:19:26.837739",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/binance2nautilus/instruments.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-24T18:19:26.848041",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/binance2nautilus/converters/base.py"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-24T18:19:34.289755",
+      "todo_count": 5
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-24T18:19:48.324735",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run ruff check strategies/binance2nautilus/ --output-format=json 2>/dev/null | python3 -c \"import sys, json; data = json.load(sys.stdin); print(f'Issues: {len(data)}'); [print(f\\\"  {d['code']}: {d['filename']}:{d['location']['row']} - {d['message']}\\\") for d in data[:20]]\" 2>/dev/null || echo \"Ruff check completed\"",
+      "description": "Run ruff linter on binance2nautilus"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-24T18:19:52.154335",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run pyright strategies/binance2nautilus/ --outputjson 2>/dev/null | python3 -c \"import sys, json; data = json.load(sys.stdin); diags = data.get('generalDiagnostics', []); print(f'Type errors: {len(diags)}'); [print(f\\\"  {d['severity']}: {d['file']}:{d['range']['start']['line']} - {d['message']}\\\") for d in diags[:15]]\" 2>/dev/null || echo \"Pyright check completed\"",
+      "description": "Run pyright type checker"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-24T18:20:01.260107",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run pytest strategies/binance2nautilus/tests/ -v --tb=short 2>&1 | tail -60",
+      "description": "Run binance2nautilus tests"
+    },
+    {
+      "operation": "glob",
+      "timestamp": "2025-12-24T18:20:13.819936",
+      "pattern": "**/__init__.py",
+      "path": "/media/sam/1TB/nautilus_dev/strategies/binance2nautilus"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-24T18:20:13.831313",
+      "command": "ls -la /media/sam/1TB/nautilus_dev/strategies/ 2>/dev/null | head -20",
+      "description": "List strategies directory structure"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-24T18:20:13.903369",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/binance2nautilus/tests/test_klines.py"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-24T18:20:20.919481",
+      "command": "ls -la /media/sam/1TB/nautilus_dev/strategies/ && cat /media/sam/1TB/nautilus_dev/strategies/__init__.py 2>/dev/null || echo \"__init__.py not found in strategies/\"",
+      "description": "Check for strategies __init__.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-24T18:20:22.756620",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/binance2nautilus/__init__.py"
+    },
+    {
+      "operation": "grep",
+      "timestamp": "2025-12-24T18:20:30.892350",
+      "pattern": "datetime\\.utcnow",
+      "path": "/media/sam/1TB/nautilus_dev/strategies/binance2nautilus",
+      "output_mode": "content"
+    },
+    {
+      "operation": "grep",
+      "timestamp": "2025-12-24T18:20:30.907370",
+      "pattern": "\\.iterrows",
+      "path": "/media/sam/1TB/nautilus_dev/strategies/binance2nautilus",
+      "output_mode": "content"
+    },
+    {
+      "operation": "grep",
+      "timestamp": "2025-12-24T18:20:30.915814",
+      "pattern": "int\\(.*\\*",
+      "path": "/media/sam/1TB/nautilus_dev/strategies/binance2nautilus",
+      "output_mode": "content"
+    },
+    {
+      "operation": "grep",
+      "timestamp": "2025-12-24T18:20:40.284172",
+      "pattern": "pd\\.to_datetime",
+      "path": "/media/sam/1TB/nautilus_dev/strategies/binance2nautilus",
+      "output_mode": "content"
+    },
+    {
+      "operation": "grep",
+      "timestamp": "2025-12-24T18:20:40.295297",
+      "pattern": "ts_event|ts_init",
+      "path": "/media/sam/1TB/nautilus_dev/strategies/binance2nautilus",
+      "output_mode": "content"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-24T18:20:56.732677",
+      "todo_count": 5
+    },
+    {
+      "operation": "grep",
+      "timestamp": "2025-12-24T18:21:02.306746",
+      "pattern": "empty|None|null|len\\(",
+      "path": "/media/sam/1TB/nautilus_dev/strategies/binance2nautilus",
+      "output_mode": "content"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-24T18:21:02.346689",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/binance2nautilus/validate.py"
+    },
+    {
+      "operation": "grep",
+      "timestamp": "2025-12-24T18:21:09.595740",
+      "pattern": "if bars\\[|if ticks\\[|bars\\[0\\]|ticks\\[0\\]",
+      "path": "/media/sam/1TB/nautilus_dev/strategies/binance2nautilus",
+      "output_mode": "content"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-24T18:21:16.829295",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/binance2nautilus/cli.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-24T18:21:16.847534",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/binance2nautilus/converters/klines.py"
+    },
+    {
+      "operation": "grep",
+      "timestamp": "2025-12-24T18:21:28.106952",
+      "pattern": "unit=.ms",
+      "path": "/media/sam/1TB/nautilus_dev/strategies/binance2nautilus",
+      "output_mode": "content"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-24T18:21:28.458109",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python3 -c \"\nimport pandas as pd\n# Test: What happens if ms timestamp is passed?\nts_ms = 1704067200000  # ms timestamp\ndt = pd.to_datetime(ts_ms, unit='ms', utc=True)\nprint(f'Input (ms): {ts_ms}')\nprint(f'Output datetime: {dt}')\nprint(f'Output ns: {dt.value}')\nprint(f'Expected ns: {ts_ms * 1_000_000}')\nprint(f'Match: {dt.value == ts_ms * 1_000_000}')\n\"",
+      "description": "Test ms to ns timestamp conversion"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-24T18:21:41.032727",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python3 -c \"\nimport sys\nimport numpy as np\n\n# Check precision\nprint('System bit size:', sys.maxsize.bit_length() + 1, 'bits')\nprint('Float64 precision:', np.finfo(np.float64).precision, 'decimal places')\n\n# Check if price values can lose precision\ntest_price = 90320.12345678  # 8 decimal places (Binance precision)\nfloat64_price = np.float64(test_price)\nprint(f'Original: {test_price}')\nprint(f'Float64:  {float64_price}')\nprint(f'Match: {abs(test_price - float64_price) < 1e-10}')\n\n# Check quantity\ntest_qty = 0.00000001  # Smallest Binance quantity\nfloat64_qty = np.float64(test_qty)\nprint(f'Qty Original: {test_qty}')\nprint(f'Qty Float64:  {float64_qty}')\nprint(f'Qty Match: {test_qty == float64_qty}')\n\"",
+      "description": "Check precision handling"
+    },
+    {
+      "operation": "grep",
+      "timestamp": "2025-12-24T18:21:47.153516",
+      "pattern": "price_precision|size_precision",
+      "path": "/media/sam/1TB/nautilus_dev/strategies/binance2nautilus",
+      "output_mode": "content"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-24T18:21:57.271435",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python3 -c \"\n# Check if the precision settings match Binance reality\n# BTCUSDT-PERP has: price_precision=2, size_precision=3\n\n# Test with a realistic price\ntest_prices = [\n    ('BTC/USDT low', 18000.00),\n    ('BTC/USDT mid', 45000.50),\n    ('BTC/USDT high', 100000.00),\n    ('BTC/USDT precise', 45123.45),\n]\n\nfor name, price in test_prices:\n    rounded = round(price, 2)  # price_precision=2\n    print(f'{name}: {price} -> {rounded} (diff: {price - rounded})')\n\n# Test quantity\ntest_qtys = [\n    ('Min qty', 0.001),\n    ('Typical qty', 0.125),\n    ('Precise qty', 0.1234),  # Would be truncated\n]\n\nfor name, qty in test_qtys:\n    rounded = round(qty, 3)  # size_precision=3\n    print(f'{name}: {qty} -> {rounded} (diff: {qty - rounded})')\n\"",
+      "description": "Verify precision settings"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-24T18:22:03.707760",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/binance2nautilus/converters/trades.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-24T18:22:13.194421",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/binance2nautilus/validate.py"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-24T18:22:25.238524",
+      "todo_count": 5
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-24T18:22:47.015339",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python3 -c \"\n# Test actual wrangler output\nimport pandas as pd\nimport numpy as np\n\n# Create sample data matching Binance klines format\ndata = {\n    'open_time': [1704067200000, 1704067260000],\n    'open': [90320.50, 90376.80],\n    'high': [90396.90, 90450.00],\n    'low': [90254.00, 90350.00],\n    'close': [90376.80, 90425.50],\n    'volume': [393.365, 250.123],\n}\ndf = pd.DataFrame(data)\n\n# Transform like the converter does\nbar_df = pd.DataFrame({\n    'open': df['open'].values.astype('float64'),\n    'high': df['high'].values.astype('float64'),\n    'low': df['low'].values.astype('float64'),\n    'close': df['close'].values.astype('float64'),\n    'volume': df['volume'].values.astype('float64'),\n})\nbar_df.index = pd.to_datetime(df['open_time'], unit='ms', utc=True)\n\nprint('Transformed DataFrame:')\nprint(bar_df)\nprint()\nprint('Index dtype:', bar_df.index.dtype)\nprint('Index tz:', bar_df.index.tz)\nprint()\n\n# Now test with wrangler\nfrom nautilus_trader.persistence.wranglers import BarDataWrangler\nfrom nautilus_trader.model.data import BarType\nfrom nautilus_trader.model.identifiers import InstrumentId, Symbol, Venue\nfrom nautilus_trader.model.instruments import CryptoPerpetual\nfrom nautilus_trader.model.objects import Currency, Money, Price, Quantity\nfrom decimal import Decimal\n\n# Create instrument\nUSDT = Currency.from_str('USDT')\nBTC = Currency.from_str('BTC')\nBINANCE = Venue('BINANCE')\n\ninstrument = CryptoPerpetual(\n    instrument_id=InstrumentId(Symbol('BTCUSDT-PERP'), BINANCE),\n    raw_symbol=Symbol('BTCUSDT'),\n    base_currency=BTC,\n    quote_currency=USDT,\n    settlement_currency=USDT,\n    is_inverse=False,\n    price_precision=2,\n    size_precision=3,\n    price_increment=Price.from_str('0.01'),\n    size_increment=Quantity.from_str('0.001'),\n    max_quantity=Quantity.from_str('1000'),\n    min_quantity=Quantity.from_str('0.001'),\n    max_notional=None,\n    min_notional=Money(10, USDT),\n    max_price=Price.from_str('1000000'),\n    min_price=Price.from_str('0.01'),\n    margin_init=Decimal('0.05'),\n    margin_maint=Decimal('0.025'),\n    maker_fee=Decimal('0.0002'),\n    taker_fee=Decimal('0.0004'),\n    ts_event=1567296000000000000,\n    ts_init=1567296000000000000,\n)\n\nbar_type = BarType.from_str('BTCUSDT-PERP.BINANCE-1-MINUTE-LAST-EXTERNAL')\nwrangler = BarDataWrangler(bar_type=bar_type, instrument=instrument)\n\nbars = wrangler.process(bar_df)\nprint('Generated bars:', len(bars))\nprint('First bar ts_event:', bars[0].ts_event)\nprint('First bar ts_init:', bars[0].ts_init)\nprint('First bar open:', bars[0].open)\nprint('First bar type:', type(bars[0]))\n\"",
+      "description": "Test wrangler output integration"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-24T18:23:09.821163",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python3 -c \"\n# Test BacktestEngine integration\nimport pandas as pd\nfrom decimal import Decimal\n\nfrom nautilus_trader.backtest.engine import BacktestEngine, BacktestEngineConfig\nfrom nautilus_trader.backtest.models import FillModel\nfrom nautilus_trader.model.currencies import USDT\nfrom nautilus_trader.model.enums import AccountType, OmsType\nfrom nautilus_trader.model.objects import Money, Currency, Price, Quantity\nfrom nautilus_trader.persistence.wranglers import BarDataWrangler\nfrom nautilus_trader.model.data import BarType\nfrom nautilus_trader.model.identifiers import InstrumentId, Symbol, Venue\nfrom nautilus_trader.model.instruments import CryptoPerpetual\n\n# Create test data\ndata = {\n    'open_time': [1704067200000 + i * 60000 for i in range(10)],\n    'open': [90320.50 + i for i in range(10)],\n    'high': [90396.90 + i for i in range(10)],\n    'low': [90254.00 + i for i in range(10)],\n    'close': [90376.80 + i for i in range(10)],\n    'volume': [393.365 + i for i in range(10)],\n}\ndf = pd.DataFrame(data)\nbar_df = pd.DataFrame({\n    'open': df['open'].values.astype('float64'),\n    'high': df['high'].values.astype('float64'),\n    'low': df['low'].values.astype('float64'),\n    'close': df['close'].values.astype('float64'),\n    'volume': df['volume'].values.astype('float64'),\n})\nbar_df.index = pd.to_datetime(df['open_time'], unit='ms', utc=True)\n\n# Create instrument\nBTC = Currency.from_str('BTC')\nBINANCE = Venue('BINANCE')\ninstrument = CryptoPerpetual(\n    instrument_id=InstrumentId(Symbol('BTCUSDT-PERP'), BINANCE),\n    raw_symbol=Symbol('BTCUSDT'),\n    base_currency=BTC,\n    quote_currency=USDT,\n    settlement_currency=USDT,\n    is_inverse=False,\n    price_precision=2,\n    size_precision=3,\n    price_increment=Price.from_str('0.01'),\n    size_increment=Quantity.from_str('0.001'),\n    max_quantity=Quantity.from_str('1000'),\n    min_quantity=Quantity.from_str('0.001'),\n    max_notional=None,\n    min_notional=Money(10, USDT),\n    max_price=Price.from_str('1000000'),\n    min_price=Price.from_str('0.01'),\n    margin_init=Decimal('0.05'),\n    margin_maint=Decimal('0.025'),\n    maker_fee=Decimal('0.0002'),\n    taker_fee=Decimal('0.0004'),\n    ts_event=1567296000000000000,\n    ts_init=1567296000000000000,\n)\n\n# Process with wrangler\nbar_type = BarType.from_str('BTCUSDT-PERP.BINANCE-1-MINUTE-LAST-EXTERNAL')\nwrangler = BarDataWrangler(bar_type=bar_type, instrument=instrument)\nbars = wrangler.process(bar_df)\n\n# Test BacktestEngine compatibility\nconfig = BacktestEngineConfig(trader_id='VALIDATOR-001')\nengine = BacktestEngine(config=config)\nengine.add_venue(\n    venue=BINANCE,\n    oms_type=OmsType.HEDGING,\n    account_type=AccountType.MARGIN,\n    base_currency=None,\n    starting_balances=[Money(1_000_000, USDT)],\n    fill_model=FillModel(),\n)\nengine.add_instrument(instrument)\nengine.add_data(bars)\n\nprint('BacktestEngine compatibility: PASS')\nprint(f'Bars added: {len(bars)}')\nprint(f'Bar type: {type(bars[0]).__name__}')\n\" 2>&1",
+      "description": "Test BacktestEngine compatibility"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-24T18:23:35.723838",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python3 -c \"\n# Test TradeTickDataWrangler\nimport pandas as pd\nfrom decimal import Decimal\n\nfrom nautilus_trader.model.currencies import USDT\nfrom nautilus_trader.model.objects import Money, Currency, Price, Quantity\nfrom nautilus_trader.persistence.wranglers import TradeTickDataWrangler\nfrom nautilus_trader.model.identifiers import InstrumentId, Symbol, Venue\nfrom nautilus_trader.model.instruments import CryptoPerpetual\n\n# Create test trade data\ndata = {\n    'time': [1704067200000, 1704067200050, 1704067200100],\n    'id': [12345, 12346, 12347],\n    'price': [90320.50, 90320.51, 90320.49],\n    'qty': [0.001, 0.015, 0.100],\n    'is_buyer_maker': [True, False, True],\n}\ndf = pd.DataFrame(data)\n\n# Transform like trades converter\ntick_df = pd.DataFrame({\n    'price': df['price'].values.astype('float64'),\n    'quantity': df['qty'].values.astype('float64'),\n    'buyer_maker': df['is_buyer_maker'].values,\n    'trade_id': df['id'].astype(str).values,\n})\ntick_df.index = pd.to_datetime(df['time'], unit='ms', utc=True)\n\nprint('Transformed DataFrame:')\nprint(tick_df)\nprint()\n\n# Create instrument\nBTC = Currency.from_str('BTC')\nBINANCE = Venue('BINANCE')\ninstrument = CryptoPerpetual(\n    instrument_id=InstrumentId(Symbol('BTCUSDT-PERP'), BINANCE),\n    raw_symbol=Symbol('BTCUSDT'),\n    base_currency=BTC,\n    quote_currency=USDT,\n    settlement_currency=USDT,\n    is_inverse=False,\n    price_precision=2,\n    size_precision=3,\n    price_increment=Price.from_str('0.01'),\n    size_increment=Quantity.from_str('0.001'),\n    max_quantity=Quantity.from_str('1000'),\n    min_quantity=Quantity.from_str('0.001'),\n    max_notional=None,\n    min_notional=Money(10, USDT),\n    max_price=Price.from_str('1000000'),\n    min_price=Price.from_str('0.01'),\n    margin_init=Decimal('0.05'),\n    margin_maint=Decimal('0.025'),\n    maker_fee=Decimal('0.0002'),\n    taker_fee=Decimal('0.0004'),\n    ts_event=1567296000000000000,\n    ts_init=1567296000000000000,\n)\n\nwrangler = TradeTickDataWrangler(instrument=instrument)\nticks = wrangler.process(tick_df)\n\nprint('Generated ticks:', len(ticks))\nfor i, tick in enumerate(ticks):\n    print(f'Tick {i}: price={tick.price}, size={tick.size}, ts_event={tick.ts_event}, trade_id={tick.trade_id}')\n\" 2>&1",
+      "description": "Test TradeTickDataWrangler"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-24T18:23:52.515126",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python3 -c \"\n# Test column naming - ensure 'quantity' NOT 'size' is used\nimport pandas as pd\nfrom decimal import Decimal\nfrom nautilus_trader.model.currencies import USDT\nfrom nautilus_trader.model.objects import Money, Currency, Price, Quantity\nfrom nautilus_trader.persistence.wranglers import TradeTickDataWrangler\nfrom nautilus_trader.model.identifiers import InstrumentId, Symbol, Venue\nfrom nautilus_trader.model.instruments import CryptoPerpetual\n\n# Test with wrong column name 'size' instead of 'quantity'\ndf_wrong = pd.DataFrame({\n    'price': [90320.50],\n    'size': [0.001],  # WRONG column name\n    'buyer_maker': [True],\n    'trade_id': ['12345'],\n})\ndf_wrong.index = pd.to_datetime([1704067200000], unit='ms', utc=True)\n\n# Create instrument\nBTC = Currency.from_str('BTC')\nBINANCE = Venue('BINANCE')\ninstrument = CryptoPerpetual(\n    instrument_id=InstrumentId(Symbol('BTCUSDT-PERP'), BINANCE),\n    raw_symbol=Symbol('BTCUSDT'),\n    base_currency=BTC,\n    quote_currency=USDT,\n    settlement_currency=USDT,\n    is_inverse=False,\n    price_precision=2,\n    size_precision=3,\n    price_increment=Price.from_str('0.01'),\n    size_increment=Quantity.from_str('0.001'),\n    max_quantity=Quantity.from_str('1000'),\n    min_quantity=Quantity.from_str('0.001'),\n    max_notional=None,\n    min_notional=Money(10, USDT),\n    max_price=Price.from_str('1000000'),\n    min_price=Price.from_str('0.01'),\n    margin_init=Decimal('0.05'),\n    margin_maint=Decimal('0.025'),\n    maker_fee=Decimal('0.0002'),\n    taker_fee=Decimal('0.0004'),\n    ts_event=1567296000000000000,\n    ts_init=1567296000000000000,\n)\n\nwrangler = TradeTickDataWrangler(instrument=instrument)\ntry:\n    ticks = wrangler.process(df_wrong)\n    print('ERROR: Should have failed with wrong column name')\nexcept Exception as e:\n    print(f'Correctly failed with: {type(e).__name__}: {e}')\n\"",
+      "description": "Test column naming requirement"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-24T18:24:07.770892",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python3 -c \"\n# Reproduce the NameError issue in validate.py\ndef test_unbound_variable():\n    errors = []\n    all_bars = None  # Simulating what happens if this line is never reached\n    \n    try:\n        # Simulate catalog.bars() failing\n        raise Exception('Connection failed')\n    except Exception as e:\n        errors.append(f'Failed: {e}')\n        # Note: all_bars is never assigned\n    \n    # This line uses all_bars without checking if it was assigned\n    if all_bars:  # What happens if all_bars was never assigned?\n        print('Has bars')\n    else:\n        print('No bars')\n\n# In Python, this works if all_bars was initialized to None above\n# But in validate.py, all_bars is only defined inside the try block!\n\n# Let's see what actually happens\ndef actual_validate_issue():\n    errors = []\n    try:\n        all_bars = [1, 2, 3]  # Simulate success\n    except Exception as e:\n        errors.append(str(e))\n        # all_bars is NOT defined here\n    \n    # This works because try succeeded\n    if all_bars:\n        print('OK: all_bars defined')\n\ndef actual_validate_failure():\n    errors = []\n    try:\n        raise Exception('Fail')  # Force failure\n        all_bars = [1, 2, 3]\n    except Exception as e:\n        errors.append(str(e))\n    \n    # This will cause NameError\n    try:\n        if all_bars:\n            print('all_bars exists')\n    except NameError as ne:\n        print(f'BUG CONFIRMED: {ne}')\n\nprint('Test 1 - Success case:')\nactual_validate_issue()\n\nprint()\nprint('Test 2 - Failure case:')\nactual_validate_failure()\n\"",
+      "description": "Reproduce validate.py NameError bug"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-24T18:24:21.681320",
+      "todo_count": 5
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-24T18:24:46.116542",
+      "todo_count": 5
     }
   ],
-  "last_updated": "2025-12-24T18:18:10.408461"
+  "last_updated": "2025-12-24T18:24:46.116558"
 }

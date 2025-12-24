@@ -201,12 +201,12 @@
   - Test with catalog write/read
   - (Tests in test_integration.py: TestInstruments class)
 
-- [ ] T030 [P] Create `strategies/binance2nautilus/tests/test_klines.py`
+- [x] T030 [P] Create `strategies/binance2nautilus/tests/test_klines.py`
   - Test CSV parsing
   - Test DataFrame transformation
   - Test wrangler output types
 
-- [ ] T031 [P] Create `strategies/binance2nautilus/tests/test_trades.py`
+- [x] T031 [P] Create `strategies/binance2nautilus/tests/test_trades.py`
   - Test trades CSV parsing
   - Test chunked processing
   - Test aggressor_side mapping
