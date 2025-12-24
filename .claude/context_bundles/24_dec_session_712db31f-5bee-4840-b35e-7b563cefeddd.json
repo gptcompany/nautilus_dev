@@ -61,7 +61,85 @@
       "operation": "todowrite",
       "timestamp": "2025-12-24T13:14:52.791665",
       "todo_count": 9
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-24T13:15:09.972059",
+      "todo_count": 4
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-24T13:15:14.448168",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/ccxt_pipeline/models/liquidation.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-24T13:15:19.768287",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/ccxt_pipeline/streams/liquidations.py"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-24T13:15:28.523485",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/ccxt_pipeline/streams/liquidations.py",
+      "old_string": "        try:\n            return Liquidation(\n                timestamp=datetime.fromtimestamp(\n     ..."
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-24T13:15:33.412333",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/ccxt_pipeline/streams/liquidations.py"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-24T13:15:42.304210",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/ccxt_pipeline/streams/liquidations.py",
+      "old_string": "        symbol = liq_data.get(\"symbol\", \"\")\n\n        try:\n            return Liquidation(\n          ..."
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-24T13:15:47.952993",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/ccxt_pipeline/streams/liquidations.py"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-24T13:15:57.075990",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/ccxt_pipeline/streams/liquidations.py",
+      "old_string": "            coin = trade.get(\"coin\", \"\")\n\n            try:\n                return Liquidation(\n     ..."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-24T13:16:07.416117",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/ccxt_pipeline/streams/liquidations.py",
+      "old_string": "        try:\n            price = float(order.get(\"ap\", order.get(\"p\", 0)))\n            quantity = fl..."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-24T13:16:15.696718",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/ccxt_pipeline/streams/liquidations.py",
+      "old_string": "        try:\n            price = float(liq_data.get(\"price\", 0))\n            quantity = float(liq_da..."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-24T13:16:23.983459",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/ccxt_pipeline/streams/liquidations.py",
+      "old_string": "            try:\n                price = float(trade.get(\"px\", 0))\n                quantity = float(..."
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-24T13:16:32.266896",
+      "todo_count": 4
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-24T13:16:37.733628",
+      "command": "PYTHONPATH=/media/sam/1TB/nautilus_dev uv run pytest tests/ccxt_pipeline/ -q --tb=no 2>&1 | tail -5",
+      "description": "Quick test run"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-24T13:17:46.566349",
+      "command": "git add -A && git commit -m \"$(cat <<'EOF'\nfix: Add missing value field + validation in liquidation streams\n\n- Add required `value` field (price * quantity) to all Liquidation objects\n- Add validation to skip invalid data (price/quantity <= 0)\n- Fixes Pydantic ValidationError that would prevent liquidation processing\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n)\" && systemctl --user restart ccxt-pipeline.service",
+      "description": "Commit fixes and restart"
     }
   ],
-  "last_updated": "2025-12-24T13:14:52.791681"
+  "last_updated": "2025-12-24T13:17:46.566390"
 }

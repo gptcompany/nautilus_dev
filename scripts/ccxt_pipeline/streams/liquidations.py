@@ -166,6 +166,11 @@ class BinanceLiquidationStream(BaseLiquidationStream):
             return None
 
         try:
+            price = float(order.get("ap", order.get("p", 0)))
+            quantity = float(order.get("q", 0))
+            # Skip invalid data (Liquidation model requires gt=0)
+            if price <= 0 or quantity <= 0:
+                return None
             return Liquidation(
                 timestamp=datetime.fromtimestamp(
                     order.get("T", data.get("E", 0)) / 1000, tz=timezone.utc
@@ -174,8 +179,9 @@ class BinanceLiquidationStream(BaseLiquidationStream):
                 venue=Venue.BINANCE,
                 # SELL order = LONG position liquidated, BUY order = SHORT position liquidated
                 side=Side.LONG if order.get("S") == "SELL" else Side.SHORT,
-                price=float(order.get("ap", order.get("p", 0))),
-                quantity=float(order.get("q", 0)),
+                price=price,
+                quantity=quantity,
+                value=price * quantity,
             )
         except (ValueError, TypeError) as e:
             logger.warning(f"Failed to parse Binance liquidation: {e}")
@@ -243,6 +249,11 @@ class BybitLiquidationStream(BaseLiquidationStream):
         symbol = liq_data.get("symbol", "")
 
         try:
+            price = float(liq_data.get("price", 0))
+            quantity = float(liq_data.get("size", 0))
+            # Skip invalid data (Liquidation model requires gt=0)
+            if price <= 0 or quantity <= 0:
+                return None
             return Liquidation(
                 timestamp=datetime.fromtimestamp(
                     liq_data.get("updatedTime", data.get("ts", 0)) / 1000,
@@ -252,8 +263,9 @@ class BybitLiquidationStream(BaseLiquidationStream):
                 venue=Venue.BYBIT,
                 # Buy order = SHORT position liquidated, Sell order = LONG position liquidated
                 side=Side.SHORT if liq_data.get("side") == "Buy" else Side.LONG,
-                price=float(liq_data.get("price", 0)),
-                quantity=float(liq_data.get("size", 0)),
+                price=price,
+                quantity=quantity,
+                value=price * quantity,
             )
         except (ValueError, TypeError) as e:
             logger.warning(f"Failed to parse Bybit liquidation: {e}")
@@ -321,14 +333,20 @@ class HyperliquidLiquidationStream(BaseLiquidationStream):
             coin = trade.get("coin", "")
 
             try:
+                price = float(trade.get("px", 0))
+                quantity = float(trade.get("sz", 0))
+                # Skip invalid data (Liquidation model requires gt=0)
+                if price <= 0 or quantity <= 0:
+                    continue
                 return Liquidation(
                     timestamp=datetime.fromtimestamp(trade.get("time", 0) / 1000, tz=timezone.utc),
                     symbol=f"{coin}USDT-PERP",
                     venue=Venue.HYPERLIQUID,
                     # A (ask/sell) = LONG position liquidated, B (bid/buy) = SHORT position liquidated
                     side=Side.LONG if trade.get("side") == "A" else Side.SHORT,
-                    price=float(trade.get("px", 0)),
-                    quantity=float(trade.get("sz", 0)),
+                    price=price,
+                    quantity=quantity,
+                    value=price * quantity,
                 )
             except (ValueError, TypeError) as e:
                 logger.warning(f"Failed to parse Hyperliquid liquidation: {e}")
