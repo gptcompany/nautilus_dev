@@ -31,7 +31,7 @@ def sample_trades_csv(tmp_path: Path) -> Path:
 def large_trades_csv(tmp_path: Path) -> Path:
     """Create a larger trades CSV file for chunked testing."""
     lines = ["id,price,qty,quote_qty,time,is_buyer_maker"]
-    for i in range(500):  # 500 rows
+    for i in range(1, 501):  # 500 rows, starting from 1 to avoid zero qty
         is_buyer_maker = "true" if i % 2 == 0 else "false"
         lines.append(
             f"{i},90000.{i:03d},{i / 1000:.6f},{i * 90:.6f},170406720{i:04d},{is_buyer_maker}"
@@ -148,7 +148,7 @@ class TestTradesConverter:
         assert str(tick.instrument_id) == "BTCUSDT-PERP.BINANCE"
         assert float(tick.price) == pytest.approx(90320.5, rel=1e-6)
         assert float(tick.size) == pytest.approx(0.003, rel=1e-6)
-        assert tick.trade_id == "6954502553"
+        assert str(tick.trade_id) == "6954502553"
 
         # Check timestamp is in nanoseconds
         assert tick.ts_event > 1_700_000_000_000_000_000
@@ -221,8 +221,8 @@ class TestChunkedProcessing:
             all_ticks.extend(chunk)
 
         # Check trade IDs are in order
-        trade_ids = [int(t.trade_id) for t in all_ticks]
-        assert trade_ids == list(range(500))
+        trade_ids = [int(str(t.trade_id)) for t in all_ticks]
+        assert trade_ids == list(range(1, 501))
 
 
 class TestAggressorSideMapping:
