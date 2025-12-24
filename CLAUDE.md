@@ -23,10 +23,15 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Exchange adapters**: Binance, Bybit, OKX, Interactive Brokers
 - **BacktestNode** (simulation), **TradingNode** (live execution)
 
-**Nightly Environment** (2025-12-10):
-- Version: `1.222.0.dev20251210+12438`
+**Nightly Environment** (ACTIVE - Full Rust):
+- Version: `1.222.0` (nightly)
 - Python: 3.12.11
-- Location: `/media/sam/2TB-NVMe/prod/apps/nautilus_nightly/`
+- Location: `/media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/`
+- **Rust Core**: ✅ `nautilus_pyo3` available
+- **Precision**: 128-bit (`fixed_size_binary[16]`) - Linux default
+- **Wranglers**: Use V1 only (`BarDataWrangler`, `TradeTickDataWrangler`) - V2 incompatible with BacktestEngine
+
+**IMPORTANT**: Always use nightly for new development. Stable version catalogs are INCOMPATIBLE with nightly (schema mismatch).
 
 ## Repository Organization
 
@@ -102,21 +107,47 @@ Finds bugs even when tests pass. Triggers automatically after implementation pha
 3. Confidence >= 95%
 4. Tests failing -> human intervention
 
+### Pre-Planning Research (MANDATORY)
+
+**BEFORE any `/speckit.plan`, implementation, or task execution**:
+
+1. **Delegate to `nautilus-docs-specialist`** for comprehensive documentation search
+2. **Search `docs/discord/`** for recent discussions on the topic
+3. **Check `docs/nautilus/`** for version-specific breaking changes
+4. **Use Context7** for official API documentation
+5. **Document findings** in `research.md` before proceeding
+
+**Always delegate first**:
+```
+Use Task tool with subagent_type='nautilus-docs-specialist' to:
+- Search Discord for recent bugs/workarounds on the topic
+- Check Context7 for API changes in nightly vs stable
+- Verify schema/format changes in latest versions
+```
+
+```bash
+# Manual search fallback
+grep -r "wrangler\|ParquetDataCatalog" docs/discord/ --include="*.md"
+grep -r "breaking\|deprecated" docs/nautilus/ --include="*.md"
+```
+
+**Why**: Discord contains real-world bugs, workarounds, and API changes not yet in official docs.
+
 ### Documentation & Code Analysis Workflow
 
 | Tool | Purpose | When to Use |
 |------|---------|-------------|
-| **Context7 MCP** | NautilusTrader API docs | Quick lookups, specific API reference |
-| **Discord** (`docs/discord/`) | Community solutions | Best practices, real bugs/fixes |
+| **Discord** (`docs/discord/`) | Community solutions | **FIRST** - Recent bugs, workarounds |
+| **Context7 MCP** | NautilusTrader API docs | Official API reference |
 | **backtest-analyzer** | Analyze backtest logs | Strategy review, performance analysis |
 | **alpha-debug** | Hunt bugs in code | Edge cases, logic errors |
 | **Serena MCP** | Search codebase | Find patterns, locate implementations |
 
 **Analysis Workflow**:
-- Use Context7 for official documentation
-- Use Discord (`docs/discord/`) for community solutions
-- Use `backtest-analyzer` agent for log analysis (chunked processing)
-- Use `alpha-debug` agent for code bug hunting
+1. **Discord first** (`docs/discord/`) - Check for recent issues/solutions
+2. Use Context7 for official documentation
+3. Use `backtest-analyzer` agent for log analysis (chunked processing)
+4. Use `alpha-debug` agent for code bug hunting
 
 ## Architecture Principles
 
