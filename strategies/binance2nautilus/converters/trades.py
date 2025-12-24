@@ -86,15 +86,18 @@ class TradesConverter(BaseConverter):
             - buyer_maker: True means buyer was maker, so SELLER was aggressor
         """
         # Create DataFrame with required columns for V1 wrangler
+        # Note: Use .values to avoid pandas index alignment issues
         tick_df = pd.DataFrame(
             {
-                "price": df["price"].astype("float64"),
-                "quantity": df["qty"].astype("float64"),  # V1 requires 'quantity'
-                "buyer_maker": df["is_buyer_maker"],  # bool
-                "trade_id": df["id"].astype(str),
+                "price": df["price"].values.astype("float64"),
+                "quantity": df["qty"].values.astype(
+                    "float64"
+                ),  # V1 requires 'quantity'
+                "buyer_maker": df["is_buyer_maker"].values,  # bool
+                "trade_id": df["id"].astype(str).values,
             },
-            index=pd.to_datetime(df["time"], unit="ms", utc=True),
         )
+        tick_df.index = pd.to_datetime(df["time"], unit="ms", utc=True)
         return tick_df
 
     def wrangle(self, df: pd.DataFrame) -> list[TradeTick]:

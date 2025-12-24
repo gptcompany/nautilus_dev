@@ -113,16 +113,17 @@ class KlinesConverter(BaseConverter):
             and columns: open, high, low, close, volume
         """
         # Create DataFrame with required columns
+        # Note: Use .values to avoid pandas index alignment issues
         bar_df = pd.DataFrame(
             {
-                "open": df["open"].astype("float64"),
-                "high": df["high"].astype("float64"),
-                "low": df["low"].astype("float64"),
-                "close": df["close"].astype("float64"),
-                "volume": df["volume"].astype("float64"),
+                "open": df["open"].values.astype("float64"),
+                "high": df["high"].values.astype("float64"),
+                "low": df["low"].values.astype("float64"),
+                "close": df["close"].values.astype("float64"),
+                "volume": df["volume"].values.astype("float64"),
             },
-            index=pd.to_datetime(df["open_time"], unit="ms", utc=True),
         )
+        bar_df.index = pd.to_datetime(df["open_time"], unit="ms", utc=True)
         return bar_df
 
     def wrangle(self, df: pd.DataFrame) -> list[Bar]:
