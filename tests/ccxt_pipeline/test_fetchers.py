@@ -125,14 +125,16 @@ class TestHyperliquidFetcher:
 
     def test_normalize_symbol(self, fetcher: HyperliquidFetcher) -> None:
         """Test symbol normalization for Hyperliquid."""
-        # Hyperliquid uses different symbol format
-        assert fetcher.normalize_symbol("BTC-USD-PERP") == "BTC/USD:USD"
+        # Hyperliquid uses USDC for perpetuals
+        assert fetcher.normalize_symbol("BTC-USD-PERP") == "BTC/USDC:USDC"
+        assert fetcher.normalize_symbol("BTCUSDT-PERP") == "BTC/USDC:USDC"
+        assert fetcher.normalize_symbol("ETH-USDC-PERP") == "ETH/USDC:USDC"
 
     @pytest.mark.asyncio
     async def test_fetch_open_interest(self, fetcher: HyperliquidFetcher) -> None:
         """Test fetching current open interest."""
         mock_response = {
-            "symbol": "BTC/USD:USD",
+            "symbol": "BTC/USDC:USDC",
             "openInterestAmount": 42567.10,
             "openInterestValue": 4256710000.0,
             "timestamp": 1705320000000,
@@ -363,7 +365,7 @@ class TestFetchFundingRate:
         from scripts.ccxt_pipeline.models import FundingRate
 
         mock_response = {
-            "symbol": "BTC/USD:USD",
+            "symbol": "BTC/USDC:USDC",
             "fundingRate": 0.00008,
             "fundingTimestamp": 1705323600000,  # 1h interval for Hyperliquid
             "timestamp": 1705320000000,
@@ -519,7 +521,7 @@ class TestStreamLiquidations:
         # Hyperliquid returns liquidations via REST API polling
         mock_liquidations = [
             {
-                "symbol": "BTC/USD:USD",
+                "symbol": "BTC/USDC:USDC",
                 "side": "sell",
                 "price": 99000.0,
                 "amount": 2.0,
