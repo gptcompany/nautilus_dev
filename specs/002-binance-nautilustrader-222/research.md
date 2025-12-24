@@ -34,6 +34,18 @@ Precision Mode: 128-bit (fixed_size_binary[16]) - Linux default
 - The Rust core is available but BacktestEngine hasn't been fully migrated to accept PyO3 objects yet
 - This is a **transition period** - future versions will support V2 wranglers with BacktestEngine
 
+**VERIFIED (2025-12-24)**: BacktestEngine source code (`engine.pyx`) contains EXPLICIT rejection:
+```python
+if isinstance(data[0], NAUTILUS_PYO3_DATA_TYPES):
+    raise TypeError(
+        f"Cannot add data of type `{type(data[0]).__name__}` from pyo3 directly to engine. "
+        "This will be supported in a future release.",
+    )
+```
+
+**Discord Confirmation** (2025-11-17, @faysou):
+> "rust objects are not supposed to be used now, they are not compatible with the existing cython system"
+
 **Alternatives considered**:
 - V2 Wranglers (`BarDataWranglerV2`, `TradeTickDataWranglerV2`) - Rejected due to BacktestEngine incompatibility
 
@@ -45,6 +57,15 @@ Precision Mode: 128-bit (fixed_size_binary[16]) - Linux default
 | `TradeTickDataWranglerV2` | PyO3 objects | ❌ No (yet) |
 
 **Note**: V1 wranglers are still very fast (~400k records/sec). The bottleneck is typically I/O, not wrangling.
+
+**Alternative: BacktestNode with DataCatalog** (discovered during verification):
+```python
+from nautilus_trader.backtest.node import BacktestNode
+
+node = BacktestNode(configs=[...])
+node.run()  # Uses DataFusion streaming internally - may handle PyO3 differently
+```
+This high-level API uses DataFusion streaming backend. Worth investigating for future compatibility.
 
 ---
 

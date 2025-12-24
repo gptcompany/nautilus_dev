@@ -29,10 +29,14 @@
 ┌─────────────────────────────────────────────────────────────────────────┐
 │                     binance2nautilus CLI                                │
 │                                                                         │
-│  ┌─────────────┐    ┌─────────────┐    ┌─────────────┐                  │
-│  │ CSV Parser  │───▶│ V1 Wrangler │───▶│  Catalog    │                  │
-│  │  (pandas)   │    │ (Cython)    │    │  Writer     │                  │
-│  └─────────────┘    └─────────────┘    └─────────────┘                  │
+│  ┌─────────────┐    ┌──────────────────┐    ┌─────────────┐             │
+│  │ CSV Parser  │───▶│ Wrangler Factory │───▶│  Catalog    │             │
+│  │  (pandas)   │    │   (V1 or V2)     │    │  Writer     │             │
+│  └─────────────┘    └──────────────────┘    └─────────────┘             │
+│                                                                         │
+│  wrangler_factory.py: V2-ready architecture                             │
+│  - use_rust_wranglers=False → V1 (current)                              │
+│  - use_rust_wranglers=True  → V2 (when available)                       │
 │                                                                         │
 │  State Tracker: conversion_state.json                                   │
 └──────────────────────────────┬──────────────────────────────────────────┘
@@ -79,6 +83,14 @@
 │          └───────────────────┼───────────────────┘           │
 │                              │                               │
 │  ┌───────────────────────────▼───────────────────────────┐   │
+│  │               wrangler_factory.py                     │   │
+│  │                                                       │   │
+│  │  - get_bar_wrangler(instrument, bar_type, config)     │   │
+│  │  - get_trade_wrangler(instrument, config)             │   │
+│  │  - Uses config.use_rust_wranglers to select V1/V2     │   │
+│  └───────────────────────────────────────────────────────┘   │
+│                              │                               │
+│  ┌───────────────────────────▼───────────────────────────┐   │
 │  │                   instruments.py                      │   │
 │  │                                                       │   │
 │  │  - create_btcusdt_perp()                              │   │
@@ -101,9 +113,15 @@
    - Pros: Native Rust/PyO3, potentially faster
    - Cons: **NOT compatible with BacktestEngine** (PyO3 objects)
 
-**Selected**: Option 1 (V1 Wranglers)
+**Selected**: Option 1 (V1 Wranglers) with **V2-Ready Architecture**
 
 **Rationale**: V2 wranglers produce PyO3 objects that cannot be used with the current BacktestEngine. This was confirmed in Discord discussions and NautilusTrader documentation.
+
+**Migration-Ready Design**:
+- Factory pattern isolates wrangler selection to single file (`wrangler_factory.py`)
+- Config flag `use_rust_wranglers: bool = False` controls V1/V2 selection
+- All converter code uses factory, never direct imports
+- When Rust BacktestEngine is available: flip flag to `True`, test, done
 
 ---
 
@@ -150,6 +168,7 @@
 - [x] `state.py` - Conversion state tracking (JSON-based)
 - [x] `config.py` - Configuration model with paths and settings
 - [x] Basic project structure with `__init__.py`
+- [ ] `wrangler_factory.py` - V1/V2 wrangler selection (migration-ready)
 
 **Dependencies**: None
 
@@ -157,9 +176,10 @@
 ```
 strategies/binance2nautilus/
 ├── __init__.py
-├── instruments.py      # Instrument definitions
-├── state.py            # State tracking
-└── config.py           # Configuration
+├── instruments.py        # Instrument definitions
+├── state.py              # State tracking
+├── config.py             # Configuration (includes use_rust_wranglers flag)
+└── wrangler_factory.py   # V1/V2 wrangler selection (migration-ready)
 ```
 
 ---
@@ -187,9 +207,9 @@ bar_df = pd.DataFrame({
     'volume': data['volume'].astype('float64'),
 }, index=pd.to_datetime(data['open_time'], unit='ms', utc=True))
 
-# Use V1 wrangler
+# Use factory for V2-ready architecture
 bar_type = BarType.from_str('BTCUSDT-PERP.BINANCE-1-MINUTE-LAST-EXTERNAL')
-wrangler = BarDataWrangler(bar_type=bar_type, instrument=instrument)
+wrangler = get_bar_wrangler(bar_type=bar_type, instrument=instrument, config=config)
 bars = wrangler.process(bar_df)
 ```
 
@@ -218,7 +238,7 @@ tick_df = pd.DataFrame({
     'trade_id': chunk['id'].astype(str),
 }, index=pd.to_datetime(chunk['time'], unit='ms', utc=True))
 
-wrangler = TradeTickDataWrangler(instrument=instrument)
+wrangler = get_trade_wrangler(instrument=instrument, config=config)
 ticks = wrangler.process(tick_df)
 ```
 
@@ -276,6 +296,7 @@ strategies/binance2nautilus/
 ├── instruments.py            # CryptoPerpetual definitions
 ├── state.py                  # Conversion state tracking
 ├── validate.py               # Catalog validation
+├── wrangler_factory.py       # V1/V2 wrangler selection
 ├── converters/
 │   ├── __init__.py
 │   ├── base.py               # Base converter class
@@ -326,6 +347,7 @@ class ConverterConfig(BaseModel):
     timeframes: list[str] = ['1m', '5m', '15m']
     chunk_size: int = 100_000
     nautilus_env: Path = Path('/media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env')
+    use_rust_wranglers: bool = False  # Flip to True when Rust BacktestEngine available
 ```
 
 ## Testing Strategy
@@ -355,7 +377,7 @@ class ConverterConfig(BaseModel):
 |------|--------|------------|------------|
 | Schema mismatch (precision) | High | Low | Verified 128-bit mode in nightly |
 | Memory exhaustion (trades) | High | Medium | Chunked processing (100k rows) |
-| V2 wrangler incompatibility | High | Low | Explicitly use V1 wranglers only |
+| V2 wrangler incompatibility | High | Low | Explicitly use V1 via factory |
 | Disk space insufficient | Medium | Low | Check space before bulk conversion |
 | n8n workflow conflict | Low | Low | Lock file during conversion |
 
@@ -388,7 +410,7 @@ class ConverterConfig(BaseModel):
 
 ## Next Steps
 
-1. Run `/speckit.tasks` to generate task breakdown
-2. Implement Phase 1 (instruments, state, config)
+1. ✅ Run `/speckit.tasks` to generate task breakdown
+2. Implement Phase 1 (instruments, state, config, wrangler_factory)
 3. Test with 1-month subset using quickstart.md
 4. Proceed with remaining phases

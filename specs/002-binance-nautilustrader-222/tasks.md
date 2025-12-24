@@ -33,8 +33,13 @@
 
 - [ ] T004 [P] Create `strategies/binance2nautilus/instruments.py` with CryptoPerpetual definitions (BTCUSDT-PERP, ETHUSDT-PERP)
 - [ ] T005 [P] Create `strategies/binance2nautilus/state.py` with ConversionState model and load/save functions
-- [ ] T006 [P] Create `strategies/binance2nautilus/converters/__init__.py` with converter exports
-- [ ] T007 Create `strategies/binance2nautilus/converters/base.py` with BaseConverter abstract class
+- [ ] T006 [P] Create `strategies/binance2nautilus/wrangler_factory.py` with V1/V2 factory functions
+  - `get_bar_wrangler(instrument, bar_type, config)` - Returns V1 or V2 based on config
+  - `get_trade_wrangler(instrument, config)` - Returns V1 or V2 based on config
+  - Uses `config.use_rust_wranglers` flag to select implementation
+  - **Migration to V2**: Just flip flag when Rust BacktestEngine available
+- [ ] T007 [P] Create `strategies/binance2nautilus/converters/__init__.py` with converter exports
+- [ ] T008 Create `strategies/binance2nautilus/converters/base.py` with BaseConverter abstract class
 
 **Checkpoint**: Foundation ready - user story implementation can now begin
 
@@ -48,37 +53,39 @@
 
 ### Implementation for User Story 1
 
-- [ ] T008 [P] [US1] Create klines CSV parser in `strategies/binance2nautilus/converters/klines.py`
+- [ ] T009 [P] [US1] Create klines CSV parser in `strategies/binance2nautilus/converters/klines.py`
   - Parse Binance klines CSV format (open_time, open, high, low, close, volume, close_time, quote_volume, count, taker_buy_volume, taker_buy_quote_volume, ignore)
-  - Transform to DataFrame format expected by V1 BarDataWrangler
+  - Transform to DataFrame format expected by wrangler
   - Support 1m, 5m, 15m timeframes
 
-- [ ] T009 [P] [US1] Create trades CSV parser in `strategies/binance2nautilus/converters/trades.py`
+- [ ] T010 [P] [US1] Create trades CSV parser in `strategies/binance2nautilus/converters/trades.py`
   - Parse Binance trades CSV format (id, price, qty, quote_qty, time, is_buyer_maker)
-  - Transform to DataFrame format expected by V1 TradeTickDataWrangler
+  - Transform to DataFrame format expected by wrangler
   - Use chunked processing (100k rows) for memory efficiency
 
-- [ ] T010 [US1] Create catalog writer in `strategies/binance2nautilus/catalog.py`
+- [ ] T011 [US1] Create catalog writer in `strategies/binance2nautilus/catalog.py`
   - Initialize ParquetDataCatalog at output directory
   - Write instrument FIRST, then data
   - Support batch writing for large datasets
 
-- [ ] T011 [US1] Implement klines conversion pipeline in `strategies/binance2nautilus/converters/klines.py`
-  - Use V1 BarDataWrangler (NOT V2 - incompatible with BacktestEngine)
+- [ ] T012 [US1] Implement klines conversion pipeline in `strategies/binance2nautilus/converters/klines.py`
+  - Use `wrangler_factory.get_bar_wrangler()` (V2-ready)
   - Create BarType string (e.g., `BTCUSDT-PERP.BINANCE-1-MINUTE-LAST-EXTERNAL`)
   - Process all CSV files for specified symbol and timeframe
 
-- [ ] T012 [US1] Implement trades conversion pipeline in `strategies/binance2nautilus/converters/trades.py`
-  - Use V1 TradeTickDataWrangler (NOT V2)
+- [ ] T013 [US1] Implement trades conversion pipeline in `strategies/binance2nautilus/converters/trades.py`
+  - Use `wrangler_factory.get_trade_wrangler()` (V2-ready)
   - Implement generator pattern for memory-efficient processing
   - Map is_buyer_maker to aggressor_side (True = SELLER)
 
-- [ ] T013 [US1] Create validation module in `strategies/binance2nautilus/validate.py`
+- [ ] T014 [US1] Create validation module in `strategies/binance2nautilus/validate.py`
   - Verify catalog loads without schema errors
   - Check instrument count and data ranges
   - Perform BacktestEngine compatibility test
+  - **FR-009**: Verify timestamp precision (nanoseconds) - check ts_event/ts_init are int64 ns
+  - **SC-004**: Verify record count matches source CSV count (data integrity)
 
-- [ ] T014 [US1] Integration test: Verify BacktestEngine compatibility in `strategies/binance2nautilus/tests/test_integration.py`
+- [ ] T015 [US1] Integration test: Verify BacktestEngine compatibility in `strategies/binance2nautilus/tests/test_integration.py`
   - Load catalog with ParquetDataCatalog
   - Add instrument and bars to BacktestEngine
   - Verify no errors with v1.222.0 full Rust engine
@@ -95,22 +102,22 @@
 
 ### Implementation for User Story 2
 
-- [ ] T015 [US2] Implement file scanning in `strategies/binance2nautilus/state.py`
+- [ ] T016 [US2] Implement file scanning in `strategies/binance2nautilus/state.py`
   - Detect new CSV files since last run
   - Track processed files in conversion_state.json
   - Support resumable operations
 
-- [ ] T016 [US2] Add incremental update logic to `strategies/binance2nautilus/converters/base.py`
+- [ ] T017 [US2] Add incremental update logic to `strategies/binance2nautilus/converters/base.py`
   - Check state before processing each file
   - Skip already-processed files
   - Append new data to existing catalog
 
-- [ ] T017 [US2] Implement duplicate detection in `strategies/binance2nautilus/converters/base.py`
+- [ ] T018 [US2] Implement duplicate detection in `strategies/binance2nautilus/converters/base.py`
   - Check timestamp ranges for overlap
   - Skip duplicate records during incremental updates
   - Log skipped duplicates for audit trail
 
-- [ ] T018 [US2] Add update command to `strategies/binance2nautilus/cli.py`
+- [ ] T019 [US2] Add update command to `strategies/binance2nautilus/cli.py`
   - Implement `binance2nautilus update [SYMBOL]` command
   - Auto-detect new files and process incrementally
   - Support `--force` flag for reprocessing
@@ -127,21 +134,21 @@
 
 ### Implementation for User Story 3
 
-- [ ] T019 [P] [US3] Add ETHUSDT instrument definition to `strategies/binance2nautilus/instruments.py`
+- [ ] T020 [P] [US3] Add ETHUSDT instrument definition to `strategies/binance2nautilus/instruments.py`
   - CryptoPerpetual with correct precision (price_precision=2, size_precision=3)
   - Correct fees and margin requirements
 
-- [ ] T020 [US3] Update converters to support symbol parameter
+- [ ] T021 [US3] Update converters to support symbol parameter
   - Modify `strategies/binance2nautilus/converters/klines.py` to accept symbol
   - Modify `strategies/binance2nautilus/converters/trades.py` to accept symbol
   - Use correct instrument based on symbol parameter
 
-- [ ] T021 [US3] Add multi-symbol CLI support to `strategies/binance2nautilus/cli.py`
+- [ ] T022 [US3] Add multi-symbol CLI support to `strategies/binance2nautilus/cli.py`
   - Support `--symbols BTCUSDT,ETHUSDT` parameter
   - Process each symbol sequentially (or parallel with --parallel flag)
   - Track state per symbol
 
-- [ ] T022 [US3] Validate multi-instrument catalog in `strategies/binance2nautilus/validate.py`
+- [ ] T023 [US3] Validate multi-instrument catalog in `strategies/binance2nautilus/validate.py`
   - Query bars by specific instrument
   - Verify data separation between instruments
   - Test BacktestEngine with multiple instruments
@@ -158,15 +165,15 @@
 
 ### Implementation for User Story 4
 
-- [ ] T023 [P] [US4] Create funding rate converter in `strategies/binance2nautilus/converters/funding.py`
+- [ ] T024 [P] [US4] Create funding rate converter in `strategies/binance2nautilus/converters/funding.py`
   - Parse Binance funding rate CSV format (calcTime, fundingIntervalHours, lastFundingRate)
   - Create custom data type compatible with NautilusTrader
 
-- [ ] T024 [US4] Implement funding rate storage in `strategies/binance2nautilus/catalog.py`
+- [ ] T025 [US4] Implement funding rate storage in `strategies/binance2nautilus/catalog.py`
   - Store as custom data in ParquetDataCatalog
   - Support timestamp range queries
 
-- [ ] T025 [US4] Add funding rate to CLI in `strategies/binance2nautilus/cli.py`
+- [ ] T026 [US4] Add funding rate to CLI in `strategies/binance2nautilus/cli.py`
   - Support `binance2nautilus convert BTCUSDT funding` command
   - Include in update command
 
@@ -178,32 +185,32 @@
 
 **Purpose**: Complete CLI interface and cross-cutting improvements
 
-- [ ] T026 [P] Create main CLI entry point in `strategies/binance2nautilus/cli.py`
+- [ ] T027 [P] Create main CLI entry point in `strategies/binance2nautilus/cli.py`
   - Implement Click-based CLI with commands: convert, update, validate, status
   - Add progress bars for long operations (tqdm)
   - Support JSON output mode for automation
 
-- [ ] T027 [P] Add status command to `strategies/binance2nautilus/cli.py`
+- [ ] T028 [P] Add status command to `strategies/binance2nautilus/cli.py`
   - Show conversion progress per symbol/data type
   - Display catalog statistics
   - Support --json output
 
-- [ ] T028 Create `strategies/binance2nautilus/tests/test_instruments.py`
+- [ ] T029 Create `strategies/binance2nautilus/tests/test_instruments.py`
   - Test CryptoPerpetual creation
   - Verify instrument ID format
   - Test with catalog write/read
 
-- [ ] T029 [P] Create `strategies/binance2nautilus/tests/test_klines.py`
+- [ ] T030 [P] Create `strategies/binance2nautilus/tests/test_klines.py`
   - Test CSV parsing
   - Test DataFrame transformation
   - Test wrangler output types
 
-- [ ] T030 [P] Create `strategies/binance2nautilus/tests/test_trades.py`
+- [ ] T031 [P] Create `strategies/binance2nautilus/tests/test_trades.py`
   - Test trades CSV parsing
   - Test chunked processing
   - Test aggressor_side mapping
 
-- [ ] T031 Run alpha-debug verification on complete implementation
+- [ ] T032 Run alpha-debug verification on complete implementation
   - Check for edge cases in timestamp handling
   - Verify precision mode compatibility
   - Check memory usage patterns

@@ -3,29 +3,29 @@
 ## Entity Relationship Diagram
 
 ```
-┌─────────────────────┐     ┌─────────────────────┐
-│   BinanceKlineCSV   │     │   BinanceTra deCSV   │
-│  (Source Format)    │     │   (Source Format)   │
-└──────────┬──────────┘     └──────────┬──────────┘
-           │                           │
-           ▼                           ▼
-┌─────────────────────┐     ┌─────────────────────┐
-│   BarDataWrangler   │     │TradeTickDataWrangler│
-│      (V1 Only)      │     │      (V1 Only)      │
-└──────────┬──────────┘     └──────────┬──────────┘
-           │                           │
-           ▼                           ▼
-┌─────────────────────┐     ┌─────────────────────┐
-│        Bar          │     │      TradeTick      │
-│  (Nautilus Type)    │     │   (Nautilus Type)   │
-└──────────┬──────────┘     └──────────┬──────────┘
-           │                           │
-           └───────────┬───────────────┘
-                       ▼
-              ┌─────────────────────┐
-              │ ParquetDataCatalog  │
-              │   (v1.222.0 Schema) │
-              └─────────────────────┘
+┌─────────────────────┐     ┌─────────────────────┐     ┌─────────────────────┐
+│   BinanceKlineCSV   │     │   BinanceTradeCSV   │     │BinanceFundingRateCSV│
+│  (Source Format)    │     │   (Source Format)   │     │   (Source Format)   │
+└──────────┬──────────┘     └──────────┬──────────┘     └──────────┬──────────┘
+           │                           │                           │
+           ▼                           ▼                           ▼
+┌─────────────────────┐     ┌─────────────────────┐     ┌─────────────────────┐
+│   BarDataWrangler   │     │TradeTickDataWrangler│     │  FundingConverter   │
+│      (V1 Only)      │     │      (V1 Only)      │     │   (Custom Logic)    │
+└──────────┬──────────┘     └──────────┬──────────┘     └──────────┬──────────┘
+           │                           │                           │
+           ▼                           ▼                           ▼
+┌─────────────────────┐     ┌─────────────────────┐     ┌─────────────────────┐
+│        Bar          │     │      TradeTick      │     │    FundingRate      │
+│  (Nautilus Type)    │     │   (Nautilus Type)   │     │   (Custom Data)     │
+└──────────┬──────────┘     └──────────┬──────────┘     └──────────┬──────────┘
+           │                           │                           │
+           └───────────────────────────┼───────────────────────────┘
+                                       ▼
+                              ┌─────────────────────┐
+                              │ ParquetDataCatalog  │
+                              │   (v1.222.0 Schema) │
+                              └─────────────────────┘
 ```
 
 ---
@@ -153,6 +153,36 @@
 | `ts_init` | int64 (ns) | uint64 | Init timestamp |
 
 **Catalog Path**: `data/trade_tick/{INSTRUMENT_ID}/`
+
+---
+
+### FundingRate (Custom Data)
+
+**Description**: Periodic funding rate for perpetual futures in NautilusTrader-compatible format.
+
+| Field | Type | Schema (Parquet) | Description |
+|-------|------|------------------|-------------|
+| `instrument_id` | InstrumentId | metadata | e.g., `BTCUSDT-PERP.BINANCE` |
+| `funding_rate` | Decimal | fixed_size_binary[16] | Funding rate as decimal (e.g., 0.0001 = 0.01%) |
+| `funding_interval_hours` | int | uint8 | Interval between funding (typically 8) |
+| `ts_event` | int64 (ns) | uint64 | Funding calculation timestamp |
+| `ts_init` | int64 (ns) | uint64 | Record initialization timestamp |
+
+**Catalog Path**: `data/custom/funding_rate/{INSTRUMENT_ID}/`
+
+**Implementation Notes**:
+- Stored as custom data type (not native NautilusTrader type)
+- Queryable by timestamp range via ParquetDataCatalog
+- Used for accurate perpetual futures PnL calculation
+- Funding rate is typically between -0.01 and +0.01 (±1%)
+
+**Transformation from BinanceFundingRateCSV**:
+```python
+# Binance CSV → FundingRate
+funding_rate = Decimal(str(row['lastFundingRate']))
+ts_event = int(row['calcTime']) * 1_000_000  # ms → ns
+funding_interval_hours = int(row['fundingIntervalHours'])
+```
 
 ---
 

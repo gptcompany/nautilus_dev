@@ -16,6 +16,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Tech Stack
 
+> **Full Architecture Details**: See `docs/ARCHITECTURE.md` for wrangler compatibility, data pipeline, and storage locations.
+
 **NautilusTrader**:
 - **Python 3.11+** frontend with **Rust core** (100x faster than pure Python)
 - **Parquet/DuckDB** for data (streaming, not in-memory)
@@ -23,22 +25,23 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Exchange adapters**: Binance, Bybit, OKX, Interactive Brokers
 - **BacktestNode** (simulation), **TradingNode** (live execution)
 
-**Nightly Environment** (ACTIVE - Full Rust):
-- Version: `1.222.0` (nightly)
-- Python: 3.12.11
-- Location: `/media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/`
-- **Rust Core**: ✅ `nautilus_pyo3` available
-- **Precision**: 128-bit (`fixed_size_binary[16]`) - Linux default
-- **Wranglers**: Use V1 only (`BarDataWrangler`, `TradeTickDataWrangler`) - V2 incompatible with BacktestEngine
+**Nightly Environment** (v1.222.0):
+```bash
+source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate
+```
 
-**IMPORTANT**: Always use nightly for new development. Stable version catalogs are INCOMPATIBLE with nightly (schema mismatch).
+**CRITICAL CONSTRAINTS** (verified 2025-12-24):
+- Use **V1 Wranglers only** - V2 (PyO3) incompatible with BacktestEngine
+- Use **128-bit precision** - Linux nightly default
+- Stable catalogs **INCOMPATIBLE** with nightly (schema mismatch)
 
 ## Repository Organization
 
 ```
 nautilus_dev/
-├── CLAUDE.md                 # THIS FILE
+├── CLAUDE.md                 # THIS FILE (dev guidelines)
 ├── docs/
+│   ├── ARCHITECTURE.md       # Technical architecture (wranglers, data pipeline)
 │   ├── api_reference/        # API documentation
 │   ├── concepts/             # Core concepts
 │   ├── developer_guide/      # Developer guides
