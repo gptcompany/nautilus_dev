@@ -241,6 +241,8 @@ class DaemonRunner:
                 if result.success and result.data:
                     data_points.append(result.data)
                 elif result.error:
+                    self.stats.error_count += 1
+                    self.stats.last_error = str(result.error)
                     logger.warning(f"OI fetch error from {result.venue}: {result.error}")
 
             if data_points:
@@ -273,6 +275,8 @@ class DaemonRunner:
                 if result.success and result.data:
                     data_points.append(result.data)
                 elif result.error:
+                    self.stats.error_count += 1
+                    self.stats.last_error = str(result.error)
                     logger.warning(f"Funding fetch error from {result.venue}: {result.error}")
 
             if data_points:
