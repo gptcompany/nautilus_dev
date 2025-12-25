@@ -1,0 +1,16 @@
+{
+  "name": "tradingview-dashboard",
+  "version": "1.0.0",
+  "description": "Real-time trading dashboard with TradingView Lightweight Charts",
+  "private": true,
+  "scripts": {
+    "build": "node build.js",
+    "dev": "node build.js --watch"
+  },
+  "devDependencies": {
+    "esbuild": "^0.20.0"
+  },
+  "dependencies": {
+    "lightweight-charts": "^4.1.0"
+  }
+}

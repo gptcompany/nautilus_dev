@@ -1,0 +1,19 @@
+# Dashboard Server Dependencies
+# TradingView Lightweight Charts Real-Time Dashboard
+
+# Web Framework
+fastapi>=0.100.0
+uvicorn[standard]>=0.24.0
+
+# WebSocket support
+websockets>=12.0
+
+# Data handling
+pydantic>=2.0.0
+duckdb>=0.9.0
+
+# CORS and HTTP
+python-multipart>=0.0.6
+
+# Optional: For Parquet historical data
+pyarrow>=14.0.0

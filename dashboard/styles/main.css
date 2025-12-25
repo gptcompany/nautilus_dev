@@ -1,0 +1,428 @@
+/**
+ * Trading Dashboard Styles
+ *
+ * Dark theme optimized for trading data visualization.
+ */
+
+/* =============================================================================
+   CSS Variables / Theme
+   ============================================================================= */
+
+:root {
+    /* Background colors */
+    --bg-primary: #1a1a2e;
+    --bg-secondary: #16213e;
+    --bg-tertiary: #0f3460;
+    --bg-card: #1e1e3f;
+
+    /* Text colors */
+    --text-primary: #e0e0e0;
+    --text-secondary: #a0a0a0;
+    --text-muted: #606080;
+
+    /* Accent colors */
+    --accent-blue: #2196F3;
+    --accent-green: #4caf50;
+    --accent-red: #f44336;
+    --accent-orange: #ff5722;
+    --accent-yellow: #ffc107;
+
+    /* Chart colors */
+    --chart-oi: #2196F3;
+    --chart-funding-positive: #ff5722;
+    --chart-funding-negative: #4caf50;
+    --chart-liq-long: #f44336;
+    --chart-liq-short: #00c853;
+
+    /* Status colors */
+    --status-connected: #00c853;
+    --status-reconnecting: #ffc107;
+    --status-disconnected: #f44336;
+
+    /* Borders */
+    --border-color: #3a3a5a;
+    --border-radius: 8px;
+
+    /* Shadows */
+    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.2);
+    --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.3);
+
+    /* Spacing */
+    --spacing-xs: 4px;
+    --spacing-sm: 8px;
+    --spacing-md: 16px;
+    --spacing-lg: 24px;
+    --spacing-xl: 32px;
+
+    /* Font */
+    --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+    --font-mono: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Code', monospace;
+}
+
+/* =============================================================================
+   Reset & Base
+   ============================================================================= */
+
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html, body {
+    height: 100%;
+    overflow: hidden;
+}
+
+body {
+    font-family: var(--font-family);
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--text-primary);
+    background-color: var(--bg-primary);
+}
+
+/* =============================================================================
+   Layout
+   ============================================================================= */
+
+#app {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    max-width: 100%;
+}
+
+/* =============================================================================
+   Header
+   ============================================================================= */
+
+#dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-sm) var(--spacing-md);
+    background-color: var(--bg-secondary);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+}
+
+.header-left h1 {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+}
+
+/* =============================================================================
+   Connection Status
+   ============================================================================= */
+
+#connection-status {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-radius: var(--border-radius);
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+}
+
+#connection-status.connected .status-dot {
+    background-color: var(--status-connected);
+}
+
+#connection-status.reconnecting .status-dot {
+    background-color: var(--status-reconnecting);
+    animation: pulse 1s infinite;
+}
+
+#connection-status.disconnected .status-dot {
+    background-color: var(--status-disconnected);
+    animation: none;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* =============================================================================
+   Symbol Selector
+   ============================================================================= */
+
+#symbol-selector {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    font-size: 14px;
+    font-family: var(--font-mono);
+    color: var(--text-primary);
+    background-color: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+#symbol-selector:hover {
+    border-color: var(--accent-blue);
+}
+
+#symbol-selector:focus {
+    border-color: var(--accent-blue);
+    box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.2);
+}
+
+#symbol-selector option {
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
+}
+
+/* =============================================================================
+   Main Content
+   ============================================================================= */
+
+#dashboard-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    padding: var(--spacing-sm);
+    gap: var(--spacing-sm);
+}
+
+/* =============================================================================
+   Funding Section
+   ============================================================================= */
+
+#funding-section {
+    padding: var(--spacing-sm);
+}
+
+#funding-display {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    padding: var(--spacing-sm) var(--spacing-md);
+    background-color: var(--bg-card);
+    border-radius: var(--border-radius);
+    border: 1px solid var(--border-color);
+}
+
+.funding-label {
+    font-size: 12px;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.funding-value {
+    font-size: 24px;
+    font-weight: 600;
+    font-family: var(--font-mono);
+}
+
+.funding-value.positive {
+    color: var(--chart-funding-positive);
+}
+
+.funding-value.negative {
+    color: var(--chart-funding-negative);
+}
+
+.funding-value.neutral {
+    color: var(--text-secondary);
+}
+
+.funding-next {
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+/* =============================================================================
+   Historical Data Section
+   ============================================================================= */
+
+#historical-section {
+    padding: 0 var(--spacing-sm);
+}
+
+#historical-controls {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-sm) var(--spacing-md);
+    background-color: var(--bg-card);
+    border-radius: var(--border-radius);
+    border: 1px solid var(--border-color);
+    flex-wrap: wrap;
+}
+
+#historical-controls label {
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+#historical-controls input[type="date"] {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    font-size: 13px;
+    font-family: var(--font-mono);
+    color: var(--text-primary);
+    background-color: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    outline: none;
+}
+
+#historical-controls input[type="date"]:focus {
+    border-color: var(--accent-blue);
+}
+
+#historical-controls input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(0.8);
+    cursor: pointer;
+}
+
+#load-historical {
+    padding: var(--spacing-xs) var(--spacing-md);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-primary);
+    background-color: var(--accent-blue);
+    border: none;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    transition: background-color 0.2s, opacity 0.2s;
+}
+
+#load-historical:hover {
+    background-color: #1976D2;
+}
+
+#load-historical:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+#historical-progress {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-left: var(--spacing-sm);
+}
+
+/* =============================================================================
+   Charts Section
+   ============================================================================= */
+
+#charts-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    overflow: hidden;
+}
+
+.chart-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--bg-card);
+    border-radius: var(--border-radius);
+    border: 1px solid var(--border-color);
+    overflow: hidden;
+    min-height: 200px;
+}
+
+.chart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.chart-title {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+.chart {
+    flex: 1;
+    min-height: 150px;
+}
+
+/* =============================================================================
+   Footer
+   ============================================================================= */
+
+#dashboard-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-xs) var(--spacing-md);
+    font-size: 11px;
+    color: var(--text-muted);
+    background-color: var(--bg-secondary);
+    border-top: 1px solid var(--border-color);
+}
+
+/* =============================================================================
+   Utilities
+   ============================================================================= */
+
+.hidden {
+    display: none !important;
+}
+
+.text-positive {
+    color: var(--accent-green);
+}
+
+.text-negative {
+    color: var(--accent-red);
+}
+
+.text-muted {
+    color: var(--text-muted);
+}
+
+/* =============================================================================
+   Scrollbar
+   ============================================================================= */
+
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--text-muted);
+}

@@ -204,7 +204,31 @@
       "timestamp": "2025-12-24T13:19:23.993983",
       "command": "git add -A && git commit -m \"fix: Update Hyperliquid tests for USDC symbol format\" && git log --oneline -3",
       "description": "Commit test fix"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-24T13:43:26.403146",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -c \"import nautilus_trader; print(f'Version: {nautilus_trader.__version__}')\" && pip show nautilus_trader | grep -E \"^(Version|Location)\"",
+      "description": "Check nightly version"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-24T13:43:34.166423",
+      "command": "/media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/python -c \"import nautilus_trader; print(f'Version: {nautilus_trader.__version__}')\"",
+      "description": "Check nightly direct"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-24T13:43:42.306932",
+      "command": "/media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/python -c \"\nimport nautilus_trader\nprint(f'Version: {nautilus_trader.__version__}')\n\n# Check for Rust components\ntry:\n    from nautilus_trader.core.nautilus_pyo3 import UUID4\n    print('Rust core (pyo3): ✅')\nexcept ImportError as e:\n    print(f'Rust core: ❌ {e}')\n\n# Check indicators\ntry:\n    from nautilus_trader.indicators.average.ema import ExponentialMovingAverage\n    print('Rust indicators: ✅')\nexcept ImportError as e:\n    print(f'Rust indicators: ❌ {e}')\n\"",
+      "description": "Check Rust components"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-24T13:43:51.857601",
+      "command": "/media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/python -c \"\nfrom nautilus_trader.indicators import ExponentialMovingAverage\nprint(f'EMA type: {type(ExponentialMovingAverage)}')\nprint(f'EMA module: {ExponentialMovingAverage.__module__}')\n\n# Check if it's Rust-based\nema = ExponentialMovingAverage(20)\nprint(f'EMA instance: {ema}')\n\"",
+      "description": "Check EMA indicator"
     }
   ],
-  "last_updated": "2025-12-24T13:19:23.994000"
+  "last_updated": "2025-12-24T13:43:51.857616"
 }
