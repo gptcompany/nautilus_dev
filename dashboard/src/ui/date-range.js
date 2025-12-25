@@ -29,6 +29,9 @@ export class DateRangeSelector {
         this.fromDate = null;
         this.toDate = null;
 
+        // B22: Store bound handlers for cleanup
+        this._boundHandleChange = this._handleChange.bind(this);
+
         this._init();
     }
 
@@ -43,15 +46,28 @@ export class DateRangeSelector {
         this.toDate = this._formatDate(now);
         this.fromDate = this._formatDate(sevenDaysAgo);
 
-        // Initialize inputs
+        // Initialize inputs - B22: Use stored bound handler for cleanup
         if (this.elements.from) {
             this.elements.from.value = this.fromDate;
-            this.elements.from.addEventListener('change', this._handleChange.bind(this));
+            this.elements.from.addEventListener('change', this._boundHandleChange);
         }
 
         if (this.elements.to) {
             this.elements.to.value = this.toDate;
-            this.elements.to.addEventListener('change', this._handleChange.bind(this));
+            this.elements.to.addEventListener('change', this._boundHandleChange);
+        }
+    }
+
+    /**
+     * Cleanup event listeners.
+     * B22: Added destroy method to prevent memory leaks.
+     */
+    destroy() {
+        if (this.elements.from) {
+            this.elements.from.removeEventListener('change', this._boundHandleChange);
+        }
+        if (this.elements.to) {
+            this.elements.to.removeEventListener('change', this._boundHandleChange);
         }
     }
 

@@ -392,7 +392,375 @@
       "operation": "todowrite",
       "timestamp": "2025-12-25T14:23:13.489223",
       "todo_count": 3
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-25T17:56:40.919773",
+      "command": "git log --oneline -3",
+      "description": "Verify merge"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-25T17:56:45.389616",
+      "command": "git push origin master",
+      "description": "Push to remote"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-25T17:56:49.032105",
+      "command": "git remote -v",
+      "description": "Check remotes"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-25T17:57:01.005949",
+      "todo_count": 7
+    },
+    {
+      "operation": "task",
+      "timestamp": "2025-12-25T18:03:10.221693",
+      "subagent_type": "alpha-debug",
+      "prompt": "Perform iterative alpha-debug analysis on the recently committed code changes.\n\n**Commit**: 1915a7e0..."
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-25T18:03:17.195354",
+      "todo_count": 9
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-25T18:03:25.506886",
+      "command": "git diff 2f0ac8c..1915a7e0 --stat 2>/dev/null | tail -30",
+      "description": "Check diff stats between commits"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-25T18:03:25.566632",
+      "file_path": "/media/sam/1TB/nautilus_dev/dashboard/server.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-25T18:03:25.572924",
+      "file_path": "/media/sam/1TB/nautilus_dev/dashboard/models.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-25T18:03:25.581745",
+      "file_path": "/media/sam/1TB/nautilus_dev/dashboard/src/app.js"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-25T18:03:33.085047",
+      "file_path": "/media/sam/1TB/nautilus_dev/dashboard/src/data/ws-client.js"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-25T18:03:33.087590",
+      "file_path": "/media/sam/1TB/nautilus_dev/dashboard/src/data/buffer.js"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-25T18:03:33.093203",
+      "file_path": "/media/sam/1TB/nautilus_dev/dashboard/src/data/api-client.js"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-25T18:03:33.108462",
+      "file_path": "/media/sam/1TB/nautilus_dev/dashboard/src/charts/base-chart.js"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-25T18:03:43.179657",
+      "file_path": "/media/sam/1TB/nautilus_dev/dashboard/src/charts/oi-chart.js"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-25T18:03:43.185004",
+      "file_path": "/media/sam/1TB/nautilus_dev/dashboard/src/charts/funding-chart.js"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-25T18:03:43.194298",
+      "file_path": "/media/sam/1TB/nautilus_dev/dashboard/src/charts/liquidation-layer.js"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-25T18:03:43.201045",
+      "file_path": "/media/sam/1TB/nautilus_dev/dashboard/src/ui/date-range.js"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-25T18:03:43.211840",
+      "file_path": "/media/sam/1TB/nautilus_dev/dashboard/src/ui/funding-display.js"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-25T18:03:43.221835",
+      "file_path": "/media/sam/1TB/nautilus_dev/dashboard/src/ui/status.js"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-25T18:03:51.598702",
+      "file_path": "/media/sam/1TB/nautilus_dev/dashboard/src/ui/symbol-selector.js"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-25T18:03:51.602049",
+      "file_path": "/media/sam/1TB/nautilus_dev/dashboard/src/utils/format.js"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-25T18:03:51.612201",
+      "file_path": "/media/sam/1TB/nautilus_dev/dashboard/index.html"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-25T18:03:51.618774",
+      "file_path": "/media/sam/1TB/nautilus_dev/dashboard/styles/main.css"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-25T18:04:02.318659",
+      "todo_count": 9
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-25T18:04:32.423590",
+      "todo_count": 9
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-25T18:04:57.387835",
+      "todo_count": 9
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-25T18:05:25.654284",
+      "todo_count": 9
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-25T18:06:02.028024",
+      "todo_count": 9
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-25T18:06:32.532337",
+      "todo_count": 8
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-25T18:07:03.314108",
+      "todo_count": 8
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-25T18:07:35.882764",
+      "todo_count": 8
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-25T18:08:11.792077",
+      "todo_count": 9
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-25T18:08:36.848669",
+      "todo_count": 10
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-25T18:09:22.149684",
+      "todo_count": 8
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-25T18:09:28.812554",
+      "file_path": "/media/sam/1TB/nautilus_dev/dashboard/server.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-25T18:09:28.820201",
+      "file_path": "/media/sam/1TB/nautilus_dev/dashboard/server.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-25T18:09:28.831078",
+      "file_path": "/media/sam/1TB/nautilus_dev/dashboard/server.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-25T18:09:38.072992",
+      "file_path": "/media/sam/1TB/nautilus_dev/dashboard/server.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-25T18:09:56.403146",
+      "file_path": "/media/sam/1TB/nautilus_dev/dashboard/server.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-25T18:10:00.993992",
+      "file_path": "/media/sam/1TB/nautilus_dev/dashboard/server.py"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-25T18:10:14.689037",
+      "todo_count": 8
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-25T18:10:19.768743",
+      "file_path": "/media/sam/1TB/nautilus_dev/dashboard/src/data/ws-client.js"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-25T18:10:28.169219",
+      "file_path": "/media/sam/1TB/nautilus_dev/dashboard/src/data/ws-client.js"
+    },
+    {
+      "operation": "grep",
+      "timestamp": "2025-12-25T18:10:46.527332",
+      "pattern": "createChart\\(",
+      "path": "/media/sam/1TB/nautilus_dev/dashboard/src",
+      "output_mode": "content"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-25T18:10:55.126105",
+      "file_path": "/media/sam/1TB/nautilus_dev/dashboard/src/charts/oi-chart.js"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-25T18:10:55.133224",
+      "file_path": "/media/sam/1TB/nautilus_dev/dashboard/src/charts/funding-chart.js"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-25T18:11:05.062153",
+      "file_path": "/media/sam/1TB/nautilus_dev/dashboard/src/charts/oi-chart.js",
+      "old_string": "    /**\n     * Initialize chart.\n     */\n    _init() {\n        // Create chart with dark theme\n     ..."
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-25T18:11:09.941639",
+      "file_path": "/media/sam/1TB/nautilus_dev/dashboard/src/charts/oi-chart.js"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-25T18:11:16.849805",
+      "file_path": "/media/sam/1TB/nautilus_dev/dashboard/src/charts/oi-chart.js",
+      "old_string": "    /**\n     * Update chart with new OI data point.\n     * B36: Added try/catch for out-of-order tim..."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-25T18:11:26.088644",
+      "file_path": "/media/sam/1TB/nautilus_dev/dashboard/src/charts/funding-chart.js",
+      "old_string": "    /**\n     * Initialize chart.\n     */\n    _init() {\n        // Create chart\n        this.chart = ..."
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-25T18:11:33.066658",
+      "file_path": "/media/sam/1TB/nautilus_dev/dashboard/src/charts/funding-chart.js"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-25T18:11:39.958243",
+      "file_path": "/media/sam/1TB/nautilus_dev/dashboard/src/charts/funding-chart.js",
+      "old_string": "    /**\n     * Update chart with new funding data.\n     * @param {Object} msg - Funding update messa..."
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-25T18:11:49.486395",
+      "todo_count": 8
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-25T18:11:53.115631",
+      "file_path": "/media/sam/1TB/nautilus_dev/dashboard/src/ui/date-range.js"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-25T18:12:01.352906",
+      "file_path": "/media/sam/1TB/nautilus_dev/dashboard/src/ui/date-range.js",
+      "old_string": "        // Callbacks\n        this.onRangeChange = options.onRangeChange || null;\n\n        // State\n ..."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-25T18:12:10.222046",
+      "file_path": "/media/sam/1TB/nautilus_dev/dashboard/src/ui/date-range.js",
+      "old_string": "        // Initialize inputs\n        if (this.elements.from) {\n            this.elements.from.value ..."
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-25T18:12:15.326335",
+      "file_path": "/media/sam/1TB/nautilus_dev/dashboard/src/app.js"
+    },
+    {
+      "operation": "grep",
+      "timestamp": "2025-12-25T18:12:24.042526",
+      "pattern": "state\\.oiChart\\.|state\\.fundingChart\\.",
+      "path": "/media/sam/1TB/nautilus_dev/dashboard/src/app.js",
+      "output_mode": "content"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-25T18:12:30.220020",
+      "file_path": "/media/sam/1TB/nautilus_dev/dashboard/src/app.js"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-25T18:12:42.386295",
+      "file_path": "/media/sam/1TB/nautilus_dev/dashboard/src/app.js",
+      "old_string": "    // Remove charts\n    if (state.oiChart) {\n        state.oiChart.remove();\n        state.oiChart ..."
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-25T18:12:53.858835",
+      "todo_count": 8
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-25T18:12:59.123724",
+      "file_path": "/media/sam/1TB/nautilus_dev/dashboard/src/app.js"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-25T18:13:11.346741",
+      "file_path": "/media/sam/1TB/nautilus_dev/dashboard/src/app.js",
+      "old_string": "            // B53/B119: Deduplicate markers by time+position\n            const liveMarkers = state...."
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-25T18:13:24.859243",
+      "todo_count": 8
+    },
+    {
+      "operation": "task",
+      "timestamp": "2025-12-25T18:13:33.274894",
+      "subagent_type": "alpha-debug",
+      "prompt": "Perform 3-round alpha-debug verification on the recently fixed files.\n\n**Fixed bugs**:\n- B12: Null c..."
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-25T18:13:38.780942",
+      "file_path": "/media/sam/1TB/nautilus_dev/dashboard/src/charts/oi-chart.js"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-25T18:13:38.787885",
+      "file_path": "/media/sam/1TB/nautilus_dev/dashboard/src/charts/funding-chart.js"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-25T18:13:38.795047",
+      "file_path": "/media/sam/1TB/nautilus_dev/dashboard/src/ui/date-range.js"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-25T18:13:38.797592",
+      "file_path": "/media/sam/1TB/nautilus_dev/dashboard/src/app.js"
     }
   ],
-  "last_updated": "2025-12-25T14:23:13.489243"
+  "last_updated": "2025-12-25T18:13:38.797612"
 }

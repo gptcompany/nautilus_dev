@@ -44,10 +44,17 @@ export class FundingChart {
 
     /**
      * Initialize chart.
+     * B12: Handles null return from createChart (CDN failure).
      */
     _init() {
         // Create chart
         this.chart = createChart(this.container);
+
+        // B12: Handle CDN failure gracefully
+        if (!this.chart) {
+            console.error('[FundingChart] Failed to create chart - CDN may be unavailable');
+            return;
+        }
 
         // Create histogram series for funding rates
         this.series = this.chart.addHistogramSeries({
@@ -78,6 +85,9 @@ export class FundingChart {
      * @param {Object} msg - Funding update message from WebSocket
      */
     update(msg) {
+        // B12: Guard against CDN failure (chart not initialized)
+        if (!this.series) return;
+
         // Transform to chart format
         const point = this.transformToChartPoint(msg);
 
@@ -143,9 +153,13 @@ export class FundingChart {
 
     /**
      * Set all data (for historical load).
+     * B93: Added null guard for CDN failure.
      * @param {Object[]} data - Array of funding data points
      */
     setData(data) {
+        // B93: Guard against CDN failure
+        if (!this.chart || !this.series) return;
+
         const chartData = data.map(d => {
             const rate = d.funding_rate;
             return {
@@ -164,10 +178,14 @@ export class FundingChart {
 
     /**
      * Clear all chart data.
+     * B93: Added null guard for CDN failure.
      */
     clear() {
         this.buffer.clear();
-        this.series.setData([]);
+        // B93: Guard against CDN failure
+        if (this.series) {
+            this.series.setData([]);
+        }
         this.currentRate = null;
         this.nextFundingTime = null;
     }

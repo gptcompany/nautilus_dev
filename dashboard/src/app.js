@@ -123,14 +123,20 @@ export function destroy() {
         state.ws = null;
     }
 
-    // Remove charts
+    // Remove charts - B28: Disconnect ResizeObserver to prevent memory leak
     if (state.oiChart) {
+        if (state.oiChart._resizeObserver) {
+            state.oiChart._resizeObserver.disconnect();
+        }
         state.oiChart.remove();
         state.oiChart = null;
         state.oiSeries = null;
         state.oiHistoricalSeries = null;
     }
     if (state.fundingChart) {
+        if (state.fundingChart._resizeObserver) {
+            state.fundingChart._resizeObserver.disconnect();
+        }
         state.fundingChart.remove();
         state.fundingChart = null;
         state.fundingSeries = null;
@@ -419,12 +425,13 @@ function applyHistoricalData(data) {
                 }))
                 .sort((a, b) => a.time - b.time);
 
-            // B53/B119: Deduplicate markers by time+position
+            // B53/B119/B37: Deduplicate markers by time+position+text (finer granularity)
             const liveMarkers = state.liquidationBuffer.getMarkers();
             const seenKeys = new Set();
             const allMarkers = [...historicalMarkers, ...liveMarkers]
                 .filter(m => {
-                    const key = `${m.time}-${m.position}`;
+                    // B37: Use time+position+text for finer granularity to avoid data loss
+                    const key = `${m.time}-${m.position}-${m.text || ''}`;
                     if (seenKeys.has(key)) return false;
                     seenKeys.add(key);
                     return true;

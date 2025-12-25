@@ -48,10 +48,17 @@ export class OIChart {
 
     /**
      * Initialize chart.
+     * B12: Handles null return from createChart (CDN failure).
      */
     _init() {
         // Create chart with dark theme
         this.chart = createChart(this.container);
+
+        // B12: Handle CDN failure gracefully
+        if (!this.chart) {
+            console.error('[OIChart] Failed to create chart - CDN may be unavailable');
+            return;
+        }
 
         // Create line series for OI
         this.series = createLineSeries(this.chart, {
@@ -71,6 +78,9 @@ export class OIChart {
      * @param {Object} msg - OI update message from WebSocket
      */
     update(msg) {
+        // B12: Guard against CDN failure (chart not initialized)
+        if (!this.series) return;
+
         // Transform to chart format
         const point = this.transformToChartPoint(msg);
 
@@ -117,7 +127,10 @@ export class OIChart {
      */
     addLiquidationMarker(liquidation) {
         this.markerBuffer.addLiquidation(liquidation);
-        this.series.setMarkers(this.markerBuffer.getMarkers());
+        // B91: Guard against CDN failure
+        if (this.series) {
+            this.series.setMarkers(this.markerBuffer.getMarkers());
+        }
     }
 
     /**
@@ -125,6 +138,9 @@ export class OIChart {
      * @param {Object[]} data - Array of OI data points
      */
     setData(data) {
+        // B91: Guard against CDN failure
+        if (!this.chart || !this.series) return;
+
         const chartData = data.map(d => ({
             time: Math.floor(d.timestamp / 1000),
             value: d.open_interest_value,
@@ -139,20 +155,26 @@ export class OIChart {
 
     /**
      * Clear all chart data.
+     * B91: Added null guards for CDN failure.
      */
     clear() {
         this.oiBuffer.clear();
         this.markerBuffer.clear();
-        this.series.setData([]);
-        this.series.setMarkers([]);
+        // B91: Guard against CDN failure
+        if (this.series) {
+            this.series.setData([]);
+            this.series.setMarkers([]);
+        }
         this.lastOIValue = null;
     }
 
     /**
      * Save chart state (zoom/pan).
-     * @returns {Object}
+     * B92: Added null guard for CDN failure.
+     * @returns {Object|null}
      */
     saveState() {
+        if (!this.chart) return null;
         return saveChartState(this.chart);
     }
 
@@ -161,6 +183,7 @@ export class OIChart {
      * @param {Object} state
      */
     restoreState(state) {
+        if (!this.chart) return;
         restoreChartState(this.chart, state);
     }
 
