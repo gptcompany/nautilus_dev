@@ -1,28 +1,28 @@
 # NautilusTrader Status Feed
 
-## Last Update: 12/23/2025, 12:00:40 AM UTC
+## Last Update: 12/25/2025, 12:00:41 AM UTC
 
 ### Current Versions
 - **Stable**: v1.221.0
 - **Nightly Commits**: 50 commits ahead
 
 ### Open Issues Summary
-- **Total Open Issues**: 15500
-- **Bugs**: 500
+- **Total Open Issues**: 15750
+- **Bugs**: 750
 - **Feature Requests**: 15250
 
 ### Recent Open Issues (Top 5)
+- [#3336](https://github.com/nautechsystems/nautilus_trader/issues/3336) query_bars returning empty list on second and subsequent calls [bug]
 - [#3307](https://github.com/nautechsystems/nautilus_trader/issues/3307) Add support for ticker name changes, stock splits and corporate actions in general [enhancement]
 - [#3269](https://github.com/nautechsystems/nautilus_trader/issues/3269) [Deribit] Initial integration [enhancement, rust]
 - [#3180](https://github.com/nautechsystems/nautilus_trader/issues/3180) RFC: Comparison of Bybit Python vs Rust adapter performance [enhancement, RFC, rust, python, adapter]
 - [#3177](https://github.com/nautechsystems/nautilus_trader/issues/3177) Support for Generating Time-Indexed (Daily/Per Bar) Backtest Reports [enhancement]
-- [#3152](https://github.com/nautechsystems/nautilus_trader/issues/3152) [Hyperliquid] Execution and reconciliation testing [enhancement, rust]
 
 ### Active Bug Reports
+- [#3336](https://github.com/nautechsystems/nautilus_trader/issues/3336) query_bars returning empty list on second and subsequent calls
 - [#3104](https://github.com/nautechsystems/nautilus_trader/issues/3104) [Reconciliation] LiveExecEngine fails to reconcile long-lived Binance Futures positions for HEDGING
 - [#3042](https://github.com/nautechsystems/nautilus_trader/issues/3042) [Reconciliation] Fails for routing clients when instrument venue differs from client venue
-- [#3104](https://github.com/nautechsystems/nautilus_trader/issues/3104) [Reconciliation] LiveExecEngine fails to reconcile long-lived Binance Futures positions for HEDGING
-- [#3042](https://github.com/nautechsystems/nautilus_trader/issues/3042) [Reconciliation] Fails for routing clients when instrument venue differs from client venue
+- [#3336](https://github.com/nautechsystems/nautilus_trader/issues/3336) query_bars returning empty list on second and subsequent calls
 - [#3104](https://github.com/nautechsystems/nautilus_trader/issues/3104) [Reconciliation] LiveExecEngine fails to reconcile long-lived Binance Futures positions for HEDGING
 
 ### Requested Features
