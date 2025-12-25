@@ -151,6 +151,22 @@ export function destroy() {
     // Remove event listeners
     document.removeEventListener('visibilitychange', handleVisibilityChange);
 
+    // B94: Cleanup DateRangeSelector and its event listeners
+    if (state.dateRangeSelector) {
+        state.dateRangeSelector.destroy();
+        state.dateRangeSelector = null;
+    }
+
+    // B95: Remove symbol selector listener
+    if (state.elements.symbolSelector) {
+        state.elements.symbolSelector.removeEventListener('change', handleSymbolChange);
+    }
+
+    // B96: Remove load historical button listener
+    if (state.elements.loadHistoricalBtn) {
+        state.elements.loadHistoricalBtn.removeEventListener('click', loadHistoricalData);
+    }
+
     state.initialized = false;
     console.log('[Dashboard] Destroyed');
 }
