@@ -17,9 +17,11 @@ if TYPE_CHECKING:
 
 # Skip all tests if visualization extra not available
 try:
-    from nautilus_trader.analysis.tearsheet import create_tearsheet
+    import importlib.util
 
-    HAS_VISUALIZATION = True
+    HAS_VISUALIZATION = (
+        importlib.util.find_spec("nautilus_trader.analysis.tearsheet") is not None
+    )
 except ImportError:
     HAS_VISUALIZATION = False
 

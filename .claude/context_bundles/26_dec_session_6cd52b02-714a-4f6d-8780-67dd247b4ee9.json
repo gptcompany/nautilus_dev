@@ -207,7 +207,283 @@
       "timestamp": "2025-12-26T13:36:57.797730",
       "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && PYTHONPATH=/media/sam/1TB/nautilus_dev uv run pytest tests/test_tearsheets.py tests/integration/test_tearsheet_integration.py -v --tb=short 2>&1",
       "description": "Run tearsheet unit and integration tests"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-26T13:37:21.156481",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/integration/test_tearsheet_integration.py"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-26T13:37:26.770208",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -c \"from nautilus_trader.analysis.tearsheet import create_tearsheet; print('OK')\" 2>&1",
+      "description": "Check tearsheet import"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-26T13:37:36.445168",
+      "todo_count": 6
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-26T13:37:40.831964",
+      "command": "ruff check strategies/common/tearsheet/ --fix && ruff format strategies/common/tearsheet/",
+      "description": "Lint and format tearsheet module"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-26T13:37:45.897240",
+      "command": "ruff check tests/test_tearsheets.py tests/integration/test_tearsheet_integration.py --fix && ruff format tests/test_tearsheets.py tests/integration/test_tearsheet_integration.py",
+      "description": "Lint and format test files"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-26T13:37:53.245262",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/integration/test_tearsheet_integration.py",
+      "old_string": "try:\n    from nautilus_trader.analysis.tearsheet import create_tearsheet\n\n    HAS_VISUALIZATION = Tr..."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-26T13:37:59.612939",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/test_tearsheets.py",
+      "old_string": "        stats_general = mock_portfolio_analyzer.get_performance_stats_general()\n        stats_return..."
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-26T13:38:04.331575",
+      "command": "ruff check tests/test_tearsheets.py tests/integration/test_tearsheet_integration.py --fix && ruff format tests/test_tearsheets.py tests/integration/test_tearsheet_integration.py",
+      "description": "Re-run lint and format"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-26T13:38:10.699629",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && PYTHONPATH=/media/sam/1TB/nautilus_dev uv run pytest tests/test_tearsheets.py -v --tb=short 2>&1 | tail -30",
+      "description": "Final test run"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-26T13:38:21.279768",
+      "todo_count": 6
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-26T13:38:26.775382",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/004-plotly-backtest-tearsheets/tasks.md"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-26T13:38:41.943424",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/004-plotly-backtest-tearsheets/tasks.md",
+      "old_string": "- [ ] T005 Create base test fixtures for BacktestEngine mocking in `tests/conftest.py`\n- [ ] T006 [P..."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-26T13:38:56.084604",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/004-plotly-backtest-tearsheets/tasks.md",
+      "old_string": "### Tests for User Story 1\n\n- [ ] T012 [P] [US1] Unit test for create_tearsheet wrapper in `tests/te..."
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-26T13:39:00.198658",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/004-plotly-backtest-tearsheets/tasks.md"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-26T13:39:13.292644",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/004-plotly-backtest-tearsheets/tasks.md",
+      "old_string": "### Tests for User Story 2\n\n- [ ] T021 [P] [US2] Unit test for equity curve data extraction in `test..."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-26T13:39:23.770118",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/004-plotly-backtest-tearsheets/tasks.md",
+      "old_string": "### Tests for User Story 3\n\n- [ ] T028 [P] [US3] Unit test for monthly returns extraction in `tests/..."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-26T13:39:34.273009",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/004-plotly-backtest-tearsheets/tasks.md",
+      "old_string": "### Tests for User Story 4\n\n- [ ] T034 [P] [US4] Unit test for trade distribution data in `tests/tes..."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-26T13:39:46.012230",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/004-plotly-backtest-tearsheets/tasks.md",
+      "old_string": "### Tests for User Story 5\n\n- [ ] T040 [P] [US5] Unit test for chart registration in `tests/test_tea..."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-26T13:40:01.944001",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/004-plotly-backtest-tearsheets/tasks.md",
+      "old_string": "### Tests for User Story 6\n\n- [ ] T047 [P] [US6] Unit test for StrategyMetrics dataclass in `tests/t..."
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-26T13:40:07.073834",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/004-plotly-backtest-tearsheets/tasks.md"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-26T13:40:16.678940",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/004-plotly-backtest-tearsheets/tasks.md",
+      "old_string": "## Phase 9: Polish & Cross-Cutting Concerns\n\n**Purpose**: Improvements that affect multiple user sto..."
+    },
+    {
+      "operation": "task",
+      "timestamp": "2025-12-26T13:50:18.354857",
+      "subagent_type": "alpha-debug",
+      "prompt": "Run iterative bug hunting on the recently created tearsheet module.\n\nMAX_ROUNDS=5\nStop conditions: 5..."
+    },
+    {
+      "operation": "task",
+      "timestamp": "2025-12-26T13:50:18.372169",
+      "subagent_type": "general-purpose",
+      "prompt": "Create documentation file at /media/sam/1TB/nautilus_dev/docs/concepts/tearsheets.md\n\nContent should..."
+    },
+    {
+      "operation": "glob",
+      "timestamp": "2025-12-26T13:50:21.195286",
+      "pattern": "**/tearsheet*"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-26T13:50:21.232267",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/004-plotly-backtest-tearsheets/tasks.md"
+    },
+    {
+      "operation": "glob",
+      "timestamp": "2025-12-26T13:50:23.602201",
+      "pattern": "strategies/common/tearsheet/__init__.py"
+    },
+    {
+      "operation": "glob",
+      "timestamp": "2025-12-26T13:50:23.618846",
+      "pattern": "strategies/common/tearsheet/edge_cases.py"
+    },
+    {
+      "operation": "glob",
+      "timestamp": "2025-12-26T13:50:23.622868",
+      "pattern": "strategies/common/tearsheet/themes.py"
+    },
+    {
+      "operation": "glob",
+      "timestamp": "2025-12-26T13:50:23.626323",
+      "pattern": "strategies/common/tearsheet/custom_charts.py"
+    },
+    {
+      "operation": "taskoutput",
+      "timestamp": "2025-12-26T13:50:25.758805",
+      "task_id": "a3514e1",
+      "block": true,
+      "timeout": 120000
+    },
+    {
+      "operation": "taskoutput",
+      "timestamp": "2025-12-26T13:50:25.762078",
+      "task_id": "ac12544",
+      "block": true,
+      "timeout": 120000
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-26T13:50:26.101000",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/tearsheet/__init__.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-26T13:50:26.103145",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/tearsheet/edge_cases.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-26T13:50:26.106073",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/tearsheet/themes.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-26T13:50:26.156348",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/tearsheet/custom_charts.py"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-26T13:50:26.703091",
+      "todo_count": 6
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-26T13:50:35.257940",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/tearsheet/comparison.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-26T13:50:35.268873",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/tearsheet/edge_cases.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-26T13:50:35.275479",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/tearsheet/validation.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-26T13:50:35.289313",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/tearsheet/custom_charts.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-26T13:50:35.296470",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/tearsheet/themes.py"
+    },
+    {
+      "operation": "glob",
+      "timestamp": "2025-12-26T13:50:42.908102",
+      "pattern": "**/tearsheet/**/*.py",
+      "path": "/media/sam/1TB/nautilus_dev"
+    },
+    {
+      "operation": "glob",
+      "timestamp": "2025-12-26T13:50:42.911654",
+      "pattern": "**/test*tearsheet*.py",
+      "path": "/media/sam/1TB/nautilus_dev"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-26T13:50:42.925398",
+      "command": "git diff HEAD~3 --stat strategies/common/tearsheet/ 2>/dev/null | tail -10",
+      "description": "Check recent changes to tearsheet module"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-26T13:50:48.122702",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/tearsheet/__init__.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-26T13:50:48.133889",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/test_tearsheets.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-26T13:50:48.146558",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/integration/test_tearsheet_integration.py"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-26T13:50:55.756119",
+      "todo_count": 6
+    },
+    {
+      "operation": "write",
+      "timestamp": "2025-12-26T13:51:00.844465",
+      "file_path": "/media/sam/1TB/nautilus_dev/docs/concepts/tearsheets.md",
+      "content_length": 10676
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-26T13:51:06.180082",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -m py_compile strategies/common/tearsheet/core.py strategies/common/tearsheet/comparison.py strategies/common/tearsheet/edge_cases.py strategies/common/tearsheet/validation.py strategies/common/tearsheet/custom_charts.py strategies/common/tearsheet/themes.py 2>&1 | head -50",
+      "description": "Syntax check all tearsheet modules"
     }
   ],
-  "last_updated": "2025-12-26T13:36:57.797744"
+  "last_updated": "2025-12-26T13:51:06.180100"
 }

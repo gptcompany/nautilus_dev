@@ -320,7 +320,6 @@ class TestStatsTableMetrics:
         """Test all required metrics are available."""
         stats_general = mock_portfolio_analyzer.get_performance_stats_general()
         stats_returns = mock_portfolio_analyzer.get_performance_stats_returns()
-        stats_pnls = mock_portfolio_analyzer.get_performance_stats_pnls()
 
         assert "Win Rate" in stats_general
         assert "Profit Factor" in stats_general

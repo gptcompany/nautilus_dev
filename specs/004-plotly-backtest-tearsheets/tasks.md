@@ -33,16 +33,16 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T005 Create base test fixtures for BacktestEngine mocking in `tests/conftest.py`
-- [ ] T006 [P] Create sample backtest data fixture (1-year daily BTCUSDT) in `tests/fixtures/sample_backtest_data.py`
-- [ ] T007 [P] Create project theme registration module in `strategies/common/tearsheet/themes.py`
-- [ ] T008 Register `nautilus_dev` custom theme with brand colors in `strategies/common/tearsheet/themes.py`
-- [ ] T009 Create edge case handler utilities in `strategies/common/tearsheet/edge_cases.py`
-- [ ] T010 Implement zero-trades detection and warning in `strategies/common/tearsheet/edge_cases.py`
-- [ ] T011 Implement open-positions-at-end detection (epoch bug workaround) in `strategies/common/tearsheet/edge_cases.py`
-- [ ] T011a [P] Verify native themes (`plotly_white`, `plotly_dark`, `nautilus`, `nautilus_dark`) work correctly
-- [ ] T011b [P] Implement long backtest handling (10+ years) with ScatterGL in `strategies/common/tearsheet/edge_cases.py`
-- [ ] T011c [P] Implement high-frequency trade aggregation (1000+ trades/day) in `strategies/common/tearsheet/edge_cases.py`
+- [x] T005 Create base test fixtures for BacktestEngine mocking in `tests/conftest.py`
+- [x] T006 [P] Create sample backtest data fixture (1-year daily BTCUSDT) in `tests/fixtures/sample_backtest_data.py`
+- [x] T007 [P] Create project theme registration module in `strategies/common/tearsheet/themes.py`
+- [x] T008 Register `nautilus_dev` custom theme with brand colors in `strategies/common/tearsheet/themes.py`
+- [x] T009 Create edge case handler utilities in `strategies/common/tearsheet/edge_cases.py`
+- [x] T010 Implement zero-trades detection and warning in `strategies/common/tearsheet/edge_cases.py`
+- [x] T011 Implement open-positions-at-end detection (epoch bug workaround) in `strategies/common/tearsheet/edge_cases.py`
+- [x] T011a [P] Verify native themes (`plotly_white`, `plotly_dark`, `nautilus`, `nautilus_dark`) work correctly
+- [x] T011b [P] Implement long backtest handling (10+ years) with ScatterGL in `strategies/common/tearsheet/edge_cases.py`
+- [x] T011c [P] Implement high-frequency trade aggregation (1000+ trades/day) in `strategies/common/tearsheet/edge_cases.py`
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
@@ -56,18 +56,18 @@
 
 ### Tests for User Story 1
 
-- [ ] T012 [P] [US1] Unit test for create_tearsheet wrapper in `tests/test_tearsheets.py::test_create_tearsheet_basic`
-- [ ] T013 [P] [US1] Unit test for tearsheet output file creation in `tests/test_tearsheets.py::test_tearsheet_file_created`
-- [ ] T014 [P] [US1] Unit test for HTML self-contained check in `tests/test_tearsheets.py::test_tearsheet_self_contained`
-- [ ] T015 [P] [US1] Integration test with real BacktestEngine in `tests/integration/test_tearsheet_integration.py::test_full_tearsheet_generation`
+- [x] T012 [P] [US1] Unit test for create_tearsheet wrapper in `tests/test_tearsheets.py::test_create_tearsheet_basic`
+- [x] T013 [P] [US1] Unit test for tearsheet output file creation in `tests/test_tearsheets.py::test_tearsheet_file_created`
+- [x] T014 [P] [US1] Unit test for HTML self-contained check in `tests/test_tearsheets.py::test_tearsheet_self_contained`
+- [x] T015 [P] [US1] Integration test with real BacktestEngine in `tests/integration/test_tearsheet_integration.py::test_full_tearsheet_generation`
 
 ### Implementation for User Story 1
 
-- [ ] T016 [US1] Create tearsheet wrapper function in `strategies/common/tearsheet/core.py`
-- [ ] T017 [US1] Implement edge case pre-checks (zero trades, open positions) in wrapper
-- [ ] T018 [US1] Add logging for tearsheet generation process in `strategies/common/tearsheet/core.py`
-- [ ] T019 [US1] Verify all 8 built-in charts render via integration test
-- [ ] T020 [US1] Document basic usage example in `strategies/common/tearsheet/__init__.py` docstring
+- [x] T016 [US1] Create tearsheet wrapper function in `strategies/common/tearsheet/core.py`
+- [x] T017 [US1] Implement edge case pre-checks (zero trades, open positions) in wrapper
+- [x] T018 [US1] Add logging for tearsheet generation process in `strategies/common/tearsheet/core.py`
+- [x] T019 [US1] Verify all 8 built-in charts render via integration test
+- [x] T020 [US1] Document basic usage example in `strategies/common/tearsheet/__init__.py` docstring
 
 **Checkpoint**: User Story 1 complete - can generate basic tearsheets with all 8 charts
 
@@ -81,14 +81,14 @@
 
 ### Tests for User Story 2
 
-- [ ] T021 [P] [US2] Unit test for equity curve data extraction in `tests/test_tearsheets.py::test_equity_curve_data`
-- [ ] T022 [P] [US2] Unit test for drawdown calculation verification in `tests/test_tearsheets.py::test_drawdown_calculation`
-- [ ] T023 [P] [US2] Integration test for equity+drawdown chart interactivity in `tests/integration/test_tearsheet_integration.py::test_equity_drawdown_charts`
+- [x] T021 [P] [US2] Unit test for equity curve data extraction in `tests/test_tearsheets.py::test_equity_curve_data`
+- [x] T022 [P] [US2] Unit test for drawdown calculation verification in `tests/test_tearsheets.py::test_drawdown_calculation`
+- [x] T023 [P] [US2] Integration test for equity+drawdown chart interactivity in `tests/integration/test_tearsheet_integration.py::test_equity_drawdown_charts`
 
 ### Implementation for User Story 2
 
-- [ ] T024 [US2] Create equity curve validation helper in `strategies/common/tearsheet/validation.py`
-- [ ] T025 [US2] Create drawdown validation helper in `strategies/common/tearsheet/validation.py`
+- [x] T024 [US2] Create equity curve validation helper in `strategies/common/tearsheet/validation.py`
+- [x] T025 [US2] Create drawdown validation helper in `strategies/common/tearsheet/validation.py`
 - [ ] T026 [US2] Add benchmark comparison support wrapper in `strategies/common/tearsheet/core.py`
 - [ ] T027 [US2] Test with real 1-year BTCUSDT backtest data
 
@@ -104,13 +104,13 @@
 
 ### Tests for User Story 3
 
-- [ ] T028 [P] [US3] Unit test for monthly returns extraction in `tests/test_tearsheets.py::test_monthly_returns_data`
-- [ ] T029 [P] [US3] Unit test for yearly returns extraction in `tests/test_tearsheets.py::test_yearly_returns_data`
-- [ ] T030 [P] [US3] Integration test for heatmap color coding in `tests/integration/test_tearsheet_integration.py::test_returns_heatmaps`
+- [x] T028 [P] [US3] Unit test for monthly returns extraction in `tests/test_tearsheets.py::test_monthly_returns_data`
+- [x] T029 [P] [US3] Unit test for yearly returns extraction in `tests/test_tearsheets.py::test_yearly_returns_data`
+- [x] T030 [P] [US3] Integration test for heatmap color coding in `tests/integration/test_tearsheet_integration.py::test_returns_heatmaps`
 
 ### Implementation for User Story 3
 
-- [ ] T031 [US3] Create returns data validation helper in `strategies/common/tearsheet/validation.py`
+- [x] T031 [US3] Create returns data validation helper in `strategies/common/tearsheet/validation.py`
 - [ ] T032 [US3] Add multi-year data handling check in edge_cases.py
 - [ ] T033 [US3] Verify color coding for negative returns (red gradient)
 
@@ -126,13 +126,13 @@
 
 ### Tests for User Story 4
 
-- [ ] T034 [P] [US4] Unit test for trade distribution data in `tests/test_tearsheets.py::test_trade_distribution_data`
-- [ ] T035 [P] [US4] Unit test for stats table metrics in `tests/test_tearsheets.py::test_stats_table_metrics`
-- [ ] T036 [P] [US4] Integration test for bars_with_fills chart in `tests/integration/test_tearsheet_integration.py::test_trade_markers`
+- [x] T034 [P] [US4] Unit test for trade distribution data in `tests/test_tearsheets.py::test_trade_distribution_data`
+- [x] T035 [P] [US4] Unit test for stats table metrics in `tests/test_tearsheets.py::test_stats_table_metrics`
+- [x] T036 [P] [US4] Integration test for bars_with_fills chart in `tests/integration/test_tearsheet_integration.py::test_trade_markers`
 
 ### Implementation for User Story 4
 
-- [ ] T037 [US4] Create trade metrics validation helper in `strategies/common/tearsheet/validation.py`
+- [x] T037 [US4] Create trade metrics validation helper in `strategies/common/tearsheet/validation.py`
 - [ ] T038 [US4] Add OHLC data availability check for bars_with_fills
 - [ ] T039 [US4] Implement graceful degradation when OHLC missing (skip bars_with_fills chart)
 
@@ -148,16 +148,16 @@
 
 ### Tests for User Story 5
 
-- [ ] T040 [P] [US5] Unit test for chart registration in `tests/test_tearsheets.py::test_register_custom_chart`
-- [ ] T041 [P] [US5] Unit test for custom chart rendering in `tests/test_tearsheets.py::test_custom_chart_in_tearsheet`
-- [ ] T042 [P] [US5] Integration test for multiple custom charts in `tests/integration/test_tearsheet_integration.py::test_multiple_custom_charts`
+- [x] T040 [P] [US5] Unit test for chart registration in `tests/test_tearsheets.py::test_register_custom_chart`
+- [x] T041 [P] [US5] Unit test for custom chart rendering in `tests/test_tearsheets.py::test_custom_chart_in_tearsheet`
+- [x] T042 [P] [US5] Integration test for multiple custom charts in `tests/integration/test_tearsheet_integration.py::test_multiple_custom_charts`
 
 ### Implementation for User Story 5
 
-- [ ] T043 [US5] Create custom chart registration wrapper in `strategies/common/tearsheet/custom_charts.py`
-- [ ] T044 [US5] Create example custom chart (rolling volatility) in `strategies/common/tearsheet/custom_charts.py`
-- [ ] T045 [US5] Document custom chart creation in module docstring
-- [ ] T046 [US5] Add `register_custom_charts()` one-time setup function
+- [x] T043 [US5] Create custom chart registration wrapper in `strategies/common/tearsheet/custom_charts.py`
+- [x] T044 [US5] Create example custom chart (rolling volatility) in `strategies/common/tearsheet/custom_charts.py`
+- [x] T045 [US5] Document custom chart creation in module docstring
+- [x] T046 [US5] Add `register_custom_charts()` one-time setup function
 
 **Checkpoint**: User Story 5 complete - custom charts can be registered and rendered
 
@@ -171,20 +171,20 @@
 
 ### Tests for User Story 6
 
-- [ ] T047 [P] [US6] Unit test for StrategyMetrics dataclass in `tests/test_tearsheets.py::test_strategy_metrics_from_engine`
-- [ ] T048 [P] [US6] Unit test for ComparisonConfig validation in `tests/test_tearsheets.py::test_comparison_config_validation`
-- [ ] T049 [P] [US6] Unit test for comparison equity chart in `tests/test_tearsheets.py::test_comparison_equity_overlay`
-- [ ] T050 [P] [US6] Integration test for full comparison tearsheet in `tests/integration/test_tearsheet_integration.py::test_multi_strategy_comparison`
+- [x] T047 [P] [US6] Unit test for StrategyMetrics dataclass in `tests/test_tearsheets.py::test_strategy_metrics_from_engine`
+- [x] T048 [P] [US6] Unit test for ComparisonConfig validation in `tests/test_tearsheets.py::test_comparison_config_validation`
+- [x] T049 [P] [US6] Unit test for comparison equity chart in `tests/test_tearsheets.py::test_comparison_equity_overlay`
+- [x] T050 [P] [US6] Integration test for full comparison tearsheet in `tests/integration/test_tearsheet_integration.py::test_multi_strategy_comparison`
 
 ### Implementation for User Story 6
 
-- [ ] T051 [US6] Create StrategyMetrics dataclass in `strategies/common/tearsheet/comparison.py`
-- [ ] T052 [US6] Create ComparisonConfig dataclass in `strategies/common/tearsheet/comparison.py`
-- [ ] T053 [E] [US6] Implement comparison equity chart renderer in `strategies/common/tearsheet/comparison.py`
-- [ ] T054 [US6] Implement comparison drawdown chart renderer in `strategies/common/tearsheet/comparison.py`
-- [ ] T055 [US6] Implement comparison stats table renderer in `strategies/common/tearsheet/comparison.py`
-- [ ] T056 [US6] Create `create_comparison_tearsheet()` main function in `strategies/common/tearsheet/comparison.py`
-- [ ] T057 [US6] Register comparison charts on module import in `strategies/common/tearsheet/__init__.py`
+- [x] T051 [US6] Create StrategyMetrics dataclass in `strategies/common/tearsheet/comparison.py`
+- [x] T052 [US6] Create ComparisonConfig dataclass in `strategies/common/tearsheet/comparison.py`
+- [x] T053 [E] [US6] Implement comparison equity chart renderer in `strategies/common/tearsheet/comparison.py` (via alpha-evolve)
+- [x] T054 [US6] Implement comparison drawdown chart renderer in `strategies/common/tearsheet/comparison.py`
+- [x] T055 [US6] Implement comparison stats table renderer in `strategies/common/tearsheet/comparison.py`
+- [x] T056 [US6] Create `create_comparison_tearsheet()` main function in `strategies/common/tearsheet/comparison.py`
+- [x] T057 [US6] Register comparison charts on module import in `strategies/common/tearsheet/__init__.py`
 
 **Checkpoint**: User Story 6 complete - multi-strategy comparison fully functional
 
@@ -194,13 +194,13 @@
 
 **Purpose**: Improvements that affect multiple user stories
 
-- [ ] T058 [P] Performance test for 1-year daily backtest (< 5 seconds) in `tests/test_tearsheets.py::test_performance_1year`
-- [ ] T059 [P] Performance test for 10K+ data points in `tests/test_tearsheets.py::test_performance_large_dataset`
-- [ ] T060 [P] HTML file size validation (< 2MB) in `tests/test_tearsheets.py::test_file_size_limit`
+- [x] T058 [P] Performance test for 1-year daily backtest (< 5 seconds) in `tests/test_tearsheets.py::test_performance_1year`
+- [x] T059 [P] Performance test for 10K+ data points in `tests/test_tearsheets.py::test_performance_large_dataset`
+- [x] T060 [P] HTML file size validation (< 2MB) in `tests/test_tearsheets.py::test_file_size_limit`
 - [ ] T061 [P] Documentation update in `docs/concepts/tearsheets.md`
-- [ ] T062 [P] Add quickstart example to module __init__.py
+- [x] T062 [P] Add quickstart example to module __init__.py
 - [ ] T063 Code cleanup and type hint verification (mypy)
-- [ ] T064 Run ruff format and ruff check for code style
+- [x] T064 Run ruff format and ruff check for code style
 - [ ] T065 Run alpha-debug verification for edge cases
 
 ---
