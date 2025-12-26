@@ -157,8 +157,9 @@ As a quant, I need to query historical metrics so that I can analyze long-term p
 
 - Docker >= 24.0
 - Docker Compose >= 2.0
-- QuestDB >= 7.0
-- Grafana >= 10.0
+- QuestDB >= 9.2.3
+- Grafana >= 11.0.0
+- questdb (Python) >= 4.1.0
 - Spec 001: CCXT Pipeline (metrics source)
 
 ## Out of Scope

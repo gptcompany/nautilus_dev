@@ -1,0 +1,342 @@
+# Grafana Provisioning Contract
+# Defines the structure of provisioning files for Infrastructure as Code
+
+# ============================================================================
+# Data Source Configuration
+# ============================================================================
+# File: grafana/provisioning/datasources/questdb.yaml
+
+datasource_schema:
+  apiVersion: "1"
+  datasources:
+    - name: QuestDB
+      type: questdb-questdb-datasource
+      access: proxy
+      url: http://questdb:8812
+      database: qdb
+      user: admin
+      secureJsonData:
+        password: "${QUESTDB_PASSWORD}"
+      jsonData:
+        tlsSkipVerify: false
+        defaultMinTimeInterval: "1s"
+      editable: true
+      isDefault: true
+
+# ============================================================================
+# Dashboard Provider Configuration
+# ============================================================================
+# File: grafana/provisioning/dashboards/default.yaml
+
+dashboard_provider_schema:
+  apiVersion: "1"
+  providers:
+    - name: "Trading System Dashboards"
+      orgId: 1
+      folder: "Trading"
+      type: file
+      disableDeletion: false
+      options:
+        path: /var/lib/grafana/dashboards
+        foldersFromFilesStructure: true
+        updateIntervalSeconds: 10
+        allowUiUpdates: true
+
+# ============================================================================
+# Alert Rule Configuration
+# ============================================================================
+# File: grafana/provisioning/alerting/alert-rules.yaml
+
+alert_rules_schema:
+  apiVersion: "1"
+  groups:
+    - name: "Daemon Health"
+      folder: "Trading"
+      interval: "1m"
+      rules:
+        # High error rate alert
+        - uid: "daemon_error_rate"
+          title: "Daemon Error Rate High"
+          condition: "A"
+          data:
+            - refId: "A"
+              relativeTimeRange:
+                from: 300  # 5 minutes
+                to: 0
+              datasourceUid: "questdb"
+              expression: |
+                SELECT
+                  timestamp,
+                  error_count - lag(error_count) OVER (ORDER BY timestamp) as errors
+                FROM daemon_metrics
+                WHERE timestamp > now() - interval '5m'
+                SAMPLE BY 1m
+          for: "2m"
+          noDataState: "NoData"
+          execErrState: "Alerting"
+          annotations:
+            description: "Daemon error rate exceeded threshold"
+            runbook_url: "https://wiki/runbooks/daemon-errors"
+          labels:
+            severity: "warning"
+            team: "trading"
+
+        # Daemon down alert
+        - uid: "daemon_down"
+          title: "Daemon Not Running"
+          condition: "A"
+          data:
+            - refId: "A"
+              relativeTimeRange:
+                from: 300
+                to: 0
+              datasourceUid: "questdb"
+              expression: |
+                SELECT timestamp, running
+                FROM daemon_metrics
+                WHERE timestamp > now() - interval '5m'
+                ORDER BY timestamp DESC
+                LIMIT 1
+          for: "1m"
+          annotations:
+            description: "Daemon is not running"
+          labels:
+            severity: "critical"
+
+    - name: "Exchange Connectivity"
+      folder: "Trading"
+      interval: "1m"
+      rules:
+        # Exchange disconnected alert
+        - uid: "exchange_disconnected"
+          title: "Exchange Disconnected"
+          condition: "A"
+          data:
+            - refId: "A"
+              relativeTimeRange:
+                from: 300
+                to: 0
+              datasourceUid: "questdb"
+              expression: |
+                SELECT
+                  exchange,
+                  connected
+                FROM exchange_status
+                WHERE timestamp > now() - interval '5m'
+                LATEST BY exchange
+          for: "5m"
+          annotations:
+            description: "Exchange {{ $labels.exchange }} disconnected for 5+ minutes"
+          labels:
+            severity: "critical"
+
+        # High latency alert
+        - uid: "exchange_latency"
+          title: "Exchange Latency High"
+          condition: "A"
+          data:
+            - refId: "A"
+              relativeTimeRange:
+                from: 300
+                to: 0
+              datasourceUid: "questdb"
+              expression: |
+                SELECT
+                  exchange,
+                  avg(latency_ms) as avg_latency
+                FROM exchange_status
+                WHERE timestamp > now() - interval '5m'
+                GROUP BY exchange
+          for: "2m"
+          annotations:
+            description: "Exchange {{ $labels.exchange }} latency > 500ms"
+          labels:
+            severity: "warning"
+
+    - name: "Data Pipeline"
+      folder: "Trading"
+      interval: "5m"
+      rules:
+        # Data gap detected
+        - uid: "pipeline_gap"
+          title: "Data Gap Detected"
+          condition: "A"
+          data:
+            - refId: "A"
+              relativeTimeRange:
+                from: 3600  # 1 hour
+                to: 0
+              datasourceUid: "questdb"
+              expression: |
+                SELECT
+                  timestamp,
+                  exchange,
+                  symbol,
+                  gap_duration_seconds
+                FROM pipeline_metrics
+                WHERE gap_detected = true
+                AND timestamp > now() - interval '1h'
+          for: "0s"  # Immediate
+          annotations:
+            description: "Data gap of {{ $values.gap_duration_seconds }}s detected for {{ $labels.symbol }}"
+          labels:
+            severity: "warning"
+
+# ============================================================================
+# Contact Points (Notification Channels)
+# ============================================================================
+# File: grafana/provisioning/alerting/contact-points.yaml
+
+contact_points_schema:
+  apiVersion: "1"
+  contactPoints:
+    - orgId: 1
+      name: "telegram-trading"
+      receivers:
+        - uid: "telegram-1"
+          type: "telegram"
+          settings:
+            bottoken: "${TELEGRAM_BOT_TOKEN}"
+            chatid: "${TELEGRAM_CHAT_ID}"
+            parse_mode: "Markdown"
+          disableResolveMessage: false
+
+    - orgId: 1
+      name: "discord-alerts"
+      receivers:
+        - uid: "discord-1"
+          type: "discord"
+          settings:
+            url: "${DISCORD_WEBHOOK_URL}"
+            use_discord_username: true
+          disableResolveMessage: false
+
+    - orgId: 1
+      name: "email-critical"
+      receivers:
+        - uid: "email-1"
+          type: "email"
+          settings:
+            addresses: "${ALERT_EMAIL_ADDRESSES}"
+          disableResolveMessage: false
+
+# ============================================================================
+# Notification Policies (Routing)
+# ============================================================================
+# File: grafana/provisioning/alerting/policies.yaml
+
+notification_policies_schema:
+  apiVersion: "1"
+  policies:
+    - orgId: 1
+      receiver: "telegram-trading"  # Default receiver
+      group_by: ["alertname", "severity"]
+      group_wait: "30s"
+      group_interval: "5m"
+      repeat_interval: "4h"
+      routes:
+        # Critical alerts to all channels
+        - receiver: "telegram-trading"
+          object_matchers:
+            - ["severity", "=", "critical"]
+          continue: true
+        - receiver: "discord-alerts"
+          object_matchers:
+            - ["severity", "=", "critical"]
+          continue: true
+        - receiver: "email-critical"
+          object_matchers:
+            - ["severity", "=", "critical"]
+          continue: false
+
+        # Warning alerts to Telegram only
+        - receiver: "telegram-trading"
+          object_matchers:
+            - ["severity", "=", "warning"]
+
+# ============================================================================
+# Dashboard JSON Schema Reference
+# ============================================================================
+
+dashboard_panel_schema:
+  type: object
+  required:
+    - id
+    - title
+    - type
+    - datasource
+    - targets
+  properties:
+    id:
+      type: integer
+      description: Unique panel ID within dashboard
+    title:
+      type: string
+      maxLength: 255
+    type:
+      type: string
+      enum:
+        - timeseries    # Time series chart
+        - stat          # Single stat
+        - gauge         # Gauge meter
+        - table         # Data table
+        - bargauge      # Bar gauge
+        - piechart      # Pie chart
+        - heatmap       # Heatmap
+        - logs          # Log panel
+    datasource:
+      type: string
+      enum: [QuestDB]
+    targets:
+      type: array
+      items:
+        type: object
+        properties:
+          refId:
+            type: string
+            pattern: "^[A-Z]$"
+          expr:
+            type: string
+            description: SQL query for QuestDB
+    fieldConfig:
+      type: object
+      description: Field configuration for visualization
+    gridPos:
+      type: object
+      properties:
+        x:
+          type: integer
+          minimum: 0
+          maximum: 23
+        y:
+          type: integer
+          minimum: 0
+        w:
+          type: integer
+          minimum: 1
+          maximum: 24
+        h:
+          type: integer
+          minimum: 1
+
+# ============================================================================
+# Environment Variables Required
+# ============================================================================
+
+environment_variables:
+  # QuestDB
+  - QUESTDB_PASSWORD: "Password for QuestDB admin user"
+
+  # Telegram
+  - TELEGRAM_BOT_TOKEN: "Telegram bot token from BotFather"
+  - TELEGRAM_CHAT_ID: "Telegram chat/group ID for alerts"
+
+  # Discord
+  - DISCORD_WEBHOOK_URL: "Discord webhook URL"
+
+  # Email
+  - ALERT_EMAIL_ADDRESSES: "Comma-separated email addresses"
+  - GF_SMTP_ENABLED: "true"
+  - GF_SMTP_HOST: "SMTP server host:port"
+  - GF_SMTP_USER: "SMTP username"
+  - GF_SMTP_PASSWORD: "SMTP password"
