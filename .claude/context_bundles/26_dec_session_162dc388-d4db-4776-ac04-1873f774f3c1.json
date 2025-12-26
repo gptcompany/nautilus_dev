@@ -1,0 +1,82 @@
+{
+  "session_id": "162dc388-d4db-4776-ac04-1873f774f3c1",
+  "created_at": "2025-12-26T19:07:10.972567",
+  "operations": [
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-26T19:07:10.972584",
+      "command": "git branch -a | grep -E \"004|spec\"",
+      "description": "Check for branch 004"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-26T19:07:18.386654",
+      "command": "git merge 002-binance-nautilustrader-222 --no-edit -m \"Merge branch '002-binance-nautilustrader-222' into master\"",
+      "description": "Merge 002 into master"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-26T19:07:28.848395",
+      "command": "ls -la /media/sam/1TB/nautilus_dev/specs/",
+      "description": "Check specs directory"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-26T19:07:28.874450",
+      "command": "git branch -a",
+      "description": "List all branches again"
+    },
+    {
+      "operation": "glob",
+      "timestamp": "2025-12-26T19:07:40.326453",
+      "pattern": "**/tearsheet*"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-26T19:07:40.334980",
+      "command": "ls -la /media/sam/1TB/nautilus_dev/specs/004-plotly-backtest-tearsheets/",
+      "description": "Check 004 spec contents"
+    },
+    {
+      "operation": "glob",
+      "timestamp": "2025-12-26T19:07:49.937369",
+      "pattern": "**/*tearsheet*.py"
+    },
+    {
+      "operation": "glob",
+      "timestamp": "2025-12-26T19:07:49.949229",
+      "pattern": "**/plotly*/**/*.py"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-26T19:07:58.229164",
+      "command": "git log --all --oneline --source | grep -i tearsheet | head -10",
+      "description": "Check git history for tearsheet"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-26T19:07:58.256426",
+      "command": "git log --all --oneline | head -20",
+      "description": "Recent commits across all branches"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-26T19:08:06.373330",
+      "command": "git merge 003-tradingview-lightweight-charts --no-edit -m \"Merge branch '003-tradingview-lightweight-charts' into master\"",
+      "description": "Merge 003 into master"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-26T19:08:13.720728",
+      "command": "git merge 005-grafana-questdb-monitoring --no-edit -m \"Merge branch '005-grafana-questdb-monitoring' into master\"",
+      "description": "Merge 005 into master"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-26T19:08:21.878119",
+      "command": "rm -f .claude/context_bundles/26_dec_session_162dc388-d4db-4776-ac04-1873f774f3c1.json && git checkout -- .claude/stats/session_metrics.jsonl && git merge 005-grafana-questdb-monitoring --no-edit",
+      "description": "Remove conflict and merge 005"
+    }
+  ],
+  "last_updated": "2025-12-26T19:08:21.878135"
+}
