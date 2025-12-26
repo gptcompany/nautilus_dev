@@ -6,6 +6,14 @@ This file provides common fixtures used across all test modules.
 
 from __future__ import annotations
 
+import sys
+from pathlib import Path
+
+# Add project root to sys.path for test discovery
+project_root = Path(__file__).parent.parent
+if str(project_root) not in sys.path:
+    sys.path.insert(0, str(project_root))
+
 from typing import TYPE_CHECKING
 from unittest.mock import MagicMock
 

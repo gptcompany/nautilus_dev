@@ -1,0 +1,18 @@
+# T006: Dashboard provider configuration for Grafana
+# Automatically loads dashboards from monitoring/grafana/dashboards/
+
+apiVersion: 1
+
+providers:
+  - name: 'nautilus-monitoring'
+    orgId: 1
+    folder: 'NautilusTrader'
+    folderUid: 'nautilus'
+    type: file
+    disableDeletion: false
+    updateIntervalSeconds: 30
+    allowUiUpdates: true
+    options:
+      path: /var/lib/grafana/dashboards/nautilus
+      # Alternative: use absolute path from project
+      # path: /media/sam/1TB/nautilus_dev/monitoring/grafana/dashboards
