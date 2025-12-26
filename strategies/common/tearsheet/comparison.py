@@ -166,15 +166,19 @@ class StrategyMetrics:
         stats_returns = analyzer.get_performance_stats_returns()
         stats_general = analyzer.get_performance_stats_general()
 
-        # Helper to get stat with default fallback
+        # Helper to get stat with default fallback (handles None values)
         def get_stat(stats: dict, key: str) -> Any:
-            return stats.get(key, cls._STAT_DEFAULTS.get(key))
+            value = stats.get(key)
+            if value is None:
+                return cls._STAT_DEFAULTS.get(key)
+            return value
 
-        # Aggregate PnL across all currencies
-        total_pnl = sum(
-            Decimal(str(currency_stats.get("PnL (total)", 0)))
-            for currency_stats in stats_pnls.values()
-        )
+        # Aggregate PnL across all currencies (handles None values)
+        total_pnl = Decimal(0)
+        for currency_stats in stats_pnls.values():
+            pnl_value = currency_stats.get("PnL (total)")
+            if pnl_value is not None:
+                total_pnl += Decimal(str(pnl_value))
 
         return cls(
             name=name,
@@ -223,7 +227,12 @@ class StrategyMetrics:
         cumulative = self.cumulative_returns
         if cumulative.empty:
             return cumulative
-        return cumulative / cumulative.iloc[0]
+        first_value = cumulative.iloc[0]
+        if first_value == 0:
+            # Avoid division by zero - return cumulative as-is
+            _logger.warning("Cumulative returns starts at 0, cannot normalize")
+            return cumulative
+        return cumulative / first_value
 
     @property
     def drawdown_series(self) -> pd.Series:
@@ -239,7 +248,13 @@ class StrategyMetrics:
         if cumulative.empty:
             return pd.Series(dtype=float)
         running_max = cumulative.cummax()
-        drawdown = (cumulative - running_max) / running_max
+        # Avoid division by zero when running_max is 0
+        # Replace 0 with NaN before division, then fill back with 0
+        safe_max = running_max.replace(0, float("nan"))
+        drawdown = (cumulative - running_max) / safe_max
+        # Replace inf/-inf/NaN with 0
+        drawdown = drawdown.replace([float("inf"), float("-inf")], float("nan"))
+        drawdown = drawdown.fillna(0)
         return drawdown
 
 
@@ -630,7 +645,10 @@ def render_comparison_stats_table(
                 },
                 cells={
                     "values": cell_values,
-                    "fill_color": [["#f9fafb", "#ffffff"] * 4],  # Alternating rows
+                    # Alternating row colors based on actual number of metrics
+                    "fill_color": [
+                        ["#f9fafb", "#ffffff"] * ((len(metric_labels) + 1) // 2)
+                    ][: len(metric_labels)],
                     "align": ["left"] + ["center"] * len(metrics_list),
                     "font": {"size": 11},
                     "height": 25,

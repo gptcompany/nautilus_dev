@@ -18,8 +18,9 @@ from __future__ import annotations
 import logging
 from typing import TYPE_CHECKING
 
+import pandas as pd
+
 if TYPE_CHECKING:
-    import pandas as pd
     import plotly.graph_objects as go
 
 _logger = logging.getLogger(__name__)
@@ -134,15 +135,16 @@ def create_rolling_volatility_chart(
         )
     )
 
-    # Add mean line
+    # Add mean line (skip if all NaN)
     mean_vol = rolling_vol.mean()
-    fig.add_hline(
-        y=mean_vol,
-        line_dash="dash",
-        line_color="#94a3b8",
-        annotation_text=f"Mean: {mean_vol:.2%}",
-        annotation_position="bottom right",
-    )
+    if pd.notna(mean_vol):
+        fig.add_hline(
+            y=mean_vol,
+            line_dash="dash",
+            line_color="#94a3b8",
+            annotation_text=f"Mean: {mean_vol:.2%}",
+            annotation_position="bottom right",
+        )
 
     fig.update_layout(
         title=f"Rolling Volatility ({window}-Day Window)",

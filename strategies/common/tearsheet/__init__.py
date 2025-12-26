@@ -169,6 +169,8 @@ def create_comparison_tearsheet(
     strategy_names: list[str] | None = None,
     output_path: str = "comparison.html",
     config: "TearsheetConfig | None" = None,
+    normalize_equity: bool = True,
+    colors: list[str] | None = None,
 ) -> str:
     """
     Generate comparison tearsheet for multiple strategies.
@@ -183,6 +185,10 @@ def create_comparison_tearsheet(
         Output HTML file path.
     config : TearsheetConfig | None
         Custom configuration. Defaults to comparison-optimized layout.
+    normalize_equity : bool
+        If True, normalize all equity curves to start at 1.0.
+    colors : list[str] | None
+        Custom colors for each strategy.
 
     Returns
     -------
@@ -190,7 +196,7 @@ def create_comparison_tearsheet(
         Path to generated HTML file.
     """
     return _get_comparison().create_comparison_tearsheet(
-        engines, strategy_names, output_path, config
+        engines, strategy_names, output_path, config, normalize_equity, colors
     )
 
 

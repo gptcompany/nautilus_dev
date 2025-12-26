@@ -89,7 +89,8 @@ def validate_drawdown(engine: "BacktestEngine") -> tuple[bool, str]:
         drawdown = (cumulative - running_max) / running_max
 
         # Verify drawdown properties
-        if drawdown.max() > 0:
+        # Allow small positive values due to floating point precision
+        if drawdown.max() > 1e-10:
             return False, f"Drawdown has positive values (max={drawdown.max():.4f})"
 
         # Get max drawdown from stats
