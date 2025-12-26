@@ -209,8 +209,12 @@ class TradingCollector(BaseCollector[TradingMetrics]):
         if time_delta <= 0:
             return 0.0
 
-        # Calculate order delta
+        # Calculate order delta (handle counter resets by clamping to 0)
         order_delta = current_orders - self._last_orders[strategy_id]
+        if order_delta < 0:
+            # Counter was reset, restart tracking
+            logger.debug(f"Order counter reset detected for {strategy_id}")
+            order_delta = 0
 
         # Update tracking for this strategy
         self._last_orders[strategy_id] = current_orders
