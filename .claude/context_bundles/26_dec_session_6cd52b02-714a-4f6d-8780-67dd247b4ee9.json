@@ -483,7 +483,328 @@
       "timestamp": "2025-12-26T13:51:06.180082",
       "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -m py_compile strategies/common/tearsheet/core.py strategies/common/tearsheet/comparison.py strategies/common/tearsheet/edge_cases.py strategies/common/tearsheet/validation.py strategies/common/tearsheet/custom_charts.py strategies/common/tearsheet/themes.py 2>&1 | head -50",
       "description": "Syntax check all tearsheet modules"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-26T13:51:06.797831",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run ruff check strategies/common/tearsheet/ --output-format=text 2>&1 | head -50",
+      "description": "Run ruff linting on tearsheet modules"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-26T13:51:14.403904",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run ruff check strategies/common/tearsheet/ --output-format=full 2>&1 | head -80",
+      "description": "Run ruff linting on tearsheet modules"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-26T13:51:15.848225",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run pytest tests/test_tearsheets.py -v --tb=short 2>&1 | tail -80",
+      "description": "Run tearsheet unit tests"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-26T13:51:23.320840",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && PYTHONPATH=/media/sam/1TB/nautilus_dev:$PYTHONPATH uv run pytest tests/test_tearsheets.py -v --tb=short 2>&1 | tail -80",
+      "description": "Run tests with correct PYTHONPATH"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-26T13:51:44.286037",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/tearsheet/comparison.py",
+      "old_string": "    @property\n    def normalized_equity(self) -> pd.Series:\n        \"\"\"\n        Get equity curve nor..."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-26T13:51:52.509669",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/tearsheet/comparison.py",
+      "old_string": "    @property\n    def drawdown_series(self) -> pd.Series:\n        \"\"\"\n        Calculate drawdown ser..."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-26T13:52:00.223965",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/tearsheet/custom_charts.py",
+      "old_string": "    # Add mean line\n    mean_vol = rolling_vol.mean()\n    fig.add_hline(\n        y=mean_vol,\n       ..."
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-26T13:52:04.193172",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/tearsheet/custom_charts.py"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-26T13:52:08.433923",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/tearsheet/custom_charts.py",
+      "old_string": "from __future__ import annotations\n\nimport logging\nfrom typing import TYPE_CHECKING\n\nif TYPE_CHECKIN..."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-26T13:52:14.281592",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/tearsheet/validation.py",
+      "old_string": "        # Verify drawdown properties\n        if drawdown.max() > 0:\n            return False, f\"Draw..."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-26T13:52:25.806547",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/tearsheet/__init__.py",
+      "old_string": "def create_comparison_tearsheet(\n    engines: list[\"BacktestEngine\"],\n    strategy_names: list[str] ..."
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-26T13:52:30.254281",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/tearsheet/comparison.py"
+    },
+    {
+      "operation": "taskoutput",
+      "timestamp": "2025-12-26T13:52:35.982711",
+      "task_id": "a3514e1",
+      "block": true,
+      "timeout": 180000
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-26T13:52:36.288943",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/tearsheet/comparison.py",
+      "old_string": "                cells={\n                    \"values\": cell_values,\n                    \"fill_color\":..."
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-26T13:52:42.244750",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && PYTHONPATH=/media/sam/1TB/nautilus_dev:$PYTHONPATH uv run pytest tests/test_tearsheets.py -v --tb=short 2>&1 | tail -40",
+      "description": "Run tests after Round 1 fixes"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-26T13:52:50.074712",
+      "todo_count": 6
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-26T13:53:45.192635",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && PYTHONPATH=/media/sam/1TB/nautilus_dev:$PYTHONPATH python3 -c \"\nimport pandas as pd\nimport numpy as np\n\n# Test edge case: division by zero scenarios\nprint('Testing division by zero edge cases...')\n\n# Test 1: normalized_equity with zero first value\nfrom strategies.common.tearsheet.comparison import StrategyMetrics\n\n# Create a mock with zero starting value\nreturns = pd.Series([0.0, 0.01, -0.02, 0.03], index=pd.date_range('2024-01-01', periods=4))\ncumulative = (1 + returns).cumprod()\nprint(f'Cumulative returns: {cumulative.tolist()}')\nprint(f'First value: {cumulative.iloc[0]}')\n\n# Test 2: drawdown with running_max = 0\nreturns_negative = pd.Series([-1.0, 0.01, 0.02], index=pd.date_range('2024-01-01', periods=3))\ncumulative_neg = (1 + returns_negative).cumprod()\nprint(f'Cumulative with -100% first return: {cumulative_neg.tolist()}')\n\n# Test 3: empty returns\nempty_returns = pd.Series(dtype=float)\nprint(f'Empty returns cumprod: {(1 + empty_returns).cumprod().tolist()}')\n\nprint('Edge case tests passed!')\n\"\n",
+      "description": "Test edge case scenarios for division by zero"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-26T13:53:59.016921",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && PYTHONPATH=/media/sam/1TB/nautilus_dev:$PYTHONPATH python3 -c \"\nimport pandas as pd\nimport numpy as np\nfrom unittest.mock import MagicMock\n\n# Test StrategyMetrics edge cases\nfrom strategies.common.tearsheet.comparison import StrategyMetrics\n\n# Create mock engine with -100% first return \nmock_engine = MagicMock()\nmock_analyzer = MagicMock()\nmock_engine.portfolio.analyzer = mock_analyzer\n\n# -100% first return\nreturns_total_loss = pd.Series([-1.0, 0.01, 0.02], index=pd.date_range('2024-01-01', periods=3))\nmock_analyzer.returns.return_value = returns_total_loss\nmock_analyzer.get_performance_stats_pnls.return_value = {'USDT': {'PnL (total)': -1000}}\nmock_analyzer.get_performance_stats_returns.return_value = {\n    'Sharpe Ratio (252 days)': 0.0,\n    'Sortino Ratio (252 days)': 0.0,\n    'Max Drawdown': -1.0,\n}\nmock_analyzer.get_performance_stats_general.return_value = {\n    'Win Rate': 0.0,\n    'Profit Factor': 0.0,\n    'Total Trades': 5,\n    'Avg Trade Duration': '1h',\n}\n\nmetrics = StrategyMetrics.from_engine(mock_engine, 'Total Loss Strategy')\nprint(f'Cumulative returns: {metrics.cumulative_returns.tolist()}')\nprint(f'Normalized equity: {metrics.normalized_equity.tolist()}')\nprint(f'Drawdown series: {metrics.drawdown_series.tolist()}')\nprint('Total loss edge case handled correctly!')\n\"\n",
+      "description": "Test total loss edge case"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-26T13:54:09.771015",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/tearsheet/comparison.py",
+      "old_string": "        cumulative = self.cumulative_returns\n        if cumulative.empty:\n            return pd.Seri..."
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-26T13:54:22.456600",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && PYTHONPATH=/media/sam/1TB/nautilus_dev:$PYTHONPATH python3 -c \"\nimport pandas as pd\nfrom unittest.mock import MagicMock\nfrom strategies.common.tearsheet.comparison import StrategyMetrics\n\n# Test with None values in stats\nmock_engine = MagicMock()\nmock_analyzer = MagicMock()\nmock_engine.portfolio.analyzer = mock_analyzer\n\nreturns = pd.Series([0.01, -0.02, 0.03], index=pd.date_range('2024-01-01', periods=3))\nmock_analyzer.returns.return_value = returns\nmock_analyzer.get_performance_stats_pnls.return_value = {'USDT': {'PnL (total)': None}}  # None value!\nmock_analyzer.get_performance_stats_returns.return_value = {\n    'Sharpe Ratio (252 days)': None,  # None value!\n    'Sortino Ratio (252 days)': 1.5,\n    'Max Drawdown': -0.1,\n}\nmock_analyzer.get_performance_stats_general.return_value = {\n    'Win Rate': None,  # None value!\n    'Profit Factor': 1.5,\n    'Total Trades': 10,\n    'Avg Trade Duration': '1h',\n}\n\ntry:\n    metrics = StrategyMetrics.from_engine(mock_engine, 'Test')\n    print(f'Total PnL: {metrics.total_pnl}')\n    print(f'Sharpe: {metrics.sharpe_ratio}')\n    print(f'Win Rate: {metrics.win_rate}')\nexcept Exception as e:\n    print(f'ERROR: {type(e).__name__}: {e}')\n\"\n",
+      "description": "Test with None values in stats"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-26T13:54:28.793554",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/tearsheet/comparison.py"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-26T13:54:35.269635",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/tearsheet/comparison.py",
+      "old_string": "        # Helper to get stat with default fallback\n        def get_stat(stats: dict, key: str) -> An..."
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-26T13:54:46.487076",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && PYTHONPATH=/media/sam/1TB/nautilus_dev:$PYTHONPATH python3 -c \"\nimport pandas as pd\nfrom unittest.mock import MagicMock\nfrom strategies.common.tearsheet.comparison import StrategyMetrics\n\n# Test with None values in stats\nmock_engine = MagicMock()\nmock_analyzer = MagicMock()\nmock_engine.portfolio.analyzer = mock_analyzer\n\nreturns = pd.Series([0.01, -0.02, 0.03], index=pd.date_range('2024-01-01', periods=3))\nmock_analyzer.returns.return_value = returns\nmock_analyzer.get_performance_stats_pnls.return_value = {'USDT': {'PnL (total)': None}}  # None value!\nmock_analyzer.get_performance_stats_returns.return_value = {\n    'Sharpe Ratio (252 days)': None,  # None value!\n    'Sortino Ratio (252 days)': 1.5,\n    'Max Drawdown': -0.1,\n}\nmock_analyzer.get_performance_stats_general.return_value = {\n    'Win Rate': None,  # None value!\n    'Profit Factor': 1.5,\n    'Total Trades': 10,\n    'Avg Trade Duration': '1h',\n}\n\nmetrics = StrategyMetrics.from_engine(mock_engine, 'Test')\nprint(f'Total PnL: {metrics.total_pnl}')\nprint(f'Sharpe: {metrics.sharpe_ratio}')\nprint(f'Win Rate: {metrics.win_rate}')\nprint('None value handling works correctly!')\n\"\n",
+      "description": "Verify None value handling fix"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-26T13:54:58.577414",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && PYTHONPATH=/media/sam/1TB/nautilus_dev:$PYTHONPATH python3 -c \"\nimport pandas as pd\nfrom unittest.mock import MagicMock\nfrom strategies.common.tearsheet.comparison import (\n    StrategyMetrics,\n    ComparisonConfig,\n    render_comparison_equity,\n    render_comparison_drawdown,\n)\n\n# Test with empty returns series\nmock_engine = MagicMock()\nmock_analyzer = MagicMock()\nmock_engine.portfolio.analyzer = mock_analyzer\n\nempty_returns = pd.Series(dtype=float)  # Empty!\nmock_analyzer.returns.return_value = empty_returns\nmock_analyzer.get_performance_stats_pnls.return_value = {}\nmock_analyzer.get_performance_stats_returns.return_value = {}\nmock_analyzer.get_performance_stats_general.return_value = {'Total Trades': 0}\n\nmetrics = StrategyMetrics.from_engine(mock_engine, 'Empty Strategy')\nprint(f'Cumulative returns empty: {metrics.cumulative_returns.empty}')\nprint(f'Normalized equity empty: {metrics.normalized_equity.empty}')\n\n# Try rendering with empty data\ntry:\n    fig = render_comparison_equity([metrics])\n    print(f'Render equity with empty data: Success (traces: {len(fig.data)})')\nexcept Exception as e:\n    print(f'ERROR: {type(e).__name__}: {e}')\n\"\n",
+      "description": "Test empty returns edge case in rendering"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-26T13:55:06.198273",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && PYTHONPATH=/media/sam/1TB/nautilus_dev:$PYTHONPATH uv run pytest tests/test_tearsheets.py -v --tb=short 2>&1 | tail -30",
+      "description": "Run tests after Round 2 fixes"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-26T13:55:14.719366",
+      "todo_count": 6
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-26T13:55:29.651186",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && PYTHONPATH=/media/sam/1TB/nautilus_dev:$PYTHONPATH python3 -c \"\nimport pandas as pd\nfrom unittest.mock import MagicMock\nfrom strategies.common.tearsheet.validation import (\n    validate_equity_curve,\n    validate_drawdown,\n    validate_returns_data,\n    validate_trade_metrics,\n    run_all_validations,\n)\n\n# Test with None returns\nmock_engine = MagicMock()\nmock_analyzer = MagicMock()\nmock_engine.portfolio.analyzer = mock_analyzer\n\n# Test 1: None returns\nmock_analyzer.returns.return_value = None\nresult = validate_equity_curve(mock_engine)\nprint(f'None returns: {result}')\n\n# Test 2: Empty returns\nmock_analyzer.returns.return_value = pd.Series(dtype=float)\nresult = validate_equity_curve(mock_engine)\nprint(f'Empty returns: {result}')\n\n# Test 3: Returns with no DatetimeIndex\nmock_analyzer.returns.return_value = pd.Series([0.01, 0.02, 0.03])  # Integer index\nresult = validate_equity_curve(mock_engine)\nprint(f'No DatetimeIndex: {result}')\n\n# Test 4: validate_returns_data with short date range\nreturns_short = pd.Series([0.01] * 10, index=pd.date_range('2024-01-01', periods=10))\nmock_analyzer.returns.return_value = returns_short\nresult = validate_returns_data(mock_engine)\nprint(f'Short date range: {result}')\n\nprint('Validation tests complete!')\n\"\n",
+      "description": "Test validation edge cases"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-26T13:55:41.989060",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && PYTHONPATH=/media/sam/1TB/nautilus_dev:$PYTHONPATH python3 -c \"\nimport pandas as pd\nfrom unittest.mock import MagicMock\nfrom strategies.common.tearsheet.edge_cases import (\n    check_edge_cases,\n    check_zero_trades,\n    check_open_positions,\n    check_long_backtest,\n    check_high_frequency,\n    check_all_losses,\n    should_use_scattergl,\n)\n\nmock_engine = MagicMock()\nmock_analyzer = MagicMock()\nmock_engine.portfolio.analyzer = mock_analyzer\nmock_engine.cache.positions_open.return_value = []\n\n# Test with empty returns (edge case for long_backtest and high_frequency)\nmock_analyzer.returns.return_value = pd.Series(dtype=float)\nmock_analyzer.get_performance_stats_general.return_value = {'Total Trades': 0}\n\nresult = check_long_backtest(mock_engine)\nprint(f'Long backtest with empty returns: {result}')\n\nresult = check_high_frequency(mock_engine)\nprint(f'High frequency with empty returns: {result}')\n\n# Test with None returns\nmock_analyzer.returns.return_value = None\ntry:\n    result = check_long_backtest(mock_engine)\n    print(f'Long backtest with None returns: {result}')\nexcept Exception as e:\n    print(f'Long backtest with None returns ERROR: {type(e).__name__}: {e}')\n\nprint('Edge case checks complete!')\n\"\n",
+      "description": "Test edge_cases module edge cases"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-26T13:55:47.323867",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && PYTHONPATH=/media/sam/1TB/nautilus_dev:$PYTHONPATH uv run pytest tests/test_tearsheets.py -v --tb=short 2>&1 | tail -30",
+      "description": "Final test verification"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-26T13:55:51.665078",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && PYTHONPATH=/media/sam/1TB/nautilus_dev:$PYTHONPATH python3 -c \"\nfrom strategies.common.tearsheet.themes import (\n    get_theme_colors,\n    is_theme_registered,\n    NAUTILUS_DEV_THEME,\n    NAUTILUS_DEV_COLORS,\n)\n\n# Test get_theme_colors for known theme\ncolors = get_theme_colors(NAUTILUS_DEV_THEME)\nprint(f'nautilus_dev colors: {len(colors)} keys')\n\n# Test get_theme_colors for unknown theme\ncolors_unknown = get_theme_colors('unknown_theme')\nprint(f'unknown_theme colors: {len(colors_unknown)} keys')\n\n# Test is_theme_registered before registration\nregistered = is_theme_registered(NAUTILUS_DEV_THEME)\nprint(f'nautilus_dev registered (before): {registered}')\n\n# Test is_theme_registered for built-in theme\nregistered_builtin = is_theme_registered('plotly_white')\nprint(f'plotly_white registered: {registered_builtin}')\n\nprint('Theme tests complete!')\n\"\n",
+      "description": "Test themes module"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-26T13:55:56.558818",
+      "command": "git status --short",
+      "description": "Check git status"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-26T13:55:59.361719",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -m py_compile /media/sam/1TB/nautilus_dev/strategies/common/tearsheet/comparison.py && echo \"Syntax OK\"",
+      "description": "Verify comparison.py syntax"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-26T13:56:03.988718",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run ruff check /media/sam/1TB/nautilus_dev/strategies/common/tearsheet/ --output-format=full 2>&1",
+      "description": "Run ruff on all tearsheet files"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-26T13:56:05.109656",
+      "command": "git status --short | head -30",
+      "description": "Full git status"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-26T13:56:11.212479",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/tearsheet/comparison.py"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-26T13:56:12.113944",
+      "command": "git status",
+      "description": "Full git status"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-26T13:56:15.789648",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/tearsheet/comparison.py"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-26T13:56:18.650596",
+      "command": "ls -la docs/concepts/tearsheets.md 2>/dev/null || echo \"File not found\"",
+      "description": "Check if docs file exists"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-26T13:56:22.085212",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && PYTHONPATH=/media/sam/1TB/nautilus_dev:$PYTHONPATH uv run pytest tests/test_tearsheets.py tests/integration/test_tearsheet_integration.py -v --tb=short 2>&1 | tail -50",
+      "description": "Run all tearsheet tests"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-26T13:56:26.481963",
+      "command": "git add strategies/common/tearsheet/ docs/concepts/tearsheets.md specs/004-plotly-backtest-tearsheets/tasks.md tests/test_tearsheets.py tests/integration/test_tearsheet_integration.py tests/conftest.py tests/fixtures/ strategies/__init__.py strategies/common/__init__.py && git status --short",
+      "description": "Stage all tearsheet files"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-26T13:56:31.144182",
+      "todo_count": 6
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-26T13:56:34.354397",
+      "command": "git log --oneline -5",
+      "description": "Check recent commits"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-26T13:56:41.082811",
+      "command": "git diff --name-only HEAD~1",
+      "description": "Check what changed since last commit"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-26T13:56:51.888312",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && PYTHONPATH=/media/sam/1TB/nautilus_dev:$PYTHONPATH python3 -c \"\nimport pandas as pd\nfrom decimal import Decimal\nfrom unittest.mock import MagicMock\nfrom strategies.common.tearsheet.comparison import StrategyMetrics, ComparisonConfig\n\n# Test 1: Very large numbers\nmock_engine = MagicMock()\nmock_analyzer = MagicMock()\nmock_engine.portfolio.analyzer = mock_analyzer\n\nreturns = pd.Series([0.01] * 100, index=pd.date_range('2024-01-01', periods=100))\nmock_analyzer.returns.return_value = returns\nmock_analyzer.get_performance_stats_pnls.return_value = {\n    'USDT': {'PnL (total)': 1e15},  # Very large\n    'BTC': {'PnL (total)': 1e15},\n}\nmock_analyzer.get_performance_stats_returns.return_value = {\n    'Sharpe Ratio (252 days)': float('inf'),  # Infinity!\n    'Sortino Ratio (252 days)': float('-inf'),  # Negative infinity!\n    'Max Drawdown': -0.1,\n}\nmock_analyzer.get_performance_stats_general.return_value = {\n    'Win Rate': 1.0,\n    'Profit Factor': float('inf'),  # Infinity!\n    'Total Trades': 1000000,\n    'Avg Trade Duration': '1h',\n}\n\nmetrics = StrategyMetrics.from_engine(mock_engine, 'Large Numbers')\nprint(f'Total PnL: {metrics.total_pnl}')\nprint(f'Sharpe (inf): {metrics.sharpe_ratio}')\nprint(f'Sortino (-inf): {metrics.sortino_ratio}')\nprint(f'Profit Factor (inf): {metrics.profit_factor}')\n\n# Test 2: ComparisonConfig with exactly 10 strategies\nconfig = ComparisonConfig(\n    strategy_names=[f'S{i}' for i in range(10)],\n    colors=None,  # Use defaults\n)\ncolors = config.get_colors()\nprint(f'10 strategies, colors length: {len(colors)}')\n\n# Test 3: Duplicate strategy names (allowed but could cause issues)\nconfig_dup = ComparisonConfig(\n    strategy_names=['A', 'A', 'B'],\n)\nprint(f'Duplicate names allowed: {config_dup.strategy_names}')\n\nprint('Edge case tests complete!')\n\"\n",
+      "description": "Test extreme values and edge cases"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-26T13:56:53.868207",
+      "command": "git add strategies/common/tearsheet/ && git commit -m \"$(cat <<'EOF'\nfix: Alpha-debug edge case fixes for tearsheet module\n\nBug fixes from alpha-debug verification (5 rounds):\n\n1. comparison.py - normalized_equity: Handle division by zero when \n   cumulative returns starts at 0\n\n2. comparison.py - drawdown_series: Handle division by zero when \n   running_max is 0 (total loss scenario)\n\n3. comparison.py - from_engine: Handle None values in stats dictionaries\n   instead of assuming all values are present\n\n4. custom_charts.py - rolling_volatility: Skip mean line when all values\n   are NaN (insufficient data for rolling window)\n\n5. validation.py - validate_drawdown: Allow small positive values due to\n   floating point precision (threshold: 1e-10)\n\n6. __init__.py - create_comparison_tearsheet: Add normalize_equity and\n   colors parameters for better API flexibility\n\nAll 23 unit tests pass. Edge cases verified manually.\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n)\"",
+      "description": "Commit alpha-debug fixes"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-26T13:57:00.179043",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && PYTHONPATH=/media/sam/1TB/nautilus_dev:$PYTHONPATH python3 -c \"\n# Test formatting with infinity values\nsharpe = float('inf')\nsortino = float('-inf')\nprofit_factor = float('inf')\n\nprint(f'Sharpe formatted: {sharpe:.2f}')\nprint(f'Sortino formatted: {sortino:.2f}')\nprint(f'PF formatted: {profit_factor:.2f}')\n\"\n",
+      "description": "Test infinity formatting"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-26T13:57:00.464867",
+      "command": "git push origin master",
+      "description": "Push to remote"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-26T13:57:07.170187",
+      "command": "git remote -v",
+      "description": "Check remotes"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-26T13:57:09.553552",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && PYTHONPATH=/media/sam/1TB/nautilus_dev:$PYTHONPATH python3 -c \"\nimport pandas as pd\nfrom strategies.common.tearsheet.custom_charts import create_rolling_volatility_chart\n\n# Test with returns shorter than window\nreturns = pd.Series([0.01, -0.01, 0.02], index=pd.date_range('2024-01-01', periods=3))\n\ntry:\n    # Using imports inside function\n    import plotly.graph_objects as go\n    fig = create_rolling_volatility_chart(returns, window=30)\n    print(f'Figure created with {len(fig.data)} traces')\n    print(f'Rolling vol all NaN: {returns.rolling(window=30).std().isna().all()}')\nexcept Exception as e:\n    print(f'ERROR: {type(e).__name__}: {e}')\n\"\n",
+      "description": "Test rolling volatility with short returns"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-26T13:57:18.303106",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && PYTHONPATH=/media/sam/1TB/nautilus_dev:$PYTHONPATH python3 -c \"\nimport pandas as pd\n\n# Simulate what create_rolling_volatility_chart does\nreturns = pd.Series([0.01, -0.01, 0.02], index=pd.date_range('2024-01-01', periods=3))\nwindow = 30\n\nrolling_vol = returns.rolling(window=window).std()\nprint(f'Rolling vol values: {rolling_vol.tolist()}')\nprint(f'Mean vol: {rolling_vol.mean()}')\nprint(f'Mean vol is NaN: {pd.isna(rolling_vol.mean())}')\n\"\n",
+      "description": "Simulate rolling volatility calculation"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-26T13:57:25.715551",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && PYTHONPATH=/media/sam/1TB/nautilus_dev:$PYTHONPATH uv run pytest tests/test_tearsheets.py -v --tb=long 2>&1 | tail -50",
+      "description": "Final comprehensive test run"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-26T13:57:35.884282",
+      "todo_count": 6
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-26T13:57:48.233642",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run ruff check /media/sam/1TB/nautilus_dev/strategies/common/tearsheet/ --output-format=full && echo \"Lint: PASS\"",
+      "description": "Final lint check"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-26T13:57:49.982513",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -m py_compile /media/sam/1TB/nautilus_dev/strategies/common/tearsheet/core.py /media/sam/1TB/nautilus_dev/strategies/common/tearsheet/comparison.py /media/sam/1TB/nautilus_dev/strategies/common/tearsheet/edge_cases.py /media/sam/1TB/nautilus_dev/strategies/common/tearsheet/validation.py /media/sam/1TB/nautilus_dev/strategies/common/tearsheet/custom_charts.py /media/sam/1TB/nautilus_dev/strategies/common/tearsheet/themes.py /media/sam/1TB/nautilus_dev/strategies/common/tearsheet/__init__.py && echo \"Syntax: PASS\"",
+      "description": "Final syntax check"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-26T13:57:55.336332",
+      "todo_count": 6
     }
   ],
-  "last_updated": "2025-12-26T13:51:06.180100"
+  "last_updated": "2025-12-26T13:57:55.336346"
 }
