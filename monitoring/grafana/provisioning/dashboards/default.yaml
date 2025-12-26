@@ -13,6 +13,5 @@ providers:
     updateIntervalSeconds: 30
     allowUiUpdates: true
     options:
-      path: /var/lib/grafana/dashboards/nautilus
-      # Alternative: use absolute path from project
-      # path: /media/sam/1TB/nautilus_dev/monitoring/grafana/dashboards
+      # Path matches docker-compose volume mount
+      path: /var/lib/grafana/dashboards

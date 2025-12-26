@@ -1,10 +1,13 @@
+# T005: QuestDB data source provisioning for Grafana
+# Uses Docker internal network hostname 'questdb'
 apiVersion: 1
 
 datasources:
   - name: QuestDB
     type: questdb-questdb-datasource
     access: proxy
-    url: http://localhost:9000
+    # Use Docker service name when running in docker-compose
+    url: http://questdb:9000
     isDefault: true
     jsonData:
       httpMode: http

@@ -1,0 +1,156 @@
+# monitoring/grafana/provisioning/alerting/policies.yaml
+# T047-T048: Notification routing policies with severity-based routing
+#
+# Routes alerts to appropriate contact points based on severity and category
+# Docs: https://grafana.com/docs/grafana/latest/alerting/set-up/provision-alerting-resources/file-provisioning/
+
+apiVersion: 1
+
+policies:
+  - orgId: 1
+    # Default receiver when no routes match
+    receiver: default-alerting
+
+    # Group alerts by these labels
+    group_by:
+      - alertname
+      - severity
+      - category
+
+    # Timing settings
+    group_wait: 30s        # Wait before sending first notification
+    group_interval: 5m     # Wait before sending updated notifications
+    repeat_interval: 4h    # Wait before re-sending notification
+
+    # ============================================
+    # T048: Severity-Based Routing
+    # ============================================
+    routes:
+      # ----------------------------------------
+      # Critical alerts → ALL channels
+      # ----------------------------------------
+      - receiver: telegram-critical
+        matchers:
+          - severity = critical
+        continue: true  # Continue to next matching route
+        group_wait: 10s
+        group_interval: 1m
+        repeat_interval: 15m
+
+      - receiver: discord-critical
+        matchers:
+          - severity = critical
+        continue: true
+        group_wait: 10s
+        group_interval: 1m
+        repeat_interval: 15m
+
+      - receiver: email-critical
+        matchers:
+          - severity = critical
+        continue: false  # Stop here for critical
+        group_wait: 10s
+        group_interval: 1m
+        repeat_interval: 1h
+
+      # ----------------------------------------
+      # Warning alerts → Telegram only
+      # ----------------------------------------
+      - receiver: telegram-warning
+        matchers:
+          - severity = warning
+        continue: true
+        group_wait: 1m
+        group_interval: 5m
+        repeat_interval: 4h
+
+      - receiver: discord-all
+        matchers:
+          - severity = warning
+        continue: false
+        group_wait: 1m
+        group_interval: 5m
+        repeat_interval: 4h
+
+      # ----------------------------------------
+      # Category-specific routing overrides
+      # ----------------------------------------
+
+      # Connectivity issues - faster notification
+      - receiver: telegram-critical
+        matchers:
+          - category = connectivity
+        continue: true
+        group_wait: 15s
+        group_interval: 2m
+        repeat_interval: 30m
+
+      # Data quality issues - moderate urgency
+      - receiver: telegram-warning
+        matchers:
+          - category = data_quality
+        continue: true
+        group_wait: 1m
+        group_interval: 5m
+        repeat_interval: 2h
+
+      # Infrastructure issues - all channels for critical
+      - receiver: discord-all
+        matchers:
+          - category = infrastructure
+        continue: false
+        group_wait: 30s
+        group_interval: 5m
+        repeat_interval: 4h
+
+      # ----------------------------------------
+      # Environment-specific routing
+      # ----------------------------------------
+
+      # Production alerts - higher priority
+      - receiver: telegram-critical
+        matchers:
+          - env = prod
+          - severity = critical
+        continue: true
+        group_wait: 5s
+        repeat_interval: 10m
+
+      # Staging/Dev alerts - lower priority, Discord only
+      - receiver: discord-all
+        matchers:
+          - env =~ staging|dev
+        continue: false
+        group_wait: 5m
+        repeat_interval: 8h
+
+# ============================================
+# Mute Timings (Optional - Uncomment to enable)
+# ============================================
+# muteTimes:
+#   - orgId: 1
+#     name: maintenance-window
+#     time_intervals:
+#       - times:
+#           - start_time: "02:00"
+#             end_time: "04:00"
+#         weekdays:
+#           - sunday
+#         location: UTC
+
+# ============================================
+# Templates (Optional - Uncomment to enable)
+# ============================================
+# templates:
+#   - orgId: 1
+#     name: custom_template
+#     template: |
+#       {{ define "custom_title" }}
+#       [{{ .Status | toUpper }}] {{ .CommonLabels.alertname }}
+#       {{ end }}
+#
+#       {{ define "custom_message" }}
+#       {{ range .Alerts }}
+#       Alert: {{ .Annotations.summary }}
+#       {{ end }}
+#       {{ end }}
