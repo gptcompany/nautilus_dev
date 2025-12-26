@@ -3,7 +3,7 @@
 # T012: Create MonitoringConfig Pydantic model
 
 from pydantic import Field
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class MonitoringConfig(BaseSettings):
@@ -11,6 +11,11 @@ class MonitoringConfig(BaseSettings):
 
     Can be loaded from environment variables with MONITORING_ prefix.
     """
+
+    model_config = SettingsConfigDict(
+        env_prefix="MONITORING_",
+        env_file=".env",
+    )
 
     # QuestDB connection
     questdb_host: str = Field(default="localhost", description="QuestDB hostname")
@@ -48,10 +53,6 @@ class MonitoringConfig(BaseSettings):
     grafana_api_key: str | None = Field(
         default=None, description="Grafana API key for provisioning"
     )
-
-    class Config:
-        env_prefix = "MONITORING_"
-        env_file = ".env"
 
 
 # Alias for backward compatibility

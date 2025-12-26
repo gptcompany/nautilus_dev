@@ -90,10 +90,11 @@ class TestMetricsClient:
     @pytest.mark.asyncio
     async def test_client_flush_on_threshold(self):
         """Client should auto-flush when buffer reaches threshold."""
-        from monitoring.client import MetricsClient, MetricsClientConfig
+        from monitoring.client import MetricsClient
+        from monitoring.config import MonitoringConfig
         from monitoring.models import DaemonMetrics
 
-        config = MetricsClientConfig(
+        config = MonitoringConfig(
             questdb_host="localhost",
             batch_size=10,  # Low threshold for test
         )
