@@ -189,7 +189,25 @@
       "timestamp": "2025-12-26T13:35:58.703597",
       "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && PYTHONPATH=/media/sam/1TB/nautilus_dev uv run pytest tests/test_tearsheets.py -v --tb=short 2>&1",
       "description": "Run tearsheet unit tests"
+    },
+    {
+      "operation": "write",
+      "timestamp": "2025-12-26T13:36:43.618088",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/tearsheet/validation.py",
+      "content_length": 6167
+    },
+    {
+      "operation": "task",
+      "timestamp": "2025-12-26T13:36:51.165438",
+      "subagent_type": "test-runner",
+      "prompt": "Run all tearsheet tests (unit and integration) to verify the complete implementation:\n\n```bash\ncd /m..."
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-26T13:36:57.797730",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && PYTHONPATH=/media/sam/1TB/nautilus_dev uv run pytest tests/test_tearsheets.py tests/integration/test_tearsheet_integration.py -v --tb=short 2>&1",
+      "description": "Run tearsheet unit and integration tests"
     }
   ],
-  "last_updated": "2025-12-26T13:35:58.703611"
+  "last_updated": "2025-12-26T13:36:57.797744"
 }
