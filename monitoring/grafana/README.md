@@ -132,9 +132,100 @@ datasources:
     version: 1
 ```
 
+## Grafana Explore for Historical Analysis (T065)
+
+Grafana Explore provides an ad-hoc query interface for historical analysis across all monitoring data.
+
+### Accessing Explore
+
+1. Click the **Explore** icon (compass) in the left sidebar
+2. Select **QuestDB** as the data source
+3. Write QuestDB SQL queries
+
+### Common Historical Analysis Queries
+
+**30-Day PnL Summary**:
+```sql
+SELECT
+    timestamp,
+    strategy,
+    sum(pnl) + sum(unrealized_pnl) as total_pnl
+FROM trading_metrics
+WHERE timestamp > now() - interval '30d'
+  AND env = 'prod'
+SAMPLE BY 1d ALIGN TO CALENDAR
+```
+
+**Exchange Uptime Analysis (90 days)**:
+```sql
+SELECT
+    exchange,
+    count(*) as total_samples,
+    sum(CASE WHEN connected THEN 1 ELSE 0 END) as connected_samples,
+    round(100.0 * sum(CASE WHEN connected THEN 1 ELSE 0 END) / count(*), 2) as uptime_pct
+FROM exchange_status
+WHERE timestamp > now() - interval '90d'
+  AND env = 'prod'
+GROUP BY exchange
+```
+
+**Data Gap Analysis**:
+```sql
+SELECT
+    timestamp,
+    exchange,
+    data_type,
+    gap_duration_seconds
+FROM pipeline_metrics
+WHERE gap_detected = true
+  AND timestamp > now() - interval '30d'
+ORDER BY gap_duration_seconds DESC
+LIMIT 100
+```
+
+### Performance Tips for Large Queries
+
+1. **Use SAMPLE BY** for aggregations over large time ranges:
+   - `SAMPLE BY 1h` for hourly aggregates
+   - `SAMPLE BY 1d` for daily aggregates
+   - `SAMPLE BY 1w` for weekly aggregates
+
+2. **Use LATEST BY** for current state queries:
+   ```sql
+   SELECT * FROM exchange_status
+   WHERE timestamp > now() - interval '1h'
+   LATEST BY exchange
+   ```
+
+3. **Limit results** for exploration:
+   ```sql
+   SELECT * FROM trading_metrics
+   ORDER BY timestamp DESC
+   LIMIT 1000
+   ```
+
+4. **Export to CSV** via QuestDB HTTP API:
+   ```bash
+   curl -G "http://localhost:9000/exec" \
+     --data-urlencode "query=SELECT * FROM trading_metrics WHERE timestamp > now() - interval '7d'" \
+     > export.json
+   ```
+
+### Pre-built Dashboards
+
+Located in `monitoring/grafana/dashboards/`:
+- **health.json** - Daemon health monitoring (US1)
+- **pipeline.json** - Data pipeline metrics (US2)
+- **exchange.json** - Exchange connectivity (US3)
+- **trading.json** - Trading performance (US5)
+
+### Export Query Examples
+
+See `monitoring/scripts/export_queries.sql` for comprehensive export queries.
+
 ## Next Steps
 
-1. Create dashboards for trading metrics visualization
-2. Set up alerting rules for trading anomalies
+1. ~~Create dashboards for trading metrics visualization~~ ✓ Done
+2. ~~Set up alerting rules for trading anomalies~~ ✓ Done (see provisioning/alerting/)
 3. Configure additional data sources if needed (Prometheus, Loki, etc.)
 4. Import pre-built dashboards from Grafana marketplace

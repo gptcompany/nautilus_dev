@@ -130,15 +130,15 @@ Include exact file paths in descriptions.
 
 ### Implementation for User Story 4
 
-- [ ] T040 [US4] Create alert rules YAML for daemon health in monitoring/grafana/provisioning/alerting/alert-rules.yaml
-- [ ] T041 [US4] Add exchange connectivity alert rules to alert-rules.yaml
-- [ ] T042 [US4] Add data pipeline gap alert rules to alert-rules.yaml
-- [ ] T043 [US4] Create contact points configuration in monitoring/grafana/provisioning/alerting/contact-points.yaml
-- [ ] T044 [US4] Configure Telegram notification channel in contact-points.yaml
-- [ ] T045 [US4] Configure Discord notification channel in contact-points.yaml
-- [ ] T046 [US4] Configure Email notification channel in contact-points.yaml
-- [ ] T047 [US4] Create notification routing policies in monitoring/grafana/provisioning/alerting/policies.yaml
-- [ ] T048 [US4] Implement severity-based routing (critical → all channels, warning → Telegram only)
+- [X] T040 [US4] Create alert rules YAML for daemon health in monitoring/grafana/provisioning/alerting/alert-rules.yaml
+- [X] T041 [US4] Add exchange connectivity alert rules to alert-rules.yaml
+- [X] T042 [US4] Add data pipeline gap alert rules to alert-rules.yaml
+- [X] T043 [US4] Create contact points configuration in monitoring/grafana/provisioning/alerting/contact-points.yaml
+- [X] T044 [US4] Configure Telegram notification channel in contact-points.yaml
+- [X] T045 [US4] Configure Discord notification channel in contact-points.yaml
+- [X] T046 [US4] Configure Email notification channel in contact-points.yaml
+- [X] T047 [US4] Create notification routing policies in monitoring/grafana/provisioning/alerting/policies.yaml
+- [X] T048 [US4] Implement severity-based routing (critical → all channels, warning → Telegram only)
 
 **Checkpoint**: At this point, alerting system is functional for all metrics
 
@@ -152,17 +152,17 @@ Include exact file paths in descriptions.
 
 ### Implementation for User Story 5
 
-- [ ] T049 [US5] Create TradingCollector class in monitoring/collectors/trading.py
-- [ ] T050 [US5] Implement real-time PnL tracking in monitoring/collectors/trading.py
-- [ ] T051 [US5] Implement orders/minute rate calculation in monitoring/collectors/trading.py
-- [ ] T052 [US5] Implement position exposure tracking in monitoring/collectors/trading.py
-- [ ] T053 [US5] Create trading_metrics table schema SQL in monitoring/schemas/trading_metrics.sql
-- [ ] T054 [US5] Create Trading Dashboard JSON definition in monitoring/grafana/dashboards/trading.json
-- [ ] T055 [US5] Add real-time PnL panel to Trading Dashboard
-- [ ] T056 [US5] Add orders/minute rate panel to Trading Dashboard
-- [ ] T057 [US5] Add position exposure panel (per symbol) to Trading Dashboard
-- [ ] T058 [US5] Add fill rate panel to Trading Dashboard
-- [ ] T059 [US5] Add drawdown panel to Trading Dashboard
+- [X] T049 [US5] Create TradingCollector class in monitoring/collectors/trading.py
+- [X] T050 [US5] Implement real-time PnL tracking in monitoring/collectors/trading.py
+- [X] T051 [US5] Implement orders/minute rate calculation in monitoring/collectors/trading.py
+- [X] T052 [US5] Implement position exposure tracking in monitoring/collectors/trading.py
+- [X] T053 [US5] Create trading_metrics table schema SQL in monitoring/schemas/trading_metrics.sql
+- [X] T054 [US5] Create Trading Dashboard JSON definition in monitoring/grafana/dashboards/trading.json
+- [X] T055 [US5] Add real-time PnL panel to Trading Dashboard
+- [X] T056 [US5] Add orders/minute rate panel to Trading Dashboard
+- [X] T057 [US5] Add position exposure panel (per symbol) to Trading Dashboard
+- [X] T058 [US5] Add fill rate panel to Trading Dashboard
+- [X] T059 [US5] Add drawdown panel to Trading Dashboard
 
 **Checkpoint**: Trading performance metrics now visible in real-time
 
@@ -176,12 +176,12 @@ Include exact file paths in descriptions.
 
 ### Implementation for User Story 6
 
-- [ ] T060 [US6] Configure QuestDB partitioning strategy for 90-day retention in monitoring/questdb/server.conf
-- [ ] T061 [US6] Create retention policy script in monitoring/scripts/retention_cleanup.py
-- [ ] T062 [US6] Add time range variable to all dashboards for flexible querying
-- [ ] T063 [US6] Optimize dashboard queries for large time ranges using SAMPLE BY
-- [ ] T064 [US6] Create CSV export query examples in monitoring/scripts/export_queries.sql
-- [ ] T065 [US6] Add Grafana Explore documentation section to quickstart.md
+- [X] T060 [US6] Configure QuestDB partitioning strategy for 90-day retention in monitoring/questdb/server.conf
+- [X] T061 [US6] Create retention policy script in monitoring/scripts/retention_cleanup.py
+- [X] T062 [US6] Add time range variable to all dashboards for flexible querying
+- [X] T063 [US6] Optimize dashboard queries for large time ranges using SAMPLE BY
+- [X] T064 [US6] Create CSV export query examples in monitoring/scripts/export_queries.sql
+- [X] T065 [US6] Add Grafana Explore documentation section to quickstart.md
 
 **Checkpoint**: Historical analysis queries now performant across all dashboards
 
@@ -191,17 +191,17 @@ Include exact file paths in descriptions.
 
 **Purpose**: End-to-end integration and cross-cutting concerns
 
-- [ ] T066 Create main metrics collector entry point in monitoring/metrics_collector.py
-- [ ] T067 Implement collector orchestration (all collectors running together) in monitoring/metrics_collector.py
-- [ ] T068 Implement batch flushing strategy (500-1000 rows per flush) in monitoring/client.py
-- [ ] T069 [P] Expose Prometheus-compatible /metrics endpoint in monitoring/metrics_collector.py (FR-011)
-- [ ] T070 Create startup health check script in monitoring/scripts/healthcheck.sh
-- [ ] T071 Update quickstart.md with complete setup instructions
-- [ ] T072 Create docker-compose commands reference in monitoring/README.md
-- [ ] T073 Verify all dashboards load in < 3 seconds (SC-002)
-- [ ] T074 Verify 10,000 writes/second sustained (SC-004)
-- [ ] T075 Run alpha-debug verification on monitoring/client.py
-- [ ] T076 Run alpha-debug verification on monitoring/collectors/*.py
+- [X] T066 Create main metrics collector entry point in monitoring/metrics_collector.py
+- [X] T067 Implement collector orchestration (all collectors running together) in monitoring/metrics_collector.py
+- [X] T068 Implement batch flushing strategy (500-1000 rows per flush) in monitoring/client.py
+- [X] T069 [P] Expose Prometheus-compatible /metrics endpoint in monitoring/metrics_collector.py (FR-011)
+- [X] T070 Create startup health check script in monitoring/scripts/healthcheck.sh
+- [X] T071 Update quickstart.md with complete setup instructions
+- [X] T072 Create docker-compose commands reference in monitoring/README.md
+- [X] T073 Verify all dashboards load in < 3 seconds (SC-002)
+- [X] T074 Verify 10,000 writes/second sustained (SC-004)
+- [X] T075 Run alpha-debug verification on monitoring/client.py
+- [X] T076 Run alpha-debug verification on monitoring/collectors/*.py
 
 ---
 
