@@ -38,8 +38,15 @@ class DaemonMetrics(BaseModel):
             f"running={'t' if self.running else 'f'}",
         ]
         if self.last_error:
-            # Escape special chars in string field
-            escaped = self.last_error.replace('"', '\\"').replace("\\", "\\\\")
+            # Escape special chars in string field for ILP format
+            # Order matters: backslashes first, then quotes, then control chars
+            escaped = (
+                self.last_error.replace("\\", "\\\\")
+                .replace('"', '\\"')
+                .replace("\n", "\\n")
+                .replace("\r", "\\r")
+                .replace("\t", "\\t")
+            )
             fields.append(f'last_error="{escaped}"')
 
         fields_str = ",".join(fields)

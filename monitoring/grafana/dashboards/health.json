@@ -19,7 +19,7 @@
         "refresh": 1,
         "multi": false,
         "includeAll": true,
-        "allValue": "*"
+        "allValue": "%"
       },
       {
         "name": "env",
@@ -42,7 +42,7 @@
       "datasource": "QuestDB",
       "targets": [
         {
-          "rawSql": "SELECT running FROM daemon_metrics WHERE host = '${host}' AND env = '${env}' ORDER BY timestamp DESC LIMIT 1",
+          "rawSql": "SELECT running FROM daemon_metrics WHERE host LIKE '${host}' AND env = '${env}' ORDER BY timestamp DESC LIMIT 1",
           "format": "table"
         }
       ],
@@ -70,7 +70,7 @@
       "datasource": "QuestDB",
       "targets": [
         {
-          "rawSql": "SELECT uptime_seconds / 3600 as uptime_hours FROM daemon_metrics WHERE host = '${host}' AND env = '${env}' ORDER BY timestamp DESC LIMIT 1",
+          "rawSql": "SELECT uptime_seconds / 3600 as uptime_hours FROM daemon_metrics WHERE host LIKE '${host}' AND env = '${env}' ORDER BY timestamp DESC LIMIT 1",
           "format": "table"
         }
       ],
@@ -98,7 +98,7 @@
       "datasource": "QuestDB",
       "targets": [
         {
-          "rawSql": "SELECT fetch_count FROM daemon_metrics WHERE host = '${host}' AND env = '${env}' ORDER BY timestamp DESC LIMIT 1",
+          "rawSql": "SELECT fetch_count FROM daemon_metrics WHERE host LIKE '${host}' AND env = '${env}' ORDER BY timestamp DESC LIMIT 1",
           "format": "table"
         }
       ],
@@ -117,7 +117,7 @@
       "datasource": "QuestDB",
       "targets": [
         {
-          "rawSql": "SELECT error_count FROM daemon_metrics WHERE host = '${host}' AND env = '${env}' ORDER BY timestamp DESC LIMIT 1",
+          "rawSql": "SELECT error_count FROM daemon_metrics WHERE host LIKE '${host}' AND env = '${env}' ORDER BY timestamp DESC LIMIT 1",
           "format": "table"
         }
       ],
@@ -144,7 +144,7 @@
       "datasource": "QuestDB",
       "targets": [
         {
-          "rawSql": "SELECT timestamp, fetch_count - lag(fetch_count) OVER (ORDER BY timestamp) as fetch_rate FROM daemon_metrics WHERE timestamp > now() - interval '24h' AND host = '${host}' AND env = '${env}' SAMPLE BY 1h",
+          "rawSql": "SELECT timestamp, fetch_count - lag(fetch_count) OVER (ORDER BY timestamp) as fetch_rate FROM daemon_metrics WHERE timestamp > now() - interval '24h' AND host LIKE '${host}' AND env = '${env}' SAMPLE BY 1h",
           "format": "time_series"
         }
       ],
@@ -167,7 +167,7 @@
       "datasource": "QuestDB",
       "targets": [
         {
-          "rawSql": "SELECT timestamp, error_count - lag(error_count) OVER (ORDER BY timestamp) as error_rate FROM daemon_metrics WHERE timestamp > now() - interval '24h' AND host = '${host}' AND env = '${env}' SAMPLE BY 1h",
+          "rawSql": "SELECT timestamp, error_count - lag(error_count) OVER (ORDER BY timestamp) as error_rate FROM daemon_metrics WHERE timestamp > now() - interval '24h' AND host LIKE '${host}' AND env = '${env}' SAMPLE BY 1h",
           "format": "time_series"
         }
       ],
@@ -225,7 +225,7 @@
       "datasource": "QuestDB",
       "targets": [
         {
-          "rawSql": "SELECT timestamp, liquidation_count - lag(liquidation_count) OVER (ORDER BY timestamp) as liq_rate FROM daemon_metrics WHERE timestamp > now() - interval '24h' AND host = '${host}' AND env = '${env}' SAMPLE BY 1h",
+          "rawSql": "SELECT timestamp, liquidation_count - lag(liquidation_count) OVER (ORDER BY timestamp) as liq_rate FROM daemon_metrics WHERE timestamp > now() - interval '24h' AND host LIKE '${host}' AND env = '${env}' SAMPLE BY 1h",
           "format": "time_series"
         }
       ],

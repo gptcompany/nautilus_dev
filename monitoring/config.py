@@ -2,8 +2,13 @@
 #
 # T012: Create MonitoringConfig Pydantic model
 
+from typing import Literal
+
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+# Valid environment values - must match models.py validation
+Environment = Literal["prod", "staging", "dev"]
 
 
 class MonitoringConfig(BaseSettings):
@@ -23,7 +28,9 @@ class MonitoringConfig(BaseSettings):
     questdb_ilp_port: int = Field(default=9009, description="QuestDB ILP port")
 
     # Environment
-    env: str = Field(default="dev", description="Environment: prod, staging, dev")
+    env: Environment = Field(
+        default="dev", description="Environment: prod, staging, dev"
+    )
     host: str = Field(default="localhost", description="This host's identifier")
 
     # Collection intervals (seconds)
