@@ -21,12 +21,12 @@ Include exact file paths in descriptions.
 
 **Purpose**: Docker Compose stack initialization and base configuration
 
-- [ ] T001 Create monitoring directory structure per implementation plan
-- [ ] T002 Create Docker Compose configuration in monitoring/docker-compose.yml
-- [ ] T003 [P] Create QuestDB server configuration in monitoring/questdb/server.conf
-- [ ] T004 [P] Create environment variables template in monitoring/.env.example
-- [ ] T005 Create Grafana data source provisioning in monitoring/grafana/provisioning/datasources/questdb.yaml
-- [ ] T006 Create dashboard provider configuration in monitoring/grafana/provisioning/dashboards/default.yaml
+- [X] T001 Create monitoring directory structure per implementation plan
+- [X] T002 Create Docker Compose configuration in monitoring/docker-compose.yml
+- [X] T003 [P] Create QuestDB server configuration in monitoring/questdb/server.conf
+- [X] T004 [P] Create environment variables template in monitoring/.env.example
+- [X] T005 Create Grafana data source provisioning in monitoring/grafana/provisioning/datasources/questdb.yaml
+- [X] T006 Create dashboard provider configuration in monitoring/grafana/provisioning/dashboards/default.yaml
 
 ---
 
@@ -38,17 +38,17 @@ Include exact file paths in descriptions.
 
 ### Tests for Foundational (TDD: Write FIRST, ensure FAIL)
 
-- [ ] T007 [P] Write unit tests for DaemonMetrics model validation in tests/monitoring/test_models.py
-- [ ] T008 [P] Write unit tests for ExchangeStatus model validation in tests/monitoring/test_models.py
-- [ ] T009 [P] Write unit tests for PipelineMetrics model validation in tests/monitoring/test_models.py
-- [ ] T010 Write unit tests for MetricsClient in tests/monitoring/test_client.py
+- [X] T007 [P] Write unit tests for DaemonMetrics model validation in tests/monitoring/test_models.py
+- [X] T008 [P] Write unit tests for ExchangeStatus model validation in tests/monitoring/test_models.py
+- [X] T009 [P] Write unit tests for PipelineMetrics model validation in tests/monitoring/test_models.py
+- [X] T010 Write unit tests for MetricsClient in tests/monitoring/test_client.py
 
 ### Implementation for Foundational
 
-- [ ] T011 Create Pydantic models for all metrics in monitoring/models.py
-- [ ] T012 Create MonitoringConfig Pydantic model in monitoring/config.py
-- [ ] T013 Create QuestDB MetricsClient wrapper in monitoring/client.py
-- [ ] T014 Create base collector interface in monitoring/collectors/__init__.py
+- [X] T011 Create Pydantic models for all metrics in monitoring/models.py
+- [X] T012 Create MonitoringConfig Pydantic model in monitoring/config.py
+- [X] T013 Create QuestDB MetricsClient wrapper in monitoring/client.py
+- [X] T014 Create base collector interface in monitoring/collectors/__init__.py
 
 **Checkpoint**: Foundation ready - all tests pass, user story implementation can now begin in parallel
 
@@ -62,14 +62,14 @@ Include exact file paths in descriptions.
 
 ### Implementation for User Story 1
 
-- [ ] T011 [US1] Create DaemonCollector class in monitoring/collectors/daemon.py
-- [ ] T012 [US1] Implement DaemonRunner.get_status() polling in monitoring/collectors/daemon.py
-- [ ] T013 [US1] Create daemon_metrics table schema SQL in monitoring/schemas/daemon_metrics.sql
-- [ ] T014 [US1] Create Health Dashboard JSON definition in monitoring/grafana/dashboards/health.json
-- [ ] T015 [US1] Add uptime panel to Health Dashboard
-- [ ] T016 [US1] Add memory/CPU usage panels to Health Dashboard
-- [ ] T017 [US1] Add error rate panel with threshold markers to Health Dashboard
-- [ ] T018 [US1] Add last error timestamp panel to Health Dashboard
+- [X] T011 [US1] Create DaemonCollector class in monitoring/collectors/daemon.py
+- [X] T012 [US1] Implement DaemonRunner.get_status() polling in monitoring/collectors/daemon.py
+- [X] T013 [US1] Create daemon_metrics table schema SQL in monitoring/schemas/daemon_metrics.sql
+- [X] T014 [US1] Create Health Dashboard JSON definition in monitoring/grafana/dashboards/health.json
+- [X] T015 [US1] Add uptime panel to Health Dashboard
+- [X] T016 [US1] Add memory/CPU usage panels to Health Dashboard
+- [X] T017 [US1] Add error rate panel with threshold markers to Health Dashboard
+- [X] T018 [US1] Add last error timestamp panel to Health Dashboard
 
 **Checkpoint**: At this point, User Story 1 should be fully functional - daemon health visible in Grafana
 
@@ -83,16 +83,16 @@ Include exact file paths in descriptions.
 
 ### Implementation for User Story 2
 
-- [ ] T019 [US2] Create PipelineCollector class in monitoring/collectors/pipeline.py
-- [ ] T020 [US2] Implement fetch_count tracking per exchange in monitoring/collectors/pipeline.py
-- [ ] T021 [US2] Implement data gap detection logic in monitoring/collectors/pipeline.py
-- [ ] T022 [US2] Create pipeline_metrics table schema SQL in monitoring/schemas/pipeline_metrics.sql
-- [ ] T023 [US2] Create Pipeline Dashboard JSON definition in monitoring/grafana/dashboards/pipeline.json
-- [ ] T024 [US2] Add OI fetches/hour panel (per exchange) to Pipeline Dashboard
-- [ ] T025 [US2] Add Funding fetches/hour panel to Pipeline Dashboard
-- [ ] T026 [US2] Add Liquidations/minute panel with aggregation to Pipeline Dashboard
-- [ ] T027 [US2] Add data gaps timeline panel to Pipeline Dashboard
-- [ ] T028 [US2] Add Parquet storage size panel to Pipeline Dashboard
+- [X] T019 [US2] Create PipelineCollector class in monitoring/collectors/pipeline.py
+- [X] T020 [US2] Implement fetch_count tracking per exchange in monitoring/collectors/pipeline.py
+- [X] T021 [US2] Implement data gap detection logic in monitoring/collectors/pipeline.py
+- [X] T022 [US2] Create pipeline_metrics table schema SQL in monitoring/schemas/pipeline_metrics.sql
+- [X] T023 [US2] Create Pipeline Dashboard JSON definition in monitoring/grafana/dashboards/pipeline.json
+- [X] T024 [US2] Add OI fetches/hour panel (per exchange) to Pipeline Dashboard
+- [X] T025 [US2] Add Funding fetches/hour panel to Pipeline Dashboard
+- [X] T026 [US2] Add Liquidations/minute panel with aggregation to Pipeline Dashboard
+- [X] T027 [US2] Add data gaps timeline panel to Pipeline Dashboard
+- [X] T028 [US2] Add Parquet storage size panel to Pipeline Dashboard
 
 **Checkpoint**: At this point, User Stories 1 AND 2 should both work independently
 
@@ -106,17 +106,17 @@ Include exact file paths in descriptions.
 
 ### Implementation for User Story 3
 
-- [ ] T029 [US3] Create ExchangeCollector class in monitoring/collectors/exchange.py
-- [ ] T030 [US3] Implement WebSocket connection status tracking in monitoring/collectors/exchange.py
-- [ ] T031 [US3] Implement latency measurement in monitoring/collectors/exchange.py
-- [ ] T032 [US3] Implement reconnection counter in monitoring/collectors/exchange.py
-- [ ] T033 [US3] Create exchange_status table schema SQL in monitoring/schemas/exchange_status.sql
-- [ ] T034 [US3] Create Exchange Dashboard JSON definition in monitoring/grafana/dashboards/exchange.json
-- [ ] T035 [US3] Add connection status panel (traffic light per exchange) to Exchange Dashboard
-- [ ] T036 [US3] Add WebSocket latency panel to Exchange Dashboard
-- [ ] T037 [US3] Add reconnection count panel to Exchange Dashboard
-- [ ] T038 [US3] Add last message timestamp panel to Exchange Dashboard
-- [ ] T039 [US3] Add downtime timeline panel to Exchange Dashboard
+- [X] T029 [US3] Create ExchangeCollector class in monitoring/collectors/exchange.py
+- [X] T030 [US3] Implement WebSocket connection status tracking in monitoring/collectors/exchange.py
+- [X] T031 [US3] Implement latency measurement in monitoring/collectors/exchange.py
+- [X] T032 [US3] Implement reconnection counter in monitoring/collectors/exchange.py
+- [X] T033 [US3] Create exchange_status table schema SQL in monitoring/schemas/exchange_status.sql
+- [X] T034 [US3] Create Exchange Dashboard JSON definition in monitoring/grafana/dashboards/exchange.json
+- [X] T035 [US3] Add connection status panel (traffic light per exchange) to Exchange Dashboard
+- [X] T036 [US3] Add WebSocket latency panel to Exchange Dashboard
+- [X] T037 [US3] Add reconnection count panel to Exchange Dashboard
+- [X] T038 [US3] Add last message timestamp panel to Exchange Dashboard
+- [X] T039 [US3] Add downtime timeline panel to Exchange Dashboard
 
 **Checkpoint**: All P1 user stories now independently functional
 

@@ -1,0 +1,266 @@
+{
+  "uid": "nautilus-exchange",
+  "title": "Exchange Connectivity",
+  "description": "Exchange WebSocket status and latency monitoring (US3)",
+  "tags": ["nautilus", "exchange", "connectivity"],
+  "timezone": "browser",
+  "refresh": "5s",
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "templating": {
+    "list": [
+      {
+        "name": "exchange",
+        "type": "query",
+        "datasource": "QuestDB",
+        "query": "SELECT DISTINCT exchange FROM exchange_status WHERE timestamp > now() - interval '24h'",
+        "refresh": 1,
+        "multi": true,
+        "includeAll": true,
+        "allValue": "%"
+      },
+      {
+        "name": "env",
+        "type": "custom",
+        "options": [
+          {"text": "prod", "value": "prod"},
+          {"text": "staging", "value": "staging"},
+          {"text": "dev", "value": "dev"}
+        ],
+        "current": {"text": "prod", "value": "prod"}
+      }
+    ]
+  },
+  "panels": [
+    {
+      "id": 1,
+      "title": "Connection Status",
+      "type": "stat",
+      "gridPos": {"x": 0, "y": 0, "w": 8, "h": 6},
+      "datasource": "QuestDB",
+      "targets": [
+        {
+          "rawSql": "SELECT exchange, connected FROM exchange_status WHERE timestamp > now() - interval '1m' AND exchange LIKE '${exchange}' AND env = '${env}' LATEST BY exchange",
+          "format": "table"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [
+            {"type": "value", "options": {"true": {"text": "CONNECTED", "color": "green"}}},
+            {"type": "value", "options": {"false": {"text": "DISCONNECTED", "color": "red"}}}
+          ]
+        }
+      },
+      "options": {
+        "orientation": "horizontal",
+        "reduceOptions": {"calcs": ["lastNotNull"]}
+      }
+    },
+    {
+      "id": 2,
+      "title": "Current Latency (ms)",
+      "type": "stat",
+      "gridPos": {"x": 8, "y": 0, "w": 8, "h": 6},
+      "datasource": "QuestDB",
+      "targets": [
+        {
+          "rawSql": "SELECT exchange, latency_ms FROM exchange_status WHERE timestamp > now() - interval '1m' AND exchange LIKE '${exchange}' AND env = '${env}' LATEST BY exchange",
+          "format": "table"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms",
+          "decimals": 1,
+          "color": {"mode": "thresholds"},
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"color": "green", "value": null},
+              {"color": "yellow", "value": 100},
+              {"color": "orange", "value": 300},
+              {"color": "red", "value": 500}
+            ]
+          }
+        }
+      },
+      "options": {
+        "orientation": "horizontal",
+        "reduceOptions": {"calcs": ["lastNotNull"]}
+      }
+    },
+    {
+      "id": 3,
+      "title": "Total Reconnections (24h)",
+      "type": "stat",
+      "gridPos": {"x": 16, "y": 0, "w": 8, "h": 6},
+      "datasource": "QuestDB",
+      "targets": [
+        {
+          "rawSql": "SELECT exchange, max(reconnect_count) - min(reconnect_count) as reconnections FROM exchange_status WHERE timestamp > now() - interval '24h' AND exchange LIKE '${exchange}' AND env = '${env}' GROUP BY exchange",
+          "format": "table"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": {"mode": "thresholds"},
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"color": "green", "value": null},
+              {"color": "yellow", "value": 5},
+              {"color": "red", "value": 20}
+            ]
+          }
+        }
+      },
+      "options": {
+        "orientation": "horizontal"
+      }
+    },
+    {
+      "id": 4,
+      "title": "WebSocket Latency Over Time",
+      "type": "timeseries",
+      "gridPos": {"x": 0, "y": 6, "w": 12, "h": 8},
+      "datasource": "QuestDB",
+      "targets": [
+        {
+          "rawSql": "SELECT timestamp, exchange, latency_ms FROM exchange_status WHERE timestamp > now() - interval '6h' AND exchange LIKE '${exchange}' AND env = '${env}'",
+          "format": "time_series"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms",
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "smooth",
+            "fillOpacity": 10,
+            "pointSize": 3
+          },
+          "color": {"mode": "palette-classic"}
+        }
+      }
+    },
+    {
+      "id": 5,
+      "title": "Reconnection Events",
+      "type": "timeseries",
+      "gridPos": {"x": 12, "y": 6, "w": 12, "h": 8},
+      "datasource": "QuestDB",
+      "targets": [
+        {
+          "rawSql": "SELECT timestamp, exchange, reconnect_count - lag(reconnect_count) OVER (PARTITION BY exchange ORDER BY timestamp) as reconnect_delta FROM exchange_status WHERE timestamp > now() - interval '24h' AND exchange LIKE '${exchange}' AND env = '${env}'",
+          "format": "time_series"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "custom": {
+            "drawStyle": "points",
+            "pointSize": 8
+          },
+          "color": {"mode": "thresholds"},
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"color": "transparent", "value": null},
+              {"color": "yellow", "value": 1},
+              {"color": "red", "value": 3}
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 6,
+      "title": "Last Message Timestamp",
+      "type": "table",
+      "gridPos": {"x": 0, "y": 14, "w": 12, "h": 6},
+      "datasource": "QuestDB",
+      "targets": [
+        {
+          "rawSql": "SELECT exchange, connected, last_message_at, (now() - last_message_at) as age FROM exchange_status WHERE timestamp > now() - interval '1m' AND exchange LIKE '${exchange}' AND env = '${env}' LATEST BY exchange ORDER BY exchange",
+          "format": "table"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": [
+          {
+            "matcher": {"id": "byName", "options": "exchange"},
+            "properties": [{"id": "custom.width", "value": 100}]
+          },
+          {
+            "matcher": {"id": "byName", "options": "connected"},
+            "properties": [
+              {"id": "mappings", "value": [
+                {"type": "value", "options": {"true": {"text": "✓", "color": "green"}}},
+                {"type": "value", "options": {"false": {"text": "✗", "color": "red"}}}
+              ]}
+            ]
+          },
+          {
+            "matcher": {"id": "byName", "options": "age"},
+            "properties": [
+              {"id": "unit", "value": "s"},
+              {"id": "thresholds", "value": {
+                "mode": "absolute",
+                "steps": [
+                  {"color": "green", "value": null},
+                  {"color": "yellow", "value": 30},
+                  {"color": "red", "value": 60}
+                ]
+              }}
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": 7,
+      "title": "Downtime Events (Last 7 Days)",
+      "type": "timeseries",
+      "gridPos": {"x": 12, "y": 14, "w": 12, "h": 6},
+      "datasource": "QuestDB",
+      "targets": [
+        {
+          "rawSql": "SELECT timestamp, exchange, CASE WHEN connected THEN 1 ELSE 0 END as status FROM exchange_status WHERE timestamp > now() - interval '7d' AND exchange LIKE '${exchange}' AND env = '${env}'",
+          "format": "time_series"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "stepAfter",
+            "fillOpacity": 30
+          },
+          "mappings": [
+            {"type": "value", "options": {"1": {"text": "UP"}}},
+            {"type": "value", "options": {"0": {"text": "DOWN"}}}
+          ],
+          "color": {"mode": "thresholds"},
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"color": "red", "value": null},
+              {"color": "green", "value": 1}
+            ]
+          }
+        }
+      },
+      "options": {
+        "legend": {"showLegend": true, "placement": "bottom"}
+      }
+    }
+  ],
+  "schemaVersion": 39,
+  "version": 1
+}

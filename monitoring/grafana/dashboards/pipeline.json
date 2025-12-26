@@ -1,0 +1,269 @@
+{
+  "uid": "nautilus-pipeline",
+  "title": "Data Pipeline Metrics",
+  "description": "CCXT data pipeline throughput monitoring (US2)",
+  "tags": ["nautilus", "pipeline", "data"],
+  "timezone": "browser",
+  "refresh": "30s",
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "templating": {
+    "list": [
+      {
+        "name": "exchange",
+        "type": "query",
+        "datasource": "QuestDB",
+        "query": "SELECT DISTINCT exchange FROM pipeline_metrics WHERE timestamp > now() - interval '24h'",
+        "refresh": 1,
+        "multi": true,
+        "includeAll": true,
+        "allValue": "%"
+      },
+      {
+        "name": "data_type",
+        "type": "custom",
+        "options": [
+          {"text": "All", "value": "%"},
+          {"text": "OI", "value": "oi"},
+          {"text": "Funding", "value": "funding"},
+          {"text": "Liquidation", "value": "liquidation"}
+        ],
+        "current": {"text": "All", "value": "%"}
+      },
+      {
+        "name": "env",
+        "type": "custom",
+        "options": [
+          {"text": "prod", "value": "prod"},
+          {"text": "staging", "value": "staging"},
+          {"text": "dev", "value": "dev"}
+        ],
+        "current": {"text": "prod", "value": "prod"}
+      }
+    ]
+  },
+  "panels": [
+    {
+      "id": 1,
+      "title": "Total Records (Last Hour)",
+      "type": "stat",
+      "gridPos": {"x": 0, "y": 0, "w": 6, "h": 4},
+      "datasource": "QuestDB",
+      "targets": [
+        {
+          "rawSql": "SELECT sum(records_count) as total FROM pipeline_metrics WHERE timestamp > now() - interval '1h' AND exchange LIKE '${exchange}' AND data_type LIKE '${data_type}' AND env = '${env}'",
+          "format": "table"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": {"mode": "palette-classic"}
+        }
+      }
+    },
+    {
+      "id": 2,
+      "title": "Total Bytes Written (Last Hour)",
+      "type": "stat",
+      "gridPos": {"x": 6, "y": 0, "w": 6, "h": 4},
+      "datasource": "QuestDB",
+      "targets": [
+        {
+          "rawSql": "SELECT sum(bytes_written) as total FROM pipeline_metrics WHERE timestamp > now() - interval '1h' AND exchange LIKE '${exchange}' AND data_type LIKE '${data_type}' AND env = '${env}'",
+          "format": "table"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bytes",
+          "color": {"mode": "palette-classic"}
+        }
+      }
+    },
+    {
+      "id": 3,
+      "title": "Average Latency (ms)",
+      "type": "stat",
+      "gridPos": {"x": 12, "y": 0, "w": 6, "h": 4},
+      "datasource": "QuestDB",
+      "targets": [
+        {
+          "rawSql": "SELECT avg(latency_ms) as avg_latency FROM pipeline_metrics WHERE timestamp > now() - interval '1h' AND exchange LIKE '${exchange}' AND data_type LIKE '${data_type}' AND env = '${env}'",
+          "format": "table"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms",
+          "decimals": 1,
+          "color": {"mode": "thresholds"},
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"color": "green", "value": null},
+              {"color": "yellow", "value": 100},
+              {"color": "red", "value": 500}
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 4,
+      "title": "Data Gaps Detected",
+      "type": "stat",
+      "gridPos": {"x": 18, "y": 0, "w": 6, "h": 4},
+      "datasource": "QuestDB",
+      "targets": [
+        {
+          "rawSql": "SELECT count(*) as gap_count FROM pipeline_metrics WHERE gap_detected = true AND timestamp > now() - interval '24h' AND exchange LIKE '${exchange}' AND env = '${env}'",
+          "format": "table"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": {"mode": "thresholds"},
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"color": "green", "value": null},
+              {"color": "yellow", "value": 1},
+              {"color": "red", "value": 10}
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 5,
+      "title": "OI Fetches Per Hour (by Exchange)",
+      "type": "timeseries",
+      "gridPos": {"x": 0, "y": 4, "w": 12, "h": 8},
+      "datasource": "QuestDB",
+      "targets": [
+        {
+          "rawSql": "SELECT timestamp, exchange, sum(records_count) as fetch_count FROM pipeline_metrics WHERE data_type = 'oi' AND timestamp > now() - interval '24h' AND exchange LIKE '${exchange}' AND env = '${env}' SAMPLE BY 1h ALIGN TO CALENDAR",
+          "format": "time_series"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "smooth",
+            "fillOpacity": 20,
+            "pointSize": 5
+          }
+        }
+      }
+    },
+    {
+      "id": 6,
+      "title": "Funding Fetches Per Hour",
+      "type": "timeseries",
+      "gridPos": {"x": 12, "y": 4, "w": 12, "h": 8},
+      "datasource": "QuestDB",
+      "targets": [
+        {
+          "rawSql": "SELECT timestamp, exchange, sum(records_count) as fetch_count FROM pipeline_metrics WHERE data_type = 'funding' AND timestamp > now() - interval '24h' AND exchange LIKE '${exchange}' AND env = '${env}' SAMPLE BY 1h ALIGN TO CALENDAR",
+          "format": "time_series"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "smooth",
+            "fillOpacity": 20,
+            "pointSize": 5
+          }
+        }
+      }
+    },
+    {
+      "id": 7,
+      "title": "Liquidations Per Minute",
+      "type": "timeseries",
+      "gridPos": {"x": 0, "y": 12, "w": 12, "h": 8},
+      "datasource": "QuestDB",
+      "targets": [
+        {
+          "rawSql": "SELECT timestamp, exchange, sum(records_count) as liq_count FROM pipeline_metrics WHERE data_type = 'liquidation' AND timestamp > now() - interval '6h' AND exchange LIKE '${exchange}' AND env = '${env}' SAMPLE BY 1m ALIGN TO CALENDAR",
+          "format": "time_series"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "custom": {
+            "drawStyle": "bars",
+            "fillOpacity": 50
+          }
+        }
+      }
+    },
+    {
+      "id": 8,
+      "title": "Data Gaps Timeline",
+      "type": "timeseries",
+      "gridPos": {"x": 12, "y": 12, "w": 12, "h": 8},
+      "datasource": "QuestDB",
+      "targets": [
+        {
+          "rawSql": "SELECT timestamp, exchange, gap_duration_seconds FROM pipeline_metrics WHERE gap_detected = true AND timestamp > now() - interval '24h' AND exchange LIKE '${exchange}' AND env = '${env}'",
+          "format": "time_series"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "custom": {
+            "drawStyle": "points",
+            "pointSize": 10
+          },
+          "color": {"mode": "thresholds"},
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"color": "yellow", "value": null},
+              {"color": "orange", "value": 60},
+              {"color": "red", "value": 300}
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 9,
+      "title": "Parquet Storage Growth",
+      "type": "timeseries",
+      "gridPos": {"x": 0, "y": 20, "w": 24, "h": 6},
+      "datasource": "QuestDB",
+      "targets": [
+        {
+          "rawSql": "SELECT timestamp, exchange, sum(bytes_written) as storage_bytes FROM pipeline_metrics WHERE timestamp > now() - interval '7d' AND exchange LIKE '${exchange}' AND env = '${env}' SAMPLE BY 1h ALIGN TO CALENDAR",
+          "format": "time_series"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bytes",
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "stepAfter",
+            "fillOpacity": 30,
+            "stacking": {"mode": "normal"}
+          }
+        }
+      }
+    }
+  ],
+  "schemaVersion": 39,
+  "version": 1
+}
