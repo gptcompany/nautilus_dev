@@ -234,5 +234,40 @@ class MetricsClient:
         except Exception:
             return False
 
+    def submit(self, metric: MetricType) -> None:
+        """Submit metric to buffer (sync interface for callbacks).
+
+        This method provides a synchronous interface for callback handlers.
+        The metric is buffered and will be flushed asynchronously.
+
+        Args:
+            metric: Metric object to submit.
+        """
+        # Schedule the async buffer operation on the event loop
+        try:
+            loop = asyncio.get_running_loop()
+            loop.create_task(self.buffer(metric))
+        except RuntimeError:
+            # No running loop - log warning and skip
+            logger.warning("No running event loop, metric not submitted")
+
+    async def start(self) -> None:
+        """Start the metrics client.
+
+        Initializes HTTP client and starts periodic flush task.
+        """
+        if self._http_client is None:
+            self._http_client = httpx.AsyncClient(timeout=30.0)
+        self._start_flush_task()
+        logger.info(f"MetricsClient started (QuestDB: {self._base_url})")
+
+    async def stop(self) -> None:
+        """Stop the metrics client.
+
+        Alias for close() for consistency with collector interfaces.
+        """
+        await self.close()
+        logger.info("MetricsClient stopped")
+
 
 __all__ = ["MetricsClient"]

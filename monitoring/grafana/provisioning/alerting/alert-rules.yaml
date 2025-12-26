@@ -540,7 +540,7 @@ groups:
                     type: and
         noDataState: OK
         execErrState: Alerting
-        for: 0s
+        for: 1m
         annotations:
           summary: "CRITICAL: Large data gap for {{ $labels.exchange }} {{ $labels.data_type }}"
           description: "Data gap of more than 5 minutes detected. Gap duration: {{ $values.B }}s"

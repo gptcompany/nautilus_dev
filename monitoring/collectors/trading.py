@@ -56,9 +56,9 @@ class TradingCollector(BaseCollector[TradingMetrics]):
         self._env = config.env
         self._on_metrics: Callable[[TradingMetrics], None] | None = None
 
-        # Track orders for rate calculation
+        # Track orders for rate calculation (per-strategy tracking)
         self._last_orders: dict[str, int] = {}
-        self._last_collection_time: datetime | None = None
+        self._last_collection_times: dict[str, datetime] = {}
 
     def set_on_metrics(self, callback: Callable[[TradingMetrics], None]) -> None:
         """Set callback for when metrics are collected.
@@ -91,15 +91,19 @@ class TradingCollector(BaseCollector[TradingMetrics]):
         if self._metrics_provider:
             return self._metrics_provider()
 
-        # Default: Try to import from NautilusTrader portfolio
+        # Default: Try to check if NautilusTrader is available
         try:
-            from nautilus_trader.live.node import TradingNode
+            import importlib.util
 
-            # This would need integration with an actual running TradingNode
-            # For now, return mock data in development
-            logger.warning("TradingNode metrics not available, using mock data")
-            return self._mock_metrics()
-        except (ImportError, AttributeError):
+            if importlib.util.find_spec("nautilus_trader") is not None:
+                # NautilusTrader is available but TradingNode integration needed
+                # For now, return mock data in development
+                logger.warning("TradingNode metrics not available, using mock data")
+                return self._mock_metrics()
+            else:
+                logger.warning("nautilus_trader not installed, using mock data")
+                return self._mock_metrics()
+        except Exception:
             logger.warning("Trading metrics not available, using mock data")
             return self._mock_metrics()
 
@@ -190,24 +194,29 @@ class TradingCollector(BaseCollector[TradingMetrics]):
         """
         now = datetime.now(timezone.utc)
 
-        if self._last_collection_time is None or strategy_id not in self._last_orders:
+        # Check if this is the first collection for this strategy
+        if (
+            strategy_id not in self._last_orders
+            or strategy_id not in self._last_collection_times
+        ):
             self._last_orders[strategy_id] = current_orders
-            self._last_collection_time = now
+            self._last_collection_times[strategy_id] = now
             return 0.0
 
-        # Calculate time delta in minutes
-        time_delta = (now - self._last_collection_time).total_seconds() / 60.0
+        # Calculate time delta in minutes (per-strategy tracking)
+        last_time = self._last_collection_times[strategy_id]
+        time_delta = (now - last_time).total_seconds() / 60.0
         if time_delta <= 0:
             return 0.0
 
         # Calculate order delta
-        order_delta = current_orders - self._last_orders.get(strategy_id, 0)
+        order_delta = current_orders - self._last_orders[strategy_id]
 
-        # Update tracking
+        # Update tracking for this strategy
         self._last_orders[strategy_id] = current_orders
-        self._last_collection_time = now
+        self._last_collection_times[strategy_id] = now
 
-        return order_delta / time_delta if time_delta > 0 else 0.0
+        return order_delta / time_delta
 
     async def start(self) -> None:
         """Start periodic collection."""

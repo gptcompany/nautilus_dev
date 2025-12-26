@@ -203,7 +203,7 @@
       "datasource": "QuestDB",
       "targets": [
         {
-          "rawSql": "SELECT timestamp, strategy, max(orders_placed) - min(orders_placed) as orders_delta FROM trading_metrics WHERE timestamp > now() - interval '24h' AND strategy LIKE '${strategy}' AND symbol LIKE '${symbol}' AND venue LIKE '${venue}' AND env = '${env}' SAMPLE BY 1h ALIGN TO CALENDAR",
+          "rawSql": "SELECT timestamp, strategy, max(orders_placed) - min(orders_placed) as orders_delta FROM trading_metrics WHERE timestamp > now() - interval '24h' AND strategy LIKE '${strategy}' AND symbol LIKE '${symbol}' AND venue LIKE '${venue}' AND env = '${env}' SAMPLE BY 1h FILL(NULL) ALIGN TO CALENDAR GROUP BY strategy",
           "format": "time_series"
         }
       ],
@@ -251,7 +251,7 @@
       "datasource": "QuestDB",
       "targets": [
         {
-          "rawSql": "SELECT timestamp, strategy, avg(fill_rate) * 100 as fill_pct FROM trading_metrics WHERE timestamp > now() - interval '24h' AND strategy LIKE '${strategy}' AND symbol LIKE '${symbol}' AND venue LIKE '${venue}' AND env = '${env}' SAMPLE BY 1h ALIGN TO CALENDAR",
+          "rawSql": "SELECT timestamp, strategy, avg(fill_rate) * 100 as fill_pct FROM trading_metrics WHERE timestamp > now() - interval '24h' AND strategy LIKE '${strategy}' AND symbol LIKE '${symbol}' AND venue LIKE '${venue}' AND env = '${env}' SAMPLE BY 1h FILL(NULL) ALIGN TO CALENDAR GROUP BY strategy",
           "format": "time_series"
         }
       ],

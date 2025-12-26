@@ -123,6 +123,9 @@ class ExchangeCollector(BaseCollector[ExchangeStatus]):
             },
         }
 
+    # Valid exchange names (must match models.ExchangeStatus Literal)
+    VALID_EXCHANGES = frozenset(("binance", "bybit", "okx", "dydx"))
+
     def _status_to_metrics(self, status_dict: dict) -> list[ExchangeStatus]:
         """Convert status dict to list of ExchangeStatus.
 
@@ -136,6 +139,11 @@ class ExchangeCollector(BaseCollector[ExchangeStatus]):
         now = datetime.now(timezone.utc)
 
         for exchange, data in status_dict.items():
+            # Skip unknown exchanges to avoid Pydantic validation errors
+            if exchange not in self.VALID_EXCHANGES:
+                logger.warning(f"Skipping unknown exchange: {exchange}")
+                continue
+
             # Clamp latency to valid range
             latency = min(max(data.get("latency_ms", 0.0), 0.0), 10000.0)
 
