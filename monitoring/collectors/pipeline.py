@@ -10,6 +10,7 @@ from typing import Callable
 
 from monitoring.collectors import BaseCollector
 from monitoring.config import MonitoringConfig
+from monitoring.constants import VALID_DATA_TYPES, VALID_EXCHANGES
 from monitoring.models import PipelineMetrics
 
 logger = logging.getLogger(__name__)
@@ -53,11 +54,6 @@ class PipelineCollector(BaseCollector[PipelineMetrics]):
         self._host = config.host or socket.gethostname()
         self._env = config.env
         self._on_metrics: Callable[[PipelineMetrics], None] | None = None
-
-        # Internal tracking
-        self._last_fetch_counts: dict[
-            str, dict[str, int]
-        ] = {}  # exchange -> data_type -> count
 
     def set_on_metrics(self, callback: Callable[[PipelineMetrics], None]) -> None:
         """Set callback for when metrics are collected.
@@ -131,10 +127,6 @@ class PipelineCollector(BaseCollector[PipelineMetrics]):
             "gaps": [],
         }
 
-    # Valid values (must match models.PipelineMetrics Literal types)
-    VALID_EXCHANGES = frozenset(("binance", "bybit", "okx", "dydx"))
-    VALID_DATA_TYPES = frozenset(("oi", "funding", "liquidation"))
-
     def _stats_to_metrics(self, stats: dict) -> list[PipelineMetrics]:
         """Convert stats dict to list of PipelineMetrics.
 
@@ -157,13 +149,13 @@ class PipelineCollector(BaseCollector[PipelineMetrics]):
 
         for exchange, data_types in exchanges.items():
             # Skip unknown exchanges to avoid Pydantic validation errors
-            if exchange not in self.VALID_EXCHANGES:
+            if exchange not in VALID_EXCHANGES:
                 logger.warning(f"Skipping unknown exchange: {exchange}")
                 continue
 
             for data_type, data in data_types.items():
                 # Skip unknown data types to avoid Pydantic validation errors
-                if data_type not in self.VALID_DATA_TYPES:
+                if data_type not in VALID_DATA_TYPES:
                     logger.warning(f"Skipping unknown data type: {data_type}")
                     continue
 

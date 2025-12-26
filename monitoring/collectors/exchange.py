@@ -11,6 +11,7 @@ from typing import Callable
 from monitoring.collectors import BaseCollector
 from monitoring.config import MonitoringConfig
 from monitoring.models import ExchangeStatus
+from monitoring.constants import VALID_EXCHANGES
 
 logger = logging.getLogger(__name__)
 
@@ -123,9 +124,6 @@ class ExchangeCollector(BaseCollector[ExchangeStatus]):
             },
         }
 
-    # Valid exchange names (must match models.ExchangeStatus Literal)
-    VALID_EXCHANGES = frozenset(("binance", "bybit", "okx", "dydx"))
-
     def _status_to_metrics(self, status_dict: dict) -> list[ExchangeStatus]:
         """Convert status dict to list of ExchangeStatus.
 
@@ -140,7 +138,7 @@ class ExchangeCollector(BaseCollector[ExchangeStatus]):
 
         for exchange, data in status_dict.items():
             # Skip unknown exchanges to avoid Pydantic validation errors
-            if exchange not in self.VALID_EXCHANGES:
+            if exchange not in VALID_EXCHANGES:
                 logger.warning(f"Skipping unknown exchange: {exchange}")
                 continue
 

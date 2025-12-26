@@ -11,6 +11,7 @@ from typing import Callable
 from monitoring.collectors import BaseCollector
 from monitoring.config import MonitoringConfig
 from monitoring.models import TradingMetrics
+from monitoring.constants import VALID_EXCHANGES
 
 logger = logging.getLogger(__name__)
 
@@ -158,7 +159,7 @@ class TradingCollector(BaseCollector[TradingMetrics]):
 
             # Get venue with validation
             venue = data.get("venue", "binance")
-            if venue not in ("binance", "bybit", "okx", "dydx"):
+            if venue not in VALID_EXCHANGES:
                 venue = "binance"  # Default to binance
 
             metrics = TradingMetrics(
