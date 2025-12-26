@@ -20,10 +20,10 @@
 
 **Purpose**: Project initialization and tearsheet module structure
 
-- [ ] T001 Create tearsheet module directory structure: `strategies/common/tearsheet/`
-- [ ] T002 [P] Create module __init__.py with public API exports in `strategies/common/tearsheet/__init__.py`
-- [ ] T003 [P] Verify NautilusTrader visualization extra is installed in nightly environment
-- [ ] T004 [P] Create test directory structure: `tests/test_tearsheets.py` and `tests/integration/test_tearsheet_integration.py`
+- [x] T001 Create tearsheet module directory structure: `strategies/common/tearsheet/`
+- [x] T002 [P] Create module __init__.py with public API exports in `strategies/common/tearsheet/__init__.py`
+- [x] T003 [P] Verify NautilusTrader visualization extra is installed in nightly environment
+- [x] T004 [P] Create test directory structure: `tests/test_tearsheets.py` and `tests/integration/test_tearsheet_integration.py`
 
 ---
 
