@@ -18,7 +18,7 @@ As a trader, I need to generate a comprehensive HTML report after running a back
 **Acceptance Scenarios**:
 
 1. **Given** a completed backtest, **When** I call `create_tearsheet(engine)`, **Then** an interactive HTML file is generated
-2. **Given** tearsheet is generated, **When** I open in browser, **Then** all charts are interactive (zoom, pan, hover tooltips)
+2. **Given** tearsheet is generated, **When** I open in browser, **Then** all charts are interactive (zoom ≥2x, pan enabled, hover tooltips appear within 200ms)
 3. **Given** tearsheet with trades, **When** viewing equity curve, **Then** I can see drawdown overlay and trade markers
 
 ---
@@ -105,11 +105,14 @@ As a trader, I need to compare multiple strategy backtests side-by-side so that 
 
 ### Edge Cases
 
-- What happens with zero trades (no fills)?
-- How to handle extremely long backtests (10+ years)?
-- What if strategy has only losses (no positive trades)?
-- How to handle missing OHLC data for trade overlay?
-- What happens with very high frequency (1000+ trades/day)?
+| Edge Case | Expected Behavior |
+|-----------|-------------------|
+| Zero trades (no fills) | Display warning message in tearsheet; stats table shows "N/A" for trade metrics |
+| Extremely long backtests (10+ years) | Use ScatterGL for WebGL rendering; aggregate data if >50K points |
+| All losses (no positive trades) | Charts render normally; profit factor shows 0; color coding reflects losses |
+| Missing OHLC data for trade overlay | Skip `bars_with_fills` chart gracefully; log warning; continue with other charts |
+| Very high frequency (1000+ trades/day) | Aggregate trades to hourly for overview; provide drill-down option |
+| Open positions at backtest end | Warn user about epoch timestamp bug; recommend closing all positions first |
 
 ## Requirements *(mandatory)*
 

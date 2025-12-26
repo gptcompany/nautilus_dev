@@ -384,3 +384,54 @@ config = TearsheetConfig(
 - [ ] All 8 built-in charts render without JS errors
 - [ ] Documentation updated in `docs/concepts/`
 - [ ] alpha-debug verification passed
+
+---
+
+## Post-Design Constitution Check
+
+### Principle Compliance (Final)
+
+| Principle | Status | Evidence |
+|-----------|--------|----------|
+| **Black Box Design** | PASS | Uses NautilusTrader chart registry; custom charts are replaceable modules |
+| **Everything Replaceable** | PASS | Custom comparison chart can be swapped without affecting native system |
+| **KISS & YAGNI** | PASS | Leverages existing tearsheet system; only adds 3 custom files |
+| **Native First** | PASS | Uses `create_tearsheet()`, `TearsheetConfig`, `register_chart()` |
+| **No df.iterrows()** | PASS | All chart functions use vectorized Pandas/NumPy operations |
+| **TDD Discipline** | PLANNED | Test fixtures in Phase 1; RED-GREEN-REFACTOR in Phase 2 |
+
+### Quality Gate Compliance
+
+| Gate | Status | Notes |
+|------|--------|-------|
+| Type hints | PLANNED | All custom functions will have type hints |
+| Docstrings | PLANNED | NumPy-style docstrings on public API |
+| Coverage > 80% | PLANNED | Test plan includes all custom code |
+| No hardcoded values | PASS | Uses TearsheetConfig for all settings |
+| No NEEDS CLARIFICATION | PASS | All unknowns resolved in research.md |
+
+### Prohibited Actions Check
+
+| Prohibited | Avoided? | Notes |
+|------------|----------|-------|
+| df.iterrows() | YES | Uses vectorized operations |
+| Reimplement native | YES | Uses native tearsheet system |
+| Create report files | YES | Only creates user-requested HTML tearsheets |
+| Hardcode secrets | N/A | No secrets in visualization |
+
+### Gate Violations
+
+**None identified.** Design follows all constitution principles.
+
+---
+
+## Appendix: Generated Artifacts
+
+| Artifact | Path | Status |
+|----------|------|--------|
+| Feature Spec | `specs/004-plotly-backtest-tearsheets/spec.md` | Complete |
+| Implementation Plan | `specs/004-plotly-backtest-tearsheets/plan.md` | Complete |
+| Research | `specs/004-plotly-backtest-tearsheets/research.md` | Complete |
+| Data Model | `specs/004-plotly-backtest-tearsheets/data-model.md` | Complete |
+| API Contract | `specs/004-plotly-backtest-tearsheets/contracts/tearsheet-api.yaml` | Complete |
+| Quickstart | `specs/004-plotly-backtest-tearsheets/quickstart.md` | Complete |
