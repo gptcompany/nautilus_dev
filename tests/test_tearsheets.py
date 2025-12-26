@@ -242,7 +242,7 @@ class TestEquityCurveData:
         cumulative = (1 + returns).cumprod() - 1
 
         assert len(cumulative) == 252
-        assert cumulative.iloc[0] == returns.iloc[0]
+        assert cumulative.iloc[0] == pytest.approx(returns.iloc[0])
 
 
 class TestDrawdownCalculation:
