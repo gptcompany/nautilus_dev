@@ -1,6 +1,11 @@
 # TDD RED Phase: Tests for monitoring models (T007-T009)
 # These tests MUST fail initially until models.py is implemented
 
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+
 import pytest
 from datetime import datetime, timezone
 from pydantic import ValidationError

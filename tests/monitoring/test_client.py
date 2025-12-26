@@ -1,6 +1,11 @@
 # TDD RED Phase: Tests for MetricsClient (T010)
 # These tests MUST fail initially until client.py is implemented
 
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+
 import pytest
 from datetime import datetime, timezone
 from unittest.mock import AsyncMock, patch, MagicMock
