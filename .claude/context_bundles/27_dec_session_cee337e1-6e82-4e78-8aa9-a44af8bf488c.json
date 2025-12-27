@@ -405,7 +405,116 @@
       "operation": "read",
       "timestamp": "2025-12-27T13:27:39.290097",
       "file_path": "/media/sam/1TB/LiquidationHeatmap/docs/mathematical_foundation.md"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T13:27:41.140821",
+      "command": "ls -lah /media/sam/1TB/N8N_dev/ml_scripts/",
+      "description": "List ML scripts directory contents"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-27T13:27:41.213389",
+      "file_path": "/media/sam/1TB/N8N_dev/Dockerfile.ml"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T13:27:45.752362",
+      "command": "ls -la /media/sam/1TB/LiquidationHeatmap/frontend",
+      "description": "List frontend files"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T13:27:45.785258",
+      "command": "ls -la /media/sam/1TB/LiquidationHeatmap/scripts | head -20",
+      "description": "List scripts directory"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-27T13:27:45.867238",
+      "file_path": "/media/sam/1TB/LiquidationHeatmap/.env.template"
+    },
+    {
+      "operation": "taskoutput",
+      "timestamp": "2025-12-27T13:27:47.247928",
+      "task_id": "a69fcdb",
+      "block": true,
+      "timeout": 120000
+    },
+    {
+      "operation": "taskoutput",
+      "timestamp": "2025-12-27T13:27:47.256550",
+      "task_id": "aa39aaa",
+      "block": true,
+      "timeout": 120000
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T13:27:49.034797",
+      "command": "mkdir -p /media/sam/1TB/N8N_dev/docs",
+      "description": "Create docs directory if it doesn't exist"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-27T13:27:52.755458",
+      "file_path": "/media/sam/1TB/LiquidationHeatmap/src/liquidationheatmap/models/binance_standard.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-27T13:27:52.763174",
+      "file_path": "/media/sam/1TB/LiquidationHeatmap/src/clustering/service.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-27T13:27:52.786404",
+      "file_path": "/media/sam/1TB/LiquidationHeatmap/src/liquidationheatmap/ingestion/db_service.py"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T13:27:59.710778",
+      "command": "mkdir -p /media/sam/1TB/LiquidationHeatmap/docs",
+      "description": "Create docs directory if it doesn't exist"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T13:28:00.250322",
+      "command": "tree -L 2 /media/sam/1TB/LiquidationHeatmap/data 2>/dev/null || ls -la /media/sam/1TB/LiquidationHeatmap/data",
+      "description": "Show data directory structure"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-27T13:28:01.850300",
+      "file_path": "/media/sam/1TB/LiquidationHeatmap/src/services/tier_loader.py"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T13:28:07.595194",
+      "command": "ls -la /media/sam/1TB/LiquidationHeatmap/src/api 2>/dev/null | head -15",
+      "description": "Check API structure"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T13:28:07.621908",
+      "command": "find /media/sam/1TB/LiquidationHeatmap/tests -name \"*.py\" -type f | head -20",
+      "description": "List test files"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-27T13:28:07.688341",
+      "file_path": "/media/sam/1TB/LiquidationHeatmap/docs/api_guide.md"
+    },
+    {
+      "operation": "write",
+      "timestamp": "2025-12-27T13:30:12.948548",
+      "file_path": "/media/sam/1TB/N8N_dev/docs/ARCHITECTURE.md",
+      "content_length": 25157
+    },
+    {
+      "operation": "write",
+      "timestamp": "2025-12-27T13:30:35.468587",
+      "file_path": "/media/sam/1TB/LiquidationHeatmap/docs/ARCHITECTURE.md",
+      "content_length": 27482
     }
   ],
-  "last_updated": "2025-12-27T13:27:39.290114"
+  "last_updated": "2025-12-27T13:30:35.468605"
 }
