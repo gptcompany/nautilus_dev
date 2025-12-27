@@ -243,9 +243,168 @@ Key verified information from Discord community:
 
 ---
 
+## Alpha-Evolve Strategy Evolution (specs 006-010)
+
+### Purpose
+
+Evolutionary strategy discovery using LLM-driven mutations. Inspired by pwb-alphaevolve, adapted for NautilusTrader architecture.
+
+### Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                         ALPHA-EVOLVE SYSTEM                                  │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│  ┌────────────────────────────────────────────────────────────────────────┐ │
+│  │ CONTROLLER (spec-009)                                                  │ │
+│  │ - Async evolution loop                                                 │ │
+│  │ - Parent selection: 10% elite / 70% exploit / 20% explore             │ │
+│  │ - Integrates with alpha-evolve agent for LLM mutations                │ │
+│  │ - CLI interface: evolve start/status/best/export                      │ │
+│  └───────────────────────────────────┬────────────────────────────────────┘ │
+│                                      │                                      │
+│                                      ▼                                      │
+│  ┌────────────────────────────────────────────────────────────────────────┐ │
+│  │ STRATEGY TEMPLATES (spec-008)                                         │ │
+│  │ - BaseEvolveStrategy: equity tracking, order helpers                  │ │
+│  │ - EVOLVE-BLOCK markers for surgical mutations                         │ │
+│  │ - Native Rust indicators (EMA, RSI, etc.)                            │ │
+│  │ - Seed: MomentumEvolveStrategy (dual EMA crossover)                  │ │
+│  └───────────────────────────────────┬────────────────────────────────────┘ │
+│                                      │                                      │
+│                                      ▼                                      │
+│  ┌────────────────────────────────────────────────────────────────────────┐ │
+│  │ BACKTEST EVALUATOR (spec-007)                                         │ │
+│  │ - Dynamic strategy loading from string                                │ │
+│  │ - NautilusTrader BacktestNode wrapper                                 │ │
+│  │ - KPI extraction: Sharpe, Calmar, CAGR, MaxDD                        │ │
+│  │ - ParquetDataCatalog for streaming data                              │ │
+│  └───────────────────────────────────┬────────────────────────────────────┘ │
+│                                      │                                      │
+│                                      ▼                                      │
+│  ┌────────────────────────────────────────────────────────────────────────┐ │
+│  │ CORE INFRASTRUCTURE (spec-006)                                        │ │
+│  │ - Patching: EVOLVE-BLOCK regex replacement + indent preservation      │ │
+│  │ - Store: SQLite hall-of-fame (top_k, sample, prune)                  │ │
+│  │ - Config: YAML for evolution parameters                              │ │
+│  └───────────────────────────────────┬────────────────────────────────────┘ │
+│                                      │                                      │
+│                                      ▼                                      │
+│  ┌────────────────────────────────────────────────────────────────────────┐ │
+│  │ GRAFANA DASHBOARD (spec-010)                                          │ │
+│  │ - Fitness progress over generations                                   │ │
+│  │ - Top 10 strategies leaderboard                                       │ │
+│  │ - Population statistics                                               │ │
+│  │ - Mutation success rate                                               │ │
+│  └────────────────────────────────────────────────────────────────────────┘ │
+│                                                                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+### Data Flow
+
+```
+Seed Strategy (strategies/templates/momentum_evolve.py)
+        │
+        │ 1. Insert into Hall-of-Fame
+        ▼
+┌───────────────────┐
+│ Parent Selection  │ ←──────────────────────────────────────┐
+│ (elite/exploit/   │                                         │
+│  explore)         │                                         │
+└────────┬──────────┘                                         │
+         │                                                     │
+         │ 2. Build mutation prompt                           │
+         ▼                                                     │
+┌───────────────────┐                                         │
+│ Claude Code       │                                         │
+│ (alpha-evolve     │                                         │
+│  agent)           │                                         │
+└────────┬──────────┘                                         │
+         │                                                     │
+         │ 3. Return mutated EVOLVE-BLOCK                     │
+         ▼                                                     │
+┌───────────────────┐                                         │
+│ Patching System   │                                         │
+│ (apply mutation)  │                                         │
+└────────┬──────────┘                                         │
+         │                                                     │
+         │ 4. Generate child strategy code                    │
+         ▼                                                     │
+┌───────────────────┐                                         │
+│ NautilusTrader    │                                         │
+│ BacktestNode      │                                         │
+└────────┬──────────┘                                         │
+         │                                                     │
+         │ 5. Extract KPIs (Sharpe, Calmar, CAGR, DD)        │
+         ▼                                                     │
+┌───────────────────┐                                         │
+│ Hall-of-Fame      │─────────────────────────────────────────┘
+│ (insert, prune,   │
+│  rank)            │
+└───────────────────┘
+         │
+         │ After N iterations
+         ▼
+   Best Strategy (top_k(k=1))
+```
+
+### Key Files
+
+| Component | Location |
+|-----------|----------|
+| Patching System | `scripts/alpha_evolve/patching.py` |
+| SQLite Store | `scripts/alpha_evolve/store.py` |
+| Backtest Evaluator | `scripts/alpha_evolve/evaluator.py` |
+| Evolution Controller | `scripts/alpha_evolve/controller.py` |
+| CLI Runner | `scripts/alpha_evolve/cli.py` |
+| Base Strategy Template | `strategies/templates/base_evolve.py` |
+| Seed Strategy | `strategies/templates/momentum_evolve.py` |
+| Grafana Dashboard | `monitoring/grafana/dashboards/alpha-evolve.json` |
+
+### Configuration
+
+```yaml
+# scripts/alpha_evolve/config.yaml
+evolution:
+  population_size: 500
+  archive_size: 50
+  elite_ratio: 0.1       # Top 10% for elite selection
+  exploration_ratio: 0.2 # Random 20% for exploration
+  max_concurrent: 2      # Memory constraint
+
+backtest:
+  symbols: ["BTCUSDT-PERP.BINANCE", "ETHUSDT-PERP.BINANCE"]
+  start_date: "2024-01-01"
+  end_date: "2024-12-01"
+  initial_capital: 100000.0
+  data_catalog: "/media/sam/2TB-NVMe/nautilus_catalog_v1222/"
+
+fitness:
+  primary_metric: "calmar"
+  constraints:
+    max_drawdown: -0.25
+    min_sharpe: 0.5
+```
+
+### Dependencies
+
+- **Claude Code alpha-evolve agent**: LLM-guided mutations (zero cost)
+- **NautilusTrader nightly v1.222.0**: BacktestNode for evaluation
+- **ParquetDataCatalog**: Streaming historical data
+- **Grafana + QuestDB**: Monitoring dashboard (already running)
+
+---
+
 ## Related Specs
 
 | Spec | Description | Status |
 |------|-------------|--------|
 | spec-002 | Binance to NautilusTrader v1.222.0 Data Ingestion | In Progress |
 | spec-003 | TradingView Lightweight Charts Dashboard | Planned |
+| spec-006 | Alpha-Evolve Core Infrastructure | Draft |
+| spec-007 | Alpha-Evolve Backtest Evaluator | Draft |
+| spec-008 | Alpha-Evolve Strategy Templates | Draft |
+| spec-009 | Alpha-Evolve Controller & CLI | Draft |
+| spec-010 | Alpha-Evolve Grafana Dashboard | Draft |

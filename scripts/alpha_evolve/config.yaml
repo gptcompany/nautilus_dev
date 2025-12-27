@@ -1,0 +1,13 @@
+# Alpha-Evolve Default Configuration
+# Override with environment variables: EVOLVE_<PARAMETER_NAME>
+
+# Population Management
+population_size: 500      # Maximum strategies in population
+archive_size: 50          # Protected top performers from pruning
+
+# Selection Ratios
+elite_ratio: 0.1          # Probability of elite selection (top 10%)
+exploration_ratio: 0.2    # Probability of random selection
+
+# Execution
+max_concurrent: 2         # Maximum parallel evaluations
