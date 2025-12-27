@@ -153,8 +153,8 @@
 
 ### Performance Validation
 
-- [x] T045 Create performance benchmark script in `scripts/alpha_evolve/templates/benchmark.py`
-- [x] T046 Verify equity tracking overhead < 5% in benchmark output
+- [ ] T045 Create performance benchmark script in `scripts/alpha_evolve/templates/benchmark.py`
+- [ ] T046 Verify equity tracking overhead < 5% in benchmark output
 
 ---
 

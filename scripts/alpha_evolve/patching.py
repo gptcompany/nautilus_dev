@@ -92,8 +92,16 @@ def _replace_block(code: str, block_name: str, new_body: str) -> str:
 
 
 def _indent_code(code: str, indent_str: str) -> str:
-    """Add indentation to each line of code."""
-    lines = code.split("\n")
+    """
+    Add indentation to each line of code.
+
+    First dedents the code to remove any existing indentation,
+    then applies the target indentation. This ensures consistent
+    indentation regardless of whether the input uses tabs or spaces.
+    """
+    # First dedent to normalize
+    dedented = _dedent_body(code)
+    lines = dedented.split("\n")
     indented_lines = []
     for line in lines:
         if line.strip():  # Non-empty line

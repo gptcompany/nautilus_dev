@@ -30,6 +30,11 @@ if TYPE_CHECKING:
     from nautilus_trader.model.identifiers import InstrumentId
 
 
+# Maximum equity curve points to retain (prevents unbounded memory growth)
+# ~525K bars/year for 1-min bars, this keeps ~2 years of data (~42MB max)
+MAX_EQUITY_POINTS = 1_050_000
+
+
 @dataclass(frozen=True)
 class EquityPoint:
     """Single equity curve entry."""
@@ -119,6 +124,10 @@ class BaseEvolveStrategy(Strategy, ABC):
         equity = self._get_equity()
         point = EquityPoint(timestamp=unix_nanos_to_dt(bar.ts_event), equity=equity)
         self._equity_curve.append(point)
+
+        # Trim equity curve if it exceeds max size (keep most recent)
+        if len(self._equity_curve) > MAX_EQUITY_POINTS:
+            self._equity_curve = self._equity_curve[-MAX_EQUITY_POINTS:]
 
     def on_stop(self) -> None:
         """
