@@ -1,172 +1,92 @@
-# Implementation Plan: Alpha-Evolve Backtest Evaluator
+# Implementation Plan: [FEATURE NAME]
 
-**Feature Branch**: `007-alpha-evolve-evaluator`
-**Created**: 2025-12-27
+**Feature Branch**: `[###-feature-name]`
+**Created**: [DATE]
 **Status**: Draft
-**Spec Reference**: `specs/007-alpha-evolve-evaluator/spec.md`
+**Spec Reference**: `specs/[###-feature-name]/spec.md`
 
 ## Architecture Overview
 
-The Backtest Evaluator wraps NautilusTrader's BacktestEngine to enable dynamic strategy evaluation for the AlphaEvolve system. It receives strategy code as strings, loads them dynamically, executes backtests, and extracts standardized fitness metrics.
+<!--
+  Describe the high-level architecture and how this feature integrates
+  with the existing NautilusTrader codebase.
+-->
 
 ### System Context
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                     AlphaEvolve Controller                   │
-│                      (spec-009, future)                      │
-└─────────────────────────────┬───────────────────────────────┘
-                              │ EvaluationRequest
-                              ▼
-┌─────────────────────────────────────────────────────────────┐
-│                   Backtest Evaluator (007)                   │
-│  ┌─────────────┐  ┌──────────────┐  ┌───────────────────┐  │
-│  │ Dynamic     │  │  Backtest    │  │ Metrics           │  │
-│  │ Loader      │──│  Runner      │──│ Extractor         │  │
-│  │ (exec)      │  │  (Engine)    │  │ (PortfolioAnalyzer)  │
-│  └─────────────┘  └──────────────┘  └───────────────────┘  │
-│        │                 │                    │             │
-│        ▼                 ▼                    ▼             │
-│  [Strategy Code]   [ParquetCatalog]    [FitnessMetrics]    │
-└─────────────────────────────────────────────────────────────┘
-                              │
-                              ▼
-┌─────────────────────────────────────────────────────────────┐
-│                   ProgramStore (spec-006)                    │
-│                  (Hall-of-Fame persistence)                  │
-└─────────────────────────────────────────────────────────────┘
+[Describe how the feature fits into the NautilusTrader ecosystem]
 ```
 
 ### Component Diagram
 
 ```
-scripts/alpha_evolve/
-├── evaluator.py           # Main evaluator module (NEW)
-│   ├── BacktestConfig     # Configuration dataclass
-│   ├── EvaluationRequest  # Input request
-│   ├── EvaluationResult   # Output result
-│   └── StrategyEvaluator  # Core evaluator class
-├── store.py               # From spec-006
-├── patching.py            # From spec-006
-└── config.py              # From spec-006
-
-tests/alpha_evolve/
-└── test_evaluator.py      # Tests (NEW)
+[ASCII art or description of component relationships]
 ```
 
 ## Technical Decisions
 
-### Decision 1: Dynamic Strategy Loading Method
+### Decision 1: [Topic]
 
 **Options Considered**:
-1. **Option A**: `exec()` with `types.ModuleType`
-   - Pros: Pure Python, no file I/O, immediate cleanup
-   - Cons: Imports may not work if strategy imports non-standard modules
-2. **Option B**: Temporary file + `importlib`
-   - Pros: Full Python import semantics, debuggable
-   - Cons: File I/O overhead, cleanup complexity
-3. **Option C**: `ast.parse` + compile
-   - Pros: Pre-validation before execution
-   - Cons: More complex, same execution behavior as exec
+1. **Option A**: [Description]
+   - Pros: [list]
+   - Cons: [list]
+2. **Option B**: [Description]
+   - Pros: [list]
+   - Cons: [list]
 
-**Selected**: Option A with hybrid fallback
+**Selected**: Option [X]
 
-**Rationale**: Most evolved strategies will only import NautilusTrader components (already in sys.modules). Use exec with ModuleType for speed, with optional file-based fallback for complex imports.
+**Rationale**: [Why this option was chosen]
 
 ---
 
-### Decision 2: Backtest Execution API
+### Decision 2: [Topic]
 
 **Options Considered**:
-1. **Option A**: BacktestNode (high-level API)
-   - Pros: Simpler configuration, handles multiple configs
-   - Cons: Requires ImportableStrategyConfig (file-based)
-2. **Option B**: BacktestEngine (low-level API)
-   - Pros: Direct strategy injection, more control
-   - Cons: More setup code, manual venue/data configuration
+1. **Option A**: [Description]
+2. **Option B**: [Description]
 
-**Selected**: Option B (BacktestEngine)
+**Selected**: Option [X]
 
-**Rationale**: BacktestEngine allows direct strategy instance injection without file-based ImportableStrategyConfig. Essential for dynamic code evaluation where we have the class object, not a file path.
-
----
-
-### Decision 3: Concurrency Model
-
-**Options Considered**:
-1. **Option A**: `threading.Semaphore`
-   - Pros: Simple, synchronous API
-   - Cons: GIL limits parallelism
-2. **Option B**: `asyncio.Semaphore` + `asyncio.to_thread`
-   - Pros: Async-compatible, integrates with controller
-   - Cons: Slightly more complex
-
-**Selected**: Option B (asyncio)
-
-**Rationale**: Evolution controller (spec-009) will be async for coordinating multiple evaluations. Use asyncio.to_thread to run blocking BacktestEngine in thread pool while respecting semaphore.
-
----
-
-### Decision 4: Timeout Implementation
-
-**Options Considered**:
-1. **Option A**: `signal.alarm` + SIGALRM
-   - Pros: OS-level timeout
-   - Cons: Only works on Unix, main thread only
-2. **Option B**: `asyncio.wait_for` + `asyncio.to_thread`
-   - Pros: Cross-platform, async-compatible
-   - Cons: Relies on thread being interruptible
-3. **Option C**: `multiprocessing.Process` with `terminate()`
-   - Pros: True process isolation, force-killable
-   - Cons: Higher overhead, serialization complexity
-
-**Selected**: Option B with Option C fallback
-
-**Rationale**: Start with asyncio.wait_for for simplicity. If a strategy enters an infinite loop that doesn't yield, document as known limitation. Future enhancement can add multiprocessing for true isolation.
+**Rationale**: [Why this option was chosen]
 
 ---
 
 ## Implementation Strategy
 
-### Phase 1: Core Evaluator
+### Phase 1: Foundation
 
-**Goal**: Basic single-strategy evaluation with metrics extraction
+**Goal**: [What this phase achieves]
 
 **Deliverables**:
-- [x] `EvaluationRequest` dataclass
-- [x] `EvaluationResult` dataclass
-- [x] `BacktestConfig` dataclass
-- [x] `StrategyEvaluator.evaluate()` method
-- [x] Dynamic strategy loading via exec()
-- [x] Metrics extraction from PortfolioAnalyzer
+- [ ] [Deliverable 1]
+- [ ] [Deliverable 2]
 
-**Dependencies**: spec-006 (FitnessMetrics)
+**Dependencies**: None / [List dependencies]
 
 ---
 
-### Phase 2: Error Handling & Timeout
+### Phase 2: Core Implementation
 
-**Goal**: Robust error handling for malformed strategies
+**Goal**: [What this phase achieves]
 
 **Deliverables**:
-- [ ] Syntax error detection before execution
-- [ ] Runtime exception capture
-- [ ] Timeout implementation with asyncio
-- [ ] Structured error results
+- [ ] [Deliverable 1]
+- [ ] [Deliverable 2]
 
 **Dependencies**: Phase 1
 
 ---
 
-### Phase 3: Concurrency & Integration
+### Phase 3: Integration & Testing
 
-**Goal**: Support concurrent evaluations with memory limits
+**Goal**: [What this phase achieves]
 
 **Deliverables**:
-- [ ] Semaphore-based concurrency control
-- [ ] Async wrapper for BacktestEngine
-- [ ] Integration with ProgramStore
-- [ ] Memory usage monitoring (optional)
+- [ ] [Deliverable 1]
+- [ ] [Deliverable 2]
 
 **Dependencies**: Phase 2
 
@@ -175,19 +95,16 @@ tests/alpha_evolve/
 ## File Structure
 
 ```
-scripts/alpha_evolve/
-├── __init__.py            # Updated exports
-├── evaluator.py           # NEW: Main evaluator module
-├── store.py               # From spec-006
-├── patching.py            # From spec-006
-└── config.py              # From spec-006
-
-tests/alpha_evolve/
-├── conftest.py            # Updated fixtures
-├── test_evaluator.py      # NEW: Evaluator tests
-├── test_store.py          # From spec-006
-├── test_patching.py       # From spec-006
-└── test_integration.py    # Updated integration tests
+strategies/                    # or appropriate directory
+├── {feature_name}/
+│   ├── __init__.py
+│   ├── strategy.py           # Main strategy implementation
+│   ├── config.py             # Configuration models
+│   └── indicators.py         # Custom indicators (if needed)
+tests/
+├── test_{feature_name}.py    # Unit tests
+└── integration/
+    └── test_{feature_name}_integration.py
 ```
 
 ## API Design
@@ -195,170 +112,59 @@ tests/alpha_evolve/
 ### Public Interface
 
 ```python
-@dataclass
-class BacktestConfig:
-    """Configuration for backtest execution."""
-    catalog_path: str | Path
-    instrument_id: str
-    start_date: str  # ISO 8601
-    end_date: str    # ISO 8601
-    bar_type: str = "1-MINUTE-LAST"
-    initial_capital: float = 100_000.0
-    venue: str = "BINANCE"
-    oms_type: str = "NETTING"
-    account_type: str = "MARGIN"
-    base_currency: str = "USDT"
-    random_seed: int | None = 42  # For reproducibility (FR-008)
-
-
-@dataclass
-class EvaluationRequest:
-    """Input for strategy evaluation."""
-    strategy_code: str
-    strategy_class_name: str = "EvolvedStrategy"
-    config_class_name: str = "EvolvedStrategyConfig"
-    backtest_config: BacktestConfig | None = None
-
-
-@dataclass
-class EvaluationResult:
-    """Output from strategy evaluation."""
-    success: bool
-    metrics: FitnessMetrics | None
-    error: str | None
-    error_type: str | None  # "syntax", "runtime", "timeout"
-    duration_ms: int
-    trade_count: int
-
-
-class StrategyEvaluator:
-    """Evaluates strategy code via backtesting."""
-
-    def __init__(
-        self,
-        default_config: BacktestConfig,
-        max_concurrent: int = 2,
-        timeout_seconds: int = 300,
-    ) -> None: ...
-
-    async def evaluate(
-        self,
-        request: EvaluationRequest,
-    ) -> EvaluationResult: ...
-
-    def evaluate_sync(
-        self,
-        request: EvaluationRequest,
-    ) -> EvaluationResult: ...
+# Example API surface
+class {FeatureName}Strategy(Strategy):
+    def __init__(self, config: {FeatureName}Config) -> None: ...
+    def on_start(self) -> None: ...
+    def on_bar(self, bar: Bar) -> None: ...
+    def on_stop(self) -> None: ...
 ```
 
-### Internal Methods
+### Configuration
 
 ```python
-class StrategyEvaluator:
-    # Dynamic loading
-    def _load_strategy(
-        self,
-        code: str,
-        class_name: str,
-        config_name: str,
-    ) -> tuple[type, type]: ...
-
-    # Backtest execution
-    def _run_backtest(
-        self,
-        strategy: Strategy,
-        config: BacktestConfig,
-    ) -> BacktestEngine: ...
-
-    # Metrics extraction
-    def _extract_metrics(
-        self,
-        engine: BacktestEngine,
-    ) -> FitnessMetrics: ...
+class {FeatureName}Config(BaseModel):
+    instrument_id: str
+    # ... other config fields
 ```
 
 ## Testing Strategy
 
 ### Unit Tests
-- [x] Test dynamic strategy loading (valid code)
-- [x] Test dynamic strategy loading (syntax error)
-- [x] Test dynamic strategy loading (missing class)
-- [x] Test metrics extraction (profitable strategy)
-- [x] Test metrics extraction (no trades)
-- [x] Test metrics extraction (negative returns)
+- [ ] Test strategy initialization
+- [ ] Test indicator calculations
+- [ ] Test signal generation
+- [ ] Test order management
 
 ### Integration Tests
-- [x] Test full evaluation cycle with sample strategy
-- [x] Test evaluation with ParquetDataCatalog
-- [x] Test concurrent evaluations (semaphore)
-- [x] Test timeout handling
+- [ ] Test with BacktestNode
+- [ ] Test with sample data
+- [ ] Test edge cases (empty data, gaps)
 
-### Edge Cases
-- [ ] Strategy with infinite loop (document limitation)
-- [ ] Strategy importing unavailable modules
-- [ ] Empty data catalog
-- [ ] Invalid date range
-- [ ] Mismatched instrument ID
+### Performance Tests
+- [ ] Benchmark against baseline
+- [ ] Memory usage profiling
 
 ## Risk Assessment
 
 | Risk | Impact | Likelihood | Mitigation |
 |------|--------|------------|------------|
-| Infinite loop in strategy | High | Medium | Timeout + documentation |
-| Memory exhaustion | High | Low | Semaphore limits, monitoring |
-| Catalog data gaps | Medium | Medium | Validate data before backtest |
-| Import errors in dynamic code | Medium | Low | Pre-validate syntax, controlled imports |
+| [Risk 1] | High/Medium/Low | High/Medium/Low | [Mitigation strategy] |
+| [Risk 2] | High/Medium/Low | High/Medium/Low | [Mitigation strategy] |
 
 ## Dependencies
 
 ### External Dependencies
-- NautilusTrader >= 1.222.0 (nightly)
-- Python 3.11+
+- NautilusTrader >= 1.220.0
+- [Other dependencies]
 
 ### Internal Dependencies
-- spec-006: FitnessMetrics, ProgramStore
-- ParquetDataCatalog (pre-populated)
-
-## Constitution Check
-
-### Pre-Design Validation
-
-| Principle | Compliance | Notes |
-|-----------|------------|-------|
-| Black Box Design | ✅ | Clean API: evaluate(request) → result |
-| KISS | ✅ | Single module, minimal complexity |
-| Native First | ✅ | Uses BacktestEngine, PortfolioAnalyzer |
-| NO df.iterrows() | ✅ | No pandas iteration |
-| TDD Discipline | ✅ | Tests defined before implementation |
-| Coverage > 80% | ⏳ | Target during implementation |
-
-### Post-Design Validation
-
-| Gate | Status | Evidence |
-|------|--------|----------|
-| Single Responsibility | ✅ | evaluator.py handles only evaluation |
-| Streaming Data | ✅ | Uses ParquetDataCatalog |
-| Type Hints | ✅ | All public functions typed in contracts |
-| Docstrings | ✅ | All classes/methods documented |
-| No Hardcoded Values | ✅ | All config via BacktestConfig |
-| Test Coverage Plan | ✅ | 43 tests defined in plan |
-| Documentation Updated | ✅ | quickstart.md, data-model.md created |
-| No NEEDS CLARIFICATION | ✅ | All research questions resolved |
-
-### Prohibited Actions Check
-
-| Prohibited | Avoided? | Notes |
-|------------|----------|-------|
-| df.iterrows() | ✅ | N/A - no pandas in design |
-| Reimplementing native | ✅ | Uses NautilusTrader PortfolioAnalyzer |
-| Hardcoded secrets | ✅ | Catalog path via config |
-| Report files | ✅ | No reports created |
+- [List internal modules/features this depends on]
 
 ## Acceptance Criteria
 
-- [x] All unit tests passing (coverage > 80%)
+- [ ] All unit tests passing (coverage > 80%)
 - [ ] All integration tests passing
-- [ ] Documentation updated (quickstart.md)
-- [ ] Performance: < 60s for 6-month 1-minute data
-- [ ] Memory: < 4GB per evaluation
+- [ ] Documentation updated
+- [ ] Code review approved
+- [ ] Performance benchmarks met
