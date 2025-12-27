@@ -14,9 +14,20 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Development Philosophy**: KISS (Keep It Simple) + YAGNI (You Ain't Gonna Need It)
 
-## Tech Stack
+## Architecture Documentation
 
-> **Full Architecture Details**: See `docs/ARCHITECTURE.md` for wrangler compatibility, data pipeline, and storage locations.
+> **Canonical Source**: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)
+>
+> ARCHITECTURE.md is the single source of truth for:
+> - System architecture and component diagrams
+> - Data flow and pipeline documentation
+> - Technical decisions and rationale
+> - Wrangler compatibility matrix
+>
+> **Auto-validated** by architecture-validator hook on each commit.
+> Do NOT duplicate architecture info here - keep CLAUDE.md focused on dev guidelines.
+
+## Tech Stack
 
 **NautilusTrader**:
 - **Python 3.11+** frontend with **Rust core** (100x faster than pure Python)
