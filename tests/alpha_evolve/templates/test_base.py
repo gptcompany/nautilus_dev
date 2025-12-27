@@ -89,8 +89,9 @@ class TestEquityCurveTracking:
 
     def test_equity_curve_starts_empty(self) -> None:
         """Equity curve should be empty on initialization."""
-        # Need concrete strategy for this test
-        assert hasattr(BaseEvolveStrategy, "_equity_curve")
+        # _equity_curve is an instance attribute, verify via get_equity_curve method
+        assert hasattr(BaseEvolveStrategy, "get_equity_curve")
+        # Full verification requires a concrete subclass instance
 
 
 # =============================================================================

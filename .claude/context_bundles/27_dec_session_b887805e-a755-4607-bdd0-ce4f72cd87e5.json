@@ -485,7 +485,196 @@
       "operation": "read",
       "timestamp": "2025-12-27T18:15:49.751475",
       "file_path": "/media/sam/1TB/nautilus_dev/tests/alpha_evolve/templates/test_base.py"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-27T18:16:07.857374",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/alpha_evolve/templates/test_base.py",
+      "old_string": "    def test_equity_curve_starts_empty(self) -> None:\n        \"\"\"Equity curve should be empty on ini..."
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T18:16:13.930242",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run pytest tests/alpha_evolve/templates/test_base.py -v --tb=short 2>&1 | head -60",
+      "description": "Run base strategy tests"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-27T18:16:35.839065",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/008-alpha-evolve-templates/tasks.md",
+      "old_string": "- [ ] T007 [US1] Write test_base_strategy_inheritance in `tests/alpha_evolve/templates/test_base.py`..."
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-27T18:16:44.561416",
+      "todo_count": 8
+    },
+    {
+      "operation": "write",
+      "timestamp": "2025-12-27T18:17:16.829698",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/alpha_evolve/templates/test_momentum.py",
+      "content_length": 6328
+    },
+    {
+      "operation": "write",
+      "timestamp": "2025-12-27T18:17:41.959804",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/templates/momentum.py",
+      "content_length": 4173
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-27T18:17:52.226034",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/templates/__init__.py",
+      "old_string": "\"\"\"\nAlpha-Evolve Strategy Templates.\n\nProvides evolvable strategy templates for NautilusTrader:\n- Ba..."
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T18:17:58.300010",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run pytest tests/alpha_evolve/templates/test_momentum.py -v --tb=short 2>&1 | head -60",
+      "description": "Run momentum strategy tests"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T18:18:07.486025",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python3 -c \"from nautilus_trader.indicators.average.ema import ExponentialMovingAverage; print('OK')\"",
+      "description": "Check EMA import path"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T18:18:14.516383",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python3 -c \"import nautilus_trader.indicators as ind; print(dir(ind))\"",
+      "description": "Check available indicators"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T18:18:22.619090",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && which python3 && python3 -c \"from nautilus_trader.indicators import ExponentialMovingAverage; print('OK')\"",
+      "description": "Check EMA import in nightly env"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T18:18:31.801918",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python3 -m pytest tests/alpha_evolve/templates/test_momentum.py -v --tb=short 2>&1 | head -60",
+      "description": "Run momentum tests with nightly Python"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T18:18:40.187799",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && pip install pyyaml",
+      "description": "Install pyyaml"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T18:18:48.285706",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/pip install pyyaml",
+      "description": "Install pyyaml in venv"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T18:18:55.152806",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python3 -m pip install pyyaml",
+      "description": "Install pyyaml in venv"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T18:19:00.272451",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv pip install pyyaml",
+      "description": "Install pyyaml via uv"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T18:19:05.195548",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python3 -m pytest tests/alpha_evolve/templates/test_momentum.py -v --tb=short 2>&1 | head -80",
+      "description": "Run momentum tests"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-27T18:19:22.967999",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/008-alpha-evolve-templates/tasks.md",
+      "old_string": "- [ ] T018 [US2] Write test_momentum_config_validation in `tests/alpha_evolve/templates/test_momentu..."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-27T18:19:34.694871",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/008-alpha-evolve-templates/tasks.md",
+      "old_string": "- [ ] T027 [US3] Write test_uses_native_indicators in `tests/alpha_evolve/templates/test_momentum.py..."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-27T18:19:50.871140",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/008-alpha-evolve-templates/tasks.md",
+      "old_string": "- [ ] T032 [US4] Write test_enter_long_creates_market_order in `tests/alpha_evolve/templates/test_ba..."
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-27T18:20:00.515177",
+      "todo_count": 8
+    },
+    {
+      "operation": "write",
+      "timestamp": "2025-12-27T18:20:29.274591",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/alpha_evolve/test_templates_integration.py",
+      "content_length": 5565
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T18:20:35.633300",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python3 -m pytest tests/alpha_evolve/test_templates_integration.py -v --tb=short 2>&1 | head -60",
+      "description": "Run integration tests"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-27T18:20:48.509597",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/alpha_evolve/test_templates_integration.py",
+      "old_string": "    def test_extract_decision_logic_block(self, momentum_strategy_code: str) -> None:\n        \"\"\"Sho..."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-27T18:21:05.742130",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/alpha_evolve/test_templates_integration.py",
+      "old_string": "    def test_patched_code_is_valid_python(self, momentum_strategy_code: str) -> None:\n        \"\"\"Pat..."
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T18:21:10.960386",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python3 -m pytest tests/alpha_evolve/test_templates_integration.py -v --tb=short 2>&1 | head -40",
+      "description": "Run integration tests"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-27T18:21:26.702862",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/008-alpha-evolve-templates/tasks.md",
+      "old_string": "- [ ] T041 [P] Write test_strategy_evaluation_returns_metrics in `tests/alpha_evolve/test_templates_..."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-27T18:21:35.070531",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/__init__.py",
+      "old_string": "]"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T18:21:45.717506",
+      "command": "ruff format scripts/alpha_evolve/templates/ tests/alpha_evolve/templates/ tests/alpha_evolve/test_templates_integration.py && ruff check scripts/alpha_evolve/templates/ tests/alpha_evolve/templates/ tests/alpha_evolve/test_templates_integration.py --fix 2>&1 | head -30",
+      "description": "Format and lint new files"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T18:21:52.427854",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python3 -m pytest tests/alpha_evolve/templates/ tests/alpha_evolve/test_templates_integration.py -v --tb=short 2>&1 | tail -40",
+      "description": "Run all template tests"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-27T18:22:06.160024",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/008-alpha-evolve-templates/tasks.md",
+      "old_string": "- [ ] T047 [P] Add module docstrings to all template files\n- [ ] T048 [P] Update alpha_evolve module..."
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-27T18:22:14.364912",
+      "todo_count": 8
     }
   ],
-  "last_updated": "2025-12-27T18:15:49.751504"
+  "last_updated": "2025-12-27T18:22:14.364934"
 }

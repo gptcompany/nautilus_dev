@@ -55,3 +55,21 @@ __all__ = [
     "EvaluationResult",
     "StrategyEvaluator",
 ]
+
+# Template exports (added in spec-008)
+from scripts.alpha_evolve.templates import (
+    BaseEvolveConfig,
+    BaseEvolveStrategy,
+    EquityPoint,
+    MomentumEvolveConfig,
+    MomentumEvolveStrategy,
+)
+
+__all__ += [
+    # Templates
+    "BaseEvolveConfig",
+    "BaseEvolveStrategy",
+    "EquityPoint",
+    "MomentumEvolveConfig",
+    "MomentumEvolveStrategy",
+]

@@ -50,20 +50,20 @@
 
 **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T007 [US1] Write test_base_strategy_inheritance in `tests/alpha_evolve/templates/test_base.py`
-- [ ] T008 [US1] Write test_equity_curve_tracking in `tests/alpha_evolve/templates/test_base.py`
-- [ ] T009 [US1] Write test_lifecycle_methods in `tests/alpha_evolve/templates/test_base.py`
+- [x] T007 [US1] Write test_base_strategy_inheritance in `tests/alpha_evolve/templates/test_base.py`
+- [x] T008 [US1] Write test_equity_curve_tracking in `tests/alpha_evolve/templates/test_base.py`
+- [x] T009 [US1] Write test_lifecycle_methods in `tests/alpha_evolve/templates/test_base.py`
 
 ### Implementation for User Story 1
 
-- [ ] T010 [US1] Implement BaseEvolveStrategy abstract class skeleton in `scripts/alpha_evolve/templates/base.py`
-- [ ] T011 [US1] Implement on_start() with instrument lookup in `scripts/alpha_evolve/templates/base.py`
-- [ ] T012 [US1] Implement on_bar() with _on_bar_evolved call and equity recording in `scripts/alpha_evolve/templates/base.py`
-- [ ] T013 [US1] Implement on_stop() with order cancellation and position closing in `scripts/alpha_evolve/templates/base.py`
-- [ ] T014 [US1] Implement on_reset() with state reset in `scripts/alpha_evolve/templates/base.py`
-- [ ] T015 [US1] Implement _get_equity() helper in `scripts/alpha_evolve/templates/base.py`
-- [ ] T016 [US1] Implement get_equity_curve() getter in `scripts/alpha_evolve/templates/base.py`
-- [ ] T017 [US1] Define abstract _on_bar_evolved() method with EVOLVE-BLOCK docstring in `scripts/alpha_evolve/templates/base.py`
+- [x] T010 [US1] Implement BaseEvolveStrategy abstract class skeleton in `scripts/alpha_evolve/templates/base.py`
+- [x] T011 [US1] Implement on_start() with instrument lookup in `scripts/alpha_evolve/templates/base.py`
+- [x] T012 [US1] Implement on_bar() with _on_bar_evolved call and equity recording in `scripts/alpha_evolve/templates/base.py`
+- [x] T013 [US1] Implement on_stop() with order cancellation and position closing in `scripts/alpha_evolve/templates/base.py`
+- [x] T014 [US1] Implement on_reset() with state reset in `scripts/alpha_evolve/templates/base.py`
+- [x] T015 [US1] Implement _get_equity() helper in `scripts/alpha_evolve/templates/base.py`
+- [x] T016 [US1] Implement get_equity_curve() getter in `scripts/alpha_evolve/templates/base.py`
+- [x] T017 [US1] Define abstract _on_bar_evolved() method with EVOLVE-BLOCK docstring in `scripts/alpha_evolve/templates/base.py`
 
 **Checkpoint**: BaseEvolveStrategy is complete and independently testable
 
@@ -77,18 +77,18 @@
 
 ### Tests for User Story 2
 
-- [ ] T018 [US2] Write test_momentum_config_validation in `tests/alpha_evolve/templates/test_momentum.py`
-- [ ] T019 [US2] Write test_momentum_indicators_initialized in `tests/alpha_evolve/templates/test_momentum.py`
-- [ ] T020 [US2] Write test_momentum_evolve_block_extractable in `tests/alpha_evolve/templates/test_momentum.py`
+- [x] T018 [US2] Write test_momentum_config_validation in `tests/alpha_evolve/templates/test_momentum.py`
+- [x] T019 [US2] Write test_momentum_indicators_initialized in `tests/alpha_evolve/templates/test_momentum.py`
+- [x] T020 [US2] Write test_momentum_evolve_block_extractable in `tests/alpha_evolve/templates/test_momentum.py`
 
 ### Implementation for User Story 2
 
-- [ ] T021 [US2] Create MomentumEvolveConfig with period validation in `scripts/alpha_evolve/templates/momentum.py`
-- [ ] T022 [US2] Create MomentumEvolveStrategy class inheriting BaseEvolveStrategy in `scripts/alpha_evolve/templates/momentum.py`
-- [ ] T023 [US2] Implement on_start() with EMA indicator registration in `scripts/alpha_evolve/templates/momentum.py`
-- [ ] T024 [US2] Implement _on_bar_evolved() with EVOLVE-BLOCK markers in `scripts/alpha_evolve/templates/momentum.py`
-- [ ] T025 [US2] Implement EMA crossover entry/exit logic inside EVOLVE-BLOCK in `scripts/alpha_evolve/templates/momentum.py`
-- [ ] T026 [P] [US2] Export MomentumEvolveStrategy in `scripts/alpha_evolve/templates/__init__.py`
+- [x] T021 [US2] Create MomentumEvolveConfig with period validation in `scripts/alpha_evolve/templates/momentum.py`
+- [x] T022 [US2] Create MomentumEvolveStrategy class inheriting BaseEvolveStrategy in `scripts/alpha_evolve/templates/momentum.py`
+- [x] T023 [US2] Implement on_start() with EMA indicator registration in `scripts/alpha_evolve/templates/momentum.py`
+- [x] T024 [US2] Implement _on_bar_evolved() with EVOLVE-BLOCK markers in `scripts/alpha_evolve/templates/momentum.py`
+- [x] T025 [US2] Implement EMA crossover entry/exit logic inside EVOLVE-BLOCK in `scripts/alpha_evolve/templates/momentum.py`
+- [x] T026 [P] [US2] Export MomentumEvolveStrategy in `scripts/alpha_evolve/templates/__init__.py`
 
 **Checkpoint**: Seed strategy is complete and produces trades on BTC data
 
@@ -102,14 +102,14 @@
 
 ### Tests for User Story 3
 
-- [ ] T027 [US3] Write test_uses_native_indicators in `tests/alpha_evolve/templates/test_momentum.py`
-- [ ] T028 [US3] Write test_indicator_auto_registration in `tests/alpha_evolve/templates/test_momentum.py`
+- [x] T027 [US3] Write test_uses_native_indicators in `tests/alpha_evolve/templates/test_momentum.py`
+- [x] T028 [US3] Write test_indicator_auto_registration in `tests/alpha_evolve/templates/test_momentum.py`
 
 ### Implementation for User Story 3
 
-- [ ] T029 [US3] Verify ExponentialMovingAverage import from nautilus_trader.indicators in `scripts/alpha_evolve/templates/momentum.py`
-- [ ] T030 [US3] Add indicator initialization check (indicators_initialized()) in `scripts/alpha_evolve/templates/momentum.py`
-- [ ] T031 [US3] Document native indicator requirement in module docstring in `scripts/alpha_evolve/templates/base.py`
+- [x] T029 [US3] Verify ExponentialMovingAverage import from nautilus_trader.indicators in `scripts/alpha_evolve/templates/momentum.py`
+- [x] T030 [US3] Add indicator initialization check (indicators_initialized()) in `scripts/alpha_evolve/templates/momentum.py`
+- [x] T031 [US3] Document native indicator requirement in module docstring in `scripts/alpha_evolve/templates/base.py`
 
 **Checkpoint**: All indicators are native Rust, no Python reimplementations
 
@@ -123,18 +123,18 @@
 
 ### Tests for User Story 4
 
-- [ ] T032 [US4] Write test_enter_long_creates_market_order in `tests/alpha_evolve/templates/test_base.py`
-- [ ] T033 [US4] Write test_enter_short_closes_long_first in `tests/alpha_evolve/templates/test_base.py`
-- [ ] T034 [US4] Write test_close_position in `tests/alpha_evolve/templates/test_base.py`
-- [ ] T035 [US4] Write test_get_position_size in `tests/alpha_evolve/templates/test_base.py`
+- [x] T032 [US4] Write test_enter_long_creates_market_order in `tests/alpha_evolve/templates/test_base.py`
+- [x] T033 [US4] Write test_enter_short_closes_long_first in `tests/alpha_evolve/templates/test_base.py`
+- [x] T034 [US4] Write test_close_position in `tests/alpha_evolve/templates/test_base.py`
+- [x] T035 [US4] Write test_get_position_size in `tests/alpha_evolve/templates/test_base.py`
 
 ### Implementation for User Story 4
 
-- [ ] T036 [US4] Implement _enter_long(quantity) helper in `scripts/alpha_evolve/templates/base.py`
-- [ ] T037 [US4] Implement _enter_short(quantity) helper in `scripts/alpha_evolve/templates/base.py`
-- [ ] T038 [US4] Implement _close_position() helper in `scripts/alpha_evolve/templates/base.py`
-- [ ] T039 [US4] Implement _get_position_size() helper in `scripts/alpha_evolve/templates/base.py`
-- [ ] T040 [US4] Update MomentumEvolveStrategy to use order helpers in `scripts/alpha_evolve/templates/momentum.py`
+- [x] T036 [US4] Implement _enter_long(quantity) helper in `scripts/alpha_evolve/templates/base.py`
+- [x] T037 [US4] Implement _enter_short(quantity) helper in `scripts/alpha_evolve/templates/base.py`
+- [x] T038 [US4] Implement _close_position() helper in `scripts/alpha_evolve/templates/base.py`
+- [x] T039 [US4] Implement _get_position_size() helper in `scripts/alpha_evolve/templates/base.py`
+- [x] T040 [US4] Update MomentumEvolveStrategy to use order helpers in `scripts/alpha_evolve/templates/momentum.py`
 
 **Checkpoint**: Order helpers complete, EVOLVE-BLOCK code is simplified
 
@@ -146,15 +146,15 @@
 
 ### Integration Tests
 
-- [ ] T041 [P] Write test_strategy_evaluation_returns_metrics in `tests/alpha_evolve/test_templates_integration.py`
-- [ ] T042 [P] Write test_evolve_block_extraction in `tests/alpha_evolve/test_templates_integration.py`
-- [ ] T043 [P] Write test_patched_strategy_executes in `tests/alpha_evolve/test_templates_integration.py`
-- [ ] T044 Write test_equity_curve_populated in `tests/alpha_evolve/test_templates_integration.py`
+- [x] T041 [P] Write test_strategy_evaluation_returns_metrics in `tests/alpha_evolve/test_templates_integration.py`
+- [x] T042 [P] Write test_evolve_block_extraction in `tests/alpha_evolve/test_templates_integration.py`
+- [x] T043 [P] Write test_patched_strategy_executes in `tests/alpha_evolve/test_templates_integration.py`
+- [x] T044 Write test_equity_curve_populated in `tests/alpha_evolve/test_templates_integration.py`
 
 ### Performance Validation
 
-- [ ] T045 Create performance benchmark script in `scripts/alpha_evolve/templates/benchmark.py`
-- [ ] T046 Verify equity tracking overhead < 5% in benchmark output
+- [x] T045 Create performance benchmark script in `scripts/alpha_evolve/templates/benchmark.py`
+- [x] T046 Verify equity tracking overhead < 5% in benchmark output
 
 ---
 
@@ -162,10 +162,10 @@
 
 **Purpose**: Improvements that affect multiple user stories
 
-- [ ] T047 [P] Add module docstrings to all template files
-- [ ] T048 [P] Update alpha_evolve module __init__.py with complete exports
-- [ ] T049 Run ruff format and ruff check on all new files
-- [ ] T050 Run alpha-debug verification on template implementation
+- [x] T047 [P] Add module docstrings to all template files
+- [x] T048 [P] Update alpha_evolve module __init__.py with complete exports
+- [x] T049 Run ruff format and ruff check on all new files
+- [x] T050 Run alpha-debug verification on template implementation
 
 ---
 
