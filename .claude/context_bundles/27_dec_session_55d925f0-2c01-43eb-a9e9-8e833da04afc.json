@@ -308,7 +308,376 @@
       "timestamp": "2025-12-27T23:22:48.585259",
       "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run pytest tests/alpha_evolve/test_controller_integration.py -v --tb=short 2>&1 | tail -40",
       "description": "Run integration tests for alpha-evolve controller"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T23:23:03.607970",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && ruff check scripts/alpha_evolve/controller.py scripts/alpha_evolve/mutator.py scripts/alpha_evolve/cli.py --fix && ruff format scripts/alpha_evolve/controller.py scripts/alpha_evolve/mutator.py scripts/alpha_evolve/cli.py 2>&1",
+      "description": "Format new files with ruff"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-27T23:23:16.111418",
+      "todo_count": 11
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-27T23:23:21.050362",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/009-alpha-evolve-controller/tasks.md"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-27T23:23:59.177109",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/009-alpha-evolve-controller/tasks.md",
+      "old_string": "## Phase 1: Setup (Shared Infrastructure)\n\n**Purpose**: Project initialization and module structure\n..."
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-27T23:24:03.774943",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/009-alpha-evolve-controller/tasks.md"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-27T23:24:54.744611",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/009-alpha-evolve-controller/tasks.md",
+      "old_string": "## Phase 5: User Story 3 - LLM Mutation Integration (Priority: P1)\n\n**Goal**: Request code mutations..."
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T23:25:00.882488",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run pytest tests/alpha_evolve/ -v --tb=short 2>&1 | tail -50",
+      "description": "Run all alpha_evolve tests"
+    },
+    {
+      "operation": "grep",
+      "timestamp": "2025-12-27T23:26:09.553072",
+      "pattern": "from nautilus_trader.indicators import ExponentialMovingAverage",
+      "path": "/media/sam/1TB/nautilus_dev/tests/alpha_evolve"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-27T23:26:15.581791",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/alpha_evolve/templates/test_momentum.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-27T23:26:15.609265",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/alpha_evolve/templates/conftest.py"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-27T23:26:22.347019",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/alpha_evolve/templates/test_momentum.py",
+      "old_string": "from nautilus_trader.indicators import ExponentialMovingAverage"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T23:26:31.947599",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run pytest tests/alpha_evolve/ -v --tb=short 2>&1 | head -150",
+      "description": "Run all alpha_evolve tests"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T23:26:45.576950",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run pytest tests/alpha_evolve/ -v --tb=short 2>&1 | tail -80",
+      "description": "View remaining test output"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-27T23:27:08.125895",
+      "todo_count": 11
+    },
+    {
+      "operation": "task",
+      "timestamp": "2025-12-27T23:27:21.918473",
+      "subagent_type": "alpha-debug",
+      "prompt": "Run alpha-debug verification on scripts/alpha_evolve/controller.py to find potential bugs, edge case..."
+    },
+    {
+      "operation": "task",
+      "timestamp": "2025-12-27T23:27:21.924086",
+      "subagent_type": "alpha-debug",
+      "prompt": "Run alpha-debug verification on scripts/alpha_evolve/mutator.py to find potential bugs, edge cases, ..."
+    },
+    {
+      "operation": "glob",
+      "timestamp": "2025-12-27T23:27:27.597210",
+      "pattern": "**/alpha_evolve/test*.py",
+      "path": "/media/sam/1TB/nautilus_dev"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T23:27:27.608369",
+      "command": "git diff HEAD~3 --stat /media/sam/1TB/nautilus_dev/scripts/alpha_evolve/controller.py 2>/dev/null | tail -20",
+      "description": "Check recent changes to controller.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-27T23:27:27.677390",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/controller.py"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-27T23:27:28.531248",
+      "todo_count": 5
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-27T23:27:33.512049",
+      "todo_count": 3
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T23:27:34.865969",
+      "command": "git diff HEAD~3 --stat /media/sam/1TB/nautilus_dev/scripts/alpha_evolve/mutator.py 2>/dev/null || echo \"No recent changes\"",
+      "description": "Check recent changes to mutator.py"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T23:27:34.895675",
+      "command": "wc -l /media/sam/1TB/nautilus_dev/scripts/alpha_evolve/mutator.py",
+      "description": "Count lines in mutator.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-27T23:27:34.953040",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/mutator.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-27T23:27:41.543858",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/alpha_evolve/test_controller.py"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T23:27:41.887428",
+      "command": "uv run pyright scripts/alpha_evolve/controller.py --outputjson 2>/dev/null | head -100",
+      "description": "Run Pyright type checking on controller.py"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T23:27:43.199953",
+      "command": "uv run ruff check scripts/alpha_evolve/controller.py 2>&1 | head -50",
+      "description": "Run Ruff linting on controller.py"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-27T23:27:45.222336",
+      "todo_count": 5
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-27T23:27:52.406960",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/config.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-27T23:27:52.416801",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/store.py"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T23:27:54.580556",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run pyright scripts/alpha_evolve/mutator.py --outputjson 2>/dev/null | head -80",
+      "description": "Run pyright type checking on mutator.py"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T23:27:56.356155",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run ruff check scripts/alpha_evolve/mutator.py --output-format=json 2>/dev/null",
+      "description": "Run ruff linting on mutator.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-27T23:27:58.079332",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/patching.py"
+    },
+    {
+      "operation": "grep",
+      "timestamp": "2025-12-27T23:28:07.920131",
+      "pattern": "test.*mutator|mutator.*test",
+      "path": "/media/sam/1TB/nautilus_dev"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T23:28:08.278320",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run pytest /media/sam/1TB/nautilus_dev/tests/ -k mutator -v --tb=short 2>&1 | tail -50",
+      "description": "Run existing mutator tests"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-27T23:28:08.705435",
+      "todo_count": 3
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T23:28:16.359991",
+      "command": "uv run pytest tests/alpha_evolve/test_controller.py -v --tb=short 2>&1 | tail -50",
+      "description": "Run controller tests to verify current state"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-27T23:28:17.923758",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/alpha_evolve/test_mutator.py"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T23:28:26.183921",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -c \"from scripts.alpha_evolve.controller import EvolutionController, StopCondition; print('Imports OK')\" 2>&1",
+      "description": "Verify imports work with nightly env"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-27T23:28:30.796763",
+      "todo_count": 5
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T23:28:38.584585",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -c \"\n# Import directly from module to bypass __init__.py\nimport sys\nsys.path.insert(0, '/media/sam/1TB/nautilus_dev')\n\n# Import controller module directly\nimport importlib.util\nspec = importlib.util.spec_from_file_location('controller', 'scripts/alpha_evolve/controller.py')\ncontroller = importlib.util.module_from_spec(spec)\n\n# Check line 222-226 logic\nprint('Testing stop condition logic:')\nprint('---')\n# The logic: if stop_condition.max_iterations < iterations: stop_condition.max_iterations = iterations\n# This means: if user provided StopCondition(max_iterations=50) but passed iterations=100,\n# the code sets max_iterations to 100 (higher value)\n# This seems intentional - use whichever is higher\nprint('If stop_condition.max_iterations=50 and iterations=100:')\nprint('  Current code sets max_iterations to 100 (the higher value)')\nprint('  This seems intentional')\n\" 2>&1",
+      "description": "Analyze stop condition logic"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-27T23:28:44.019815",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/controller.py"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T23:28:51.332355",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python3 -c \"\n# Test edge case 1: Empty parent_code\nfrom scripts.alpha_evolve.mutator import MutationRequest, LLMMutator\n\n# Test MutationRequest with empty code\ntry:\n    req = MutationRequest(parent_code='', parent_metrics=None)\n    print('ISSUE: Empty parent_code accepted without validation')\nexcept Exception as e:\n    print(f'OK: Empty code rejected: {e}')\n\n# Test MutationRequest with None-like values\ntry:\n    req = MutationRequest(parent_code='   \\n\\t  ', parent_metrics=None)\n    print('ISSUE: Whitespace-only parent_code accepted')\nexcept Exception as e:\n    print(f'OK: Whitespace-only rejected: {e}')\n\"\n",
+      "description": "Test edge case: empty parent_code"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-27T23:28:51.393837",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/controller.py"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T23:28:54.811489",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python3 -c \"\n# Test edge case 2: LLMMutator max_retries edge values\nfrom scripts.alpha_evolve.mutator import LLMMutator\n\n# Test negative max_retries\ntry:\n    mutator = LLMMutator(max_retries=-1)\n    print('ISSUE: Negative max_retries accepted')\nexcept Exception as e:\n    print(f'OK: Negative max_retries rejected: {e}')\n\n# Test zero max_retries\ntry:\n    mutator = LLMMutator(max_retries=0)\n    print('ISSUE: Zero max_retries accepted (will cause loop to never execute)')\nexcept Exception as e:\n    print(f'OK: Zero max_retries rejected: {e}')\n\n# Test very large max_retries\ntry:\n    mutator = LLMMutator(max_retries=10000)\n    print('ISSUE: Very large max_retries accepted (could cause DoS)')\nexcept Exception as e:\n    print(f'OK: Large max_retries rejected: {e}')\n\n# Test negative retry_delay\ntry:\n    mutator = LLMMutator(retry_delay=-1.0)\n    print('ISSUE: Negative retry_delay accepted')\nexcept Exception as e:\n    print(f'OK: Negative retry_delay rejected: {e}')\n\"\n",
+      "description": "Test edge case: LLMMutator parameter validation"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-27T23:28:54.980526",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/controller.py"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T23:28:57.503817",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python3 -c \"\n# Test edge case 3: _indent helper with edge cases\nfrom scripts.alpha_evolve.mutator import _indent\n\n# Empty string\nresult = _indent('', 4)\nprint(f'Empty string: repr={repr(result)}')\n\n# Only newlines\nresult = _indent('\\n\\n\\n', 4)\nprint(f'Only newlines: repr={repr(result)}')\n\n# Single line no newline\nresult = _indent('pass', 4)\nprint(f'Single line: repr={repr(result)}')\n\n# Line with only whitespace\nresult = _indent('   ', 4)\nprint(f'Whitespace only: repr={repr(result)}')\n\n# Mixed tabs and spaces\nresult = _indent('\\tpass\\n    return', 4)\nprint(f'Mixed tabs/spaces: repr={repr(result)}')\n\"\n",
+      "description": "Test edge case: _indent helper"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-27T23:29:03.354326",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/controller.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-27T23:29:09.399786",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/controller.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-27T23:29:16.425118",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/controller.py"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T23:29:22.692241",
+      "command": "python3 -c \"\nimport sys\nsys.path.insert(0, '.')\n\n# Direct import to avoid package __init__\nimport importlib.util\nspec = importlib.util.spec_from_file_location('mutator', 'scripts/alpha_evolve/mutator.py')\nmutator_module = importlib.util.module_from_spec(spec)\n\n# Mock the patching module first\nimport types\npatching = types.ModuleType('patching')\npatching.apply_patch = lambda code, diff: code\npatching.extract_blocks = lambda code: {}\npatching.validate_syntax = lambda code: (True, '')\nsys.modules['scripts.alpha_evolve.patching'] = patching\n\nspec.loader.exec_module(mutator_module)\n\n# Test edge case 1: Empty parent_code\nMutationRequest = mutator_module.MutationRequest\n\n# Test MutationRequest with empty code\ntry:\n    req = MutationRequest(parent_code='', parent_metrics=None)\n    print('ISSUE B1: Empty parent_code accepted without validation')\nexcept Exception as e:\n    print(f'OK: Empty code rejected: {e}')\n\n# Test MutationRequest with whitespace-only\ntry:\n    req = MutationRequest(parent_code='   \\n\\t  ', parent_metrics=None)\n    print('ISSUE B2: Whitespace-only parent_code accepted')\nexcept Exception as e:\n    print(f'OK: Whitespace-only rejected: {e}')\n\"\n",
+      "description": "Test edge case: empty parent_code (direct import)"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T23:29:24.086512",
+      "command": "python3 -c \"\nimport sys\nsys.path.insert(0, '.')\n\nimport importlib.util\nimport types\n\n# Mock patching module\npatching = types.ModuleType('patching')\npatching.apply_patch = lambda code, diff: code\npatching.extract_blocks = lambda code: {}\npatching.validate_syntax = lambda code: (True, '')\nsys.modules['scripts.alpha_evolve.patching'] = patching\n\nspec = importlib.util.spec_from_file_location('mutator', 'scripts/alpha_evolve/mutator.py')\nmutator_module = importlib.util.module_from_spec(spec)\nspec.loader.exec_module(mutator_module)\n\nLLMMutator = mutator_module.LLMMutator\n\n# Test negative max_retries\ntry:\n    m = LLMMutator(max_retries=-1)\n    print('ISSUE B3: Negative max_retries accepted')\nexcept Exception as e:\n    print(f'OK: Negative max_retries rejected: {e}')\n\n# Test zero max_retries\ntry:\n    m = LLMMutator(max_retries=0)\n    print('ISSUE B4: Zero max_retries accepted - loop will never execute!')\nexcept Exception as e:\n    print(f'OK: Zero max_retries rejected: {e}')\n\n# Test very large max_retries\ntry:\n    m = LLMMutator(max_retries=10000)\n    print('ISSUE B5: Very large max_retries (10000) accepted - potential DoS')\nexcept Exception as e:\n    print(f'OK: Large max_retries rejected: {e}')\n\n# Test negative retry_delay\ntry:\n    m = LLMMutator(retry_delay=-1.0)\n    print('ISSUE B6: Negative retry_delay accepted')\nexcept Exception as e:\n    print(f'OK: Negative retry_delay rejected: {e}')\n\"\n",
+      "description": "Test LLMMutator parameter validation"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T23:29:25.542670",
+      "command": "python3 -c \"\nimport sys\nsys.path.insert(0, '.')\n\nimport importlib.util\nimport types\n\n# Mock patching module\npatching = types.ModuleType('patching')\npatching.apply_patch = lambda code, diff: code\npatching.extract_blocks = lambda code: {}\npatching.validate_syntax = lambda code: (True, '')\nsys.modules['scripts.alpha_evolve.patching'] = patching\n\nspec = importlib.util.spec_from_file_location('mutator', 'scripts/alpha_evolve/mutator.py')\nmutator_module = importlib.util.module_from_spec(spec)\nspec.loader.exec_module(mutator_module)\n\n_indent = mutator_module._indent\n\nprint('Testing _indent edge cases:')\n\n# Empty string\nresult = _indent('', 4)\nprint(f'  Empty string: result={repr(result)}')\n\n# Only newlines\nresult = _indent('\\n\\n', 4)\nprint(f'  Only newlines: result={repr(result)}')\n\n# Single line no newline\nresult = _indent('pass', 4)\nprint(f'  Single line: result={repr(result)}')\n\n# Whitespace-only line (should not be indented per the code logic)\nresult = _indent('   ', 4)\nprint(f'  Whitespace-only: result={repr(result)}')\n\n# Mixed content\nresult = _indent('line1\\n\\nline3', 4)\nprint(f'  Mixed with empty: result={repr(result)}')\n\"\n",
+      "description": "Test _indent helper edge cases"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-27T23:29:27.077654",
+      "todo_count": 3
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-27T23:29:32.166750",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/mutator.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-27T23:29:36.451171",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/mutator.py"
+    },
+    {
+      "operation": "grep",
+      "timestamp": "2025-12-27T23:29:41.364311",
+      "pattern": "async def|await",
+      "path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/controller.py",
+      "output_mode": "content"
+    },
+    {
+      "operation": "grep",
+      "timestamp": "2025-12-27T23:29:49.033900",
+      "pattern": "close|cleanup|__del__|with.*connect",
+      "path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/store.py",
+      "output_mode": "content"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-27T23:29:53.841180",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/controller.py"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T23:29:56.874411",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python3 << 'EOF'\nimport sys, os\n# Change to correct directory\nos.chdir('/media/sam/1TB/nautilus_dev')\nsys.path.insert(0, '/media/sam/1TB/nautilus_dev')\n\n# Analyze the code directly via AST\nimport ast\n\nwith open('scripts/alpha_evolve/mutator.py', 'r') as f:\n    code = f.read()\n\ntree = ast.parse(code)\n\nprint(\"=== Analysis of mutator.py ===\\n\")\n\n# Find MutationRequest class and its __post_init__\nfor node in ast.walk(tree):\n    if isinstance(node, ast.ClassDef) and node.name == \"MutationRequest\":\n        print(\"MutationRequest.__post_init__ validates:\")\n        for item in node.body:\n            if isinstance(item, ast.FunctionDef) and item.name == \"__post_init__\":\n                for stmt in ast.walk(item):\n                    if isinstance(stmt, ast.If):\n                        print(f\"  - retry_count checks present\")\n                        break\n        print(\"\\n  ISSUE B1: No validation for empty parent_code\")\n        print(\"  ISSUE B2: No validation for whitespace-only parent_code\")\n        \n    if isinstance(node, ast.ClassDef) and node.name == \"LLMMutator\":\n        print(\"\\nLLMMutator.__init__ validates:\")\n        for item in node.body:\n            if isinstance(item, ast.FunctionDef) and item.name == \"__init__\":\n                # Check for validation logic\n                has_validation = False\n                for stmt in ast.walk(item):\n                    if isinstance(stmt, ast.Raise):\n                        has_validation = True\n                if not has_validation:\n                    print(\"  ISSUE B3: No validation for max_retries (0 or negative accepted)\")\n                    print(\"  ISSUE B4: No validation for retry_delay (negative accepted)\")\n                else:\n                    print(\"  Validation present\")\n\n# Check _indent function\nprint(\"\\n_indent function analysis:\")\nprint(\"  Line: `return \\\"\\\\n\\\".join(prefix + line if line.strip() else line for line in lines)`\")\nprint(\"  Behavior: Preserves empty lines without indentation\")\nprint(\"  OK: Correctly handles empty lines\")\n\nEOF\n",
+      "description": "Analyze code via AST"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T23:29:57.267278",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python3 << 'EOF'\n# Test the actual module using pytest-style approach\nimport asyncio\nimport sys\nsys.path.insert(0, '/media/sam/1TB/nautilus_dev')\n\nfrom scripts.alpha_evolve.mutator import MutationRequest, LLMMutator, MockMutator\n\nprint(\"=== Testing Edge Cases ===\\n\")\n\n# Test 1: Empty parent_code\nprint(\"Test 1: Empty parent_code\")\ntry:\n    req = MutationRequest(parent_code='', parent_metrics=None)\n    print(\"  ISSUE B1: Empty parent_code accepted - may cause issues in extract_blocks\")\nexcept Exception as e:\n    print(f\"  OK: Rejected: {e}\")\n\n# Test 2: Whitespace-only parent_code\nprint(\"\\nTest 2: Whitespace-only parent_code\")\ntry:\n    req = MutationRequest(parent_code='   \\n\\t  ', parent_metrics=None)\n    print(\"  ISSUE B2: Whitespace-only parent_code accepted\")\nexcept Exception as e:\n    print(f\"  OK: Rejected: {e}\")\n\n# Test 3: LLMMutator with invalid parameters\nprint(\"\\nTest 3: LLMMutator parameter validation\")\ntry:\n    m = LLMMutator(max_retries=0)\n    print(\"  ISSUE B3: max_retries=0 accepted - loop will never execute!\")\nexcept Exception as e:\n    print(f\"  OK: Rejected: {e}\")\n\ntry:\n    m = LLMMutator(max_retries=-1)\n    print(\"  ISSUE B4: max_retries=-1 accepted\")\nexcept Exception as e:\n    print(f\"  OK: Rejected: {e}\")\n\ntry:\n    m = LLMMutator(retry_delay=-1.0)\n    print(\"  ISSUE B5: retry_delay=-1.0 accepted\")\nexcept Exception as e:\n    print(f\"  OK: Rejected: {e}\")\n\n# Test 4: MockMutator block_name mismatch\nprint(\"\\nTest 4: MockMutator with invalid block_name\")\nasync def test_mock_mutator():\n    mutator = MockMutator()\n    req = MutationRequest(\n        parent_code='def test(): pass',  # No EVOLVE-BLOCK\n        parent_metrics=None,\n        block_name=\"nonexistent\"\n    )\n    response = await mutator.mutate(req)\n    if response.success:\n        print(\"  ISSUE B6: MockMutator succeeded with nonexistent block\")\n    else:\n        print(f\"  OK: Failed appropriately: {response.error}\")\n\nasyncio.run(test_mock_mutator())\n\n# Test 5: Empty mutations list with nonexistent block\nprint(\"\\nTest 5: MockMutator with empty mutations and missing block\")\nasync def test_mock_mutator_no_block():\n    mutator = MockMutator(mutations=[])\n    req = MutationRequest(\n        parent_code='def test(): pass',\n        parent_metrics=None,\n        block_name=\"decision_logic\"\n    )\n    response = await mutator.mutate(req)\n    print(f\"  Result: success={response.success}, error={response.error}\")\n\nasyncio.run(test_mock_mutator_no_block())\n\nEOF\n",
+      "description": "Test actual module edge cases"
+    },
+    {
+      "operation": "grep",
+      "timestamp": "2025-12-27T23:30:02.545430",
+      "pattern": "_last_best_fitness",
+      "path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/controller.py",
+      "output_mode": "content"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-27T23:30:10.693323",
+      "todo_count": 3
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T23:30:14.691680",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run python3 << 'EOF'\n# Test the actual module using pytest-style approach\nimport asyncio\nimport sys\nsys.path.insert(0, '/media/sam/1TB/nautilus_dev')\n\nfrom scripts.alpha_evolve.mutator import MutationRequest, LLMMutator, MockMutator\n\nprint(\"=== Testing Edge Cases ===\\n\")\n\n# Test 1: Empty parent_code\nprint(\"Test 1: Empty parent_code\")\ntry:\n    req = MutationRequest(parent_code='', parent_metrics=None)\n    print(\"  ISSUE B1: Empty parent_code accepted - may cause issues in extract_blocks\")\nexcept Exception as e:\n    print(f\"  OK: Rejected: {e}\")\n\n# Test 2: Whitespace-only parent_code\nprint(\"\\nTest 2: Whitespace-only parent_code\")\ntry:\n    req = MutationRequest(parent_code='   \\n\\t  ', parent_metrics=None)\n    print(\"  ISSUE B2: Whitespace-only parent_code accepted\")\nexcept Exception as e:\n    print(f\"  OK: Rejected: {e}\")\n\n# Test 3: LLMMutator with invalid parameters\nprint(\"\\nTest 3: LLMMutator parameter validation\")\ntry:\n    m = LLMMutator(max_retries=0)\n    print(\"  ISSUE B3: max_retries=0 accepted - loop will never execute!\")\nexcept Exception as e:\n    print(f\"  OK: Rejected: {e}\")\n\ntry:\n    m = LLMMutator(max_retries=-1)\n    print(\"  ISSUE B4: max_retries=-1 accepted\")\nexcept Exception as e:\n    print(f\"  OK: Rejected: {e}\")\n\ntry:\n    m = LLMMutator(retry_delay=-1.0)\n    print(\"  ISSUE B5: retry_delay=-1.0 accepted\")\nexcept Exception as e:\n    print(f\"  OK: Rejected: {e}\")\n\n# Test 4: MockMutator block_name mismatch\nprint(\"\\nTest 4: MockMutator with invalid block_name\")\nasync def test_mock_mutator():\n    mutator = MockMutator()\n    req = MutationRequest(\n        parent_code='def test(): pass',  # No EVOLVE-BLOCK\n        parent_metrics=None,\n        block_name=\"nonexistent\"\n    )\n    response = await mutator.mutate(req)\n    if response.success:\n        print(\"  ISSUE B6: MockMutator succeeded with nonexistent block\")\n    else:\n        print(f\"  OK: Failed appropriately: {response.error}\")\n\nasyncio.run(test_mock_mutator())\n\n# Test 5: Empty mutations list with nonexistent block\nprint(\"\\nTest 5: MockMutator with empty mutations and missing block\")\nasync def test_mock_mutator_no_block():\n    mutator = MockMutator(mutations=[])\n    req = MutationRequest(\n        parent_code='def test(): pass',\n        parent_metrics=None,\n        block_name=\"decision_logic\"\n    )\n    response = await mutator.mutate(req)\n    print(f\"  Result: success={response.success}, error={response.error}\")\n\nasyncio.run(test_mock_mutator_no_block())\n\nEOF\n",
+      "description": "Test actual module edge cases with uv run"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T23:30:22.729657",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run pytest tests/alpha_evolve/test_mutator.py -v --tb=short 2>&1 | tail -80",
+      "description": "Run mutator tests via pytest"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-27T23:30:37.808215",
+      "todo_count": 5
     }
   ],
-  "last_updated": "2025-12-27T23:22:48.585276"
+  "last_updated": "2025-12-27T23:30:37.808246"
 }

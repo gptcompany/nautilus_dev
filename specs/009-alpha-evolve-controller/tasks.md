@@ -20,8 +20,8 @@
 
 **Purpose**: Project initialization and module structure
 
-- [ ] T001 Verify existing alpha_evolve module structure in scripts/alpha_evolve/__init__.py
-- [ ] T002 [P] Add click and tqdm dependencies to pyproject.toml (if not present)
+- [X] T001 Verify existing alpha_evolve module structure in scripts/alpha_evolve/__init__.py
+- [X] T002 [P] Add click and tqdm dependencies to pyproject.toml (if not present)
 
 ---
 
@@ -31,16 +31,16 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T003 Create EvolutionStatus enum in scripts/alpha_evolve/controller.py
-- [ ] T004 Create StopCondition dataclass in scripts/alpha_evolve/controller.py
-- [ ] T005 Create EvolutionProgress dataclass in scripts/alpha_evolve/controller.py
-- [ ] T006 Create ProgressEvent and ProgressEventType in scripts/alpha_evolve/controller.py
-- [ ] T007 Create EvolutionResult dataclass in scripts/alpha_evolve/controller.py
-- [ ] T008 Create MutationRequest dataclass in scripts/alpha_evolve/mutator.py
-- [ ] T009 Create MutationResponse dataclass in scripts/alpha_evolve/mutator.py
-- [ ] T010 Create Mutator protocol in scripts/alpha_evolve/mutator.py
+- [X] T003 Create EvolutionStatus enum in scripts/alpha_evolve/controller.py
+- [X] T004 Create StopCondition dataclass in scripts/alpha_evolve/controller.py
+- [X] T005 Create EvolutionProgress dataclass in scripts/alpha_evolve/controller.py
+- [X] T006 Create ProgressEvent and ProgressEventType in scripts/alpha_evolve/controller.py
+- [X] T007 Create EvolutionResult dataclass in scripts/alpha_evolve/controller.py
+- [X] T008 Create MutationRequest dataclass in scripts/alpha_evolve/mutator.py
+- [X] T009 Create MutationResponse dataclass in scripts/alpha_evolve/mutator.py
+- [X] T010 Create Mutator protocol in scripts/alpha_evolve/mutator.py
 
-**Checkpoint**: Foundation ready - core entities defined, user story implementation can begin
+**Checkpoint**: Foundation ready - core entities defined, user story implementation can begin ✓
 
 ---
 
@@ -52,24 +52,24 @@
 
 ### Tests for User Story 1
 
-- [ ] T011 [US1] Write test_controller_init in tests/alpha_evolve/test_controller.py
-- [ ] T012 [US1] Write test_run_single_iteration in tests/alpha_evolve/test_controller.py
-- [ ] T013 [US1] Write test_run_stops_at_iteration_limit in tests/alpha_evolve/test_controller.py
-- [ ] T014 [US1] Write test_continues_on_evaluation_failure in tests/alpha_evolve/test_controller.py
-- [ ] T015 [US1] Write test_stop_condition_target_fitness in tests/alpha_evolve/test_controller.py
-- [ ] T016 [US1] Write test_progress_event_emission in tests/alpha_evolve/test_controller.py
+- [X] T011 [US1] Write test_controller_init in tests/alpha_evolve/test_controller.py
+- [X] T012 [US1] Write test_run_single_iteration in tests/alpha_evolve/test_controller.py
+- [X] T013 [US1] Write test_run_stops_at_iteration_limit in tests/alpha_evolve/test_controller.py
+- [X] T014 [US1] Write test_continues_on_evaluation_failure in tests/alpha_evolve/test_controller.py
+- [X] T015 [US1] Write test_stop_condition_target_fitness in tests/alpha_evolve/test_controller.py
+- [X] T016 [US1] Write test_progress_event_emission in tests/alpha_evolve/test_controller.py
 
 ### Implementation for User Story 1
 
-- [ ] T017 [US1] Implement EvolutionController.__init__() in scripts/alpha_evolve/controller.py
-- [ ] T018 [US1] Implement EvolutionController._load_seed_strategy() in scripts/alpha_evolve/controller.py
-- [ ] T019 [E] [US1] Implement EvolutionController.run() main loop in scripts/alpha_evolve/controller.py
-- [ ] T020 [US1] Implement EvolutionController._run_iteration() in scripts/alpha_evolve/controller.py
-- [ ] T021 [US1] Implement EvolutionController._check_stop_conditions() in scripts/alpha_evolve/controller.py
-- [ ] T022 [US1] Implement EvolutionController._emit_progress() in scripts/alpha_evolve/controller.py
-- [ ] T023 [US1] Implement EvolutionController.get_progress() in scripts/alpha_evolve/controller.py
+- [X] T017 [US1] Implement EvolutionController.__init__() in scripts/alpha_evolve/controller.py
+- [X] T018 [US1] Implement EvolutionController._load_seed_strategy() in scripts/alpha_evolve/controller.py
+- [X] T019 [E] [US1] Implement EvolutionController.run() main loop in scripts/alpha_evolve/controller.py
+- [X] T020 [US1] Implement EvolutionController._run_iteration() in scripts/alpha_evolve/controller.py
+- [X] T021 [US1] Implement EvolutionController._check_stop_conditions() in scripts/alpha_evolve/controller.py
+- [X] T022 [US1] Implement EvolutionController._emit_progress() in scripts/alpha_evolve/controller.py
+- [X] T023 [US1] Implement EvolutionController.get_progress() in scripts/alpha_evolve/controller.py
 
-**Checkpoint**: Evolution loop executes for configured iterations, stores results, emits progress
+**Checkpoint**: Evolution loop executes for configured iterations, stores results, emits progress ✓
 
 ---
 
@@ -81,19 +81,19 @@
 
 ### Tests for User Story 2
 
-- [ ] T024 [US2] Write test_select_parent_mode_distribution in tests/alpha_evolve/test_controller.py
-- [ ] T025 [US2] Write test_select_parent_elite in tests/alpha_evolve/test_controller.py
-- [ ] T026 [US2] Write test_select_parent_exploit in tests/alpha_evolve/test_controller.py
-- [ ] T027 [US2] Write test_select_parent_explore in tests/alpha_evolve/test_controller.py
-- [ ] T028 [US2] Write test_select_parent_empty_store in tests/alpha_evolve/test_controller.py
+- [X] T024 [US2] Write test_select_parent_mode_distribution in tests/alpha_evolve/test_controller.py
+- [X] T025 [US2] Write test_select_parent_elite in tests/alpha_evolve/test_controller.py
+- [X] T026 [US2] Write test_select_parent_exploit in tests/alpha_evolve/test_controller.py
+- [X] T027 [US2] Write test_select_parent_explore in tests/alpha_evolve/test_controller.py
+- [X] T028 [US2] Write test_select_parent_empty_store in tests/alpha_evolve/test_controller.py
 
 ### Implementation for User Story 2
 
-- [ ] T029 [US2] Implement EvolutionController._select_parent_mode() in scripts/alpha_evolve/controller.py
-- [ ] T030 [US2] Implement EvolutionController._select_parent() in scripts/alpha_evolve/controller.py
-- [ ] T031 [US2] Integrate parent selection into _run_iteration() in scripts/alpha_evolve/controller.py
+- [X] T029 [US2] Implement EvolutionController._select_parent_mode() in scripts/alpha_evolve/controller.py
+- [X] T030 [US2] Implement EvolutionController._select_parent() in scripts/alpha_evolve/controller.py
+- [X] T031 [US2] Integrate parent selection into _run_iteration() in scripts/alpha_evolve/controller.py
 
-**Checkpoint**: Parent selection works with correct distribution, integrates into loop
+**Checkpoint**: Parent selection works with correct distribution, integrates into loop ✓
 
 ---
 
@@ -105,23 +105,23 @@
 
 ### Tests for User Story 3
 
-- [ ] T032 [P] [US3] Write test_mutation_request_creation in tests/alpha_evolve/test_mutator.py
-- [ ] T033 [P] [US3] Write test_mutation_response_success in tests/alpha_evolve/test_mutator.py
-- [ ] T034 [P] [US3] Write test_mutation_response_syntax_error in tests/alpha_evolve/test_mutator.py
-- [ ] T035 [US3] Write test_llm_mutator_retry_on_syntax_error in tests/alpha_evolve/test_mutator.py
-- [ ] T036 [US3] Write test_llm_mutator_max_retries in tests/alpha_evolve/test_mutator.py
-- [ ] T037 [US3] Write test_mutation_prompt_includes_metrics in tests/alpha_evolve/test_mutator.py
+- [X] T032 [P] [US3] Write test_mutation_request_creation in tests/alpha_evolve/test_mutator.py
+- [X] T033 [P] [US3] Write test_mutation_response_success in tests/alpha_evolve/test_mutator.py
+- [X] T034 [P] [US3] Write test_mutation_response_syntax_error in tests/alpha_evolve/test_mutator.py
+- [X] T035 [US3] Write test_llm_mutator_retry_on_syntax_error in tests/alpha_evolve/test_mutator.py
+- [X] T036 [US3] Write test_llm_mutator_max_retries in tests/alpha_evolve/test_mutator.py
+- [X] T037 [US3] Write test_mutation_prompt_includes_metrics in tests/alpha_evolve/test_mutator.py
 
 ### Implementation for User Story 3
 
-- [ ] T038 [US3] Implement LLMMutator.__init__() in scripts/alpha_evolve/mutator.py
-- [ ] T039 [US3] Implement LLMMutator._build_prompt() with mutation logging (FR-013) in scripts/alpha_evolve/mutator.py
-- [ ] T040 [E] [US3] Implement LLMMutator.mutate() with retry logic in scripts/alpha_evolve/mutator.py
-- [ ] T041 [US3] Implement LLMMutator._validate_mutation() in scripts/alpha_evolve/mutator.py
-- [ ] T042 [US3] Implement LLMMutator._handle_unavailable() for graceful LLM degradation in scripts/alpha_evolve/mutator.py
-- [ ] T043 [US3] Integrate LLMMutator into EvolutionController._request_mutation() in scripts/alpha_evolve/controller.py
+- [X] T038 [US3] Implement LLMMutator.__init__() in scripts/alpha_evolve/mutator.py
+- [X] T039 [US3] Implement LLMMutator._build_prompt() with mutation logging (FR-013) in scripts/alpha_evolve/mutator.py
+- [X] T040 [E] [US3] Implement LLMMutator.mutate() with retry logic in scripts/alpha_evolve/mutator.py
+- [X] T041 [US3] Implement LLMMutator._validate_mutation() in scripts/alpha_evolve/mutator.py
+- [X] T042 [US3] Implement LLMMutator._handle_unavailable() for graceful LLM degradation in scripts/alpha_evolve/mutator.py
+- [X] T043 [US3] Integrate LLMMutator into EvolutionController._request_mutation() in scripts/alpha_evolve/controller.py
 
-**Checkpoint**: Mutations work, syntax validation works, retries work, integrates into loop
+**Checkpoint**: Mutations work, syntax validation works, retries work, integrates into loop ✓
 
 ---
 
@@ -133,24 +133,24 @@
 
 ### Tests for User Story 4
 
-- [ ] T044 [P] [US4] Write test_cli_start_basic in tests/alpha_evolve/test_cli.py
-- [ ] T045 [P] [US4] Write test_cli_status_json_output in tests/alpha_evolve/test_cli.py
-- [ ] T046 [P] [US4] Write test_cli_best_top_k in tests/alpha_evolve/test_cli.py
-- [ ] T047 [P] [US4] Write test_cli_export_strategy in tests/alpha_evolve/test_cli.py
-- [ ] T048 [P] [US4] Write test_cli_list_experiments in tests/alpha_evolve/test_cli.py
+- [X] T044 [P] [US4] Write test_cli_start_basic in tests/alpha_evolve/test_cli.py
+- [X] T045 [P] [US4] Write test_cli_status_json_output in tests/alpha_evolve/test_cli.py
+- [X] T046 [P] [US4] Write test_cli_best_top_k in tests/alpha_evolve/test_cli.py
+- [X] T047 [P] [US4] Write test_cli_export_strategy in tests/alpha_evolve/test_cli.py
+- [X] T048 [P] [US4] Write test_cli_list_experiments in tests/alpha_evolve/test_cli.py
 
 ### Implementation for User Story 4
 
-- [ ] T049 [US4] Create CLI group and global options in scripts/alpha_evolve/cli.py
-- [ ] T050 [US4] Implement evolve start command in scripts/alpha_evolve/cli.py
-- [ ] T051 [US4] Implement evolve status command in scripts/alpha_evolve/cli.py
-- [ ] T052 [US4] Implement evolve best command in scripts/alpha_evolve/cli.py
-- [ ] T053 [US4] Implement evolve export command in scripts/alpha_evolve/cli.py
-- [ ] T054 [US4] Implement evolve stop command in scripts/alpha_evolve/cli.py
-- [ ] T055 [US4] Implement evolve list command in scripts/alpha_evolve/cli.py
-- [ ] T056 [US4] Add CLI entry point to pyproject.toml
+- [X] T049 [US4] Create CLI group and global options in scripts/alpha_evolve/cli.py
+- [X] T050 [US4] Implement evolve start command in scripts/alpha_evolve/cli.py
+- [X] T051 [US4] Implement evolve status command in scripts/alpha_evolve/cli.py
+- [X] T052 [US4] Implement evolve best command in scripts/alpha_evolve/cli.py
+- [X] T053 [US4] Implement evolve export command in scripts/alpha_evolve/cli.py
+- [X] T054 [US4] Implement evolve stop command in scripts/alpha_evolve/cli.py
+- [X] T055 [US4] Implement evolve list command in scripts/alpha_evolve/cli.py
+- [X] T056 [US4] Add CLI entry point to pyproject.toml
 
-**Checkpoint**: All CLI commands work, proper exit codes, JSON output where specified
+**Checkpoint**: All CLI commands work, proper exit codes, JSON output where specified ✓
 
 ---
 
@@ -162,19 +162,19 @@
 
 ### Tests for User Story 5
 
-- [ ] T057 [US5] Write test_experiment_isolation in tests/alpha_evolve/test_controller.py
-- [ ] T058 [US5] Write test_resume_paused_experiment in tests/alpha_evolve/test_controller.py
-- [ ] T059 [US5] Write test_resume_adds_iterations in tests/alpha_evolve/test_controller.py
-- [ ] T060 [P] [US5] Write test_cli_resume_command in tests/alpha_evolve/test_cli.py
+- [X] T057 [US5] Write test_experiment_isolation in tests/alpha_evolve/test_controller.py
+- [X] T058 [US5] Write test_resume_paused_experiment in tests/alpha_evolve/test_controller.py
+- [X] T059 [US5] Write test_resume_adds_iterations in tests/alpha_evolve/test_controller.py
+- [X] T060 [P] [US5] Write test_cli_resume_command in tests/alpha_evolve/test_cli.py
 
 ### Implementation for User Story 5
 
-- [ ] T061 [US5] Implement EvolutionController.stop() in scripts/alpha_evolve/controller.py
-- [ ] T062 [US5] Implement EvolutionController.resume() in scripts/alpha_evolve/controller.py
-- [ ] T063 [US5] Implement EvolutionController._load_checkpoint() in scripts/alpha_evolve/controller.py
-- [ ] T064 [US5] Implement evolve resume command in scripts/alpha_evolve/cli.py
+- [X] T061 [US5] Implement EvolutionController.stop() in scripts/alpha_evolve/controller.py
+- [X] T062 [US5] Implement EvolutionController.resume() in scripts/alpha_evolve/controller.py
+- [X] T063 [US5] Implement EvolutionController._load_checkpoint() in scripts/alpha_evolve/controller.py
+- [X] T064 [US5] Implement evolve resume command in scripts/alpha_evolve/cli.py
 
-**Checkpoint**: Experiments isolated, resume works, checkpoint persistence verified
+**Checkpoint**: Experiments isolated, resume works, checkpoint persistence verified ✓
 
 ---
 
@@ -182,11 +182,11 @@
 
 **Purpose**: End-to-end validation across all user stories
 
-- [ ] T065 Write test_evolution_loop_full_cycle in tests/alpha_evolve/test_controller_integration.py
-- [ ] T066 Write test_evolution_stop_and_resume in tests/alpha_evolve/test_controller_integration.py
-- [ ] T067 Write test_cli_full_workflow in tests/alpha_evolve/test_cli.py
+- [X] T065 Write test_evolution_loop_full_cycle in tests/alpha_evolve/test_controller_integration.py
+- [X] T066 Write test_evolution_stop_and_resume in tests/alpha_evolve/test_controller_integration.py
+- [X] T067 Write test_cli_full_workflow in tests/alpha_evolve/test_cli.py
 
-**Checkpoint**: All user stories work together, full evolution cycle verified
+**Checkpoint**: All user stories work together, full evolution cycle verified ✓
 
 ---
 
@@ -194,13 +194,13 @@
 
 **Purpose**: Improvements that affect multiple user stories
 
-- [ ] T068 [P] Add comprehensive docstrings to controller.py
-- [ ] T069 [P] Add comprehensive docstrings to mutator.py
-- [ ] T070 [P] Add comprehensive docstrings to cli.py
-- [ ] T071 Run ruff check and format on all new files
+- [X] T068 [P] Add comprehensive docstrings to controller.py
+- [X] T069 [P] Add comprehensive docstrings to mutator.py
+- [X] T070 [P] Add comprehensive docstrings to cli.py
+- [X] T071 Run ruff check and format on all new files
 - [ ] T072 Run alpha-debug verification on controller.py
 - [ ] T073 Run alpha-debug verification on mutator.py
-- [ ] T074 Update alpha_evolve module __init__.py exports
+- [X] T074 Update alpha_evolve module __init__.py exports
 
 ---
 
