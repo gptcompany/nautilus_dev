@@ -285,7 +285,30 @@
       "timestamp": "2025-12-27T23:20:58.650858",
       "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run pytest tests/alpha_evolve/test_controller.py tests/alpha_evolve/test_mutator.py tests/alpha_evolve/test_cli.py -v --tb=short 2>&1 | tail -80",
       "description": "Run alpha_evolve tests with verbose output"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-27T23:21:25.757352",
+      "todo_count": 11
+    },
+    {
+      "operation": "write",
+      "timestamp": "2025-12-27T23:22:36.239383",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/alpha_evolve/test_controller_integration.py",
+      "content_length": 14687
+    },
+    {
+      "operation": "task",
+      "timestamp": "2025-12-27T23:22:42.027888",
+      "subagent_type": "test-runner",
+      "prompt": "Run the integration tests:\n\n```bash\ncd /media/sam/1TB/nautilus_dev && source /media/sam/2TB-NVMe/pro..."
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T23:22:48.585259",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run pytest tests/alpha_evolve/test_controller_integration.py -v --tb=short 2>&1 | tail -40",
+      "description": "Run integration tests for alpha-evolve controller"
     }
   ],
-  "last_updated": "2025-12-27T23:20:58.650873"
+  "last_updated": "2025-12-27T23:22:48.585276"
 }
