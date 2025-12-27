@@ -223,7 +223,331 @@
       "operation": "todowrite",
       "timestamp": "2025-12-27T19:15:35.246582",
       "todo_count": 6
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-27T19:16:13.755338",
+      "todo_count": 4
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-27T19:16:14.051238",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/templates/momentum.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-27T19:16:14.077684",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/templates/base.py"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-27T19:16:27.290012",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/templates/momentum.py",
+      "old_string": "from __future__ import annotations\n\nfrom typing import TYPE_CHECKING\n\nfrom nautilus_trader.indicator..."
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-27T19:16:34.032203",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/templates/momentum.py"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-27T19:16:44.723986",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/templates/momentum.py",
+      "old_string": "from __future__ import annotations\n\nfrom typing import TYPE_CHECKING\n\n\nfrom nautilus_trader.indicato..."
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-27T19:16:57.129984",
+      "todo_count": 4
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-27T19:16:57.428774",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/templates/base.py",
+      "old_string": "from __future__ import annotations\n\nfrom abc import ABC, abstractmethod\nfrom dataclasses import data..."
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-27T19:17:04.436067",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/templates/base.py"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-27T19:17:19.076974",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/templates/base.py",
+      "old_string": "from __future__ import annotations\n\nfrom abc import ABC, abstractmethod\nfrom dataclasses import data..."
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-27T19:17:28.828815",
+      "todo_count": 4
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-27T19:17:29.151791",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/alpha_evolve/templates/test_momentum.py"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-27T19:17:39.208657",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/alpha_evolve/templates/test_momentum.py",
+      "old_string": "\"\"\"Tests for MomentumEvolveStrategy seed strategy.\"\"\"\n\nfrom decimal import Decimal\n\nfrom nautilus_tr..."
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-27T19:17:46.006106",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/alpha_evolve/templates/test_momentum.py"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-27T19:17:56.524256",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/alpha_evolve/templates/test_momentum.py",
+      "old_string": "\"\"\"Tests for MomentumEvolveStrategy seed strategy.\"\"\"\n\nfrom decimal import Decimal\n\nfrom nautilus_tr..."
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-27T19:18:01.270247",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/alpha_evolve/templates/test_momentum.py"
+    },
+    {
+      "operation": "write",
+      "timestamp": "2025-12-27T19:18:39.046584",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/alpha_evolve/templates/test_momentum.py",
+      "content_length": 9109
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-27T19:18:48.910689",
+      "todo_count": 4
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T19:18:49.190762",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run pytest tests/alpha_evolve/templates/test_momentum.py::TestConfigValidationEdgeCases -v 2>&1 | head -60",
+      "description": "Run validation edge case tests"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T19:18:57.436087",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -c \"from nautilus_trader.indicators.average.ema import ExponentialMovingAverage; print('OK')\"",
+      "description": "Check correct EMA import"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T19:19:04.393697",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -c \"from nautilus_trader.indicators import ExponentialMovingAverage; print('OK')\" 2>&1",
+      "description": "Check EMA import from indicators"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T19:19:14.035789",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && pytest tests/alpha_evolve/templates/test_momentum.py::TestConfigValidationEdgeCases -v 2>&1 | head -80",
+      "description": "Run tests with nightly env"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T19:19:23.163230",
+      "command": "/media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/python -m pytest tests/alpha_evolve/templates/test_momentum.py::TestConfigValidationEdgeCases -v 2>&1 | head -80",
+      "description": "Run tests with nightly Python"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T19:19:34.551911",
+      "command": "/media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/python -c \"\nfrom nautilus_trader.config import StrategyConfig\nprint('StrategyConfig bases:', StrategyConfig.__bases__)\nprint('StrategyConfig mro:', [c.__name__ for c in StrategyConfig.__mro__])\n\"",
+      "description": "Check StrategyConfig base classes"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T19:19:45.984708",
+      "command": "/media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/python -c \"\nimport msgspec\nclass TestConfig(msgspec.Struct, frozen=True):\n    value: int\n    \n    def __post_init__(self):\n        if self.value < 0:\n            raise ValueError('value must be positive')\n\ntry:\n    c = TestConfig(value=-1)\n    print('No error raised')\nexcept ValueError as e:\n    print(f'ValueError: {e}')\nexcept Exception as e:\n    print(f'Other error: {type(e).__name__}: {e}')\n\"",
+      "description": "Test msgspec __post_init__"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-27T19:19:52.107407",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/templates/base.py"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-27T19:20:04.691791",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/templates/base.py",
+      "old_string": "from __future__ import annotations\n\nfrom abc import ABC, abstractmethod\nfrom dataclasses import data..."
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-27T19:20:09.207233",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/templates/momentum.py"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-27T19:20:21.847210",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/templates/momentum.py",
+      "old_string": "from __future__ import annotations\n\nfrom typing import TYPE_CHECKING, Self\n\nfrom pydantic import mod..."
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-27T19:20:26.431209",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/alpha_evolve/templates/test_momentum.py"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-27T19:20:34.087353",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/alpha_evolve/templates/test_momentum.py",
+      "old_string": "import pytest\nfrom nautilus_trader.indicators import ExponentialMovingAverage\nfrom nautilus_trader.m..."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-27T19:20:40.409994",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/alpha_evolve/templates/test_momentum.py",
+      "old_string": "    def test_rejects_fast_period_less_than_2(self) -> None:\n        \"\"\"Config should reject fast_per..."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-27T19:20:46.455520",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/alpha_evolve/templates/test_momentum.py",
+      "old_string": "    def test_rejects_fast_period_greater_than_slow(self) -> None:\n        \"\"\"Config should reject fa..."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-27T19:20:52.099601",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/alpha_evolve/templates/test_momentum.py",
+      "old_string": "    def test_rejects_equal_periods(self) -> None:\n        \"\"\"Config should reject fast_period == slo..."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-27T19:20:57.527768",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/alpha_evolve/templates/test_momentum.py",
+      "old_string": "    def test_rejects_zero_trade_size(self) -> None:\n        \"\"\"Config should reject trade_size <= 0...."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-27T19:21:04.113687",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/alpha_evolve/templates/test_momentum.py",
+      "old_string": "    def test_rejects_negative_trade_size(self) -> None:\n        \"\"\"Config should reject negative tra..."
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T19:21:09.755557",
+      "command": "/media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/python -m pytest tests/alpha_evolve/templates/test_momentum.py::TestConfigValidationEdgeCases -v 2>&1 | head -40",
+      "description": "Run validation tests again"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T19:21:16.958973",
+      "command": "/media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/python -m pytest tests/alpha_evolve/templates/ -v 2>&1 | tail -30",
+      "description": "Run all template tests"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T19:21:28.358927",
+      "command": "git status",
+      "description": "Check git status"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T19:21:39.754366",
+      "command": "git add scripts/alpha_evolve/templates/base.py scripts/alpha_evolve/templates/momentum.py tests/alpha_evolve/templates/test_momentum.py && git commit -m \"$(cat <<'EOF'\nfix(alpha-evolve): Add config validation with edge case tests\n\n- Add __post_init__ validation to BaseEvolveConfig (trade_size > 0)\n- Add __post_init__ validation to MomentumEvolveConfig (period constraints)\n  - fast_period must be >= 2\n  - slow_period must be > fast_period\n- Add edge case tests for all validation rules\n- Use msgspec __post_init__ instead of pydantic (NautilusTrader uses msgspec)\n\nFixes: B1, B2, B3, B4, B5, B6, B9, B11, B12 from alpha-debug analysis\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n)\"",
+      "description": "Commit validation fixes"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T19:21:45.161718",
+      "command": "git push origin master",
+      "description": "Push to origin"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-27T19:21:52.684256",
+      "todo_count": 4
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-27T22:25:20.471277",
+      "todo_count": 5
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-27T22:25:20.777975",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/templates/base.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-27T22:25:20.823178",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/patching.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-27T22:25:41.827741",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/templates/base.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-27T22:25:41.835986",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/008-alpha-evolve-templates/tasks.md"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-27T22:25:53.260361",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/templates/base.py",
+      "old_string": "@dataclass(frozen=True)\nclass EquityPoint:\n    \"\"\"Single equity curve entry.\"\"\"\n\n    timestamp: date..."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-27T22:26:01.605096",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/templates/base.py",
+      "old_string": "        # Record equity (infrastructure - not evolvable)\n        equity = self._get_equity()\n       ..."
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-27T22:26:11.912921",
+      "todo_count": 5
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-27T22:26:12.228033",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/008-alpha-evolve-templates/tasks.md",
+      "old_string": "- [x] T045 Create performance benchmark script in `scripts/alpha_evolve/templates/benchmark.py`\n- [x..."
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-27T22:26:23.612805",
+      "todo_count": 5
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-27T22:26:23.933736",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/patching.py",
+      "old_string": "def _indent_code(code: str, indent_str: str) -> str:\n    \"\"\"Add indentation to each line of code.\"\"\"..."
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T22:26:31.962851",
+      "command": "/media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/python -m pytest tests/alpha_evolve/ -v 2>&1 | tail -40",
+      "description": "Run all alpha_evolve tests"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-27T22:26:51.516240",
+      "todo_count": 5
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T22:26:51.813027",
+      "command": "git add scripts/alpha_evolve/templates/base.py scripts/alpha_evolve/patching.py specs/008-alpha-evolve-templates/tasks.md && git commit -m \"$(cat <<'EOF'\nfix(alpha-evolve): Address remaining LOW/MEDIUM bugs from alpha-debug\n\n- B8: Add MAX_EQUITY_POINTS limit (1.05M) to prevent unbounded memory growth\n- B10: Mark T045-T046 as incomplete in tasks.md (benchmark.py not created)\n- B13: Fix _indent_code to dedent before re-indenting (mixed tabs/spaces)\n- B7: No change needed (forward refs work with __future__.annotations)\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n)\"",
+      "description": "Commit remaining fixes"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T22:26:57.804533",
+      "command": "git push origin master",
+      "description": "Push to origin"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-27T22:27:05.994444",
+      "todo_count": 5
     }
   ],
-  "last_updated": "2025-12-27T19:15:35.246599"
+  "last_updated": "2025-12-27T22:27:05.994462"
 }
