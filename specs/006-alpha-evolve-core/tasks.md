@@ -147,7 +147,7 @@
 - [x] T051 [P] Write integration test insert->update_metrics->top_k in tests/alpha_evolve/test_integration.py
 - [x] T052 Verify all exports in scripts/alpha_evolve/__init__.py
 - [x] T053 Run full test suite with coverage in tests/alpha_evolve/
-- [ ] T054 Run alpha-debug verification on scripts/alpha_evolve/
+- [x] T054 Run alpha-debug verification on scripts/alpha_evolve/
 
 ---
 

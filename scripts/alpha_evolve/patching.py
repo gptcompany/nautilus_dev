@@ -17,9 +17,9 @@ from typing import Any
 #   <body>
 #   # === END EVOLVE-BLOCK ===
 BLOCK_RE = re.compile(
-    r"(^[ \t]*# === EVOLVE-BLOCK:\s*(?P<name>\w+).*?$\n)"  # head with name
+    r"(?P<head>^[ \t]*# === EVOLVE-BLOCK:\s*(?P<name>[\w-]+).*?$\n)"  # head with name (supports hyphens)
     r"(?P<body>.*?)"  # body (lazy match)
-    r"(^[ \t]*# === END EVOLVE-BLOCK.*?$)",  # tail
+    r"(?P<tail>^[ \t]*# === END EVOLVE-BLOCK.*?$)",  # tail
     re.M | re.S,  # Multiline + Dotall
 )
 
@@ -73,19 +73,19 @@ def _replace_block(code: str, block_name: str, new_body: str) -> str:
         raise ValueError(f"EVOLVE-BLOCK '{block_name}' not found or malformed markers")
 
     # Detect indentation from the marker line
-    head = target_match.group(1)
+    head = target_match.group("head")
     indent = len(head) - len(head.lstrip())
     indent_str = head[:indent]
 
     # Add indentation to new body lines
     indented_body = _indent_code(new_body, indent_str)
 
-    # Reconstruct the block
+    # Reconstruct the block (normalize trailing newlines)
     start, end = target_match.span()
-    head_line = target_match.group(1)
-    tail_line = target_match.group(4)
+    head_line = target_match.group("head")
+    tail_line = target_match.group("tail")
 
-    new_block = head_line + indented_body + "\n" + tail_line
+    new_block = head_line + indented_body.rstrip("\n") + "\n" + tail_line
     result = code[:start] + new_block + code[end:]
 
     return result

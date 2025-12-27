@@ -119,10 +119,13 @@ class EvolutionConfig(BaseSettings):
 
     def validate(self) -> None:
         """
-        Validate configuration parameters.
+        Re-validate configuration parameters.
+
+        This method re-runs Pydantic validation on the current instance.
+        Useful after programmatic modifications to ensure constraints are met.
 
         Raises:
-            ValueError: If parameters are invalid
+            ValidationError: If parameters are invalid
 
         Validations:
             - population_size >= 10
@@ -133,9 +136,8 @@ class EvolutionConfig(BaseSettings):
             - elite_ratio + exploration_ratio <= 1.0
             - max_concurrent >= 1
         """
-        # Pydantic already validates on construction
-        # This method exists for explicit validation API
-        pass
+        # Re-run Pydantic validation
+        self.model_validate(self.model_dump())
 
     def to_dict(self) -> dict:
         """

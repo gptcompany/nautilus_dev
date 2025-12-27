@@ -128,8 +128,9 @@ class ProgramStore:
         generation = 0
         if parent_id:
             parent = self.get(parent_id)
-            if parent:
-                generation = parent.generation + 1
+            if parent is None:
+                raise ValueError(f"Parent not found: {parent_id}")
+            generation = parent.generation + 1
 
         with sqlite3.connect(self.db_path) as conn:
             if metrics:

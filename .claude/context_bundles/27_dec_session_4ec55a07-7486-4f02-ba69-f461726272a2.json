@@ -413,7 +413,68 @@
       "operation": "todowrite",
       "timestamp": "2025-12-27T15:12:50.070330",
       "todo_count": 4
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-27T15:13:55.391989",
+      "todo_count": 3
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-27T15:13:59.374142",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/patching.py"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-27T15:14:10.619339",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/patching.py",
+      "old_string": "BLOCK_RE = re.compile(\n    r\"(^[ \\t]*# === EVOLVE-BLOCK:\\s*(?P<name>\\w+).*?$\\n)\"  # head with name\n ..."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-27T15:14:19.917873",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/patching.py",
+      "old_string": "    # Detect indentation from the marker line\n    head = target_match.group(1)\n    indent = len(head..."
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-27T15:14:24.349467",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/store.py"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-27T15:14:35.013334",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/store.py",
+      "old_string": "        # Calculate generation from parent\n        generation = 0\n        if parent_id:\n            ..."
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-27T15:14:39.238367",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/config.py"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-27T15:14:48.123786",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/config.py",
+      "old_string": "    def validate(self) -> None:\n        \"\"\"\n        Validate configuration parameters.\n\n        Rais..."
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T15:14:55.672637",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run pytest tests/alpha_evolve/ -v --tb=short 2>&1",
+      "description": "Run all tests after fixes"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-27T15:15:05.520553",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/006-alpha-evolve-core/tasks.md",
+      "old_string": "- [ ] T054 Run alpha-debug verification on scripts/alpha_evolve/"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-27T15:15:10.282348",
+      "todo_count": 3
     }
   ],
-  "last_updated": "2025-12-27T15:12:50.070350"
+  "last_updated": "2025-12-27T15:15:10.282366"
 }
