@@ -6,6 +6,7 @@ Provides foundational components for evolutionary strategy discovery:
 - Store: SQLite persistence for strategies and metrics
 - Config: Evolution parameter configuration
 - Evaluator: Dynamic strategy evaluation via backtesting
+- Templates: Evolvable strategy base classes
 """
 
 __version__ = "0.1.0"
