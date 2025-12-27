@@ -205,6 +205,18 @@ class HyperliquidFetcher(BaseFetcher):
 
         response = await exchange.fetch_open_interest(ccxt_symbol)
 
+        # Calculate open_interest_value if not provided by API
+        if response.get("openInterestValue") is None:
+            oi_amount = safe_float(response.get("openInterestAmount"))
+            if oi_amount > 0:
+                try:
+                    ticker = await exchange.fetch_ticker(ccxt_symbol)
+                    price = safe_float(ticker.get("last"))
+                    if price > 0:
+                        response["openInterestValue"] = oi_amount * price
+                except Exception as e:
+                    logger.warning(f"Failed to fetch price for OI value calc: {e}")
+
         return self._parse_open_interest(symbol, response)
 
     async def fetch_open_interest_history(

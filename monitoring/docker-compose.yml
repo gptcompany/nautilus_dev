@@ -16,13 +16,13 @@ services:
     environment:
       - QDB_CAIRO_COMMIT_MODE=nosync
       - QDB_PG_ENABLED=true
-      - QDB_PG_NET_BIND_TO=0.0.0.0
+      - QDB_PG_NET_BIND_TO=0.0.0.0:8812
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9000/exec?query=SELECT%201"]
-      interval: 10s
-      timeout: 5s
-      retries: 3
-      start_period: 10s
+      interval: 30s
+      timeout: 15s
+      retries: 5
+      start_period: 30s
     networks:
       - monitoring
 

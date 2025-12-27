@@ -1,37 +1,273 @@
 {
   "session_id": "cee337e1-6e82-4e78-8aa9-a44af8bf488c",
-  "created_at": "2025-12-27T12:23:02.166591",
+  "created_at": "2025-12-27T13:13:26.937003",
   "operations": [
     {
       "operation": "bash",
-      "timestamp": "2025-12-27T12:23:02.166611",
-      "command": "find /media/sam/1TB/nautilus_dev/data -type f -name \"*.parquet\" | wc -l",
-      "description": "Count parquet files in data directory"
+      "timestamp": "2025-12-27T13:13:26.937023",
+      "command": "ls -la /media/sam/1TB/UTXOracle/.claude/agents/ 2>/dev/null | head -30",
+      "description": "List agents in UTXOracle"
     },
     {
       "operation": "bash",
-      "timestamp": "2025-12-27T12:23:02.187774",
-      "command": "du -sh /media/sam/1TB/nautilus_dev/data/ccxt_catalog 2>/dev/null",
-      "description": "Check size of data catalog"
+      "timestamp": "2025-12-27T13:13:26.946564",
+      "command": "ls -la /media/sam/1TB/N8N_dev/.claude/agents/ 2>/dev/null | head -30",
+      "description": "List agents in N8N_dev"
     },
     {
       "operation": "bash",
-      "timestamp": "2025-12-27T12:23:05.771446",
-      "command": "find /media/sam/3TB-WDC -type d -name \"*binance*\" 2>/dev/null | head -10",
-      "description": "Check for existing binance data"
+      "timestamp": "2025-12-27T13:13:26.974997",
+      "command": "ls -la /media/sam/1TB/LiquidationHeatmap/.claude/agents/ 2>/dev/null | head -30",
+      "description": "List agents in LiquidationHeatmap"
     },
     {
       "operation": "bash",
-      "timestamp": "2025-12-27T12:23:05.773779",
-      "command": "ls -la /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/ 2>/dev/null | head -20",
-      "description": "Check nightly environment directory"
+      "timestamp": "2025-12-27T13:13:28.800896",
+      "command": "ls -la /media/sam/1TB/claude-hooks-shared/hooks/core/ 2>/dev/null | head -20",
+      "description": "List core hooks directory"
     },
     {
       "operation": "bash",
-      "timestamp": "2025-12-27T12:23:05.796768",
-      "command": "docker ps --all 2>/dev/null",
-      "description": "Check docker containers status"
+      "timestamp": "2025-12-27T13:13:28.822650",
+      "command": "find /media/sam/1TB/claude-hooks-shared -type f -name \"*.py\" | head -20",
+      "description": "Find hook Python scripts"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-27T13:13:28.871623",
+      "file_path": "/media/sam/1TB/nautilus_dev/.claude/agents/backtest-analyzer.md"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-27T13:13:28.881439",
+      "file_path": "/media/sam/1TB/nautilus_dev/.claude/agents/alpha-evolve.md"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T13:13:31.885748",
+      "command": "test -f /media/sam/1TB/UTXOracle/CLAUDE.md && echo \"EXISTS\" || echo \"MISSING\"; test -f /media/sam/1TB/UTXOracle/docs/ARCHITECTURE.md && echo \"ARCH_EXISTS\" || echo \"ARCH_MISSING\"",
+      "description": "Check CLAUDE.md and ARCHITECTURE.md in UTXOracle"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T13:13:33.536373",
+      "command": "test -f /media/sam/1TB/N8N_dev/CLAUDE.md && echo \"EXISTS\" || echo \"MISSING\"; test -f /media/sam/1TB/N8N_dev/docs/ARCHITECTURE.md && echo \"ARCH_EXISTS\" || echo \"ARCH_MISSING\"",
+      "description": "Check CLAUDE.md and ARCHITECTURE.md in N8N_dev"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T13:13:35.147904",
+      "command": "ls -la /media/sam/1TB/claude-hooks-shared/hooks/ 2>/dev/null",
+      "description": "List all hook categories"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T13:13:35.544962",
+      "command": "cat /media/sam/1TB/claude-hooks-shared/hooks/core/context_bundle_builder.py | head -80",
+      "description": "Read context bundle builder hook"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T13:13:35.699461",
+      "command": "test -f /media/sam/1TB/LiquidationHeatmap/CLAUDE.md && echo \"EXISTS\" || echo \"MISSING\"; test -f /media/sam/1TB/LiquidationHeatmap/docs/ARCHITECTURE.md && echo \"ARCH_EXISTS\" || echo \"ARCH_MISSING\"",
+      "description": "Check CLAUDE.md and ARCHITECTURE.md in LiquidationHeatmap"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T13:13:37.462115",
+      "command": "cat /media/sam/1TB/claude-hooks-shared/hooks/productivity/auto-alpha-debug.py | head -100",
+      "description": "Read auto alpha-debug hook"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-27T13:13:38.588251",
+      "file_path": "/media/sam/1TB/nautilus_dev/.claude/agents/nautilus-data-pipeline-operator.md"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T13:13:39.717525",
+      "command": "find /media/sam/1TB/UTXOracle -maxdepth 2 -type d | grep -E \"(src|lib|app|components|server)\" | head -10",
+      "description": "Find main source directories in UTXOracle"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T13:13:39.725690",
+      "command": "find /media/sam/1TB/N8N_dev -maxdepth 2 -type d | grep -E \"(src|lib|app|workflows)\" | head -10",
+      "description": "Find main source directories in N8N_dev"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T13:13:39.751708",
+      "command": "find /media/sam/1TB/LiquidationHeatmap -maxdepth 2 -type d | grep -E \"(src|lib|app|components|server)\" | head -10",
+      "description": "Find main source directories in LiquidationHeatmap"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T13:13:43.517859",
+      "command": "ls -la /media/sam/1TB/UTXOracle/ | grep -E \"(pyproject|package|requirements|setup)\"",
+      "description": "Check project config files in UTXOracle"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T13:13:43.530640",
+      "command": "ls -la /media/sam/1TB/N8N_dev/ | grep -E \"(pyproject|package|requirements|setup)\"",
+      "description": "Check project config files in N8N_dev"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T13:13:43.554154",
+      "command": "ls -la /media/sam/1TB/LiquidationHeatmap/ | grep -E \"(pyproject|package|requirements|setup)\"",
+      "description": "Check project config files in LiquidationHeatmap"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T13:13:43.692070",
+      "command": "ls -1 /media/sam/1TB/nautilus_dev/.claude/agents/ | sort",
+      "description": "List all agents"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T13:13:43.710874",
+      "command": "find /media/sam/1TB/nautilus_dev/.claude/commands -type f -name \"*.md\" | sort",
+      "description": "List all commands"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-27T13:13:43.790239",
+      "file_path": "/media/sam/1TB/nautilus_dev/.claude/commands/tdd/cycle.md"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-27T13:13:43.795014",
+      "file_path": "/media/sam/1TB/nautilus_dev/.claude/commands/speckit/speckit.specify.md"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T13:13:47.110174",
+      "command": "test -d /media/sam/1TB/UTXOracle/.specify && echo \"EXIST\" || echo \"MISSING\"; ls -la /media/sam/1TB/UTXOracle/.specify 2>/dev/null | head -15",
+      "description": "Check .specify in UTXOracle"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-27T13:13:48.579606",
+      "file_path": "/media/sam/1TB/nautilus_dev/.claude/agents/tdd-guard.md"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-27T13:13:48.593408",
+      "file_path": "/media/sam/1TB/nautilus_dev/.claude/agents/nautilus-visualization-renderer.md"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-27T13:13:48.608510",
+      "file_path": "/media/sam/1TB/nautilus_dev/.claude/agents/alpha-visual.md"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-27T13:13:48.615586",
+      "file_path": "/media/sam/1TB/nautilus_dev/.claude/agents/grafana-expert.md"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T13:13:49.551914",
+      "command": "test -d /media/sam/1TB/N8N_dev/.specify && echo \"EXIST\" || echo \"MISSING\"; ls -la /media/sam/1TB/N8N_dev/.specify 2>/dev/null | head -15",
+      "description": "Check .specify in N8N_dev"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T13:13:51.440774",
+      "command": "test -d /media/sam/1TB/LiquidationHeatmap/.specify && echo \"EXIST\" || echo \"MISSING\"; ls -la /media/sam/1TB/LiquidationHeatmap/.specify 2>/dev/null | head -15",
+      "description": "Check .specify in LiquidationHeatmap"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T13:13:56.198077",
+      "command": "test -d /media/sam/1TB/UTXOracle/.serena && echo \"EXIST\" || echo \"MISSING\"; ls -la /media/sam/1TB/UTXOracle/.serena 2>/dev/null",
+      "description": "Check .serena in UTXOracle"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T13:13:58.634268",
+      "command": "test -d /media/sam/1TB/N8N_dev/.serena && echo \"EXIST\" || echo \"MISSING\"; ls -la /media/sam/1TB/N8N_dev/.serena 2>/dev/null",
+      "description": "Check .serena in N8N_dev"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T13:14:00.029897",
+      "command": "test -d /media/sam/1TB/LiquidationHeatmap/.serena && echo \"EXIST\" || echo \"MISSING\"; ls -la /media/sam/1TB/LiquidationHeatmap/.serena 2>/dev/null",
+      "description": "Check .serena in LiquidationHeatmap"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T13:14:05.288940",
+      "command": "ls /media/sam/1TB/UTXOracle/.claude/agents/*.md 2>/dev/null | wc -l",
+      "description": "Count agent files in UTXOracle"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T13:14:06.538053",
+      "command": "ls /media/sam/1TB/N8N_dev/.claude/agents/*.md 2>/dev/null | wc -l",
+      "description": "Count agent files in N8N_dev"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T13:14:08.361433",
+      "command": "ls /media/sam/1TB/LiquidationHeatmap/.claude/agents/*.md 2>/dev/null | wc -l",
+      "description": "Count agent files in LiquidationHeatmap"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T13:14:10.172551",
+      "command": "test -f /media/sam/1TB/UTXOracle/.claude/settings.local.json && echo \"EXISTS\" || echo \"MISSING\"",
+      "description": "Check settings in UTXOracle"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T13:14:11.323710",
+      "command": "test -f /media/sam/1TB/N8N_dev/.claude/settings.local.json && echo \"EXISTS\" || echo \"MISSING\"",
+      "description": "Check settings in N8N_dev"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T13:14:12.486564",
+      "command": "test -f /media/sam/1TB/LiquidationHeatmap/.claude/settings.local.json && echo \"EXISTS\" || echo \"MISSING\"",
+      "description": "Check settings in LiquidationHeatmap"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T13:14:16.758766",
+      "command": "test -d /media/sam/1TB/UTXOracle/.git && echo \"GIT_REPO\" || echo \"NO_GIT\"; head -5 /media/sam/1TB/UTXOracle/README.md 2>/dev/null || echo \"NO_README\"",
+      "description": "Check git repo and README in UTXOracle"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T13:14:18.143755",
+      "command": "test -d /media/sam/1TB/N8N_dev/.git && echo \"GIT_REPO\" || echo \"NO_GIT\"; head -5 /media/sam/1TB/N8N_dev/README.md 2>/dev/null || echo \"NO_README\"",
+      "description": "Check git repo and README in N8N_dev"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T13:14:20.231389",
+      "command": "test -d /media/sam/1TB/LiquidationHeatmap/.git && echo \"GIT_REPO\" || echo \"NO_GIT\"; head -5 /media/sam/1TB/LiquidationHeatmap/README.md 2>/dev/null || echo \"NO_README\"",
+      "description": "Check git repo and README in LiquidationHeatmap"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T13:14:24.203748",
+      "command": "head -20 /media/sam/1TB/N8N_dev/CLAUDE.md",
+      "description": "Get context about N8N_dev project"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T13:14:24.236074",
+      "command": "head -20 /media/sam/1TB/LiquidationHeatmap/CLAUDE.md",
+      "description": "Get context about LiquidationHeatmap project"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-27T13:14:24.329015",
+      "file_path": "/media/sam/1TB/UTXOracle/pyproject.toml"
     }
   ],
-  "last_updated": "2025-12-27T12:23:05.796784"
+  "last_updated": "2025-12-27T13:14:24.329032"
 }
