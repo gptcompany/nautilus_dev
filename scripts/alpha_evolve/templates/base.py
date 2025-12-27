@@ -45,12 +45,17 @@ class BaseEvolveConfig(StrategyConfig, frozen=True):
     Attributes:
         instrument_id: Trading instrument identifier
         bar_type: Bar type for data subscription
-        trade_size: Order quantity per trade
+        trade_size: Order quantity per trade (must be positive)
     """
 
     instrument_id: "InstrumentId"
     bar_type: "BarType"
     trade_size: Decimal
+
+    def __post_init__(self) -> None:
+        """Validate that trade_size is positive."""
+        if self.trade_size <= Decimal("0"):
+            raise ValueError(f"trade_size must be positive, got {self.trade_size}")
 
 
 class BaseEvolveStrategy(Strategy, ABC):

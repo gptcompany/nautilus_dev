@@ -33,12 +33,24 @@ class MomentumEvolveConfig(BaseEvolveConfig, frozen=True):
         instrument_id: Trading instrument identifier
         bar_type: Bar type for data subscription
         trade_size: Order quantity per trade
-        fast_period: Fast EMA period (default: 10)
-        slow_period: Slow EMA period (default: 30)
+        fast_period: Fast EMA period (must be >= 2)
+        slow_period: Slow EMA period (must be > fast_period)
     """
 
     fast_period: int = 10
     slow_period: int = 30
+
+    def __post_init__(self) -> None:
+        """Validate that fast_period < slow_period and both are >= 2."""
+        super().__post_init__()  # Validate trade_size from base class
+        if self.fast_period < 2:
+            raise ValueError(f"fast_period must be >= 2, got {self.fast_period}")
+        if self.slow_period < 2:
+            raise ValueError(f"slow_period must be >= 2, got {self.slow_period}")
+        if self.fast_period >= self.slow_period:
+            raise ValueError(
+                f"fast_period ({self.fast_period}) must be < slow_period ({self.slow_period})"
+            )
 
 
 class MomentumEvolveStrategy(BaseEvolveStrategy):

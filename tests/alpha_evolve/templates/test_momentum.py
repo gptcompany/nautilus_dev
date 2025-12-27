@@ -2,16 +2,17 @@
 
 from decimal import Decimal
 
+import pytest
+from nautilus_trader.indicators import ExponentialMovingAverage
 from nautilus_trader.model.data import BarType
 from nautilus_trader.model.identifiers import InstrumentId
-from nautilus_trader.indicators import ExponentialMovingAverage
 
+from scripts.alpha_evolve.patching import extract_blocks
 from scripts.alpha_evolve.templates.base import BaseEvolveStrategy
 from scripts.alpha_evolve.templates.momentum import (
     MomentumEvolveConfig,
     MomentumEvolveStrategy,
 )
-from scripts.alpha_evolve.patching import extract_blocks
 
 
 # =============================================================================
@@ -158,3 +159,73 @@ class TestNativeIndicators:
 
         # Verify it's the same class from nautilus_trader
         assert type(strategy.fast_ema).__module__.startswith("nautilus_trader")
+
+
+# =============================================================================
+# Config Validation Edge Cases (B1, B2, B6, B12)
+# =============================================================================
+
+
+class TestConfigValidationEdgeCases:
+    """Tests for config validation edge cases - ensures invalid configs are rejected."""
+
+    def test_rejects_fast_period_less_than_2(self) -> None:
+        """Config should reject fast_period < 2."""
+        with pytest.raises(ValueError, match="fast_period must be >= 2"):
+            MomentumEvolveConfig(
+                instrument_id=InstrumentId.from_str("BTCUSDT-PERP.BINANCE"),
+                bar_type=BarType.from_str(
+                    "BTCUSDT-PERP.BINANCE-1-MINUTE-LAST-EXTERNAL"
+                ),
+                trade_size=Decimal("0.1"),
+                fast_period=1,
+                slow_period=30,
+            )
+
+    def test_rejects_fast_period_greater_than_slow(self) -> None:
+        """Config should reject fast_period >= slow_period."""
+        with pytest.raises(ValueError, match="fast_period.*must be < slow_period"):
+            MomentumEvolveConfig(
+                instrument_id=InstrumentId.from_str("BTCUSDT-PERP.BINANCE"),
+                bar_type=BarType.from_str(
+                    "BTCUSDT-PERP.BINANCE-1-MINUTE-LAST-EXTERNAL"
+                ),
+                trade_size=Decimal("0.1"),
+                fast_period=30,
+                slow_period=10,
+            )
+
+    def test_rejects_equal_periods(self) -> None:
+        """Config should reject fast_period == slow_period."""
+        with pytest.raises(ValueError, match="fast_period.*must be < slow_period"):
+            MomentumEvolveConfig(
+                instrument_id=InstrumentId.from_str("BTCUSDT-PERP.BINANCE"),
+                bar_type=BarType.from_str(
+                    "BTCUSDT-PERP.BINANCE-1-MINUTE-LAST-EXTERNAL"
+                ),
+                trade_size=Decimal("0.1"),
+                fast_period=20,
+                slow_period=20,
+            )
+
+    def test_rejects_zero_trade_size(self) -> None:
+        """Config should reject trade_size <= 0."""
+        with pytest.raises(ValueError, match="trade_size must be positive"):
+            MomentumEvolveConfig(
+                instrument_id=InstrumentId.from_str("BTCUSDT-PERP.BINANCE"),
+                bar_type=BarType.from_str(
+                    "BTCUSDT-PERP.BINANCE-1-MINUTE-LAST-EXTERNAL"
+                ),
+                trade_size=Decimal("0"),
+            )
+
+    def test_rejects_negative_trade_size(self) -> None:
+        """Config should reject negative trade_size."""
+        with pytest.raises(ValueError, match="trade_size must be positive"):
+            MomentumEvolveConfig(
+                instrument_id=InstrumentId.from_str("BTCUSDT-PERP.BINANCE"),
+                bar_type=BarType.from_str(
+                    "BTCUSDT-PERP.BINANCE-1-MINUTE-LAST-EXTERNAL"
+                ),
+                trade_size=Decimal("-0.1"),
+            )
