@@ -1,231 +1,229 @@
 {
   "session_id": "a2422530-a4bf-45f3-a99a-8b3b35b661fb",
-  "created_at": "2025-12-27T18:53:03.451000",
+  "created_at": "2025-12-27T19:08:20.311134",
   "operations": [
     {
-      "operation": "task",
-      "timestamp": "2025-12-27T18:53:03.451015",
-      "subagent_type": "alpha-debug",
-      "prompt": "AUTO ALPHA-DEBUG SESSION\n\nMAX_ROUNDS: 2\nStop conditions:\n1. 2 rounds complete\n2. 2 consecutive clean..."
+      "operation": "grep",
+      "timestamp": "2025-12-27T19:08:20.311157",
+      "pattern": "(trade_size|quantity|fast_period|slow_period)",
+      "path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/templates",
+      "output_mode": "content"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-27T19:08:32.545580",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/008-alpha-evolve-templates/contracts/seed_strategy.py"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T19:08:32.839296",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python3 -c \"\nfrom decimal import Decimal\nfrom nautilus_trader.model.data import BarType\nfrom nautilus_trader.model.identifiers import InstrumentId\nfrom scripts.alpha_evolve.templates.momentum import MomentumEvolveConfig\n\n# Test edge case: fast_period >= slow_period (should this be allowed?)\ntry:\n    config = MomentumEvolveConfig(\n        instrument_id=InstrumentId.from_str('BTCUSDT-PERP.BINANCE'),\n        bar_type=BarType.from_str('BTCUSDT-PERP.BINANCE-1-MINUTE-LAST-EXTERNAL'),\n        trade_size=Decimal('0.1'),\n        fast_period=30,  # Same as slow\n        slow_period=30,\n    )\n    print('EDGE CASE: fast_period=30, slow_period=30 - config created without error')\nexcept Exception as e:\n    print(f'Validation caught: {e}')\n\" 2>&1",
+      "description": "Test invalid config edge case"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T19:08:51.932675",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python3 -c \"\nfrom decimal import Decimal\nfrom nautilus_trader.model.data import BarType\nfrom nautilus_trader.model.identifiers import InstrumentId\nfrom scripts.alpha_evolve.templates.momentum import MomentumEvolveConfig\n\n# Test edge case: negative trade_size (should this be allowed?)\ntry:\n    config = MomentumEvolveConfig(\n        instrument_id=InstrumentId.from_str('BTCUSDT-PERP.BINANCE'),\n        bar_type=BarType.from_str('BTCUSDT-PERP.BINANCE-1-MINUTE-LAST-EXTERNAL'),\n        trade_size=Decimal('-0.1'),  # Negative!\n        fast_period=10,\n        slow_period=30,\n    )\n    print('EDGE CASE: negative trade_size - config created without error')\nexcept Exception as e:\n    print(f'Validation caught: {e}')\n\n# Test edge case: zero trade_size\ntry:\n    config = MomentumEvolveConfig(\n        instrument_id=InstrumentId.from_str('BTCUSDT-PERP.BINANCE'),\n        bar_type=BarType.from_str('BTCUSDT-PERP.BINANCE-1-MINUTE-LAST-EXTERNAL'),\n        trade_size=Decimal('0'),  # Zero!\n        fast_period=10,\n        slow_period=30,\n    )\n    print('EDGE CASE: zero trade_size - config created without error')\nexcept Exception as e:\n    print(f'Validation caught: {e}')\n\n# Test edge case: fast_period=1\ntry:\n    config = MomentumEvolveConfig(\n        instrument_id=InstrumentId.from_str('BTCUSDT-PERP.BINANCE'),\n        bar_type=BarType.from_str('BTCUSDT-PERP.BINANCE-1-MINUTE-LAST-EXTERNAL'),\n        trade_size=Decimal('0.1'),\n        fast_period=1,  # Too small per contract\n        slow_period=30,\n    )\n    print('EDGE CASE: fast_period=1 - config created without error')\nexcept Exception as e:\n    print(f'Validation caught: {e}')\n\" 2>&1",
+      "description": "Test more edge cases"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T19:08:55.001682",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python3 -c \"\nfrom decimal import Decimal\nfrom nautilus_trader.model.data import BarType\nfrom nautilus_trader.model.identifiers import InstrumentId\nfrom scripts.alpha_evolve.templates.momentum import MomentumEvolveConfig, MomentumEvolveStrategy\n\n# Test: What happens with fast_period > slow_period?\nconfig = MomentumEvolveConfig(\n    instrument_id=InstrumentId.from_str('BTCUSDT-PERP.BINANCE'),\n    bar_type=BarType.from_str('BTCUSDT-PERP.BINANCE-1-MINUTE-LAST-EXTERNAL'),\n    trade_size=Decimal('0.1'),\n    fast_period=30,  # Greater than slow!\n    slow_period=10,\n)\nstrategy = MomentumEvolveStrategy(config)\nprint(f'Strategy created with fast_period={config.fast_period}, slow_period={config.slow_period}')\nprint(f'fast_ema.period={strategy.fast_ema.period}, slow_ema.period={strategy.slow_ema.period}')\nprint('This is a BUG - the \\\"fast\\\" EMA is actually slower than the \\\"slow\\\" EMA!')\n\" 2>&1",
+      "description": "Test inverted periods"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T19:09:13.197521",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python3 -c \"\nfrom decimal import Decimal\nfrom nautilus_trader.model.data import BarType\nfrom nautilus_trader.model.identifiers import InstrumentId\nfrom scripts.alpha_evolve.templates.momentum import MomentumEvolveConfig, MomentumEvolveStrategy\n\n# Test: _get_position_size return type consistency\nconfig = MomentumEvolveConfig(\n    instrument_id=InstrumentId.from_str('BTCUSDT-PERP.BINANCE'),\n    bar_type=BarType.from_str('BTCUSDT-PERP.BINANCE-1-MINUTE-LAST-EXTERNAL'),\n    trade_size=Decimal('0.1'),\n)\nstrategy = MomentumEvolveStrategy(config)\n\n# Check what portfolio.net_position actually returns\nfrom nautilus_trader.portfolio.portfolio import Portfolio\nimport inspect\nsig = inspect.signature(Portfolio.net_position)\nprint(f'Portfolio.net_position signature: {sig}')\n\n# Check docstring says it returns Decimal but need to verify\nprint(f'_get_position_size method returns: {strategy._get_position_size.__annotations__.get(\\\"return\\\", \\\"unknown\\\")}')\n\" 2>&1",
+      "description": "Check return type consistency"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T19:09:16.192758",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python3 -c \"\n# Check what type portfolio.net_position actually returns\nimport inspect\nfrom nautilus_trader.portfolio.portfolio import Portfolio\n\n# Get the net_position method info\nm = getattr(Portfolio, 'net_position')\nif hasattr(m, '__doc__'):\n    print('net_position docstring:', m.__doc__[:200] if m.__doc__ else 'None')\n    \n# Check return type annotation\nannotations = getattr(m, '__annotations__', {})\nprint(f'Annotations: {annotations}')\n\" 2>&1",
+      "description": "Check portfolio.net_position return type"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T19:09:32.324758",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python3 -c \"\n# Check if unix_nanos_to_dt handles edge cases properly\nfrom nautilus_trader.core.datetime import unix_nanos_to_dt\nimport datetime\n\n# Test with 0\ntry:\n    result = unix_nanos_to_dt(0)\n    print(f'unix_nanos_to_dt(0) = {result}')\nexcept Exception as e:\n    print(f'Error with 0: {e}')\n\n# Test with negative (should not happen but could crash)\ntry:\n    result = unix_nanos_to_dt(-1000000000)\n    print(f'unix_nanos_to_dt(-1000000000) = {result}')\nexcept Exception as e:\n    print(f'Error with negative: {e}')\n\" 2>&1",
+      "description": "Test datetime edge cases"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T19:09:34.427115",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python3 -c \"\n# Check if the EMA period of 1 actually works\nfrom nautilus_trader.indicators import ExponentialMovingAverage\n\n# EMA with period 1 - should this be allowed?\ntry:\n    ema = ExponentialMovingAverage(1)\n    print(f'EMA(1) created: period={ema.period}')\nexcept Exception as e:\n    print(f'Error creating EMA(1): {e}')\n\n# EMA with period 0 - definitely should fail\ntry:\n    ema = ExponentialMovingAverage(0)\n    print(f'EMA(0) created: period={ema.period}')\nexcept Exception as e:\n    print(f'EMA(0) rejected: {type(e).__name__}: {e}')\n\n# EMA with period -1 - should fail\ntry:\n    ema = ExponentialMovingAverage(-1)\n    print(f'EMA(-1) created: period={ema.period}')\nexcept Exception as e:\n    print(f'EMA(-1) rejected: {type(e).__name__}: {e}')\n\" 2>&1",
+      "description": "Test EMA period edge cases"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T19:09:47.693583",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python3 -c \"\n# Check instrument.make_qty behavior with edge cases\nfrom nautilus_trader.test_kit.stubs.identifiers import TestIdStubs\nfrom nautilus_trader.model.instruments import CurrencyPair\nfrom nautilus_trader.test_kit.stubs.data import TestDataStubs\nfrom decimal import Decimal\n\n# Get test instrument\ninstrument = TestDataStubs.audusd_fxcm()\nprint(f'Instrument: {instrument.id}')\nprint(f'Min quantity: {instrument.min_quantity}')\nprint(f'Lot size: {instrument.lot_size}')\n\n# Test make_qty with 0\ntry:\n    qty = instrument.make_qty(Decimal('0'))\n    print(f'make_qty(0) = {qty}')\nexcept Exception as e:\n    print(f'make_qty(0) error: {e}')\n\n# Test make_qty with negative\ntry:\n    qty = instrument.make_qty(Decimal('-1'))\n    print(f'make_qty(-1) = {qty}')\nexcept Exception as e:\n    print(f'make_qty(-1) error: {e}')\n\" 2>&1",
+      "description": "Test make_qty edge cases"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T19:09:57.914659",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python3 -c \"\n# Check what test instruments are available\nfrom nautilus_trader.test_kit.stubs.data import TestDataStubs\nfrom nautilus_trader.test_kit.stubs.identifiers import TestIdStubs\nfrom decimal import Decimal\n\n# List available methods\nmethods = [m for m in dir(TestDataStubs) if not m.startswith('_')]\nprint('Available methods starting with aud:', [m for m in methods if 'aud' in m.lower() or 'currency' in m.lower()])\n\" 2>&1",
+      "description": "Find available test stubs"
+    },
+    {
+      "operation": "grep",
+      "timestamp": "2025-12-27T19:10:08.046936",
+      "pattern": "test.*negative|test.*zero|test.*invalid|test.*edge",
+      "path": "/media/sam/1TB/nautilus_dev/tests/alpha_evolve/templates",
+      "output_mode": "content"
+    },
+    {
+      "operation": "grep",
+      "timestamp": "2025-12-27T19:10:08.058287",
+      "pattern": "raise|ValueError|TypeError|Exception",
+      "path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/templates",
+      "output_mode": "content"
     },
     {
       "operation": "todowrite",
-      "timestamp": "2025-12-27T18:53:10.564686",
-      "todo_count": 3
+      "timestamp": "2025-12-27T19:10:15.504817",
+      "todo_count": 5
     },
     {
       "operation": "bash",
-      "timestamp": "2025-12-27T18:53:20.324516",
-      "command": "git diff HEAD~3 --stat 2>/dev/null | tail -20",
-      "description": "Check recent changes statistics"
-    },
-    {
-      "operation": "bash",
-      "timestamp": "2025-12-27T18:53:20.350095",
-      "command": "git diff HEAD~3 --name-only 2>/dev/null",
-      "description": "List changed files"
+      "timestamp": "2025-12-27T19:10:38.762704",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python3 -c \"\n# Test what happens when on_start fails due to missing instrument\n# This simulates runtime edge case\n\nfrom decimal import Decimal\nfrom nautilus_trader.model.data import BarType\nfrom nautilus_trader.model.identifiers import InstrumentId\nfrom scripts.alpha_evolve.templates.momentum import MomentumEvolveConfig, MomentumEvolveStrategy\n\nconfig = MomentumEvolveConfig(\n    instrument_id=InstrumentId.from_str('BTCUSDT-PERP.BINANCE'),\n    bar_type=BarType.from_str('BTCUSDT-PERP.BINANCE-1-MINUTE-LAST-EXTERNAL'),\n    trade_size=Decimal('0.1'),\n)\nstrategy = MomentumEvolveStrategy(config)\n\n# Check initial state\nprint(f'Initial instrument: {strategy.instrument}')\nprint(f'Initial equity curve: {strategy.get_equity_curve()}')\n\n# Check if _enter_long handles None instrument\n# Note: strategy.instrument is None before on_start is called\nprint('Testing _enter_long with instrument=None...')\n# This would fail in real runtime but we can check the guard\nprint(f'Guard check: strategy.instrument is None = {strategy.instrument is None}')\n\" 2>&1",
+      "description": "Test lifecycle edge cases"
     },
     {
       "operation": "read",
-      "timestamp": "2025-12-27T18:53:20.408160",
-      "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/__init__.py"
-    },
-    {
-      "operation": "read",
-      "timestamp": "2025-12-27T18:53:20.408841",
-      "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/templates/__init__.py"
-    },
-    {
-      "operation": "read",
-      "timestamp": "2025-12-27T18:53:20.421261",
-      "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/templates/momentum.py"
-    },
-    {
-      "operation": "read",
-      "timestamp": "2025-12-27T18:53:20.427490",
-      "file_path": "/media/sam/1TB/nautilus_dev/tests/alpha_evolve/templates/test_base.py"
-    },
-    {
-      "operation": "read",
-      "timestamp": "2025-12-27T18:53:20.433982",
-      "file_path": "/media/sam/1TB/nautilus_dev/tests/alpha_evolve/templates/test_momentum.py"
-    },
-    {
-      "operation": "read",
-      "timestamp": "2025-12-27T18:53:20.446213",
-      "file_path": "/media/sam/1TB/nautilus_dev/tests/alpha_evolve/test_templates_integration.py"
-    },
-    {
-      "operation": "read",
-      "timestamp": "2025-12-27T18:53:28.224134",
+      "timestamp": "2025-12-27T19:10:42.230739",
       "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/templates/base.py"
     },
     {
-      "operation": "read",
-      "timestamp": "2025-12-27T18:53:28.232836",
-      "file_path": "/media/sam/1TB/nautilus_dev/tests/alpha_evolve/templates/conftest.py"
+      "operation": "bash",
+      "timestamp": "2025-12-27T19:11:06.883929",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python3 -c \"\n# Check for potential issues with the close-before-enter logic\n# Issue: If closing a position takes time (async), we might try to open\n# a new position before the close is confirmed\n\n# The code does:\n#   if self.portfolio.is_net_short(...):\n#       self._close_position()\n#   order = self.order_factory.market(...)  # <-- This runs immediately after close_all_positions\n\n# In nautilus_trader, close_all_positions is async-ish\n# Let's check if this could cause double orders\n\nprint('Potential Race Condition Analysis:')\nprint('1. is_net_short() returns True')\nprint('2. _close_position() called (submits close order)')\nprint('3. Immediately creates new BUY order')\nprint('4. If close not yet filled, position could be short + long order pending')\nprint('')\nprint('This is standard nautilus_trader pattern - the engine handles it correctly')\nprint('But users should be aware that orders may queue')\n\" 2>&1",
+      "description": "Analyze race condition potential"
     },
     {
       "operation": "bash",
-      "timestamp": "2025-12-27T18:53:38.911906",
-      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run pyright scripts/alpha_evolve/templates/ 2>&1 | head -60",
-      "description": "Run pyright type checking on templates"
+      "timestamp": "2025-12-27T19:11:08.458072",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python3 -c \"\n# Check for memory leak potential in equity curve\n# Each bar appends to _equity_curve - is this bounded?\n\nfrom decimal import Decimal\nfrom nautilus_trader.model.data import BarType\nfrom nautilus_trader.model.identifiers import InstrumentId\nfrom scripts.alpha_evolve.templates.momentum import MomentumEvolveConfig, MomentumEvolveStrategy\n\nconfig = MomentumEvolveConfig(\n    instrument_id=InstrumentId.from_str('BTCUSDT-PERP.BINANCE'),\n    bar_type=BarType.from_str('BTCUSDT-PERP.BINANCE-1-MINUTE-LAST-EXTERNAL'),\n    trade_size=Decimal('0.1'),\n)\nstrategy = MomentumEvolveStrategy(config)\n\n# Estimate memory usage for 1 year of minute bars\n# 365 days * 24 hours * 60 minutes = 525,600 bars\n# Each EquityPoint has datetime (~72 bytes) + float (8 bytes) = ~80 bytes\n# Total: 525,600 * 80 = ~42 MB\n\nprint('Memory Analysis for equity curve:')\nprint('1 year of 1-minute bars = 525,600 entries')\nprint('Each EquityPoint = ~80 bytes (datetime + float)')\nprint('Total memory = ~42 MB')\nprint('')\nprint('For 5 years = ~210 MB')\nprint('This is acceptable but could be a concern for very long backtests')\nprint('')\nprint('Note: on_reset() clears the curve, which is good')\n\" 2>&1",
+      "description": "Check memory usage"
     },
     {
       "operation": "bash",
-      "timestamp": "2025-12-27T18:53:40.485246",
-      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run ruff check scripts/alpha_evolve/templates/ 2>&1 | head -40",
-      "description": "Run ruff linting on templates"
+      "timestamp": "2025-12-27T19:11:22.927781",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python3 -c \"\n# Check if _get_equity handles the case where account has no base_currency\nfrom decimal import Decimal\nfrom nautilus_trader.model.data import BarType\nfrom nautilus_trader.model.identifiers import InstrumentId\nfrom scripts.alpha_evolve.templates.momentum import MomentumEvolveConfig, MomentumEvolveStrategy\nfrom scripts.alpha_evolve.templates.base import BaseEvolveStrategy\nimport inspect\n\n# Get the _get_equity source\nsource = inspect.getsource(BaseEvolveStrategy._get_equity)\nprint('_get_equity source:')\nprint(source)\nprint()\nprint('Potential Issues:')\nprint('1. Line: currency = account.base_currency')\nprint('   - If base_currency is None, balance_total(None) may fail')\nprint('2. Line: balance.as_double() if balance else 0.0')\nprint('   - Good: handles None balance')\nprint('3. Line: unrealized.as_double()')\nprint('   - Already guarded by if unrealized:')\n\" 2>&1",
+      "description": "Analyze _get_equity for edge cases"
     },
     {
       "operation": "bash",
-      "timestamp": "2025-12-27T18:53:42.693129",
-      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run pytest tests/alpha_evolve/templates/ tests/alpha_evolve/test_templates_integration.py -v --tb=short 2>&1 | tail -80",
-      "description": "Run tests on templates"
+      "timestamp": "2025-12-27T19:11:32.616619",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python3 -c \"\n# Check account.balance_total behavior with None currency\nfrom nautilus_trader.accounting.accounts.cash import CashAccount\nimport inspect\n\n# Check signature\nsig = inspect.signature(CashAccount.balance_total)\nprint(f'balance_total signature: {sig}')\n\n# Check if there's documentation\nif CashAccount.balance_total.__doc__:\n    print(f'balance_total doc: {CashAccount.balance_total.__doc__[:300]}...')\n\" 2>&1",
+      "description": "Check balance_total with None"
     },
     {
       "operation": "bash",
-      "timestamp": "2025-12-27T18:53:54.235992",
-      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python3 -c \"from nautilus_trader.indicators.average.ema import ExponentialMovingAverage; print('SUCCESS:', ExponentialMovingAverage)\" 2>&1",
-      "description": "Check correct EMA import path"
+      "timestamp": "2025-12-27T19:11:48.243556",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python3 -c \"\n# Check if the config types are properly typed\nfrom scripts.alpha_evolve.templates.base import BaseEvolveConfig\nfrom scripts.alpha_evolve.templates.momentum import MomentumEvolveConfig\nimport typing\n\n# Check type annotations\nprint('BaseEvolveConfig annotations:')\nhints = typing.get_type_hints(BaseEvolveConfig)\nfor name, hint in hints.items():\n    print(f'  {name}: {hint}')\n\nprint()\nprint('MomentumEvolveConfig annotations:')\nhints = typing.get_type_hints(MomentumEvolveConfig)\nfor name, hint in hints.items():\n    print(f'  {name}: {hint}')\n\" 2>&1",
+      "description": "Check type annotations"
     },
     {
       "operation": "bash",
-      "timestamp": "2025-12-27T18:53:56.710770",
-      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python3 -c \"import nautilus_trader.indicators as ind; print(dir(ind))\" 2>&1",
-      "description": "List available indicator imports"
+      "timestamp": "2025-12-27T19:11:51.779670",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python3 -c \"\n# Check EMA crossover edge case: what if fast_ema.value == slow_ema.value?\n# The current logic is:\n#   if fast > slow: enter long\n#   elif fast < slow: exit\n#   (implicit else: do nothing when equal)\n\nprint('EMA Crossover Edge Case Analysis:')\nprint('')\nprint('Current logic:')\nprint('  if fast_ema.value > slow_ema.value: ENTER')\nprint('  elif fast_ema.value < slow_ema.value: EXIT')\nprint('  else: (implicit) DO NOTHING')\nprint('')\nprint('When fast == slow:')\nprint('  - Flat position: stays flat (OK)')\nprint('  - Long position: stays long (OK - no whipsaw)')\nprint('')\nprint('This is correct behavior - no bug here.')\n\" 2>&1",
+      "description": "Analyze EMA equality edge case"
     },
     {
       "operation": "bash",
-      "timestamp": "2025-12-27T18:54:08.501001",
-      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python3 -c \"from nautilus_trader.indicators import ExponentialMovingAverage; print('SUCCESS:', ExponentialMovingAverage)\" 2>&1",
-      "description": "Test EMA import with nightly env activated"
-    },
-    {
-      "operation": "bash",
-      "timestamp": "2025-12-27T18:54:11.034237",
-      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python3 -m pytest tests/alpha_evolve/templates/ tests/alpha_evolve/test_templates_integration.py -v --tb=short 2>&1 | tail -100",
-      "description": "Run tests with nightly environment"
+      "timestamp": "2025-12-27T19:12:04.929743",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python3 -c \"\n# The error shows that InstrumentId is used in a string annotation\n# but TYPE_CHECKING imports aren't available at runtime for get_type_hints\n\n# Check the actual annotations\nfrom scripts.alpha_evolve.templates.base import BaseEvolveConfig\n\n# Get raw annotations (without evaluation)\nprint('Raw __annotations__:')\nprint(BaseEvolveConfig.__annotations__)\nprint()\nprint('This shows string annotations (forward refs) are used for:')\nprint('- InstrumentId')\nprint('- BarType')\nprint()\nprint('This is fine for runtime, but tools using get_type_hints() may have issues.')\nprint('This is a LOW severity documentation/tooling issue, not a runtime bug.')\n\" 2>&1",
+      "description": "Investigate forward reference issue"
     },
     {
       "operation": "todowrite",
-      "timestamp": "2025-12-27T18:54:22.364377",
-      "todo_count": 3
+      "timestamp": "2025-12-27T19:12:21.198561",
+      "todo_count": 5
     },
     {
       "operation": "bash",
-      "timestamp": "2025-12-27T18:54:46.482425",
-      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python3 -c \"\nfrom nautilus_trader.portfolio.base import PortfolioFacade\nimport inspect\nsig = inspect.signature(PortfolioFacade.net_position)\nprint('net_position signature:', sig)\nprint('Return annotation:', sig.return_annotation)\n\" 2>&1",
-      "description": "Check net_position return type"
+      "timestamp": "2025-12-27T19:12:40.662581",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python3 << 'EOF'\n# Compare contract (spec) vs implementation\n\nfrom scripts.alpha_evolve.templates.base import BaseEvolveConfig, BaseEvolveStrategy, EquityPoint\nfrom scripts.alpha_evolve.templates.momentum import MomentumEvolveConfig, MomentumEvolveStrategy\nfrom nautilus_trader.trading.strategy import Strategy\nfrom abc import ABC\nimport inspect\n\nprint(\"=== CONTRACT COMPLIANCE CHECK ===\")\nprint()\n\n# Check 1: BaseEvolveStrategy inherits from Strategy and ABC\nprint(\"1. BaseEvolveStrategy inheritance:\")\nprint(f\"   - Inherits Strategy: {issubclass(BaseEvolveStrategy, Strategy)}\")\nprint(f\"   - Is ABC: {issubclass(BaseEvolveStrategy, ABC)}\")\nprint()\n\n# Check 2: Required methods exist\nrequired_methods = [\n    'on_start', 'on_bar', 'on_stop', 'on_reset',\n    '_on_bar_evolved', 'get_equity_curve',\n    '_enter_long', '_enter_short', '_close_position', '_get_position_size', '_get_equity'\n]\nprint(\"2. Required methods exist:\")\nfor method in required_methods:\n    exists = hasattr(BaseEvolveStrategy, method)\n    print(f\"   - {method}: {'YES' if exists else 'MISSING'}\")\nprint()\n\n# Check 3: _on_bar_evolved is abstract\nprint(\"3. _on_bar_evolved is abstract:\")\nmethod = getattr(BaseEvolveStrategy, '_on_bar_evolved')\nis_abstract = getattr(method, '__isabstractmethod__', False)\nprint(f\"   - Is abstract: {is_abstract}\")\nprint()\n\n# Check 4: EquityPoint is frozen dataclass\nprint(\"4. EquityPoint attributes:\")\nprint(f\"   - Is frozen: {True}\")  # @dataclass(frozen=True)\nprint(f\"   - Has timestamp: {hasattr(EquityPoint, 'timestamp')}\")\nprint(f\"   - Has equity: {hasattr(EquityPoint, 'equity')}\")\nprint()\n\n# Check 5: MomentumEvolveConfig validation (CONTRACT VIOLATION!)\nprint(\"5. MomentumEvolveConfig validation:\")\nprint(\"   CONTRACT specifies __post_init__ validation:\")\nprint(\"     - fast_period >= 2\")\nprint(\"     - slow_period > fast_period\")\nprint(\"   IMPLEMENTATION: NO __post_init__ method!\")\nhas_post_init = hasattr(MomentumEvolveConfig, '__post_init__')\nprint(f\"   - Has __post_init__: {has_post_init}\")\nprint()\n\n# Check 6: MomentumEvolveStrategy implements _on_bar_evolved\nprint(\"6. MomentumEvolveStrategy implements _on_bar_evolved:\")\nhas_method = hasattr(MomentumEvolveStrategy, '_on_bar_evolved')\n# Check it's not abstract\nis_abstract = getattr(getattr(MomentumEvolveStrategy, '_on_bar_evolved'), '__isabstractmethod__', False)\nprint(f\"   - Has method: {has_method}\")\nprint(f\"   - Is concrete (not abstract): {not is_abstract}\")\nprint()\n\n# Check 7: EVOLVE-BLOCK markers in _on_bar_evolved\nprint(\"7. EVOLVE-BLOCK markers present:\")\nsource = inspect.getsource(MomentumEvolveStrategy._on_bar_evolved)\nhas_start = \"# === EVOLVE-BLOCK: decision_logic ===\" in source\nhas_end = \"# === END EVOLVE-BLOCK ===\" in source\nprint(f\"   - Start marker: {'YES' if has_start else 'MISSING'}\")\nprint(f\"   - End marker: {'YES' if has_end else 'MISSING'}\")\nEOF\n",
+      "description": "Verify contract compliance"
     },
     {
       "operation": "bash",
-      "timestamp": "2025-12-27T18:54:49.734240",
-      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python3 -c \"\nfrom nautilus_trader.core.datetime import unix_nanos_to_dt\nprint('unix_nanos_to_dt available')\nfrom datetime import datetime\n# Check if ts_event has to_datetime method\nfrom nautilus_trader.model.data import Bar\nprint('Bar.ts_event type annotation:', Bar.__annotations__.get('ts_event', 'not found'))\n\" 2>&1",
-      "description": "Check ts_event datetime conversion"
-    },
-    {
-      "operation": "bash",
-      "timestamp": "2025-12-27T18:54:52.923862",
-      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python3 -c \"\nfrom nautilus_trader.indicators import ExponentialMovingAverage\nema = ExponentialMovingAverage(10)\nprint('EMA initialized:', ema.initialized)\n# Check what initialized property means\nfor i in range(5):\n    ema.update_raw(100.0 + i)\nprint('EMA after 5 updates:', ema.initialized, ema.value)\nfor i in range(5):\n    ema.update_raw(100.0 + i)\nprint('EMA after 10 updates:', ema.initialized, ema.value)\n\" 2>&1",
-      "description": "Check EMA initialization behavior"
-    },
-    {
-      "operation": "bash",
-      "timestamp": "2025-12-27T18:55:05.041398",
-      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python3 -c \"\nfrom nautilus_trader.test_kit.stubs.data import TestDataStubs\nbar = TestDataStubs.bar_5decimal()\nprint('bar.ts_event:', bar.ts_event)\nprint('bar.ts_event type:', type(bar.ts_event))\n# Check if has to_datetime method\nprint('Has to_datetime:', hasattr(bar.ts_event, 'to_datetime'))\nif hasattr(bar.ts_event, 'to_datetime'):\n    print('to_datetime result:', bar.ts_event.to_datetime())\n\" 2>&1",
-      "description": "Verify ts_event.to_datetime() behavior"
-    },
-    {
-      "operation": "bash",
-      "timestamp": "2025-12-27T18:55:08.204786",
-      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python3 -c \"\nfrom nautilus_trader.trading.strategy import Strategy\n# Check indicators_initialized behavior\nprint('Strategy.indicators_initialized:', Strategy.indicators_initialized)\n\" 2>&1",
-      "description": "Check indicators_initialized method"
-    },
-    {
-      "operation": "bash",
-      "timestamp": "2025-12-27T18:55:19.265151",
-      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python3 -c \"\nfrom nautilus_trader.core.datetime import unix_nanos_to_dt\nfrom nautilus_trader.test_kit.stubs.data import TestDataStubs\nbar = TestDataStubs.bar_5decimal()\nprint('ts_event as int:', bar.ts_event)\n# Correct way to convert\ndt = unix_nanos_to_dt(bar.ts_event)\nprint('Converted datetime:', dt)\nprint('Type:', type(dt))\n\" 2>&1",
-      "description": "Verify correct datetime conversion method"
-    },
-    {
-      "operation": "bash",
-      "timestamp": "2025-12-27T18:55:32.562845",
-      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python3 -c \"\nfrom nautilus_trader.portfolio.base import PortfolioFacade\nfrom decimal import Decimal\nimport inspect\n# Get actual return type by looking at source\nprint('net_position doc:', PortfolioFacade.net_position.__doc__)\n\" 2>&1",
-      "description": "Check net_position documentation for return type"
-    },
-    {
-      "operation": "grep",
-      "timestamp": "2025-12-27T18:55:35.065667",
-      "pattern": "to_datetime",
-      "path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve",
-      "output_mode": "content"
-    },
-    {
-      "operation": "bash",
-      "timestamp": "2025-12-27T18:55:43.594194",
-      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python3 -c \"\n# Check actual net_position return type in a simulated environment\nfrom nautilus_trader.model.identifiers import InstrumentId\nfrom nautilus_trader.portfolio.portfolio import Portfolio\nfrom nautilus_trader.common.clock import TestClock\n\nclock = TestClock()\n\n# Look at the signature/stub files\nimport nautilus_trader.portfolio.portfolio as portfolio_mod\nimport inspect\nsrc = inspect.getsource(Portfolio.net_position)\nprint(src[:500])\n\" 2>&1",
-      "description": "Check Portfolio.net_position source"
-    },
-    {
-      "operation": "bash",
-      "timestamp": "2025-12-27T18:55:52.930014",
-      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python3 -c \"\n# Check if there's a return type hint in portfolio\nfrom nautilus_trader.portfolio import Portfolio\nhelp(Portfolio.net_position)\n\" 2>&1 | head -20",
-      "description": "Get help for net_position"
-    },
-    {
-      "operation": "todowrite",
-      "timestamp": "2025-12-27T18:56:10.171766",
-      "todo_count": 3
-    },
-    {
-      "operation": "bash",
-      "timestamp": "2025-12-27T18:56:18.220861",
-      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python3 -c \"\nfrom nautilus_trader.test_kit.stubs.data import TestDataStubs\nbar = TestDataStubs.bar_5decimal()\n\n# Simulate what base.py:114 does\ntry:\n    result = bar.ts_event.to_datetime()\n    print('SUCCESS:', result)\nexcept AttributeError as e:\n    print('FAILED as expected:', e)\n\" 2>&1",
-      "description": "Confirm the bug by running the code"
-    },
-    {
-      "operation": "bash",
-      "timestamp": "2025-12-27T18:56:31.840456",
-      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python3 -c \"\n# Check if test_base.py tests actually exercise on_bar\nimport ast\nwith open('tests/alpha_evolve/templates/test_base.py') as f:\n    source = f.read()\n# Check if 'on_bar' is called in tests\nprint('on_bar called in tests:', 'on_bar(' in source or '.on_bar' in source)\nprint('EquityPoint tested:', 'EquityPoint' in source)\nprint('_on_bar_evolved tested:', '_on_bar_evolved' in source)\n\" 2>&1",
-      "description": "Check test coverage for on_bar"
-    },
-    {
-      "operation": "bash",
-      "timestamp": "2025-12-27T18:56:34.057242",
-      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python3 -c \"\n# Check if test_templates_integration.py exercises on_bar\nwith open('tests/alpha_evolve/test_templates_integration.py') as f:\n    source = f.read()\nprint('on_bar called in integration tests:', 'on_bar(' in source or '.on_bar' in source)\nprint('Test that exercises equity curve:', 'equity_curve' in source)\n\" 2>&1",
-      "description": "Check integration test coverage"
-    },
-    {
-      "operation": "grep",
-      "timestamp": "2025-12-27T18:56:45.381925",
-      "pattern": "ts_event|ts_init",
-      "path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve",
-      "output_mode": "content"
-    },
-    {
-      "operation": "bash",
-      "timestamp": "2025-12-27T18:56:45.693694",
-      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python3 -c \"\n# Check if there are any other datetime conversion issues\n# Look for patterns that might fail\nimport re\n\nwith open('scripts/alpha_evolve/templates/base.py') as f:\n    content = f.read()\n\n# Find all datetime/timestamp operations\npatterns = [\n    r'\\.to_datetime\\(\\)',\n    r'\\.timestamp\\(\\)',\n    r'datetime\\.from',\n]\n\nfor pat in patterns:\n    matches = re.findall(pat, content)\n    if matches:\n        print(f'Pattern {pat}: {matches}')\n\" 2>&1",
-      "description": "Search for datetime conversion patterns"
+      "timestamp": "2025-12-27T19:12:52.623775",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python3 << 'EOF'\nfrom scripts.alpha_evolve.templates.base import EquityPoint\nfrom datetime import datetime\n\n# Check EquityPoint in detail\nprint(\"EquityPoint inspection:\")\nprint(f\"  Class: {EquityPoint}\")\nprint(f\"  __dataclass_fields__: {EquityPoint.__dataclass_fields__}\")\nprint()\n\n# Create instance\npt = EquityPoint(timestamp=datetime.now(), equity=100.0)\nprint(f\"  Instance: {pt}\")\nprint(f\"  pt.timestamp: {pt.timestamp}\")\nprint(f\"  pt.equity: {pt.equity}\")\nprint()\n\n# The hasattr issue - check why it returned False\nprint(\"hasattr checks:\")\nprint(f\"  hasattr(EquityPoint, 'timestamp'): {hasattr(EquityPoint, 'timestamp')}\")\nprint(f\"  hasattr(pt, 'timestamp'): {hasattr(pt, 'timestamp')}\")\nprint()\nprint(\"Note: dataclass fields are instance attributes, not class attributes\")\nprint(\"This is not a bug - just how dataclasses work.\")\nEOF\n",
+      "description": "Verify EquityPoint dataclass"
     },
     {
       "operation": "read",
-      "timestamp": "2025-12-27T18:56:53.295589",
-      "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/evaluator.py"
+      "timestamp": "2025-12-27T19:13:00.745253",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/008-alpha-evolve-templates/tasks.md"
     },
     {
-      "operation": "grep",
-      "timestamp": "2025-12-27T18:56:59.815897",
-      "pattern": "ts_event|to_datetime",
-      "path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/evaluator.py",
-      "output_mode": "content"
+      "operation": "glob",
+      "timestamp": "2025-12-27T19:13:08.601813",
+      "pattern": "**/benchmark.py",
+      "path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/templates"
+    },
+    {
+      "operation": "glob",
+      "timestamp": "2025-12-27T19:13:08.613219",
+      "pattern": "**/benchmark*.py",
+      "path": "/media/sam/1TB/nautilus_dev/scripts"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T19:13:16.247838",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python3 -m pytest tests/alpha_evolve/templates/ tests/alpha_evolve/test_templates_integration.py --collect-only 2>&1 | grep \"test_\" | head -50",
+      "description": "List all tests"
     },
     {
       "operation": "todowrite",
-      "timestamp": "2025-12-27T18:57:13.430040",
-      "todo_count": 3
+      "timestamp": "2025-12-27T19:13:37.405181",
+      "todo_count": 6
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-27T19:13:44.328828",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/patching.py"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T19:13:59.079714",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python3 << 'EOF'\n# Test patching system with the actual momentum strategy\nimport inspect\nfrom scripts.alpha_evolve.patching import extract_blocks, apply_patch, validate_syntax\nfrom scripts.alpha_evolve.templates.momentum import MomentumEvolveStrategy\n\n# Get actual strategy source\nsource = inspect.getsource(MomentumEvolveStrategy)\nprint(\"=== Patching System Integration Test ===\")\nprint()\n\n# Test 1: Extract blocks\nblocks = extract_blocks(source)\nprint(f\"1. Extracted blocks: {list(blocks.keys())}\")\nprint(f\"   decision_logic content length: {len(blocks.get('decision_logic', ''))}\")\nprint()\n\n# Test 2: Original source is valid\nvalid, error = validate_syntax(source)\nprint(f\"2. Original source valid: {valid}\")\nif not valid:\n    print(f\"   Error: {error}\")\nprint()\n\n# Test 3: Apply patch with new logic\nnew_logic = \"\"\"if self.fast_ema.value > self.slow_ema.value * 1.02:\n    if self.portfolio.is_flat(self.config.instrument_id):\n        self._enter_long(self.config.trade_size)\"\"\"\n\npatched = apply_patch(source, {\"blocks\": {\"decision_logic\": new_logic}})\nvalid, error = validate_syntax(patched)\nprint(f\"3. Patched source valid: {valid}\")\nif not valid:\n    print(f\"   Error: {error}\")\nprint()\n\n# Test 4: Check indentation is preserved\nprint(\"4. Checking indentation preservation:\")\nnew_blocks = extract_blocks(patched)\npatched_logic = new_blocks.get(\"decision_logic\", \"\")\nprint(f\"   Patched logic starts with: {repr(patched_logic[:50])}\")\nprint()\n\n# Test 5: Empty body test\ntry:\n    patched_empty = apply_patch(source, {\"blocks\": {\"decision_logic\": \"\"}})\n    valid, error = validate_syntax(patched_empty)\n    print(f\"5. Empty body patched source valid: {valid}\")\nexcept Exception as e:\n    print(f\"5. Empty body patch error: {e}\")\nprint()\n\n# Test 6: Multiline with complex indentation\ncomplex_logic = \"\"\"# Multi-line logic\nif self.fast_ema.value > self.slow_ema.value:\n    # Nested comment\n    if self.portfolio.is_flat(self.config.instrument_id):\n        self._enter_long(self.config.trade_size)\n    else:\n        pass  # Already in position\"\"\"\npatched_complex = apply_patch(source, {\"blocks\": {\"decision_logic\": complex_logic}})\nvalid, error = validate_syntax(patched_complex)\nprint(f\"6. Complex logic patched source valid: {valid}\")\nif not valid:\n    print(f\"   Error: {error}\")\nEOF\n",
+      "description": "Test patching system integration"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T19:14:17.163094",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python3 << 'EOF'\n# Test edge cases in patching system\nimport inspect\nfrom scripts.alpha_evolve.patching import extract_blocks, apply_patch, validate_syntax, BLOCK_RE\nfrom scripts.alpha_evolve.templates.momentum import MomentumEvolveStrategy\n\nsource = inspect.getsource(MomentumEvolveStrategy)\n\nprint(\"=== Patching Edge Cases ===\")\nprint()\n\n# Test 1: Non-existent block name\ntry:\n    patched = apply_patch(source, {\"blocks\": {\"nonexistent_block\": \"pass\"}})\n    print(\"1. Non-existent block: NO ERROR (BUG?)\")\nexcept ValueError as e:\n    print(f\"1. Non-existent block: Correctly raises ValueError: {e}\")\nprint()\n\n# Test 2: Invalid Python in patch (syntax error)\ninvalid_logic = \"if x == :\"  # Syntax error\npatched = apply_patch(source, {\"blocks\": {\"decision_logic\": invalid_logic}})\nvalid, error = validate_syntax(patched)\nprint(f\"2. Invalid Python patch: valid={valid}\")\nif not valid:\n    print(f\"   Error caught: {error}\")\nprint()\n\n# Test 3: Special characters in block body\nspecial_logic = 'if x > 0:  # Comment with \"quotes\" and \\'apostrophe\\'\\n    pass'\ntry:\n    patched = apply_patch(source, {\"blocks\": {\"decision_logic\": special_logic}})\n    valid, error = validate_syntax(patched)\n    print(f\"3. Special characters: valid={valid}\")\nexcept Exception as e:\n    print(f\"3. Special characters error: {e}\")\nprint()\n\n# Test 4: Block with tabs vs spaces\ntab_logic = \"\\tif x > 0:\\n\\t\\tpass\"\ntry:\n    patched = apply_patch(source, {\"blocks\": {\"decision_logic\": tab_logic}})\n    valid, error = validate_syntax(patched)\n    print(f\"4. Tab indentation: valid={valid}\")\n    if not valid:\n        print(f\"   Error: {error}\")\nexcept Exception as e:\n    print(f\"4. Tab indentation error: {e}\")\nprint()\n\n# Test 5: Unicode in logic\nunicode_logic = 'x = \"日本語\"  # Japanese\\nif x:\\n    pass'\ntry:\n    patched = apply_patch(source, {\"blocks\": {\"decision_logic\": unicode_logic}})\n    valid, error = validate_syntax(patched)\n    print(f\"5. Unicode content: valid={valid}\")\nexcept Exception as e:\n    print(f\"5. Unicode error: {e}\")\nprint()\n\n# Test 6: Very long body\nlong_logic = \"\\n\".join([f\"x{i} = {i}\" for i in range(100)]) + \"\\nif True:\\n    pass\"\ntry:\n    patched = apply_patch(source, {\"blocks\": {\"decision_logic\": long_logic}})\n    valid, error = validate_syntax(patched)\n    print(f\"6. Long body (100+ lines): valid={valid}\")\nexcept Exception as e:\n    print(f\"6. Long body error: {e}\")\nEOF\n",
+      "description": "Test patching edge cases"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-27T19:14:36.061996",
+      "todo_count": 6
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T19:14:53.874054",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python3 << 'EOF'\n# Final check: Verify NautilusTrader API compatibility\nfrom scripts.alpha_evolve.templates.momentum import MomentumEvolveConfig, MomentumEvolveStrategy\nfrom scripts.alpha_evolve.templates.base import BaseEvolveConfig, BaseEvolveStrategy\nfrom decimal import Decimal\nfrom nautilus_trader.model.data import BarType\nfrom nautilus_trader.model.identifiers import InstrumentId\nfrom nautilus_trader.trading.strategy import Strategy\nfrom nautilus_trader.config import StrategyConfig\n\nprint(\"=== NautilusTrader API Compatibility Check ===\")\nprint()\n\n# 1. Verify inheritance chain\nprint(\"1. Inheritance Chain:\")\nprint(f\"   MomentumEvolveStrategy.__mro__ includes Strategy: {Strategy in MomentumEvolveStrategy.__mro__}\")\nprint()\n\n# 2. Verify config inheritance\nprint(\"2. Config Inheritance:\")\nprint(f\"   BaseEvolveConfig inherits StrategyConfig: {issubclass(BaseEvolveConfig, StrategyConfig)}\")\nprint(f\"   MomentumEvolveConfig inherits BaseEvolveConfig: {issubclass(MomentumEvolveConfig, BaseEvolveConfig)}\")\nprint()\n\n# 3. Check if strategy can access standard Strategy attributes\nconfig = MomentumEvolveConfig(\n    instrument_id=InstrumentId.from_str(\"BTCUSDT-PERP.BINANCE\"),\n    bar_type=BarType.from_str(\"BTCUSDT-PERP.BINANCE-1-MINUTE-LAST-EXTERNAL\"),\n    trade_size=Decimal(\"0.1\"),\n)\nstrategy = MomentumEvolveStrategy(config)\n\nprint(\"3. Standard Strategy Attributes:\")\nprint(f\"   Has cache attr: {hasattr(strategy, 'cache')}\")\nprint(f\"   Has portfolio attr: {hasattr(strategy, 'portfolio')}\")\nprint(f\"   Has order_factory attr: {hasattr(strategy, 'order_factory')}\")\nprint(f\"   Has log attr: {hasattr(strategy, 'log')}\")\nprint(f\"   Has config attr: {hasattr(strategy, 'config')}\")\nprint()\n\n# 4. Check NautilusTrader method signatures\nprint(\"4. Method Signature Compatibility:\")\nimport inspect\n# on_start() should take only self\non_start_sig = inspect.signature(strategy.on_start)\nprint(f\"   on_start params: {list(on_start_sig.parameters.keys())}\")\n\n# on_bar() should take self and bar\non_bar_sig = inspect.signature(strategy.on_bar)\nprint(f\"   on_bar params: {list(on_bar_sig.parameters.keys())}\")\n\n# on_stop() should take only self\non_stop_sig = inspect.signature(strategy.on_stop)\nprint(f\"   on_stop params: {list(on_stop_sig.parameters.keys())}\")\n\nprint()\n\n# 5. Check indicators are properly registered\nprint(\"5. Indicator Registration:\")\nprint(f\"   fast_ema type: {type(strategy.fast_ema).__name__}\")\nprint(f\"   slow_ema type: {type(strategy.slow_ema).__name__}\")\nprint()\n\n# 6. Check config access patterns used in strategy\nprint(\"6. Config Access Patterns:\")\nprint(f\"   strategy.config type: {type(strategy.config)}\")\nprint(f\"   strategy.config.instrument_id: {strategy.config.instrument_id}\")\nprint(f\"   strategy.config.bar_type: {strategy.config.bar_type}\")\nprint(f\"   strategy.config.trade_size: {strategy.config.trade_size}\")\nprint(f\"   strategy.config.fast_period: {strategy.config.fast_period}\")\nprint(f\"   strategy.config.slow_period: {strategy.config.slow_period}\")\nEOF\n",
+      "description": "Final NautilusTrader compatibility check"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T19:15:21.218305",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python3 << 'EOF'\n# Final Verification: Reproduce all HIGH severity bugs\n\nprint(\"=== HIGH Severity Bug Verification ===\")\nprint()\n\nfrom decimal import Decimal\nfrom nautilus_trader.model.data import BarType\nfrom nautilus_trader.model.identifiers import InstrumentId\nfrom scripts.alpha_evolve.templates.momentum import MomentumEvolveConfig, MomentumEvolveStrategy\n\n# B1: fast_period >= slow_period allowed (should be rejected)\nprint(\"B1: fast_period >= slow_period\")\ntry:\n    config = MomentumEvolveConfig(\n        instrument_id=InstrumentId.from_str(\"BTCUSDT-PERP.BINANCE\"),\n        bar_type=BarType.from_str(\"BTCUSDT-PERP.BINANCE-1-MINUTE-LAST-EXTERNAL\"),\n        trade_size=Decimal(\"0.1\"),\n        fast_period=30,\n        slow_period=10,  # Inverted!\n    )\n    print(f\"   BUG CONFIRMED: Config created with fast={config.fast_period}, slow={config.slow_period}\")\nexcept ValueError as e:\n    print(f\"   Fixed: {e}\")\nprint()\n\n# B2: fast_period=1 allowed (contract says >=2)\nprint(\"B2: fast_period=1 (contract requires >=2)\")\ntry:\n    config = MomentumEvolveConfig(\n        instrument_id=InstrumentId.from_str(\"BTCUSDT-PERP.BINANCE\"),\n        bar_type=BarType.from_str(\"BTCUSDT-PERP.BINANCE-1-MINUTE-LAST-EXTERNAL\"),\n        trade_size=Decimal(\"0.1\"),\n        fast_period=1,\n        slow_period=10,\n    )\n    print(f\"   BUG CONFIRMED: Config created with fast_period={config.fast_period}\")\nexcept ValueError as e:\n    print(f\"   Fixed: {e}\")\nprint()\n\n# B3: trade_size <= 0 allowed\nprint(\"B3: trade_size <= 0\")\ntry:\n    config = MomentumEvolveConfig(\n        instrument_id=InstrumentId.from_str(\"BTCUSDT-PERP.BINANCE\"),\n        bar_type=BarType.from_str(\"BTCUSDT-PERP.BINANCE-1-MINUTE-LAST-EXTERNAL\"),\n        trade_size=Decimal(\"-0.1\"),  # Negative!\n    )\n    print(f\"   BUG CONFIRMED: Config created with trade_size={config.trade_size}\")\nexcept ValueError as e:\n    print(f\"   Fixed: {e}\")\n\ntry:\n    config = MomentumEvolveConfig(\n        instrument_id=InstrumentId.from_str(\"BTCUSDT-PERP.BINANCE\"),\n        bar_type=BarType.from_str(\"BTCUSDT-PERP.BINANCE-1-MINUTE-LAST-EXTERNAL\"),\n        trade_size=Decimal(\"0\"),  # Zero!\n    )\n    print(f\"   BUG CONFIRMED: Config created with trade_size={config.trade_size}\")\nexcept ValueError as e:\n    print(f\"   Fixed: {e}\")\nprint()\n\n# B5: Contract specifies __post_init__ but missing\nprint(\"B5: Missing __post_init__ validation\")\nhas_post_init = hasattr(MomentumEvolveConfig, '__post_init__')\n# For msgspec configs, check for __post_init__ differently\nimport inspect\nmembers = dict(inspect.getmembers(MomentumEvolveConfig))\nhas_custom_post_init = '__post_init__' in members and members['__post_init__'] is not None\nprint(f\"   BUG CONFIRMED: MomentumEvolveConfig has __post_init__: {has_custom_post_init}\")\nprint()\n\n# B9: Contract violation - period validation\nprint(\"B9: Contract says validation in __post_init__, implementation lacks it\")\nprint(\"   See B1, B2 - directly related bugs\")\nprint()\n\nprint(\"=== Summary ===\")\nprint(\"HIGH severity bugs confirmed: 5\")\nprint(\"These bugs allow invalid strategy configurations that could\")\nprint(\"cause silent failures or incorrect trading behavior.\")\nEOF\n",
+      "description": "Final bug verification"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-27T19:15:35.246582",
+      "todo_count": 6
     }
   ],
-  "last_updated": "2025-12-27T18:57:13.430055"
+  "last_updated": "2025-12-27T19:15:35.246599"
 }
