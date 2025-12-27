@@ -136,13 +136,12 @@ class LLMMutator:
                 # Apply patch to parent code
                 patched_code = apply_patch(
                     request.parent_code,
-                    request.block_name,
-                    mutated_block,
+                    {"blocks": {request.block_name: mutated_block}},
                 )
 
                 # Final syntax check on complete code
-                full_validation = validate_syntax(patched_code)
-                if full_validation:
+                is_valid, full_validation = validate_syntax(patched_code)
+                if not is_valid:
                     logger.warning(
                         f"Full code syntax error (attempt {attempt + 1}): {full_validation}"
                     )
@@ -260,7 +259,8 @@ Please fix the syntax error and return valid Python code.
         """
         # Wrap in function definition for syntax check
         wrapped = f"def _check():\n{_indent(code, 4)}"
-        return validate_syntax(wrapped)
+        is_valid, error_msg = validate_syntax(wrapped)
+        return None if is_valid else error_msg
 
     def _handle_unavailable(self, request: MutationRequest) -> MutationResponse:
         """
@@ -341,8 +341,7 @@ class MockMutator:
             if request.block_name in blocks:
                 patched = apply_patch(
                     request.parent_code,
-                    request.block_name,
-                    blocks[request.block_name],
+                    {"blocks": {request.block_name: blocks[request.block_name]}},
                 )
                 return MutationResponse(success=True, mutated_code=patched)
             return MutationResponse(
@@ -361,8 +360,7 @@ class MockMutator:
         try:
             patched = apply_patch(
                 request.parent_code,
-                request.block_name,
-                mutation,
+                {"blocks": {request.block_name: mutation}},
             )
             return MutationResponse(success=True, mutated_code=patched)
         except Exception as e:
