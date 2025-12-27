@@ -6,6 +6,7 @@ Provides foundational components for evolutionary strategy discovery:
 - Store: SQLite persistence for strategies and metrics
 - Config: Evolution parameter configuration
 - Evaluator: Dynamic strategy evaluation via backtesting
+- Templates: Evolvable strategy base classes
 """
 
 __version__ = "0.1.0"
@@ -53,4 +54,22 @@ __all__ = [
     "EvaluationRequest",
     "EvaluationResult",
     "StrategyEvaluator",
+]
+
+# Template exports (added in spec-008)
+from scripts.alpha_evolve.templates import (
+    BaseEvolveConfig,
+    BaseEvolveStrategy,
+    EquityPoint,
+    MomentumEvolveConfig,
+    MomentumEvolveStrategy,
+)
+
+__all__ += [
+    # Templates
+    "BaseEvolveConfig",
+    "BaseEvolveStrategy",
+    "EquityPoint",
+    "MomentumEvolveConfig",
+    "MomentumEvolveStrategy",
 ]
