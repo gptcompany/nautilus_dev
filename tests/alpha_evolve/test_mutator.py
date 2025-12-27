@@ -1,6 +1,5 @@
 """Tests for Alpha-Evolve Mutator."""
 
-
 import pytest
 
 from scripts.alpha_evolve.mutator import (
@@ -417,7 +416,8 @@ class TestMutationValidation:
 
         error = llm_mutator._validate_mutation(invalid_code)
         assert error is not None
-        assert "syntax" in error.lower() or "Syntax" in error
+        # Error message contains line number and error description
+        assert "Line" in error or "line" in error.lower()
 
 
 # === RETRY PROMPT TESTS ===

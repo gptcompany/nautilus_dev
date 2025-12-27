@@ -73,3 +73,43 @@ __all__ += [
     "MomentumEvolveConfig",
     "MomentumEvolveStrategy",
 ]
+
+# Controller exports (added in spec-009)
+from scripts.alpha_evolve.controller import (
+    EvolutionController,
+    EvolutionProgress,
+    EvolutionResult,
+    EvolutionStatus,
+    ProgressEvent,
+    ProgressEventType,
+    StopCondition,
+)
+
+__all__ += [
+    # Controller
+    "EvolutionController",
+    "EvolutionProgress",
+    "EvolutionResult",
+    "EvolutionStatus",
+    "ProgressEvent",
+    "ProgressEventType",
+    "StopCondition",
+]
+
+# Mutator exports (added in spec-009)
+from scripts.alpha_evolve.mutator import (
+    LLMMutator,
+    MockMutator,
+    MutationRequest,
+    MutationResponse,
+    Mutator,
+)
+
+__all__ += [
+    # Mutator
+    "LLMMutator",
+    "MockMutator",
+    "MutationRequest",
+    "MutationResponse",
+    "Mutator",
+]

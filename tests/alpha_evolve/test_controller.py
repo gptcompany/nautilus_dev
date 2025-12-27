@@ -685,8 +685,10 @@ class TestGetProgress:
         progress_snapshots: list[EvolutionProgress] = []
 
         def capture_progress(event: ProgressEvent):
-            progress = controller.get_progress()
-            progress_snapshots.append(progress)
+            # Only capture during iteration events (while still running)
+            if event.event_type == ProgressEventType.ITERATION_START:
+                progress = controller.get_progress()
+                progress_snapshots.append(progress)
 
         with patch.object(controller, "_load_seed_strategy", new_callable=AsyncMock):
             controller.store.insert(
@@ -713,6 +715,7 @@ class TestGetProgress:
         assert len(progress_snapshots) > 0
         for p in progress_snapshots:
             assert p.experiment == "test_exp"
+            # During iteration start, status should be RUNNING
             assert p.status == EvolutionStatus.RUNNING
 
 
