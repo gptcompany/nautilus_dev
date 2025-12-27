@@ -21,6 +21,7 @@ from decimal import Decimal
 from typing import TYPE_CHECKING
 
 from nautilus_trader.config import StrategyConfig
+from nautilus_trader.core.datetime import unix_nanos_to_dt
 from nautilus_trader.model.enums import OrderSide, TimeInForce
 from nautilus_trader.trading.strategy import Strategy
 
@@ -111,7 +112,7 @@ class BaseEvolveStrategy(Strategy, ABC):
 
         # Record equity (infrastructure - not evolvable)
         equity = self._get_equity()
-        point = EquityPoint(timestamp=bar.ts_event.to_datetime(), equity=equity)
+        point = EquityPoint(timestamp=unix_nanos_to_dt(bar.ts_event), equity=equity)
         self._equity_curve.append(point)
 
     def on_stop(self) -> None:
