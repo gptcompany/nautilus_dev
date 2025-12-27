@@ -93,7 +93,7 @@ As a system operator, I need to limit concurrent evaluations so that backtests d
 - **FR-004**: Evaluator MUST capture and return all exceptions without crashing
 
 #### Backtest Execution
-- **FR-005**: Evaluator MUST use NautilusTrader BacktestNode for strategy execution
+- **FR-005**: Evaluator MUST use NautilusTrader BacktestEngine for strategy execution
 - **FR-006**: Evaluator MUST use ParquetDataCatalog for streaming historical data
 - **FR-007**: Evaluator MUST support configurable initial capital (default 100,000)
 - **FR-008**: Evaluator MUST use deterministic random seeds for reproducibility
