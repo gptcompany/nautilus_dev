@@ -20,9 +20,9 @@
 
 **Purpose**: Initialize risk module directory structure
 
-- [ ] T001 Create risk module directory structure: `risk/__init__.py`
-- [ ] T002 [P] Add risk module dependencies to project (Pydantic >= 2.0)
-- [ ] T003 [P] Create test directory structure: `tests/test_risk_config.py`, `tests/test_risk_manager.py`, `tests/integration/test_risk_backtest.py`
+- [X] T001 Create risk module directory structure: `risk/__init__.py`
+- [X] T002 [P] Add risk module dependencies to project (Pydantic >= 2.0)
+- [X] T003 [P] Create test directory structure: `tests/test_risk_config.py`, `tests/test_risk_manager.py`, `tests/integration/test_risk_backtest.py`
 
 ---
 
@@ -32,12 +32,12 @@
 
 **⚠️ CRITICAL**: RiskConfig is required by all subsequent phases
 
-- [ ] T004 Create StopLossType enum in `risk/config.py` (market, limit, emulated)
-- [ ] T005 Create TrailingOffsetType enum in `risk/config.py` (price, basis_points)
-- [ ] T006 Create RiskConfig Pydantic model in `risk/config.py` with validation
-- [ ] T007 Add RiskConfig JSON serialization support (model_dump_json)
-- [ ] T008 [P] Write unit tests for RiskConfig validation in `tests/test_risk_config.py`
-- [ ] T009 Export public API in `risk/__init__.py` (RiskConfig, StopLossType, TrailingOffsetType)
+- [X] T004 Create StopLossType enum in `risk/config.py` (market, limit, emulated)
+- [X] T005 Create TrailingOffsetType enum in `risk/config.py` (price, basis_points)
+- [X] T006 Create RiskConfig Pydantic model in `risk/config.py` with validation
+- [X] T007 Add RiskConfig JSON serialization support (model_dump_json)
+- [X] T008 [P] Write unit tests for RiskConfig validation in `tests/test_risk_config.py`
+- [X] T009 Export public API in `risk/__init__.py` (RiskConfig, StopLossType, TrailingOffsetType)
 
 **Checkpoint**: Foundation ready - RiskConfig validated, user story implementation can begin
 
@@ -53,24 +53,24 @@
 
 **NOTE: Write tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T010 [P] [US1] Unit test for `_calculate_stop_price()` LONG/SHORT in `tests/test_risk_manager.py`
-- [ ] T011 [P] [US1] Unit test for `_create_stop_order()` with reduce_only in `tests/test_risk_manager.py`
-- [ ] T012 [P] [US1] Unit test for `handle_event()` routing in `tests/test_risk_manager.py`
-- [ ] T013 [US1] Unit test for `_on_position_opened()` creates stop in `tests/test_risk_manager.py`
-- [ ] T014 [US1] Unit test for `_on_position_closed()` cancels stop in `tests/test_risk_manager.py`
+- [X] T010 [P] [US1] Unit test for `_calculate_stop_price()` LONG/SHORT in `tests/test_risk_manager.py`
+- [X] T011 [P] [US1] Unit test for `_create_stop_order()` with reduce_only in `tests/test_risk_manager.py`
+- [X] T012 [P] [US1] Unit test for `handle_event()` routing in `tests/test_risk_manager.py`
+- [X] T013 [US1] Unit test for `_on_position_opened()` creates stop in `tests/test_risk_manager.py`
+- [X] T014 [US1] Unit test for `_on_position_closed()` cancels stop in `tests/test_risk_manager.py`
 
 ### Implementation for User Story 1
 
-- [ ] T015 [US1] Create RiskManager class skeleton in `risk/manager.py` (implements IRiskManager)
-- [ ] T016 [US1] Implement `__init__()` with config and strategy reference in `risk/manager.py`
-- [ ] T017 [US1] Implement `active_stops` property (dict[PositionId, ClientOrderId]) in `risk/manager.py`
-- [ ] T018 [E] [US1] Implement `_calculate_stop_price()` for LONG and SHORT positions in `risk/manager.py`
-- [ ] T019 [US1] Implement `_create_stop_order()` with STOP_MARKET and reduce_only=True in `risk/manager.py`
-- [ ] T020 [US1] Implement `_on_position_opened()` - create and submit stop in `risk/manager.py`
-- [ ] T021 [US1] Implement `_on_position_closed()` - cancel stop order in `risk/manager.py`
-- [ ] T022 [US1] Implement `handle_event()` routing for PositionOpened/Closed in `risk/manager.py`
-- [ ] T023 [US1] Add logging for stop-loss operations in `risk/manager.py`
-- [ ] T024 [US1] Export RiskManager in `risk/__init__.py`
+- [X] T015 [US1] Create RiskManager class skeleton in `risk/manager.py` (implements IRiskManager)
+- [X] T016 [US1] Implement `__init__()` with config and strategy reference in `risk/manager.py`
+- [X] T017 [US1] Implement `active_stops` property (dict[PositionId, ClientOrderId]) in `risk/manager.py`
+- [X] T018 [E] [US1] Implement `_calculate_stop_price()` for LONG and SHORT positions in `risk/manager.py`
+- [X] T019 [US1] Implement `_create_stop_order()` with STOP_MARKET and reduce_only=True in `risk/manager.py`
+- [X] T020 [US1] Implement `_on_position_opened()` - create and submit stop in `risk/manager.py`
+- [X] T021 [US1] Implement `_on_position_closed()` - cancel stop order in `risk/manager.py`
+- [X] T022 [US1] Implement `handle_event()` routing for PositionOpened/Closed in `risk/manager.py`
+- [X] T023 [US1] Add logging for stop-loss operations in `risk/manager.py`
+- [X] T024 [US1] Export RiskManager in `risk/__init__.py`
 
 **Checkpoint**: US1 complete - positions automatically get stop-loss orders
 
@@ -84,17 +84,17 @@
 
 ### Tests for User Story 2
 
-- [ ] T025 [P] [US2] Unit test for `validate_order()` per-instrument limit in `tests/test_risk_manager.py`
-- [ ] T026 [P] [US2] Unit test for `validate_order()` total exposure limit in `tests/test_risk_manager.py`
-- [ ] T027 [US2] Unit test for `validate_order()` returns True when within limits in `tests/test_risk_manager.py`
+- [X] T025 [P] [US2] Unit test for `validate_order()` per-instrument limit in `tests/test_risk_manager.py`
+- [X] T026 [P] [US2] Unit test for `validate_order()` total exposure limit in `tests/test_risk_manager.py`
+- [X] T027 [US2] Unit test for `validate_order()` returns True when within limits in `tests/test_risk_manager.py`
 
 ### Implementation for User Story 2
 
-- [ ] T028 [US2] Implement `_get_current_position_size()` helper in `risk/manager.py`
-- [ ] T029 [US2] Implement `_get_total_exposure()` helper in `risk/manager.py`
-- [ ] T030 [US2] Implement `validate_order()` per-instrument check in `risk/manager.py`
-- [ ] T031 [US2] Implement `validate_order()` total exposure check in `risk/manager.py`
-- [ ] T032 [US2] Add logging for order rejections in `risk/manager.py`
+- [X] T028 [US2] Implement `_get_current_position_size()` helper in `risk/manager.py`
+- [X] T029 [US2] Implement `_get_total_exposure()` helper in `risk/manager.py`
+- [X] T030 [US2] Implement `validate_order()` per-instrument check in `risk/manager.py`
+- [X] T031 [US2] Implement `validate_order()` total exposure check in `risk/manager.py`
+- [X] T032 [US2] Add logging for order rejections in `risk/manager.py`
 
 **Checkpoint**: US2 complete - orders exceeding limits are rejected
 
