@@ -108,17 +108,17 @@
 
 ### Tests for User Story 3
 
-- [ ] T033 [US3] Integration test: stop-loss execution on price drop in `tests/integration/test_risk_backtest.py`
-- [ ] T034 [US3] Integration test: stop-loss with gap-through scenario in `tests/integration/test_risk_backtest.py`
-- [ ] T035 [US3] Integration test: position limit rejection in `tests/integration/test_risk_backtest.py`
-- [ ] T036 [US3] Integration test: multiple positions with separate stops in `tests/integration/test_risk_backtest.py`
+- [X] T033 [US3] Integration test: stop-loss execution on price drop in `tests/integration/test_risk_backtest.py`
+- [X] T034 [US3] Integration test: stop-loss with gap-through scenario in `tests/integration/test_risk_backtest.py`
+- [X] T035 [US3] Integration test: position limit rejection in `tests/integration/test_risk_backtest.py`
+- [X] T036 [US3] Integration test: multiple positions with separate stops in `tests/integration/test_risk_backtest.py`
 
 ### Implementation for User Story 3
 
-- [ ] T037 [US3] Create example strategy using RiskManager in `strategies/examples/risk_managed_strategy.py`
-- [ ] T038 [US3] Create backtest configuration for risk testing in `tests/integration/test_risk_backtest.py`
-- [ ] T039 [US3] Add edge case handling: position closed before stop created in `risk/manager.py`
-- [ ] T040 [US3] Add edge case handling: OrderFilled event for stop order in `risk/manager.py`
+- [X] T037 [US3] Create example strategy using RiskManager in `strategies/examples/risk_managed_strategy.py`
+- [X] T038 [US3] Create backtest configuration for risk testing in `tests/integration/test_risk_backtest.py`
+- [X] T039 [US3] Add edge case handling: position closed before stop created in `risk/manager.py`
+- [X] T040 [US3] Add edge case handling: OrderFilled event for stop order in `risk/manager.py`
 
 **Checkpoint**: US3 complete - full integration verified with BacktestNode
 
@@ -132,15 +132,15 @@
 
 ### Tests for User Story 4
 
-- [ ] T041 [P] [US4] Unit test for `_on_position_changed()` trailing update in `tests/test_risk_manager.py`
-- [ ] T042 [P] [US4] Unit test for `_create_stop_order()` with STOP_LIMIT type in `tests/test_risk_manager.py`
+- [X] T041 [P] [US4] Unit test for `_on_position_changed()` trailing update in `tests/test_risk_manager.py`
+- [X] T042 [P] [US4] Unit test for `_create_stop_order()` with STOP_LIMIT type in `tests/test_risk_manager.py`
 
 ### Implementation for User Story 4
 
-- [ ] T043 [US4] Implement `_on_position_changed()` for trailing stop in `risk/manager.py`
-- [ ] T044 [US4] Add trailing stop price calculation logic in `risk/manager.py`
-- [ ] T045 [US4] Implement STOP_LIMIT order creation in `_create_stop_order()` in `risk/manager.py`
-- [ ] T046 [US4] Update `handle_event()` to route PositionChanged events in `risk/manager.py`
+- [X] T043 [US4] Implement `_on_position_changed()` for trailing stop in `risk/manager.py`
+- [X] T044 [US4] Add trailing stop price calculation logic in `risk/manager.py`
+- [X] T045 [US4] Implement STOP_LIMIT order creation in `_create_stop_order()` in `risk/manager.py`
+- [X] T046 [US4] Update `handle_event()` to route PositionChanged events in `risk/manager.py`
 
 **Checkpoint**: US4 complete - trailing stops and STOP_LIMIT working
 

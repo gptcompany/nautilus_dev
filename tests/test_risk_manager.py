@@ -21,13 +21,13 @@ from nautilus_trader.model.identifiers import (
     TraderId,
 )
 from nautilus_trader.model.objects import Currency, Money, Price, Quantity
-
-# Create USDT currency constant for Money objects
-USDT = Currency.from_str("USDT")
 from nautilus_trader.model.position import Position
 
 from risk import RiskConfig, StopLossType
 from risk.manager import RiskManager
+
+# Create USDT currency constant for Money objects
+USDT = Currency.from_str("USDT")
 
 
 # --- Fixtures ---
