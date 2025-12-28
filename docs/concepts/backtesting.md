@@ -478,25 +478,35 @@ When you have trade tick data, enable `trade_execution=True` in your venue confi
 based on trade activity. A trade tick indicates that liquidity was accessed at the trade price, allowing resting
 limit orders to match.
 
-The matching engine uses a "transient override" mechanism: during the matching process, it temporarily updates
-the Best Bid (for BUYER trades) or Best Ask (for SELLER trades) to the trade price. This allows resting orders
-on the passive side to cross the spread and fill. After matching, the original book state is restored, ensuring
-the spread is not permanently corrupted by the transient trade price.
+The matching engine uses a "transient override" mechanism: during the matching process, it temporarily adjusts
+the matching core's Best Bid (for BUYER trades) or Best Ask (for SELLER trades) toward the trade price. This allows
+resting orders on the passive side to cross the spread and fill. Note: the underlying order book data is never
+modified (it remains immutable); only the matching core's internal price references are adjusted.
 
-**Fill behavior:**
+**Fill determination:**
 
-- **SELLER trade at P**: The engine temporarily sets the Best Ask to P. Resting BUY LIMIT orders at P or higher will fill (as they are willing to buy at P or more).
-- **BUYER trade at P**: The engine temporarily sets the Best Bid to P. Resting SELL LIMIT orders at P or lower will fill (as they are willing to sell at P or less).
+When a trade tick triggers order matching, the engine determines fills as follows:
 
-**Fill quantity capping:**
+1. **Book reflects trade price**: If the order book has liquidity at the trade price, fills use book depth (standard behavior).
+2. **Book doesn't reflect trade price**: If the book's liquidity is at a different price, the engine uses a "trade-driven fill" at the trade price, capped to `min(order.leaves_qty, trade.size)`.
 
-Fill quantities are capped to ensure realistic execution simulation:
+This ensures that when a trade prints through the spread but the book hasn't updated, fills are bounded by what the trade tick actually evidences. When `liquidity_consumption=False` (default), the same trade size can fill multiple orders within an iteration. When `liquidity_consumption=True`, consumption tracking applies to trade-driven fills as well—repeated fills at the same trade price will be bounded by consumed liquidity until fresh data arrives.
 
-- **Per-order capping**: Each order's fill quantity is limited to the minimum of the order's remaining quantity and the trade tick's size. For example, if you have a BUY LIMIT order for 100,000 units and a 200-unit SELLER trade occurs at your limit price, the order will be partially filled for 200 units (not the full 100,000).
+**Restoration behavior:**
 
-- **Multi-order capping**: When multiple orders match the same trade tick, the total filled quantity across all orders will not exceed the trade tick's size. For example, if two BUY LIMIT orders (40 and 60 units) are resting and a 50-unit SELLER trade occurs, the first order fills for 40 units and the second fills for 10 units (the remaining trade size), totaling 50 units.
+After matching, the core's bid/ask are only restored to their original values if the trade price improved them
+(moved them away from the spread):
 
-This behavior ensures that backtests don't overstate execution volumes beyond what the historical trade data indicates was actually available in the market.
+- **SELLER trade**: Ask is restored only if trade price was below the original ask.
+- **BUYER trade**: Bid is restored only if trade price was above the original bid.
+
+If the trade price didn't improve the quote (e.g., a SELLER trade at or above the ask), the core retains
+the trade price. This means repeated trades at or beyond the spread can progressively move the core's bid/ask.
+
+**Fill price:**
+
+- **SELLER trade at P**: The engine sets the core's Best Ask to P (if P < current ask). Resting BUY LIMIT orders at P or higher will fill at the trade price P (if book doesn't have that level) or at book prices (if book does).
+- **BUYER trade at P**: The engine sets the core's Best Bid to P (if P > current bid). Resting SELL LIMIT orders at P or lower will fill at the trade price P (if book doesn't have that level) or at book prices (if book does).
 
 **Example:**
 
@@ -514,6 +524,36 @@ engine.add_venue(
 Combine trade data with book or quote data for best results: book/quote data establishes the baseline spread,
 while trade ticks trigger execution for orders that might be inside the spread or ahead of the quote updates.
 :::
+
+#### Understanding trade tick aggressor sides
+
+A common source of confusion is the `aggressor_side` field on trade ticks:
+
+- **SELLER trade**: A seller aggressed—they sold into the bid. This provides evidence of fill-able liquidity for **BUY** orders at the trade price.
+- **BUYER trade**: A buyer aggressed—they bought from the ask. This provides evidence of fill-able liquidity for **SELL** orders at the trade price.
+
+In other words, trade ticks trigger fills for orders on the **opposite** side of the aggressor. A SELLER trade at 100.00 can fill your resting BUY LIMIT at 100.00, but cannot fill your SELL LIMIT—the trade already represents someone else selling.
+
+#### Combining L2 book data with trade ticks
+
+When using L2 order book data (e.g., 100ms throttled depth snapshots) combined with trade tick data:
+
+1. **Book updates establish the spread**: Each book delta/snapshot updates the matching engine's view of available liquidity at each price level.
+
+2. **Trade ticks provide execution evidence**: Trade ticks indicate that liquidity was accessed at a specific price, potentially between book snapshots.
+
+3. **Fill quantity determination**: When a trade triggers a fill:
+   - If the book already reflects liquidity at the trade price, fills use book depth
+   - If the trade price is inside the spread (not in the current book), fills are capped by `min(order.leaves_qty, trade.size)`
+
+4. **Timing considerations**: With throttled book data (e.g., 100ms), the book may lag behind trades. A trade at a price not yet reflected in the book will use trade-driven fill logic.
+
+**Common misconception**: Users sometimes expect every trade tick to trigger fills. Remember:
+
+- Only trades on the **opposite** side can fill your orders
+- SELLER trades → potential BUY fills
+- BUYER trades → potential SELL fills
+- Book UPDATE events move the market but only trigger fills if prices cross your order
 
 ### Fill price determination
 
@@ -662,6 +702,30 @@ When backtesting with bar data, be aware that the reduced granularity of price i
 For the most realistic backtesting results, consider using higher granularity data sources such as L2 or L3 order book data when available.
 :::
 
+### Fill modeling philosophy
+
+NautilusTrader uses a practical fill modeling approach that treats historical order book and trade data as **immutable**. Optionally, **consumed liquidity tracking** can be enabled to prevent unrealistic duplicate fills.
+
+This addresses a gap in academic literature: most research focuses on live market dynamics (queue position modeling, birth-death processes for order flow) where the book actually evolves. Historical backtesting with frozen snapshots is a distinct engineering problem—how do we simulate realistic fills against data that doesn't change in response to our orders?
+
+**Core principles:**
+
+1. **Immutable historical data**: The order book and trade data are never modified. What happened in the market is preserved exactly as recorded.
+
+2. **Per-level consumption tracking** (when `liquidity_consumption=True`): The engine tracks how much liquidity has been "consumed" at each price level. When fresh data arrives (the book's quantity at a level changes), the consumption counter resets—new liquidity is available. When disabled (the default), each iteration fills against the full book liquidity independently.
+
+3. **Trade tick liquidity**: Trade ticks provide evidence of liquidity at the trade price. When consumption tracking is enabled, this liquidity is tracked separately and subject to the same consumption rules.
+
+**How consumption tracking works (when enabled):**
+
+For each price level, the engine tracks `(original_size, consumed)`. When filling:
+
+- `available = original_size - consumed`
+- If `original_size` no longer matches the book (fresh data arrived), reset the entry
+- After a fill, increment `consumed` by the fill quantity
+
+This prevents the same displayed liquidity from generating fills multiple times while still allowing fills when genuine new data arrives. The approach is deterministic and reproducible—the same backtest with the same data always produces the same results.
+
 ### Fill model
 
 The `FillModel` helps simulate order queue position and execution in a simple probabilistic way during backtesting.
@@ -769,6 +833,13 @@ The order book itself handles slippage naturally based on available liquidity at
 - `prob_fill_on_limit` is active - simulates queue position.
 - `prob_slippage` is not used - real order book depth determines price impact.
 
+:::warning
+The historical order book is immutable during backtesting. Book depth is **not** decremented after fills.
+By default (`liquidity_consumption=False`), the same liquidity can be consumed repeatedly within an iteration.
+Enable `liquidity_consumption=True` to track consumed liquidity per price level—consumption resets when fresh
+data arrives at that level. See [Order book immutability](#order-book-immutability) for details.
+:::
+
 **L1 order book data**
 
 With only best bid/ask prices available, the `FillModel` provides additional simulation:
@@ -787,48 +858,83 @@ When using less granular data, the same behaviors apply as L1:
 
 The `FillModel` has certain limitations to keep in mind:
 
-- **Partial fills are supported** with L2/L3 order book data - when there is no longer any size available in the order book, no more fills will be generated and the order will remain in a partially filled state. This accurately simulates real market conditions where not enough liquidity is available at the desired price levels.
-- With L1 data, slippage limits to a fixed 1-tick, at which the system fills the entire order's quantity.
+- **Partial fills are supported** with L2/L3 order book data - fill quantities are limited to the available liquidity at each price level.
+- With L1 data, slippage limits to a fixed 1-tick, at which the system fills the entire order's remaining quantity.
+- **Consumption tracking** (optional): When `liquidity_consumption=True`, the matching engine tracks consumed liquidity per price level. Consumption resets when fresh data arrives at that level. See [Order book immutability](#order-book-immutability) for configuration details.
 
-### Order book immutability and consumed liquidity
+### Order book immutability
 
 Historical order book data is immutable during backtesting. When your order fills against book liquidity,
 the book state remains unchanged. This preserves historical data integrity.
 
-The matching engine tracks **total consumed quantity** per order. On subsequent market updates,
-available liquidity is calculated as:
+The matching engine can optionally use **per-level consumption tracking** to prevent duplicate fills while
+allowing fills when fresh liquidity arrives. This behavior is controlled by the `liquidity_consumption`
+configuration option.
 
+**Configuration:**
+
+```python
+from nautilus_trader.backtest.config import BacktestVenueConfig
+
+venue_config = BacktestVenueConfig(
+    name="SIM",
+    oms_type="NETTING",
+    account_type="CASH",
+    starting_balances=["100_000 USD"],
+    liquidity_consumption=True,  # Enable consumption tracking (default: False)
+)
 ```
-available_liquidity = book_liquidity - consumed_liquidity
-```
+
+- `liquidity_consumption=False` (default): Each iteration fills against the full book liquidity independently.
+  Simpler behavior, assumes you're a small participant whose orders don't meaningfully impact available liquidity.
+- `liquidity_consumption=True`: Tracks consumed liquidity per price level. Prevents the same
+  displayed liquidity from generating multiple fills. Resets when fresh data arrives at that level.
+
+**How consumption tracking works (when enabled):**
+
+For each price level, the engine maintains:
+
+- `original_size`: The book's quantity when tracking began
+- `consumed`: How much has been filled against this level
+
+When processing a fill:
+
+1. Check if the book's current size at this level matches `original_size`
+2. If different (fresh data arrived), reset the entry: `original_size = current_size`, `consumed = 0`
+3. Calculate `available = original_size - consumed`
+4. After filling, increment `consumed` by the fill quantity
 
 **Example:**
 
-1. Order book shows 10 units at price 100.00.
-2. Your BUY LIMIT order for 200 units at 100.00 fills 10 units (consumed = 10).
-3. An unrelated market update arrives (e.g., a change on the bid side).
-4. The book still shows 10 units at 100.00, but consumed = 10.
-5. Available = 10 - 10 = 0, so no additional fill occurs.
-6. The book updates to show 50 units at 100.00.
-7. Available = 50 - 10 = 40, so the order fills 40 more units.
+1. Order book shows 100 units at ask 100.00. Engine tracks: `(original=100, consumed=0)`.
+2. Your BUY order fills 30 units. Engine updates: `(original=100, consumed=30)`. Available = 70.
+3. Another BUY order attempts 50 units. Available = 70, so it fills 50. `(original=100, consumed=80)`.
+4. A delta updates ask 100.00 to 120 units. Engine resets: `(original=120, consumed=0)`.
+5. New orders can now fill against the fresh 120 units.
 
-When new liquidity arrives at better prices, fills are calculated from best to worst prices
-with the total consumed quantity subtracted. This ensures correct total fill quantity
-and is slightly conservative on fill prices.
+**Trade tick liquidity:**
 
-:::note
-Consumed liquidity tracking is **per-order**. Different orders can each consume the full book liquidity independently.
-A future update may implement persistent liquidity consumption across orders at each price level.
-:::
+Trade ticks provide evidence of executable liquidity at the trade price. When a trade occurs at a price level
+not reflected in the current book, the engine can use the trade quantity as available liquidity, subject to
+the same consumption tracking rules (when enabled).
 
 :::note
 As the `FillModel` continues to evolve, future versions may introduce more sophisticated simulation of order execution dynamics, including:
 
-- Partial fill simulation.
 - Variable slippage based on order size.
 - More complex queue position modeling.
 
 :::
+
+#### Known limitations
+
+**No queue position within a level**: Consumption tracking determines *how much* liquidity remains at a level,
+but doesn't model *where* your order sits in the queue relative to other participants. Use `prob_fill_on_limit`
+to simulate queue position probabilistically.
+
+**Trade-driven fills are opportunistic**: When trade ticks indicate liquidity at a price not in the book,
+the engine uses this as fill evidence. However, this represents liquidity that existed momentarily and may
+not reflect sustained availability.
 
 ## Account types
 
