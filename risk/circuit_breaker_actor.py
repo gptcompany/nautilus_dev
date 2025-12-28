@@ -6,7 +6,7 @@ NautilusTrader's event-driven architecture.
 """
 
 from decimal import Decimal
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Literal
 
 from risk.circuit_breaker import CircuitBreaker
 from risk.circuit_breaker_config import CircuitBreakerConfig
@@ -14,6 +14,8 @@ from risk.circuit_breaker_state import CircuitBreakerState
 
 if TYPE_CHECKING:
     from nautilus_trader.model.events import AccountState
+
+    from monitoring.collectors.circuit_breaker import CircuitBreakerCollector
 
 
 class CircuitBreakerActor:
@@ -25,11 +27,16 @@ class CircuitBreakerActor:
     2. Handling account state updates to track equity
     3. Providing periodic timer checks for safety
     4. Exposing circuit breaker state for strategies
+    5. Emitting metrics to QuestDB via collector (optional)
 
     Parameters
     ----------
     config : CircuitBreakerConfig
         Circuit breaker configuration.
+    trader_id : str, optional
+        Trader identifier for metrics (default: "TRADER-001").
+    env : str, optional
+        Environment for metrics (default: "dev").
 
     Example
     -------
@@ -42,10 +49,18 @@ class CircuitBreakerActor:
     ...         return  # Skip entry
     """
 
-    def __init__(self, config: CircuitBreakerConfig) -> None:
+    def __init__(
+        self,
+        config: CircuitBreakerConfig,
+        trader_id: str = "TRADER-001",
+        env: Literal["prod", "staging", "dev"] = "dev",
+    ) -> None:
         self._config = config
         self._circuit_breaker = CircuitBreaker(config=config, portfolio=None)
         self._previous_state = CircuitBreakerState.ACTIVE
+        self._trader_id = trader_id
+        self._env = env
+        self._collector: "CircuitBreakerCollector | None" = None
 
     @property
     def circuit_breaker(self) -> CircuitBreaker:
@@ -99,12 +114,24 @@ class CircuitBreakerActor:
         # Check for state change
         self._check_state_change()
 
+    def set_collector(self, collector: "CircuitBreakerCollector") -> None:
+        """Set the metrics collector for emitting to QuestDB.
+
+        Parameters
+        ----------
+        collector : CircuitBreakerCollector
+            Collector instance for emitting metrics.
+        """
+        self._collector = collector
+
     def _check_state_change(self) -> None:
-        """Check if state changed and log if needed."""
+        """Check if state changed and emit metrics if needed."""
         current_state = self._circuit_breaker.state
         if current_state != self._previous_state:
             self._previous_state = current_state
-            # In production, would emit metric to QuestDB here
+            # Emit metric to QuestDB via collector
+            if self._collector is not None:
+                self._collector.emit_from_circuit_breaker(self._circuit_breaker)
 
     def can_open_position(self) -> bool:
         """Delegate to circuit breaker."""
