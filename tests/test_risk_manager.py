@@ -580,10 +580,10 @@ class TestValidateOrderTotalExposureLimit:
         order.quantity = Quantity.from_str("0.04")  # 0.04 BTC @ $50000 = $2000
         order.side = OrderSide.BUY
 
-        # Mock price for notional calculation
-        mock_strategy.cache.instrument.return_value.make_price.return_value = (
-            Price.from_str("50000.00")
-        )
+        # Mock quote_tick for notional calculation (new implementation)
+        mock_quote = MagicMock()
+        mock_quote.ask_price = Price.from_str("50000.00")
+        mock_strategy.cache.quote_tick.return_value = mock_quote
 
         result = manager.validate_order(order)
 
@@ -741,3 +741,324 @@ class TestCreateStopLimitOrder:
 
         # Should call stop_limit instead of stop_market
         mock_strategy.order_factory.stop_limit.assert_called_once()
+
+
+# --- T023-T024: Circuit Breaker Integration Tests ---
+
+
+class TestRiskManagerWithCircuitBreaker:
+    """T023: Unit test for RiskManager with circuit_breaker parameter."""
+
+    def test_accepts_circuit_breaker_parameter(
+        self,
+        mock_strategy: MagicMock,
+        instrument_id: InstrumentId,
+    ) -> None:
+        """RiskManager should accept optional circuit_breaker parameter."""
+        from risk import CircuitBreaker, CircuitBreakerConfig
+
+        cb_config = CircuitBreakerConfig()
+        circuit_breaker = CircuitBreaker(config=cb_config, portfolio=None)
+
+        config = RiskConfig()
+        manager = RiskManager(
+            config=config,
+            strategy=mock_strategy,
+            circuit_breaker=circuit_breaker,
+        )
+
+        assert manager.circuit_breaker is circuit_breaker
+
+    def test_circuit_breaker_is_optional(
+        self,
+        risk_manager: RiskManager,
+    ) -> None:
+        """RiskManager should work without circuit_breaker."""
+        assert risk_manager.circuit_breaker is None
+
+
+class TestOrderRejectionOnHaltedState:
+    """T024: Unit test for order rejection on HALTED state."""
+
+    def test_rejects_order_when_circuit_breaker_halted(
+        self,
+        mock_strategy: MagicMock,
+        instrument_id: InstrumentId,
+    ) -> None:
+        """Order should be rejected when circuit breaker is in HALTED state."""
+        from risk import CircuitBreaker, CircuitBreakerConfig
+
+        cb_config = CircuitBreakerConfig()
+        circuit_breaker = CircuitBreaker(config=cb_config, portfolio=None)
+        circuit_breaker.set_initial_equity(Decimal("100000"))
+        circuit_breaker.update(equity=Decimal("80000"))  # 20% drawdown -> HALTED
+
+        config = RiskConfig()
+        manager = RiskManager(
+            config=config,
+            strategy=mock_strategy,
+            circuit_breaker=circuit_breaker,
+        )
+
+        order = MagicMock()
+        order.instrument_id = instrument_id
+        order.quantity = Quantity.from_str("0.1")
+        order.side = OrderSide.BUY
+
+        result = manager.validate_order(order)
+
+        assert result is False
+
+    def test_rejects_order_when_circuit_breaker_reducing(
+        self,
+        mock_strategy: MagicMock,
+        instrument_id: InstrumentId,
+    ) -> None:
+        """Order should be rejected when circuit breaker is in REDUCING state."""
+        from risk import CircuitBreaker, CircuitBreakerConfig
+
+        cb_config = CircuitBreakerConfig()
+        circuit_breaker = CircuitBreaker(config=cb_config, portfolio=None)
+        circuit_breaker.set_initial_equity(Decimal("100000"))
+        circuit_breaker.update(equity=Decimal("85000"))  # 15% drawdown -> REDUCING
+
+        config = RiskConfig()
+        manager = RiskManager(
+            config=config,
+            strategy=mock_strategy,
+            circuit_breaker=circuit_breaker,
+        )
+
+        order = MagicMock()
+        order.instrument_id = instrument_id
+        order.quantity = Quantity.from_str("0.1")
+        order.side = OrderSide.BUY
+
+        result = manager.validate_order(order)
+
+        assert result is False
+
+    def test_allows_order_when_circuit_breaker_active(
+        self,
+        mock_strategy: MagicMock,
+        instrument_id: InstrumentId,
+    ) -> None:
+        """Order should be allowed when circuit breaker is in ACTIVE state."""
+        from risk import CircuitBreaker, CircuitBreakerConfig
+
+        cb_config = CircuitBreakerConfig()
+        circuit_breaker = CircuitBreaker(config=cb_config, portfolio=None)
+        circuit_breaker.set_initial_equity(Decimal("100000"))
+        circuit_breaker.update(equity=Decimal("100000"))  # 0% drawdown -> ACTIVE
+
+        config = RiskConfig()
+        manager = RiskManager(
+            config=config,
+            strategy=mock_strategy,
+            circuit_breaker=circuit_breaker,
+        )
+
+        order = MagicMock()
+        order.instrument_id = instrument_id
+        order.quantity = Quantity.from_str("0.1")
+        order.side = OrderSide.BUY
+
+        result = manager.validate_order(order)
+
+        assert result is True
+
+    def test_allows_order_when_circuit_breaker_warning(
+        self,
+        mock_strategy: MagicMock,
+        instrument_id: InstrumentId,
+    ) -> None:
+        """Order should be allowed when circuit breaker is in WARNING state."""
+        from risk import CircuitBreaker, CircuitBreakerConfig
+
+        cb_config = CircuitBreakerConfig()
+        circuit_breaker = CircuitBreaker(config=cb_config, portfolio=None)
+        circuit_breaker.set_initial_equity(Decimal("100000"))
+        circuit_breaker.update(equity=Decimal("90000"))  # 10% drawdown -> WARNING
+
+        config = RiskConfig()
+        manager = RiskManager(
+            config=config,
+            strategy=mock_strategy,
+            circuit_breaker=circuit_breaker,
+        )
+
+        order = MagicMock()
+        order.instrument_id = instrument_id
+        order.quantity = Quantity.from_str("0.1")
+        order.side = OrderSide.BUY
+
+        result = manager.validate_order(order)
+
+        assert result is True
+
+
+# --- T030-T034: Daily PnL Tracker Integration Tests ---
+
+
+class TestRiskManagerWithDailyTracker:
+    """T030: Unit test for RiskManager with daily_tracker parameter."""
+
+    def test_accepts_daily_tracker_parameter(
+        self,
+        mock_strategy: MagicMock,
+        instrument_id: InstrumentId,
+    ) -> None:
+        """RiskManager should accept optional daily_tracker parameter."""
+        from risk import DailyLossConfig, DailyPnLTracker
+
+        daily_config = DailyLossConfig()
+        daily_tracker = DailyPnLTracker(config=daily_config, strategy=mock_strategy)
+
+        config = RiskConfig()
+        manager = RiskManager(
+            config=config,
+            strategy=mock_strategy,
+            daily_tracker=daily_tracker,
+        )
+
+        assert manager.daily_tracker is daily_tracker
+
+    def test_daily_tracker_is_optional(
+        self,
+        risk_manager: RiskManager,
+    ) -> None:
+        """RiskManager should work without daily_tracker."""
+        assert risk_manager.daily_tracker is None
+
+
+class TestRiskManagerWithoutDailyTracker:
+    """T031: Unit test for RiskManager without daily_tracker."""
+
+    def test_validates_order_without_daily_tracker(
+        self,
+        risk_manager: RiskManager,
+        instrument_id: InstrumentId,
+    ) -> None:
+        """Order validation should work without daily_tracker."""
+        order = MagicMock()
+        order.instrument_id = instrument_id
+        order.quantity = Quantity.from_str("0.1")
+        order.side = OrderSide.BUY
+
+        result = risk_manager.validate_order(order)
+
+        assert result is True
+
+
+class TestDailyTrackerEventRouting:
+    """T032/T033: Test event routing to daily_tracker."""
+
+    def test_routes_position_closed_to_daily_tracker(
+        self,
+        mock_strategy: MagicMock,
+        instrument_id: InstrumentId,
+    ) -> None:
+        """PositionClosed event should be routed to daily_tracker."""
+        from risk import DailyLossConfig, DailyPnLTracker
+
+        daily_config = DailyLossConfig()
+        daily_tracker = DailyPnLTracker(config=daily_config, strategy=mock_strategy)
+
+        config = RiskConfig(stop_loss_enabled=False)
+        manager = RiskManager(
+            config=config,
+            strategy=mock_strategy,
+            daily_tracker=daily_tracker,
+        )
+
+        position = create_mock_position(
+            instrument_id=instrument_id,
+            side=PositionSide.LONG,
+            entry_price="50000.00",
+            quantity="0.1",
+        )
+
+        # Create PositionClosed event with realized_pnl
+        close_event = create_mock_position_closed_event(position)
+        from nautilus_trader.model.objects import Money
+
+        close_event.realized_pnl = Money(100.0, USDT)
+
+        manager.handle_event(close_event)
+
+        # Daily tracker should have accumulated the realized PnL
+        assert daily_tracker.daily_realized == Decimal("100")
+
+
+class TestDailyTrackerValidateOrderIntegration:
+    """T034: Test validate_order() integration with daily_tracker.can_trade()."""
+
+    def test_rejects_order_when_daily_limit_triggered(
+        self,
+        mock_strategy: MagicMock,
+        instrument_id: InstrumentId,
+    ) -> None:
+        """Order should be rejected when daily loss limit is triggered."""
+        from risk import DailyLossConfig, DailyPnLTracker
+
+        daily_config = DailyLossConfig(daily_loss_limit=Decimal("100"))
+        daily_tracker = DailyPnLTracker(config=daily_config, strategy=mock_strategy)
+
+        config = RiskConfig()
+        manager = RiskManager(
+            config=config,
+            strategy=mock_strategy,
+            daily_tracker=daily_tracker,
+        )
+
+        # Create a PositionClosed event to trigger the daily limit
+        position = create_mock_position(
+            instrument_id=instrument_id,
+            side=PositionSide.LONG,
+            entry_price="50000.00",
+            quantity="0.1",
+        )
+        close_event = create_mock_position_closed_event(position)
+        from nautilus_trader.model.objects import Money
+
+        close_event.realized_pnl = Money(-150.0, USDT)  # Loss exceeds $100 limit
+
+        manager.handle_event(close_event)
+        daily_tracker.check_limit()
+
+        # Now try to place an order
+        order = MagicMock()
+        order.instrument_id = instrument_id
+        order.quantity = Quantity.from_str("0.1")
+        order.side = OrderSide.BUY
+
+        result = manager.validate_order(order)
+
+        assert result is False
+
+    def test_allows_order_when_daily_limit_not_triggered(
+        self,
+        mock_strategy: MagicMock,
+        instrument_id: InstrumentId,
+    ) -> None:
+        """Order should be allowed when daily loss limit not triggered."""
+        from risk import DailyLossConfig, DailyPnLTracker
+
+        daily_config = DailyLossConfig(daily_loss_limit=Decimal("1000"))
+        daily_tracker = DailyPnLTracker(config=daily_config, strategy=mock_strategy)
+
+        config = RiskConfig()
+        manager = RiskManager(
+            config=config,
+            strategy=mock_strategy,
+            daily_tracker=daily_tracker,
+        )
+
+        order = MagicMock()
+        order.instrument_id = instrument_id
+        order.quantity = Quantity.from_str("0.1")
+        order.side = OrderSide.BUY
+
+        result = manager.validate_order(order)
+
+        assert result is True

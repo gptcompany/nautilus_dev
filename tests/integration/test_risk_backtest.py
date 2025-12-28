@@ -542,3 +542,255 @@ class TestEdgeCases:
         # No stop order should be created
         mock_strategy.order_factory.stop_market.assert_not_called()
         assert len(manager.active_stops) == 0
+
+
+# --- T039-T042: Daily Loss Limit Integration Tests (Spec 013) ---
+
+
+class TestDailyLossLimitSingleStrategy:
+    """T039: Integration test for daily loss limit with single strategy."""
+
+    def test_daily_limit_triggers_on_cumulative_loss(
+        self,
+        mock_strategy: MagicMock,
+        instrument_id: InstrumentId,
+    ) -> None:
+        """
+        Scenario: Daily limit $1000, three losing trades totaling $1200.
+
+        Expected: can_trade() returns False after cumulative loss exceeds limit.
+        """
+        from risk import DailyLossConfig, DailyPnLTracker, RiskConfig, RiskManager
+
+        daily_config = DailyLossConfig(daily_loss_limit=Decimal("1000"))
+        daily_tracker = DailyPnLTracker(config=daily_config, strategy=mock_strategy)
+
+        config = RiskConfig(stop_loss_enabled=False)
+        manager = RiskManager(
+            config=config,
+            strategy=mock_strategy,
+            daily_tracker=daily_tracker,
+        )
+
+        # Three losing trades
+        losses = [-400.0, -500.0, -300.0]  # Total: -$1200
+
+        for i, loss in enumerate(losses):
+            position = create_mock_position(
+                instrument_id=instrument_id,
+                side=PositionSide.LONG,
+                entry_price="50000.00",
+                quantity="0.1",
+                position_id=f"P-{i}",
+            )
+            close_event = create_position_closed_event(position)
+            close_event.realized_pnl = Money(loss, USDT)
+
+            manager.handle_event(close_event)
+
+        # Check limit
+        daily_tracker.check_limit()
+
+        # Should have triggered
+        assert daily_tracker.limit_triggered is True
+        assert daily_tracker.can_trade() is False
+
+        # New orders should be rejected
+        order = MagicMock()
+        order.instrument_id = instrument_id
+        order.quantity = Quantity.from_str("0.1")
+        order.side = OrderSide.BUY
+
+        assert manager.validate_order(order) is False
+
+    def test_daily_limit_not_triggered_with_mixed_results(
+        self,
+        mock_strategy: MagicMock,
+        instrument_id: InstrumentId,
+    ) -> None:
+        """
+        Scenario: Daily limit $1000, wins and losses netting to -$500.
+
+        Expected: can_trade() returns True (under limit).
+        """
+        from risk import DailyLossConfig, DailyPnLTracker, RiskConfig, RiskManager
+
+        daily_config = DailyLossConfig(daily_loss_limit=Decimal("1000"))
+        daily_tracker = DailyPnLTracker(config=daily_config, strategy=mock_strategy)
+
+        config = RiskConfig(stop_loss_enabled=False)
+        manager = RiskManager(
+            config=config,
+            strategy=mock_strategy,
+            daily_tracker=daily_tracker,
+        )
+
+        # Mixed trades: net -$500
+        pnls = [200.0, -400.0, 100.0, -400.0]  # Total: -$500
+
+        for i, pnl in enumerate(pnls):
+            position = create_mock_position(
+                instrument_id=instrument_id,
+                side=PositionSide.LONG,
+                entry_price="50000.00",
+                quantity="0.1",
+                position_id=f"P-{i}",
+            )
+            close_event = create_position_closed_event(position)
+            close_event.realized_pnl = Money(pnl, USDT)
+
+            manager.handle_event(close_event)
+
+        daily_tracker.check_limit()
+
+        # Should NOT have triggered
+        assert daily_tracker.limit_triggered is False
+        assert daily_tracker.can_trade() is True
+
+
+class TestDailyLossLimitMultiPosition:
+    """T040: Integration test for daily loss limit with multiple positions."""
+
+    def test_positions_closed_on_limit_trigger(
+        self,
+        mock_strategy: MagicMock,
+        instrument_id: InstrumentId,
+    ) -> None:
+        """
+        Scenario: Daily limit $100 with close_positions_on_limit=True,
+                  two open positions when limit triggered.
+
+        Expected: Both positions receive close orders.
+        """
+        from risk import DailyLossConfig, DailyPnLTracker, RiskConfig, RiskManager
+
+        daily_config = DailyLossConfig(
+            daily_loss_limit=Decimal("100"),
+            close_positions_on_limit=True,
+        )
+        daily_tracker = DailyPnLTracker(config=daily_config, strategy=mock_strategy)
+
+        config = RiskConfig(stop_loss_enabled=False)
+        manager = RiskManager(
+            config=config,
+            strategy=mock_strategy,
+            daily_tracker=daily_tracker,
+        )
+
+        # Two open positions
+        open_positions = [
+            create_mock_position(
+                instrument_id=instrument_id,
+                side=PositionSide.LONG,
+                entry_price="50000.00",
+                quantity="0.1",
+                position_id="P-001",
+            ),
+            create_mock_position(
+                instrument_id=instrument_id,
+                side=PositionSide.SHORT,
+                entry_price="51000.00",
+                quantity="0.2",
+                position_id="P-002",
+            ),
+        ]
+        mock_strategy.cache.positions_open.return_value = open_positions
+
+        # Trigger daily limit with big loss
+        position = create_mock_position(
+            instrument_id=instrument_id,
+            side=PositionSide.LONG,
+            entry_price="50000.00",
+            quantity="0.1",
+            position_id="P-CLOSED",
+        )
+        close_event = create_position_closed_event(position)
+        close_event.realized_pnl = Money(-150.0, USDT)
+
+        manager.handle_event(close_event)
+        daily_tracker.check_limit()
+
+        # Should have submitted close orders for both positions
+        assert mock_strategy.submit_order.call_count == 2
+
+
+class TestDailyLossLimitReset:
+    """T041: Integration test for daily loss limit reset at midnight."""
+
+    def test_reset_clears_triggered_state(
+        self,
+        mock_strategy: MagicMock,
+        instrument_id: InstrumentId,
+    ) -> None:
+        """
+        Scenario: Daily limit triggered, then reset() called.
+
+        Expected: can_trade() returns True after reset.
+        """
+        from risk import DailyLossConfig, DailyPnLTracker, RiskConfig, RiskManager
+
+        daily_config = DailyLossConfig(daily_loss_limit=Decimal("100"))
+        daily_tracker = DailyPnLTracker(config=daily_config, strategy=mock_strategy)
+
+        config = RiskConfig(stop_loss_enabled=False)
+        manager = RiskManager(
+            config=config,
+            strategy=mock_strategy,
+            daily_tracker=daily_tracker,
+        )
+
+        # Trigger limit
+        position = create_mock_position(
+            instrument_id=instrument_id,
+            side=PositionSide.LONG,
+            entry_price="50000.00",
+            quantity="0.1",
+        )
+        close_event = create_position_closed_event(position)
+        close_event.realized_pnl = Money(-150.0, USDT)
+
+        manager.handle_event(close_event)
+        daily_tracker.check_limit()
+
+        assert daily_tracker.can_trade() is False
+
+        # Reset (simulates midnight)
+        daily_tracker.reset()
+
+        assert daily_tracker.can_trade() is True
+        assert daily_tracker.daily_realized == Decimal("0")
+        assert daily_tracker.limit_triggered is False
+
+
+class TestMidnightEdgeCases:
+    """T042: Edge cases for positions spanning midnight."""
+
+    def test_unrealized_pnl_not_reset(
+        self,
+        mock_strategy: MagicMock,
+        instrument_id: InstrumentId,
+    ) -> None:
+        """
+        Scenario: Position open at midnight with unrealized loss.
+
+        Expected: After reset, unrealized PnL still counts toward limit.
+        """
+        from risk import DailyLossConfig, DailyPnLTracker
+
+        # Mock portfolio with unrealized loss
+        mock_strategy.portfolio.unrealized_pnls.return_value = Money(-500.0, USDT)
+
+        daily_config = DailyLossConfig(daily_loss_limit=Decimal("400"))
+        daily_tracker = DailyPnLTracker(config=daily_config, strategy=mock_strategy)
+
+        # Reset (simulates midnight)
+        daily_tracker.reset()
+
+        # Realized is 0, but unrealized is -500
+        assert daily_tracker.daily_realized == Decimal("0")
+        assert daily_tracker.daily_unrealized == Decimal("-500")
+        assert daily_tracker.total_daily_pnl == Decimal("-500")
+
+        # Check limit - should trigger because unrealized exceeds limit
+        daily_tracker.check_limit()
+        assert daily_tracker.limit_triggered is True

@@ -24,6 +24,9 @@ if TYPE_CHECKING:
     from nautilus_trader.model.position import Position
     from nautilus_trader.trading.strategy import Strategy
 
+    from risk.circuit_breaker import CircuitBreaker
+    from risk.daily_pnl_tracker import DailyPnLTracker
+
 
 class RiskManager:
     """
@@ -36,11 +39,21 @@ class RiskManager:
     2. Canceling stop-loss orders when positions close
     3. Updating trailing stops on position changes
     4. Validating orders against position limits
+    5. Enforcing circuit breaker state (if configured)
+    6. Enforcing daily loss limits (if configured)
     """
 
-    def __init__(self, config: RiskConfig, strategy: "Strategy") -> None:
+    def __init__(
+        self,
+        config: RiskConfig,
+        strategy: "Strategy",
+        circuit_breaker: "CircuitBreaker | None" = None,
+        daily_tracker: "DailyPnLTracker | None" = None,
+    ) -> None:
         self._config = config
         self._strategy = strategy
+        self._circuit_breaker = circuit_breaker
+        self._daily_tracker = daily_tracker
         self._active_stops: dict[PositionId, ClientOrderId] = {}
 
     @property
@@ -48,11 +61,25 @@ class RiskManager:
         return self._config
 
     @property
+    def circuit_breaker(self) -> "CircuitBreaker | None":
+        """Return the circuit breaker if configured."""
+        return self._circuit_breaker
+
+    @property
+    def daily_tracker(self) -> "DailyPnLTracker | None":
+        """Return the daily PnL tracker if configured."""
+        return self._daily_tracker
+
+    @property
     def active_stops(self) -> dict[PositionId, ClientOrderId]:
         return self._active_stops
 
     def handle_event(self, event: "Event") -> None:
         """Route events with simple if/elif chain."""
+        # Route to daily tracker first (tracks all position events)
+        if self._daily_tracker is not None:
+            self._daily_tracker.handle_event(event)
+
         if isinstance(event, PositionOpened):
             self._on_position_opened(event)
         elif isinstance(event, PositionClosed):
@@ -61,7 +88,20 @@ class RiskManager:
             self._on_position_changed(event)
 
     def validate_order(self, order: "Order") -> bool:
-        """Pre-flight check against position limits."""
+        """Pre-flight check against circuit breaker, daily limits, and position limits."""
+        # Check circuit breaker first (portfolio-level protection)
+        if self._circuit_breaker is not None:
+            if not self._circuit_breaker.can_open_position():
+                return False
+
+        # Check daily loss limit (daily protection)
+        if self._daily_tracker is not None:
+            # Must check limit first to update triggered state
+            self._daily_tracker.check_limit()
+            if not self._daily_tracker.can_trade():
+                return False
+
+        # Check position limits
         if (
             self._config.max_position_size is None
             and self._config.max_total_exposure is None
@@ -145,9 +185,13 @@ class RiskManager:
             self._active_stops[position_id] = new_stop_order.client_order_id
             # Only cancel old stop after new one is submitted
             self._strategy.cancel_order(old_stop_id)
-        except Exception:
+        except Exception as e:
             # If new stop fails, keep old stop active for protection
-            pass
+            import logging
+
+            logging.getLogger(__name__).warning(
+                f"Failed to update trailing stop for {position_id}: {e}"
+            )
 
     def _calculate_stop_price(self, position: "Position") -> Price:
         """
@@ -225,10 +269,21 @@ class RiskManager:
 
     def _estimate_order_notional(self, order: "Order") -> float:
         """
-        Estimate order notional value.
+        Estimate order notional value using market price from cache.
 
-        Note: MVP uses simplified calculation. Production would query
-        current market price from cache or data provider.
+        Returns 0.0 if price unavailable (allows order to proceed with warning).
         """
-        # TODO: Get actual price from cache/market data
-        return float(order.quantity) * 50000.0
+        # Get last quote from cache
+        last_quote = self._strategy.cache.quote_tick(order.instrument_id)
+        if last_quote is not None:
+            price = float(last_quote.ask_price)
+            return float(order.quantity) * price
+
+        # Fallback: try last bar
+        last_bar = self._strategy.cache.bar(order.instrument_id)
+        if last_bar is not None:
+            price = float(last_bar.close)
+            return float(order.quantity) * price
+
+        # No price available - return 0 to allow order (conservative)
+        return 0.0

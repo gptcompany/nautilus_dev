@@ -258,7 +258,50 @@ class TradingMetrics(BaseModel):
         return f"trading_metrics,{tags} {fields_str} {ts_ns}"
 
 
+class CircuitBreakerMetrics(BaseModel):
+    """Circuit breaker state metrics.
+
+    Table: circuit_breaker_state
+    Spec: 012-circuit-breaker-drawdown
+    """
+
+    timestamp: datetime = Field(..., description="UTC timestamp")
+    trader_id: str = Field(..., min_length=1, description="Trader identifier")
+    state: Literal["active", "warning", "reducing", "halted"] = Field(
+        ..., description="Circuit breaker state"
+    )
+    current_drawdown: float = Field(
+        ..., ge=0, description="Current drawdown as decimal"
+    )
+    peak_equity: float = Field(..., ge=0, description="High water mark")
+    current_equity: float = Field(..., description="Current equity value")
+    env: Literal["prod", "staging", "dev"] = Field(..., description="Environment")
+
+    def to_ilp_line(self) -> str:
+        """Convert to InfluxDB Line Protocol format for QuestDB HTTP ILP."""
+        # Tags (dimensions)
+        escaped_trader_id = (
+            self.trader_id.replace(" ", "\\ ").replace(",", "\\,").replace("=", "\\=")
+        )
+        tags = f"trader_id={escaped_trader_id},state={self.state},env={self.env}"
+
+        # Fields
+        fields = [
+            f"current_drawdown={self.current_drawdown}",
+            f"peak_equity={self.peak_equity}",
+            f"current_equity={self.current_equity}",
+        ]
+
+        fields_str = ",".join(fields)
+
+        # Timestamp in nanoseconds
+        ts_ns = int(self.timestamp.timestamp() * 1_000_000_000)
+
+        return f"circuit_breaker_state,{tags} {fields_str} {ts_ns}"
+
+
 __all__ = [
+    "CircuitBreakerMetrics",
     "DaemonMetrics",
     "EvolutionMetrics",
     "ExchangeStatus",

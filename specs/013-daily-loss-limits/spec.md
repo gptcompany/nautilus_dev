@@ -54,8 +54,9 @@ class DailyLossConfig(BaseModel):
 - No missed trades or double counting
 
 #### NFR-002: Persistence
-- Daily PnL must persist across restarts within the same day
-- Historical daily PnL stored for analysis
+- **MVP (Backtest)**: In-memory state only (sufficient for backtest scope)
+- **Phase 2 (Live Trading)**: Daily PnL must persist across restarts within the same day (Redis)
+- Historical daily PnL stored for analysis (QuestDB)
 
 ## Technical Design
 
@@ -65,9 +66,9 @@ class DailyLossConfig(BaseModel):
 class DailyPnLTracker:
     """Tracks daily PnL and enforces daily loss limits."""
 
-    def __init__(self, config: DailyLossConfig, portfolio: Portfolio):
+    def __init__(self, config: DailyLossConfig, strategy: Strategy):
         self.config = config
-        self.portfolio = portfolio
+        self._strategy = strategy  # Provides cache + portfolio access
         self.daily_realized: Decimal = Decimal("0")
         self.day_start: datetime = self._get_day_start()
         self.limit_triggered: bool = False
