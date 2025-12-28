@@ -19,7 +19,25 @@
       "timestamp": "2025-12-28T16:23:24.473628",
       "command": "git reset --hard HEAD && rm -f .claude/context_bundles/28_dec_session_7b2df9c9-3898-4fa5-b6c0-f33a51133bf3.json && git status",
       "description": "Force reset and clean"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-28T16:23:43.712190",
+      "command": "git merge 011-stop-loss-position-limits --no-ff -m \"$(cat <<'EOF'\nMerge branch '011-stop-loss-position-limits'\n\nSpec 011: Stop-Loss & Position Limits - Complete Implementation\n\nFeatures:\n- Automatic stop-loss on position open\n- Position limit validation (per-instrument + total exposure)\n- Trailing stop support\n- STOP_MARKET/STOP_LIMIT order types\n\nNew files:\n- risk/config.py, risk/manager.py, risk/__init__.py\n- tests/test_risk_config.py, tests/test_risk_manager.py\n- tests/integration/test_risk_backtest.py\n- strategies/examples/risk_managed_strategy.py\n\nTest coverage: 63 tests, all passing\nEOF\n)\"",
+      "description": "Merge feature branch"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-28T16:23:54.665680",
+      "command": "git merge 011-stop-loss-position-limits --no-ff -X theirs -m \"$(cat <<'EOF'\nMerge branch '011-stop-loss-position-limits'\n\nSpec 011: Stop-Loss & Position Limits - Complete Implementation\n\nFeatures:\n- Automatic stop-loss on position open\n- Position limit validation (per-instrument + total exposure)\n- Trailing stop support\n- STOP_MARKET/STOP_LIMIT order types\n\nNew files:\n- risk/config.py, risk/manager.py, risk/__init__.py\n- tests/test_risk_config.py, tests/test_risk_manager.py\n- tests/integration/test_risk_backtest.py\n- strategies/examples/risk_managed_strategy.py\n\nTest coverage: 63 tests, all passing\nEOF\n)\"",
+      "description": "Merge with theirs strategy"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-28T16:24:05.591707",
+      "command": "git add .claude/ && git commit -m \"Update session stats\" && git merge 011-stop-loss-position-limits --no-ff -m \"$(cat <<'EOF'\nMerge branch '011-stop-loss-position-limits'\n\nSpec 011: Stop-Loss & Position Limits - Complete Implementation\n\nFeatures:\n- Automatic stop-loss on position open\n- Position limit validation (per-instrument + total exposure)\n- Trailing stop support\n- STOP_MARKET/STOP_LIMIT order types\n\nNew files:\n- risk/config.py, risk/manager.py, risk/__init__.py\n- tests/test_risk_config.py, tests/test_risk_manager.py\n- tests/integration/test_risk_backtest.py\n- strategies/examples/risk_managed_strategy.py\n\nTest coverage: 63 tests, all passing\nEOF\n)\"",
+      "description": "Commit stats and merge"
     }
   ],
-  "last_updated": "2025-12-28T16:23:24.473647"
+  "last_updated": "2025-12-28T16:24:05.591724"
 }
