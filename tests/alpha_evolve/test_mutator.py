@@ -185,7 +185,6 @@ class TestLLMMutatorRetryOnSyntaxError:
 
         # Track call count
         call_count = [0]
-        original_call_llm = mutator._call_llm
 
         async def mock_call_llm(prompt, request):
             call_count[0] += 1
@@ -206,7 +205,7 @@ elif self.ema.value < bar.close * 0.97:
             block_name="decision_logic",
         )
 
-        response = await mutator.mutate(request)
+        await mutator.mutate(request)
 
         # Should have retried
         assert call_count[0] == 3
@@ -443,3 +442,39 @@ class TestRetryPrompt:
         assert "PREVIOUS ATTEMPT FAILED" in retry_prompt
         assert "SyntaxError" in retry_prompt
         assert failed_code in retry_prompt
+
+
+# === LLM MUTATOR INITIALIZATION VALIDATION ===
+
+
+class TestLLMMutatorInitValidation:
+    """Test LLMMutator initialization parameter validation."""
+
+    def test_init_valid_params(self):
+        """Valid parameters are accepted."""
+        mutator = LLMMutator(max_retries=5, retry_delay=2.0)
+        assert mutator.max_retries == 5
+        assert mutator.retry_delay == 2.0
+
+    def test_init_rejects_zero_retries(self):
+        """Zero max_retries is rejected."""
+        with pytest.raises(ValueError) as exc_info:
+            LLMMutator(max_retries=0)
+        assert "max_retries must be >= 1" in str(exc_info.value)
+
+    def test_init_rejects_negative_retries(self):
+        """Negative max_retries is rejected."""
+        with pytest.raises(ValueError) as exc_info:
+            LLMMutator(max_retries=-1)
+        assert "max_retries must be >= 1" in str(exc_info.value)
+
+    def test_init_rejects_negative_delay(self):
+        """Negative retry_delay is rejected."""
+        with pytest.raises(ValueError) as exc_info:
+            LLMMutator(max_retries=3, retry_delay=-0.5)
+        assert "retry_delay must be >= 0" in str(exc_info.value)
+
+    def test_init_accepts_zero_delay(self):
+        """Zero retry_delay is accepted."""
+        mutator = LLMMutator(max_retries=3, retry_delay=0)
+        assert mutator.retry_delay == 0

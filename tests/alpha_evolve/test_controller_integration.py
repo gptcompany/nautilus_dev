@@ -240,7 +240,7 @@ class TestEvolutionStopAndResume:
         controller._load_seed_strategy = mock_load_seed
 
         # Run 3 iterations
-        result = await controller.run(
+        await controller.run(
             seed_strategy="momentum",
             experiment="checkpoint_test",
             iterations=3,

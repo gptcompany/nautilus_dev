@@ -181,6 +181,8 @@ class EvolutionController:
         iterations: int,
         stop_condition: StopCondition | None = None,
         on_progress: Callable[[ProgressEvent], None] | None = None,
+        *,
+        _skip_seed: bool = False,
     ) -> EvolutionResult:
         """
         Execute evolution loop.
@@ -191,6 +193,7 @@ class EvolutionController:
             iterations: Number of iterations to run
             stop_condition: Optional early termination conditions
             on_progress: Callback for progress events
+            _skip_seed: Internal flag to skip seed loading (for resume)
 
         Returns:
             EvolutionResult with final statistics
@@ -199,23 +202,26 @@ class EvolutionController:
             ValueError: If seed strategy not found
             RuntimeError: If evolution fails unrecoverably
         """
-        # Initialize state
+        # Initialize state (skip resets for resume to preserve checkpoint state)
         self._experiment = experiment
-        self._current_iteration = 0
-        self._best_fitness = float("-inf")
-        self._best_strategy_id = None
         self._status = EvolutionStatus.RUNNING
         self._stop_requested = False
-        self._start_time = time.time()
         self._on_progress = on_progress
 
-        # Reset statistics
-        self._mutations_attempted = 0
-        self._mutations_successful = 0
-        self._evaluations_completed = 0
-        self._evaluations_failed = 0
-        self._generations_without_improvement = 0
-        self._last_best_fitness = float("-inf")
+        if not _skip_seed:
+            # Fresh run: reset all state
+            self._current_iteration = 0
+            self._best_fitness = float("-inf")
+            self._best_strategy_id = None
+            self._start_time = time.time()
+
+            # Reset statistics
+            self._mutations_attempted = 0
+            self._mutations_successful = 0
+            self._evaluations_completed = 0
+            self._evaluations_failed = 0
+            self._generations_without_improvement = 0
+        # else: resume() has already restored checkpoint state
 
         # Create stop condition if not provided
         if stop_condition is None:
@@ -225,8 +231,9 @@ class EvolutionController:
             if stop_condition.max_iterations < iterations:
                 stop_condition.max_iterations = iterations
 
-        # Load seed strategy
-        await self._load_seed_strategy(seed_strategy, experiment)
+        # Load seed strategy (skip for resume)
+        if not _skip_seed:
+            await self._load_seed_strategy(seed_strategy, experiment)
 
         logger.info(f"Starting evolution: {experiment}, iterations={iterations}")
 
@@ -367,12 +374,13 @@ class EvolutionController:
         self._best_strategy_id = checkpoint.get("best_strategy_id")
         self._start_time = time.time() - checkpoint.get("elapsed_seconds", 0)
 
-        # Continue evolution
+        # Continue evolution (skip seed loading since we're resuming)
         return await self.run(
-            seed_strategy="",  # Already loaded
+            seed_strategy="",
             experiment=experiment,
             iterations=iterations,
             on_progress=on_progress,
+            _skip_seed=True,
         )
 
     def get_progress(self, experiment: str | None = None) -> EvolutionProgress:
@@ -535,7 +543,6 @@ class EvolutionController:
             experiment: Experiment name
         """
         # 1. Select parent
-        self._emit_progress(ProgressEventType.PARENT_SELECTED, {})
         parent = self._select_parent(experiment)
 
         self._emit_progress(

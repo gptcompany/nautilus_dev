@@ -147,7 +147,8 @@ class TestLoadStrategyValidCode:
             "EvolvedStrategy",
             "EvolvedStrategyConfig",
         )
-        first_set = set(seen_modules)
+        # Capture module count after first load
+        _ = set(seen_modules)
 
         evaluator._load_strategy(
             sample_valid_strategy_code,

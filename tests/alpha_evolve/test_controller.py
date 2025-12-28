@@ -511,7 +511,8 @@ class TestSelectParentElite:
                 experiment="test_exp",
             )
 
-        controller = EvolutionController(
+        # Controller for context (not used directly in sampling test)
+        EvolutionController(
             config=evolution_config,
             store=temp_store,
             evaluator=mock_evaluator,

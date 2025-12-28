@@ -198,8 +198,8 @@
 - [X] T069 [P] Add comprehensive docstrings to mutator.py
 - [X] T070 [P] Add comprehensive docstrings to cli.py
 - [X] T071 Run ruff check and format on all new files
-- [ ] T072 Run alpha-debug verification on controller.py
-- [ ] T073 Run alpha-debug verification on mutator.py
+- [X] T072 Run alpha-debug verification on controller.py (fixed: resume _skip_seed, duplicate event)
+- [X] T073 Run alpha-debug verification on mutator.py (fixed: parameter validation)
 - [X] T074 Update alpha_evolve module __init__.py exports
 
 ---

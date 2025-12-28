@@ -7,6 +7,8 @@ Provides foundational components for evolutionary strategy discovery:
 - Config: Evolution parameter configuration
 - Evaluator: Dynamic strategy evaluation via backtesting
 - Templates: Evolvable strategy base classes
+- Controller: Evolution loop orchestration
+- Mutator: LLM-based code mutation
 """
 
 __version__ = "0.1.0"
@@ -37,6 +39,35 @@ from scripts.alpha_evolve.evaluator import (
     StrategyEvaluator,
 )
 
+# Template exports (added in spec-008)
+from scripts.alpha_evolve.templates import (
+    BaseEvolveConfig,
+    BaseEvolveStrategy,
+    EquityPoint,
+    MomentumEvolveConfig,
+    MomentumEvolveStrategy,
+)
+
+# Controller exports (added in spec-009)
+from scripts.alpha_evolve.controller import (
+    EvolutionController,
+    EvolutionProgress,
+    EvolutionResult,
+    EvolutionStatus,
+    ProgressEvent,
+    ProgressEventType,
+    StopCondition,
+)
+
+# Mutator exports (added in spec-009)
+from scripts.alpha_evolve.mutator import (
+    LLMMutator,
+    MockMutator,
+    MutationRequest,
+    MutationResponse,
+    Mutator,
+)
+
 __all__ = [
     # Patching
     "BLOCK_RE",
@@ -54,38 +85,12 @@ __all__ = [
     "EvaluationRequest",
     "EvaluationResult",
     "StrategyEvaluator",
-]
-
-# Template exports (added in spec-008)
-from scripts.alpha_evolve.templates import (
-    BaseEvolveConfig,
-    BaseEvolveStrategy,
-    EquityPoint,
-    MomentumEvolveConfig,
-    MomentumEvolveStrategy,
-)
-
-__all__ += [
     # Templates
     "BaseEvolveConfig",
     "BaseEvolveStrategy",
     "EquityPoint",
     "MomentumEvolveConfig",
     "MomentumEvolveStrategy",
-]
-
-# Controller exports (added in spec-009)
-from scripts.alpha_evolve.controller import (
-    EvolutionController,
-    EvolutionProgress,
-    EvolutionResult,
-    EvolutionStatus,
-    ProgressEvent,
-    ProgressEventType,
-    StopCondition,
-)
-
-__all__ += [
     # Controller
     "EvolutionController",
     "EvolutionProgress",
@@ -94,18 +99,6 @@ __all__ += [
     "ProgressEvent",
     "ProgressEventType",
     "StopCondition",
-]
-
-# Mutator exports (added in spec-009)
-from scripts.alpha_evolve.mutator import (
-    LLMMutator,
-    MockMutator,
-    MutationRequest,
-    MutationResponse,
-    Mutator,
-)
-
-__all__ += [
     # Mutator
     "LLMMutator",
     "MockMutator",

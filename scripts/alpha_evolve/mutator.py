@@ -80,9 +80,16 @@ class LLMMutator:
         Initialize LLM mutator.
 
         Args:
-            max_retries: Maximum retry attempts per mutation
-            retry_delay: Delay between retries in seconds
+            max_retries: Maximum retry attempts per mutation (must be >= 1)
+            retry_delay: Delay between retries in seconds (must be >= 0)
+
+        Raises:
+            ValueError: If parameters are invalid
         """
+        if max_retries < 1:
+            raise ValueError("max_retries must be >= 1")
+        if retry_delay < 0:
+            raise ValueError("retry_delay must be >= 0")
         self.max_retries = max_retries
         self.retry_delay = retry_delay
 

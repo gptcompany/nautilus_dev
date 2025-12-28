@@ -3,7 +3,6 @@
 from pathlib import Path
 
 
-
 class TestPatchInsertSampleCycle:
     """T050: Test patch -> insert -> sample cycle."""
 
