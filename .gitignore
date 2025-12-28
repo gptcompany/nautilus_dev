@@ -55,11 +55,17 @@ Thumbs.db
 .claude/cache/
 .claude/tdd-guard/data/
 
-# Credentials
+# Credentials and Secrets
 .env
+.env.production
+.env.local
 *.key
 *.pem
 config/credentials.json
 data/
+
+# Docker
+logs/
+data/catalog/
 # Exception: Dashboard source data directory should be tracked
 !dashboard/src/data/

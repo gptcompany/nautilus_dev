@@ -109,8 +109,8 @@ BYBIT_TESTNET=false
 - Separate testnet/production credentials
 
 #### NFR-002: Reliability
-- Auto-reconnect on connection loss
-- Graceful shutdown preserves state
+- Auto-reconnect on connection loss (native to NautilusTrader adapters - no custom implementation needed)
+- Graceful shutdown preserves state (positions/orders persisted via Redis cache per FR-002)
 
 ## Technical Design
 
@@ -143,12 +143,19 @@ class TradingNodeConfigFactory:
 
 ```
 config/
-├── __init__.py
-├── base.py           # Base configuration classes
-├── production.py     # Production config factory
-├── testnet.py        # Testnet config factory
-├── logging.py        # Logging configuration
-└── secrets.py        # Secret loading utilities
+├── __init__.py           # Package exports
+├── models.py             # Pydantic configuration models
+├── factory.py            # TradingNodeConfigFactory
+├── cache.py              # CacheConfig builder
+├── execution.py          # LiveExecEngineConfig builder
+├── data.py               # LiveDataEngineConfig builder
+├── risk.py               # LiveRiskEngineConfig builder
+├── logging_config.py     # LoggingConfig builder
+├── streaming.py          # StreamingConfig builder
+└── clients/
+    ├── __init__.py
+    ├── binance.py        # Binance client configs
+    └── bybit.py          # Bybit client configs
 ```
 
 ## Environment Setup
