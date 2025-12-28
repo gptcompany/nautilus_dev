@@ -525,7 +525,114 @@
       "operation": "read",
       "timestamp": "2025-12-28T03:15:35.030365",
       "file_path": "/media/sam/1TB/nautilus_dev/.claude/visual-validation/grafana_check.png"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-28T03:15:58.975955",
+      "command": "curl -s \"http://localhost:3000/api/ds/query\" \\\n  -H \"Authorization: Bearer glsa_ZZKIVD8E8nMUp7jvs0I1fUYF26NwlV2I_65938b10\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"queries\": [{\n      \"datasource\": {\"uid\": \"P2596F1C8E12435D2\", \"type\": \"questdb-questdb-datasource\"},\n      \"rawSql\": \"SELECT timestamp, calmar FROM evolution_metrics ORDER BY timestamp\",\n      \"refId\": \"A\"\n    }],\n    \"from\": \"now-6h\",\n    \"to\": \"now\"\n  }' | python3 -c \"import json,sys; d=json.load(sys.stdin); r=d['results']['A']; print('Error:',r.get('error')) if r.get('error') else print('Rows:', len(r['frames'][0]['data']['values'][0]) if r.get('frames') and r['frames'][0].get('data',{}).get('values') else 0)\"",
+      "description": "Test simple query"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-28T03:16:09.180588",
+      "command": "python3 << 'EOF'\nimport json\n\nwith open('/media/sam/1TB/nautilus_dev/monitoring/grafana/dashboards/evolution.json', 'r') as f:\n    dashboard = json.load(f)\n\n# Remove experiment filter from first panel to test\npanel = dashboard['panels'][0]\ntarget = panel['targets'][0]\nsql = target['rawSql']\nprint(\"Before:\", sql)\nsql = sql.replace(\"WHERE experiment = '${experiment}' AND\", \"WHERE\")\nsql = sql.replace(\"WHERE experiment = '${experiment}'\", \"\")\ntarget['rawSql'] = sql\nprint(\"After:\", sql)\n\nwith open('/media/sam/1TB/nautilus_dev/monitoring/grafana/dashboards/evolution.json', 'w') as f:\n    json.dump(dashboard, f, indent=2)\nEOF",
+      "description": "Remove experiment filter for test"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-28T03:16:17.865025",
+      "command": "python3 << 'EOF'\nimport json\nimport re\n\nwith open('/media/sam/1TB/nautilus_dev/monitoring/grafana/dashboards/evolution.json', 'r') as f:\n    dashboard = json.load(f)\n\n# Remove ALL experiment filters from ALL panels\nfor panel in dashboard.get('panels', []):\n    for target in panel.get('targets', []):\n        sql = target.get('rawSql', '')\n        # Remove experiment filter completely\n        sql = re.sub(r\"experiment\\s*=\\s*'\\$\\{experiment\\}'\\s*AND\\s*\", \"\", sql)\n        sql = re.sub(r\"AND\\s*experiment\\s*=\\s*'\\$\\{experiment\\}'\", \"\", sql)\n        sql = re.sub(r\"WHERE\\s*experiment\\s*=\\s*'\\$\\{experiment\\}'\", \"\", sql)\n        sql = re.sub(r\"\\s+AND\\s+AND\\s+\", \" AND \", sql)\n        sql = re.sub(r\"WHERE\\s+AND\", \"WHERE\", sql)\n        sql = re.sub(r\"\\s+$\", \"\", sql)\n        target['rawSql'] = sql\n\nwith open('/media/sam/1TB/nautilus_dev/monitoring/grafana/dashboards/evolution.json', 'w') as f:\n    json.dump(dashboard, f, indent=2)\n\nprint(\"Removed all experiment filters\")\nEOF",
+      "description": "Remove all experiment filters"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-28T03:16:26.421215",
+      "command": "curl -s -X POST \"http://localhost:3000/api/dashboards/db\" \\\n  -H \"Authorization: Bearer glsa_ZZKIVD8E8nMUp7jvs0I1fUYF26NwlV2I_65938b10\" \\\n  -H \"Content-Type: application/json\" \\\n  -d \"{\\\"dashboard\\\": $(cat /media/sam/1TB/nautilus_dev/monitoring/grafana/dashboards/evolution.json), \\\"overwrite\\\": true}\" && echo \" v7\"",
+      "description": "Reimport v7"
+    },
+    {
+      "operation": "task",
+      "timestamp": "2025-12-28T03:16:46.113050",
+      "subagent_type": "alpha-visual",
+      "prompt": "Screenshot http://localhost:3000/d/alpha-evolve-evolution/alpha-evolve-evolution?from=now-6h&to=now\n..."
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-28T03:16:55.267199",
+      "command": "curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3000/d/alpha-evolve-evolution/alpha-evolve-evolution 2>/dev/null || echo \"not_running\"",
+      "description": "Check if Grafana server is running on port 3000"
+    },
+    {
+      "operation": "glob",
+      "timestamp": "2025-12-28T03:16:56.811347",
+      "pattern": "**/*alpha-evolve*dashboard*.json",
+      "path": "/media/sam/1TB/nautilus_dev"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-28T03:17:06.776250",
+      "command": "mkdir -p /media/sam/1TB/nautilus_dev/.claude/visual-validation",
+      "description": "Create visual validation directory"
+    },
+    {
+      "operation": "taskoutput",
+      "timestamp": "2025-12-28T03:17:07.436254",
+      "task_id": "ad5b3c4",
+      "block": true,
+      "timeout": 30000
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-28T03:17:11.288643",
+      "command": "curl -s -o /media/sam/1TB/nautilus_dev/.claude/visual-validation/grafana_dashboard.png \"http://localhost:3000/render/d/alpha-evolve-evolution/alpha-evolve-evolution?from=now-6h&to=now&width=1920&height=1080\" 2>&1 || echo \"Render API not available, trying alternative...\"",
+      "description": "Capture Grafana dashboard screenshot"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-28T03:17:15.768052",
+      "command": "file /media/sam/1TB/nautilus_dev/.claude/visual-validation/grafana_dashboard.png",
+      "description": "Check if screenshot was captured"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-28T03:17:21.789383",
+      "command": "which chromium-browser google-chrome chromium 2>/dev/null | head -1",
+      "description": "Find available Chrome browser"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-28T03:17:28.336456",
+      "command": "google-chrome --headless --screenshot=/media/sam/1TB/nautilus_dev/.claude/visual-validation/grafana_full.png --window-size=1920,2000 --disable-gpu \"http://localhost:3000/d/alpha-evolve-evolution/alpha-evolve-evolution?from=now-6h&to=now&kiosk\" 2>&1",
+      "description": "Take full dashboard screenshot with Chrome"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-28T03:17:36.265822",
+      "file_path": "/media/sam/1TB/nautilus_dev/.claude/visual-validation/grafana_full.png"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-28T03:17:42.786733",
+      "command": "timeout 20 google-chrome --headless --screenshot=/media/sam/1TB/nautilus_dev/.claude/visual-validation/grafana_delayed.png --window-size=1920,3000 --disable-gpu --virtual-time-budget=10000 \"http://localhost:3000/d/alpha-evolve-evolution/alpha-evolve-evolution?from=now-6h&to=now&kiosk\" 2>&1",
+      "description": "Take screenshot with virtual time delay"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-28T03:17:46.884548",
+      "command": "cat /media/sam/1TB/nautilus_dev/monitoring/grafana/dashboards/evolution.json | python3 -c \"\nimport json, sys\nd = json.load(sys.stdin)\nfor i, panel in enumerate(d.get('panels', [])):\n    title = panel.get('title', 'no title')\n    targets = panel.get('targets', [])\n    if targets:\n        sql = targets[0].get('rawSql', 'no sql')\n        print(f'{i+1}. {title}')\n        print(f'   {sql[:100]}')\n        print()\n\"",
+      "description": "Check all panel queries"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-28T03:17:52.079940",
+      "file_path": "/media/sam/1TB/nautilus_dev/.claude/visual-validation/grafana_delayed.png"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-28T03:17:59.582913",
+      "command": "python3 << 'EOF'\nimport json\nimport re\n\nwith open('/media/sam/1TB/nautilus_dev/monitoring/grafana/dashboards/evolution.json', 'r') as f:\n    dashboard = json.load(f)\n\nfor panel in dashboard.get('panels', []):\n    for target in panel.get('targets', []):\n        sql = target.get('rawSql', '')\n        \n        # Fix dangling AND (no WHERE before it)\n        sql = re.sub(r\"FROM\\s+(\\w+)\\s+AND\\s+\", r\"FROM \\1 WHERE \", sql)\n        \n        # Fix interval syntax everywhere\n        sql = re.sub(r\"now\\(\\)\\s*-\\s*interval\\s*'(\\d+)([dhms])'\", r\"dateadd('\\2', -\\1, now())\", sql)\n        \n        # Clean up double spaces\n        sql = re.sub(r'\\s+', ' ', sql).strip()\n        \n        target['rawSql'] = sql\n\nwith open('/media/sam/1TB/nautilus_dev/monitoring/grafana/dashboards/evolution.json', 'w') as f:\n    json.dump(dashboard, f, indent=2)\n\nprint(\"Fixed all queries\")\nEOF",
+      "description": "Fix all query syntax"
     }
   ],
-  "last_updated": "2025-12-28T03:15:35.030386"
+  "last_updated": "2025-12-28T03:17:59.582931"
 }
