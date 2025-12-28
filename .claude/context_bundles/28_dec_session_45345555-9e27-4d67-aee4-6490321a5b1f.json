@@ -394,7 +394,138 @@
       "operation": "read",
       "timestamp": "2025-12-28T03:12:25.655239",
       "file_path": "/media/sam/1TB/nautilus_dev/.claude/visual-validation/grafana_alpha_evolve.png"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-28T03:12:42.875711",
+      "command": "git add -A && git status --short",
+      "description": "Check what to commit"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-28T03:12:49.903594",
+      "command": "git diff --stat HEAD monitoring/grafana/dashboards/evolution.json scripts/alpha_evolve/templates/momentum.py .claude/agents/",
+      "description": "Check dashboard changes"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-28T03:12:55.015701",
+      "command": "git status",
+      "description": "Full git status"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-28T03:12:59.990630",
+      "command": "git diff HEAD -- monitoring/grafana/dashboards/evolution.json | head -100",
+      "description": "Check dashboard diff"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-28T03:13:07.529902",
+      "command": "git show HEAD:monitoring/grafana/dashboards/evolution.json 2>/dev/null | python3 -c \"import json,sys; d=json.load(sys.stdin); t=d['panels'][0]['targets'][0]; print('format:', t.get('format')); print('ds uid:', t.get('datasource',{}).get('uid'))\" 2>/dev/null || echo \"File not in HEAD\"",
+      "description": "Check committed version"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-28T03:13:15.791921",
+      "command": "echo \"Current time: $(date -u '+%Y-%m-%dT%H:%M:%SZ')\" && curl -s -G \"http://localhost:9000/exec\" --data-urlencode \"query=SELECT min(timestamp), max(timestamp) FROM evolution_metrics\" | python3 -c \"import json,sys; d=json.load(sys.stdin); r=d['dataset'][0] if d['dataset'] else ['none','none']; print(f'Data range: {r[0]} to {r[1]}')\"",
+      "description": "Compare times"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-28T03:13:27.649192",
+      "command": "curl -s -G \"http://localhost:9000/exec\" --data-urlencode \"query=INSERT INTO evolution_metrics VALUES\n(now(), 'fresh-001', 'test_exp', 0, NULL, 1.5, 2.0, 10.5, 0.35, 0.65, 100, 0.55, 'seed', 0),\n(now() - 60000000, 'fresh-002', 'test_exp', 1, 'fresh-001', 1.8, 2.5, 8.2, 0.42, 0.78, 120, 0.58, 'success', 2340),\n(now() - 120000000, 'fresh-003', 'test_exp', 2, 'fresh-002', 2.1, 3.2, 6.5, 0.48, 0.92, 150, 0.62, 'success', 2100)\"",
+      "description": "Insert fresh data"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-28T03:13:40.532817",
+      "command": "curl -s \"http://localhost:3000/api/ds/query\" \\\n  -H \"Authorization: Bearer glsa_ZZKIVD8E8nMUp7jvs0I1fUYF26NwlV2I_65938b10\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"queries\": [{\n      \"datasource\": {\"uid\": \"P2596F1C8E12435D2\", \"type\": \"questdb-questdb-datasource\"},\n      \"rawSql\": \"SELECT timestamp, calmar FROM evolution_metrics WHERE experiment = '\"'\"'test_exp'\"'\"' ORDER BY timestamp\",\n      \"refId\": \"A\"\n    }],\n    \"from\": \"now-1h\",\n    \"to\": \"now\"\n  }' | python3 -c \"\nimport json, sys\nd = json.load(sys.stdin)\nr = d.get('results', {}).get('A', {})\nif r.get('error'):\n    print('ERROR:', r['error'])\nelse:\n    frames = r.get('frames', [])\n    if frames and frames[0].get('data', {}).get('values'):\n        vals = frames[0]['data']['values']\n        print(f'Data found: {len(vals[0])} rows')\n        print('Calmar values:', vals[1][:5])\n    else:\n        print('No data in response')\n\"",
+      "description": "Test Grafana query"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-28T03:13:49.363897",
+      "command": "cat /media/sam/1TB/nautilus_dev/monitoring/grafana/dashboards/evolution.json | python3 -c \"\nimport json, sys\nd = json.load(sys.stdin)\nsql = d['panels'][0]['targets'][0]['rawSql']\nprint('Panel 0 SQL:')\nprint(sql)\n\"",
+      "description": "Check panel SQL"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-28T03:13:55.962785",
+      "command": "curl -s -G \"http://localhost:9000/exec\" --data-urlencode \"query=SELECT mutation_outcome, count(*) as cnt FROM evolution_metrics GROUP BY mutation_outcome\"",
+      "description": "Check mutation outcomes"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-28T03:14:04.829379",
+      "command": "curl -s -G \"http://localhost:9000/exec\" --data-urlencode \"query=SELECT timestamp, max(calmar) as best_calmar FROM evolution_metrics WHERE experiment = 'test_exp' AND mutation_outcome = 'success' AND timestamp > now() - interval '7d' SAMPLE BY 5m\"",
+      "description": "Test exact panel query"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-28T03:14:15.759180",
+      "command": "python3 << 'EOF'\nimport json\n\nwith open('/media/sam/1TB/nautilus_dev/monitoring/grafana/dashboards/evolution.json', 'r') as f:\n    dashboard = json.load(f)\n\n# Fix queries for QuestDB compatibility\nfor panel in dashboard.get('panels', []):\n    for target in panel.get('targets', []):\n        sql = target.get('rawSql', '')\n        # Remove SAMPLE BY - it doesn't work well with this data\n        sql = sql.replace('SAMPLE BY 5m', '')\n        sql = sql.replace('SAMPLE BY 1m', '')\n        # Remove the mutation_outcome filter for Fitness Progress\n        if 'best_calmar' in sql and 'success' in sql:\n            sql = sql.replace(\"AND mutation_outcome = 'success'\", \"\")\n        target['rawSql'] = sql.strip()\n\nwith open('/media/sam/1TB/nautilus_dev/monitoring/grafana/dashboards/evolution.json', 'w') as f:\n    json.dump(dashboard, f, indent=2)\n\nprint(\"Fixed queries\")\nEOF",
+      "description": "Fix QuestDB queries"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-28T03:14:20.408512",
+      "command": "curl -s -G \"http://localhost:9000/exec\" --data-urlencode \"query=SELECT timestamp, max(calmar) as best_calmar FROM evolution_metrics WHERE experiment = 'test_exp' AND timestamp > now() - interval '7d' ORDER BY timestamp\"",
+      "description": "Test fixed query"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-28T03:14:25.907588",
+      "command": "curl -s -G \"http://localhost:9000/exec\" --data-urlencode \"query=SELECT timestamp, calmar FROM evolution_metrics WHERE experiment = 'test_exp' ORDER BY timestamp\"",
+      "description": "Simple query without interval"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-28T03:14:31.767144",
+      "command": "curl -s -G \"http://localhost:9000/exec\" --data-urlencode \"query=SELECT timestamp, calmar FROM evolution_metrics WHERE experiment = 'test_exp' AND timestamp > dateadd('d', -7, now()) ORDER BY timestamp\"",
+      "description": "Try dateadd syntax"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-28T03:14:45.731946",
+      "command": "python3 << 'EOF'\nimport json\nimport re\n\nwith open('/media/sam/1TB/nautilus_dev/monitoring/grafana/dashboards/evolution.json', 'r') as f:\n    dashboard = json.load(f)\n\n# Fix all queries\nfor panel in dashboard.get('panels', []):\n    for target in panel.get('targets', []):\n        sql = target.get('rawSql', '')\n        # Fix interval syntax: \"now() - interval 'Xd'\" -> \"dateadd('d', -X, now())\"\n        sql = re.sub(r\"now\\(\\)\\s*-\\s*interval\\s*'(\\d+)d'\", r\"dateadd('d', -\\1, now())\", sql)\n        sql = re.sub(r\"timestamp\\s*>\\s*now\\(\\)\\s*-\\s*interval\\s*'(\\d+)d'\", r\"timestamp > dateadd('d', -\\1, now())\", sql)\n        # Also remove SAMPLE BY\n        sql = re.sub(r'\\s*SAMPLE BY \\d+[mh]', '', sql)\n        target['rawSql'] = sql.strip()\n        print(f\"Panel: {panel.get('title', 'unknown')[:30]}\")\n        print(f\"  SQL: {sql[:80]}...\")\n\nwith open('/media/sam/1TB/nautilus_dev/monitoring/grafana/dashboards/evolution.json', 'w') as f:\n    json.dump(dashboard, f, indent=2)\n\nprint(\"\\nAll queries fixed\")\nEOF",
+      "description": "Fix all interval syntax"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-28T03:14:52.873199",
+      "command": "curl -s -X POST \"http://localhost:3000/api/dashboards/db\" \\\n  -H \"Authorization: Bearer glsa_ZZKIVD8E8nMUp7jvs0I1fUYF26NwlV2I_65938b10\" \\\n  -H \"Content-Type: application/json\" \\\n  -d \"{\\\"dashboard\\\": $(cat /media/sam/1TB/nautilus_dev/monitoring/grafana/dashboards/evolution.json), \\\"overwrite\\\": true}\" && echo \" OK\"",
+      "description": "Reimport"
+    },
+    {
+      "operation": "task",
+      "timestamp": "2025-12-28T03:15:00.115110",
+      "subagent_type": "alpha-visual",
+      "prompt": "Screenshot http://localhost:3000/d/alpha-evolve-evolution/alpha-evolve-evolution?from=now-6h&to=now\n..."
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-28T03:15:07.683504",
+      "command": "curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3000/d/alpha-evolve-evolution/alpha-evolve-evolution 2>/dev/null || echo \"Connection failed\"",
+      "description": "Check if Grafana is accessible"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-28T03:15:13.443991",
+      "command": "mkdir -p /media/sam/1TB/nautilus_dev/.claude/visual-validation",
+      "description": "Create visual validation directory"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-28T03:15:19.873272",
+      "command": "python3 -c \"\nfrom playwright.sync_api import sync_playwright\nimport time\n\nwith sync_playwright() as p:\n    browser = p.chromium.launch(headless=True)\n    page = browser.new_page(viewport={'width': 1920, 'height': 1080})\n    page.goto('http://localhost:3000/d/alpha-evolve-evolution/alpha-evolve-evolution?from=now-6h&to=now')\n    time.sleep(5)  # Wait for panels to load\n    page.screenshot(path='/media/sam/1TB/nautilus_dev/.claude/visual-validation/grafana_check.png', full_page=True)\n    browser.close()\n    print('Screenshot saved')\n\"",
+      "description": "Take Grafana dashboard screenshot"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-28T03:15:35.030365",
+      "file_path": "/media/sam/1TB/nautilus_dev/.claude/visual-validation/grafana_check.png"
     }
   ],
-  "last_updated": "2025-12-28T03:12:25.655256"
+  "last_updated": "2025-12-28T03:15:35.030386"
 }

@@ -55,7 +55,7 @@
       "targets": [
         {
           "refId": "A",
-          "rawSql": "SELECT timestamp, max(calmar) as best_calmar FROM evolution_metrics WHERE experiment = '${experiment}' AND mutation_outcome = 'success' AND timestamp > now() - interval '7d' SAMPLE BY 5m",
+          "rawSql": "SELECT timestamp, max(calmar) as best_calmar FROM evolution_metrics WHERE experiment = '${experiment}'  AND timestamp > dateadd('d', -7, now())",
           "datasource": {
             "type": "questdb-questdb-datasource",
             "uid": "P2596F1C8E12435D2"
@@ -63,7 +63,7 @@
         },
         {
           "refId": "B",
-          "rawSql": "SELECT timestamp, max(sharpe) as best_sharpe FROM evolution_metrics WHERE experiment = '${experiment}' AND mutation_outcome = 'success' AND timestamp > now() - interval '7d' SAMPLE BY 5m",
+          "rawSql": "SELECT timestamp, max(sharpe) as best_sharpe FROM evolution_metrics WHERE experiment = '${experiment}' AND mutation_outcome = 'success' AND timestamp > dateadd('d', -7, now())",
           "hide": true,
           "datasource": {
             "type": "questdb-questdb-datasource",
@@ -858,7 +858,7 @@
       "targets": [
         {
           "refId": "A",
-          "rawSql": "SELECT timestamp, 100.0 * sum(CASE WHEN mutation_outcome = 'success' THEN 1 ELSE 0 END) / count() as success_rate FROM evolution_metrics WHERE experiment = '${experiment}' AND timestamp > now() - interval '24h' SAMPLE BY 1h",
+          "rawSql": "SELECT timestamp, 100.0 * sum(CASE WHEN mutation_outcome = 'success' THEN 1 ELSE 0 END) / count() as success_rate FROM evolution_metrics WHERE experiment = '${experiment}' AND timestamp > now() - interval '24h'",
           "datasource": {
             "type": "questdb-questdb-datasource",
             "uid": "P2596F1C8E12435D2"
