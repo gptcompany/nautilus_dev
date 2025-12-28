@@ -355,7 +355,70 @@
       "timestamp": "2025-12-28T17:00:01.510199",
       "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -m pytest tests/test_circuit_breaker.py tests/test_circuit_breaker_config.py tests/test_risk_manager.py -v 2>&1",
       "description": "Run risk and circuit breaker tests"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-28T17:00:31.266403",
+      "todo_count": 10
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-28T17:00:35.737660",
+      "command": "ruff check risk/ --fix && ruff format risk/",
+      "description": "Run ruff check and format on risk module"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-28T17:00:42.293906",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/012-circuit-breaker-drawdown/tasks.md"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-28T17:00:50.240699",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/012-circuit-breaker-drawdown/tasks.md",
+      "old_string": "## Phase 1: Setup (Shared Infrastructure)\n\n**Purpose**: Create project structure and basic risk modu..."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-28T17:01:13.533240",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/012-circuit-breaker-drawdown/tasks.md",
+      "old_string": "### Tests for Core Implementation\n\n- [ ] T004 [P] Write failing test for CircuitBreakerState enum in..."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-28T17:01:28.812437",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/012-circuit-breaker-drawdown/tasks.md",
+      "old_string": "### Tests for Actor Integration\n\n- [ ] T016 [P] Write failing test for CircuitBreakerActor initializ..."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-28T17:01:39.542693",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/012-circuit-breaker-drawdown/tasks.md",
+      "old_string": "### Tests for RiskManager Integration\n\n- [ ] T023 Write failing test for RiskManager with circuit_br..."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-28T17:01:51.737319",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/012-circuit-breaker-drawdown/tasks.md",
+      "old_string": "### Implementation for Monitoring\n\n- [ ] T029 [P] Create QuestDB schema in monitoring/schemas/circui..."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-28T17:02:04.316197",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/012-circuit-breaker-drawdown/tasks.md",
+      "old_string": "## Phase 6: Polish & Cross-Cutting Concerns\n\n**Purpose**: Final cleanup, documentation, performance ..."
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-28T17:02:15.038930",
+      "todo_count": 10
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-28T17:02:19.731396",
+      "command": "ls -la /media/sam/1TB/nautilus_dev/risk/*.py",
+      "description": "List all risk module files"
     }
   ],
-  "last_updated": "2025-12-28T17:00:01.510215"
+  "last_updated": "2025-12-28T17:02:19.731414"
 }
