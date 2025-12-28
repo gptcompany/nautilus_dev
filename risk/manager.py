@@ -24,6 +24,8 @@ if TYPE_CHECKING:
     from nautilus_trader.model.position import Position
     from nautilus_trader.trading.strategy import Strategy
 
+    from risk.circuit_breaker import CircuitBreaker
+
 
 class RiskManager:
     """
@@ -36,16 +38,28 @@ class RiskManager:
     2. Canceling stop-loss orders when positions close
     3. Updating trailing stops on position changes
     4. Validating orders against position limits
+    5. Enforcing circuit breaker state (if configured)
     """
 
-    def __init__(self, config: RiskConfig, strategy: "Strategy") -> None:
+    def __init__(
+        self,
+        config: RiskConfig,
+        strategy: "Strategy",
+        circuit_breaker: "CircuitBreaker | None" = None,
+    ) -> None:
         self._config = config
         self._strategy = strategy
+        self._circuit_breaker = circuit_breaker
         self._active_stops: dict[PositionId, ClientOrderId] = {}
 
     @property
     def config(self) -> RiskConfig:
         return self._config
+
+    @property
+    def circuit_breaker(self) -> "CircuitBreaker | None":
+        """Return the circuit breaker if configured."""
+        return self._circuit_breaker
 
     @property
     def active_stops(self) -> dict[PositionId, ClientOrderId]:
@@ -61,7 +75,13 @@ class RiskManager:
             self._on_position_changed(event)
 
     def validate_order(self, order: "Order") -> bool:
-        """Pre-flight check against position limits."""
+        """Pre-flight check against circuit breaker and position limits."""
+        # Check circuit breaker first (portfolio-level protection)
+        if self._circuit_breaker is not None:
+            if not self._circuit_breaker.can_open_position():
+                return False
+
+        # Check position limits
         if (
             self._config.max_position_size is None
             and self._config.max_total_exposure is None

@@ -741,3 +741,157 @@ class TestCreateStopLimitOrder:
 
         # Should call stop_limit instead of stop_market
         mock_strategy.order_factory.stop_limit.assert_called_once()
+
+
+# --- T023-T024: Circuit Breaker Integration Tests ---
+
+
+class TestRiskManagerWithCircuitBreaker:
+    """T023: Unit test for RiskManager with circuit_breaker parameter."""
+
+    def test_accepts_circuit_breaker_parameter(
+        self,
+        mock_strategy: MagicMock,
+        instrument_id: InstrumentId,
+    ) -> None:
+        """RiskManager should accept optional circuit_breaker parameter."""
+        from risk import CircuitBreaker, CircuitBreakerConfig
+
+        cb_config = CircuitBreakerConfig()
+        circuit_breaker = CircuitBreaker(config=cb_config, portfolio=None)
+
+        config = RiskConfig()
+        manager = RiskManager(
+            config=config,
+            strategy=mock_strategy,
+            circuit_breaker=circuit_breaker,
+        )
+
+        assert manager.circuit_breaker is circuit_breaker
+
+    def test_circuit_breaker_is_optional(
+        self,
+        risk_manager: RiskManager,
+    ) -> None:
+        """RiskManager should work without circuit_breaker."""
+        assert risk_manager.circuit_breaker is None
+
+
+class TestOrderRejectionOnHaltedState:
+    """T024: Unit test for order rejection on HALTED state."""
+
+    def test_rejects_order_when_circuit_breaker_halted(
+        self,
+        mock_strategy: MagicMock,
+        instrument_id: InstrumentId,
+    ) -> None:
+        """Order should be rejected when circuit breaker is in HALTED state."""
+        from risk import CircuitBreaker, CircuitBreakerConfig
+
+        cb_config = CircuitBreakerConfig()
+        circuit_breaker = CircuitBreaker(config=cb_config, portfolio=None)
+        circuit_breaker.set_initial_equity(Decimal("100000"))
+        circuit_breaker.update(equity=Decimal("80000"))  # 20% drawdown -> HALTED
+
+        config = RiskConfig()
+        manager = RiskManager(
+            config=config,
+            strategy=mock_strategy,
+            circuit_breaker=circuit_breaker,
+        )
+
+        order = MagicMock()
+        order.instrument_id = instrument_id
+        order.quantity = Quantity.from_str("0.1")
+        order.side = OrderSide.BUY
+
+        result = manager.validate_order(order)
+
+        assert result is False
+
+    def test_rejects_order_when_circuit_breaker_reducing(
+        self,
+        mock_strategy: MagicMock,
+        instrument_id: InstrumentId,
+    ) -> None:
+        """Order should be rejected when circuit breaker is in REDUCING state."""
+        from risk import CircuitBreaker, CircuitBreakerConfig
+
+        cb_config = CircuitBreakerConfig()
+        circuit_breaker = CircuitBreaker(config=cb_config, portfolio=None)
+        circuit_breaker.set_initial_equity(Decimal("100000"))
+        circuit_breaker.update(equity=Decimal("85000"))  # 15% drawdown -> REDUCING
+
+        config = RiskConfig()
+        manager = RiskManager(
+            config=config,
+            strategy=mock_strategy,
+            circuit_breaker=circuit_breaker,
+        )
+
+        order = MagicMock()
+        order.instrument_id = instrument_id
+        order.quantity = Quantity.from_str("0.1")
+        order.side = OrderSide.BUY
+
+        result = manager.validate_order(order)
+
+        assert result is False
+
+    def test_allows_order_when_circuit_breaker_active(
+        self,
+        mock_strategy: MagicMock,
+        instrument_id: InstrumentId,
+    ) -> None:
+        """Order should be allowed when circuit breaker is in ACTIVE state."""
+        from risk import CircuitBreaker, CircuitBreakerConfig
+
+        cb_config = CircuitBreakerConfig()
+        circuit_breaker = CircuitBreaker(config=cb_config, portfolio=None)
+        circuit_breaker.set_initial_equity(Decimal("100000"))
+        circuit_breaker.update(equity=Decimal("100000"))  # 0% drawdown -> ACTIVE
+
+        config = RiskConfig()
+        manager = RiskManager(
+            config=config,
+            strategy=mock_strategy,
+            circuit_breaker=circuit_breaker,
+        )
+
+        order = MagicMock()
+        order.instrument_id = instrument_id
+        order.quantity = Quantity.from_str("0.1")
+        order.side = OrderSide.BUY
+
+        result = manager.validate_order(order)
+
+        assert result is True
+
+    def test_allows_order_when_circuit_breaker_warning(
+        self,
+        mock_strategy: MagicMock,
+        instrument_id: InstrumentId,
+    ) -> None:
+        """Order should be allowed when circuit breaker is in WARNING state."""
+        from risk import CircuitBreaker, CircuitBreakerConfig
+
+        cb_config = CircuitBreakerConfig()
+        circuit_breaker = CircuitBreaker(config=cb_config, portfolio=None)
+        circuit_breaker.set_initial_equity(Decimal("100000"))
+        circuit_breaker.update(equity=Decimal("90000"))  # 10% drawdown -> WARNING
+
+        config = RiskConfig()
+        manager = RiskManager(
+            config=config,
+            strategy=mock_strategy,
+            circuit_breaker=circuit_breaker,
+        )
+
+        order = MagicMock()
+        order.instrument_id = instrument_id
+        order.quantity = Quantity.from_str("0.1")
+        order.side = OrderSide.BUY
+
+        result = manager.validate_order(order)
+
+        assert result is True
