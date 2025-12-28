@@ -14,6 +14,50 @@ Current strategies in alpha-evolve have NO stop-loss protection. A single bad tr
 2. **Position Limits**: Enforce max position size per instrument
 3. **Integration**: Works with both BacktestNode and TradingNode
 
+## User Stories
+
+### US1: Automatic Stop-Loss (P1 - MVP)
+**As a** trader running a strategy,
+**I want** every position to automatically have a stop-loss order,
+**So that** I am protected from catastrophic losses on any single trade.
+
+**Acceptance Criteria**:
+- [ ] When PositionOpened event fires, stop-loss order submitted within same event loop
+- [ ] Stop price calculated correctly for LONG (below entry) and SHORT (above entry)
+- [ ] Stop order uses `reduce_only=True` to prevent position flip
+- [ ] When position closes (manually or via TP), stop order is cancelled
+
+### US2: Position Limits (P2)
+**As a** risk manager,
+**I want** to enforce maximum position sizes per instrument and total exposure,
+**So that** no single position or aggregate exposure exceeds predefined limits.
+
+**Acceptance Criteria**:
+- [ ] Orders exceeding per-instrument limit are rejected with clear message
+- [ ] Orders exceeding total exposure limit are rejected with clear message
+- [ ] Valid orders within limits are approved
+
+### US3: Integration Testing (P3)
+**As a** developer,
+**I want** to verify risk management works end-to-end with BacktestNode,
+**So that** I can trust the system before live deployment.
+
+**Acceptance Criteria**:
+- [ ] Stop-loss executes correctly when price drops below trigger
+- [ ] Gap-through scenarios handled (price gaps past stop)
+- [ ] Position limit rejections work in backtest context
+- [ ] Multiple positions maintain separate stops
+
+### US4: Advanced Features (P4 - Optional)
+**As a** trader with sophisticated strategies,
+**I want** trailing stops and STOP_LIMIT order types,
+**So that** I can lock in profits and have more control over execution.
+
+**Acceptance Criteria**:
+- [ ] Trailing stop updates on favorable price moves
+- [ ] STOP_LIMIT orders created with correct limit price offset
+- [ ] PositionChanged events properly update trailing stops
+
 ## Requirements
 
 ### Functional Requirements
@@ -35,25 +79,36 @@ Current strategies in alpha-evolve have NO stop-loss protection. A single bad tr
 - Trailing stop-loss (optional, advanced)
 
 #### FR-004: Configuration
+
+> **Canonical Definition**: See `plan.md` → Configuration section for full RiskConfig model.
+> See `data-model.md` for detailed field descriptions and validation rules.
+
 ```python
 class RiskConfig(BaseModel):
+    # Stop-Loss Settings
+    stop_loss_enabled: bool = True
     stop_loss_pct: Decimal = Decimal("0.02")  # 2%
-    stop_loss_type: Literal["market", "limit"] = "market"
-    max_position_size: Decimal | None = None
-    max_total_exposure: Decimal | None = None
+    stop_loss_type: Literal["market", "limit", "emulated"] = "market"
+
+    # Trailing Stop (optional)
     trailing_stop: bool = False
     trailing_distance_pct: Decimal = Decimal("0.01")
+
+    # Position Limits
+    max_position_size: dict[str, Decimal] | None = None  # Per instrument
+    max_total_exposure: Decimal | None = None
 ```
 
 ### Non-Functional Requirements
 
 #### NFR-001: Performance
-- Stop-loss order must be submitted within 10ms of entry fill
+- Stop-loss order must be submitted within 10ms of entry fill (**live trading only** - backtest is synchronous)
 - No impact on strategy execution speed
 
 #### NFR-002: Reliability
-- Stop-loss must survive strategy restart
-- OCO (One-Cancels-Other) pairing with take-profit if applicable
+- **MVP Scope (Backtest)**: Stop-loss state maintained in memory (`active_stops` dict) - no persistence required
+- **Future Scope (Live Trading)**: Stop-loss state persisted to Redis/DB for restart recovery (out of MVP scope)
+- OCO (One-Cancels-Other) pairing with take-profit: **Out of MVP scope** - manual cancellation via `on_order_filled()` event handler
 
 ## Technical Design
 
@@ -66,7 +121,7 @@ class RiskManager:
     def __init__(self, config: RiskConfig, strategy: Strategy):
         self.config = config
         self.strategy = strategy
-        self.active_stops: dict[PositionId, OrderId] = {}
+        self.active_stops: dict[PositionId, ClientOrderId] = {}  # Maps position to stop order
 
     def on_position_opened(self, event: PositionOpened) -> None:
         """Generate stop-loss when position opens."""
@@ -117,6 +172,15 @@ class MyStrategy(Strategy):
 1. **Unit Tests**: RiskManager logic
 2. **Integration Tests**: BacktestNode with stop-loss execution
 3. **Edge Cases**: Gap through stop, partial fills, position flip
+
+### Edge Case: Partial Fills
+
+**Scenario**: Order partially filled, creating position smaller than requested.
+
+**Behavior**:
+- PositionOpened fires with actual filled quantity
+- Stop-loss created for actual position size (not requested size)
+- No special handling needed - NautilusTrader events reflect actual fills
 
 ## Dependencies
 
