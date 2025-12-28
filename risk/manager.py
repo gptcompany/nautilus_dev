@@ -118,6 +118,12 @@ class RiskManager:
         del self._active_stops[position_id]
 
     def _on_position_changed(self, event: PositionChanged) -> None:
+        """
+        Update trailing stop when position changes.
+
+        Note: MVP implementation uses avg_px_open as reference price.
+        Full trailing stop would track high watermark for LONG positions.
+        """
         if not self._config.trailing_stop:
             return
 
@@ -130,12 +136,18 @@ class RiskManager:
             return
 
         old_stop_id = self._active_stops[position_id]
-        self._strategy.cancel_order(old_stop_id)
 
-        new_stop_price = self._calculate_trailing_stop_price(position)
-        new_stop_order = self._create_stop_order(position, new_stop_price)
-        self._strategy.submit_order(new_stop_order)
-        self._active_stops[position_id] = new_stop_order.client_order_id
+        # Create new stop before canceling old one to maintain protection
+        try:
+            new_stop_price = self._calculate_trailing_stop_price(position)
+            new_stop_order = self._create_stop_order(position, new_stop_price)
+            self._strategy.submit_order(new_stop_order)
+            self._active_stops[position_id] = new_stop_order.client_order_id
+            # Only cancel old stop after new one is submitted
+            self._strategy.cancel_order(old_stop_id)
+        except Exception:
+            # If new stop fails, keep old stop active for protection
+            pass
 
     def _calculate_stop_price(self, position: "Position") -> Price:
         """
@@ -212,4 +224,11 @@ class RiskManager:
         return 0.0
 
     def _estimate_order_notional(self, order: "Order") -> float:
+        """
+        Estimate order notional value.
+
+        Note: MVP uses simplified calculation. Production would query
+        current market price from cache or data provider.
+        """
+        # TODO: Get actual price from cache/market data
         return float(order.quantity) * 50000.0
