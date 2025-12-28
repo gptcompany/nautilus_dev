@@ -895,3 +895,170 @@ class TestOrderRejectionOnHaltedState:
         result = manager.validate_order(order)
 
         assert result is True
+
+
+# --- T030-T034: Daily PnL Tracker Integration Tests ---
+
+
+class TestRiskManagerWithDailyTracker:
+    """T030: Unit test for RiskManager with daily_tracker parameter."""
+
+    def test_accepts_daily_tracker_parameter(
+        self,
+        mock_strategy: MagicMock,
+        instrument_id: InstrumentId,
+    ) -> None:
+        """RiskManager should accept optional daily_tracker parameter."""
+        from risk import DailyLossConfig, DailyPnLTracker
+
+        daily_config = DailyLossConfig()
+        daily_tracker = DailyPnLTracker(config=daily_config, strategy=mock_strategy)
+
+        config = RiskConfig()
+        manager = RiskManager(
+            config=config,
+            strategy=mock_strategy,
+            daily_tracker=daily_tracker,
+        )
+
+        assert manager.daily_tracker is daily_tracker
+
+    def test_daily_tracker_is_optional(
+        self,
+        risk_manager: RiskManager,
+    ) -> None:
+        """RiskManager should work without daily_tracker."""
+        assert risk_manager.daily_tracker is None
+
+
+class TestRiskManagerWithoutDailyTracker:
+    """T031: Unit test for RiskManager without daily_tracker."""
+
+    def test_validates_order_without_daily_tracker(
+        self,
+        risk_manager: RiskManager,
+        instrument_id: InstrumentId,
+    ) -> None:
+        """Order validation should work without daily_tracker."""
+        order = MagicMock()
+        order.instrument_id = instrument_id
+        order.quantity = Quantity.from_str("0.1")
+        order.side = OrderSide.BUY
+
+        result = risk_manager.validate_order(order)
+
+        assert result is True
+
+
+class TestDailyTrackerEventRouting:
+    """T032/T033: Test event routing to daily_tracker."""
+
+    def test_routes_position_closed_to_daily_tracker(
+        self,
+        mock_strategy: MagicMock,
+        instrument_id: InstrumentId,
+    ) -> None:
+        """PositionClosed event should be routed to daily_tracker."""
+        from risk import DailyLossConfig, DailyPnLTracker
+
+        daily_config = DailyLossConfig()
+        daily_tracker = DailyPnLTracker(config=daily_config, strategy=mock_strategy)
+
+        config = RiskConfig(stop_loss_enabled=False)
+        manager = RiskManager(
+            config=config,
+            strategy=mock_strategy,
+            daily_tracker=daily_tracker,
+        )
+
+        position = create_mock_position(
+            instrument_id=instrument_id,
+            side=PositionSide.LONG,
+            entry_price="50000.00",
+            quantity="0.1",
+        )
+
+        # Create PositionClosed event with realized_pnl
+        close_event = create_mock_position_closed_event(position)
+        from nautilus_trader.model.objects import Money
+
+        close_event.realized_pnl = Money(100.0, USDT)
+
+        manager.handle_event(close_event)
+
+        # Daily tracker should have accumulated the realized PnL
+        assert daily_tracker.daily_realized == Decimal("100")
+
+
+class TestDailyTrackerValidateOrderIntegration:
+    """T034: Test validate_order() integration with daily_tracker.can_trade()."""
+
+    def test_rejects_order_when_daily_limit_triggered(
+        self,
+        mock_strategy: MagicMock,
+        instrument_id: InstrumentId,
+    ) -> None:
+        """Order should be rejected when daily loss limit is triggered."""
+        from risk import DailyLossConfig, DailyPnLTracker
+
+        daily_config = DailyLossConfig(daily_loss_limit=Decimal("100"))
+        daily_tracker = DailyPnLTracker(config=daily_config, strategy=mock_strategy)
+
+        config = RiskConfig()
+        manager = RiskManager(
+            config=config,
+            strategy=mock_strategy,
+            daily_tracker=daily_tracker,
+        )
+
+        # Create a PositionClosed event to trigger the daily limit
+        position = create_mock_position(
+            instrument_id=instrument_id,
+            side=PositionSide.LONG,
+            entry_price="50000.00",
+            quantity="0.1",
+        )
+        close_event = create_mock_position_closed_event(position)
+        from nautilus_trader.model.objects import Money
+
+        close_event.realized_pnl = Money(-150.0, USDT)  # Loss exceeds $100 limit
+
+        manager.handle_event(close_event)
+        daily_tracker.check_limit()
+
+        # Now try to place an order
+        order = MagicMock()
+        order.instrument_id = instrument_id
+        order.quantity = Quantity.from_str("0.1")
+        order.side = OrderSide.BUY
+
+        result = manager.validate_order(order)
+
+        assert result is False
+
+    def test_allows_order_when_daily_limit_not_triggered(
+        self,
+        mock_strategy: MagicMock,
+        instrument_id: InstrumentId,
+    ) -> None:
+        """Order should be allowed when daily loss limit not triggered."""
+        from risk import DailyLossConfig, DailyPnLTracker
+
+        daily_config = DailyLossConfig(daily_loss_limit=Decimal("1000"))
+        daily_tracker = DailyPnLTracker(config=daily_config, strategy=mock_strategy)
+
+        config = RiskConfig()
+        manager = RiskManager(
+            config=config,
+            strategy=mock_strategy,
+            daily_tracker=daily_tracker,
+        )
+
+        order = MagicMock()
+        order.instrument_id = instrument_id
+        order.quantity = Quantity.from_str("0.1")
+        order.side = OrderSide.BUY
+
+        result = manager.validate_order(order)
+
+        assert result is True

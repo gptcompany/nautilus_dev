@@ -58,18 +58,23 @@ class DailyLossConfig(BaseModel):
 
     @model_validator(mode="after")
     def validate_reset_time(self) -> "DailyLossConfig":
-        """Ensure reset_time_utc is valid HH:MM format."""
+        """Ensure reset_time_utc is valid HH:MM format (strict 2-digit)."""
+        time_str = self.reset_time_utc
         try:
-            parts = self.reset_time_utc.split(":")
-            if len(parts) != 2:
+            # Must be exactly 5 chars: HH:MM
+            if not isinstance(time_str, str) or len(time_str) != 5:
                 raise ValueError
-            hour, minute = int(parts[0]), int(parts[1])
+            if time_str[2] != ":":
+                raise ValueError
+            hour_str, minute_str = time_str[:2], time_str[3:5]
+            # Must be 2 digits each
+            if not (hour_str.isdigit() and minute_str.isdigit()):
+                raise ValueError
+            hour, minute = int(hour_str), int(minute_str)
             if not (0 <= hour <= 23 and 0 <= minute <= 59):
                 raise ValueError
-        except (ValueError, AttributeError):
-            raise ValueError(
-                f"reset_time_utc must be in HH:MM format, got: {self.reset_time_utc}"
-            )
+        except (ValueError, AttributeError, TypeError):
+            raise ValueError(f"reset_time_utc must be in HH:MM format, got: {time_str}")
         return self
 
     def get_effective_limit(self, starting_equity: Decimal) -> Decimal:

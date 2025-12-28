@@ -23,7 +23,7 @@
 
 **Purpose**: Project initialization - extending existing risk module
 
-- [ ] T001 Verify existing risk module structure in risk/__init__.py
+- [X] T001 Verify existing risk module structure in risk/__init__.py
 
 ---
 
@@ -33,11 +33,11 @@
 
 **⚠️ CRITICAL**: No tracker work can begin until DailyLossConfig is complete
 
-- [ ] T002 Create DailyLossConfig Pydantic model in risk/daily_loss_config.py
-- [ ] T003 [P] Write unit tests for DailyLossConfig validation in tests/test_daily_loss_config.py
-- [ ] T004 Add DailyLossConfig export to risk/__init__.py
+- [X] T002 Create DailyLossConfig Pydantic model in risk/daily_loss_config.py
+- [X] T003 [P] Write unit tests for DailyLossConfig validation in tests/test_daily_loss_config.py
+- [X] T004 Add DailyLossConfig export to risk/__init__.py
 
-**Checkpoint**: Foundation ready - tracker implementation can now begin
+**Checkpoint**: ✅ Foundation ready - tracker implementation can now begin
 
 ---
 
@@ -51,18 +51,18 @@
 
 **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T005 [P] [FR1] Write test_daily_realized_accumulates in tests/test_daily_pnl_tracker.py
-- [ ] T006 [P] [FR1] Write test_unrealized_pnl_calculation in tests/test_daily_pnl_tracker.py
-- [ ] T007 [P] [FR1] Write test_total_daily_pnl_sum in tests/test_daily_pnl_tracker.py
+- [X] T005 [P] [FR1] Write test_daily_realized_accumulates in tests/test_daily_pnl_tracker.py
+- [X] T006 [P] [FR1] Write test_unrealized_pnl_calculation in tests/test_daily_pnl_tracker.py
+- [X] T007 [P] [FR1] Write test_total_daily_pnl_sum in tests/test_daily_pnl_tracker.py
 
 ### Implementation for User Story 1
 
-- [ ] T008 [FR1] Create DailyPnLTracker class skeleton in risk/daily_pnl_tracker.py
-- [ ] T009 [FR1] Implement daily_realized property and _on_position_closed handler in risk/daily_pnl_tracker.py
-- [ ] T010 [FR1] Implement daily_unrealized property using portfolio.unrealized_pnls() in risk/daily_pnl_tracker.py
-- [ ] T011 [FR1] Implement total_daily_pnl computed property in risk/daily_pnl_tracker.py
-- [ ] T012 [FR1] Implement handle_event() with PositionClosed routing in risk/daily_pnl_tracker.py
-- [ ] T013 [FR1] Add DailyPnLTracker export to risk/__init__.py
+- [X] T008 [FR1] Create DailyPnLTracker class skeleton in risk/daily_pnl_tracker.py
+- [X] T009 [FR1] Implement daily_realized property and _on_position_closed handler in risk/daily_pnl_tracker.py
+- [X] T010 [FR1] Implement daily_unrealized property using portfolio.unrealized_pnls() in risk/daily_pnl_tracker.py
+- [X] T011 [FR1] Implement total_daily_pnl computed property in risk/daily_pnl_tracker.py
+- [X] T012 [FR1] Implement handle_event() with PositionClosed routing in risk/daily_pnl_tracker.py
+- [X] T013 [FR1] Add DailyPnLTracker export to risk/__init__.py
 
 **Checkpoint**: At this point, PnL tracking should work and tests pass
 
@@ -76,18 +76,18 @@
 
 ### Tests for User Story 2
 
-- [ ] T014 [P] [FR2] Write test_limit_not_triggered_under_threshold in tests/test_daily_pnl_tracker.py
-- [ ] T015 [P] [FR2] Write test_limit_triggered_at_threshold in tests/test_daily_pnl_tracker.py
-- [ ] T016 [P] [FR2] Write test_can_trade_returns_false_when_triggered in tests/test_daily_pnl_tracker.py
-- [ ] T017 [P] [FR2] Write test_close_positions_on_limit_true in tests/test_daily_pnl_tracker.py
+- [X] T014 [P] [FR2] Write test_limit_not_triggered_under_threshold in tests/test_daily_pnl_tracker.py
+- [X] T015 [P] [FR2] Write test_limit_triggered_at_threshold in tests/test_daily_pnl_tracker.py
+- [X] T016 [P] [FR2] Write test_can_trade_returns_false_when_triggered in tests/test_daily_pnl_tracker.py
+- [X] T017 [P] [FR2] Write test_close_positions_on_limit_true in tests/test_daily_pnl_tracker.py
 
 ### Implementation for User Story 2
 
-- [ ] T018 [FR2] Implement limit_triggered property and state management in risk/daily_pnl_tracker.py
-- [ ] T019 [FR2] Implement check_limit() method with threshold comparison in risk/daily_pnl_tracker.py
-- [ ] T020 [FR2] Implement can_trade() method in risk/daily_pnl_tracker.py
-- [ ] T021 [FR2] Implement _close_all_positions() helper for limit trigger in risk/daily_pnl_tracker.py
-- [ ] T022 [FR2] Add warning threshold alert at 50% of limit in risk/daily_pnl_tracker.py
+- [X] T018 [FR2] Implement limit_triggered property and state management in risk/daily_pnl_tracker.py
+- [X] T019 [FR2] Implement check_limit() method with threshold comparison in risk/daily_pnl_tracker.py
+- [X] T020 [FR2] Implement can_trade() method in risk/daily_pnl_tracker.py
+- [X] T021 [FR2] Implement _close_all_positions() helper for limit trigger in risk/daily_pnl_tracker.py
+- [X] T022 [FR2] Add warning threshold alert at 50% of limit in risk/daily_pnl_tracker.py
 
 **Checkpoint**: At this point, loss limit enforcement should work independently
 
@@ -101,16 +101,16 @@
 
 ### Tests for User Story 3
 
-- [ ] T023 [P] [FR3] Write test_reset_clears_daily_realized in tests/test_daily_pnl_tracker.py
-- [ ] T024 [P] [FR3] Write test_reset_clears_limit_triggered in tests/test_daily_pnl_tracker.py
-- [ ] T025 [P] [FR3] Write test_day_start_property_updates_on_reset in tests/test_daily_pnl_tracker.py
+- [X] T023 [P] [FR3] Write test_reset_clears_daily_realized in tests/test_daily_pnl_tracker.py
+- [X] T024 [P] [FR3] Write test_reset_clears_limit_triggered in tests/test_daily_pnl_tracker.py
+- [X] T025 [P] [FR3] Write test_day_start_property_updates_on_reset in tests/test_daily_pnl_tracker.py
 
 ### Implementation for User Story 3
 
-- [ ] T026 [FR3] Implement reset() method in risk/daily_pnl_tracker.py
-- [ ] T027 [FR3] Implement day_start property and _get_day_start() helper in risk/daily_pnl_tracker.py
-- [ ] T028 [FR3] Implement timer-based reset using clock.set_timer() in risk/daily_pnl_tracker.py
-- [ ] T029 [FR3] Implement _next_reset_time() helper for calculating next reset in risk/daily_pnl_tracker.py
+- [X] T026 [FR3] Implement reset() method in risk/daily_pnl_tracker.py
+- [X] T027 [FR3] Implement day_start property and _get_day_start() helper in risk/daily_pnl_tracker.py
+- [X] T028 [FR3] Implement timer-based reset using clock.set_timer() in risk/daily_pnl_tracker.py
+- [X] T029 [FR3] Implement _next_reset_time() helper for calculating next reset in risk/daily_pnl_tracker.py
 
 **Checkpoint**: At this point, daily reset should work independently
 
@@ -124,16 +124,16 @@
 
 ### Tests for User Story 4
 
-- [ ] T030 [P] [FR4] Write test_risk_manager_with_daily_tracker in tests/test_risk_manager.py
-- [ ] T031 [P] [FR4] Write test_risk_manager_without_daily_tracker in tests/test_risk_manager.py
+- [X] T030 [P] [FR4] Write test_risk_manager_with_daily_tracker in tests/test_risk_manager.py
+- [X] T031 [P] [FR4] Write test_risk_manager_without_daily_tracker in tests/test_risk_manager.py
 
 ### Implementation for User Story 4
 
-- [ ] T032 [FR4] Add daily_tracker parameter to RiskManager.__init__() in risk/manager.py
-- [ ] T033 [FR4] Add daily_tracker event routing in RiskManager.handle_event() in risk/manager.py
-- [ ] T034 [FR4] Add validate_order() integration with daily_tracker.can_trade() in risk/manager.py
-- [ ] T034a [FR4] Implement per_strategy=True tracking logic (strategy_id key in DailyPnLTracker) in risk/daily_pnl_tracker.py
-- [ ] T034b [P] [FR4] Write test_per_strategy_limits_independent in tests/test_daily_pnl_tracker.py
+- [X] T032 [FR4] Add daily_tracker parameter to RiskManager.__init__() in risk/manager.py
+- [X] T033 [FR4] Add daily_tracker event routing in RiskManager.handle_event() in risk/manager.py
+- [X] T034 [FR4] Add validate_order() integration with daily_tracker.can_trade() in risk/manager.py
+- [X] T034a [FR4] Implement per_strategy=True tracking logic (strategy_id key in DailyPnLTracker) in risk/daily_pnl_tracker.py
+- [X] T034b [P] [FR4] Write test_per_strategy_limits_independent in tests/test_daily_pnl_tracker.py
 
 **Checkpoint**: At this point, RiskManager integration and per-strategy limits should work
 
@@ -147,13 +147,13 @@
 
 ### Tests for User Story 5
 
-- [ ] T035 [P] [MON] Write test_questdb_record_on_check_limit in tests/test_daily_pnl_tracker.py
+- [X] T035 [P] [MON] Write test_questdb_record_on_check_limit in tests/test_daily_pnl_tracker.py
 
 ### Implementation for User Story 5
 
-- [ ] T036 [MON] Create daily_pnl QuestDB table schema in monitoring/schemas/daily_pnl.sql
-- [ ] T037 [MON] Implement _publish_to_questdb() helper in risk/daily_pnl_tracker.py
-- [ ] T038 [MON] Add QuestDB publish on check_limit() call in risk/daily_pnl_tracker.py
+- [X] T036 [MON] Create daily_pnl QuestDB table schema in monitoring/schemas/daily_pnl.sql
+- [X] T037 [MON] Implement _publish_to_questdb() helper in risk/daily_pnl_tracker.py
+- [X] T038 [MON] Add QuestDB publish on check_limit() call in risk/daily_pnl_tracker.py
 
 **Checkpoint**: At this point, monitoring should work
 
@@ -165,10 +165,10 @@
 
 ### Integration Tests
 
-- [ ] T039 [P] [INT] Write test_daily_limit_backtest_single_strategy in tests/integration/test_daily_limits_backtest.py
-- [ ] T040 [P] [INT] Write test_daily_limit_backtest_multi_position in tests/integration/test_daily_limits_backtest.py
-- [ ] T041 [INT] Write test_daily_limit_reset_at_midnight in tests/integration/test_daily_limits_backtest.py
-- [ ] T042 [INT] Write test_positions_spanning_midnight_edge_case in tests/integration/test_daily_limits_backtest.py
+- [X] T039 [P] [INT] Write test_daily_limit_backtest_single_strategy in tests/integration/test_daily_limits_backtest.py
+- [X] T040 [P] [INT] Write test_daily_limit_backtest_multi_position in tests/integration/test_daily_limits_backtest.py
+- [X] T041 [INT] Write test_daily_limit_reset_at_midnight in tests/integration/test_daily_limits_backtest.py
+- [X] T042 [INT] Write test_positions_spanning_midnight_edge_case in tests/integration/test_daily_limits_backtest.py
 
 **Checkpoint**: All integration tests should pass
 
@@ -178,9 +178,9 @@
 
 **Purpose**: Improvements that affect multiple user stories
 
-- [ ] T043 [P] Add comprehensive docstrings to DailyPnLTracker in risk/daily_pnl_tracker.py
-- [ ] T044 [P] Add logging for limit triggers and resets in risk/daily_pnl_tracker.py
-- [ ] T045 Run alpha-debug verification on risk/daily_pnl_tracker.py
+- [X] T043 [P] Add comprehensive docstrings to DailyPnLTracker in risk/daily_pnl_tracker.py
+- [X] T044 [P] Add logging for limit triggers and resets in risk/daily_pnl_tracker.py
+- [X] T045 Run alpha-debug verification on risk/daily_pnl_tracker.py
 
 ---
 

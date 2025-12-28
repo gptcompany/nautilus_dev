@@ -39,6 +39,7 @@ class RiskManager:
     3. Updating trailing stops on position changes
     4. Validating orders against position limits
     5. Enforcing circuit breaker state (if configured)
+    6. Enforcing daily loss limits (if configured)
     """
 
     def __init__(
@@ -46,10 +47,12 @@ class RiskManager:
         config: RiskConfig,
         strategy: "Strategy",
         circuit_breaker: "CircuitBreaker | None" = None,
+        daily_tracker: "DailyPnLTracker | None" = None,
     ) -> None:
         self._config = config
         self._strategy = strategy
         self._circuit_breaker = circuit_breaker
+        self._daily_tracker = daily_tracker
         self._active_stops: dict[PositionId, ClientOrderId] = {}
 
     @property
@@ -62,11 +65,20 @@ class RiskManager:
         return self._circuit_breaker
 
     @property
+    def daily_tracker(self) -> "DailyPnLTracker | None":
+        """Return the daily PnL tracker if configured."""
+        return self._daily_tracker
+
+    @property
     def active_stops(self) -> dict[PositionId, ClientOrderId]:
         return self._active_stops
 
     def handle_event(self, event: "Event") -> None:
         """Route events with simple if/elif chain."""
+        # Route to daily tracker first (tracks all position events)
+        if self._daily_tracker is not None:
+            self._daily_tracker.handle_event(event)
+
         if isinstance(event, PositionOpened):
             self._on_position_opened(event)
         elif isinstance(event, PositionClosed):
@@ -75,10 +87,15 @@ class RiskManager:
             self._on_position_changed(event)
 
     def validate_order(self, order: "Order") -> bool:
-        """Pre-flight check against circuit breaker and position limits."""
+        """Pre-flight check against circuit breaker, daily limits, and position limits."""
         # Check circuit breaker first (portfolio-level protection)
         if self._circuit_breaker is not None:
             if not self._circuit_breaker.can_open_position():
+                return False
+
+        # Check daily loss limit (daily protection)
+        if self._daily_tracker is not None:
+            if not self._daily_tracker.can_trade():
                 return False
 
         # Check position limits

@@ -37,6 +37,8 @@ from risk.circuit_breaker_actor import CircuitBreakerActor
 from risk.circuit_breaker_config import CircuitBreakerConfig
 from risk.circuit_breaker_state import CircuitBreakerState
 from risk.config import RiskConfig, StopLossType, TrailingOffsetType
+from risk.daily_loss_config import DailyLossConfig
+from risk.daily_pnl_tracker import DailyPnLTracker
 from risk.manager import RiskManager
 
 __all__ = [
@@ -44,6 +46,8 @@ __all__ = [
     "CircuitBreakerActor",
     "CircuitBreakerConfig",
     "CircuitBreakerState",
+    "DailyLossConfig",
+    "DailyPnLTracker",
     "RiskConfig",
     "RiskManager",
     "StopLossType",
