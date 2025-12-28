@@ -19,6 +19,14 @@ The nautilus-coder knows best practices, native Rust implementations, and common
 ### 5. Always use the nautilus-visualization-renderer for trading charts and dashboards.
 The visualization-renderer implements Canvas 2D/WebGL charts for equity curves, orderbook heatmaps, and real-time PnL dashboards.
 
+### 6. ALWAYS spawn grafana-visual-validator after creating/editing Grafana dashboards.
+After ANY Write/Edit to `monitoring/grafana/dashboards/*.json`:
+1. Spawn `alpha-visual` agent to screenshot the dashboard
+2. Verify panels render correctly (no errors, data shows if available)
+3. Auto-fix datasource UIDs if panels show "invalid server" errors
+4. Re-import dashboard if fixes were applied
+This is MANDATORY - never skip visual validation for Grafana changes.
+
 ## Philosophy
 
 ### Error Handling for Trading Systems

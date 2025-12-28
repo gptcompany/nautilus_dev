@@ -22,8 +22,20 @@
         "query": "SELECT DISTINCT experiment FROM evolution_metrics WHERE timestamp > now() - interval '7d'",
         "refresh": 1,
         "multi": false,
-        "includeAll": false,
-        "current": {}
+        "includeAll": true,
+        "current": {
+          "selected": true,
+          "text": "test_exp",
+          "value": "test_exp"
+        },
+        "options": [
+          {
+            "selected": true,
+            "text": "test_exp",
+            "value": "test_exp"
+          }
+        ],
+        "allValue": "*"
       }
     ]
   },
