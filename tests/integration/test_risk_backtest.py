@@ -21,6 +21,7 @@ from nautilus_trader.model.identifiers import (
     StrategyId,
     TraderId,
 )
+from nautilus_trader.model.currencies import USDT
 from nautilus_trader.model.objects import Money, Price, Quantity
 
 from risk import RiskConfig, RiskManager
