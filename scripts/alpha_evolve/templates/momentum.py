@@ -17,7 +17,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from nautilus_trader.indicators import ExponentialMovingAverage
+from nautilus_trader.indicators.average.ema import ExponentialMovingAverage
 
 from scripts.alpha_evolve.templates.base import BaseEvolveConfig, BaseEvolveStrategy
 
