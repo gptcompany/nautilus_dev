@@ -580,10 +580,10 @@ class TestValidateOrderTotalExposureLimit:
         order.quantity = Quantity.from_str("0.04")  # 0.04 BTC @ $50000 = $2000
         order.side = OrderSide.BUY
 
-        # Mock price for notional calculation
-        mock_strategy.cache.instrument.return_value.make_price.return_value = (
-            Price.from_str("50000.00")
-        )
+        # Mock quote_tick for notional calculation (new implementation)
+        mock_quote = MagicMock()
+        mock_quote.ask_price = Price.from_str("50000.00")
+        mock_strategy.cache.quote_tick.return_value = mock_quote
 
         result = manager.validate_order(order)
 
