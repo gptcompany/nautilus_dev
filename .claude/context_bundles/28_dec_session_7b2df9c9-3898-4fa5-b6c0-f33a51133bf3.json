@@ -627,7 +627,134 @@
       "timestamp": "2025-12-28T15:44:44.907758",
       "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run pytest /media/sam/1TB/nautilus_dev/tests/test_risk_config.py /media/sam/1TB/nautilus_dev/tests/test_risk_manager.py /media/sam/1TB/nautilus_dev/tests/integration/test_risk_backtest.py -v 2>&1",
       "description": "Run pytest on risk-related test files"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-28T15:45:06.742224",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -m pytest tests/test_risk_config.py tests/test_risk_manager.py tests/integration/test_risk_backtest.py --cov=risk --cov-report=term-missing 2>&1 | tail -30",
+      "description": "Run coverage report"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-28T15:45:13.822560",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && pip install pytest-cov -q && python -m pytest tests/test_risk_config.py tests/test_risk_manager.py tests/integration/test_risk_backtest.py --cov=risk --cov-report=term-missing 2>&1 | tail -40",
+      "description": "Install pytest-cov and run coverage"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-28T15:45:59.194551",
+      "file_path": "/media/sam/1TB/nautilus_dev/pytest.ini"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-28T15:46:04.674893",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -m pytest tests/test_risk_config.py tests/test_risk_manager.py tests/integration/test_risk_backtest.py -p no:cov --cov=risk --cov-report=term 2>&1 | tail -40",
+      "description": "Run coverage with explicit override"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-28T15:46:09.930202",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && pip list | grep -i cov",
+      "description": "Check if pytest-cov installed"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-28T15:46:17.140455",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -c \"import coverage; cov = coverage.Coverage(source=['risk']); cov.start(); import subprocess; subprocess.run(['python', '-m', 'pytest', 'tests/test_risk_config.py', 'tests/test_risk_manager.py', 'tests/integration/test_risk_backtest.py', '-q']); cov.stop(); cov.report()\" 2>&1 | tail -20",
+      "description": "Run coverage manually"
+    },
+    {
+      "operation": "task",
+      "timestamp": "2025-12-28T15:46:28.146457",
+      "subagent_type": "alpha-debug",
+      "prompt": "Perform alpha-debug verification on `/media/sam/1TB/nautilus_dev/risk/manager.py`.\n\nFocus on:\n1. Edg..."
+    },
+    {
+      "operation": "glob",
+      "timestamp": "2025-12-28T15:46:35.661411",
+      "pattern": "**/tests/**/test*manager*.py",
+      "path": "/media/sam/1TB/nautilus_dev"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-28T15:46:35.670641",
+      "command": "git diff HEAD~3 --stat risk/manager.py 2>/dev/null || echo \"File not in recent changes\"",
+      "description": "Check recent changes to manager.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-28T15:46:35.734960",
+      "file_path": "/media/sam/1TB/nautilus_dev/risk/manager.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-28T15:46:41.981767",
+      "file_path": "/media/sam/1TB/nautilus_dev/risk/config.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-28T15:46:41.991383",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/test_risk_manager.py"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-28T15:46:55.820323",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run pyright risk/manager.py --outputjson 2>/dev/null | head -80 || echo \"Pyright check complete\"",
+      "description": "Run pyright type checking on manager.py"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-28T15:46:57.841807",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run ruff check risk/manager.py 2>&1 | head -30",
+      "description": "Run ruff linting on manager.py"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-28T15:46:59.570890",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run pytest tests/test_risk_manager.py -v --tb=short 2>&1 | tail -50",
+      "description": "Run existing tests for risk manager"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-28T15:47:39.339600",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python3 -c \"\nfrom nautilus_trader.model.enums import PositionSide\nprint('PositionSide values:')\nfor attr in dir(PositionSide):\n    if not attr.startswith('_'):\n        try:\n            val = getattr(PositionSide, attr)\n            if isinstance(val, PositionSide):\n                print(f'  {attr} = {val}')\n        except:\n            pass\n\"",
+      "description": "Check all PositionSide enum values"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-28T15:47:42.167937",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python3 -c \"\nfrom decimal import Decimal\n\n# Test stop price calculation edge cases\nentry_price = Decimal('50000.00')\nstop_loss_pct = Decimal('0.02')\n\n# LONG calculation\nlong_stop = entry_price * (1 - stop_loss_pct)\nprint(f'LONG entry={entry_price}, stop={long_stop}')\n\n# SHORT calculation  \nshort_stop = entry_price * (1 + stop_loss_pct)\nprint(f'SHORT entry={entry_price}, stop={short_stop}')\n\n# Edge case: what if stop_loss_pct is 1.0 (100%)?\nedge_pct = Decimal('1.0')\ntry:\n    edge_stop = entry_price * (1 - edge_pct)\n    print(f'LONG with 100% stop: stop={edge_stop}')  # This would be 0!\nexcept Exception as e:\n    print(f'Error: {e}')\n\n# Edge case: what if entry price is 0?\nzero_entry = Decimal('0')\nzero_stop = zero_entry * (1 - stop_loss_pct)\nprint(f'Zero entry price: stop={zero_stop}')\n\n# Edge case: negative price (should never happen but...)\nneg_entry = Decimal('-100')\nneg_stop = neg_entry * (1 - stop_loss_pct)\nprint(f'Negative entry price: stop={neg_stop}')\n\"",
+      "description": "Test edge cases in stop price calculation"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-28T15:47:44.507591",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python3 -c \"\nfrom decimal import Decimal\n\n# Test order validation edge cases\n# Scenario: SHORT position + SELL order = INCREASING exposure\n\ncurrent_short_size = -0.5  # SHORT 0.5 BTC\nnew_sell_qty = 0.3  # Another SELL\n\n# Current logic (WRONG):\n# if order.side == SELL: pass  # Assumed to reduce risk\n\n# Reality: total exposure would be 0.8 BTC short\nprint(f'Current SHORT position: {current_short_size}')\nprint(f'New SELL order qty: {new_sell_qty}')\nprint(f'Projected exposure: {abs(current_short_size) + new_sell_qty} BTC')\nprint('Current code allows this - BUG!')\n\n# Scenario 2: LONG position + SELL that exceeds position = flip to SHORT\ncurrent_long = 0.3\nsell_qty = 0.5  # More than current LONG\n\nprint()\nprint(f'Current LONG position: {current_long}')  \nprint(f'SELL order qty: {sell_qty}')\nprint(f'Would flip to SHORT: {sell_qty - current_long}')\nprint('Current code allows this too - potential BUG depending on intent')\n\"",
+      "description": "Test order validation logic edge cases"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-28T15:47:56.910482",
+      "file_path": "/media/sam/1TB/nautilus_dev/risk/manager.py"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-28T15:48:28.730184",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python3 -c \"\n# Test what happens when cache.position returns None\n# This is checked in _on_position_opened but let's verify other paths\n\nfrom decimal import Decimal\n\n# Scenario 1: Position is None in _on_position_opened\n# Code at line 102-104: if position is None: return\n# This is handled correctly\n\n# Scenario 2: Position is None in _on_position_changed  \n# Code at line 128-130: if position is None: return\n# This is handled correctly\n\n# Scenario 3: What if instrument is None?\n# Code at line 155-159 handles this with fallback to Price.from_str\n# But what about in validate_order?\n\nprint('Checking error handling paths...')\nprint()\nprint('_on_position_opened:')\nprint('  - position is None: handled (line 103-104)')\nprint('  - instrument is None: handled with fallback (line 156-159)')\nprint()\nprint('_on_position_changed:')\nprint('  - position is None: handled (line 129-130)')\nprint('  - position_id not in active_stops: handled (line 125-126)')\nprint()\nprint('_on_position_closed:')\nprint('  - position_id not in active_stops: handled (line 113-114)')\nprint('  - cancel_order fails: NOT HANDLED - potential issue')\nprint()\nprint('validate_order:')\nprint('  - max_position_size is None: handled (line 66-69)')\nprint('  - instrument not in max_position_size: handled (line 75-76)')\nprint('  - portfolio.net_exposure returns None: handled (line 210-212)')\n\"",
+      "description": "Analyze error handling paths"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-28T15:48:30.041313",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python3 -c \"\nfrom decimal import Decimal\n\n# Edge case: What if stop_loss_pct is very close to 0 or very close to 1?\n# Config validation says: gt=0, lt=1\n\nentry = Decimal('50000')\n\n# Very small stop loss (0.0001 = 0.01%)\ntiny_pct = Decimal('0.0001')\ntiny_stop = entry * (1 - tiny_pct)\nprint(f'Tiny stop loss (0.01%): entry={entry}, stop={tiny_stop}')\nprint(f'  Distance: {entry - tiny_stop} ({(entry - tiny_stop)/entry * 100}%)')\n\n# Very large stop loss (0.9999 = 99.99%)\nhuge_pct = Decimal('0.9999')\nhuge_stop = entry * (1 - huge_pct)\nprint(f'Huge stop loss (99.99%): entry={entry}, stop={huge_stop}')\nprint(f'  Distance: {entry - huge_stop} ({(entry - huge_stop)/entry * 100}%)')\n\n# This reveals that the config allows stop losses up to 99.99%\n# which would mean the stop triggers only if price drops to 0.005% of entry\n# This is technically valid but probably not intended\n\"",
+      "description": "Test extreme stop loss percentages"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-28T15:48:31.589510",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python3 -c \"\n# Check if there's a race condition possibility in _on_position_changed\n# where old stop is canceled but new stop creation fails\n\nprint('Race condition analysis for _on_position_changed:')\nprint()\nprint('Current code (lines 132-138):')\nprint('  old_stop_id = self._active_stops[position_id]')\nprint('  self._strategy.cancel_order(old_stop_id)       # Step 1: Cancel old')\nprint('  new_stop_price = self._calculate_trailing_stop_price(position)')\nprint('  new_stop_order = self._create_stop_order(...)  # Step 2: Create new')\nprint('  self._strategy.submit_order(new_stop_order)    # Step 3: Submit new')\nprint('  self._active_stops[position_id] = new_stop_order.client_order_id')\nprint()\nprint('Issue: If step 2 or 3 fails (exception), the position is LEFT WITHOUT')\nprint('       a stop loss because old stop was already canceled!')\nprint()\nprint('This is NOT thread-safety (NautilusTrader is single-threaded) but')\nprint('rather error handling - if create or submit throws, position is unprotected.')\n\"",
+      "description": "Analyze potential race condition in trailing stop update"
     }
   ],
-  "last_updated": "2025-12-28T15:44:44.907783"
+  "last_updated": "2025-12-28T15:48:31.589529"
 }
