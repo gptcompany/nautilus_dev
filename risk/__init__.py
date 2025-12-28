@@ -22,9 +22,11 @@ Examples
 """
 
 from risk.config import RiskConfig, StopLossType, TrailingOffsetType
+from risk.manager import RiskManager
 
 __all__ = [
     "RiskConfig",
+    "RiskManager",
     "StopLossType",
     "TrailingOffsetType",
 ]
