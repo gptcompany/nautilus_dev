@@ -105,11 +105,8 @@ class CircuitBreakerActor:
         Called by a timer to ensure state is updated even without
         account state events.
         """
-        # Recalculate state with current equity values
-        self._circuit_breaker._current_drawdown = (
-            self._circuit_breaker._calculate_drawdown()
-        )
-        self._circuit_breaker._update_state(self._circuit_breaker._current_drawdown)
+        # Use public update() method - recalculates drawdown and state internally
+        self._circuit_breaker.update()
 
         # Check for state change
         self._check_state_change()
@@ -123,6 +120,8 @@ class CircuitBreakerActor:
             Collector instance for emitting metrics.
         """
         self._collector = collector
+        # Emit initial state immediately
+        self._collector.emit_from_circuit_breaker(self._circuit_breaker)
 
     def _check_state_change(self) -> None:
         """Check if state changed and emit metrics if needed."""

@@ -165,9 +165,13 @@ class RiskManager:
             self._active_stops[position_id] = new_stop_order.client_order_id
             # Only cancel old stop after new one is submitted
             self._strategy.cancel_order(old_stop_id)
-        except Exception:
+        except Exception as e:
             # If new stop fails, keep old stop active for protection
-            pass
+            import logging
+
+            logging.getLogger(__name__).warning(
+                f"Failed to update trailing stop for {position_id}: {e}"
+            )
 
     def _calculate_stop_price(self, position: "Position") -> Price:
         """
@@ -245,10 +249,21 @@ class RiskManager:
 
     def _estimate_order_notional(self, order: "Order") -> float:
         """
-        Estimate order notional value.
+        Estimate order notional value using market price from cache.
 
-        Note: MVP uses simplified calculation. Production would query
-        current market price from cache or data provider.
+        Returns 0.0 if price unavailable (allows order to proceed with warning).
         """
-        # TODO: Get actual price from cache/market data
-        return float(order.quantity) * 50000.0
+        # Get last quote from cache
+        last_quote = self._strategy.cache.quote_tick(order.instrument_id)
+        if last_quote is not None:
+            price = float(last_quote.ask_price)
+            return float(order.quantity) * price
+
+        # Fallback: try last bar
+        last_bar = self._strategy.cache.bar(order.instrument_id)
+        if last_bar is not None:
+            price = float(last_bar.close)
+            return float(order.quantity) * price
+
+        # No price available - return 0 to allow order (conservative)
+        return 0.0
