@@ -150,11 +150,11 @@
 
 **Purpose**: Documentation, cleanup, verification
 
-- [ ] T047 [P] Update quickstart.md with verified examples in `specs/011-stop-loss-position-limits/quickstart.md`
-- [ ] T048 [P] Add docstrings to all public methods in `risk/manager.py`
-- [ ] T049 Run `ruff check risk/ tests/` and fix any issues
-- [ ] T050 Run alpha-debug verification on `risk/manager.py`
-- [ ] T051 Verify test coverage > 80% for risk module
+- [X] T047 [P] Update quickstart.md with verified examples in `specs/011-stop-loss-position-limits/quickstart.md`
+- [X] T048 [P] Add docstrings to all public methods in `risk/manager.py`
+- [X] T049 Run `ruff check risk/ tests/` and fix any issues
+- [X] T050 Run alpha-debug verification on `risk/manager.py`
+- [X] T051 Verify test coverage > 80% for risk module
 
 ---
 
