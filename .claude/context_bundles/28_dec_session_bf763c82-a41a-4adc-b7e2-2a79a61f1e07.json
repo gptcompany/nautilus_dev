@@ -156,7 +156,84 @@
       "timestamp": "2025-12-28T16:31:25.735247",
       "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -c \"\n# Look at Strategy event handlers\nfrom nautilus_trader.trading.strategy import Strategy\nimport inspect\n\n# Get on_ methods\non_methods = [name for name in dir(Strategy) if name.startswith('on_')]\nprint('Strategy on_* event handlers:')\nfor m in sorted(on_methods):\n    print(f'  {m}')\n\" 2>/dev/null",
       "description": "List Strategy event handlers"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-28T16:31:35.055728",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -c \"\n# Check for account-related events\nfrom nautilus_trader import events\nimport inspect\n\n# Get all event classes\nevent_classes = [name for name in dir(events) if 'Account' in name or 'Balance' in name]\nprint('Account-related events:')\nfor e in event_classes:\n    print(f'  {e}')\n\" 2>/dev/null",
+      "description": "Find account-related events"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-28T16:31:35.317821",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -c \"\nfrom nautilus_trader.model.events import AccountState\nimport inspect\n\nprint('AccountState attributes:')\nfor attr in dir(AccountState):\n    if not attr.startswith('_'):\n        print(f'  {attr}')\n\" 2>/dev/null",
+      "description": "Check AccountState event"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-28T16:31:36.449091",
+      "todo_count": 7
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-28T16:31:45.249825",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -c \"\n# Check how to subscribe to AccountState events in msgbus\nfrom nautilus_trader.common.messages import MessageBus\nimport inspect\n\nprint('MessageBus methods for subscription:')\nfor attr in dir(MessageBus):\n    if 'subscribe' in attr.lower() or 'publish' in attr.lower() or 'register' in attr.lower():\n        print(f'  {attr}')\n\" 2>/dev/null",
+      "description": "Check MessageBus subscription methods"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-28T16:31:46.594535",
+      "command": "grep -rn \"on_event\\|AccountState\\|subscribe.*account\\|msgbus\" /media/sam/1TB/nautilus_dev/docs/discord/questions.md 2>/dev/null | head -30",
+      "description": "Search Discord for event subscription"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-28T16:31:55.180795",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -c \"\n# Check Actor class for subscribe methods since Strategy extends Actor\nfrom nautilus_trader.common.actor import Actor\nimport inspect\n\nmethods = [name for name in dir(Actor) if 'subscribe' in name.lower()]\nprint('Actor subscribe methods:')\nfor m in sorted(methods):\n    print(f'  {m}')\n\" 2>/dev/null",
+      "description": "Check Actor subscribe methods"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-28T16:31:56.855350",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -c \"\n# Look at PortfolioAnalyzer for equity tracking\nfrom nautilus_trader.analysis.analyzer import PortfolioAnalyzer\nimport inspect\n\nprint('PortfolioAnalyzer methods:')\nfor attr in dir(PortfolioAnalyzer):\n    if not attr.startswith('_'):\n        print(f'  {attr}')\n\" 2>/dev/null",
+      "description": "Check PortfolioAnalyzer"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-28T16:32:21.712978",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -c \"\n# Demo code: Show how to get equity from within Strategy\n# This will show the API usage pattern\n\ncode = '''\nfrom nautilus_trader.trading.strategy import Strategy\nfrom nautilus_trader.model.identifiers import Venue, InstrumentId\nfrom nautilus_trader.model.objects import Money, Currency\nfrom decimal import Decimal\n\nclass EquityTrackingStrategy(Strategy):\n    \\\"\\\"\\\"Example strategy showing portfolio/account equity access.\\\"\\\"\\\"\n    \n    def __init__(self, config):\n        super().__init__(config)\n        self._high_water_mark = Decimal(0)\n        self._equity_currency = Currency.from_str(\\\"USDT\\\")\n        self._venue = Venue(\\\"BINANCE\\\")\n    \n    def on_start(self):\n        \\\"\\\"\\\"Subscribe to price data for equity calculations.\\\"\\\"\\\"\n        # Portfolio needs price data to calculate unrealized PnL\n        self.subscribe_quote_ticks(self.instrument_id)\n    \n    def _get_account_balance(self) -> Money | None:\n        \\\"\\\"\\\"Get total account balance (without unrealized PnL).\\\"\\\"\\\"\n        account = self.portfolio.account(self._venue)\n        if account is None:\n            return None\n        \n        # balance_total returns AccountBalance object\n        balance = account.balance_total(self._equity_currency)\n        return balance  # Has .total, .free, .locked properties\n    \n    def _get_total_equity(self) -> Decimal:\n        \\\"\\\"\\\"\n        Calculate total equity = account balance + unrealized PnL.\n        \n        NautilusTrader does NOT have a direct total_equity property.\n        You must calculate it from balance + unrealized PnL.\n        \\\"\\\"\\\"\n        account = self.portfolio.account(self._venue)\n        if account is None:\n            return Decimal(0)\n        \n        # 1. Get account balance\n        balance = account.balance_total(self._equity_currency)\n        if balance is None:\n            return Decimal(0)\n        \n        # balance.total is a Money object\n        total_balance = Decimal(str(balance.total.as_double()))\n        \n        # 2. Get unrealized PnL for all positions at venue\n        unrealized = self.portfolio.unrealized_pnls(self._venue)\n        unrealized_total = Decimal(0)\n        if unrealized:\n            for currency, pnl in unrealized.items():\n                if currency == self._equity_currency:\n                    unrealized_total += Decimal(str(pnl.as_double()))\n        \n        return total_balance + unrealized_total\n    \n    def _update_high_water_mark(self):\n        \\\"\\\"\\\"Track peak equity (high water mark).\\\"\\\"\\\"\n        current_equity = self._get_total_equity()\n        if current_equity > self._high_water_mark:\n            self._high_water_mark = current_equity\n            self.log.info(f\\\"New high water mark: {self._high_water_mark}\\\")\n    \n    def _get_drawdown_percent(self) -> Decimal:\n        \\\"\\\"\\\"Calculate current drawdown from high water mark.\\\"\\\"\\\"\n        if self._high_water_mark == 0:\n            return Decimal(0)\n        \n        current_equity = self._get_total_equity()\n        drawdown = (self._high_water_mark - current_equity) / self._high_water_mark\n        return drawdown * 100\n    \n    # Event hooks for monitoring equity changes\n    \n    def on_position_opened(self, event):\n        \\\"\\\"\\\"Called when a new position is opened.\\\"\\\"\\\"\n        self._update_high_water_mark()\n    \n    def on_position_changed(self, event):\n        \\\"\\\"\\\"Called when position quantity changes (partial fills).\\\"\\\"\\\"\n        self._update_high_water_mark()\n    \n    def on_position_closed(self, event):\n        \\\"\\\"\\\"Called when position is fully closed.\\\"\\\"\\\"\n        self._update_high_water_mark()\n    \n    def on_order_filled(self, event):\n        \\\"\\\"\\\"Called on each fill - good for real-time equity tracking.\\\"\\\"\\\"\n        self._update_high_water_mark()\n        \n        # Log current equity state\n        equity = self._get_total_equity()\n        dd = self._get_drawdown_percent()\n        self.log.info(f\\\"Equity: {equity}, Drawdown: {dd:.2f}%\\\")\n    \n    def on_bar(self, bar):\n        \\\"\\\"\\\"Update equity on each bar (for backtesting).\\\"\\\"\\\"\n        self._update_high_water_mark()\n'''\nprint(code)\n\" 2>/dev/null",
+      "description": "Generate example code for equity tracking"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-28T16:32:30.887271",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -c \"\n# Verify the exact return types\nfrom nautilus_trader.model.objects import AccountBalance\nfrom nautilus_trader.model.currency import Currency\n\n# Check AccountBalance structure\nprint('AccountBalance properties:')\nprint('  .total - Money object (total balance)')\nprint('  .free - Money object (available for trading)')\nprint('  .locked - Money object (locked in orders/margin)')\nprint('  .currency - Currency object')\nprint()\n\n# Check Money methods\nfrom nautilus_trader.model.objects import Money\nprint('Money methods:')\nfor attr in dir(Money):\n    if not attr.startswith('_') and attr not in ['from_dict', 'to_dict', 'copy']:\n        print(f'  .{attr}')\n\" 2>/dev/null",
+      "description": "Verify AccountBalance and Money types"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-28T16:32:37.589339",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -c \"\nfrom nautilus_trader.model.objects import Money\nprint('Money attributes:')\nfor attr in dir(Money):\n    if not attr.startswith('_'):\n        print(f'  {attr}')\n\" 2>/dev/null",
+      "description": "Check Money object attributes"
+    },
+    {
+      "operation": "write",
+      "timestamp": "2025-12-28T16:32:59.122412",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/012-circuit-breaker-drawdown/plan.md",
+      "content_length": 14217
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-28T16:33:06.929116",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -c \"\n# Show the complete working pattern with proper types\ncode = '''\n# ============================================================\n# NautilusTrader v1.222.0+ Portfolio/Account Equity Access\n# ============================================================\n\nfrom nautilus_trader.trading.strategy import Strategy\nfrom nautilus_trader.model.identifiers import Venue, InstrumentId\nfrom nautilus_trader.model.objects import Money\nfrom nautilus_trader.model.currency import Currency\nfrom decimal import Decimal\n\n\nclass EquityMonitorMixin:\n    \\\"\\\"\\\"\n    Mixin providing portfolio equity monitoring for NautilusTrader strategies.\n    \n    Key APIs (v1.222.0+):\n    \n    1. Portfolio Access (from Strategy):\n       - self.portfolio              # Portfolio object\n       - self.portfolio.account(venue)  # Account for specific venue\n    \n    2. Account Balance Methods:\n       - account.balance_total(currency)  -> Money (total balance)\n       - account.balance_free(currency)   -> Money (available)\n       - account.balance_locked(currency) -> Money (in margin/orders)\n       - account.balances_total()         -> dict[Currency, Money]\n    \n    3. Portfolio PnL Methods:\n       - portfolio.unrealized_pnl(instrument_id, price=None) -> Money\n       - portfolio.unrealized_pnls(venue) -> dict[Currency, Money]\n       - portfolio.realized_pnl(instrument_id) -> Money\n       - portfolio.realized_pnls(venue) -> dict[Currency, Money]\n       - portfolio.total_pnl(instrument_id, price=None) -> Money\n       - portfolio.total_pnls(venue) -> dict[Currency, Money]\n    \n    4. Money Object Methods:\n       - money.as_decimal() -> Decimal (precise)\n       - money.as_double() -> float (fast)\n       - money.currency -> Currency\n       - money.raw -> int (internal representation)\n    \\\"\\\"\\\"\n    \n    def init_equity_tracking(self, venue: Venue, currency: Currency):\n        \\\"\\\"\\\"Initialize equity tracking state.\\\"\\\"\\\"\n        self._equity_venue = venue\n        self._equity_currency = currency\n        self._high_water_mark: Decimal = Decimal(0)\n    \n    def get_account_balance(self) -> Decimal:\n        \\\"\\\"\\\"\n        Get total account balance (cash only, excludes unrealized PnL).\n        \\\"\\\"\\\"\n        account = self.portfolio.account(self._equity_venue)\n        if account is None:\n            return Decimal(0)\n        \n        balance = account.balance_total(self._equity_currency)\n        if balance is None:\n            return Decimal(0)\n        \n        return balance.as_decimal()\n    \n    def get_unrealized_pnl(self) -> Decimal:\n        \\\"\\\"\\\"\n        Get total unrealized PnL across all positions at venue.\n        \\\"\\\"\\\"\n        unrealized = self.portfolio.unrealized_pnls(self._equity_venue)\n        if not unrealized:\n            return Decimal(0)\n        \n        # Sum all unrealized PnL in our tracking currency\n        total = Decimal(0)\n        for currency, pnl in unrealized.items():\n            if str(currency) == str(self._equity_currency):\n                total += pnl.as_decimal()\n        \n        return total\n    \n    def get_total_equity(self) -> Decimal:\n        \\\"\\\"\\\"\n        Calculate total equity = balance + unrealized PnL.\n        \n        NOTE: NautilusTrader does NOT have a direct total_equity method.\n        You must calculate: balance_total + unrealized_pnls\n        \\\"\\\"\\\"\n        return self.get_account_balance() + self.get_unrealized_pnl()\n    \n    def update_high_water_mark(self) -> bool:\n        \\\"\\\"\\\"\n        Update high water mark if current equity exceeds it.\n        Returns True if new high water mark was set.\n        \\\"\\\"\\\"\n        current = self.get_total_equity()\n        if current > self._high_water_mark:\n            self._high_water_mark = current\n            return True\n        return False\n    \n    def get_drawdown(self) -> Decimal:\n        \\\"\\\"\\\"Get current drawdown from high water mark (as decimal 0-1).\\\"\\\"\\\"\n        if self._high_water_mark == 0:\n            return Decimal(0)\n        current = self.get_total_equity()\n        return (self._high_water_mark - current) / self._high_water_mark\n    \n    def get_drawdown_percent(self) -> Decimal:\n        \\\"\\\"\\\"Get current drawdown as percentage.\\\"\\\"\\\"\n        return self.get_drawdown() * 100\n\n\n# ============================================================\n# Event Hooks for Equity Monitoring\n# ============================================================\n\n# Best hooks for monitoring equity changes:\n#\n# 1. on_position_opened(event)   - New position created\n# 2. on_position_changed(event)  - Position size changed (partial fills)\n# 3. on_position_closed(event)   - Position fully closed\n# 4. on_order_filled(event)      - Any order fill (most granular)\n# 5. on_bar(bar)                 - Each bar (good for backtesting)\n# 6. on_quote_tick(tick)         - Real-time price updates\n#\n# For live trading equity curves, use on_order_filled + periodic timer.\n# For backtesting, use on_bar for regular equity snapshots.\n'''\nprint(code)\n\" 2>/dev/null",
+      "description": "Generate complete documentation"
+    },
+    {
+      "operation": "write",
+      "timestamp": "2025-12-28T16:33:40.040462",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/012-circuit-breaker-drawdown/research.md",
+      "content_length": 5638
     }
   ],
-  "last_updated": "2025-12-28T16:31:25.735266"
+  "last_updated": "2025-12-28T16:33:40.040477"
 }

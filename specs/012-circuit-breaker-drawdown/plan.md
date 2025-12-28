@@ -1,110 +1,203 @@
-# Implementation Plan: [FEATURE NAME]
+# Implementation Plan: Circuit Breaker (Max Drawdown)
 
-**Feature Branch**: `[###-feature-name]`
-**Created**: [DATE]
-**Status**: Draft
-**Spec Reference**: `specs/[###-feature-name]/spec.md`
+**Feature Branch**: `012-circuit-breaker-drawdown`
+**Created**: 2025-12-28
+**Status**: Ready for Implementation
+**Spec Reference**: `specs/012-circuit-breaker-drawdown/spec.md`
 
 ## Architecture Overview
 
-<!--
-  Describe the high-level architecture and how this feature integrates
-  with the existing NautilusTrader codebase.
--->
+The Circuit Breaker provides global drawdown protection across all strategies running in a TradingNode. It monitors portfolio equity in real-time and enforces graduated risk reduction as drawdown increases.
 
 ### System Context
 
 ```
-[Describe how the feature fits into the NautilusTrader ecosystem]
+┌─────────────────────────────────────────────────────────────────┐
+│                         TradingNode                             │
+│  ┌─────────────┐     ┌─────────────────┐     ┌──────────────┐  │
+│  │  Strategy 1 │────▶│                 │────▶│ QuestDB      │  │
+│  └─────────────┘     │  CircuitBreaker │     │ (Monitoring) │  │
+│  ┌─────────────┐     │                 │     └──────────────┘  │
+│  │  Strategy 2 │────▶│ - Equity Track  │                       │
+│  └─────────────┘     │ - State Machine │     ┌──────────────┐  │
+│  ┌─────────────┐     │ - Action Exec   │────▶│ Grafana      │  │
+│  │  RiskManager│◀───│                 │     │ (Dashboard)  │  │
+│  │  (Spec 011) │     └─────────────────┘     └──────────────┘  │
+│  └─────────────┘              │                                │
+│         ▲                     ▼                                │
+│         │            ┌─────────────────┐                       │
+│         └────────────│    Portfolio    │                       │
+│                      │   account()     │                       │
+│                      └─────────────────┘                       │
+└─────────────────────────────────────────────────────────────────┘
 ```
 
 ### Component Diagram
 
 ```
-[ASCII art or description of component relationships]
+┌──────────────────────────────────────────┐
+│           CircuitBreaker                 │
+├──────────────────────────────────────────┤
+│ State Machine:                           │
+│   ACTIVE ─▶ WARNING ─▶ REDUCING ─▶ HALTED│
+│     ▲                                 │  │
+│     └─────── (recovery) ◀─────────────┘  │
+├──────────────────────────────────────────┤
+│ Properties:                              │
+│   - peak_equity: Decimal                 │
+│   - state: CircuitBreakerState           │
+│   - last_check: datetime                 │
+├──────────────────────────────────────────┤
+│ Methods:                                 │
+│   + update() → None                      │
+│   + can_open_position() → bool           │
+│   + position_size_multiplier() → Decimal │
+│   + reset() → None (manual recovery)     │
+└──────────────────────────────────────────┘
 ```
 
 ## Technical Decisions
 
-### Decision 1: [Topic]
+### Decision 1: Equity Source
 
 **Options Considered**:
-1. **Option A**: [Description]
-   - Pros: [list]
-   - Cons: [list]
-2. **Option B**: [Description]
-   - Pros: [list]
-   - Cons: [list]
+1. **Portfolio.account().balance_total()**
+   - Pros: Simple, direct access to total account value
+   - Cons: May not include unrealized PnL depending on account type
+2. **Portfolio.net_exposures() + balance**
+   - Pros: Includes unrealized PnL from open positions
+   - Cons: More complex calculation
 
-**Selected**: Option [X]
+**Selected**: Option 1 (balance_total)
 
-**Rationale**: [Why this option was chosen]
+**Rationale**: For circuit breaker purposes, we want the most liquid equity measure. Unrealized PnL can be considered via position-level checks in RiskManager (Spec 011). The balance_total is sufficient for high-level drawdown protection.
 
 ---
 
-### Decision 2: [Topic]
+### Decision 2: Integration Point
 
 **Options Considered**:
-1. **Option A**: [Description]
-2. **Option B**: [Description]
+1. **Standalone Actor** - Independent actor that subscribes to account events
+   - Pros: Decoupled from strategies, single source of truth
+   - Cons: Requires message bus coordination for position blocking
+2. **Strategy Mixin** - Each strategy has its own circuit breaker reference
+   - Pros: Tight integration, direct access to strategy methods
+   - Cons: State synchronization across strategies
+3. **Controller Integration** - Part of TradingNode controller
+   - Pros: Natural fit for global state, existing lifecycle management
+   - Cons: Requires controller refactoring
 
-**Selected**: Option [X]
+**Selected**: Option 1 (Standalone Actor)
 
-**Rationale**: [Why this option was chosen]
+**Rationale**: A standalone `CircuitBreakerActor` can subscribe to account events via MessageBus and maintain global state. Strategies query it before order submission. This is the cleanest separation and aligns with NautilusTrader's event-driven architecture.
+
+---
+
+### Decision 3: State Persistence
+
+**Options Considered**:
+1. **In-memory only** (MVP)
+   - Pros: Simple, fast
+   - Cons: State lost on restart
+2. **Redis persistence**
+   - Pros: Fast, survives restarts
+   - Cons: Additional dependency
+3. **QuestDB only** (for monitoring, not recovery)
+   - Pros: Already integrated, useful for dashboards
+   - Cons: Not suitable for fast state recovery
+
+**Selected**: Option 1 (In-memory) for MVP, with QuestDB logging for monitoring
+
+**Rationale**: For backtest scope, in-memory is sufficient. Live trading can add Redis persistence as a Phase 2 enhancement. QuestDB is used for monitoring/alerting only.
+
+---
+
+### Decision 4: Position Closure on HALTED
+
+**Options Considered**:
+1. **Automatic closure** - CircuitBreaker closes all positions when HALTED
+   - Pros: Maximum protection
+   - Cons: Can cause slippage in volatile markets
+2. **Block-only** - Only prevent new entries, manual closure required
+   - Pros: Allows trader discretion
+   - Cons: Positions remain at risk
+
+**Selected**: Option 2 (Block-only) for MVP
+
+**Rationale**: Automatic closure in volatile markets can lock in losses. Better to block new entries and alert the trader. Automatic closure can be a configurable option in Phase 2.
 
 ---
 
 ## Implementation Strategy
 
-### Phase 1: Foundation
+### Phase 1: Core Implementation
 
-**Goal**: [What this phase achieves]
+**Goal**: CircuitBreaker state machine with equity monitoring
 
 **Deliverables**:
-- [ ] [Deliverable 1]
-- [ ] [Deliverable 2]
+- [ ] `CircuitBreakerState` enum (ACTIVE, WARNING, REDUCING, HALTED)
+- [ ] `CircuitBreakerConfig` Pydantic model
+- [ ] `CircuitBreaker` class with update() and state transitions
+- [ ] Unit tests for state machine logic
+- [ ] Unit tests for drawdown calculations
 
-**Dependencies**: None / [List dependencies]
+**Dependencies**: None
 
 ---
 
-### Phase 2: Core Implementation
+### Phase 2: Actor Integration
 
-**Goal**: [What this phase achieves]
+**Goal**: CircuitBreakerActor that integrates with TradingNode
 
 **Deliverables**:
-- [ ] [Deliverable 1]
-- [ ] [Deliverable 2]
+- [ ] `CircuitBreakerActor` extending Actor
+- [ ] Subscribe to AccountState events
+- [ ] Periodic check via timer
+- [ ] Integration with RiskManager (Spec 011)
+- [ ] Integration tests with BacktestNode
 
-**Dependencies**: Phase 1
+**Dependencies**: Phase 1, Spec 011
 
 ---
 
-### Phase 3: Integration & Testing
+### Phase 3: Monitoring & Alerting
 
-**Goal**: [What this phase achieves]
+**Goal**: QuestDB metrics and Grafana dashboard
 
 **Deliverables**:
-- [ ] [Deliverable 1]
-- [ ] [Deliverable 2]
+- [ ] QuestDB schema: `circuit_breaker_state` table
+- [ ] Metrics collector for state changes
+- [ ] Grafana dashboard panel: drawdown gauge
+- [ ] Grafana alert: LEVEL 2+ trigger notification
 
-**Dependencies**: Phase 2
+**Dependencies**: Phase 2, Spec 005 (QuestDB/Grafana)
 
 ---
 
 ## File Structure
 
 ```
-strategies/                    # or appropriate directory
-├── {feature_name}/
-│   ├── __init__.py
-│   ├── strategy.py           # Main strategy implementation
-│   ├── config.py             # Configuration models
-│   └── indicators.py         # Custom indicators (if needed)
+risk/
+├── __init__.py
+├── circuit_breaker.py        # CircuitBreaker + CircuitBreakerActor
+├── circuit_breaker_config.py # CircuitBreakerConfig model
+├── circuit_breaker_state.py  # CircuitBreakerState enum
+└── integration.py            # Integration with RiskManager
+
+monitoring/
+├── schemas/
+│   └── circuit_breaker_state.sql   # QuestDB schema
+├── collectors/
+│   └── circuit_breaker.py          # CircuitBreaker metrics collector
+└── grafana/
+    └── dashboards/
+        └── circuit_breaker.json    # Grafana dashboard
+
 tests/
-├── test_{feature_name}.py    # Unit tests
+├── test_circuit_breaker.py         # Unit tests
+├── test_circuit_breaker_config.py  # Config validation tests
 └── integration/
-    └── test_{feature_name}_integration.py
+    └── test_circuit_breaker_backtest.py  # BacktestNode integration
 ```
 
 ## API Design
@@ -112,59 +205,225 @@ tests/
 ### Public Interface
 
 ```python
-# Example API surface
-class {FeatureName}Strategy(Strategy):
-    def __init__(self, config: {FeatureName}Config) -> None: ...
-    def on_start(self) -> None: ...
-    def on_bar(self, bar: Bar) -> None: ...
-    def on_stop(self) -> None: ...
+from enum import Enum
+from decimal import Decimal
+from nautilus_trader.common.actor import Actor
+from nautilus_trader.model.events import AccountState
+
+
+class CircuitBreakerState(Enum):
+    """Circuit breaker states."""
+    ACTIVE = "active"      # Normal trading
+    WARNING = "warning"    # Drawdown > level1 (10%)
+    REDUCING = "reducing"  # Drawdown > level2 (15%)
+    HALTED = "halted"      # Drawdown > level3 (20%)
+
+
+class CircuitBreaker:
+    """
+    Global circuit breaker for drawdown protection.
+
+    Example
+    -------
+    >>> cb = CircuitBreaker(config, portfolio)
+    >>> cb.update()
+    >>> if cb.can_open_position():
+    ...     size = base_size * cb.position_size_multiplier()
+    """
+
+    def __init__(
+        self,
+        config: CircuitBreakerConfig,
+        portfolio: Portfolio,
+    ) -> None: ...
+
+    @property
+    def state(self) -> CircuitBreakerState: ...
+
+    @property
+    def current_drawdown(self) -> Decimal: ...
+
+    @property
+    def peak_equity(self) -> Decimal: ...
+
+    def update(self) -> None:
+        """Check drawdown and update state."""
+        ...
+
+    def can_open_position(self) -> bool:
+        """Check if new positions are allowed."""
+        ...
+
+    def position_size_multiplier(self) -> Decimal:
+        """Get position size adjustment (0.0 - 1.0)."""
+        ...
+
+    def reset(self) -> None:
+        """Manual reset after HALTED (requires auto_recovery=False)."""
+        ...
+
+
+class CircuitBreakerActor(Actor):
+    """
+    Actor that maintains circuit breaker state.
+
+    Subscribes to AccountState events and provides
+    circuit breaker API to strategies.
+    """
+
+    def on_start(self) -> None:
+        """Subscribe to account events and start timer."""
+        ...
+
+    def on_account_state(self, event: AccountState) -> None:
+        """Update equity tracking on account changes."""
+        ...
+
+    def on_timer(self, event: TimeEvent) -> None:
+        """Periodic state check."""
+        ...
 ```
 
 ### Configuration
 
 ```python
-class {FeatureName}Config(BaseModel):
-    instrument_id: str
-    # ... other config fields
+from decimal import Decimal
+from pydantic import BaseModel, field_validator
+
+
+class CircuitBreakerConfig(BaseModel):
+    """Configuration for circuit breaker."""
+
+    # Drawdown thresholds (as decimals, e.g., 0.10 = 10%)
+    level1_drawdown_pct: Decimal = Decimal("0.10")  # WARNING
+    level2_drawdown_pct: Decimal = Decimal("0.15")  # REDUCING
+    level3_drawdown_pct: Decimal = Decimal("0.20")  # HALTED
+
+    # Recovery threshold
+    recovery_drawdown_pct: Decimal = Decimal("0.10")  # Return to ACTIVE
+
+    # Recovery mode
+    auto_recovery: bool = False  # Require manual reset after HALTED
+
+    # Check interval (seconds)
+    check_interval_secs: int = 60
+
+    # Position size multipliers per state
+    warning_size_multiplier: Decimal = Decimal("0.5")   # 50% in WARNING
+    reducing_size_multiplier: Decimal = Decimal("0.0")  # No new in REDUCING
+
+    @field_validator("level1_drawdown_pct", "level2_drawdown_pct", "level3_drawdown_pct")
+    @classmethod
+    def validate_thresholds(cls, v: Decimal) -> Decimal:
+        if not (Decimal("0") < v < Decimal("1")):
+            raise ValueError("Drawdown thresholds must be between 0 and 1")
+        return v
+
+    model_config = {"frozen": True}
+```
+
+## Integration with RiskManager (Spec 011)
+
+```python
+# In strategy initialization
+class MyStrategy(Strategy):
+    def __init__(self, config: MyStrategyConfig) -> None:
+        super().__init__(config)
+
+        # Get circuit breaker reference (registered by controller)
+        self.circuit_breaker: CircuitBreaker | None = None
+
+        # RiskManager with circuit breaker integration
+        self.risk_manager = RiskManager(
+            config=config.risk,
+            strategy=self,
+            circuit_breaker=self.circuit_breaker,
+        )
+
+    def on_start(self) -> None:
+        # Retrieve circuit breaker from cache/registry
+        self.circuit_breaker = self.cache.get("circuit_breaker")
+        self.risk_manager.circuit_breaker = self.circuit_breaker
+
+# In RiskManager
+class RiskManager:
+    def validate_order(self, order: Order) -> bool:
+        """Check position limits AND circuit breaker."""
+        # Check circuit breaker first
+        if self.circuit_breaker and not self.circuit_breaker.can_open_position():
+            self.log.warning(
+                f"Order rejected: Circuit breaker in {self.circuit_breaker.state} state"
+            )
+            return False
+
+        # Then check position limits
+        return self._validate_position_limits(order)
 ```
 
 ## Testing Strategy
 
 ### Unit Tests
-- [ ] Test strategy initialization
-- [ ] Test indicator calculations
-- [ ] Test signal generation
-- [ ] Test order management
+- [ ] Test CircuitBreakerState enum values
+- [ ] Test drawdown calculation (peak tracking)
+- [ ] Test state transitions (ACTIVE → WARNING → REDUCING → HALTED)
+- [ ] Test recovery transitions (HALTED → ACTIVE with auto_recovery)
+- [ ] Test manual reset requirement (auto_recovery=False)
+- [ ] Test position_size_multiplier for each state
+- [ ] Test can_open_position for each state
+- [ ] Test config validation (threshold ordering)
 
 ### Integration Tests
-- [ ] Test with BacktestNode
-- [ ] Test with sample data
-- [ ] Test edge cases (empty data, gaps)
+- [ ] Test CircuitBreakerActor with BacktestNode
+- [ ] Test equity updates from simulated fills
+- [ ] Test state persistence across bar iterations
+- [ ] Test integration with RiskManager (Spec 011)
+- [ ] Test multiple strategies respecting circuit breaker
+
+### Edge Cases
+- [ ] Initial equity = 0 (startup)
+- [ ] Rapid drawdown (skip states)
+- [ ] Recovery oscillation near threshold
+- [ ] Concurrent position updates
 
 ### Performance Tests
-- [ ] Benchmark against baseline
-- [ ] Memory usage profiling
+- [ ] Drawdown check latency < 1ms
+- [ ] State update overhead minimal
 
 ## Risk Assessment
 
 | Risk | Impact | Likelihood | Mitigation |
 |------|--------|------------|------------|
-| [Risk 1] | High/Medium/Low | High/Medium/Low | [Mitigation strategy] |
-| [Risk 2] | High/Medium/Low | High/Medium/Low | [Mitigation strategy] |
+| False halt due to unrealized PnL | High | Medium | Use balance_total (realized), monitor carefully |
+| Missed halt in rapid crash | High | Low | Check on every account event, not just timer |
+| State desync across strategies | Medium | Low | Singleton actor pattern |
+| Recovery oscillation | Medium | Medium | Hysteresis (different thresholds for down/up) |
 
 ## Dependencies
 
 ### External Dependencies
-- NautilusTrader >= 1.220.0
-- [Other dependencies]
+- NautilusTrader >= 1.222.0 (nightly)
+- Pydantic >= 2.0
 
 ### Internal Dependencies
-- [List internal modules/features this depends on]
+- Spec 005: QuestDB/Grafana monitoring
+- Spec 011: RiskManager integration (stop-loss)
+
+## Constitution Check
+
+| Principle | Status | Notes |
+|-----------|--------|-------|
+| Black Box Design | ✅ | Clean API, hidden state machine |
+| KISS & YAGNI | ✅ | MVP scope, no auto-close initially |
+| Native First | ✅ | Uses NautilusTrader Actor pattern |
+| Performance | ✅ | In-memory state, O(1) checks |
+| TDD | 🔜 | Tests defined, ready for RED phase |
 
 ## Acceptance Criteria
 
 - [ ] All unit tests passing (coverage > 80%)
 - [ ] All integration tests passing
-- [ ] Documentation updated
+- [ ] Documentation updated (CLAUDE.md, if needed)
 - [ ] Code review approved
-- [ ] Performance benchmarks met
+- [ ] Drawdown check latency < 1ms verified
+- [ ] QuestDB schema deployed
+- [ ] Grafana dashboard created
