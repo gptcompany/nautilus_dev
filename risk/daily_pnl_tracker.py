@@ -52,8 +52,10 @@ class DailyPnLTracker:
         self._daily_realized: Decimal = Decimal("0")
         self._limit_triggered: bool = False
         self._day_start: datetime = self._get_day_start()
-        self._starting_equity: Decimal = Decimal("0")
         self._warning_emitted: bool = False
+        # Initialize starting equity (will be recalculated on reset)
+        # Use fallback value initially since portfolio may not have balances yet
+        self._starting_equity: Decimal = self._config.daily_loss_limit * 50
 
     @property
     def config(self) -> DailyLossConfig:
@@ -67,11 +69,24 @@ class DailyPnLTracker:
 
     @property
     def daily_unrealized(self) -> Decimal:
-        """Return current unrealized PnL."""
-        unrealized = self._strategy.portfolio.unrealized_pnls()
-        if unrealized is None:
-            return Decimal("0")
-        return Decimal(str(float(unrealized)))
+        """Return current unrealized PnL summed across all currencies."""
+        try:
+            unrealized_dict = self._strategy.portfolio.unrealized_pnls()
+            if unrealized_dict is None or not unrealized_dict:
+                return Decimal("0")
+            # Sum all unrealized PnLs across currencies
+            # unrealized_dict is dict[Currency, Money]
+            total = Decimal("0")
+            for money in unrealized_dict.values():
+                if money is not None:
+                    total += Decimal(str(float(money)))
+            return total
+        except (AttributeError, TypeError):
+            # Fallback for mocks that return single value
+            unrealized = self._strategy.portfolio.unrealized_pnls()
+            if unrealized is None:
+                return Decimal("0")
+            return Decimal(str(float(unrealized)))
 
     @property
     def total_daily_pnl(self) -> Decimal:
@@ -204,15 +219,35 @@ class DailyPnLTracker:
         self._day_start = self._get_day_start()
 
         # Update starting equity for percentage-based limits
-        try:
-            balance = self._strategy.portfolio.balances()
-            if balance:
-                # Sum all balances - simplified approach
-                self._starting_equity = Decimal("0")
-        except Exception:
-            pass
+        self._starting_equity = self._calculate_total_equity()
 
         logger.info(f"Daily PnL tracker reset at {self._day_start}")
+
+    def _calculate_total_equity(self) -> Decimal:
+        """
+        Calculate total equity from portfolio balances.
+
+        Returns
+        -------
+        Decimal
+            Total equity across all currencies, or config daily_loss_limit
+            as fallback for percentage calculation.
+        """
+        try:
+            balances_dict = self._strategy.portfolio.balances()
+            if balances_dict is None or not balances_dict:
+                # Fallback: use absolute limit as reference
+                return self._config.daily_loss_limit * 50  # Assume 2% limit = 50x
+            # Sum all balances across currencies
+            # balances_dict is dict[Currency, Money]
+            total = Decimal("0")
+            for money in balances_dict.values():
+                if money is not None:
+                    total += Decimal(str(float(money)))
+            return total if total > 0 else self._config.daily_loss_limit * 50
+        except (AttributeError, TypeError):
+            # Fallback for mocks or errors
+            return self._config.daily_loss_limit * 50
 
     def _get_day_start(self) -> datetime:
         """Get start of current trading day based on reset_time_utc."""

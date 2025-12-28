@@ -25,6 +25,7 @@ if TYPE_CHECKING:
     from nautilus_trader.trading.strategy import Strategy
 
     from risk.circuit_breaker import CircuitBreaker
+    from risk.daily_pnl_tracker import DailyPnLTracker
 
 
 class RiskManager:
@@ -95,6 +96,8 @@ class RiskManager:
 
         # Check daily loss limit (daily protection)
         if self._daily_tracker is not None:
+            # Must check limit first to update triggered state
+            self._daily_tracker.check_limit()
             if not self._daily_tracker.can_trade():
                 return False
 

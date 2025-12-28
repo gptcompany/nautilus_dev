@@ -92,5 +92,9 @@ class DailyLossConfig(BaseModel):
             Absolute limit value.
         """
         if self.daily_loss_pct is not None:
+            # Validate starting_equity for percentage calculation
+            if starting_equity <= 0:
+                # Fall back to absolute limit if equity invalid
+                return self.daily_loss_limit
             return starting_equity * self.daily_loss_pct
         return self.daily_loss_limit
