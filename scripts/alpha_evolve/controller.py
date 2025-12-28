@@ -18,6 +18,7 @@ from enum import Enum
 from typing import TYPE_CHECKING, Callable
 
 if TYPE_CHECKING:
+    from monitoring.client import MetricsClient
     from scripts.alpha_evolve.config import EvolutionConfig
     from scripts.alpha_evolve.evaluator import StrategyEvaluator
     from scripts.alpha_evolve.mutator import Mutator, MutationResponse
@@ -136,6 +137,7 @@ class EvolutionController:
         store: ProgramStore,
         evaluator: StrategyEvaluator,
         mutator: Mutator | None = None,
+        metrics_client: MetricsClient | None = None,
     ) -> None:
         """
         Initialize evolution controller.
@@ -145,6 +147,7 @@ class EvolutionController:
             store: Strategy persistence store (spec-006)
             evaluator: Backtest evaluator (spec-007)
             mutator: Code mutation provider (defaults to LLMMutator)
+            metrics_client: Optional QuestDB client for dashboard metrics (spec-010)
 
         Raises:
             ValueError: If config is invalid
@@ -153,6 +156,13 @@ class EvolutionController:
         self.store = store
         self.evaluator = evaluator
         self.mutator = mutator
+
+        # Metrics publisher for Grafana dashboard (spec-010)
+        self._metrics_publisher: EvolutionMetricsPublisher | None = None
+        if metrics_client is not None:
+            from scripts.alpha_evolve.metrics_publisher import EvolutionMetricsPublisher
+
+            self._metrics_publisher = EvolutionMetricsPublisher(metrics_client)
 
         # Runtime state
         self._experiment: str | None = None
@@ -565,6 +575,20 @@ class EvolutionController:
                 ProgressEventType.MUTATION_COMPLETE,
                 {"success": False, "error": response.error},
             )
+            # Publish mutation failure to dashboard (spec-010)
+            if self._metrics_publisher:
+                outcome = (
+                    "syntax_error"
+                    if "syntax" in str(response.error).lower()
+                    else "runtime_error"
+                )
+                await self._metrics_publisher.publish_mutation_failure(
+                    experiment=experiment,
+                    outcome=outcome,
+                    latency_ms=response.latency_ms
+                    if hasattr(response, "latency_ms")
+                    else 0.0,
+                )
             return
 
         self._mutations_successful += 1
@@ -614,6 +638,18 @@ class EvolutionController:
             parent_id=parent.id,
             experiment=experiment,
         )
+
+        # 4.5. Publish to dashboard (spec-010)
+        if self._metrics_publisher:
+            child = self.store.get(child_id)
+            if child:
+                await self._metrics_publisher.publish_evaluation(
+                    program=child,
+                    mutation_outcome="success",
+                    mutation_latency_ms=response.latency_ms
+                    if hasattr(response, "latency_ms")
+                    else 0.0,
+                )
 
         # 5. Update best if improved
         if metrics and metrics.calmar_ratio > self._best_fitness:
