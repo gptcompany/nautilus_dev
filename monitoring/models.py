@@ -144,6 +144,77 @@ class PipelineMetrics(BaseModel):
         return f"pipeline_metrics,{tags} {fields_str} {ts_ns}"
 
 
+class EvolutionMetrics(BaseModel):
+    """Evolution metrics for Alpha-Evolve Grafana dashboard.
+
+    Table: evolution_metrics
+    Spec: 010-alpha-evolve-dashboard
+    """
+
+    timestamp: datetime = Field(..., description="UTC timestamp")
+    program_id: str = Field(..., min_length=1, description="Strategy UUID")
+    experiment: str = Field(..., min_length=1, description="Experiment name")
+    generation: int = Field(..., ge=0, description="Generation number (0 = seed)")
+    parent_id: str | None = Field(default=None, description="Parent strategy UUID")
+
+    # Fitness metrics
+    sharpe: float = Field(..., description="Sharpe ratio")
+    calmar: float = Field(..., description="Calmar ratio (primary fitness)")
+    max_dd: float = Field(..., ge=0, le=100, description="Maximum drawdown %")
+    cagr: float = Field(..., description="Compound annual growth rate")
+    total_return: float = Field(..., description="Total return percentage")
+    trade_count: int | None = Field(default=None, ge=0, description="Trades executed")
+    win_rate: float | None = Field(default=None, ge=0, le=1, description="Win rate 0-1")
+
+    # Mutation tracking
+    mutation_outcome: Literal[
+        "success", "syntax_error", "runtime_error", "timeout", "seed"
+    ] = Field(..., description="Mutation result category")
+    mutation_latency_ms: float = Field(
+        default=0.0, ge=0, description="Mutation API latency"
+    )
+
+    def to_ilp_line(self) -> str:
+        """Convert to InfluxDB Line Protocol format for QuestDB HTTP ILP."""
+        # Tags (dimensions) - escape special chars (space, comma, equals)
+        # Order: space, comma, equals (ILP protocol requirement)
+        escaped_program_id = (
+            self.program_id.replace(" ", "\\ ").replace(",", "\\,").replace("=", "\\=")
+        )
+        escaped_experiment = (
+            self.experiment.replace(" ", "\\ ").replace(",", "\\,").replace("=", "\\=")
+        )
+        tags = f"program_id={escaped_program_id},experiment={escaped_experiment},mutation_outcome={self.mutation_outcome}"
+
+        # Fields
+        fields = [
+            f"generation={self.generation}i",
+            f"sharpe={self.sharpe}",
+            f"calmar={self.calmar}",
+            f"max_dd={self.max_dd}",
+            f"cagr={self.cagr}",
+            f"total_return={self.total_return}",
+            f"mutation_latency_ms={self.mutation_latency_ms}",
+        ]
+
+        if self.parent_id:
+            escaped_parent = self.parent_id.replace("\\", "\\\\").replace('"', '\\"')
+            fields.append(f'parent_id="{escaped_parent}"')
+
+        if self.trade_count is not None:
+            fields.append(f"trade_count={self.trade_count}i")
+
+        if self.win_rate is not None:
+            fields.append(f"win_rate={self.win_rate}")
+
+        fields_str = ",".join(fields)
+
+        # Timestamp in nanoseconds
+        ts_ns = int(self.timestamp.timestamp() * 1_000_000_000)
+
+        return f"evolution_metrics,{tags} {fields_str} {ts_ns}"
+
+
 class TradingMetrics(BaseModel):
     """Real-time trading performance metrics.
 
@@ -189,6 +260,7 @@ class TradingMetrics(BaseModel):
 
 __all__ = [
     "DaemonMetrics",
+    "EvolutionMetrics",
     "ExchangeStatus",
     "PipelineMetrics",
     "TradingMetrics",

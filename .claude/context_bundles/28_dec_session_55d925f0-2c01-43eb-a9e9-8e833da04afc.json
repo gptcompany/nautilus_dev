@@ -299,7 +299,156 @@
       "operation": "todowrite",
       "timestamp": "2025-12-28T00:35:08.729226",
       "todo_count": 7
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-28T00:35:39.003253",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run pytest tests/alpha_evolve/ -v --tb=short 2>&1 | tail -25",
+      "description": "Verify tests pass after alpha-debug fixes"
+    },
+    {
+      "operation": "grep",
+      "timestamp": "2025-12-28T00:35:48.289249",
+      "pattern": "from nautilus_trader.indicators import ExponentialMovingAverage",
+      "path": "/media/sam/1TB/nautilus_dev"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-28T00:35:55.631007",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/templates/momentum.py",
+      "old_string": "from nautilus_trader.indicators import ExponentialMovingAverage"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-28T00:35:55.988956",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/alpha_evolve/templates/test_momentum.py",
+      "old_string": "from nautilus_trader.indicators import ExponentialMovingAverage"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-28T00:36:00.540367",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/alpha_evolve/templates/conftest.py"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-28T00:36:08.884986",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run pytest tests/alpha_evolve/ -v --tb=short 2>&1 | tail -25",
+      "description": "Verify tests pass after EMA import fix"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-28T00:36:25.752123",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && ruff check scripts/alpha_evolve/ tests/alpha_evolve/ && ruff format scripts/alpha_evolve/ tests/alpha_evolve/",
+      "description": "Run ruff check and format"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-28T00:42:43.299547",
+      "command": "git status --short",
+      "description": "Check git status"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-28T00:42:54.273850",
+      "command": "git add scripts/alpha_evolve/templates/momentum.py tests/alpha_evolve/templates/test_momentum.py && git commit -m \"$(cat <<'EOF'\nfix(alpha-evolve): Correct EMA import path for nightly\n\nReverted incorrect import change from alpha-debug. The correct path\nfor NautilusTrader nightly is nautilus_trader.indicators.average.ema.\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n)\"",
+      "description": "Commit EMA import fix"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-28T00:42:58.714322",
+      "command": "git log --oneline -5 && echo \"---\" && git branch -a | head -10",
+      "description": "Check recent commits and branches"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-28T00:43:04.115622",
+      "command": "git checkout master && git merge 009-alpha-evolve-controller --no-edit && git push origin master",
+      "description": "Merge to master and push"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-28T00:43:09.512846",
+      "command": "git stash && git checkout master && git merge 009-alpha-evolve-controller --no-edit && git push origin master && git stash pop",
+      "description": "Stash, merge to master, push, restore stash"
+    },
+    {
+      "operation": "glob",
+      "timestamp": "2025-12-28T00:54:21.278554",
+      "pattern": "**/*alpha*debug*hook*"
+    },
+    {
+      "operation": "glob",
+      "timestamp": "2025-12-28T00:54:21.290685",
+      "pattern": ".claude/settings*.json"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-28T00:54:25.646146",
+      "file_path": "/media/sam/1TB/nautilus_dev/.claude/settings.local.json"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-28T00:54:30.557358",
+      "file_path": "/media/sam/1TB/claude-hooks-shared/hooks/productivity/auto-alpha-debug.py"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-28T00:54:41.337751",
+      "file_path": "/media/sam/1TB/claude-hooks-shared/hooks/productivity/auto-alpha-debug.py",
+      "old_string": "# Configuration\nMIN_LINES_CHANGED = 20  # Minimum lines to trigger\nMIN_ROUNDS = 2\nMAX_ROUNDS = 10\nMA..."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-28T00:54:57.404024",
+      "file_path": "/media/sam/1TB/claude-hooks-shared/hooks/productivity/auto-alpha-debug.py",
+      "old_string": "def mark_commit_analyzed(commit_hash: str) -> None:\n    \"\"\"Mark a commit as analyzed to prevent re-t..."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-28T00:55:10.884349",
+      "file_path": "/media/sam/1TB/claude-hooks-shared/hooks/productivity/auto-alpha-debug.py",
+      "old_string": "def main():\n    # Read JSON input from stdin\n    try:\n        input_data = json.load(sys.stdin)\n    ..."
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-28T00:55:17.731286",
+      "file_path": "/media/sam/1TB/claude-hooks-shared/hooks/productivity/auto-alpha-debug.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-28T00:55:22.094154",
+      "file_path": "/media/sam/1TB/claude-hooks-shared/hooks/productivity/auto-alpha-debug.py"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-28T00:55:28.491052",
+      "file_path": "/media/sam/1TB/claude-hooks-shared/hooks/productivity/auto-alpha-debug.py",
+      "old_string": "Start alpha-debug now.\n\"\"\",\n        }\n\n    print(json.dumps(response))\n    sys.exit(0)"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-28T00:55:33.455049",
+      "command": "python3 -m py_compile /media/sam/1TB/claude-hooks-shared/hooks/productivity/auto-alpha-debug.py && echo \"Syntax OK\"",
+      "description": "Check Python syntax"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-28T00:56:28.026317",
+      "command": "ls -la /media/sam/1TB/nautilus_dev/specs/ 2>/dev/null || echo \"No specs dir\"",
+      "description": "List specs directory"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-28T00:56:33.563644",
+      "command": "for dir in /media/sam/1TB/nautilus_dev/specs/*/; do\n  name=$(basename \"$dir\")\n  tasks=$(cat \"$dir/tasks.md\" 2>/dev/null | grep -c \"^\\- \\[X\\]\" || echo \"0\")\n  total=$(cat \"$dir/tasks.md\" 2>/dev/null | grep -c \"^\\- \\[\" || echo \"0\")\n  echo \"$name: $tasks/$total tasks\"\ndone",
+      "description": "Check task completion for each spec"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-28T00:56:38.780792",
+      "command": "cd /media/sam/1TB/nautilus_dev/specs && for d in */; do echo \"=== $d ===\"; grep -c \"^\\- \\[X\\]\" \"$d/tasks.md\" 2>/dev/null || echo \"0\"; grep -c \"^\\- \\[\" \"$d/tasks.md\" 2>/dev/null || echo \"N/A\"; done",
+      "description": "Check task completion"
     }
   ],
-  "last_updated": "2025-12-28T00:35:08.729242"
+  "last_updated": "2025-12-28T00:56:38.780809"
 }
