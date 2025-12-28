@@ -41,10 +41,96 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate
 ```
 
-**CRITICAL CONSTRAINTS** (verified 2025-12-24):
+**CRITICAL CONSTRAINTS** (verified 2025-12-28):
 - Use **V1 Wranglers only** - V2 (PyO3) incompatible with BacktestEngine
 - Use **128-bit precision** - Linux nightly default
 - Stable catalogs **INCOMPATIBLE** with nightly (schema mismatch)
+
+## NautilusTrader Version Notes
+
+> **IMPORTANTE**: Questo progetto usa ESCLUSIVAMENTE NautilusTrader **Nightly** (v1.222.0+).
+> NON confondere con la versione Stable.
+
+### Stable vs Nightly
+
+| Aspetto | Stable | Nightly (NOI) |
+|---------|--------|---------------|
+| **Release** | Settimane/mesi | Giornaliero |
+| **Breaking Changes** | Rari | Frequenti |
+| **Bug Fixes** | Delayed | Immediati |
+| **Precision** | 64-bit default | 128-bit default (Linux) |
+| **Schema** | Stabile | Evolve |
+| **Produzione** | Raccomandato | Solo se necessario |
+
+### Problemi Noti (da Discord Community)
+
+**Binance Adapter**:
+- ADL order handling richiede versione recente
+- Chinese character tokens (es. '币安人生') - fix in nightly
+- STOP_MARKET richiede Algo Order API
+
+**Bybit Adapter (Rust Port)**:
+- ❌ Hedge mode (`positionIdx`) NON supportato
+- ⚠️ `bars_timestamp_on_close` non applicato a WebSocket bars
+- ⚠️ 1-bar offset negli indicatori (WebSocket vs HTTP)
+
+**Interactive Brokers**:
+- Reconciliation issues con posizioni esterne
+- Limite max tick-by-tick requests
+
+### Anti-Pattern da Evitare
+
+```python
+# ❌ MAI: Mischiare stable e nightly catalogs
+catalog_stable = ParquetDataCatalog("/path/stable")  # Schema diverso!
+catalog_nightly = ParquetDataCatalog("/path/nightly")
+
+# ❌ MAI: Caricare dataset interi in memoria
+df = pd.read_csv("500GB_trades.csv")  # OOM crash
+
+# ❌ MAI: Usare df.iterrows()
+for idx, row in df.iterrows():  # 100x più lento
+    process(row)
+
+# ✅ SEMPRE: Streaming con ParquetDataCatalog
+catalog = ParquetDataCatalog("./catalog")
+for bar in catalog.bars():  # Lazy loaded
+    process(bar)
+```
+
+### Warmup Pattern (Live Trading)
+
+```python
+def on_start(self):
+    """Request historical data for indicator warmup."""
+    self.request_bars(
+        bar_type=self.bar_type,
+        start=self.clock.utc_now() - timedelta(days=2),
+        callback=self._warm_up_complete
+    )
+
+def on_historical_data(self, data):
+    """Process historical bars to warm up indicators."""
+    for bar in data.bars:
+        self.ema.handle_bar(bar)
+```
+
+### TradingNode Production Config
+
+```python
+config = TradingNodeConfig(
+    trader_id="TRADER-001",
+    cache=CacheConfig(
+        database=DatabaseConfig(host="localhost", port=6379),
+        persist_account_events=True,  # CRITICO per recovery
+    ),
+    exec_engine=LiveExecEngineConfig(
+        reconciliation=True,
+        reconciliation_startup_delay_secs=10.0,  # MINIMO 10s
+        graceful_shutdown_on_exception=True,
+    ),
+)
+```
 
 ## Repository Organization
 

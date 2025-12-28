@@ -401,10 +401,157 @@ fitness:
 
 | Spec | Description | Status |
 |------|-------------|--------|
-| spec-002 | Binance to NautilusTrader v1.222.0 Data Ingestion | In Progress |
+| spec-002 | Binance to NautilusTrader v1.222.0 Data Ingestion | Complete |
 | spec-003 | TradingView Lightweight Charts Dashboard | Planned |
-| spec-006 | Alpha-Evolve Core Infrastructure | Draft |
-| spec-007 | Alpha-Evolve Backtest Evaluator | Draft |
-| spec-008 | Alpha-Evolve Strategy Templates | Draft |
-| spec-009 | Alpha-Evolve Controller & CLI | Draft |
-| spec-010 | Alpha-Evolve Grafana Dashboard | Draft |
+| spec-006 | Alpha-Evolve Core Infrastructure | Complete |
+| spec-007 | Alpha-Evolve Backtest Evaluator | Complete |
+| spec-008 | Alpha-Evolve Strategy Templates | Complete |
+| spec-009 | Alpha-Evolve Controller & CLI | Complete |
+| spec-010 | Alpha-Evolve Grafana Dashboard | Complete |
+| spec-011 | Stop-Loss & Position Limits | Planned |
+| spec-012 | Circuit Breaker (Max Drawdown) | Planned |
+| spec-013 | Daily Loss Limits | Planned |
+| spec-014 | TradingNode Configuration | Planned |
+| spec-015 | Binance Exec Client Integration | Planned |
+| spec-016 | Order Reconciliation | Planned |
+| spec-017 | Position Recovery | Planned |
+| spec-018 | Redis Cache Backend | Planned |
+| spec-019 | Graceful Shutdown | Planned |
+| spec-020 | Walk-Forward Validation | Planned |
+
+---
+
+## Production Readiness Notes
+
+### Version Compatibility (CRITICAL)
+
+> **ATTENZIONE**: Questo progetto usa ESCLUSIVAMENTE NautilusTrader **Nightly** (v1.222.0+).
+> Le versioni Stable hanno schema diverso e sono INCOMPATIBILI.
+
+| Componente | Versione | Note |
+|------------|----------|------|
+| NautilusTrader | Nightly v1.222.0+ | Breaking changes frequenti |
+| Python | 3.12.11 | Richiesto per nightly |
+| Precision Mode | 128-bit | Linux nightly default |
+| Catalog Schema | v1.222.0 | Non retro-compatibile |
+
+### Known Issues (Discord Community - Dec 2025)
+
+#### Binance Adapter
+| Issue | Severity | Status |
+|-------|----------|--------|
+| ADL order handling | MEDIUM | Fixed in nightly |
+| Chinese character tokens | LOW | Fixed in nightly |
+| STOP_MARKET requires Algo Order API | HIGH | Fixed in dev wheels |
+| Order fills not triggering if instrument unavailable | HIGH | In progress (#3006) |
+
+#### Bybit Adapter (Rust Port)
+| Issue | Severity | Status |
+|-------|----------|--------|
+| Hedge mode (`positionIdx`) NOT supported | HIGH | Community PR in progress |
+| `bars_timestamp_on_close` not applied to WS bars | MEDIUM | Known limitation |
+| 1-bar offset in indicators (WS vs HTTP) | MEDIUM | Known limitation |
+| `attachAlgoOrds` not supported | LOW | By design |
+
+#### Interactive Brokers
+| Issue | Severity | Status |
+|-------|----------|--------|
+| Reconciliation issues with external positions | HIGH | Open (#3054) |
+| Max tick-by-tick requests limit (10190) | MEDIUM | Known limitation |
+| BOND instruments fail reconciliation | LOW | Workaround available |
+
+### Anti-Patterns (NEVER DO)
+
+1. **MAI mischiare stable/nightly catalogs** - Schema incompatibile
+2. **MAI caricare dataset interi in memoria** - Usa streaming/chunking
+3. **MAI usare df.iterrows()** - 100x più lento, usa vectorized ops
+4. **MAI fare live trading in Jupyter notebooks** - Event loop issues
+5. **MAI usare low-level API senza setup** - Usa BacktestNode/TradingNode
+
+### Production Requirements
+
+#### Risk Management (MANDATORY)
+- [ ] Stop-loss per ogni posizione
+- [ ] Max position size limits
+- [ ] Circuit breaker (max drawdown)
+- [ ] Daily loss limits
+- [ ] Margin validation
+
+#### Live Trading Infrastructure
+- [ ] TradingNode configuration
+- [ ] Exchange exec clients (Binance/Bybit)
+- [ ] Order reconciliation
+- [ ] Position recovery on restart
+- [ ] Redis-backed cache
+- [ ] Graceful shutdown
+
+#### Monitoring
+- [x] QuestDB metrics storage
+- [x] Grafana dashboards
+- [x] Alert system (Telegram/Discord)
+- [ ] Health checks / heartbeat
+- [ ] Performance metrics
+
+### TradingNode Configuration Template
+
+```python
+from nautilus_trader.config import (
+    TradingNodeConfig,
+    CacheConfig,
+    DatabaseConfig,
+    LiveExecEngineConfig,
+    LoggingConfig,
+)
+
+config = TradingNodeConfig(
+    trader_id="PROD-001",
+    logging=LoggingConfig(
+        log_level="INFO",
+        log_level_file="DEBUG",
+    ),
+    cache=CacheConfig(
+        database=DatabaseConfig(
+            host="localhost",
+            port=6379,  # Redis
+        ),
+        persist_account_events=True,  # CRITICO per recovery
+    ),
+    exec_engine=LiveExecEngineConfig(
+        reconciliation=True,
+        reconciliation_startup_delay_secs=10.0,  # MINIMO per produzione
+        graceful_shutdown_on_exception=True,
+    ),
+    data_clients={...},
+    exec_clients={...},
+)
+```
+
+### Indicator Warmup Pattern
+
+```python
+def on_start(self):
+    """Request historical data for indicator warmup."""
+    self.request_bars(
+        bar_type=self.bar_type,
+        start=self.clock.utc_now() - timedelta(days=2),
+        callback=self._warm_up_complete
+    )
+
+def on_historical_data(self, data):
+    """Process historical bars to warm up indicators."""
+    for bar in data.bars:
+        self.ema.handle_bar(bar)
+```
+
+### Stop-Loss Pattern (Bybit)
+
+```python
+# NOTA: Per SHORT positions, trigger SOPRA entry price
+stop_loss_order = self.order_factory.stop_market(
+    instrument_id=instrument.id,
+    order_side=OrderSide.BUY,  # Chiude SHORT
+    quantity=position.quantity,
+    trigger_price=instrument.make_price(stop_price),  # ABOVE entry
+)
+self.submit_order(stop_loss_order)
+```
