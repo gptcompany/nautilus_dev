@@ -33,6 +33,7 @@ Examples
 """
 
 from risk.circuit_breaker import CircuitBreaker
+from risk.circuit_breaker_actor import CircuitBreakerActor
 from risk.circuit_breaker_config import CircuitBreakerConfig
 from risk.circuit_breaker_state import CircuitBreakerState
 from risk.config import RiskConfig, StopLossType, TrailingOffsetType
@@ -40,6 +41,7 @@ from risk.manager import RiskManager
 
 __all__ = [
     "CircuitBreaker",
+    "CircuitBreakerActor",
     "CircuitBreakerConfig",
     "CircuitBreakerState",
     "RiskConfig",

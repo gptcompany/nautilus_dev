@@ -463,3 +463,107 @@ class TestProperties:
 
         assert isinstance(circuit_breaker.last_check, datetime)
         assert circuit_breaker.last_check.tzinfo == timezone.utc
+
+
+# --- T016-T018: CircuitBreakerActor Tests ---
+
+
+class TestCircuitBreakerActorInitialization:
+    """T016: Unit test for CircuitBreakerActor initialization."""
+
+    def test_actor_initializes_with_config(
+        self, default_config: CircuitBreakerConfig
+    ) -> None:
+        """Actor should initialize with config and circuit breaker."""
+        from risk.circuit_breaker_actor import CircuitBreakerActor
+
+        actor = CircuitBreakerActor(config=default_config)
+
+        assert actor.circuit_breaker is not None
+        assert actor.circuit_breaker.config == default_config
+
+    def test_actor_starts_in_active_state(
+        self, default_config: CircuitBreakerConfig
+    ) -> None:
+        """Actor should start with circuit breaker in ACTIVE state."""
+        from risk.circuit_breaker_actor import CircuitBreakerActor
+
+        actor = CircuitBreakerActor(config=default_config)
+
+        assert actor.circuit_breaker.state == CircuitBreakerState.ACTIVE
+
+
+class TestCircuitBreakerActorAccountHandler:
+    """T017: Unit test for on_account_state handler."""
+
+    def test_updates_equity_on_account_state(
+        self, default_config: CircuitBreakerConfig
+    ) -> None:
+        """Should update circuit breaker equity when account state received."""
+        from unittest.mock import MagicMock
+
+        from risk.circuit_breaker_actor import CircuitBreakerActor
+
+        actor = CircuitBreakerActor(config=default_config)
+        actor.circuit_breaker.set_initial_equity(Decimal("100000"))
+
+        # Create mock account state event
+        mock_event = MagicMock()
+        mock_event.balances = [MagicMock()]
+        mock_event.balances[0].total = MagicMock()
+        mock_event.balances[0].total.as_decimal.return_value = Decimal("90000")
+
+        actor.handle_account_state(mock_event)
+
+        assert actor.circuit_breaker.current_equity == Decimal("90000")
+        assert actor.circuit_breaker.state == CircuitBreakerState.WARNING
+
+    def test_transitions_state_on_drawdown(
+        self, default_config: CircuitBreakerConfig
+    ) -> None:
+        """Should transition state based on drawdown from account updates."""
+        from unittest.mock import MagicMock
+
+        from risk.circuit_breaker_actor import CircuitBreakerActor
+
+        actor = CircuitBreakerActor(config=default_config)
+        actor.circuit_breaker.set_initial_equity(Decimal("100000"))
+
+        # Simulate 20% drawdown
+        mock_event = MagicMock()
+        mock_event.balances = [MagicMock()]
+        mock_event.balances[0].total = MagicMock()
+        mock_event.balances[0].total.as_decimal.return_value = Decimal("80000")
+
+        actor.handle_account_state(mock_event)
+
+        assert actor.circuit_breaker.state == CircuitBreakerState.HALTED
+
+
+class TestCircuitBreakerActorTimerCheck:
+    """T018: Unit test for periodic timer check."""
+
+    def test_timer_check_updates_state(
+        self, default_config: CircuitBreakerConfig
+    ) -> None:
+        """Periodic timer check should update circuit breaker state."""
+        from risk.circuit_breaker_actor import CircuitBreakerActor
+
+        actor = CircuitBreakerActor(config=default_config)
+        actor.circuit_breaker.set_initial_equity(Decimal("100000"))
+
+        # Manually update equity to simulate drawdown
+        actor.circuit_breaker._current_equity = Decimal("85000")
+
+        # Timer check should recalculate
+        actor.on_timer_check()
+
+        assert actor.circuit_breaker.state == CircuitBreakerState.REDUCING
+
+    def test_config_check_interval(self, default_config: CircuitBreakerConfig) -> None:
+        """Actor should use config check_interval_secs."""
+        from risk.circuit_breaker_actor import CircuitBreakerActor
+
+        actor = CircuitBreakerActor(config=default_config)
+
+        assert actor.check_interval_secs == default_config.check_interval_secs
