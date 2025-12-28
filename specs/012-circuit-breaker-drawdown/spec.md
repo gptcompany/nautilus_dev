@@ -25,13 +25,18 @@ Current system has no protection against runaway losses. If multiple strategies 
 
 #### FR-002: Circuit Breaker Triggers
 - **LEVEL 1** (Warning): Drawdown > 10% - Log warning, reduce position sizes by 50%
-- **LEVEL 2** (Reducing): Drawdown > 15% - Close new entries, only exits allowed
-- **LEVEL 3** (Halted): Drawdown > 20% - Close ALL positions, halt trading
+- **LEVEL 2** (Reducing): Drawdown > 15% - Block new entries, only exits allowed
+- **LEVEL 3** (Halted): Drawdown > 20% - Block ALL trading, require manual intervention
+  - **MVP**: Block-only (no auto-close) - prevents locking in losses during volatility
+  - **Future**: Configurable auto-close option (Phase 2)
 
 #### FR-003: Recovery Mode
 - After LEVEL 3 triggered, require manual reset OR
-- Auto-recovery when drawdown recovers to < 10%
-- Gradual position size increase (25% -> 50% -> 100%)
+- Auto-recovery when drawdown recovers to < recovery threshold (default 5%)
+- Position size multipliers per state:
+  - ACTIVE: 100%
+  - WARNING: 50% (configurable)
+  - REDUCING/HALTED: 0% (no new entries)
 
 #### FR-004: Configuration
 ```python
@@ -47,12 +52,13 @@ class CircuitBreakerConfig(BaseModel):
 ### Non-Functional Requirements
 
 #### NFR-001: Latency
-- Drawdown check must complete within 1ms
-- Circuit breaker activation within 100ms of threshold breach
+- Drawdown check must complete within 1ms (p99)
+- Circuit breaker activation within 100ms of threshold breach (p99)
 
 #### NFR-002: Persistence
-- Circuit breaker state must persist across restarts
-- Publish state to monitoring (QuestDB)
+- **MVP (Backtest)**: In-memory state (sufficient for backtest scope)
+- **Phase 2 (Live Trading)**: State must persist across restarts (Redis)
+- Publish state to monitoring (QuestDB) for dashboards/alerting
 
 ## Technical Design
 
