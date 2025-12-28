@@ -22,28 +22,30 @@ Current system only reads data from Binance. For live trading, we need execution
 ```python
 BinanceExecClientConfig(
     account_type=BinanceAccountType.USDT_FUTURES,
-    base_url_http="https://fapi.binance.com",
-    base_url_ws="wss://fstream.binance.com",
-    api_key=os.environ["BINANCE_API_KEY"],
-    api_secret=os.environ["BINANCE_API_SECRET"],
+    api_key=None,  # Sources from BINANCE_API_KEY env var
+    api_secret=None,  # Sources from BINANCE_API_SECRET env var
     testnet=False,
     us=False,
-    clock_sync_interval_secs=60,
     warn_rate_limits=True,
     max_retries=3,
-    retry_delay_secs=1.0,
+    retry_delay_initial_ms=500,  # Native param name
+    retry_delay_max_ms=5000,
 )
 ```
 
+**Note**: `base_url_http`, `base_url_ws`, and `clock_sync_interval_secs` are handled automatically by the adapter based on `account_type` and `testnet` settings.
+
 #### FR-002: Supported Order Types
-| Order Type | Support | Notes |
-|------------|---------|-------|
-| MARKET | Yes | Immediate execution |
-| LIMIT | Yes | Post-only supported |
-| STOP_MARKET | Yes | Requires Algo Order API |
-| STOP_LIMIT | Yes | Requires Algo Order API |
-| TAKE_PROFIT_MARKET | Yes | Via conditional orders |
-| TRAILING_STOP_MARKET | Partial | Exchange-side only |
+| Order Type | Support | Scope | Notes |
+|------------|---------|-------|-------|
+| MARKET | Yes | MVP | Immediate execution |
+| LIMIT | Yes | MVP | Post-only supported |
+| STOP_MARKET | Yes | MVP | Requires Algo Order API (fixed in nightly) |
+| STOP_LIMIT | Yes | MVP | Requires Algo Order API (fixed in nightly) |
+| TAKE_PROFIT_MARKET | Future | v2 | Via conditional orders - same API as STOP_MARKET |
+| TRAILING_STOP_MARKET | Future | v2 | Exchange-side only, requires additional params |
+
+**MVP Scope Note**: Initial implementation covers MARKET, LIMIT, STOP_MARKET, STOP_LIMIT. TAKE_PROFIT and TRAILING_STOP use same Algo Order API and can be added in v2 with minimal changes.
 
 #### FR-003: Position Mode
 - Support ONE-WAY mode (default)
@@ -73,8 +75,10 @@ strategy_config = StrategyConfig(
 - Fill notification < 50ms after exchange fill
 
 #### NFR-002: Reliability
-- Auto-reconnect on WebSocket disconnect
-- Order state consistency after reconnect
+- Auto-reconnect on WebSocket disconnect (handled by native BinanceExecClient)
+- Order state consistency after reconnect (handled by native adapter)
+
+**Note**: WebSocket reconnection and state recovery are built into NautilusTrader's BinanceExecClient. No custom implementation required - integration tests validate this behavior.
 
 ## Technical Design
 
@@ -97,14 +101,14 @@ def create_binance_exec_client() -> dict:
 
 ### Instrument Provider
 ```python
+# Example: Load specific instruments (parameterized in factory)
 InstrumentProviderConfig(
     load_all=False,  # Don't load all 500+ instruments
-    load_ids=[
-        InstrumentId.from_str("BTCUSDT-PERP.BINANCE"),
-        InstrumentId.from_str("ETHUSDT-PERP.BINANCE"),
-    ],
+    load_ids=instrument_ids,  # Passed as parameter to factory
 )
 ```
+
+**Note**: Instrument IDs are passed to `create_binance_instrument_provider()` as a parameter, not hardcoded.
 
 ### Order Submission Pattern
 ```python
