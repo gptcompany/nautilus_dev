@@ -2,7 +2,7 @@
 
 **Feature Branch**: `009-alpha-evolve-controller`
 **Created**: 2025-12-27
-**Status**: Draft
+**Status**: Implemented
 **Input**: Loop di evoluzione e interfaccia CLI. Parent selection (elite/exploit/explore), integrazione alpha-evolve agent per mutazioni, pruning automatico popolazione.
 
 ## User Scenarios & Testing *(mandatory)*

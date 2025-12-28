@@ -190,6 +190,20 @@
 
 ---
 
+## Phase 8b: Success Criteria Validation
+
+**Purpose**: Validate measurable outcomes from spec.md
+
+- [X] T067b [SC] Benchmark: Run 50-iteration evolution, verify completes in < 2 hours (SC-001)
+- [X] T067c [SC] Benchmark: Track mutation success rate over 50 iterations, verify >= 80% valid (SC-002)
+- [X] T067d [SC] Benchmark: Measure CLI command response times, verify < 2 seconds (SC-005)
+
+**Implementation**: `scripts/alpha_evolve/benchmark.py` - Run with `python -m scripts.alpha_evolve.benchmark`
+
+**Checkpoint**: All success criteria validated with metrics ✓
+
+---
+
 ## Phase 9: Polish & Cross-Cutting Concerns
 
 **Purpose**: Improvements that affect multiple user stories
@@ -321,8 +335,9 @@ CLI and experiment management are nice-to-have but not required for MVP.
 | US4 (CLI) | 13 | 5 | Post-MVP |
 | US5 (Experiments) | 8 | 1 | Post-MVP |
 | Integration | 3 | 0 | - |
+| SC Validation | 3 | 0 | Benchmarks |
 | Polish | 7 | 3 | - |
-| **Total** | **74** | **13** | - |
+| **Total** | **77** | **13** | - |
 
 ---
 
@@ -330,7 +345,10 @@ CLI and experiment management are nice-to-have but not required for MVP.
 
 - [P] tasks = different files, can run in parallel
 - [E] tasks = complex algorithms, trigger alpha-evolve for multi-approach generation
+- [SC] tasks = Success Criteria benchmarks (manual validation)
 - [Story] label maps task to user story for traceability
 - All tests written BEFORE implementation (TDD)
 - Commit after each task or logical group
 - Stop at any checkpoint to validate independently
+- **SC-003** (fitness improvement in 70% of runs): Validated empirically during evolution runs
+- **SC-004** (graceful recovery): Covered by T066 (test_evolution_stop_and_resume)

@@ -2,7 +2,7 @@
 
 **Feature Branch**: `009-alpha-evolve-controller`
 **Created**: 2025-12-27
-**Status**: Phase 1 Complete
+**Status**: Complete ✅
 **Spec Reference**: `specs/009-alpha-evolve-controller/spec.md`
 
 ## Architecture Overview
@@ -128,33 +128,33 @@ User                CLI                 Controller
 
 ---
 
-### Phase 2: Core Implementation
+### Phase 2: Core Implementation (Complete)
 
 **Goal**: Implement EvolutionController and Mutator
 
 **Deliverables**:
-- [ ] `scripts/alpha_evolve/controller.py`
+- [x] `scripts/alpha_evolve/controller.py`
   - EvolutionController class
   - StopCondition dataclass
   - EvolutionProgress dataclass
   - EvolutionResult dataclass
-- [ ] `scripts/alpha_evolve/mutator.py`
+- [x] `scripts/alpha_evolve/mutator.py`
   - Mutator protocol
   - LLMMutator implementation
   - MutationRequest/MutationResponse dataclasses
-- [ ] `tests/alpha_evolve/test_controller.py`
-- [ ] `tests/alpha_evolve/test_mutator.py`
+- [x] `tests/alpha_evolve/test_controller.py`
+- [x] `tests/alpha_evolve/test_mutator.py`
 
 **Dependencies**: Phase 1
 
 ---
 
-### Phase 3: CLI Implementation
+### Phase 3: CLI Implementation (Complete)
 
 **Goal**: Implement click-based CLI
 
 **Deliverables**:
-- [ ] `scripts/alpha_evolve/cli.py`
+- [x] `scripts/alpha_evolve/cli.py`
   - start command
   - status command
   - best command
@@ -162,21 +162,21 @@ User                CLI                 Controller
   - stop command
   - list command
   - resume command
-- [ ] CLI entry point in `pyproject.toml` or setup
-- [ ] `tests/alpha_evolve/test_cli.py`
+- [x] CLI entry point in `pyproject.toml` or setup
+- [x] `tests/alpha_evolve/test_cli.py`
 
 **Dependencies**: Phase 2
 
 ---
 
-### Phase 4: Integration & Testing
+### Phase 4: Integration & Testing (Complete)
 
 **Goal**: End-to-end testing and documentation
 
 **Deliverables**:
-- [ ] `tests/alpha_evolve/test_controller_integration.py`
-- [ ] Update `docs/` with CLI usage
-- [ ] Performance benchmarks
+- [x] `tests/alpha_evolve/test_controller_integration.py`
+- [x] Update `docs/` with CLI usage → `docs/alpha-evolve-cli.md`
+- [x] Performance benchmarks → `scripts/alpha_evolve/benchmark.py`
 
 **Dependencies**: Phase 3
 
@@ -275,9 +275,9 @@ def start(seed, iterations, experiment, ...): ...
 ## Acceptance Criteria
 
 - [x] Phase 1 documentation complete
-- [ ] All unit tests passing (coverage > 80%)
-- [ ] CLI commands functional
-- [ ] Integration tests passing
-- [ ] 50-iteration evolution completes successfully
-- [ ] Resume from interrupt works
-- [ ] Documentation updated
+- [x] All unit tests passing (coverage > 80%)
+- [x] CLI commands functional
+- [x] Integration tests passing
+- [x] 50-iteration evolution completes successfully → `benchmark.py` validates SC-001
+- [x] Resume from interrupt works
+- [x] Documentation updated → `docs/alpha-evolve-cli.md`
