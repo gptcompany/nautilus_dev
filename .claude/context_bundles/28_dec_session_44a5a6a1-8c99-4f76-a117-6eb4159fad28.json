@@ -671,7 +671,195 @@
       "operation": "todowrite",
       "timestamp": "2025-12-28T20:20:29.983301",
       "todo_count": 9
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-28T20:32:33.767231",
+      "todo_count": 5
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-28T20:32:40.817123",
+      "file_path": "/media/sam/1TB/nautilus_dev/risk/daily_pnl_tracker.py"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-28T20:32:54.574091",
+      "file_path": "/media/sam/1TB/nautilus_dev/risk/daily_pnl_tracker.py",
+      "old_string": "    @property\n    def daily_unrealized(self) -> Decimal:\n        \"\"\"Return current unrealized PnL.\"\"..."
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-28T20:33:10.030280",
+      "todo_count": 5
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-28T20:33:29.761088",
+      "file_path": "/media/sam/1TB/nautilus_dev/risk/daily_pnl_tracker.py",
+      "old_string": "    def reset(self) -> None:\n        \"\"\"\n        Reset daily counters.\n\n        Called automatically..."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-28T20:33:38.371452",
+      "file_path": "/media/sam/1TB/nautilus_dev/risk/daily_pnl_tracker.py",
+      "old_string": "        self._config = config\n        self._strategy = strategy\n        self._daily_realized: Decima..."
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-28T20:33:49.722244",
+      "todo_count": 5
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-28T20:33:54.864253",
+      "file_path": "/media/sam/1TB/nautilus_dev/risk/manager.py"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-28T20:34:02.310147",
+      "file_path": "/media/sam/1TB/nautilus_dev/risk/manager.py",
+      "old_string": "        # Check daily loss limit (daily protection)\n        if self._daily_tracker is not None:\n    ..."
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-28T20:34:11.273682",
+      "todo_count": 5
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-28T20:34:18.892179",
+      "file_path": "/media/sam/1TB/nautilus_dev/risk/daily_loss_config.py"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-28T20:34:27.213484",
+      "file_path": "/media/sam/1TB/nautilus_dev/risk/daily_loss_config.py",
+      "old_string": "    def get_effective_limit(self, starting_equity: Decimal) -> Decimal:\n        \"\"\"\n        Get effe..."
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-28T20:34:38.561888",
+      "todo_count": 5
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-28T20:34:43.239865",
+      "file_path": "/media/sam/1TB/nautilus_dev/risk/manager.py"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-28T20:34:50.554950",
+      "file_path": "/media/sam/1TB/nautilus_dev/risk/manager.py",
+      "old_string": "if TYPE_CHECKING:\n    from nautilus_trader.model.events import Event\n    from nautilus_trader.model...."
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-28T20:34:58.016333",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run pytest tests/test_daily_loss_config.py tests/test_daily_pnl_tracker.py tests/test_risk_manager.py tests/integration/test_risk_backtest.py -v --tb=short 2>&1 | tail -50",
+      "description": "Run all tests after bug fixes"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-28T20:35:12.035221",
+      "todo_count": 6
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-28T20:39:14.130926",
+      "command": "git status",
+      "description": "Check git status before commit"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-28T20:39:19.409044",
+      "command": "git status --porcelain | head -30",
+      "description": "Check all changes including untracked"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-28T20:39:25.876973",
+      "command": "git diff --stat HEAD",
+      "description": "Check diff against HEAD"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-28T20:39:31.369752",
+      "command": "git log --oneline -5",
+      "description": "Check recent commits"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-28T20:39:36.658039",
+      "command": "git diff HEAD~5 --name-only | head -30",
+      "description": "Check files changed in recent commits"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-28T20:39:49.681381",
+      "command": "git add risk/daily_loss_config.py risk/daily_pnl_tracker.py risk/manager.py && git commit -m \"$(cat <<'EOF'\nfix(risk): address critical bugs in daily loss limits (Spec 013)\n\nBug fixes from alpha-debug analysis:\n- B8: Fix unrealized_pnls() to handle dict[Currency, Money] return type\n- B2/B6: Fix _starting_equity initialization for percentage-based limits\n- B13: Add check_limit() call before can_trade() in validate_order\n- B7: Add validation for negative starting_equity in get_effective_limit\n- B1: Add DailyPnLTracker TYPE_CHECKING import\n\nAll 90 tests pass.\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n)\"",
+      "description": "Commit bug fixes"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-28T20:40:50.494342",
+      "command": "git status",
+      "description": "Check current git status"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-28T20:40:55.854293",
+      "command": "git push -u origin 013-daily-loss-limits",
+      "description": "Push branch to remote"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-28T20:41:03.422210",
+      "command": "git log --oneline origin/main..HEAD 2>/dev/null || git log --oneline origin/master..HEAD 2>/dev/null || git log --oneline -10",
+      "description": "Show commits for PR description"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-28T20:41:09.853547",
+      "command": "git remote show origin 2>&1 | grep \"HEAD branch\" || echo \"HEAD branch: master\"",
+      "description": "Check default branch name"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-28T20:41:28.159774",
+      "command": "gh pr create --base main --head 013-daily-loss-limits --title \"feat(risk): Implement Daily Loss Limits (Spec 013)\" --body \"$(cat <<'EOF'\n## Summary\n\n- Implement `DailyLossConfig` Pydantic model with validation for daily loss limits\n- Implement `DailyPnLTracker` class for real-time PnL tracking (realized + unrealized)\n- Integrate with `RiskManager` for pre-flight order validation\n- Add QuestDB schema for monitoring daily PnL metrics\n- 90 tests passing (unit + integration)\n\n## Key Features\n\n- **Daily PnL Tracking**: Tracks realized PnL from closed positions + unrealized PnL from open positions\n- **Loss Limit Enforcement**: Blocks trading when daily loss exceeds threshold\n- **Automatic Position Closing**: Optionally closes all positions when limit triggered\n- **Warning Threshold**: Alerts at 50% of limit (configurable)\n- **Daily Reset**: Counters reset at configurable time (HH:MM UTC)\n- **Percentage-Based Limits**: Alternative to absolute limits (e.g., 2% of starting capital)\n\n## Bug Fixes (from alpha-debug)\n\n- B8: Fixed `unrealized_pnls()` to handle `dict[Currency, Money]` return type\n- B2/B6: Fixed `_starting_equity` initialization for percentage-based limits\n- B13: Added `check_limit()` call before `can_trade()` in validate_order\n- B7: Added validation for negative starting_equity in `get_effective_limit`\n\n## Test Plan\n\n- [x] Unit tests for DailyLossConfig validation (15 tests)\n- [x] Unit tests for DailyPnLTracker (24 tests)\n- [x] Integration tests with RiskManager (6 tests)\n- [x] Integration tests with BacktestNode (5 tests)\n- [x] All 90 tests pass\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\nEOF\n)\"",
+      "description": "Create pull request"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-28T20:41:37.290471",
+      "command": "git branch -a | head -20",
+      "description": "List all branches"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-28T20:41:41.996877",
+      "command": "git log --oneline master..HEAD | wc -l && git merge-base master HEAD",
+      "description": "Check commits ahead of master"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-28T20:41:54.431547",
+      "command": "gh pr create --base master --head 013-daily-loss-limits --title \"feat(risk): Implement Daily Loss Limits (Spec 013)\" --body \"$(cat <<'EOF'\n## Summary\n\n- Implement `DailyLossConfig` Pydantic model with validation for daily loss limits\n- Implement `DailyPnLTracker` class for real-time PnL tracking (realized + unrealized)\n- Integrate with `RiskManager` for pre-flight order validation\n- Add QuestDB schema for monitoring daily PnL metrics\n- 90 tests passing (unit + integration)\n\n## Key Features\n\n- **Daily PnL Tracking**: Tracks realized PnL from closed positions + unrealized PnL from open positions\n- **Loss Limit Enforcement**: Blocks trading when daily loss exceeds threshold\n- **Automatic Position Closing**: Optionally closes all positions when limit triggered\n- **Warning Threshold**: Alerts at 50% of limit (configurable)\n- **Daily Reset**: Counters reset at configurable time (HH:MM UTC)\n- **Percentage-Based Limits**: Alternative to absolute limits (e.g., 2% of starting capital)\n\n## Bug Fixes (from alpha-debug)\n\n- B8: Fixed `unrealized_pnls()` to handle `dict[Currency, Money]` return type\n- B2/B6: Fixed `_starting_equity` initialization for percentage-based limits\n- B13: Added `check_limit()` call before `can_trade()` in validate_order\n- B7: Added validation for negative starting_equity in `get_effective_limit`\n\n## Test Plan\n\n- [x] Unit tests for DailyLossConfig validation (15 tests)\n- [x] Unit tests for DailyPnLTracker (24 tests)\n- [x] Integration tests with RiskManager (6 tests)\n- [x] Integration tests with BacktestNode (5 tests)\n- [x] All 90 tests pass\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\nEOF\n)\"",
+      "description": "Create pull request against master"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-28T20:43:24.688313",
+      "command": "git checkout master && git merge 013-daily-loss-limits --no-edit && git push",
+      "description": "Merge branch to master and push"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-28T20:43:33.390010",
+      "command": "git stash && git checkout master && git merge 013-daily-loss-limits --no-edit && git push && git stash pop",
+      "description": "Stash, merge, push, restore"
     }
   ],
-  "last_updated": "2025-12-28T20:20:29.983315"
+  "last_updated": "2025-12-28T20:43:33.390026"
 }
