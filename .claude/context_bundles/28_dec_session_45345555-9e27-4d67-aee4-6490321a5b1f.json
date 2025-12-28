@@ -632,7 +632,19 @@
       "timestamp": "2025-12-28T03:17:59.582913",
       "command": "python3 << 'EOF'\nimport json\nimport re\n\nwith open('/media/sam/1TB/nautilus_dev/monitoring/grafana/dashboards/evolution.json', 'r') as f:\n    dashboard = json.load(f)\n\nfor panel in dashboard.get('panels', []):\n    for target in panel.get('targets', []):\n        sql = target.get('rawSql', '')\n        \n        # Fix dangling AND (no WHERE before it)\n        sql = re.sub(r\"FROM\\s+(\\w+)\\s+AND\\s+\", r\"FROM \\1 WHERE \", sql)\n        \n        # Fix interval syntax everywhere\n        sql = re.sub(r\"now\\(\\)\\s*-\\s*interval\\s*'(\\d+)([dhms])'\", r\"dateadd('\\2', -\\1, now())\", sql)\n        \n        # Clean up double spaces\n        sql = re.sub(r'\\s+', ' ', sql).strip()\n        \n        target['rawSql'] = sql\n\nwith open('/media/sam/1TB/nautilus_dev/monitoring/grafana/dashboards/evolution.json', 'w') as f:\n    json.dump(dashboard, f, indent=2)\n\nprint(\"Fixed all queries\")\nEOF",
       "description": "Fix all query syntax"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-28T03:18:07.483050",
+      "command": "curl -s -X POST \"http://localhost:3000/api/dashboards/db\" \\\n  -H \"Authorization: Bearer glsa_ZZKIVD8E8nMUp7jvs0I1fUYF26NwlV2I_65938b10\" \\\n  -H \"Content-Type: application/json\" \\\n  -d \"{\\\"dashboard\\\": $(cat /media/sam/1TB/nautilus_dev/monitoring/grafana/dashboards/evolution.json), \\\"overwrite\\\": true}\" | python3 -c \"import json,sys; d=json.load(sys.stdin); print('v'+str(d.get('version','?')))\"",
+      "description": "Reimport v8"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-28T03:18:13.979632",
+      "command": "curl -s -X POST \"http://localhost:3000/api/dashboards/db\" \\\n  -H \"Authorization: Bearer glsa_ZZKIVD8E8nMUp7jvs0I1fUYF26NwlV2I_65938b10\" \\\n  -H \"Content-Type: application/json\" \\\n  -d \"{\\\"dashboard\\\": $(cat /media/sam/1TB/nautilus_dev/monitoring/grafana/dashboards/evolution.json), \\\"overwrite\\\": true}\"",
+      "description": "Check import response"
     }
   ],
-  "last_updated": "2025-12-28T03:17:59.582931"
+  "last_updated": "2025-12-28T03:18:13.979656"
 }
