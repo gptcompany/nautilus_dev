@@ -55,7 +55,7 @@ def mock_strategy(instrument_id: InstrumentId) -> MagicMock:
 
     # Mock portfolio
     strategy.portfolio = MagicMock()
-    strategy.portfolio.net_exposure = MagicMock(return_value=Money(0, "USDT"))
+    strategy.portfolio.net_exposure = MagicMock(return_value=Money(0, USDT))
 
     # Mock instrument
     mock_instrument = MagicMock()
