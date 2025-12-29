@@ -95,20 +95,55 @@ discord_webhook_url = "${DISCORD_WEBHOOK_URL}"
 
 ## Automated Scheduling
 
-### GitHub Actions (version check)
+### GitHub Actions (Recommended)
 
 Already configured in `.github/workflows/nautilus-update-check.yml`:
-- Runs daily at 04:00 UTC
-- Triggers Discord notification if update available
-
-### Local Cron (heavy operations)
-
-Add to crontab:
+- Runs daily at 06:00 UTC (after NautilusTrader nightly builds)
+- Checks for updates and creates PR if available
+- Sends Discord notification on success/failure
+- Can be triggered manually via workflow_dispatch
 
 ```bash
-# Daily at 05:00 local time (after GH Actions)
-0 5 * * * cd /media/sam/1TB/nautilus_dev && uv run python -m scripts.auto_update update 2>&1 | tee /var/log/nautilus-update.log
+# Manual trigger
+gh workflow run nautilus-update-check.yml
+
+# With options
+gh workflow run nautilus-update-check.yml -f dry_run=true
+gh workflow run nautilus-update-check.yml -f force=true
 ```
+
+### Local Cron (Alternative)
+
+For local automation without GitHub Actions:
+
+```bash
+# Edit crontab
+crontab -e
+
+# Add entry (daily at 07:00 local time, after GH Actions)
+0 7 * * * cd /media/sam/1TB/nautilus_dev && /home/sam/.local/bin/uv run python -m scripts.auto_update update 2>&1 | tee -a /var/log/nautilus-update.log
+
+# Check-only cron (no changes, just notifications)
+0 6 * * * cd /media/sam/1TB/nautilus_dev && /home/sam/.local/bin/uv run python -m scripts.auto_update check --format json >> /var/log/nautilus-check.log
+```
+
+### Systemd Timer (Production)
+
+Create `/etc/systemd/system/nautilus-update.timer`:
+
+```ini
+[Unit]
+Description=NautilusTrader Auto-Update Timer
+
+[Timer]
+OnCalendar=*-*-* 07:00:00
+Persistent=true
+
+[Install]
+WantedBy=timers.target
+```
+
+Enable: `sudo systemctl enable --now nautilus-update.timer`
 
 ## Common Workflows
 

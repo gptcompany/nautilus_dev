@@ -158,6 +158,7 @@ nautilus_dev/
 ├── config/                   # TradingNode configurations
 ├── scripts/
 │   ├── alpha_evolve/         # Evolution system
+│   ├── auto_update/          # NautilusTrader auto-update pipeline
 │   └── sync_research.py      # Academic research sync
 ├── .claude/
 │   ├── agents/               # Subagent definitions (12 agents)

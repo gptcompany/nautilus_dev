@@ -542,12 +542,8 @@ def dispatch(
         # Get or generate impact report
         if report:
             # Load from file
-            import json
-
-            with open(report) as f:
-                report_data = json.load(f)
             console.print(f"Loaded impact report from: {report}")
-            # Would need to deserialize ImpactReport from JSON
+            # TODO: Deserialize ImpactReport from JSON file
             console.print("[yellow]Report loading not fully implemented[/yellow]")
             ctx.exit(1)
         else:

@@ -6,7 +6,7 @@
 
 from __future__ import annotations
 
-from datetime import UTC, datetime
+from datetime import datetime
 from enum import Enum
 from pathlib import Path
 from typing import Any
@@ -180,7 +180,7 @@ class ImpactReport(BaseModel):
     confidence_level: ConfidenceLevel = ConfidenceLevel.VERY_HIGH
     can_auto_update: bool = True
     recommendation: Recommendation = Recommendation.AUTO
-    generated_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
+    generated_at: datetime = Field(default_factory=datetime.utcnow)
 
     @model_validator(mode="after")
     def validate_confidence_consistency(self) -> "ImpactReport":
@@ -263,7 +263,7 @@ class UpdateResult(BaseModel):
     pr_url: str | None = None
     test_result: TestResult | None = None
     error_message: str | None = None
-    created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
+    created_at: datetime = Field(default_factory=datetime.utcnow)
 
     @model_validator(mode="after")
     def validate_result_consistency(self) -> "UpdateResult":
