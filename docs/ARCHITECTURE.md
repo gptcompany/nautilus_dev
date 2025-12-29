@@ -678,7 +678,7 @@ Examples: `momentum_btc_v3/`, `mean_reversion_eth_v1/`, `ema_cross_multi_v2/`
 | spec-017 | Position Recovery | Planned |
 | spec-018 | Redis Cache Backend | Planned |
 | spec-019 | Graceful Shutdown | Planned |
-| spec-020 | Walk-Forward Validation | Planned |
+| spec-020 | Walk-Forward Validation | Complete |
 | spec-022 | Academic Research → Trading Strategy Pipeline | Complete |
 
 ---
@@ -787,6 +787,127 @@ config = TradingNodeConfig(
     exec_clients={...},
 )
 ```
+
+---
+
+## Walk-Forward Validation (spec-020)
+
+### Purpose
+
+Prevents overfitting in evolved strategies by testing on out-of-sample data using rolling windows. Implements Lopez de Prado's advanced metrics (Deflated Sharpe Ratio, Probability of Backtest Overfitting).
+
+### Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                     WALK-FORWARD VALIDATION PIPELINE                         │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│  Strategy Code ─────────────────────────────────────────────────────────┐   │
+│        │                                                                │   │
+│        ▼                                                                │   │
+│  ┌────────────────────────────────────────────────────────────────────┐ │   │
+│  │ WalkForwardValidator                                               │ │   │
+│  │ ┌──────────────────────────────────────────────────────────────┐   │ │   │
+│  │ │ Window Generation (Rolling)                                  │   │ │   │
+│  │ │ ├── Train: 6 months  │  Test: 3 months  │  Step: 3 months   │   │ │   │
+│  │ │ └── Embargo: 5 days pre-test, 3 days post-test              │   │ │   │
+│  │ └──────────────────────────────────────────────────────────────┘   │ │   │
+│  │                          │                                         │ │   │
+│  │                          ▼                                         │ │   │
+│  │ ┌──────────────────────────────────────────────────────────────┐   │ │   │
+│  │ │ Per-Window Evaluation                                        │   │ │   │
+│  │ │ ├── Window 1: Train → Test (train_metrics, test_metrics)    │   │ │   │
+│  │ │ ├── Window 2: Train → Test                                  │   │ │   │
+│  │ │ ├── ...                                                      │   │ │   │
+│  │ │ └── Window N: Train → Test                                  │   │ │   │
+│  │ └──────────────────────────────────────────────────────────────┘   │ │   │
+│  │                          │                                         │ │   │
+│  │                          ▼                                         │ │   │
+│  │ ┌──────────────────────────────────────────────────────────────┐   │ │   │
+│  │ │ Metrics Calculation                                          │   │ │   │
+│  │ │ ├── Robustness Score (0-100)                                │   │ │   │
+│  │ │ │   └── Consistency (30%) + Profitability (40%) + Degradation (30%) │
+│  │ │ ├── Deflated Sharpe Ratio (Lopez de Prado Ch. 14)           │   │ │   │
+│  │ │ └── Probability of Backtest Overfitting (Ch. 11)            │   │ │   │
+│  │ └──────────────────────────────────────────────────────────────┘   │ │   │
+│  │                          │                                         │ │   │
+│  │                          ▼                                         │ │   │
+│  │ ┌──────────────────────────────────────────────────────────────┐   │ │   │
+│  │ │ Pass/Fail Criteria                                           │   │ │   │
+│  │ │ ├── robustness_score >= 60                                  │   │ │   │
+│  │ │ ├── profitable_windows >= 75%                               │   │ │   │
+│  │ │ ├── max_drawdown <= 30%                                     │   │ │   │
+│  │ │ └── test_sharpe >= 0.5 in majority                          │   │ │   │
+│  │ └──────────────────────────────────────────────────────────────┘   │ │   │
+│  └────────────────────────────────────────────────────────────────────┘ │   │
+│                          │                                              │   │
+│                          ▼                                              │   │
+│  ┌────────────────────────────────────────────────────────────────────┐ │   │
+│  │ WalkForwardResult                                                  │ │   │
+│  │ ├── passed: bool                                                  │ │   │
+│  │ ├── robustness_score: float                                       │ │   │
+│  │ ├── deflated_sharpe_ratio: float                                  │ │   │
+│  │ ├── probability_backtest_overfitting: float                       │ │   │
+│  │ └── windows: list[WindowResult]                                   │ │   │
+│  └────────────────────────────────────────────────────────────────────┘ │   │
+│                                                                         │   │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+### Integration with Alpha-Evolve
+
+```python
+from scripts.alpha_evolve.walk_forward import WalkForwardConfig
+from datetime import datetime
+
+# Configure validation
+wf_config = WalkForwardConfig(
+    data_start=datetime(2023, 1, 1),
+    data_end=datetime(2024, 12, 1),
+    train_months=6,
+    test_months=3,
+    step_months=3,
+    embargo_before_days=5,
+    embargo_after_days=3,
+)
+
+# Run evolution with validation
+result, validation = await controller.evolve_with_validation(
+    seed_strategy="momentum",
+    experiment="my_experiment",
+    iterations=50,
+    walk_forward_config=wf_config,
+)
+
+if validation and validation.passed:
+    print("Strategy ready for deployment!")
+```
+
+### Key Files
+
+| Component | Location |
+|-----------|----------|
+| Configuration | `scripts/alpha_evolve/walk_forward/config.py` |
+| Validator | `scripts/alpha_evolve/walk_forward/validator.py` |
+| Metrics (DSR, PBO) | `scripts/alpha_evolve/walk_forward/metrics.py` |
+| Report Generation | `scripts/alpha_evolve/walk_forward/report.py` |
+| CLI | `scripts/alpha_evolve/walk_forward/cli.py` |
+| Tests | `tests/test_walk_forward/` |
+
+### Lopez de Prado Metrics
+
+**Deflated Sharpe Ratio (DSR)** - Ch. 14:
+- Adjusts Sharpe for multiple testing
+- Formula: `DSR = Z⁻¹[Φ(SR) - ln(N)/√N]`
+- Always <= raw Sharpe
+
+**Probability of Backtest Overfitting (PBO)** - Ch. 11:
+- Estimates false positive probability
+- Uses combinatorial permutations
+- PBO > 0.5 indicates likely overfitting
+
+---
 
 ### Indicator Warmup Pattern
 
