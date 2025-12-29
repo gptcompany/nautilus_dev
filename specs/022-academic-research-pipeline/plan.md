@@ -237,6 +237,8 @@ academic_research/
 │   └── routes_config.py              # MODIFY: Add TRADING_STRATEGY_UTTERANCES
 ├── docs/
 │   └── entity_schemas.md             # MODIFY: Add strategy__ schema
+├── scripts/
+│   └── validate_entity.py            # NEW: Entity validation function
 ├── .claude/
 │   └── skills/
 │       └── research-query-workflow/
@@ -267,9 +269,9 @@ nautilus_dev/
         ├── spec.md                   # EXISTS
         ├── research.md               # EXISTS
         ├── plan.md                   # THIS FILE
-        ├── data-model.md             # TO CREATE
-        ├── quickstart.md             # TO CREATE
-        └── tasks.md                  # TO CREATE
+        ├── data-model.md             # EXISTS
+        ├── quickstart.md             # EXISTS
+        └── tasks.md                  # EXISTS
 ```
 
 ---
@@ -417,44 +419,7 @@ class NautilusMapping:
 
 ### semantic-router Trading Route
 
-```python
-# routes_config.py addition
-
-TRADING_STRATEGY_UTTERANCES = [
-    # Momentum/Trend (6)
-    "momentum trading strategy backtest",
-    "trend following algorithm performance",
-    "moving average crossover system",
-    "breakout trading strategy",
-    "relative strength momentum",
-    "time series momentum factor",
-
-    # Mean Reversion (5)
-    "mean reversion statistical arbitrage",
-    "pairs trading cointegration",
-    "Ornstein-Uhlenbeck estimation",
-    "contrarian investment strategy",
-    "bollinger bands mean reversion",
-
-    # Market Making (4)
-    "market making spread optimization",
-    "order book imbalance signal",
-    "bid-ask spread prediction",
-    "inventory management market maker",
-
-    # Crypto-Specific (5)
-    "perpetual futures funding arbitrage",
-    "liquidation cascade prediction",
-    "whale tracking on-chain analysis",
-    "DEX AMM liquidity provision",
-    "cross-exchange arbitrage crypto",
-]
-
-trading_strategy_route = Route(
-    name="trading_strategy",
-    utterances=TRADING_STRATEGY_UTTERANCES,
-)
-```
+See `spec.md` Component 1 for the full `TRADING_STRATEGY_UTTERANCES` list (20+ utterances covering momentum, mean reversion, market making, and crypto-specific strategies).
 
 ### sync_research.py Configuration
 

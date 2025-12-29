@@ -171,7 +171,7 @@ nautilus_dev/
 
 ## Agent Architecture
 
-### Subagents (11)
+### Subagents (12)
 
 | Agent | Responsibility |
 |-------|----------------|
@@ -180,6 +180,7 @@ nautilus_dev/
 | nautilus-data-pipeline-operator | Data pipeline management |
 | nautilus-live-operator | Live trading operations |
 | nautilus-visualization-renderer | Trading charts & dashboards |
+| strategy-researcher | Paper→spec conversion (academic_research bridge) |
 | backtest-analyzer | Log analysis with chunking strategy |
 | test-runner | Test execution (ALWAYS use for tests) |
 | tdd-guard | TDD enforcement (Red-Green-Refactor) |
@@ -187,13 +188,14 @@ nautilus_dev/
 | alpha-evolve | Multi-implementation generator ([E] marker) |
 | alpha-visual | Visual validation with screenshots |
 
-### Skills (3)
+### Skills (4)
 
 | Skill | Purpose | Token Savings |
 |-------|---------|---------------|
 | pytest-test-generator | Test boilerplate | 83% |
 | github-workflow | PR/Issue/Commit templates | 79% |
 | pydantic-model-generator | Config models | 75% |
+| paper-to-strategy | Paper→NautilusTrader spec | 70% |
 
 ### Alpha-Debug (Auto-Triggered)
 

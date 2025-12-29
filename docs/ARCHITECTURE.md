@@ -397,6 +397,212 @@ fitness:
 
 ---
 
+## Academic Research → Trading Strategy Pipeline (spec-022)
+
+### Purpose
+
+Bridge between academic research knowledge graph and NautilusTrader strategy development. Automatically classifies trading papers, extracts methodology, maps to native indicators, and generates implementation-ready specs.
+
+### Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    ACADEMIC RESEARCH PIPELINE                                │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│  ┌────────────────────────────────────────────────────────────────────────┐ │
+│  │ ACADEMIC RESEARCH REPO (/media/sam/1TB/academic_research)             │ │
+│  │                                                                        │ │
+│  │  ┌─────────────────┐    ┌───────────────────┐    ┌─────────────────┐  │ │
+│  │  │ Semantic Router │───▶│ Query Classifier  │───▶│ Paper Search    │  │ │
+│  │  │ MCP Server      │    │ (trading_strategy │    │ (arXiv, SSRN,   │  │ │
+│  │  │                 │    │  stem_cs, biomed) │    │  papers-w-code) │  │ │
+│  │  └─────────────────┘    └───────────────────┘    └────────┬────────┘  │ │
+│  │                                                            │           │ │
+│  │                                                            ▼           │ │
+│  │  ┌─────────────────────────────────────────────────────────────────┐  │ │
+│  │  │ memory.json (Knowledge Graph)                                   │  │ │
+│  │  │ - source__ entities (papers)                                    │  │ │
+│  │  │ - strategy__ entities (trading methodologies) ← NEW             │  │ │
+│  │  │ - concept__ entities (indicators, patterns)                     │  │ │
+│  │  │ - Relationships: based_on, uses_concept, targets_asset          │  │ │
+│  │  └──────────────────────────────┬──────────────────────────────────┘  │ │
+│  │                                 │                                      │ │
+│  └─────────────────────────────────┼──────────────────────────────────────┘ │
+│                                    │                                        │
+│                    sync_research.py (staleness detection)                   │
+│                                    │                                        │
+│                                    ▼                                        │
+│  ┌────────────────────────────────────────────────────────────────────────┐ │
+│  │ NAUTILUS DEV REPO (/media/sam/1TB/nautilus_dev)                       │ │
+│  │                                                                        │ │
+│  │  ┌─────────────────┐    ┌───────────────────┐    ┌─────────────────┐  │ │
+│  │  │ strategy-       │───▶│ paper-to-strategy │───▶│ alpha-evolve    │  │ │
+│  │  │ researcher      │    │ skill             │    │ agent           │  │ │
+│  │  │ agent           │    │                   │    │ (multi-impl)    │  │ │
+│  │  └────────┬────────┘    └────────┬──────────┘    └────────┬────────┘  │ │
+│  │           │                      │                        │           │ │
+│  │           │                      ▼                        │           │ │
+│  │           │         ┌───────────────────────┐             │           │ │
+│  │           │         │ Mapping Tables        │             │           │ │
+│  │           │         │ - indicator_mapping   │             │           │ │
+│  │           │         │ - order_mapping       │             │           │ │
+│  │           │         └───────────────────────┘             │           │ │
+│  │           │                      │                        │           │ │
+│  │           ▼                      ▼                        ▼           │ │
+│  │  ┌─────────────────────────────────────────────────────────────────┐  │ │
+│  │  │ specs/{n}-{strategy_name}/                                     │  │ │
+│  │  │ - spec.md (NautilusTrader-compatible specification)            │  │ │
+│  │  │ - research.md (paper summary, methodology notes)               │  │ │
+│  │  │ - plan.md (implementation approach)                            │  │ │
+│  │  └──────────────────────────────┬──────────────────────────────────┘  │ │
+│  │                                 │                                      │ │
+│  │                                 ▼                                      │ │
+│  │  ┌─────────────────────────────────────────────────────────────────┐  │ │
+│  │  │ strategies/{strategy_name}/                                    │  │ │
+│  │  │ - {strategy_name}_strategy.py (implemented strategy)           │  │ │
+│  │  │ - config.py (parameters, risk limits)                          │  │ │
+│  │  └─────────────────────────────────────────────────────────────────┘  │ │
+│  │                                                                        │ │
+│  └────────────────────────────────────────────────────────────────────────┘ │
+│                                                                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+### Data Flow
+
+```
+"Research momentum reversal strategies for crypto"
+        │
+        │ 1. Query classification
+        ▼
+┌───────────────────┐
+│ Semantic Router   │
+│ (trading_strategy │
+│  confidence > 0.8)│
+└────────┬──────────┘
+         │
+         │ 2. Memory check (incremental support)
+         ▼
+┌───────────────────┐
+│ memory.json       │ ←─ Existing strategy__ entities?
+│ (search_nodes)    │    Yes → Differential report
+└────────┬──────────┘    No  → Full research
+         │
+         │ 3. Paper search
+         ▼
+┌───────────────────┐
+│ arXiv (q-fin)     │
+│ SSRN              │
+│ papers-with-code  │
+└────────┬──────────┘
+         │
+         │ 4. Paper analysis (Claude or Gemini 2M)
+         ▼
+┌───────────────────┐
+│ Methodology       │
+│ Extraction        │
+│ - entry_logic     │
+│ - exit_logic      │
+│ - indicators      │
+│ - risk_mgmt       │
+└────────┬──────────┘
+         │
+         │ 5. NautilusTrader mapping
+         ▼
+┌───────────────────┐
+│ Native Indicators │    Paper: "20-day EMA"
+│ Order Types       │ →  NT: ExponentialMovingAverage(20)
+│ Position Sizing   │
+└────────┬──────────┘
+         │
+         │ 6. Spec generation
+         ▼
+┌───────────────────┐
+│ specs/027-crypto- │
+│ momentum-reversal/│
+│ - spec.md         │
+│ - research.md     │
+└────────┬──────────┘
+         │
+         │ 7. Optional: Alpha-Evolve
+         ▼
+┌───────────────────┐
+│ Multi-Impl        │
+│ Generation        │
+│ - Variant A       │
+│ - Variant B       │
+│ - Variant C       │
+└────────┬──────────┘
+         │
+         │ 8. Backtest & rank
+         ▼
+   Best Implementation
+   (strategies/momentum_reversal/)
+```
+
+### Key Components
+
+| Component | Location | Purpose |
+|-----------|----------|---------|
+| Semantic Router | academic_research/semantic_router_mcp/ | Query classification |
+| strategy__ Schema | academic_research/docs/entity_schemas.md | Entity structure |
+| Validation | academic_research/scripts/validate_entity.py | Entity validation |
+| strategy-researcher | nautilus_dev/.claude/agents/strategy-researcher.md | Agent definition |
+| paper-to-strategy | nautilus_dev/.claude/skills/paper-to-strategy/ | Spec generation |
+| Indicator Mapping | nautilus_dev/docs/research/indicator_mapping.md | Paper → NT mapping |
+| Order Mapping | nautilus_dev/docs/research/order_mapping.md | Order type mapping |
+| Sync Script | nautilus_dev/scripts/sync_research.py | Cross-repo sync |
+| Strategies Output | nautilus_dev/docs/research/strategies.json | Synced entities |
+
+### Entity Schema (strategy__)
+
+```yaml
+ID Format: strategy__{methodology}_{asset}_{year}
+Example: strategy__momentum_btc_2024
+
+Required Observations:
+  - source_paper: "source__arxiv_2103_15879"
+  - methodology_type: momentum|mean_reversion|market_making|arbitrage|trend_following|statistical_arbitrage
+  - entry_logic: "Buy when RSI < 30 and EMA crossover"
+  - exit_logic: "Sell when RSI > 70 or trailing stop hit"
+  - implementation_status: not_started|in_progress|implemented|validated|production
+
+Relationships:
+  - based_on → source__ (paper entity)
+  - uses_concept → concept__ (indicator entities)
+  - targets_asset → domain__ (asset class)
+```
+
+### Sync Mechanism
+
+```python
+# scripts/sync_research.py
+# Syncs strategy__ entities from academic_research → nautilus_dev
+
+CONFIG = {
+    "source": Path("/media/sam/1TB/academic_research/memory.json"),
+    "target": Path("/media/sam/1TB/nautilus_dev/docs/research/strategies.json"),
+    "entity_prefix": "strategy__",
+    "stale_threshold_hours": 24,
+}
+
+# Commands
+python scripts/sync_research.py           # Normal sync (if stale)
+python scripts/sync_research.py --force   # Force sync
+python scripts/sync_research.py --dry-run # Preview only
+```
+
+### Troubleshooting
+
+See `specs/022-academic-research-pipeline/troubleshooting.md` for:
+- Semantic router classification issues
+- Entity validation errors
+- Sync script problems
+- Paper-to-strategy conversion errors
+
+---
+
 ## Related Specs
 
 | Spec | Description | Status |
@@ -418,6 +624,7 @@ fitness:
 | spec-018 | Redis Cache Backend | Planned |
 | spec-019 | Graceful Shutdown | Planned |
 | spec-020 | Walk-Forward Validation | Planned |
+| spec-022 | Academic Research → Trading Strategy Pipeline | Complete |
 
 ---
 

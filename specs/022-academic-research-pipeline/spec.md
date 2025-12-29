@@ -54,9 +54,9 @@ Currently:
 **So that** both systems share knowledge.
 
 **Acceptance Criteria**:
-- [ ] memory.json strategy entities synced to specs/research.md
-- [ ] nautilus_dev Discord insights available to academic_research
-- [ ] Bidirectional link: paper → strategy → backtest results
+- [ ] memory.json strategy__ entities synced to nautilus_dev/docs/research/strategies.json
+- [ ] Sync includes staleness detection (timestamp comparison)
+- [ ] Metadata link preserved: strategy entity references source paper ID
 
 ### US5: Incremental Research (P3)
 **As a** trader,
