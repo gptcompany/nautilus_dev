@@ -800,7 +800,42 @@
       "operation": "read",
       "timestamp": "2025-12-29T17:27:26.325946",
       "file_path": "/media/sam/1TB/nautilus_dev/scripts/sync_research.py"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-29T17:30:00.313196",
+      "command": "git push origin master",
+      "description": "Push to origin master"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-29T17:47:32.660461",
+      "command": "cat /media/sam/1TB/nautilus_dev/.mcp.json 2>/dev/null || echo \"FILE NOT FOUND\"",
+      "description": "Check existing MCP config"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-29T17:47:41.094606",
+      "file_path": "/media/sam/1TB/academic_research/.mcp.json"
+    },
+    {
+      "operation": "write",
+      "timestamp": "2025-12-29T17:47:49.705468",
+      "file_path": "/media/sam/1TB/nautilus_dev/.mcp.json",
+      "content_length": 647
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-29T17:47:59.314987",
+      "command": "git add .mcp.json && git commit -m \"$(cat <<'EOF'\nchore: Add semantic-router MCP for spec-022 pipeline\n\nEnable research pipeline from nautilus_dev by adding:\n- semantic-router: Query classification (trading_strategy domain)\n- paper-search-mcp: Multi-source paper search\n\nRestart Claude Code to activate.\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n)\"",
+      "description": "Commit MCP config"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-29T17:48:05.810894",
+      "command": "git push origin master",
+      "description": "Push MCP config"
     }
   ],
-  "last_updated": "2025-12-29T17:27:26.325965"
+  "last_updated": "2025-12-29T17:48:05.810912"
 }
