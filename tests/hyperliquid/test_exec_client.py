@@ -3,6 +3,11 @@
 Tests the factory functions for creating HyperliquidExecClientConfig.
 """
 
+import pytest
+
+# Skip entire module if Hyperliquid adapter not available
+pytest.importorskip("nautilus_trader.adapters.hyperliquid")
+
 from nautilus_trader.adapters.hyperliquid import HYPERLIQUID
 from nautilus_trader.adapters.hyperliquid import HyperliquidExecClientConfig
 from nautilus_trader.config import TradingNodeConfig

@@ -154,7 +154,16 @@ class RiskManager:
             return
 
         stop_order_id = self._active_stops[position_id]
-        self._strategy.cancel_order(stop_order_id)
+        stop_order = self._strategy.cache.order(stop_order_id)
+        if stop_order is not None:
+            try:
+                self._strategy.cancel_order(stop_order)
+            except Exception as e:
+                import logging
+
+                logging.getLogger(__name__).warning(
+                    f"Failed to cancel stop order {stop_order_id} for closed position: {e}"
+                )
         del self._active_stops[position_id]
 
     def _on_position_changed(self, event: PositionChanged) -> None:
@@ -184,7 +193,9 @@ class RiskManager:
             self._strategy.submit_order(new_stop_order)
             self._active_stops[position_id] = new_stop_order.client_order_id
             # Only cancel old stop after new one is submitted
-            self._strategy.cancel_order(old_stop_id)
+            old_stop_order = self._strategy.cache.order(old_stop_id)
+            if old_stop_order is not None:
+                self._strategy.cancel_order(old_stop_order)
         except Exception as e:
             # If new stop fails, keep old stop active for protection
             import logging

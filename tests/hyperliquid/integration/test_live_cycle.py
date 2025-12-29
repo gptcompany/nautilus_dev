@@ -14,6 +14,9 @@ from decimal import Decimal
 
 import pytest
 
+# Skip entire module if Hyperliquid adapter not available
+pytest.importorskip("nautilus_trader.adapters.hyperliquid")
+
 from configs.hyperliquid.testnet import create_testnet_trading_node
 from strategies.hyperliquid.config import HyperliquidStrategyConfig
 from strategies.hyperliquid.base_strategy import HyperliquidBaseStrategy

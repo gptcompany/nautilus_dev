@@ -18,8 +18,8 @@ export HYPERLIQUID_TESTNET_PK="0x_your_testnet_private_key"
 export HYPERLIQUID_TESTNET_VAULT=""  # Optional, leave empty if not using vault
 
 # Mainnet credentials (use separate wallet!)
-export HYPERLIQUID_MAINNET_PK="0x_your_mainnet_private_key"
-export HYPERLIQUID_MAINNET_VAULT=""  # Optional
+export HYPERLIQUID_PK="0x_your_mainnet_private_key"
+export HYPERLIQUID_VAULT=""  # Optional
 ```
 
 ## Phase 1: Data Feed Only

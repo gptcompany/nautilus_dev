@@ -4,7 +4,7 @@ This module provides factory functions for creating production-ready
 TradingNode configurations with Redis caching and reconciliation.
 
 Environment Variables Required (Mainnet):
-    HYPERLIQUID_MAINNET_PK: Private key for mainnet trading
+    HYPERLIQUID_PK: Private key for mainnet trading
 
 Example:
     >>> from configs.hyperliquid.trading_node import create_hyperliquid_trading_node

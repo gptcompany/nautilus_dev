@@ -115,7 +115,7 @@ from nautilus_trader.adapters.hyperliquid import HyperliquidExecClientConfig
 
 exec_config = {
     HYPERLIQUID: HyperliquidExecClientConfig(
-        private_key=None,  # Loads from HYPERLIQUID_TESTNET_PK or HYPERLIQUID_MAINNET_PK env var
+        private_key=None,  # Loads from HYPERLIQUID_TESTNET_PK or HYPERLIQUID_PK env var
         vault_address=None,  # Optional vault trading
         instrument_provider=InstrumentProviderConfig(load_all=True),
         testnet=False,
@@ -195,7 +195,7 @@ config = TradingNodeConfig(
     },
     exec_clients={
         HYPERLIQUID: HyperliquidExecClientConfig(
-            private_key=None,  # From HYPERLIQUID_TESTNET_PK or HYPERLIQUID_MAINNET_PK env
+            private_key=None,  # From HYPERLIQUID_TESTNET_PK or HYPERLIQUID_PK env
             instrument_provider=InstrumentProviderConfig(load_all=True),
             testnet=False,
             max_retries=3,
@@ -238,7 +238,7 @@ export HYPERLIQUID_TESTNET_PK="your_testnet_private_key"
 export HYPERLIQUID_TESTNET_VAULT="testnet_vault_address"  # Optional
 
 # Mainnet (production only - KEEP SECURE)
-export HYPERLIQUID_MAINNET_PK="your_mainnet_private_key"
+export HYPERLIQUID_PK="your_mainnet_private_key"
 export HYPERLIQUID_MAINNET_VAULT="mainnet_vault_address"  # Optional
 ```
 

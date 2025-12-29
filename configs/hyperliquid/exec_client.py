@@ -5,9 +5,9 @@ for order execution on Hyperliquid.
 
 Environment Variables:
     HYPERLIQUID_TESTNET_PK: Private key for testnet trading
-    HYPERLIQUID_MAINNET_PK: Private key for mainnet trading (production)
+    HYPERLIQUID_PK: Private key for mainnet trading (production)
     HYPERLIQUID_TESTNET_VAULT: Optional vault address for testnet
-    HYPERLIQUID_MAINNET_VAULT: Optional vault address for mainnet
+    HYPERLIQUID_VAULT: Optional vault address for mainnet
 
 Example:
     >>> from configs.hyperliquid import create_hyperliquid_exec_client
@@ -34,7 +34,7 @@ def create_hyperliquid_exec_client(
 
     IMPORTANT: Private key is loaded from environment variables:
     - Testnet: HYPERLIQUID_TESTNET_PK
-    - Mainnet: HYPERLIQUID_MAINNET_PK
+    - Mainnet: HYPERLIQUID_PK
 
     Never pass private keys directly in code!
 

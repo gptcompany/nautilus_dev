@@ -24,7 +24,7 @@
 - [X] T003 [P] Create strategies/hyperliquid/__init__.py with module docstring
 - [X] T004 [P] Create scripts/hyperliquid/ directory
 - [X] T005 [P] Create tests/hyperliquid/ directory structure
-- [X] T006 [P] Create .env.example with HYPERLIQUID_TESTNET_PK, HYPERLIQUID_MAINNET_PK template in configs/hyperliquid/
+- [X] T006 [P] Create .env.example with HYPERLIQUID_TESTNET_PK, HYPERLIQUID_PK template in configs/hyperliquid/
 
 ---
 
@@ -307,5 +307,5 @@ Task: "Implement LIMIT order submission" (T036)
 - ExecClient is "building" phase - testnet validation critical
 - Requires NautilusTrader Nightly >= 1.222.0
 - Depends on Spec 011 (Stop-Loss) for US4 RiskManager integration
-- Private keys ONLY via environment variables (HYPERLIQUID_TESTNET_PK, HYPERLIQUID_MAINNET_PK)
+- Private keys ONLY via environment variables (HYPERLIQUID_TESTNET_PK, HYPERLIQUID_PK)
 - Start with testnet=True, validate before mainnet

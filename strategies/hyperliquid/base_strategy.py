@@ -158,8 +158,11 @@ class HyperliquidBaseStrategy(Strategy):
         Returns:
             True if order is within limits, False otherwise.
         """
-        # Use RiskManager's validate_order if available
-        # For now, simple size check
+        # Reject negative or zero sizes
+        if size <= 0:
+            self.log.warning(f"Order size must be positive, got {size}")
+            return False
+        # Check against max position size
         if size > self.strategy_config.max_position_size:
             self.log.warning(
                 f"Order size {size} exceeds max_position_size "

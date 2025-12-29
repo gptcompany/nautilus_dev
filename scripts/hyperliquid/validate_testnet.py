@@ -147,6 +147,8 @@ class TestnetValidationStrategy(HyperliquidBaseStrategy):
                 self.log.info("✓ Position opened successfully")
 
                 # Check for stop-loss after a short delay
+                # Note: time.sleep is acceptable here since this is a validation
+                # script, not production code. For production, use clock.set_timer().
                 time.sleep(1)
                 self._verify_stop_loss()
 
@@ -248,15 +250,20 @@ def main():
     print(f"  Size: {args.size}")
     print(f"  Stop-loss: {args.stop_loss * 100}%")
 
-    # Create testnet node configuration
-    node_config = create_testnet_trading_node(
+    # Create base testnet node configuration
+    base_config = create_testnet_trading_node(
         trader_id="TRADER-HL-VALIDATE",
         instruments=[args.instrument],
     )
 
-    # Add logging configuration
-    node_config.logging = LoggingConfig(
-        log_level=LogLevel.INFO,
+    # Reconstruct config with logging (TradingNodeConfig is frozen)
+    from nautilus_trader.config import TradingNodeConfig
+
+    node_config = TradingNodeConfig(
+        trader_id=base_config.trader_id,
+        data_clients=base_config.data_clients,
+        exec_clients=base_config.exec_clients,
+        logging=LoggingConfig(log_level=LogLevel.INFO),
     )
 
     # Create strategy configuration

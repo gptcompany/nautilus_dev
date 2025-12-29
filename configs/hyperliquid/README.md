@@ -11,7 +11,7 @@ This directory contains configuration factories for Hyperliquid integration with
 export HYPERLIQUID_TESTNET_PK="0x_your_testnet_private_key"
 
 # Mainnet (for production - KEEP SECURE!)
-export HYPERLIQUID_MAINNET_PK="0x_your_mainnet_private_key"
+export HYPERLIQUID_PK="0x_your_mainnet_private_key"
 ```
 
 ### 2. Data Streaming Only

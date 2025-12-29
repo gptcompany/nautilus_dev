@@ -23,6 +23,7 @@ from nautilus_trader.common.enums import LogLevel
 from nautilus_trader.config import LoggingConfig
 from nautilus_trader.live.node import TradingNode
 from nautilus_trader.model.data import QuoteTick, TradeTick, OrderBookDelta
+from nautilus_trader.model.identifiers import InstrumentId
 from nautilus_trader.trading.strategy import Strategy
 
 from configs.hyperliquid.data_client import (
@@ -57,10 +58,11 @@ class DataStreamStrategy(Strategy):
         self.log.info(f"Starting data stream for {self.duration_secs} seconds")
 
         for instrument_id_str in self.instruments:
-            # Get instrument from cache
-            instrument_id = self.cache.instrument_id(instrument_id_str)
-            if instrument_id is None:
-                self.log.warning(f"Instrument not found: {instrument_id_str}")
+            # Parse instrument ID
+            instrument_id = InstrumentId.from_str(instrument_id_str)
+            # Verify instrument is loaded in cache
+            if self.cache.instrument(instrument_id) is None:
+                self.log.warning(f"Instrument not loaded: {instrument_id_str}")
                 continue
 
             # Subscribe to all data types
@@ -173,16 +175,20 @@ def main():
     print(f"  Duration: {args.duration}s")
     print(f"  Instruments: {instruments}")
 
-    # Create node configuration
-    config = create_data_only_trading_node(
+    # Create base configuration
+    base_config = create_data_only_trading_node(
         trader_id="TRADER-HL-STREAM",
         testnet=args.testnet,
         instruments=instruments,
     )
 
-    # Add logging configuration
-    config.logging = LoggingConfig(
-        log_level=LogLevel.INFO,
+    # Reconstruct config with logging (TradingNodeConfig is frozen)
+    from nautilus_trader.config import TradingNodeConfig
+
+    config = TradingNodeConfig(
+        trader_id=base_config.trader_id,
+        data_clients=base_config.data_clients,
+        logging=LoggingConfig(log_level=LogLevel.INFO),
     )
 
     # Create and configure node

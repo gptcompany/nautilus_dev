@@ -49,7 +49,7 @@
 **Environment Variables**:
 | Variable | Testnet | Mainnet |
 |----------|---------|---------|
-| Private Key | HYPERLIQUID_TESTNET_PK | HYPERLIQUID_MAINNET_PK |
+| Private Key | HYPERLIQUID_TESTNET_PK | HYPERLIQUID_PK |
 | Vault Address | HYPERLIQUID_TESTNET_VAULT | HYPERLIQUID_MAINNET_VAULT |
 
 ---

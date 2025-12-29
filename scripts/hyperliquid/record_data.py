@@ -24,6 +24,7 @@ from nautilus_trader.common.enums import LogLevel
 from nautilus_trader.config import LoggingConfig
 from nautilus_trader.live.node import TradingNode
 from nautilus_trader.model.data import QuoteTick, TradeTick, OrderBookDelta
+from nautilus_trader.model.identifiers import InstrumentId
 from nautilus_trader.trading.strategy import Strategy
 
 from configs.hyperliquid.persistence import (
@@ -57,9 +58,11 @@ class DataRecordingStrategy(Strategy):
         self.log.info(f"Starting data recording for {self.duration_secs} seconds")
 
         for instrument_id_str in self.instruments:
-            instrument_id = self.cache.instrument_id(instrument_id_str)
-            if instrument_id is None:
-                self.log.warning(f"Instrument not found: {instrument_id_str}")
+            # Parse instrument ID
+            instrument_id = InstrumentId.from_str(instrument_id_str)
+            # Verify instrument is loaded in cache
+            if self.cache.instrument(instrument_id) is None:
+                self.log.warning(f"Instrument not loaded: {instrument_id_str}")
                 continue
 
             self.subscribe_quote_ticks(instrument_id)
@@ -160,17 +163,22 @@ def main():
     # Ensure catalog directory exists
     catalog_path.mkdir(parents=True, exist_ok=True)
 
-    # Create node configuration with streaming
-    config = create_recording_trading_node(
+    # Create base configuration with streaming
+    base_config = create_recording_trading_node(
         trader_id="TRADER-HL-RECORD",
         testnet=args.testnet,
         instruments=instruments,
         catalog_path=str(catalog_path),
     )
 
-    # Add logging configuration
-    config.logging = LoggingConfig(
-        log_level=LogLevel.INFO,
+    # Reconstruct config with logging (TradingNodeConfig is frozen)
+    from nautilus_trader.config import TradingNodeConfig
+
+    config = TradingNodeConfig(
+        trader_id=base_config.trader_id,
+        data_clients=base_config.data_clients,
+        streaming=base_config.streaming,
+        logging=LoggingConfig(log_level=LogLevel.INFO),
     )
 
     # Create node

@@ -274,15 +274,20 @@ def main():
     print(f"  Trigger: {args.trigger}")
     print(f"  Reduce Only: {args.reduce_only}")
 
-    # Create testnet node configuration
-    config = create_testnet_trading_node(
+    # Create base testnet node configuration
+    base_config = create_testnet_trading_node(
         trader_id="TRADER-HL-ORDER-TEST",
         instruments=[args.instrument],
     )
 
-    # Add logging configuration
-    config.logging = LoggingConfig(
-        log_level=LogLevel.INFO,
+    # Reconstruct config with logging (TradingNodeConfig is frozen)
+    from nautilus_trader.config import TradingNodeConfig
+
+    config = TradingNodeConfig(
+        trader_id=base_config.trader_id,
+        data_clients=base_config.data_clients,
+        exec_clients=base_config.exec_clients,
+        logging=LoggingConfig(log_level=LogLevel.INFO),
     )
 
     # Create node

@@ -9,7 +9,7 @@ This script launches a production TradingNode for Hyperliquid with:
 IMPORTANT: For production use only after thorough testnet validation.
 
 Environment Variables Required:
-    HYPERLIQUID_MAINNET_PK: Private key for mainnet trading (production)
+    HYPERLIQUID_PK: Private key for mainnet trading (production)
     HYPERLIQUID_TESTNET_PK: Private key for testnet trading (if --testnet)
 
 Usage:
@@ -33,6 +33,7 @@ from nautilus_trader.common.enums import LogLevel
 from nautilus_trader.config import LoggingConfig
 from nautilus_trader.live.node import TradingNode
 
+
 from configs.hyperliquid.trading_node import create_hyperliquid_trading_node
 
 
@@ -48,7 +49,7 @@ def validate_environment(testnet: bool) -> bool:
     if testnet:
         env_var = "HYPERLIQUID_TESTNET_PK"
     else:
-        env_var = "HYPERLIQUID_MAINNET_PK"
+        env_var = "HYPERLIQUID_PK"
 
     if not os.environ.get(env_var):
         print(f"ERROR: {env_var} environment variable not set")
@@ -168,8 +169,8 @@ def main():
             print("\nAborted by user")
             sys.exit(0)
 
-    # Create node configuration
-    config = create_hyperliquid_trading_node(
+    # Create base configuration
+    base_config = create_hyperliquid_trading_node(
         trader_id=args.trader_id,
         testnet=args.testnet,
         instruments=args.instruments,
@@ -179,10 +180,20 @@ def main():
         reconciliation=not args.no_reconciliation,
     )
 
-    # Add logging configuration
+    # Create logging configuration
     log_level = getattr(LogLevel, args.log_level)
-    config.logging = LoggingConfig(
-        log_level=log_level,
+    logging_config = LoggingConfig(log_level=log_level)
+
+    # Reconstruct config with logging (TradingNodeConfig is frozen)
+    from nautilus_trader.config import TradingNodeConfig
+
+    config = TradingNodeConfig(
+        trader_id=base_config.trader_id,
+        data_clients=base_config.data_clients,
+        exec_clients=base_config.exec_clients,
+        cache=base_config.cache,
+        exec_engine=base_config.exec_engine,
+        logging=logging_config,
     )
 
     # Create node
