@@ -1,6 +1,6 @@
 # NautilusTrader Status Feed
 
-## Last Update: 12/28/2025, 12:00:28 AM UTC
+## Last Update: 12/29/2025, 12:00:29 AM UTC
 
 ### Current Versions
 - **Stable**: v1.221.0
@@ -15,7 +15,7 @@
 - [#3307](https://github.com/nautechsystems/nautilus_trader/issues/3307) Add support for ticker name changes, stock splits and corporate actions in general [enhancement]
 - [#3269](https://github.com/nautechsystems/nautilus_trader/issues/3269) [Deribit] Initial integration [enhancement, rust]
 - [#3180](https://github.com/nautechsystems/nautilus_trader/issues/3180) RFC: Comparison of Bybit Python vs Rust adapter performance [enhancement, RFC, rust, python, adapter]
-- [#3177](https://github.com/nautechsystems/nautilus_trader/issues/3177) Support for Generating Time-Indexed (Daily/Per Bar) Backtest Reports [enhancement]
+- [#3177](https://github.com/nautechsystems/nautilus_trader/issues/3177) Support for generating time-indexed (daily/per bar) backtest reports [enhancement]
 - [#3152](https://github.com/nautechsystems/nautilus_trader/issues/3152) [Hyperliquid] Execution and reconciliation testing [enhancement, rust]
 
 ### Active Bug Reports
@@ -29,7 +29,7 @@
 - [#3307](https://github.com/nautechsystems/nautilus_trader/issues/3307) Add support for ticker name changes, stock splits and corporate actions in general
 - [#3269](https://github.com/nautechsystems/nautilus_trader/issues/3269) [Deribit] Initial integration
 - [#3180](https://github.com/nautechsystems/nautilus_trader/issues/3180) RFC: Comparison of Bybit Python vs Rust adapter performance
-- [#3177](https://github.com/nautechsystems/nautilus_trader/issues/3177) Support for Generating Time-Indexed (Daily/Per Bar) Backtest Reports
+- [#3177](https://github.com/nautechsystems/nautilus_trader/issues/3177) Support for generating time-indexed (daily/per bar) backtest reports
 - [#3152](https://github.com/nautechsystems/nautilus_trader/issues/3152) [Hyperliquid] Execution and reconciliation testing
 
 ### Breaking Changes (Last 7 Days)
