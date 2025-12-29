@@ -139,34 +139,33 @@ nautilus_dev/
 ├── CLAUDE.md                 # THIS FILE (dev guidelines)
 ├── docs/
 │   ├── ARCHITECTURE.md       # Technical architecture (wranglers, data pipeline)
-│   ├── api_reference/        # API documentation
-│   ├── concepts/             # Core concepts
-│   ├── developer_guide/      # Developer guides
+│   ├── research/             # Academic research pipeline output
+│   │   ├── indicator_mapping.md
+│   │   ├── order_mapping.md
+│   │   └── strategies.json   # Synced from academic_research
 │   ├── discord/              # Discord community knowledge (420K, 90-day window)
-│   │   ├── questions.md      # Q&A patterns (2991 lines)
-│   │   ├── help.md           # Help & troubleshooting (2825 lines)
-│   │   ├── general.md        # General discussions (1203 lines)
-│   │   ├── data.md           # Data management (695 lines)
-│   │   ├── dev-rust.md       # Rust development (545 lines)
-│   │   ├── performance.md    # Performance tips
-│   │   ├── binance.md, bybit.md, okx.md, dydx.md  # Exchange-specific
-│   │   └── visualization.md  # Visualization discussions (NEW)
-│   ├── integrations/         # Exchange adapter docs
 │   ├── nautilus/             # Changelog & version tracking
-│   │   ├── nautilus-trader-changelog.md
-│   │   └── nautilus-trader-changelog.json
 │   └── tutorials/            # Tutorials
-├── feeds/                    # Data feeds
-├── context/                  # Context files
+├── strategies/               # ALL STRATEGIES (100+ scalable)
+│   ├── _templates/           # Base classes (DO NOT MODIFY)
+│   ├── production/           # ✅ Deployed, stable
+│   ├── development/          # 🔧 Work in progress
+│   ├── evolved/              # 🧬 Alpha-evolve output
+│   ├── converted/            # 📜 From /pinescript
+│   ├── archive/              # 📦 Deprecated
+│   ├── common/               # Shared utilities
+│   └── hyperliquid/          # Exchange-specific
+├── config/                   # TradingNode configurations
+├── scripts/
+│   ├── alpha_evolve/         # Evolution system
+│   └── sync_research.py      # Academic research sync
 ├── .claude/
-│   ├── agents/               # Subagent definitions (11 agents)
-│   ├── commands/             # Slash commands (SpecKit)
-│   ├── skills/               # Token-saving skills (3)
+│   ├── agents/               # Subagent definitions (12 agents)
+│   ├── commands/             # Slash commands (/research, /pinescript)
+│   ├── skills/               # Token-saving skills (5)
 │   └── settings.local.json   # Project settings
 ├── .specify/                 # SpecKit templates
-│   ├── templates/            # spec, plan, tasks, checklist
-│   └── memory/               # Project constitution
-└── .serena/                  # Serena MCP config
+└── specs/                    # Feature specifications
 ```
 
 ## Agent Architecture
@@ -188,7 +187,7 @@ nautilus_dev/
 | alpha-evolve | Multi-implementation generator ([E] marker) |
 | alpha-visual | Visual validation with screenshots |
 
-### Skills (4)
+### Skills (6)
 
 | Skill | Purpose | Token Savings |
 |-------|---------|---------------|
@@ -196,6 +195,8 @@ nautilus_dev/
 | github-workflow | PR/Issue/Commit templates | 79% |
 | pydantic-model-generator | Config models | 75% |
 | paper-to-strategy | Paper→NautilusTrader spec | 70% |
+| research-pipeline | `/research` - Academic paper search | 60% |
+| pinescript-converter | `/pinescript` - TradingView→Nautilus | 65% |
 
 ### Alpha-Debug (Auto-Triggered)
 

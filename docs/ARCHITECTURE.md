@@ -603,6 +603,61 @@ See `specs/022-academic-research-pipeline/troubleshooting.md` for:
 
 ---
 
+## Strategy Organization (100+ Scalable)
+
+### Directory Structure
+
+```
+strategies/
+├── _templates/           # Base classes (DO NOT MODIFY)
+│   ├── base_strategy.py  # BaseStrategy, BaseStrategyConfig
+│   └── base_evolve.py    # Alpha-evolve compatible base
+│
+├── production/           # ✅ Deployed, stable strategies
+│   └── {name}/
+│       ├── strategy.py
+│       ├── config.py
+│       └── README.md
+│
+├── development/          # 🔧 Work in progress
+├── evolved/              # 🧬 Alpha-evolve output (gen_XXX/)
+├── converted/            # 📜 From /pinescript command
+├── archive/              # 📦 Deprecated strategies
+│
+├── common/               # Shared utilities (risk, sizing)
+├── examples/             # Example implementations
+└── hyperliquid/          # Exchange-specific strategies
+```
+
+### Strategy Lifecycle
+
+```
+/pinescript URL        → converted/{name}/
+/research + implement  → development/{name}/
+alpha-evolve           → evolved/gen_{N}/
+Manual promotion       → production/{name}/
+Deprecate             → archive/{name}/
+```
+
+### Naming Convention
+
+```
+{methodology}_{asset}_{version}/
+```
+
+Examples: `momentum_btc_v3/`, `mean_reversion_eth_v1/`, `ema_cross_multi_v2/`
+
+### Commands
+
+| Command | Output Location | Purpose |
+|---------|-----------------|---------|
+| `/research <topic>` | docs/research/ + memory.json | Academic paper research |
+| `/pinescript <url>` | strategies/converted/ | TradingView conversion |
+| `/speckit.implement` | strategies/development/ | Spec implementation |
+| alpha-evolve | strategies/evolved/ | Strategy evolution |
+
+---
+
 ## Related Specs
 
 | Spec | Description | Status |
