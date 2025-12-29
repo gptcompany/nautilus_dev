@@ -1,0 +1,203 @@
+# Hyperliquid API Contract (Spec 021)
+# Internal Python API for Hyperliquid trading
+
+openapi: 3.0.3
+info:
+  title: Hyperliquid Trading API
+  description: Internal API contract for NautilusTrader Hyperliquid integration
+  version: 1.0.0
+
+components:
+  schemas:
+    HyperliquidDataClientConfig:
+      type: object
+      properties:
+        testnet:
+          type: boolean
+          default: false
+        base_url_http:
+          type: string
+          nullable: true
+        base_url_ws:
+          type: string
+          nullable: true
+        http_timeout_secs:
+          type: integer
+          default: 10
+        instrument_provider:
+          $ref: '#/components/schemas/InstrumentProviderConfig'
+
+    HyperliquidExecClientConfig:
+      type: object
+      properties:
+        private_key:
+          type: string
+          nullable: true
+          description: EVM private key (loads from env if null)
+        vault_address:
+          type: string
+          nullable: true
+          description: Optional vault for delegated trading
+        testnet:
+          type: boolean
+          default: false
+        max_retries:
+          type: integer
+          minimum: 1
+          maximum: 10
+          nullable: true
+        retry_delay_initial_ms:
+          type: integer
+          minimum: 50
+          nullable: true
+        retry_delay_max_ms:
+          type: integer
+          minimum: 1000
+          nullable: true
+        http_timeout_secs:
+          type: integer
+          default: 10
+        instrument_provider:
+          $ref: '#/components/schemas/InstrumentProviderConfig'
+
+    InstrumentProviderConfig:
+      type: object
+      properties:
+        load_all:
+          type: boolean
+          default: false
+        load_ids:
+          type: array
+          items:
+            type: string
+          nullable: true
+          example:
+            - "BTC-USD-PERP.HYPERLIQUID"
+            - "ETH-USD-PERP.HYPERLIQUID"
+
+    OrderSubmission:
+      type: object
+      required:
+        - instrument_id
+        - order_side
+        - order_type
+        - quantity
+      properties:
+        instrument_id:
+          type: string
+          pattern: '^[A-Z]+-USD-PERP\\.HYPERLIQUID$'
+          example: BTC-USD-PERP.HYPERLIQUID
+        order_side:
+          type: string
+          enum: [BUY, SELL]
+        order_type:
+          $ref: '#/components/schemas/OrderType'
+        quantity:
+          type: number
+          exclusiveMinimum: 0
+        price:
+          type: number
+          exclusiveMinimum: 0
+          nullable: true
+          description: Required for LIMIT orders
+        trigger_price:
+          type: number
+          exclusiveMinimum: 0
+          nullable: true
+          description: Required for STOP orders
+        time_in_force:
+          type: string
+          enum: [GTC, IOC]
+          default: GTC
+        reduce_only:
+          type: boolean
+          default: false
+        post_only:
+          type: boolean
+          default: false
+
+    OrderType:
+      type: string
+      enum:
+        - MARKET
+        - LIMIT
+        - STOP_MARKET
+        - STOP_LIMIT
+        - MARKET_IF_TOUCHED
+        - LIMIT_IF_TOUCHED
+
+    OrderStatus:
+      type: string
+      enum:
+        - INITIALIZED
+        - SUBMITTED
+        - ACCEPTED
+        - PARTIALLY_FILLED
+        - FILLED
+        - CANCELED
+        - REJECTED
+        - EXPIRED
+
+  # Environment variables
+  x-environment-variables:
+    testnet:
+      HYPERLIQUID_TESTNET_PK: "Testnet private key"
+      HYPERLIQUID_TESTNET_VAULT: "Testnet vault address (optional)"
+    mainnet:
+      HYPERLIQUID_MAINNET_PK: "Mainnet private key"
+      HYPERLIQUID_MAINNET_VAULT: "Mainnet vault address (optional)"
+
+  # Instrument symbology
+  x-instrument-symbols:
+    perpetuals:
+      - BTC-USD-PERP.HYPERLIQUID
+      - ETH-USD-PERP.HYPERLIQUID
+      - SOL-USD-PERP.HYPERLIQUID
+      - ARB-USD-PERP.HYPERLIQUID
+      - DOGE-USD-PERP.HYPERLIQUID
+    spot:
+      - PURR-USDC-SPOT.HYPERLIQUID
+      - HYPE-USDC-SPOT.HYPERLIQUID
+
+paths:
+  /internal/create_data_client:
+    post:
+      summary: Create Hyperliquid data client config
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HyperliquidDataClientConfig'
+      responses:
+        '200':
+          description: Config created
+
+  /internal/create_exec_client:
+    post:
+      summary: Create Hyperliquid execution client config
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HyperliquidExecClientConfig'
+      responses:
+        '200':
+          description: Config created
+        '400':
+          description: Invalid configuration
+
+  /internal/submit_order:
+    post:
+      summary: Submit order to Hyperliquid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderSubmission'
+      responses:
+        '200':
+          description: Order accepted
+        '400':
+          description: Invalid order
+        '503':
+          description: Chain congestion

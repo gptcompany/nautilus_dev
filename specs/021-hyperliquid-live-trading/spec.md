@@ -115,7 +115,7 @@ from nautilus_trader.adapters.hyperliquid import HyperliquidExecClientConfig
 
 exec_config = {
     HYPERLIQUID: HyperliquidExecClientConfig(
-        private_key=None,  # Loads from HYPERLIQUID_PK env var
+        private_key=None,  # Loads from HYPERLIQUID_TESTNET_PK or HYPERLIQUID_MAINNET_PK env var
         vault_address=None,  # Optional vault trading
         instrument_provider=InstrumentProviderConfig(load_all=True),
         testnet=False,
@@ -133,8 +133,8 @@ exec_config = {
 | LIMIT | ✅ | GTC, IOC supported |
 | STOP_MARKET | ✅ | Native trigger orders |
 | STOP_LIMIT | ✅ | Native trigger orders |
-| MARKET_IF_TOUCHED | ✅ | Take profit at market |
-| LIMIT_IF_TOUCHED | ✅ | Take profit with limit |
+| MARKET_IF_TOUCHED | ⏳ v2 | Take profit at market (deferred) |
+| LIMIT_IF_TOUCHED | ⏳ v2 | Take profit with limit (deferred) |
 
 #### FR-004: Symbology
 ```python
@@ -195,7 +195,7 @@ config = TradingNodeConfig(
     },
     exec_clients={
         HYPERLIQUID: HyperliquidExecClientConfig(
-            private_key=None,  # From HYPERLIQUID_PK env
+            private_key=None,  # From HYPERLIQUID_TESTNET_PK or HYPERLIQUID_MAINNET_PK env
             instrument_provider=InstrumentProviderConfig(load_all=True),
             testnet=False,
             max_retries=3,
@@ -233,13 +233,13 @@ class HyperliquidStrategy(Strategy):
 ### Environment Variables
 
 ```bash
-# Mainnet
-export HYPERLIQUID_PK="your_private_key_here"
-export HYPERLIQUID_VAULT="vault_address_here"  # Optional
-
-# Testnet
+# Testnet (use for development/testing)
 export HYPERLIQUID_TESTNET_PK="your_testnet_private_key"
 export HYPERLIQUID_TESTNET_VAULT="testnet_vault_address"  # Optional
+
+# Mainnet (production only - KEEP SECURE)
+export HYPERLIQUID_MAINNET_PK="your_mainnet_private_key"
+export HYPERLIQUID_MAINNET_VAULT="mainnet_vault_address"  # Optional
 ```
 
 ## Known Issues (Discord)
@@ -264,7 +264,7 @@ export HYPERLIQUID_TESTNET_VAULT="testnet_vault_address"  # Optional
 - EVM wallet (MetaMask or similar)
 
 ### Internal Dependencies
-- Spec 011 (Stop-Loss & Position Limits) - for RiskManager integration
+- Spec 011 (Stop-Loss & Position Limits) - ✅ **COMPLETE** - RiskManager ready for integration
 - Spec 001 (Data Pipeline) - for catalog structure reference
 - Spec 014 (TradingNode Configuration) - for TradingNode patterns
 
@@ -307,9 +307,11 @@ export HYPERLIQUID_TESTNET_VAULT="testnet_vault_address"  # Optional
 nautilus_dev/
 ├── configs/
 │   └── hyperliquid/
-│       ├── trading_node.py      # TradingNode config
+│       ├── __init__.py          # Module exports
 │       ├── data_client.py       # Data-only config
-│       └── testnet.py           # Testnet config
+│       ├── testnet.py           # Testnet config
+│       ├── persistence.py       # Data recording config
+│       └── trading_node.py      # Full production config
 ├── strategies/
 │   └── hyperliquid/
 │       ├── __init__.py
