@@ -761,3 +761,89 @@ class EvolutionController:
             "elapsed_seconds": 0,  # Cannot recover elapsed time
             "remaining_iterations": 0,  # Needs to be set by caller
         }
+
+    async def evolve_with_validation(
+        self,
+        seed_strategy: str,
+        experiment: str,
+        iterations: int,
+        walk_forward_config: "WalkForwardConfig",
+        stop_condition: StopCondition | None = None,
+        on_progress: Callable[[ProgressEvent], None] | None = None,
+    ) -> tuple[EvolutionResult, "WalkForwardResult | None"]:
+        """
+        Run evolution with walk-forward validation on best strategy.
+
+        This method runs evolution, then validates the best strategy using
+        walk-forward analysis to prevent overfitting before deployment.
+
+        Args:
+            seed_strategy: Name of seed strategy ("momentum")
+            experiment: Unique experiment name
+            iterations: Number of iterations to run
+            walk_forward_config: Configuration for walk-forward validation
+            stop_condition: Optional early termination conditions
+            on_progress: Callback for progress events
+
+        Returns:
+            Tuple of (EvolutionResult, WalkForwardResult or None if failed)
+
+        Example:
+            >>> from scripts.alpha_evolve.walk_forward import WalkForwardConfig
+            >>> wf_config = WalkForwardConfig(
+            ...     data_start=datetime(2023, 1, 1),
+            ...     data_end=datetime(2024, 12, 1),
+            ... )
+            >>> result, validation = await controller.evolve_with_validation(
+            ...     seed_strategy="momentum",
+            ...     experiment="my_experiment",
+            ...     iterations=50,
+            ...     walk_forward_config=wf_config,
+            ... )
+            >>> if validation and validation.passed:
+            ...     print("Strategy ready for deployment!")
+        """
+        from scripts.alpha_evolve.walk_forward import (
+            WalkForwardValidator,
+        )
+
+        # Run evolution
+        evolution_result = await self.run(
+            seed_strategy=seed_strategy,
+            experiment=experiment,
+            iterations=iterations,
+            stop_condition=stop_condition,
+            on_progress=on_progress,
+        )
+
+        # Check if we have a best strategy to validate
+        if evolution_result.best_strategy is None:
+            logger.warning("No best strategy found, skipping validation")
+            return evolution_result, None
+
+        # Run walk-forward validation
+        logger.info("Starting walk-forward validation on best strategy")
+
+        validator = WalkForwardValidator(walk_forward_config, self.evaluator)
+
+        try:
+            validation_result = await validator.validate(
+                evolution_result.best_strategy.code
+            )
+        except Exception as e:
+            logger.error(f"Walk-forward validation failed: {e}")
+            return evolution_result, None
+
+        # Log validation result
+        if validation_result.passed:
+            logger.info(
+                f"Strategy PASSED walk-forward validation. "
+                f"Robustness: {validation_result.robustness_score:.1f}/100"
+            )
+        else:
+            logger.warning(
+                f"Strategy FAILED walk-forward validation. "
+                f"Robustness: {validation_result.robustness_score:.1f}/100"
+            )
+
+        return evolution_result, validation_result
