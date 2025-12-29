@@ -44,7 +44,7 @@ class HyperliquidStrategyConfig(BaseModel):
         ... )
     """
 
-    instrument_id: str = "BTC-USD-PERP.HYPERLIQUID"
+    instrument_id: Annotated[str, Field(min_length=1)] = "BTC-USD-PERP.HYPERLIQUID"
     order_size: Annotated[Decimal, Field(gt=0)] = Decimal("0.001")
     max_position_size: Annotated[Decimal, Field(gt=0)] = Decimal("0.1")
     risk: RiskConfig = Field(default_factory=RiskConfig)
@@ -55,14 +55,16 @@ class HyperliquidStrategyConfig(BaseModel):
         """Get RiskConfig with max_position_size applied.
 
         Returns a RiskConfig with the max_position_size from this config
-        applied to the risk configuration.
+        merged into the risk configuration.
 
         Returns:
             RiskConfig with position limits set.
         """
-        # Create a copy of the risk config with position limits
+        # Create a copy of the risk config with position limits merged
         risk_dict = self.risk.model_dump()
+        existing_limits = self.risk.max_position_size or {}
         risk_dict["max_position_size"] = {
+            **existing_limits,
             self.instrument_id: self.max_position_size,
         }
         return RiskConfig(**risk_dict)

@@ -403,7 +403,160 @@
       "operation": "read",
       "timestamp": "2025-12-29T20:05:25.006239",
       "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/walk_forward/models.py"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-29T20:07:03.105762",
+      "todo_count": 4
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-29T20:07:10.210699",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/walk_forward/metrics.py"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-29T20:07:37.156276",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/walk_forward/metrics.py",
+      "old_string": "def estimate_probability_backtest_overfitting(\n    window_results: list[WindowResult],\n    n_permuta..."
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-29T20:07:45.636182",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/walk_forward/validator.py"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-29T20:08:03.950985",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/walk_forward/validator.py",
+      "old_string": "    def _generate_windows(self) -> list[Window]:\n        \"\"\"Generate walk-forward windows from confi..."
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-29T20:08:10.618730",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/walk_forward/validator.py"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-29T20:08:17.459985",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/walk_forward/validator.py",
+      "old_string": "        pbo = estimate_probability_backtest_overfitting(window_results)"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-29T20:08:23.899655",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/walk_forward/validator.py"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-29T20:08:32.592334",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/walk_forward/validator.py",
+      "old_string": "        # Criterion 4: Majority with adequate Sharpe\n        sharpe_ok = sum(\n            1\n        ..."
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-29T20:08:40.475675",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -m pytest tests/test_walk_forward/ -v --tb=short 2>&1 | tail -60",
+      "description": "Run tests to verify bug fixes"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-29T20:08:57.300367",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/test_walk_forward/conftest.py"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-29T20:09:11.869376",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/test_walk_forward/conftest.py",
+      "old_string": "@pytest.fixture\ndef sample_config() -> WalkForwardConfig:\n    \"\"\"Sample WalkForwardConfig for testin..."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-29T20:09:20.983808",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/walk_forward/validator.py",
+      "old_string": "        windows: list[Window] = []\n        current_start = self.config.data_start\n        window_id ..."
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-29T20:09:28.399622",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/test_walk_forward/test_window_generation.py"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-29T20:09:36.801908",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -m pytest tests/test_walk_forward/test_window_generation.py -v --tb=short 2>&1",
+      "description": "Run window generation tests"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-29T20:10:06.943813",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/walk_forward/validator.py",
+      "old_string": "            # Move to next window start position\n            # Use max to ensure next train respects..."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-29T20:10:22.539548",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/walk_forward/validator.py",
+      "old_string": "            # Move to next window by step size\n            # embargo_after is applied to ensure gap ..."
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-29T20:10:31.586006",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -m pytest tests/test_walk_forward/ -v --tb=short 2>&1 | tail -30",
+      "description": "Run all walk-forward tests"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-29T20:10:59.512269",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/test_walk_forward/conftest.py",
+      "old_string": "@pytest.fixture\ndef sample_config() -> WalkForwardConfig:\n    \"\"\"Sample WalkForwardConfig for testin..."
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-29T20:11:20.998078",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/test_walk_forward/test_window_generation.py"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-29T20:11:32.866752",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/test_walk_forward/test_window_generation.py",
+      "old_string": "    def test_24_month_data_produces_5_windows(self) -> None:\n        \"\"\"Test 24-month data with 6-mo..."
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-29T20:11:41.039295",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -m pytest tests/test_walk_forward/ -v --tb=short 2>&1 | tail -25",
+      "description": "Run walk-forward tests after fixture updates"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-29T20:11:52.319320",
+      "todo_count": 4
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-29T20:11:59.201972",
+      "command": "git status",
+      "description": "Check git status for bug fix commit"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-29T20:12:11.509594",
+      "command": "git add scripts/alpha_evolve/walk_forward/metrics.py scripts/alpha_evolve/walk_forward/validator.py tests/test_walk_forward/conftest.py tests/test_walk_forward/test_window_generation.py && git commit -m \"$(cat <<'EOF'\nfix(walk-forward): Address alpha-debug findings\n\nBug fixes from alpha-debug analysis:\n\nB1 (CRITICAL): Fix PBO algorithm\n- Replaced broken cross-window comparison with degradation-based analysis\n- Now properly detects overfitting when test << train performance\n\nB2 (HIGH): Implement embargo_after_days\n- Now enforces gap between prev test_end and next train_start\n- Prevents training on recently tested data\n\nB4 (MEDIUM): Fix majority check\n- Use float division for consistent > 50% threshold\n\nB7 (LOW): Pass seed to PBO function\n- Enables reproducible PBO calculations\n\nUpdated test fixtures for correct embargo behavior.\nAll 102 tests passing.\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n)\"",
+      "description": "Commit alpha-debug bug fixes"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-29T20:12:18.655299",
+      "command": "git push origin master",
+      "description": "Push bug fixes to origin"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-29T20:15:53.878987",
+      "command": "git log --oneline -3 && echo \"---\" && git status",
+      "description": "Verify final git status"
     }
   ],
-  "last_updated": "2025-12-29T20:05:25.006259"
+  "last_updated": "2025-12-29T20:15:53.879011"
 }
