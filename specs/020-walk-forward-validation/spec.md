@@ -31,15 +31,17 @@ Walk-Forward Windows:
 ```
 
 #### FR-002: Configuration
-```python
-class WalkForwardConfig(BaseModel):
-    train_months: int = 6
-    test_months: int = 3
-    step_months: int = 3  # Overlap
-    min_windows: int = 4
-    require_profit_in_all_windows: bool = False
-    min_profitable_windows_pct: float = 0.75  # 75%
-```
+
+See `plan.md` for authoritative `WalkForwardConfig` definition with all fields.
+
+**Key parameters**:
+- `train_months`: Training window size (default: 6)
+- `test_months`: Test window size (default: 3)
+- `step_months`: Rolling step size (default: 3)
+- `embargo_before_days`: Pre-test purge period (default: 5, per Lopez de Prado PKCV)
+- `embargo_after_days`: Post-test purge period (default: 3)
+- `min_windows`: Minimum windows required (default: 4)
+- `min_profitable_windows_pct`: Min % profitable windows (default: 0.75)
 
 #### FR-003: Metrics Per Window
 - Sharpe Ratio
@@ -68,7 +70,7 @@ def calculate_robustness_score(window_results: list[WindowMetrics]) -> float:
 #### FR-005: Pass/Fail Criteria
 - Robustness Score >= 60
 - At least 75% of windows profitable
-- Test Sharpe >= 0.5 in majority of windows
+- Test Sharpe >= 0.5 in more than half of windows (> len(windows) // 2)
 - No window with drawdown > 30%
 
 ### Non-Functional Requirements
