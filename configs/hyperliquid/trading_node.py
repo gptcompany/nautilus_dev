@@ -28,7 +28,7 @@ from configs.hyperliquid.data_client import DEFAULT_INSTRUMENTS
 
 def create_hyperliquid_trading_node(
     trader_id: str = "TRADER-HL-001",
-    testnet: bool = False,
+    testnet: bool = True,  # Default to testnet for safety
     instruments: list[str] | None = None,
     load_all: bool = False,
     redis_enabled: bool = True,
@@ -48,7 +48,7 @@ def create_hyperliquid_trading_node(
 
     Args:
         trader_id: Unique identifier for the trader.
-        testnet: If True, connect to testnet. Default False (mainnet).
+        testnet: If True, connect to testnet. Default True (testnet for safety).
         instruments: List of instrument IDs to load. If None, uses defaults.
         load_all: If True, load all available instruments.
         redis_enabled: If True, enable Redis caching. Default True.
@@ -98,6 +98,7 @@ def create_hyperliquid_trading_node(
         exec_engine_config = LiveExecEngineConfig(
             reconciliation=True,
             reconciliation_lookback_mins=60 * 24,  # 24 hours
+            reconciliation_startup_delay_secs=reconciliation_delay_secs,
         )
 
     return TradingNodeConfig(
