@@ -16,10 +16,14 @@ from scripts.alpha_evolve.walk_forward.models import (
 
 @pytest.fixture
 def sample_config() -> WalkForwardConfig:
-    """Sample WalkForwardConfig for testing."""
+    """Sample WalkForwardConfig for testing.
+
+    With embargo_after implementation, windows are spaced ~9 months apart.
+    48 months of data needed for 4+ windows with proper embargo spacing.
+    """
     return WalkForwardConfig(
-        data_start=datetime(2023, 1, 1),
-        data_end=datetime(2024, 12, 1),
+        data_start=datetime(2022, 1, 1),
+        data_end=datetime(2025, 12, 1),  # 48 months
         train_months=6,
         test_months=3,
         step_months=3,

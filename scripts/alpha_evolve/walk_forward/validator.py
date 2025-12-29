@@ -127,7 +127,9 @@ class WalkForwardValidator:
             sharpe=avg_sharpe,
             n_trials=len(window_results),
         )
-        pbo = estimate_probability_backtest_overfitting(window_results)
+        pbo = estimate_probability_backtest_overfitting(
+            window_results, seed=self.config.seed
+        )
 
         # Check pass/fail criteria
         passed = self._check_criteria(window_results, robustness_score)
@@ -150,18 +152,18 @@ class WalkForwardValidator:
         Uses rolling (sliding) windows per plan.md Decision 1.
         Applies embargo periods per plan.md Decision 4.
 
-        Note on embargo periods:
-            - embargo_before_days: Applied as gap between train_end and test_start
-            - embargo_after_days: Advisory - step_months should be large enough to
-              accommodate this gap after test_end before next training window.
-              With default step_months=3, windows don't overlap in practice.
+        Embargo periods (Lopez de Prado PKCV):
+            - embargo_before_days: Gap between train_end and test_start to prevent
+              lagging indicators from leaking future test data into training.
+            - embargo_after_days: Gap after test_end before next training window
+              can start, preventing test period contamination of subsequent training.
 
         Returns:
             List of Window objects with train/test date ranges.
         """
         windows: list[Window] = []
         current_start = self.config.data_start
-        window_id = 1
+        window_id = 1  # 1-indexed for user-facing IDs
 
         # Calculate durations
         train_delta = timedelta(days=self.config.train_months * 30)
@@ -189,8 +191,18 @@ class WalkForwardValidator:
                 )
             )
 
-            # Move to next window (apply post-test embargo for next train)
-            current_start = current_start + step_delta
+            # Move to next window by step size
+            # Note: embargo_after ensures gap between prev test_end and next train_start
+            # This prevents training on data that was recently tested
+            next_start = current_start + step_delta
+
+            # If next training window would start before prev test_end + embargo,
+            # delay the start to respect the embargo
+            min_next_start = test_end + embargo_after
+            if next_start < min_next_start:
+                next_start = min_next_start
+
+            current_start = next_start
             window_id += 1
 
         return windows
@@ -250,13 +262,14 @@ class WalkForwardValidator:
                 )
                 return False
 
-        # Criterion 4: Majority with adequate Sharpe
+        # Criterion 4: Majority with adequate Sharpe (more than 50%)
         sharpe_ok = sum(
             1
             for w in window_results
             if w.test_metrics.sharpe_ratio >= self.config.min_test_sharpe
         )
-        if sharpe_ok <= len(window_results) // 2:
+        # Use float division to correctly handle odd window counts
+        if sharpe_ok <= len(window_results) / 2:
             logger.debug(
                 f"Failed: only {sharpe_ok}/{len(window_results)} windows have "
                 f"Sharpe >= {self.config.min_test_sharpe}"

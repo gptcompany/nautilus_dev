@@ -285,13 +285,14 @@ def estimate_probability_backtest_overfitting(
     is not representative of its out-of-sample performance. A PBO > 0.5
     indicates likely overfitting.
 
-    Method:
-        1. For each permutation, randomly split windows into two groups
-        2. Assign training Sharpes to "in-sample" and test Sharpes to "out-of-sample"
-        3. Count how often median(IS) < median(OOS)
-        4. PBO = count / n_permutations
+    Method (Degradation-Based):
+        1. Calculate degradation ratio (test_sharpe/train_sharpe) per window
+        2. A ratio < 1 indicates in-sample overperformance (potential overfit)
+        3. Use permutation testing to assess consistency of degradation
+        4. Count permutations where random subsets show significant degradation
 
-    Formula: PBO = P[median(IS) < median(OOS)]
+    This implementation measures how consistently the strategy degrades from
+    training to testing across different window groupings.
 
     Reference: Lopez de Prado "Advances in Financial Machine Learning" Ch. 11
 
@@ -316,9 +317,25 @@ def estimate_probability_backtest_overfitting(
     if n < 2:
         return 0.0
 
-    # Extract Sharpe ratios
-    train_sharpes = [w.train_metrics.sharpe_ratio for w in window_results]
-    test_sharpes = [w.test_metrics.sharpe_ratio for w in window_results]
+    # Calculate degradation ratios for each window
+    # Ratio < 1 means test underperforms train (potential overfitting)
+    degradation_ratios: list[float] = []
+    for w in window_results:
+        train_sharpe = w.train_metrics.sharpe_ratio
+        test_sharpe = w.test_metrics.sharpe_ratio
+
+        if train_sharpe > _EPSILON:
+            # Normal case: calculate ratio
+            ratio = test_sharpe / train_sharpe
+        elif train_sharpe < -_EPSILON:
+            # Negative train Sharpe: invert logic (worse train = better)
+            # If test is also negative but less bad, ratio > 1
+            ratio = train_sharpe / test_sharpe if test_sharpe < -_EPSILON else 0.0
+        else:
+            # Near-zero train Sharpe: use test sign
+            ratio = 1.0 if test_sharpe >= 0 else 0.0
+
+        degradation_ratios.append(ratio)
 
     # Initialize random state
     rng = random.Random(seed)
@@ -326,24 +343,29 @@ def estimate_probability_backtest_overfitting(
     overfit_count = 0
     indices = list(range(n))
 
+    # Overfitting threshold: test performance < 50% of train
+    OVERFIT_THRESHOLD = 0.5
+
     for _ in range(n_permutations):
         # Create random permutation of indices
         rng.shuffle(indices)
 
-        # Split indices into two halves
-        mid = n // 2
-        is_indices = indices[:mid] if mid > 0 else [indices[0]]
-        oos_indices = indices[mid:] if mid < n else [indices[-1]]
+        # Split into two groups
+        mid = max(1, n // 2)
+        group_a_indices = indices[:mid]
+        group_b_indices = indices[mid:] if mid < n else [indices[-1]]
 
-        # Get Sharpes for each subset
-        is_sharpes = [train_sharpes[i] for i in is_indices]
-        oos_sharpes = [test_sharpes[i] for i in oos_indices]
+        # Calculate average degradation for each group
+        avg_deg_a = sum(degradation_ratios[i] for i in group_a_indices) / len(
+            group_a_indices
+        )
+        avg_deg_b = sum(degradation_ratios[i] for i in group_b_indices) / len(
+            group_b_indices
+        )
 
-        # Compare medians
-        is_median = _median(is_sharpes)
-        oos_median = _median(oos_sharpes)
-
-        if is_median < oos_median:
+        # Overfitting detected if either group shows significant degradation
+        # This captures strategies that overfit to specific market regimes
+        if avg_deg_a < OVERFIT_THRESHOLD or avg_deg_b < OVERFIT_THRESHOLD:
             overfit_count += 1
 
     return overfit_count / n_permutations
