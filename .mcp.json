@@ -1,0 +1,22 @@
+{
+  "mcpServers": {
+    "semantic-router": {
+      "command": "uv",
+      "args": [
+        "run",
+        "--directory",
+        "/media/sam/1TB/academic_research/semantic_router_mcp",
+        "python3",
+        "/media/sam/1TB/academic_research/semantic_router_mcp/server.py"
+      ],
+      "description": "Query classification (biomedical/stem_cs/trading_strategy/general)",
+      "enabled": true
+    },
+    "paper-search-mcp": {
+      "command": "python3",
+      "args": ["-m", "paper_search_mcp.server"],
+      "description": "Multi-source paper search (arXiv, PubMed, bioRxiv, Semantic Scholar, CrossRef)",
+      "enabled": true
+    }
+  }
+}
