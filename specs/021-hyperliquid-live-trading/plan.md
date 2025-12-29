@@ -1,321 +1,170 @@
-# Implementation Plan: Hyperliquid Live Trading (Spec 021)
+# Implementation Plan: [FEATURE NAME]
 
-**Feature Branch**: `021-hyperliquid-live-trading`
-**Created**: 2025-12-28
+**Feature Branch**: `[###-feature-name]`
+**Created**: [DATE]
 **Status**: Draft
-**Spec Reference**: `specs/021-hyperliquid-live-trading/spec.md`
-
----
+**Spec Reference**: `specs/[###-feature-name]/spec.md`
 
 ## Architecture Overview
 
+<!--
+  Describe the high-level architecture and how this feature integrates
+  with the existing NautilusTrader codebase.
+-->
+
 ### System Context
 
-Hyperliquid integration provides live trading capability for a decentralized perpetual futures exchange. This is our **primary target exchange** for live trading due to low fees and self-custody.
-
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                      TradingNode                            │
-│  ┌─────────────┐  ┌──────────────┐  ┌─────────────────────┐ │
-│  │  Strategy   │  │  ExecEngine  │  │ HyperliquidExecClient│ │
-│  │  (User)     │──│  (Core)      │──│   (Rust Adapter)    │ │
-│  └─────────────┘  └──────────────┘  └─────────────────────┘ │
-│        │                │                    │              │
-│        ▼                ▼                    ▼              │
-│   ┌─────────┐    ┌───────────┐      ┌──────────────────┐   │
-│   │ Orders  │    │   Cache   │      │   Hyperliquid    │   │
-│   │ Events  │    │  (Redis)  │      │   L1 Chain       │   │
-│   └─────────┘    └───────────┘      └──────────────────┘   │
-└─────────────────────────────────────────────────────────────┘
+[Describe how the feature fits into the NautilusTrader ecosystem]
 ```
 
 ### Component Diagram
 
 ```
-┌─────────────────────────────────────────────────────┐
-│              configs/hyperliquid/                   │
-│  ┌───────────────────────────────────────────────┐  │
-│  │  trading_node.py                              │  │
-│  │    → HyperliquidDataClientConfig              │  │
-│  │    → HyperliquidExecClientConfig              │  │
-│  │    → TradingNodeConfig                        │  │
-│  └───────────────────────────────────────────────┘  │
-└─────────────────────────────────────────────────────┘
-                        │
-                        ▼
-┌─────────────────────────────────────────────────────┐
-│           strategies/hyperliquid/                   │
-│  ┌───────────────────────────────────────────────┐  │
-│  │  base_strategy.py                             │  │
-│  │    → RiskManager integration (Spec 011)       │  │
-│  │    → Stop-loss on position open               │  │
-│  └───────────────────────────────────────────────┘  │
-└─────────────────────────────────────────────────────┘
+[ASCII art or description of component relationships]
 ```
-
----
 
 ## Technical Decisions
 
-### Decision 1: Adapter Status Mitigation
+### Decision 1: [Topic]
 
 **Options Considered**:
-1. **Wait for stable release**
-   - Pros: More reliable
-   - Cons: Unknown timeline, blocks progress
-2. **Use current nightly with monitoring**
-   - Pros: Start now, track issues
-   - Cons: May encounter bugs
+1. **Option A**: [Description]
+   - Pros: [list]
+   - Cons: [list]
+2. **Option B**: [Description]
+   - Pros: [list]
+   - Cons: [list]
 
-**Selected**: Option 2
+**Selected**: Option [X]
 
-**Rationale**: Data client is stable. Execution client is functional for basic orders. We'll use testnet extensively and monitor GitHub #3152.
+**Rationale**: [Why this option was chosen]
 
 ---
 
-### Decision 2: Data Persistence Strategy
+### Decision 2: [Topic]
 
 **Options Considered**:
-1. **Native NautilusTrader PersistenceConfig**
-   - Pros: Integrated, real-time
-   - Cons: Requires TradingNode running
-2. **CCXT Pipeline (Spec 001)**
-   - Pros: Already exists, historical backfill
-   - Cons: Not integrated with live trading
+1. **Option A**: [Description]
+2. **Option B**: [Description]
 
-**Selected**: Both (Hybrid)
+**Selected**: Option [X]
 
-**Rationale**: Use Option 1 for live data during trading. Use Option 2 for historical backfill and when TradingNode is offline.
-
----
-
-### Decision 3: Risk Manager Integration
-
-**Options Considered**:
-1. **Standalone risk checks**
-   - Pros: Simple
-   - Cons: Duplicates Spec 011 work
-2. **Integrate with Spec 011 RiskManager**
-   - Pros: Unified risk management
-   - Cons: Dependency on Spec 011
-
-**Selected**: Option 2
-
-**Rationale**: Spec 011 RiskManager is designed for this. Reuse existing code.
+**Rationale**: [Why this option was chosen]
 
 ---
 
 ## Implementation Strategy
 
-### Phase 1: Data Feed Configuration
+### Phase 1: Foundation
 
-**Goal**: Stream live market data from Hyperliquid
+**Goal**: [What this phase achieves]
 
 **Deliverables**:
-- [ ] `configs/hyperliquid/data_client.py` with HyperliquidDataClientConfig
-- [ ] Subscribe to BTC-USD-PERP, ETH-USD-PERP
-- [ ] Verify QuoteTick, TradeTick, OrderBookDelta types
-- [ ] Unit tests for config
+- [ ] [Deliverable 1]
+- [ ] [Deliverable 2]
 
-**Dependencies**: None (DataClient is stable)
+**Dependencies**: None / [List dependencies]
 
 ---
 
-### Phase 2: Data Persistence Integration
+### Phase 2: Core Implementation
 
-**Goal**: Record live data to ParquetDataCatalog
+**Goal**: [What this phase achieves]
 
 **Deliverables**:
-- [ ] `configs/hyperliquid/persistence.py` with PersistenceConfig
-- [ ] Catalog at `./catalog/hyperliquid/`
-- [ ] Verify BacktestNode compatibility
-- [ ] Integration test with recorded data
+- [ ] [Deliverable 1]
+- [ ] [Deliverable 2]
 
 **Dependencies**: Phase 1
 
 ---
 
-### Phase 3: Testnet Execution
+### Phase 3: Integration & Testing
 
-**Goal**: Submit and manage orders on Hyperliquid testnet
-
-**Deliverables**:
-- [ ] `configs/hyperliquid/testnet.py` with testnet configuration
-- [ ] Environment variable setup (HYPERLIQUID_TESTNET_PK)
-- [ ] Test MARKET order submission
-- [ ] Test LIMIT order lifecycle
-- [ ] Test STOP_MARKET order
-- [ ] Verify fill events received
-
-**Dependencies**: Phase 1, testnet credentials
-
----
-
-### Phase 4: Risk Manager Integration
-
-**Goal**: Integrate with Spec 011 RiskManager
+**Goal**: [What this phase achieves]
 
 **Deliverables**:
-- [ ] `strategies/hyperliquid/base_strategy.py` with RiskManager
-- [ ] Auto stop-loss on PositionOpened
-- [ ] Position limits enforcement
-- [ ] End-to-end test on testnet
+- [ ] [Deliverable 1]
+- [ ] [Deliverable 2]
 
-**Dependencies**: Phase 3, Spec 011 ✅ (COMPLETE)
-
----
-
-### Phase 5: Production Configuration
-
-**Goal**: Ready for mainnet trading
-
-**Deliverables**:
-- [ ] `configs/hyperliquid/trading_node.py` for production
-- [ ] `scripts/hyperliquid/run_live.py` launcher
-- [ ] Monitoring and alerting setup
-- [ ] Documentation updates
-
-**Dependencies**: Phase 4, mainnet credentials
+**Dependencies**: Phase 2
 
 ---
 
 ## File Structure
 
 ```
-nautilus_dev/
-├── configs/
-│   └── hyperliquid/
-│       ├── __init__.py
-│       ├── data_client.py       # Data-only config
-│       ├── testnet.py           # Testnet config
-│       ├── persistence.py       # Data recording config
-│       └── trading_node.py      # Full production config
-├── strategies/
-│   └── hyperliquid/
-│       ├── __init__.py
-│       ├── config.py            # Strategy config
-│       └── base_strategy.py     # Base with RiskManager
-├── scripts/
-│   └── hyperliquid/
-│       ├── record_data.py       # Data recording script
-│       └── run_live.py          # Live trading launcher
-└── tests/
-    └── hyperliquid/
-        ├── test_data_client.py
-        ├── test_exec_client.py
-        └── integration/
-            └── test_live_cycle.py
+strategies/                    # or appropriate directory
+├── {feature_name}/
+│   ├── __init__.py
+│   ├── strategy.py           # Main strategy implementation
+│   ├── config.py             # Configuration models
+│   └── indicators.py         # Custom indicators (if needed)
+tests/
+├── test_{feature_name}.py    # Unit tests
+└── integration/
+    └── test_{feature_name}_integration.py
 ```
-
----
 
 ## API Design
 
 ### Public Interface
 
 ```python
-def create_hyperliquid_data_client(
-    testnet: bool = False,
-    instruments: list[str] | None = None,
-) -> dict:
-    """Factory for Hyperliquid data client configuration."""
-
-def create_hyperliquid_exec_client(
-    testnet: bool = False,
-    max_retries: int = 3,
-) -> dict:
-    """Factory for Hyperliquid execution client configuration."""
-
-def create_hyperliquid_trading_node(
-    trader_id: str,
-    testnet: bool = False,
-    redis_enabled: bool = True,
-) -> TradingNodeConfig:
-    """Factory for complete Hyperliquid TradingNode."""
+# Example API surface
+class {FeatureName}Strategy(Strategy):
+    def __init__(self, config: {FeatureName}Config) -> None: ...
+    def on_start(self) -> None: ...
+    def on_bar(self, bar: Bar) -> None: ...
+    def on_stop(self) -> None: ...
 ```
 
----
+### Configuration
+
+```python
+class {FeatureName}Config(BaseModel):
+    instrument_id: str
+    # ... other config fields
+```
 
 ## Testing Strategy
 
 ### Unit Tests
-- [ ] Data client config validation
-- [ ] Exec client config validation
-- [ ] TradingNode config assembly
-- [ ] Strategy config validation
+- [ ] Test strategy initialization
+- [ ] Test indicator calculations
+- [ ] Test signal generation
+- [ ] Test order management
 
-### Integration Tests (Testnet)
-- [ ] Connect to Hyperliquid testnet
-- [ ] Subscribe to market data
-- [ ] Submit MARKET order
-- [ ] Submit LIMIT order
-- [ ] Submit STOP_MARKET order
-- [ ] Verify fill events
-- [ ] Test RiskManager stop-loss
+### Integration Tests
+- [ ] Test with BacktestNode
+- [ ] Test with sample data
+- [ ] Test edge cases (empty data, gaps)
 
 ### Performance Tests
-- [ ] Data feed latency < 50ms
-- [ ] Order submission latency < 200ms
-
----
+- [ ] Benchmark against baseline
+- [ ] Memory usage profiling
 
 ## Risk Assessment
 
 | Risk | Impact | Likelihood | Mitigation |
 |------|--------|------------|------------|
-| Adapter bugs | High | Medium | Use testnet extensively, monitor #3152 |
-| Chain congestion | Medium | Low | Implement retry logic, alert on delays |
-| Private key exposure | Critical | Low | Environment variables only, never in code |
-| Liquidity gaps | Medium | Medium | Small position sizes, limit orders |
-
----
+| [Risk 1] | High/Medium/Low | High/Medium/Low | [Mitigation strategy] |
+| [Risk 2] | High/Medium/Low | High/Medium/Low | [Mitigation strategy] |
 
 ## Dependencies
 
 ### External Dependencies
-- NautilusTrader Nightly >= 1.222.0
-- Hyperliquid testnet/mainnet account
-- EVM wallet with private key
-- USDC for trading
+- NautilusTrader >= 1.220.0
+- [Other dependencies]
 
 ### Internal Dependencies
-- Spec 011 (Stop-Loss & Position Limits) - ✅ **COMPLETE** - RiskManager ready
-- Spec 014 (TradingNode Configuration) - for TradingNode patterns
-
----
-
-## Constitution Check
-
-| Principle | Status | Notes |
-|-----------|--------|-------|
-| Black Box Design | PASS | Factory functions with clean interfaces |
-| KISS & YAGNI | PASS | Uses native adapter, no custom wrappers |
-| Native First | PASS | Rust adapter via Python bindings |
-| Performance | PASS | Native Rust, no df.iterrows() |
-| TDD Discipline | PENDING | Tests in implementation |
-| No Hardcoded Values | PASS | All config via params/env vars |
-
----
+- [List internal modules/features this depends on]
 
 ## Acceptance Criteria
 
-- [ ] Live data feed operational (US1)
-- [ ] Data persisted to catalog (US2)
-- [ ] Testnet orders execute successfully (US3, US5)
-- [ ] RiskManager integration working (US4)
-- [ ] All tests passing (coverage > 80%)
-- [ ] Documentation complete
-- [ ] alpha-debug verification
-
----
-
-## Generated Artifacts
-
-| Artifact | Path | Status |
-|----------|------|--------|
-| spec.md | `specs/021-hyperliquid-live-trading/spec.md` | EXISTS |
-| research.md | `specs/021-hyperliquid-live-trading/research.md` | EXISTS |
-| plan.md | `specs/021-hyperliquid-live-trading/plan.md` | CREATED |
-| data-model.md | `specs/021-hyperliquid-live-trading/data-model.md` | EXISTS |
-| contracts/ | `specs/021-hyperliquid-live-trading/contracts/` | EXISTS |
-| quickstart.md | `specs/021-hyperliquid-live-trading/quickstart.md` | EXISTS |
+- [ ] All unit tests passing (coverage > 80%)
+- [ ] All integration tests passing
+- [ ] Documentation updated
+- [ ] Code review approved
+- [ ] Performance benchmarks met
