@@ -662,14 +662,6 @@ def notify(
     try:
         console.print("\n[bold]=== Send Notification ===[/bold]\n")
 
-        # Level to color mapping for Discord embeds
-        level_colors = {
-            "info": 0x5865F2,  # Discord blurple
-            "warning": 0xFFA500,  # Orange
-            "error": 0xFF0000,  # Red
-            "critical": 0x8B0000,  # Dark red
-        }
-
         # Format message with PR URL if provided
         full_message = message
         if pr_url:
@@ -683,18 +675,11 @@ def notify(
             console.print("\n[dim]Dry run - notification not sent[/dim]")
             ctx.exit(0)
 
-        # Prepare Discord notification
-        discord_kwargs = {}
-        if use_embed:
-            discord_kwargs["embed"] = True
-            discord_kwargs["title"] = f"NautilusTrader Auto-Update ({level.upper()})"
-            discord_kwargs["color"] = level_colors.get(level, 0x5865F2)
-
         # Send notification
         result = send_notification(
             message=full_message,
             channel=channel,
-            webhook_url=webhook_url or config.discord_webhook,
+            webhook_url=webhook_url or config.discord_webhook_url,
             dry_run=False,
         )
 
