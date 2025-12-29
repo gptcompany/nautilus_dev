@@ -253,12 +253,12 @@
   - Add to Alpha-Evolve Pipeline section
   - Document data flow
 
-- [ ] T033 Run alpha-debug verification on walk_forward module
+- [X] T033 Run alpha-debug verification on walk_forward module
   - 3-5 rounds of bug hunting
   - Focus on edge cases in date arithmetic
   - Verify no lookahead bias
 
-- [ ] T034 Verify test coverage >= 80% for walk_forward module
+- [X] T034 Verify test coverage >= 80% for walk_forward module (achieved 92%)
 
 ---
 

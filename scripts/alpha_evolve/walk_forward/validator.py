@@ -150,6 +150,12 @@ class WalkForwardValidator:
         Uses rolling (sliding) windows per plan.md Decision 1.
         Applies embargo periods per plan.md Decision 4.
 
+        Note on embargo periods:
+            - embargo_before_days: Applied as gap between train_end and test_start
+            - embargo_after_days: Advisory - step_months should be large enough to
+              accommodate this gap after test_end before next training window.
+              With default step_months=3, windows don't overlap in practice.
+
         Returns:
             List of Window objects with train/test date ranges.
         """
@@ -210,6 +216,13 @@ class WalkForwardValidator:
             True if all criteria passed, False otherwise.
         """
         if not window_results:
+            return False
+
+        # Criterion 0: Minimum window count
+        if len(window_results) < self.config.min_windows:
+            logger.debug(
+                f"Failed: insufficient windows {len(window_results)} < {self.config.min_windows}"
+            )
             return False
 
         # Criterion 1: Robustness score threshold
