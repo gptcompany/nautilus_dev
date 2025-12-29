@@ -1,0 +1,49 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "nautilus-auto-update"
+version = "0.1.0"
+description = "Autonomous NautilusTrader version update pipeline"
+readme = "../../specs/023-nautilus-auto-update/quickstart.md"
+requires-python = ">=3.11"
+license = "MIT"
+
+dependencies = [
+    "pydantic>=2.0",
+    "pydantic-settings>=2.0",
+    "click>=8.0",
+    "rich>=13.0",
+    "tomli>=2.0",
+    "tomli-w>=1.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "pytest-asyncio>=0.23",
+    "pytest-cov>=4.0",
+    "mypy>=1.0",
+    "ruff>=0.1",
+]
+
+[project.scripts]
+nautilus-update = "scripts.auto_update.cli:main"
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests/scripts/auto_update"]
+
+[tool.mypy]
+python_version = "3.11"
+warn_return_any = true
+warn_unused_configs = true
+ignore_missing_imports = true
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.hatch.build.targets.wheel]
+packages = ["."]

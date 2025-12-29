@@ -79,9 +79,15 @@ Manual updates lead to:
 
 **Acceptance Criteria**:
 - [ ] Regex-based import path updates
-- [ ] Simple rename operations (sed/awk)
+  - Example: `from nautilus_trader.old_module` → `from nautilus_trader.new_module`
+- [ ] Simple rename operations
+  - Example: `def on_tick(` → `def on_quote_tick(`
+  - Example: `BarType.from_str(s)` → `BarType.from_str(s, venue=venue)`
 - [ ] Type hint updates for changed signatures
+  - Example: `-> QuoteTick` → `-> QuoteTick | None`
 - [ ] Commit fixes to update branch
+
+**Scope Definition**: "Simple" = regex-matchable patterns. "Complex" = requires AST analysis or semantic understanding.
 
 ### US6: Claude Code Integration (P3)
 **As a** developer,
@@ -98,13 +104,14 @@ Manual updates lead to:
 
 ### Functional Requirements
 
-#### FR-001: GitHub Release Monitor
+#### FR-001: GitHub Release Monitor *(EXTERNAL - N8N Workflow)*
+
+> **Note**: This requirement is satisfied by the existing N8N workflow at `/media/sam/1TB/devteam1`. The Python pipeline consumes the output (`docs/nautilus/nautilus-trader-changelog.json`) rather than fetching releases directly.
+
 ```python
-# Cron job or N8N workflow
-def check_nautilus_releases() -> list[Release]:
-    """Check for new NautilusTrader releases since last check."""
-    # Uses GitHub API or PyPI API
-    # Returns list of new releases with changelogs
+# Handled by N8N workflow - outputs to:
+# docs/nautilus/nautilus-trader-changelog.json
+# docs/nautilus/nautilus-trader-changelog.md
 ```
 
 #### FR-002: Changelog Parser
@@ -215,19 +222,25 @@ def dispatch_claude_fix(impact_report: ImpactReport) -> FixResult:
 nautilus_dev/
 ├── scripts/
 │   └── auto_update/
-│       ├── __init__.py
-│       ├── monitor.py          # GitHub release monitor
-│       ├── parser.py           # Changelog parser
-│       ├── analyzer.py         # Impact analyzer
-│       ├── updater.py          # Dependency updater
-│       └── dispatcher.py       # Claude Code dispatcher
+│       ├── __init__.py           # Module exports
+│       ├── models.py             # Pydantic data models
+│       ├── parser.py             # Changelog parser (consumes N8N output)
+│       ├── analyzer.py           # Impact analyzer (grep codebase)
+│       ├── updater.py            # Dependency updater (pyproject.toml)
+│       ├── validator.py          # Test runner wrapper
+│       ├── git_ops.py            # Git branch/commit/push/PR
+│       ├── auto_fix.py           # Regex-based auto-fixes
+│       ├── dispatcher.py         # Claude Code dispatch
+│       ├── notifier.py           # Discord/email notifications
+│       ├── cli.py                # Click CLI interface
+│       └── __main__.py           # Entry point
 ├── .github/
 │   └── workflows/
-│       └── nautilus-update.yml # GitHub Actions workflow
+│       └── nautilus-update.yml   # GitHub Actions workflow
 └── docs/
     └── nautilus/
-        ├── nautilus-trader-changelog.json  # Machine-readable
-        └── nautilus-trader-changelog.md    # Human-readable
+        ├── nautilus-trader-changelog.json  # Machine-readable (N8N output)
+        └── nautilus-trader-changelog.md    # Human-readable (N8N output)
 ```
 
 ### Integration Points
