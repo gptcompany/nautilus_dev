@@ -53,21 +53,42 @@ def load_memory(path: Path) -> dict[str, Any]:
 def extract_strategies(memory: dict[str, Any], prefix: str) -> list[dict[str, Any]]:
     """Extract entities with the specified prefix."""
     entities = memory.get("entities", [])
-    strategies = [
-        entity for entity in entities if entity.get("id", "").startswith(prefix)
-    ]
+
+    # Validate entities is a list
+    if not isinstance(entities, list):
+        print(
+            f"WARNING: 'entities' is not a list (got {type(entities).__name__}), skipping"
+        )
+        return []
+
+    strategies = []
+    for entity in entities:
+        # Skip non-dict entities
+        if not isinstance(entity, dict):
+            continue
+        # Get id and ensure it's a string
+        entity_id = entity.get("id", "")
+        if not isinstance(entity_id, str):
+            continue
+        if entity_id.startswith(prefix):
+            strategies.append(entity)
+
     return strategies
 
 
 def load_existing_sync(path: Path) -> dict[str, Any] | None:
     """Load existing sync file if it exists."""
-    if not path.exists():
+    try:
+        if not path.exists():
+            return None
+    except PermissionError:
+        print(f"WARNING: Cannot access {path}, treating as non-existent")
         return None
 
     try:
         with open(path) as f:
             return json.load(f)
-    except json.JSONDecodeError:
+    except (json.JSONDecodeError, PermissionError, OSError):
         return None
 
 
@@ -102,12 +123,21 @@ def create_sync_output(
     }
 
 
-def write_sync_output(output: dict[str, Any], path: Path) -> None:
-    """Write sync output to target path."""
-    path.parent.mkdir(parents=True, exist_ok=True)
+def write_sync_output(output: dict[str, Any], path: Path) -> bool:
+    """Write sync output to target path. Returns True on success."""
+    try:
+        path.parent.mkdir(parents=True, exist_ok=True)
+    except (PermissionError, OSError) as e:
+        print(f"ERROR: Cannot create directory {path.parent}: {e}")
+        return False
 
-    with open(path, "w") as f:
-        json.dump(output, f, indent=2, ensure_ascii=False)
+    try:
+        with open(path, "w") as f:
+            json.dump(output, f, indent=2, ensure_ascii=False)
+        return True
+    except (PermissionError, OSError) as e:
+        print(f"ERROR: Cannot write to {path}: {e}")
+        return False
 
 
 def print_strategy_summary(strategies: list[dict[str, Any]]) -> None:
@@ -189,8 +219,10 @@ def main() -> None:
 
     # Write output
     print(f"\nWriting to {args.target}...")
-    write_sync_output(output, args.target)
-    print(f"Synced {len(strategies)} strategies successfully!")
+    if write_sync_output(output, args.target):
+        print(f"Synced {len(strategies)} strategies successfully!")
+    else:
+        sys.exit(1)
 
 
 if __name__ == "__main__":
