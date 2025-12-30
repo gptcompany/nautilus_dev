@@ -187,6 +187,26 @@ config = TradingNodeConfig(
 
 **Docs**: `docs/018-redis-keys.md`, `docs/018-recovery-guide.md`
 
+### Graceful Shutdown (Spec 019)
+
+**Quick Start**:
+```python
+from config.shutdown import GracefulShutdownHandler, ShutdownConfig
+
+shutdown_handler = GracefulShutdownHandler(node, ShutdownConfig())
+shutdown_handler.setup_signal_handlers()
+```
+
+**Shutdown Sequence**: Halt trading → Cancel orders → Verify stop-losses → Flush cache → Exit
+
+**Docker Config**:
+```yaml
+stop_grace_period: 60s  # Must be >= shutdown timeout
+stop_signal: SIGTERM
+```
+
+**Docs**: `docs/019-graceful-shutdown-guide.md`
+
 ## Repository Organization
 
 ```
