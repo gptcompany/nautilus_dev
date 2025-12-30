@@ -12,6 +12,8 @@ from __future__ import annotations
 
 import json
 import logging
+import re
+import threading
 import time
 from pathlib import Path
 from typing import Any
@@ -29,6 +31,20 @@ _log = logging.getLogger(__name__)
 def _now_ns() -> int:
     """Get current time in nanoseconds."""
     return int(time.time() * 1_000_000_000)
+
+
+def _sanitize_trader_id(trader_id: str) -> str:
+    """Sanitize trader_id for safe filesystem usage (B4 fix).
+
+    Replaces any non-word characters (except hyphen) with underscore.
+
+    Args:
+        trader_id: Raw trader identifier.
+
+    Returns:
+        Filesystem-safe trader identifier.
+    """
+    return re.sub(r"[^\w\-]", "_", trader_id)
 
 
 class RecoveryStateManager:
@@ -72,6 +88,7 @@ class RecoveryStateManager:
         self._state_dir = Path(state_dir) if state_dir else None
         self._log = logger or _log
         self._state = RecoveryState()
+        self._file_lock = threading.Lock()  # Thread safety for file ops (B3 fix)
 
         # Ensure state directory exists
         if self._state_dir:
@@ -91,7 +108,9 @@ class RecoveryStateManager:
     def state_file_path(self) -> Path | None:
         """Path to the state file, if state_dir is configured."""
         if self._state_dir:
-            return self._state_dir / f"recovery_state_{self._trader_id}.json"
+            # Sanitize trader_id for safe filesystem usage (B4 fix)
+            safe_id = _sanitize_trader_id(self._trader_id)
+            return self._state_dir / f"recovery_state_{safe_id}.json"
         return None
 
     def get_state(self) -> RecoveryState:
@@ -273,6 +292,8 @@ class RecoveryStateManager:
     def save_state(self) -> bool:
         """Persist current state to JSON file.
 
+        Uses thread-safe atomic write pattern (B3 fix).
+
         Returns:
             True if save succeeded, False if state_dir not configured.
 
@@ -290,24 +311,31 @@ class RecoveryStateManager:
         state_dict["trader_id"] = self._trader_id
         state_dict["ts_saved"] = _now_ns()
 
-        try:
-            with open(self.state_file_path, "w") as f:
-                json.dump(state_dict, f, indent=2)
-            self._log.info(
-                "Recovery state saved to %s",
-                self.state_file_path,
-            )
-            return True
-        except Exception as e:
-            self._log.error(
-                "Failed to save recovery state to %s: %s",
-                self.state_file_path,
-                e,
-            )
-            raise
+        # Thread-safe atomic write (B3 fix)
+        with self._file_lock:
+            try:
+                # Write to temp file first, then atomic rename
+                temp_path = self.state_file_path.with_suffix(".tmp")
+                with open(temp_path, "w") as f:
+                    json.dump(state_dict, f, indent=2)
+                temp_path.rename(self.state_file_path)  # Atomic on POSIX
+                self._log.info(
+                    "Recovery state saved to %s",
+                    self.state_file_path,
+                )
+                return True
+            except Exception as e:
+                self._log.error(
+                    "Failed to save recovery state to %s: %s",
+                    self.state_file_path,
+                    e,
+                )
+                raise
 
     def load_state(self) -> RecoveryState | None:
         """Load state from JSON file.
+
+        Uses thread-safe read pattern (B3 fix).
 
         Returns:
             Loaded recovery state, or None if file doesn't exist.
@@ -330,29 +358,31 @@ class RecoveryStateManager:
             )
             return None
 
-        try:
-            with open(self.state_file_path) as f:
-                state_dict = json.load(f)
+        # Thread-safe read (B3 fix)
+        with self._file_lock:
+            try:
+                with open(self.state_file_path) as f:
+                    state_dict = json.load(f)
 
-            # Remove non-model fields
-            state_dict.pop("trader_id", None)
-            state_dict.pop("ts_saved", None)
+                # Remove non-model fields
+                state_dict.pop("trader_id", None)
+                state_dict.pop("ts_saved", None)
 
-            self._state = RecoveryState(**state_dict)
-            self._log.info(
-                "Recovery state loaded from %s: status=%s positions=%d",
-                self.state_file_path,
-                self._state.status.value,
-                self._state.positions_recovered,
-            )
-            return self._state.model_copy()
-        except Exception as e:
-            self._log.error(
-                "Failed to load recovery state from %s: %s",
-                self.state_file_path,
-                e,
-            )
-            raise
+                self._state = RecoveryState(**state_dict)
+                self._log.info(
+                    "Recovery state loaded from %s: status=%s positions=%d",
+                    self.state_file_path,
+                    self._state.status.value,
+                    self._state.positions_recovered,
+                )
+                return self._state.model_copy()
+            except Exception as e:
+                self._log.error(
+                    "Failed to load recovery state from %s: %s",
+                    self.state_file_path,
+                    e,
+                )
+                raise
 
     def delete_state_file(self) -> bool:
         """Delete the state file if it exists.

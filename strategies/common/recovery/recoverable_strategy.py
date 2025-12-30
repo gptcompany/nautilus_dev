@@ -128,6 +128,11 @@ class RecoverableStrategy(Strategy):
         3. Handle each recovered position (log + call hook)
         4. Request historical data for indicator warmup
         """
+        # Idempotency guard: prevent duplicate initialization (B1 fix)
+        if self._warmup_start_ns is not None:
+            self.log.warning("on_start() called multiple times, ignoring")
+            return
+
         # Load instrument
         self.instrument = self.cache.instrument(self.instrument_id)
         if self.instrument is None:
@@ -312,6 +317,11 @@ class RecoverableStrategy(Strategy):
         Args:
             bars: List of historical bars for warmup.
         """
+        # Idempotency guard: prevent duplicate warmup completion (B2 fix)
+        if self._warmup_complete:
+            self.log.warning("Warmup data received after completion, ignoring")
+            return
+
         if not bars:
             self.log.warning("No warmup bars received")
             self._complete_warmup()

@@ -187,6 +187,27 @@ class PositionRecoveryProvider:
         reconciled: list[Position] = []
         discrepancies: list[str] = []
 
+        # Warn about duplicate instrument_ids (B5 fix)
+        cached_ids = [pos.instrument_id.value for pos in cached]
+        if len(cached_ids) != len(set(cached_ids)):
+            seen: set[str] = set()
+            for iid in cached_ids:
+                if iid in seen:
+                    self._log.warning(
+                        "Duplicate instrument_id in cached positions: %s", iid
+                    )
+                seen.add(iid)
+
+        exchange_ids = [pos.instrument_id.value for pos in exchange]
+        if len(exchange_ids) != len(set(exchange_ids)):
+            seen = set()
+            for iid in exchange_ids:
+                if iid in seen:
+                    self._log.warning(
+                        "Duplicate instrument_id in exchange positions: %s", iid
+                    )
+                seen.add(iid)
+
         # Build lookup maps for O(1) access - O(n) + O(m)
         cached_map: dict[str, Position] = {
             pos.instrument_id.value: pos for pos in cached
