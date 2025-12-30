@@ -54,18 +54,18 @@
 
 ### Tests for FR-001
 
-- [ ] T011 [P] [FR1] Unit test for position loading from cache in `tests/unit/recovery/test_position_loading.py`
-- [ ] T012 [P] [FR1] Unit test for position reconciliation logic in `tests/unit/recovery/test_reconciliation.py`
-- [ ] T013 [FR1] Integration test for cold start (no prior state) in `tests/integration/recovery/test_cold_start.py`
-- [ ] T014 [FR1] Integration test for warm start (existing positions) in `tests/integration/recovery/test_warm_start.py`
+- [x] T011 [P] [FR1] Unit test for position loading from cache in `tests/unit/recovery/test_position_loading.py`
+- [x] T012 [P] [FR1] Unit test for position reconciliation logic in `tests/unit/recovery/test_reconciliation.py`
+- [x] T013 [FR1] Integration test for cold start (no prior state) in `tests/integration/recovery/test_cold_start.py`
+- [x] T014 [FR1] Integration test for warm start (existing positions) in `tests/integration/recovery/test_warm_start.py`
 
 ### Implementation for FR-001
 
-- [ ] T015 [FR1] Create PositionRecoveryProvider implementation in `strategies/common/recovery/provider.py` (implements contracts/recovery_interface.py)
-- [ ] T016 [FR1] Implement `get_cached_positions()` method in `strategies/common/recovery/provider.py`
-- [ ] T017 [FR1] Implement `get_exchange_positions()` method in `strategies/common/recovery/provider.py`
-- [ ] T018 [E] [FR1] Implement `reconcile_positions()` method with discrepancy detection in `strategies/common/recovery/provider.py`
-- [ ] T019 [FR1] Add logging for position loading events in `strategies/common/recovery/provider.py`
+- [x] T015 [FR1] Create PositionRecoveryProvider implementation in `strategies/common/recovery/provider.py` (implements contracts/recovery_interface.py)
+- [x] T016 [FR1] Implement `get_cached_positions()` method in `strategies/common/recovery/provider.py`
+- [x] T017 [FR1] Implement `get_exchange_positions()` method in `strategies/common/recovery/provider.py`
+- [x] T018 [E] [FR1] Implement `reconcile_positions()` method with discrepancy detection in `strategies/common/recovery/provider.py`
+- [x] T019 [FR1] Add logging for position loading events in `strategies/common/recovery/provider.py`
 
 **Checkpoint**: Position loading works - can load and reconcile positions from Redis
 
@@ -86,14 +86,14 @@
 
 ### Implementation for FR-002
 
-- [ ] T024 [FR2] Create RecoverableStrategy base class in `strategies/common/recovery/recoverable_strategy.py`
-- [ ] T025 [FR2] Implement `on_start()` with position detection in `strategies/common/recovery/recoverable_strategy.py`
-- [ ] T026 [FR2] Implement `on_position_recovered()` hook in `strategies/common/recovery/recoverable_strategy.py`
-- [ ] T027 [FR2] Implement `_handle_recovered_position()` method in `strategies/common/recovery/recoverable_strategy.py`
-- [ ] T028 [FR2] Implement `_setup_exit_orders()` for stop-loss recreation in `strategies/common/recovery/recoverable_strategy.py`
-- [ ] T029 [FR2] Implement historical data warmup pattern with `request_bars()` in `strategies/common/recovery/recoverable_strategy.py`
-- [ ] T030 [FR2] Implement `on_historical_data()` handler for indicator warmup in `strategies/common/recovery/recoverable_strategy.py`
-- [ ] T031 [FR2] Implement `on_warmup_complete()` callback in `strategies/common/recovery/recoverable_strategy.py`
+- [x] T024 [FR2] Create RecoverableStrategy base class in `strategies/common/recovery/recoverable_strategy.py`
+- [x] T025 [FR2] Implement `on_start()` with position detection in `strategies/common/recovery/recoverable_strategy.py`
+- [x] T026 [FR2] Implement `on_position_recovered()` hook in `strategies/common/recovery/recoverable_strategy.py`
+- [x] T027 [FR2] Implement `_handle_recovered_position()` method in `strategies/common/recovery/recoverable_strategy.py`
+- [x] T028 [FR2] Implement `_setup_exit_orders()` for stop-loss recreation in `strategies/common/recovery/recoverable_strategy.py`
+- [x] T029 [FR2] Implement historical data warmup pattern with `request_bars()` in `strategies/common/recovery/recoverable_strategy.py`
+- [x] T030 [FR2] Implement `on_historical_data()` handler for indicator warmup in `strategies/common/recovery/recoverable_strategy.py`
+- [x] T031 [FR2] Implement `on_warmup_complete()` callback in `strategies/common/recovery/recoverable_strategy.py`
 
 **Checkpoint**: Strategy state restoration works - indicators warm up and positions are managed
 
