@@ -83,7 +83,7 @@
 
 - [X] T016 [P] Update CLAUDE.md with Redis configuration section
 - [X] T017 [P] Create monitoring guide in docs/018-redis-monitoring.md
-- [ ] T018 Run alpha-debug verification on all config code
+- [X] T018 Run alpha-debug verification on all config code
 
 ---
 
@@ -152,5 +152,12 @@ T017 [P] Create monitoring guide
 
 ## Implementation Status
 
-**Completed**: 17/18 tasks (94%)
-**Remaining**: T018 (alpha-debug verification)
+**Completed**: 18/18 tasks (100%) ✅
+
+**Alpha-Debug Fixes Applied**:
+- B1/B2: Fixed unsafe int() and falsy port=0 handling
+- B3: Fixed socket resource leak with try/finally
+- B5/B8: Added positive timeout validation
+- B6: Validated max_retries and base_delay
+- B7: Reject whitespace-only hosts
+- B11/B4: Added missing exports to __init__.py

@@ -31,6 +31,14 @@ class RedisConnectionError(Exception):
     pass
 
 
+def _safe_int(value: str, name: str, default: int) -> int:
+    """Safely parse int from env var with clear error message."""
+    try:
+        return int(value)
+    except ValueError:
+        raise RedisConfigError(f"{name} must be an integer, got: {value!r}")
+
+
 def validate_redis_config(
     host: str,
     port: int,
@@ -47,8 +55,8 @@ def validate_redis_config(
     Raises:
         RedisConfigError: If any parameter is invalid
     """
-    # Validate host format
-    if not host or not isinstance(host, str):
+    # Validate host format (reject whitespace-only)
+    if not host or not isinstance(host, str) or not host.strip():
         raise RedisConfigError("REDIS_HOST must be a non-empty string")
 
     # Validate port range
@@ -96,12 +104,22 @@ def create_redis_cache_config(
     from nautilus_trader.common.config import DatabaseConfig
     from nautilus_trader.config import CacheConfig
 
-    # Load from environment with overrides
-    _host = host or os.getenv("REDIS_HOST", "localhost")
-    _port = port or int(os.getenv("REDIS_PORT", "6379"))
-    _password = password or os.getenv("REDIS_PASSWORD") or None
+    # Load from environment with overrides (explicit None check for port=0 case)
+    _host = host if host is not None else os.getenv("REDIS_HOST", "localhost")
+    _port = (
+        port
+        if port is not None
+        else _safe_int(os.getenv("REDIS_PORT", "6379"), "REDIS_PORT", 6379)
+    )
+    _password = (
+        password if password is not None else (os.getenv("REDIS_PASSWORD") or None)
+    )
     _ssl = ssl if ssl is not None else os.getenv("REDIS_SSL", "false").lower() == "true"
-    _timeout = timeout or int(os.getenv("REDIS_TIMEOUT", "2"))
+    _timeout = (
+        timeout
+        if timeout is not None
+        else _safe_int(os.getenv("REDIS_TIMEOUT", "2"), "REDIS_TIMEOUT", 2)
+    )
 
     # Validate configuration
     validate_redis_config(_host, _port, "msgpack")
@@ -146,8 +164,12 @@ def create_debug_cache_config(
     from nautilus_trader.common.config import DatabaseConfig
     from nautilus_trader.config import CacheConfig
 
-    _host = host or os.getenv("REDIS_HOST", "localhost")
-    _port = port or int(os.getenv("REDIS_PORT", "6379"))
+    _host = host if host is not None else os.getenv("REDIS_HOST", "localhost")
+    _port = (
+        port
+        if port is not None
+        else _safe_int(os.getenv("REDIS_PORT", "6379"), "REDIS_PORT", 6379)
+    )
 
     validate_redis_config(_host, _port, "json")
 
@@ -177,22 +199,24 @@ def check_redis_health(
     Args:
         host: Redis host (default: from env)
         port: Redis port (default: from env)
-        timeout: Connection timeout in seconds
+        timeout: Connection timeout in seconds (must be positive)
 
     Returns:
         True if Redis is reachable, False otherwise
     """
-    _host = host or os.getenv("REDIS_HOST", "localhost")
-    _port = port or int(os.getenv("REDIS_PORT", "6379"))
+    _host = host if host is not None else os.getenv("REDIS_HOST", "localhost")
+    _port = port if port is not None else int(os.getenv("REDIS_PORT", "6379"))
+    _timeout = max(0.1, timeout)  # Ensure positive timeout
 
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     try:
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.settimeout(timeout)
+        sock.settimeout(_timeout)
         result = sock.connect_ex((_host, _port))
-        sock.close()
         return result == 0
     except (OSError, socket.error):
         return False
+    finally:
+        sock.close()
 
 
 def wait_for_redis(
@@ -215,15 +239,17 @@ def wait_for_redis(
     Raises:
         RedisConnectionError: If Redis is not available after max_retries
     """
-    _host = host or os.getenv("REDIS_HOST", "localhost")
-    _port = port or int(os.getenv("REDIS_PORT", "6379"))
+    _host = host if host is not None else os.getenv("REDIS_HOST", "localhost")
+    _port = port if port is not None else int(os.getenv("REDIS_PORT", "6379"))
+    _max_retries = max(1, max_retries)  # At least 1 attempt
+    _base_delay = max(0.1, base_delay)  # Minimum 0.1s delay
 
-    delay = base_delay
-    for attempt in range(1, max_retries + 1):
+    delay = _base_delay
+    for attempt in range(1, _max_retries + 1):
         if check_redis_health(_host, _port):
             return
 
-        if attempt < max_retries:
+        if attempt < _max_retries:
             print(f"Redis not available, retry {attempt}/{max_retries} in {delay:.1f}s")
             time.sleep(delay)
             delay = min(delay * 2, max_delay)
