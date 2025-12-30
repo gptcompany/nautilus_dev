@@ -1,0 +1,191 @@
+{
+  "session_id": "04110261-9d19-4dcc-85ed-34f7bb28990e",
+  "created_at": "2025-12-30T12:44:41.367744",
+  "operations": [
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-30T12:44:41.367762",
+      "command": ".specify/scripts/bash/setup-plan.sh --json 016-order-reconciliation 2>/dev/null || echo '{\"error\": \"script failed\"}'",
+      "description": "Setup plan environment for 016-order-reconciliation"
+    },
+    {
+      "operation": "glob",
+      "timestamp": "2025-12-30T12:44:50.772568",
+      "pattern": ".specify/scripts/**/*.sh"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-30T12:44:56.028196",
+      "file_path": "/media/sam/1TB/nautilus_dev/.specify/scripts/bash/setup-plan.sh"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-30T12:45:00.051742",
+      "file_path": "/media/sam/1TB/nautilus_dev/.specify/scripts/bash/common.sh"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-30T12:45:07.037581",
+      "command": "SPECIFY_FEATURE=\"016-order-reconciliation\" .specify/scripts/bash/setup-plan.sh --json",
+      "description": "Run setup-plan with SPECIFY_FEATURE env var"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-30T12:45:16.139584",
+      "todo_count": 9
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-30T12:45:22.190878",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/016-order-reconciliation/spec.md"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-30T12:45:22.204477",
+      "file_path": "/media/sam/1TB/nautilus_dev/.specify/memory/constitution.md"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-30T12:45:31.876875",
+      "todo_count": 9
+    },
+    {
+      "operation": "task",
+      "timestamp": "2025-12-30T12:45:44.329976",
+      "subagent_type": "nautilus-docs-specialist",
+      "prompt": "Research NautilusTrader order reconciliation for Spec 016 implementation:\n\n1. Search Context7 for:\n ..."
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-30T12:45:53.861520",
+      "command": "grep -r -l \"reconciliation\\|reconcile\" /media/sam/1TB/nautilus_dev/docs/discord/ 2>/dev/null | head -20",
+      "description": "Find Discord files mentioning reconciliation"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-30T12:45:53.885461",
+      "command": "grep -r -l \"external.*order\\|order.*claim\\|inflight\" /media/sam/1TB/nautilus_dev/docs/discord/ 2>/dev/null | head -20",
+      "description": "Find Discord files about external orders and inflight"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-30T12:45:53.956698",
+      "file_path": "/media/sam/1TB/nautilus_dev/docs/nautilus/nautilus-trader-changelog.json"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-30T12:46:01.722267",
+      "file_path": "/media/sam/1TB/nautilus_dev/docs/discord/help.md"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-30T12:46:01.726056",
+      "file_path": "/media/sam/1TB/nautilus_dev/docs/discord/binance.md"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-30T12:46:01.733404",
+      "file_path": "/media/sam/1TB/nautilus_dev/docs/discord/general.md"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-30T12:46:01.741352",
+      "file_path": "/media/sam/1TB/nautilus_dev/docs/discord/questions.md"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-30T12:46:12.175215",
+      "command": "grep -n -B2 -A5 \"reconcil\" /media/sam/1TB/nautilus_dev/docs/discord/help.md | head -200",
+      "description": "Search for reconciliation in help.md"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-30T12:46:12.194397",
+      "command": "grep -n -B2 -A5 \"reconcil\" /media/sam/1TB/nautilus_dev/docs/discord/questions.md | head -200",
+      "description": "Search for reconciliation in questions.md"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-30T12:46:12.220544",
+      "command": "grep -rn \"external.*claim\\|claim.*order\\|inflight\\|in.flight\\|position.*report\\|PositionStatusReport\" /media/sam/1TB/nautilus_dev/docs/discord/ | head -50",
+      "description": "Search for external claims and inflight orders"
+    },
+    {
+      "operation": "webfetch",
+      "timestamp": "2025-12-30T12:46:26.273392",
+      "url": "https://nautilustrader.io/docs/nightly/concepts/live",
+      "prompt": "Extract all information about:\n1. LiveExecEngineConfig parameters (especially reconciliation-related..."
+    },
+    {
+      "operation": "webfetch",
+      "timestamp": "2025-12-30T12:46:26.277070",
+      "url": "https://nautilustrader.io/docs/nightly/api_reference/config",
+      "prompt": "Extract all LiveExecEngineConfig parameters, especially those related to:\n1. reconciliation\n2. recon..."
+    },
+    {
+      "operation": "webfetch",
+      "timestamp": "2025-12-30T12:46:51.221129",
+      "url": "https://github.com/nautechsystems/nautilus_trader/issues/3104",
+      "prompt": "Extract all details about:\n1. The reconciliation bug described\n2. Binance Futures HEDGING mode recon..."
+    },
+    {
+      "operation": "webfetch",
+      "timestamp": "2025-12-30T12:46:51.224149",
+      "url": "https://github.com/nautechsystems/nautilus_trader/issues/3042",
+      "prompt": "Extract all details about:\n1. The reconciliation bug with routing clients\n2. Instrument venue vs cli..."
+    },
+    {
+      "operation": "webfetch",
+      "timestamp": "2025-12-30T12:47:07.877941",
+      "url": "https://github.com/nautechsystems/nautilus_trader/issues/3152",
+      "prompt": "Extract details about:\n1. Hyperliquid execution and reconciliation testing status\n2. What reconcilia..."
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-30T12:47:07.885765",
+      "command": "grep -rn \"INTERNAL.DIFF\\|EXTERNAL\\|synthetic\\|generate_missing\" /media/sam/1TB/nautilus_dev/docs/discord/ 2>/dev/null | head -30",
+      "description": "Search for internal diff and synthetic positions"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-30T12:47:18.897982",
+      "file_path": "/media/sam/1TB/nautilus_dev/docs/discord/questions.md"
+    },
+    {
+      "operation": "webfetch",
+      "timestamp": "2025-12-30T12:47:27.469430",
+      "url": "https://github.com/nautechsystems/nautilus_trader/issues/3054",
+      "prompt": "Extract all details about:\n1. Interactive Brokers reconciliation issues\n2. Flat positions not being ..."
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-30T12:47:27.488229",
+      "command": "grep -rn \"hedge\\|HEDGING\\|positionIdx\" /media/sam/1TB/nautilus_dev/docs/discord/ 2>/dev/null | head -30",
+      "description": "Search for hedge mode references in Discord"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-30T12:47:40.520860",
+      "file_path": "/media/sam/1TB/nautilus_dev/docs/discord/bybit.md"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-30T12:48:57.629405",
+      "command": "cat > /media/sam/1TB/nautilus_dev/specs/016-reconciliation-system/research.md << 'RESEARCH_EOF'\n# Spec 016: Order Reconciliation Research\n\n**Date**: 2025-12-30\n**NautilusTrader Version**: v1.221.0 (stable), v1.222.0+ (nightly)\n**Sources**: Context7, Discord (90-day window), GitHub Issues\n\n---\n\n## 1. Current Implementation Status\n\n### 1.1 Core Reconciliation Architecture\n\nNautilusTrader implements reconciliation through three standardized methods in execution clients:\n\n1. **`generate_order_status_reports`** - Query venue for order states\n2. **`generate_fill_reports`** - Query venue for fill/execution history  \n3. **`generate_position_status_reports`** - Query venue for position states\n\n**Key stages in reconciliation flow**:\n1. Duplicate checking (prevents client order ID conflicts)\n2. Order reconciliation (generates missing events, processes external orders)\n3. Position reconciliation (ensures net positions match venue exactly)\n4. Exception handling (individual adapter failures don't abort entire process)\n\n### 1.2 LiveExecEngineConfig Parameters\n\n```python\nLiveExecEngineConfig(\n    # Startup Reconciliation\n    reconciliation=True,                    # Enable startup reconciliation\n    reconciliation_lookback_mins=None,      # Lookback window (None = max history)\n    reconciliation_instrument_ids=None,     # Include list for specific instruments\n    filtered_client_order_ids=None,         # Client order IDs to exclude\n    reconciliation_startup_delay_secs=10.0, # MINIMUM 10s for production\n    \n    # In-Flight Order Monitoring\n    inflight_check_interval_ms=2000,        # How often to check in-flight orders\n    inflight_check_threshold_ms=5000,       # Delay before triggering venue check\n    inflight_check_retries=5,               # Max retry attempts\n    \n    # Open Orders Polling (Continuous Reconciliation)\n    open_check_interval_secs=None,          # Polling frequency (5-10s recommended)\n    open_check_open_only=True,              # Only request open orders\n    open_check_lookback_mins=60,            # Lookback window (MINIMUM 60 mins)\n    open_check_threshold_ms=5000,           # Min time before acting on discrepancies\n    open_check_missing_retries=5,           # Retries before resolving missing orders\n    \n    # Own Books Auditing\n    own_books_audit_interval_secs=None,     # Compare own books vs venue public books\n    \n    # Memory Management\n    purge_closed_orders_interval_mins=10,   # Purge frequency (10-15 min recommended)\n    purge_closed_orders_buffer_mins=60,     # Grace period before purge\n    purge_closed_positions_interval_mins=None,\n    purge_account_events_interval_mins=None,\n    purge_from_database=False,              # CAUTION: Also deletes from backing DB\n)\n```\n\n### 1.3 External Order Claims Configuration\n\nStrategies can claim external orders for specific instruments:\n\n```python\nStrategyConfig(\n    external_order_claims=[\n        \"BTCUSDT-PERP.BINANCE\",\n        \"ETHUSDT-PERP.BINANCE\",\n    ],\n)\n```\n\n**Key behaviors**:\n- Orders with `order.strategy_id.value == \"EXTERNAL\"` are external orders\n- Orders with strategy ID `EXTERNAL` and tag `RECONCILIATION` cannot be claimed\n- External orders are included in portfolio calculations\n\n---\n\n## 2. Known Issues (Open Bugs)\n\n### 2.1 [#3104] Binance Futures HEDGING Mode Reconciliation Failure\n\n**Status**: OPEN (Bug)\n**Severity**: Critical\n**Created**: 2025-10-21\n\n**Problem**: Long-lived positions (>10 days) in hedge mode (`dualSidePosition=true`) fail to reconcile correctly. Position net quantity diverges from venue reported value.\n\n**Root Cause**: \n- Hedge mode uses different code path that only validates quantity matches\n- `generate_missing_orders` is bypassed in hedge mode pathway\n- Lookback window insufficient for long-lived positions\n\n**Workaround**: Switch to NETTING mode instead of HEDGING mode.\n\n**Source**: https://github.com/nautechsystems/nautilus_trader/issues/3104\n\n---\n\n### 2.2 [#3042] Routing Clients Venue Mismatch\n\n**Status**: OPEN (Bug/Enhancement)\n**Created**: 2025-10-07\n\n**Problem**: Position reconciliation fails when instrument venue differs from client venue (e.g., Interactive Brokers routes to NYSE but client venue is `INTERACTIVE_BROKERS`).\n\n**Root Cause**: \n- Reconciliation filters by `venue=IB_VENUE` but positions stored under `NYSE`, `NASDAQ`\n- Returns empty results, breaking reconciliation flow\n\n**Workaround**: None documented; requires code fix using `venue=None` pattern.\n\n**Source**: https://github.com/nautechsystems/nautilus_trader/issues/3042\n\n---\n\n### 2.3 [#3054] IB Flat Positions Not Closed (RESOLVED)\n\n**Status**: CLOSED (2025-12-18)\n\n**Problem**: Externally closed positions created \"contrary positions\" instead of being marked closed in NETTING accounts.\n\n**Resolution**: \"Substantial refinements to reconciliation\" implemented in develop branch.\n\n---\n\n## 3. Exchange-Specific Issues\n\n### 3.1 Binance Adapter\n\n| Issue | Status | Notes |\n|-------|--------|-------|\n| HEDGING mode reconciliation | BUG | #3104 - Long-lived positions fail |\n| ADL order handling | FIXED | v1.221.0+ - Both `x=CALCULATED` and `x=TRADE` handled |\n| Chinese character tokens | FIXED | Nightly - '币安人生' token crash resolved |\n| STOP_MARKET orders | FIXED | Must use Algo Order API |\n| PositionStatusReports | BUG | Only returns last position in hedge mode |\n\n**Discord Reference** (2025-10-11):\n> \"NT received two PositionStatusReports correctly but ends up with only one after the reconciliation\" - User reported hedge mode only keeps last position.\n\n### 3.2 Bybit Adapter (Rust Port)\n\n| Issue | Status | Notes |\n|-------|--------|-------|\n| Hedge mode (`positionIdx`) | NOT SUPPORTED | Infrastructure exists but not wired up |\n| `bars_timestamp_on_close` | BUG | Not applied to WebSocket bars |\n| Stop-loss orders | FIXED | Nightly - Correct trigger behavior |\n| Historical bars partial bar | FIXED | Nightly - Filters incomplete bars |\n\n**Critical Limitation**: Cannot place hedge mode orders - `submit_order()` does not set `position_idx`.\n\n### 3.3 Interactive Brokers\n\n| Issue | Status | Notes |\n|-------|--------|-------|\n| Venue routing mismatch | BUG | #3042 - NYSE/NASDAQ vs IB_VENUE |\n| Max tick-by-tick requests | WARNING | API limit can be hit during warmup |\n| Bond instruments | ERROR | Unsupported in reconciliation |\n| External positions | FIXED | Develop branch has substantial fixes |\n\n**Discord Reference** (2025-11-19):\n> \"New errors popping up... reaching IBKR's API limits when starting strategies' subscriptions... Max number of tick-by-tick requests has been reached\"\n\n---\n\n## 4. Position Reconciliation Patterns\n\n### 4.1 INTERNAL-DIFF Positions\n\nWhen reconciliation finds venue positions without matching cached state, it creates synthetic positions with strategy ID `INTERNAL-DIFF`:\n\n```\nScenario: Venue has +1000 AAPL, Nautilus starts fresh\nResult: Creates Position(LONG 1000 AAPL, strategy=INTERNAL-DIFF)\n```\n\n**Problem in NETTING mode** (Discord 2025-12-06):\n> \"I'm seeing synthetic INTERNAL-DIFF positions even though I'm not limiting reconciliation lookback... the INTERNAL-DIFF stays +1000 and MyStrategy goes to +100, so net is +1100, and in practice I have 2 positions existing for a single instrument even though NETTING is set.\"\n\n**Recommendation**: Use develop branch - \"many changes related to reconciliation\" have been made.\n\n### 4.2 Position Pricing Hierarchy\n\nWhen generating missing orders, reconciliation uses hierarchical pricing:\n\n1. Calculated reconciliation price (preferred)\n2. Market mid-price fallback\n3. Current position average price\n4. MARKET order (last resort)\n\n### 4.3 Partial Window Adjustment\n\nWhen lookback is limited, system analyzes position lifecycles and adds synthetic opening fills if needed.\n\n---\n\n## 5. In-Flight Order Timeout Resolution\n\nWhen orders exceed retry limits without venue confirmation:\n\n| Current State | Resolution |\n|---------------|------------|\n| `SUBMITTED` | → `REJECTED` (no confirmation received) |\n| `PENDING_UPDATE` | → `CANCELED` (modification unacknowledged) |\n| `PENDING_CANCEL` | → `CANCELED` (cancellation unconfirmed) |\n\n---\n\n## 6. Order Consistency Checks\n\nThe engine resolves discrepancies when cache state differs from venue:\n\n| Cached State | Venue State | Resolution |\n|--------------|-------------|------------|\n| `ACCEPTED` | Not found | → `REJECTED` |\n| `ACCEPTED` | `CANCELED` | → `CANCELED` |\n| `PARTIALLY_FILLED` | `CANCELED` | → `CANCELED` (preserving fills) |\n\n---\n\n## 7. Best Practices from Community\n\n### 7.1 Production Configuration\n\n```python\nTradingNodeConfig(\n    exec_engine=LiveExecEngineConfig(\n        reconciliation=True,\n        reconciliation_startup_delay_secs=10.0,  # MINIMUM 10s\n        open_check_interval_secs=5.0,            # 5-10s recommended\n        open_check_lookback_mins=60,             # NEVER reduce below 60\n        inflight_check_interval_ms=2000,\n        inflight_check_retries=5,\n        graceful_shutdown_on_exception=True,\n    ),\n    cache=CacheConfig(\n        database=DatabaseConfig(host=\"localhost\", port=6379),\n        persist_account_events=True,             # CRITICAL for recovery\n    ),\n)\n```\n\n### 7.2 Warmup Pattern (Live Trading)\n\n```python\ndef on_start(self):\n    \"\"\"Request historical data for indicator warmup.\"\"\"\n    self.request_bars(\n        bar_type=self.bar_type,\n        start=self.clock.utc_now() - timedelta(days=2),\n        callback=self._warm_up_complete,\n    )\n\ndef on_historical_data(self, data):\n    \"\"\"Process historical bars to warm up indicators.\"\"\"\n    for bar in data.bars:\n        self.ema.handle_bar(bar)\n```\n\n### 7.3 External Order Detection\n\n```python\ndef on_order_event(self, event):\n    if event.order.strategy_id.value == \"EXTERNAL\":\n        # Handle external order\n        self.log.info(f\"External order detected: {event.order}\")\n```\n\n---\n\n## 8. Gap Detection Mechanisms\n\n### 8.1 Startup Gap Detection\n\n1. Query venue for all open orders and positions\n2. Compare against cached state (Redis/database)\n3. Generate missing fills for unreconciled positions\n4. Create synthetic orders when `generate_missing_orders=True`\n\n### 8.2 Continuous Gap Detection\n\n1. **In-flight monitoring**: Check unconfirmed orders every 2s\n2. **Open orders polling**: Check venue state every 5-10s\n3. **Own books auditing**: Compare internal order book vs venue\n\n---\n\n## 9. Recommendations for Spec 016\n\n### 9.1 Must Have\n- Use NETTING mode (HEDGING has known issues)\n- Set `reconciliation_startup_delay_secs >= 10.0`\n- Never reduce `open_check_lookback_mins` below 60\n- Use Redis/database cache for recovery\n\n### 9.2 Should Avoid\n- Mixing stable and nightly catalog schemas\n- HEDGING mode on Binance Futures (bug #3104)\n- Bybit hedge mode (not implemented)\n- Reducing lookback windows for long-lived positions\n\n### 9.3 Monitor for Fixes\n- #3104: Binance HEDGING reconciliation\n- #3042: IB venue routing mismatch\n- Bybit `positionIdx` implementation (community PR in progress)\n\n---\n\n## 10. Documentation Links\n\n- [Live Trading Concepts](https://nautilustrader.io/docs/nightly/concepts/live)\n- [Reconciliation Configuration](https://nautilustrader.io/docs/nightly/concepts/live#reconciliation-configuration)\n- [Execution Reconciliation](https://nautilustrader.io/docs/nightly/concepts/live#execution-reconciliation)\n- [Cache Configuration](https://nautilustrader.io/docs/latest/concepts/cache#database-configuration)\n\n---\n\n*Research compiled from Context7, Discord (90-day window), and GitHub Issues*\nRESEARCH_EOF\n\necho \"Research file created successfully\"\nls -la /media/sam/1TB/nautilus_dev/specs/016-reconciliation-system/research.md",
+      "description": "Create research.md file for Spec 016"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-30T12:49:03.504269",
+      "command": "mkdir -p /media/sam/1TB/nautilus_dev/specs/016-reconciliation-system && ls -la /media/sam/1TB/nautilus_dev/specs/016-reconciliation-system/",
+      "description": "Create spec directory"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-30T12:50:15.557951",
+      "command": "cat > /media/sam/1TB/nautilus_dev/specs/016-reconciliation-system/research.md << 'RESEARCH_EOF'\n# Spec 016: Order Reconciliation Research\n\n**Date**: 2025-12-30\n**NautilusTrader Version**: v1.221.0 (stable), v1.222.0+ (nightly)\n**Sources**: Context7, Discord (90-day window), GitHub Issues\n\n---\n\n## 1. Current Implementation Status\n\n### 1.1 Core Reconciliation Architecture\n\nNautilusTrader implements reconciliation through three standardized methods in execution clients:\n\n1. **`generate_order_status_reports`** - Query venue for order states\n2. **`generate_fill_reports`** - Query venue for fill/execution history  \n3. **`generate_position_status_reports`** - Query venue for position states\n\n**Key stages in reconciliation flow**:\n1. Duplicate checking (prevents client order ID conflicts)\n2. Order reconciliation (generates missing events, processes external orders)\n3. Position reconciliation (ensures net positions match venue exactly)\n4. Exception handling (individual adapter failures don't abort entire process)\n\n### 1.2 LiveExecEngineConfig Parameters\n\n```python\nLiveExecEngineConfig(\n    # Startup Reconciliation\n    reconciliation=True,                    # Enable startup reconciliation\n    reconciliation_lookback_mins=None,      # Lookback window (None = max history)\n    reconciliation_instrument_ids=None,     # Include list for specific instruments\n    filtered_client_order_ids=None,         # Client order IDs to exclude\n    reconciliation_startup_delay_secs=10.0, # MINIMUM 10s for production\n    \n    # In-Flight Order Monitoring\n    inflight_check_interval_ms=2000,        # How often to check in-flight orders\n    inflight_check_threshold_ms=5000,       # Delay before triggering venue check\n    inflight_check_retries=5,               # Max retry attempts\n    \n    # Open Orders Polling (Continuous Reconciliation)\n    open_check_interval_secs=None,          # Polling frequency (5-10s recommended)\n    open_check_open_only=True,              # Only request open orders\n    open_check_lookback_mins=60,            # Lookback window (MINIMUM 60 mins)\n    open_check_threshold_ms=5000,           # Min time before acting on discrepancies\n    open_check_missing_retries=5,           # Retries before resolving missing orders\n    \n    # Own Books Auditing\n    own_books_audit_interval_secs=None,     # Compare own books vs venue public books\n    \n    # Memory Management\n    purge_closed_orders_interval_mins=10,   # Purge frequency (10-15 min recommended)\n    purge_closed_orders_buffer_mins=60,     # Grace period before purge\n    purge_closed_positions_interval_mins=None,\n    purge_account_events_interval_mins=None,\n    purge_from_database=False,              # CAUTION: Also deletes from backing DB\n)\n```\n\n### 1.3 External Order Claims Configuration\n\nStrategies can claim external orders for specific instruments:\n\n```python\nStrategyConfig(\n    external_order_claims=[\n        \"BTCUSDT-PERP.BINANCE\",\n        \"ETHUSDT-PERP.BINANCE\",\n    ],\n)\n```\n\n**Key behaviors**:\n- Orders with `order.strategy_id.value == \"EXTERNAL\"` are external orders\n- Orders with strategy ID `EXTERNAL` and tag `RECONCILIATION` cannot be claimed\n- External orders are included in portfolio calculations\n\n---\n\n## 2. Known Issues (Open Bugs)\n\n### 2.1 [#3104] Binance Futures HEDGING Mode Reconciliation Failure\n\n**Status**: OPEN (Bug)\n**Severity**: Critical\n**Created**: 2025-10-21\n\n**Problem**: Long-lived positions (>10 days) in hedge mode (`dualSidePosition=true`) fail to reconcile correctly. Position net quantity diverges from venue reported value.\n\n**Root Cause**: \n- Hedge mode uses different code path that only validates quantity matches\n- `generate_missing_orders` is bypassed in hedge mode pathway\n- Lookback window insufficient for long-lived positions\n\n**Workaround**: Switch to NETTING mode instead of HEDGING mode.\n\n**Source**: https://github.com/nautechsystems/nautilus_trader/issues/3104\n\n---\n\n### 2.2 [#3042] Routing Clients Venue Mismatch\n\n**Status**: OPEN (Bug/Enhancement)\n**Created**: 2025-10-07\n\n**Problem**: Position reconciliation fails when instrument venue differs from client venue (e.g., Interactive Brokers routes to NYSE but client venue is `INTERACTIVE_BROKERS`).\n\n**Root Cause**: \n- Reconciliation filters by `venue=IB_VENUE` but positions stored under `NYSE`, `NASDAQ`\n- Returns empty results, breaking reconciliation flow\n\n**Workaround**: None documented; requires code fix using `venue=None` pattern.\n\n**Source**: https://github.com/nautechsystems/nautilus_trader/issues/3042\n\n---\n\n### 2.3 [#3054] IB Flat Positions Not Closed (RESOLVED)\n\n**Status**: CLOSED (2025-12-18)\n\n**Problem**: Externally closed positions created \"contrary positions\" instead of being marked closed in NETTING accounts.\n\n**Resolution**: \"Substantial refinements to reconciliation\" implemented in develop branch.\n\n---\n\n## 3. Exchange-Specific Issues\n\n### 3.1 Binance Adapter\n\n| Issue | Status | Notes |\n|-------|--------|-------|\n| HEDGING mode reconciliation | BUG | #3104 - Long-lived positions fail |\n| ADL order handling | FIXED | v1.221.0+ - Both `x=CALCULATED` and `x=TRADE` handled |\n| Chinese character tokens | FIXED | Nightly - '币安人生' token crash resolved |\n| STOP_MARKET orders | FIXED | Must use Algo Order API |\n| PositionStatusReports | BUG | Only returns last position in hedge mode |\n\n**Discord Reference** (2025-10-11):\n> \"NT received two PositionStatusReports correctly but ends up with only one after the reconciliation\" - User reported hedge mode only keeps last position.\n\n### 3.2 Bybit Adapter (Rust Port)\n\n| Issue | Status | Notes |\n|-------|--------|-------|\n| Hedge mode (`positionIdx`) | NOT SUPPORTED | Infrastructure exists but not wired up |\n| `bars_timestamp_on_close` | BUG | Not applied to WebSocket bars |\n| Stop-loss orders | FIXED | Nightly - Correct trigger behavior |\n| Historical bars partial bar | FIXED | Nightly - Filters incomplete bars |\n\n**Critical Limitation**: Cannot place hedge mode orders - `submit_order()` does not set `position_idx`.\n\n### 3.3 Interactive Brokers\n\n| Issue | Status | Notes |\n|-------|--------|-------|\n| Venue routing mismatch | BUG | #3042 - NYSE/NASDAQ vs IB_VENUE |\n| Max tick-by-tick requests | WARNING | API limit can be hit during warmup |\n| Bond instruments | ERROR | Unsupported in reconciliation |\n| External positions | FIXED | Develop branch has substantial fixes |\n\n**Discord Reference** (2025-11-19):\n> \"New errors popping up... reaching IBKR's API limits when starting strategies' subscriptions... Max number of tick-by-tick requests has been reached\"\n\n---\n\n## 4. Position Reconciliation Patterns\n\n### 4.1 INTERNAL-DIFF Positions\n\nWhen reconciliation finds venue positions without matching cached state, it creates synthetic positions with strategy ID `INTERNAL-DIFF`:\n\n```\nScenario: Venue has +1000 AAPL, Nautilus starts fresh\nResult: Creates Position(LONG 1000 AAPL, strategy=INTERNAL-DIFF)\n```\n\n**Problem in NETTING mode** (Discord 2025-12-06):\n> \"I'm seeing synthetic INTERNAL-DIFF positions even though I'm not limiting reconciliation lookback... the INTERNAL-DIFF stays +1000 and MyStrategy goes to +100, so net is +1100, and in practice I have 2 positions existing for a single instrument even though NETTING is set.\"\n\n**Recommendation**: Use develop branch - \"many changes related to reconciliation\" have been made.\n\n### 4.2 Position Pricing Hierarchy\n\nWhen generating missing orders, reconciliation uses hierarchical pricing:\n\n1. Calculated reconciliation price (preferred)\n2. Market mid-price fallback\n3. Current position average price\n4. MARKET order (last resort)\n\n### 4.3 Partial Window Adjustment\n\nWhen lookback is limited, system analyzes position lifecycles and adds synthetic opening fills if needed.\n\n---\n\n## 5. In-Flight Order Timeout Resolution\n\nWhen orders exceed retry limits without venue confirmation:\n\n| Current State | Resolution |\n|---------------|------------|\n| `SUBMITTED` | -> `REJECTED` (no confirmation received) |\n| `PENDING_UPDATE` | -> `CANCELED` (modification unacknowledged) |\n| `PENDING_CANCEL` | -> `CANCELED` (cancellation unconfirmed) |\n\n---\n\n## 6. Order Consistency Checks\n\nThe engine resolves discrepancies when cache state differs from venue:\n\n| Cached State | Venue State | Resolution |\n|--------------|-------------|------------|\n| `ACCEPTED` | Not found | -> `REJECTED` |\n| `ACCEPTED` | `CANCELED` | -> `CANCELED` |\n| `PARTIALLY_FILLED` | `CANCELED` | -> `CANCELED` (preserving fills) |\n\n---\n\n## 7. Best Practices from Community\n\n### 7.1 Production Configuration\n\n```python\nTradingNodeConfig(\n    exec_engine=LiveExecEngineConfig(\n        reconciliation=True,\n        reconciliation_startup_delay_secs=10.0,  # MINIMUM 10s\n        open_check_interval_secs=5.0,            # 5-10s recommended\n        open_check_lookback_mins=60,             # NEVER reduce below 60\n        inflight_check_interval_ms=2000,\n        inflight_check_retries=5,\n        graceful_shutdown_on_exception=True,\n    ),\n    cache=CacheConfig(\n        database=DatabaseConfig(host=\"localhost\", port=6379),\n        persist_account_events=True,             # CRITICAL for recovery\n    ),\n)\n```\n\n### 7.2 Warmup Pattern (Live Trading)\n\n```python\ndef on_start(self):\n    \"\"\"Request historical data for indicator warmup.\"\"\"\n    self.request_bars(\n        bar_type=self.bar_type,\n        start=self.clock.utc_now() - timedelta(days=2),\n        callback=self._warm_up_complete,\n    )\n\ndef on_historical_data(self, data):\n    \"\"\"Process historical bars to warm up indicators.\"\"\"\n    for bar in data.bars:\n        self.ema.handle_bar(bar)\n```\n\n### 7.3 External Order Detection\n\n```python\ndef on_order_event(self, event):\n    if event.order.strategy_id.value == \"EXTERNAL\":\n        # Handle external order\n        self.log.info(f\"External order detected: {event.order}\")\n```\n\n---\n\n## 8. Gap Detection Mechanisms\n\n### 8.1 Startup Gap Detection\n\n1. Query venue for all open orders and positions\n2. Compare against cached state (Redis/database)\n3. Generate missing fills for unreconciled positions\n4. Create synthetic orders when `generate_missing_orders=True`\n\n### 8.2 Continuous Gap Detection\n\n1. **In-flight monitoring**: Check unconfirmed orders every 2s\n2. **Open orders polling**: Check venue state every 5-10s\n3. **Own books auditing**: Compare internal order book vs venue\n\n---\n\n## 9. Recommendations for Spec 016\n\n### 9.1 Must Have\n- Use NETTING mode (HEDGING has known issues)\n- Set `reconciliation_startup_delay_secs >= 10.0`\n- Never reduce `open_check_lookback_mins` below 60\n- Use Redis/database cache for recovery\n\n### 9.2 Should Avoid\n- Mixing stable and nightly catalog schemas\n- HEDGING mode on Binance Futures (bug #3104)\n- Bybit hedge mode (not implemented)\n- Reducing lookback windows for long-lived positions\n\n### 9.3 Monitor for Fixes\n- #3104: Binance HEDGING reconciliation\n- #3042: IB venue routing mismatch\n- Bybit `positionIdx` implementation (community PR in progress)\n\n---\n\n## 10. Documentation Links\n\n- [Live Trading Concepts](https://nautilustrader.io/docs/nightly/concepts/live)\n- [Reconciliation Configuration](https://nautilustrader.io/docs/nightly/concepts/live#reconciliation-configuration)\n- [Execution Reconciliation](https://nautilustrader.io/docs/nightly/concepts/live#execution-reconciliation)\n- [Cache Configuration](https://nautilustrader.io/docs/latest/concepts/cache#database-configuration)\n\n---\n\n*Research compiled from Context7, Discord (90-day window), and GitHub Issues*\nRESEARCH_EOF\n\necho \"File created:\"\nls -la /media/sam/1TB/nautilus_dev/specs/016-reconciliation-system/research.md\necho \"\"\necho \"Word count:\"\nwc -l /media/sam/1TB/nautilus_dev/specs/016-reconciliation-system/research.md",
+      "description": "Create research.md file for Spec 016"
+    }
+  ],
+  "last_updated": "2025-12-30T12:50:15.557971"
+}
