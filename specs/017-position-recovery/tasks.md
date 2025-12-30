@@ -79,10 +79,10 @@
 
 ### Tests for FR-002
 
-- [ ] T020 [P] [FR2] Unit test for RecoverableStrategy base class in `tests/unit/recovery/test_recoverable_strategy.py`
-- [ ] T021 [P] [FR2] Unit test for indicator warmup in `tests/unit/recovery/test_indicator_warmup.py`
-- [ ] T022 [FR2] Unit test for exit order recreation in `tests/unit/recovery/test_exit_order_recreation.py`
-- [ ] T023 [FR2] Integration test for strategy recovery with BacktestNode in `tests/integration/recovery/test_strategy_recovery.py`
+- [x] T020 [P] [FR2] Unit test for RecoverableStrategy base class in `tests/unit/recovery/test_recoverable_strategy.py`
+- [x] T021 [P] [FR2] Unit test for indicator warmup in `tests/unit/recovery/test_indicator_warmup.py`
+- [x] T022 [FR2] Unit test for exit order recreation in `tests/unit/recovery/test_exit_order_recreation.py`
+- [x] T023 [FR2] Integration test for strategy recovery with BacktestNode in `tests/integration/recovery/test_strategy_recovery.py`
 
 ### Implementation for FR-002
 
@@ -160,8 +160,8 @@
 
 **Purpose**: Documentation, event logging, and final validation
 
-- [ ] T046 [P] Create RecoveryEventEmitter implementation in `strategies/common/recovery/event_emitter.py`
-- [ ] T047 [P] Create RecoveryStateManager implementation in `strategies/common/recovery/state_manager.py`
+- [x] T046 [P] Create RecoveryEventEmitter implementation in `strategies/common/recovery/event_emitter.py`
+- [x] T047 [P] Create RecoveryStateManager implementation in `strategies/common/recovery/state_manager.py`
 - [ ] T048 Update quickstart.md with implementation examples in `specs/017-position-recovery/quickstart.md`
 - [ ] T049 [P] Add type hints validation with mypy in `strategies/common/recovery/`
 - [ ] T050 Run ruff format and check on recovery module

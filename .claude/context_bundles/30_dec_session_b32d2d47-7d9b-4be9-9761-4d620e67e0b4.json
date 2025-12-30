@@ -781,7 +781,48 @@
       "task_id": "a099a1c",
       "block": true,
       "timeout": 120000
+    },
+    {
+      "operation": "glob",
+      "timestamp": "2025-12-30T19:57:46.592011",
+      "pattern": "tests/**/recovery/*.py",
+      "path": "/media/sam/1TB/nautilus_dev"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-30T19:57:46.613499",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/017-position-recovery/tasks.md"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-30T19:57:58.036738",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/017-position-recovery/tasks.md",
+      "old_string": "- [ ] T020 [P] [FR2] Unit test for RecoverableStrategy base class in `tests/unit/recovery/test_recov..."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-30T19:57:58.370213",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/017-position-recovery/tasks.md",
+      "old_string": "- [ ] T046 [P] Create RecoveryEventEmitter implementation in `strategies/common/recovery/event_emitt..."
+    },
+    {
+      "operation": "task",
+      "timestamp": "2025-12-30T19:58:08.312010",
+      "subagent_type": "test-runner",
+      "prompt": "Run all recovery module tests and report results:\n\n```bash\ncd /media/sam/1TB/nautilus_dev\nsource /me..."
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-30T19:58:14.564991",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run pytest tests/unit/recovery/ tests/integration/recovery/ -v --tb=short 2>&1",
+      "description": "Run recovery module unit and integration tests"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-30T19:58:23.612616",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run pytest tests/unit/recovery/ -v --tb=short 2>&1",
+      "description": "Run only unit tests for recovery module"
     }
   ],
-  "last_updated": "2025-12-30T19:56:32.743380"
+  "last_updated": "2025-12-30T19:58:23.612642"
 }
