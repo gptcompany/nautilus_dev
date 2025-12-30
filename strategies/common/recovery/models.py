@@ -7,7 +7,7 @@ from decimal import Decimal
 from enum import Enum
 from typing import Any
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, ValidationInfo, field_validator
 
 
 class RecoveryStatus(str, Enum):
@@ -153,7 +153,7 @@ class PositionSnapshot(BaseModel):
 
     @field_validator("ts_last_updated")
     @classmethod
-    def validate_timestamps(cls, v: int, info) -> int:
+    def validate_timestamps(cls, v: int, info: ValidationInfo) -> int:
         """Validate ts_opened <= ts_last_updated."""
         ts_opened = info.data.get("ts_opened")
         if ts_opened is not None and v < ts_opened:

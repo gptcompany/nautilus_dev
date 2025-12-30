@@ -9,10 +9,12 @@ Key Components:
 - PositionRecoveryProvider: Position loading and reconciliation
 - RecoveryEventEmitter: Event emission for monitoring
 - RecoveryStateManager: State tracking and persistence
+- EventReplayManager: Event replay and synthetic event generation (FR-004)
 """
 
 from strategies.common.recovery.config import RecoveryConfig
 from strategies.common.recovery.event_emitter import RecoveryEventEmitter
+from strategies.common.recovery.event_replay import EventReplayManager, SyntheticEvent
 from strategies.common.recovery.events import (
     IndicatorsReadyEvent,
     IndicatorsWarmingEvent,
@@ -63,6 +65,9 @@ __all__ = [
     "PositionRecoveryProvider",
     # Event Emitter
     "RecoveryEventEmitter",
+    # Event Replay (FR-004)
+    "EventReplayManager",
+    "SyntheticEvent",
     # State Manager
     "RecoveryStateManager",
     # Strategy

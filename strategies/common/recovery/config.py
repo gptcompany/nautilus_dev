@@ -3,7 +3,7 @@
 This module defines the configuration model for position recovery behavior.
 """
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, ValidationInfo, field_validator
 
 
 class RecoveryConfig(BaseModel):
@@ -53,7 +53,7 @@ class RecoveryConfig(BaseModel):
 
     @field_validator("max_recovery_time_secs")
     @classmethod
-    def validate_max_recovery_time(cls, v: float, info) -> float:
+    def validate_max_recovery_time(cls, v: float, info: ValidationInfo) -> float:
         """Ensure max_recovery_time exceeds startup_delay."""
         startup_delay = info.data.get("startup_delay_secs", 10.0)
         if v <= startup_delay:
