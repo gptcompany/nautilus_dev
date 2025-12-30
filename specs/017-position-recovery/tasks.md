@@ -149,10 +149,10 @@
 
 ### Tests for NFRs
 
-- [ ] T042 [P] Performance test for recovery time < 5s (position recovery) in `tests/performance/test_recovery_time.py`
-- [ ] T043 [P] Performance test for recovery time < 30s (full state) in `tests/performance/test_full_recovery_time.py`
-- [ ] T044 Integration test for no duplicate orders after recovery in `tests/integration/recovery/test_no_duplicates.py`
-- [ ] T045 Integration test for position size accuracy in `tests/integration/recovery/test_position_accuracy.py`
+- [x] T042 [P] Performance test for recovery time < 5s (position recovery) in `tests/performance/test_recovery_time.py`
+- [x] T043 [P] Performance test for recovery time < 30s (full state) in `tests/performance/test_full_recovery_time.py`
+- [x] T044 Integration test for no duplicate orders after recovery in `tests/integration/recovery/test_no_duplicates.py`
+- [x] T045 Integration test for position size accuracy in `tests/integration/recovery/test_position_accuracy.py`
 
 ---
 

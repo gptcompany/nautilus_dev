@@ -11,7 +11,7 @@ NFR-002: Consistency
 from __future__ import annotations
 
 from decimal import Decimal
-from unittest.mock import MagicMock, PropertyMock, call, patch
+from unittest.mock import MagicMock, PropertyMock, patch
 
 import pytest
 
@@ -127,8 +127,8 @@ def strategy_config():
         recovery=RecoveryConfig(
             trader_id="TESTER-001",
             recovery_enabled=True,
-            warmup_lookback_days=0,
-            startup_delay_secs=0.0,
+            warmup_lookback_days=1,  # Minimum valid value
+            startup_delay_secs=5.0,  # Minimum valid value
             max_recovery_time_secs=30.0,
         ),
     )
@@ -391,7 +391,9 @@ class TestNoDuplicateOrders:
             recovery=RecoveryConfig(
                 trader_id="TESTER-001",
                 recovery_enabled=False,  # Disabled
-                warmup_lookback_days=0,
+                warmup_lookback_days=1,  # Minimum valid value
+                startup_delay_secs=5.0,  # Minimum valid value
+                max_recovery_time_secs=30.0,
             ),
         )
 
