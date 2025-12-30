@@ -1,0 +1,240 @@
+# Tearsheet API Contract
+# This defines the Python function signatures for tearsheet generation
+
+openapi: 3.0.3
+info:
+  title: Plotly Backtest Tearsheet API
+  version: 1.0.0
+  description: |
+    Python API for generating interactive HTML tearsheets from NautilusTrader backtest results.
+    This is NOT a REST API - it documents Python function signatures.
+
+# Note: Using OpenAPI format for documentation only
+# Actual implementation is Python functions, not HTTP endpoints
+
+paths:
+  /native/create_tearsheet:
+    post:
+      summary: Create standard tearsheet (native NautilusTrader)
+      description: |
+        ```python
+        from nautilus_trader.analysis.tearsheet import create_tearsheet
+
+        create_tearsheet(
+            engine=engine,
+            output_path="tearsheet.html",
+            title="Backtest Results",
+            currency=None,
+            config=None,
+            benchmark_returns=None,
+            benchmark_name="Benchmark",
+        )
+        ```
+      requestBody:
+        content:
+          application/x-python:
+            schema:
+              type: object
+              required:
+                - engine
+              properties:
+                engine:
+                  type: object
+                  description: BacktestEngine with completed run
+                output_path:
+                  type: string
+                  default: "tearsheet.html"
+                  description: Path to save HTML (None returns HTML string)
+                title:
+                  type: string
+                  default: "NautilusTrader Backtest Results"
+                currency:
+                  type: object
+                  nullable: true
+                  description: Currency for PnL statistics (uses first if None)
+                config:
+                  $ref: '#/components/schemas/TearsheetConfig'
+                benchmark_returns:
+                  type: object
+                  nullable: true
+                  description: pd.Series with benchmark returns
+                benchmark_name:
+                  type: string
+                  default: "Benchmark"
+      responses:
+        '200':
+          description: HTML string if output_path is None, otherwise None
+          content:
+            text/html:
+              schema:
+                type: string
+
+  /custom/create_comparison_tearsheet:
+    post:
+      summary: Create multi-strategy comparison tearsheet (custom extension)
+      description: |
+        ```python
+        from strategies.common.tearsheet import create_comparison_tearsheet
+
+        create_comparison_tearsheet(
+            engines=[engine1, engine2, engine3],
+            strategy_names=["Strategy A", "Strategy B", "Strategy C"],
+            output_path="comparison.html",
+            config=None,
+        )
+        ```
+      requestBody:
+        content:
+          application/x-python:
+            schema:
+              type: object
+              required:
+                - engines
+              properties:
+                engines:
+                  type: array
+                  items:
+                    type: object
+                  description: List of completed BacktestEngines
+                  minItems: 2
+                  maxItems: 10
+                strategy_names:
+                  type: array
+                  items:
+                    type: string
+                  nullable: true
+                  description: Display names (uses strategy IDs if None)
+                output_path:
+                  type: string
+                  default: "comparison.html"
+                config:
+                  $ref: '#/components/schemas/ComparisonConfig'
+      responses:
+        '200':
+          description: Path to generated HTML file
+          content:
+            text/plain:
+              schema:
+                type: string
+
+  /custom/register_custom_charts:
+    post:
+      summary: Register project-specific custom charts
+      description: |
+        ```python
+        from strategies.common.tearsheet import register_custom_charts
+
+        # One-time setup (call at application startup)
+        register_custom_charts()
+        ```
+
+        Registers the following custom charts:
+        - `comparison_equity`: Overlaid equity curves for multiple strategies
+        - `comparison_drawdown`: Overlaid drawdown charts
+        - `comparison_stats`: Side-by-side metrics table
+      responses:
+        '200':
+          description: Charts registered successfully
+
+components:
+  schemas:
+    TearsheetConfig:
+      type: object
+      description: Native NautilusTrader configuration
+      properties:
+        charts:
+          type: array
+          items:
+            type: string
+            enum:
+              - run_info
+              - stats_table
+              - equity
+              - drawdown
+              - monthly_returns
+              - distribution
+              - rolling_sharpe
+              - yearly_returns
+              - bars_with_fills
+          default: all charts
+        theme:
+          type: string
+          enum:
+            - plotly_white
+            - plotly_dark
+            - nautilus
+            - nautilus_dark
+            - nautilus_dev  # Custom project theme
+          default: plotly_white
+        height:
+          type: integer
+          default: 1500
+          minimum: 800
+          maximum: 5000
+        layout:
+          $ref: '#/components/schemas/GridLayout'
+        title:
+          type: string
+          nullable: true
+        include_benchmark:
+          type: boolean
+          default: true
+        benchmark_name:
+          type: string
+          default: Benchmark
+        show_logo:
+          type: boolean
+          default: true
+        chart_args:
+          type: object
+          additionalProperties:
+            type: object
+          description: Per-chart arguments (e.g., bar_type for bars_with_fills)
+
+    GridLayout:
+      type: object
+      properties:
+        rows:
+          type: integer
+          minimum: 1
+          maximum: 6
+        cols:
+          type: integer
+          minimum: 1
+          maximum: 4
+        heights:
+          type: array
+          items:
+            type: number
+          description: Relative heights for each row (sum should equal 1.0)
+        vertical_spacing:
+          type: number
+          default: 0.05
+        horizontal_spacing:
+          type: number
+          default: 0.10
+
+    ComparisonConfig:
+      type: object
+      description: Custom configuration for strategy comparison
+      properties:
+        strategy_names:
+          type: array
+          items:
+            type: string
+          minItems: 2
+          maxItems: 10
+        base_config:
+          $ref: '#/components/schemas/TearsheetConfig'
+        show_individual_stats:
+          type: boolean
+          default: true
+        show_comparison_table:
+          type: boolean
+          default: true
+        colors:
+          type: array
+          items:
+            type: string
+          nullable: true
+          description: Hex color codes for each strategy

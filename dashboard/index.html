@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trading Dashboard - Real-Time OI, Funding & Liquidations</title>
+    <!-- TradingView Lightweight Charts CDN -->
+    <script src="https://unpkg.com/lightweight-charts@4.1.0/dist/lightweight-charts.standalone.production.js"></script>
+    <!-- CSS -->
+    <link rel="stylesheet" href="styles/main.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Header with status and symbol selector -->
+        <header id="dashboard-header">
+            <div class="header-left">
+                <h1>Trading Dashboard</h1>
+                <div id="connection-status" class="status disconnected">
+                    <span class="status-dot"></span>
+                    <span class="status-text">Disconnected</span>
+                </div>
+            </div>
+            <div class="header-right">
+                <select id="symbol-selector">
+                    <option value="BTCUSDT-PERP">BTCUSDT-PERP</option>
+                    <option value="ETHUSDT-PERP">ETHUSDT-PERP</option>
+                </select>
+            </div>
+        </header>
+
+        <!-- Main content area -->
+        <main id="dashboard-main">
+            <!-- Funding Rate Display -->
+            <section id="funding-section">
+                <div id="funding-display">
+                    <span class="funding-label">Funding Rate</span>
+                    <span id="funding-value" class="funding-value neutral">--</span>
+                    <span id="funding-next" class="funding-next">Next: --</span>
+                </div>
+            </section>
+
+            <!-- Historical Data Controls -->
+            <section id="historical-section">
+                <div id="historical-controls">
+                    <label for="date-from">From:</label>
+                    <input type="date" id="date-from">
+                    <label for="date-to">To:</label>
+                    <input type="date" id="date-to">
+                    <button id="load-historical">Load Historical</button>
+                    <span id="historical-progress"></span>
+                </div>
+            </section>
+
+            <!-- Charts Container -->
+            <section id="charts-section">
+                <!-- Open Interest Chart -->
+                <div id="oi-chart-container" class="chart-container">
+                    <div class="chart-header">
+                        <span class="chart-title">Open Interest (USD)</span>
+                    </div>
+                    <div id="oi-chart" class="chart"></div>
+                </div>
+
+                <!-- Funding Rate Chart -->
+                <div id="funding-chart-container" class="chart-container">
+                    <div class="chart-header">
+                        <span class="chart-title">Funding Rate History (%)</span>
+                    </div>
+                    <div id="funding-chart" class="chart"></div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer id="dashboard-footer">
+            <span>Data from: Binance, Bybit, Hyperliquid</span>
+            <span id="last-update">Last update: --</span>
+        </footer>
+    </div>
+
+    <!-- Application Scripts -->
+    <!-- CSS -->
+    <!-- LWC -->
+    <!-- BUNDLE -->
+    <script type="module" src="src/app.js"></script>
+</body>
+</html>

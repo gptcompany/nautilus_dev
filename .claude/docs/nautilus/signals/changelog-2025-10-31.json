@@ -1,0 +1,287 @@
+{
+  "timestamp": "2025-10-31T00:00:46.719Z",
+  "stable_version": "v1.221.0",
+  "nightly_commits": 50,
+  "breaking_changes": [
+    {
+      "title": "Update dependencies and refine tooling",
+      "message": "Update dependencies and refine tooling\n\n- Pin cargo-deny/nextest/llvm-cov/audit versions\n- Enable license checks in CI\n- Clarify implied-vol MIT license with hash verification\n- Update workspace license from deprecated LGPL-3.0 to LGPL-3.0-or-later",
+      "sha": "7f820d3",
+      "date": "2025-10-27T22:40:57Z",
+      "url": "https://github.com/nautechsystems/nautilus_trader/commit/7f820d3117a99b1d88f7b200bcf030e41b45e950"
+    }
+  ],
+  "open_issues": {
+    "total": 19750,
+    "bugs": 2500,
+    "features": 16500,
+    "issues_list": [
+      {
+        "number": 3129,
+        "title": "Support for Python 3.14 on Windows",
+        "state": "open",
+        "labels": [
+          "enhancement"
+        ],
+        "created_at": "2025-10-30T02:43:52Z",
+        "updated_at": "2025-10-30T02:43:58Z",
+        "author": "cjdsellers",
+        "url": "https://github.com/nautechsystems/nautilus_trader/issues/3129",
+        "comments": 0
+      },
+      {
+        "number": 3126,
+        "title": "[Polymarket] Maker fill order side inversion when \"Yes\" and \"No\" orders are matched",
+        "state": "open",
+        "labels": [
+          "bug"
+        ],
+        "created_at": "2025-10-29T16:23:34Z",
+        "updated_at": "2025-10-29T16:23:34Z",
+        "author": "santivazq",
+        "url": "https://github.com/nautechsystems/nautilus_trader/issues/3126",
+        "comments": 0
+      },
+      {
+        "number": 3120,
+        "title": "DataFusion object store registration fails for custom S3 endpoints",
+        "state": "open",
+        "labels": [
+          "bug"
+        ],
+        "created_at": "2025-10-28T18:38:02Z",
+        "updated_at": "2025-10-28T18:38:02Z",
+        "author": "rgauny",
+        "url": "https://github.com/nautechsystems/nautilus_trader/issues/3120",
+        "comments": 0
+      },
+      {
+        "number": 3117,
+        "title": "Nautilus with Bybit adapter silently dies if bars are requested for long period of time",
+        "state": "open",
+        "labels": [
+          "bug"
+        ],
+        "created_at": "2025-10-28T07:28:44Z",
+        "updated_at": "2025-10-29T09:53:26Z",
+        "author": "h3x3d",
+        "url": "https://github.com/nautechsystems/nautilus_trader/issues/3117",
+        "comments": 0
+      },
+      {
+        "number": 3116,
+        "title": "SpreadQuoteAggregator FuturesSpread error",
+        "state": "open",
+        "labels": [
+          "bug"
+        ],
+        "created_at": "2025-10-27T16:50:36Z",
+        "updated_at": "2025-10-28T12:27:43Z",
+        "author": "q351941406",
+        "url": "https://github.com/nautechsystems/nautilus_trader/issues/3116",
+        "comments": 4
+      },
+      {
+        "number": 3104,
+        "title": "[Reconciliation] LiveExecEngine fails to reconcile long-lived Binance Futures positions for HEDGING",
+        "state": "open",
+        "labels": [
+          "bug"
+        ],
+        "created_at": "2025-10-21T09:12:48Z",
+        "updated_at": "2025-10-24T02:31:26Z",
+        "author": "willjay97",
+        "url": "https://github.com/nautechsystems/nautilus_trader/issues/3104",
+        "comments": 2
+      },
+      {
+        "number": 3091,
+        "title": "Could not generate catalog as described in Quickstart",
+        "state": "open",
+        "labels": [
+          "bug"
+        ],
+        "created_at": "2025-10-17T19:21:45Z",
+        "updated_at": "2025-10-19T20:06:09Z",
+        "author": "semihtekten",
+        "url": "https://github.com/nautechsystems/nautilus_trader/issues/3091",
+        "comments": 1
+      },
+      {
+        "number": 3081,
+        "title": "[dYdX] Strategy fails to restart due error while loading the cache",
+        "state": "open",
+        "labels": [
+          "bug"
+        ],
+        "created_at": "2025-10-14T03:34:50Z",
+        "updated_at": "2025-10-15T04:32:36Z",
+        "author": "SarunasSS",
+        "url": "https://github.com/nautechsystems/nautilus_trader/issues/3081",
+        "comments": 6
+      },
+      {
+        "number": 3061,
+        "title": "Add base currency conversion for positions and portfolio with cross-pair support",
+        "state": "open",
+        "labels": [
+          "enhancement"
+        ],
+        "created_at": "2025-10-10T23:25:56Z",
+        "updated_at": "2025-10-28T18:41:55Z",
+        "author": "bmlquant",
+        "url": "https://github.com/nautechsystems/nautilus_trader/issues/3061",
+        "comments": 1
+      },
+      {
+        "number": 3054,
+        "title": "[Interactive Brokers, Reconciliation] Flat positions not closed entirely",
+        "state": "open",
+        "labels": [
+          "bug"
+        ],
+        "created_at": "2025-10-09T12:15:34Z",
+        "updated_at": "2025-10-20T21:45:04Z",
+        "author": "idobz",
+        "url": "https://github.com/nautechsystems/nautilus_trader/issues/3054",
+        "comments": 1
+      }
+    ],
+    "bug_list": [
+      {
+        "number": 3126,
+        "title": "[Polymarket] Maker fill order side inversion when \"Yes\" and \"No\" orders are matched",
+        "state": "open",
+        "labels": [
+          "bug"
+        ],
+        "created_at": "2025-10-29T16:23:34Z",
+        "updated_at": "2025-10-29T16:23:34Z",
+        "author": "santivazq",
+        "url": "https://github.com/nautechsystems/nautilus_trader/issues/3126",
+        "comments": 0
+      },
+      {
+        "number": 3120,
+        "title": "DataFusion object store registration fails for custom S3 endpoints",
+        "state": "open",
+        "labels": [
+          "bug"
+        ],
+        "created_at": "2025-10-28T18:38:02Z",
+        "updated_at": "2025-10-28T18:38:02Z",
+        "author": "rgauny",
+        "url": "https://github.com/nautechsystems/nautilus_trader/issues/3120",
+        "comments": 0
+      },
+      {
+        "number": 3117,
+        "title": "Nautilus with Bybit adapter silently dies if bars are requested for long period of time",
+        "state": "open",
+        "labels": [
+          "bug"
+        ],
+        "created_at": "2025-10-28T07:28:44Z",
+        "updated_at": "2025-10-29T09:53:26Z",
+        "author": "h3x3d",
+        "url": "https://github.com/nautechsystems/nautilus_trader/issues/3117",
+        "comments": 0
+      },
+      {
+        "number": 3116,
+        "title": "SpreadQuoteAggregator FuturesSpread error",
+        "state": "open",
+        "labels": [
+          "bug"
+        ],
+        "created_at": "2025-10-27T16:50:36Z",
+        "updated_at": "2025-10-28T12:27:43Z",
+        "author": "q351941406",
+        "url": "https://github.com/nautechsystems/nautilus_trader/issues/3116",
+        "comments": 4
+      },
+      {
+        "number": 3104,
+        "title": "[Reconciliation] LiveExecEngine fails to reconcile long-lived Binance Futures positions for HEDGING",
+        "state": "open",
+        "labels": [
+          "bug"
+        ],
+        "created_at": "2025-10-21T09:12:48Z",
+        "updated_at": "2025-10-24T02:31:26Z",
+        "author": "willjay97",
+        "url": "https://github.com/nautechsystems/nautilus_trader/issues/3104",
+        "comments": 2
+      }
+    ],
+    "feature_list": [
+      {
+        "number": 3129,
+        "title": "Support for Python 3.14 on Windows",
+        "state": "open",
+        "labels": [
+          "enhancement"
+        ],
+        "created_at": "2025-10-30T02:43:52Z",
+        "updated_at": "2025-10-30T02:43:58Z",
+        "author": "cjdsellers",
+        "url": "https://github.com/nautechsystems/nautilus_trader/issues/3129",
+        "comments": 0
+      },
+      {
+        "number": 3061,
+        "title": "Add base currency conversion for positions and portfolio with cross-pair support",
+        "state": "open",
+        "labels": [
+          "enhancement"
+        ],
+        "created_at": "2025-10-10T23:25:56Z",
+        "updated_at": "2025-10-28T18:41:55Z",
+        "author": "bmlquant",
+        "url": "https://github.com/nautechsystems/nautilus_trader/issues/3061",
+        "comments": 1
+      },
+      {
+        "number": 3046,
+        "title": "[Reconciliation] Duplicate trade IDs and fill replay on node restart",
+        "state": "open",
+        "labels": [
+          "bug",
+          "enhancement"
+        ],
+        "created_at": "2025-10-08T00:47:15Z",
+        "updated_at": "2025-10-13T19:48:24Z",
+        "author": "cjdsellers",
+        "url": "https://github.com/nautechsystems/nautilus_trader/issues/3046",
+        "comments": 1
+      },
+      {
+        "number": 3042,
+        "title": "[Reconciliation] Fails for routing clients when instrument venue differs from client venue",
+        "state": "open",
+        "labels": [
+          "bug",
+          "enhancement"
+        ],
+        "created_at": "2025-10-07T03:10:04Z",
+        "updated_at": "2025-10-14T07:42:30Z",
+        "author": "cjdsellers",
+        "url": "https://github.com/nautechsystems/nautilus_trader/issues/3042",
+        "comments": 1
+      },
+      {
+        "number": 3026,
+        "title": "Support schwab broker",
+        "state": "open",
+        "labels": [
+          "enhancement"
+        ],
+        "created_at": "2025-10-03T23:39:30Z",
+        "updated_at": "2025-10-19T09:06:29Z",
+        "author": "aixohub",
+        "url": "https://github.com/nautechsystems/nautilus_trader/issues/3026",
+        "comments": 6
+      }
+    ]
+  }
+}

@@ -1,0 +1,302 @@
+openapi: 3.1.0
+info:
+  title: Metrics Ingestion API
+  description: |
+    Internal API for ingesting metrics into QuestDB.
+    Primary transport: InfluxDB Line Protocol over HTTP (port 9000).
+    This specification documents the Python client interface.
+  version: 1.0.0
+  contact:
+    name: NautilusTrader Dev
+    url: https://github.com/nautechsystems/nautilus_trader
+
+servers:
+  - url: http://questdb:9000
+    description: QuestDB HTTP API (ILP)
+  - url: http://questdb:8812
+    description: QuestDB PostgreSQL wire protocol (queries only)
+
+paths:
+  /api/v1/ready:
+    get:
+      summary: Health check
+      description: Check if QuestDB is ready to accept requests
+      operationId: healthCheck
+      responses:
+        '200':
+          description: QuestDB is ready
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "OK"
+        '503':
+          description: QuestDB is not ready
+
+  /write:
+    post:
+      summary: Write metrics (ILP)
+      description: |
+        Write metrics using InfluxDB Line Protocol.
+        Batching recommended: 500-1000 rows per request.
+      operationId: writeMetrics
+      requestBody:
+        required: true
+        content:
+          text/plain:
+            schema:
+              type: string
+              description: InfluxDB Line Protocol format
+              example: |
+                daemon_metrics,host=server-01,env=prod fetch_count=100i,error_count=0i 1703980800000000000
+                exchange_status,exchange=binance,host=server-01 connected=true,latency_ms=15.5 1703980800000000000
+      responses:
+        '204':
+          description: Metrics written successfully
+        '400':
+          description: Invalid line protocol format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  schemas:
+    Error:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          type: string
+          description: Error message
+        line:
+          type: integer
+          description: Line number where error occurred
+
+    DaemonMetrics:
+      type: object
+      description: Metrics from CCXT DaemonRunner
+      required:
+        - timestamp
+        - host
+        - env
+        - fetch_count
+        - error_count
+        - liquidation_count
+        - uptime_seconds
+        - running
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+          description: UTC timestamp
+        host:
+          type: string
+          maxLength: 255
+          description: Hostname running daemon
+          example: "prod-server-01"
+        env:
+          type: string
+          enum: [prod, staging, dev]
+          description: Environment
+        fetch_count:
+          type: integer
+          minimum: 0
+          description: Cumulative OI/Funding fetches
+        error_count:
+          type: integer
+          minimum: 0
+          description: Cumulative errors
+        liquidation_count:
+          type: integer
+          minimum: 0
+          description: Cumulative liquidations
+        uptime_seconds:
+          type: number
+          format: double
+          minimum: 0
+          description: Time since daemon start
+        running:
+          type: boolean
+          description: Daemon running state
+        last_error:
+          type: string
+          nullable: true
+          description: Last error message
+
+    ExchangeStatus:
+      type: object
+      description: Exchange connectivity status
+      required:
+        - timestamp
+        - exchange
+        - host
+        - env
+        - connected
+        - latency_ms
+        - reconnect_count
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        exchange:
+          type: string
+          enum: [binance, bybit, okx, dydx]
+        host:
+          type: string
+          maxLength: 255
+        env:
+          type: string
+          enum: [prod, staging, dev]
+        connected:
+          type: boolean
+          description: WebSocket connected
+        latency_ms:
+          type: number
+          format: double
+          minimum: 0
+          maximum: 10000
+          description: Round-trip latency in milliseconds
+        reconnect_count:
+          type: integer
+          minimum: 0
+          description: Cumulative reconnections
+        last_message_at:
+          type: string
+          format: date-time
+          nullable: true
+        disconnected_at:
+          type: string
+          format: date-time
+          nullable: true
+
+    PipelineMetrics:
+      type: object
+      description: Data pipeline throughput metrics
+      required:
+        - timestamp
+        - exchange
+        - symbol
+        - data_type
+        - host
+        - env
+        - records_count
+        - bytes_written
+        - latency_ms
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        exchange:
+          type: string
+          enum: [binance, bybit, okx, dydx]
+        symbol:
+          type: string
+          description: Trading symbol (e.g., BTC/USDT:USDT)
+          example: "BTC/USDT:USDT"
+        data_type:
+          type: string
+          enum: [oi, funding, liquidation]
+          description: Type of data
+        host:
+          type: string
+          maxLength: 255
+        env:
+          type: string
+          enum: [prod, staging, dev]
+        records_count:
+          type: integer
+          minimum: 0
+          description: Records in this interval
+        bytes_written:
+          type: integer
+          minimum: 0
+          description: Bytes written to storage
+        latency_ms:
+          type: number
+          format: double
+          minimum: 0
+          description: Processing latency
+        gap_detected:
+          type: boolean
+          default: false
+          description: Data gap detected
+        gap_duration_seconds:
+          type: number
+          format: double
+          nullable: true
+          description: Gap duration (if detected)
+
+    TradingMetrics:
+      type: object
+      description: Real-time trading performance
+      required:
+        - timestamp
+        - strategy
+        - symbol
+        - venue
+        - env
+        - pnl
+        - unrealized_pnl
+        - position_size
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        strategy:
+          type: string
+          maxLength: 255
+          description: Strategy identifier
+        symbol:
+          type: string
+          example: "BTC/USDT:USDT"
+        venue:
+          type: string
+          enum: [binance, bybit, okx, dydx]
+        env:
+          type: string
+          enum: [prod, staging, dev]
+        pnl:
+          type: number
+          format: double
+          description: Realized PnL
+        unrealized_pnl:
+          type: number
+          format: double
+          description: Unrealized PnL
+        position_size:
+          type: number
+          format: double
+          description: Current position size
+        orders_placed:
+          type: integer
+          minimum: 0
+          default: 0
+        orders_filled:
+          type: integer
+          minimum: 0
+          default: 0
+        fill_rate:
+          type: number
+          format: double
+          minimum: 0
+          maximum: 1
+          default: 0
+        exposure:
+          type: number
+          format: double
+          minimum: 0
+          default: 0
+        drawdown:
+          type: number
+          format: double
+          minimum: 0
+          default: 0
+          description: Current drawdown percentage

@@ -1,0 +1,310 @@
+{
+  "uid": "nautilus-circuit-breaker",
+  "title": "Circuit Breaker - Drawdown Protection",
+  "description": "Portfolio-level drawdown monitoring and circuit breaker state (Spec 012)",
+  "tags": ["nautilus", "risk", "drawdown", "circuit-breaker"],
+  "timezone": "browser",
+  "refresh": "5s",
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "templating": {
+    "list": [
+      {
+        "name": "trader_id",
+        "type": "query",
+        "datasource": "QuestDB",
+        "query": "SELECT DISTINCT trader_id FROM circuit_breaker_state WHERE timestamp > now() - interval '24h'",
+        "refresh": 1,
+        "multi": false,
+        "includeAll": false
+      },
+      {
+        "name": "env",
+        "type": "custom",
+        "options": [
+          {"text": "prod", "value": "prod"},
+          {"text": "staging", "value": "staging"},
+          {"text": "dev", "value": "dev"}
+        ],
+        "current": {"text": "prod", "value": "prod"}
+      }
+    ]
+  },
+  "annotations": {
+    "list": [
+      {
+        "name": "State Changes",
+        "datasource": "QuestDB",
+        "enable": true,
+        "iconColor": "orange",
+        "rawQuery": "SELECT timestamp, state, current_drawdown FROM circuit_breaker_state WHERE trader_id = '${trader_id}' AND env = '${env}' AND state != 'active' AND timestamp BETWEEN $__timeFrom() AND $__timeTo()"
+      }
+    ]
+  },
+  "panels": [
+    {
+      "id": 1,
+      "title": "Current State",
+      "type": "stat",
+      "gridPos": {"x": 0, "y": 0, "w": 6, "h": 4},
+      "datasource": "QuestDB",
+      "targets": [
+        {
+          "rawSql": "SELECT state FROM circuit_breaker_state WHERE trader_id = '${trader_id}' AND env = '${env}' AND timestamp > now() - interval '5m' LATEST BY trader_id",
+          "format": "table"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [
+            {"type": "value", "options": {"active": {"text": "ACTIVE", "color": "green"}}},
+            {"type": "value", "options": {"warning": {"text": "WARNING", "color": "yellow"}}},
+            {"type": "value", "options": {"reducing": {"text": "REDUCING", "color": "orange"}}},
+            {"type": "value", "options": {"halted": {"text": "HALTED", "color": "red"}}}
+          ]
+        }
+      },
+      "options": {
+        "colorMode": "background",
+        "textMode": "value"
+      }
+    },
+    {
+      "id": 2,
+      "title": "Current Drawdown",
+      "type": "gauge",
+      "gridPos": {"x": 6, "y": 0, "w": 6, "h": 4},
+      "datasource": "QuestDB",
+      "targets": [
+        {
+          "rawSql": "SELECT current_drawdown * 100 as drawdown_pct FROM circuit_breaker_state WHERE trader_id = '${trader_id}' AND env = '${env}' AND timestamp > now() - interval '5m' LATEST BY trader_id",
+          "format": "table"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "max": 30,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"color": "green", "value": null},
+              {"color": "yellow", "value": 10},
+              {"color": "orange", "value": 15},
+              {"color": "red", "value": 20}
+            ]
+          }
+        }
+      },
+      "options": {
+        "showThresholdLabels": true,
+        "showThresholdMarkers": true
+      }
+    },
+    {
+      "id": 3,
+      "title": "Peak Equity",
+      "type": "stat",
+      "gridPos": {"x": 12, "y": 0, "w": 6, "h": 4},
+      "datasource": "QuestDB",
+      "targets": [
+        {
+          "rawSql": "SELECT peak_equity FROM circuit_breaker_state WHERE trader_id = '${trader_id}' AND env = '${env}' AND timestamp > now() - interval '5m' LATEST BY trader_id",
+          "format": "table"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "currencyUSD",
+          "decimals": 2,
+          "color": {"mode": "fixed", "fixedColor": "blue"}
+        }
+      },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none"
+      }
+    },
+    {
+      "id": 4,
+      "title": "Current Equity",
+      "type": "stat",
+      "gridPos": {"x": 18, "y": 0, "w": 6, "h": 4},
+      "datasource": "QuestDB",
+      "targets": [
+        {
+          "rawSql": "SELECT current_equity FROM circuit_breaker_state WHERE trader_id = '${trader_id}' AND env = '${env}' AND timestamp > now() - interval '5m' LATEST BY trader_id",
+          "format": "table"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "currencyUSD",
+          "decimals": 2,
+          "thresholds": {
+            "mode": "percentage",
+            "steps": [
+              {"color": "red", "value": null},
+              {"color": "yellow", "value": 80},
+              {"color": "green", "value": 95}
+            ]
+          }
+        }
+      },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none"
+      }
+    },
+    {
+      "id": 5,
+      "title": "Drawdown Over Time",
+      "type": "timeseries",
+      "gridPos": {"x": 0, "y": 4, "w": 12, "h": 8},
+      "datasource": "QuestDB",
+      "targets": [
+        {
+          "rawSql": "SELECT timestamp, current_drawdown * 100 as drawdown_pct FROM circuit_breaker_state WHERE trader_id = '${trader_id}' AND env = '${env}' AND timestamp BETWEEN $__timeFrom() AND $__timeTo() ORDER BY timestamp",
+          "format": "time_series"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 20,
+            "spanNulls": true
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"color": "green", "value": null},
+              {"color": "yellow", "value": 10},
+              {"color": "orange", "value": 15},
+              {"color": "red", "value": 20}
+            ]
+          }
+        }
+      },
+      "options": {
+        "legend": {"displayMode": "hidden"},
+        "tooltip": {"mode": "single"}
+      }
+    },
+    {
+      "id": 6,
+      "title": "Peak vs Current Equity",
+      "type": "timeseries",
+      "gridPos": {"x": 12, "y": 4, "w": 12, "h": 8},
+      "datasource": "QuestDB",
+      "targets": [
+        {
+          "rawSql": "SELECT timestamp, peak_equity, current_equity FROM circuit_breaker_state WHERE trader_id = '${trader_id}' AND env = '${env}' AND timestamp BETWEEN $__timeFrom() AND $__timeTo() ORDER BY timestamp",
+          "format": "time_series"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "currencyUSD",
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 10
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {"id": "byName", "options": "peak_equity"},
+            "properties": [{"id": "color", "value": {"fixedColor": "blue", "mode": "fixed"}}]
+          },
+          {
+            "matcher": {"id": "byName", "options": "current_equity"},
+            "properties": [{"id": "color", "value": {"fixedColor": "green", "mode": "fixed"}}]
+          }
+        ]
+      },
+      "options": {
+        "legend": {"displayMode": "list", "placement": "bottom"},
+        "tooltip": {"mode": "multi"}
+      }
+    },
+    {
+      "id": 7,
+      "title": "State History",
+      "type": "state-timeline",
+      "gridPos": {"x": 0, "y": 12, "w": 24, "h": 4},
+      "datasource": "QuestDB",
+      "targets": [
+        {
+          "rawSql": "SELECT timestamp, state FROM circuit_breaker_state WHERE trader_id = '${trader_id}' AND env = '${env}' AND timestamp BETWEEN $__timeFrom() AND $__timeTo() ORDER BY timestamp",
+          "format": "time_series"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [
+            {"type": "value", "options": {"active": {"text": "ACTIVE", "color": "green"}}},
+            {"type": "value", "options": {"warning": {"text": "WARNING", "color": "yellow"}}},
+            {"type": "value", "options": {"reducing": {"text": "REDUCING", "color": "orange"}}},
+            {"type": "value", "options": {"halted": {"text": "HALTED", "color": "red"}}}
+          ]
+        }
+      },
+      "options": {
+        "showValue": "auto",
+        "alignValue": "center"
+      }
+    },
+    {
+      "id": 8,
+      "title": "Recent State Changes",
+      "type": "table",
+      "gridPos": {"x": 0, "y": 16, "w": 24, "h": 6},
+      "datasource": "QuestDB",
+      "targets": [
+        {
+          "rawSql": "SELECT timestamp, state, current_drawdown * 100 as drawdown_pct, peak_equity, current_equity FROM circuit_breaker_state WHERE trader_id = '${trader_id}' AND env = '${env}' AND timestamp > now() - interval '24h' ORDER BY timestamp DESC LIMIT 50",
+          "format": "table"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": [
+          {
+            "matcher": {"id": "byName", "options": "drawdown_pct"},
+            "properties": [{"id": "unit", "value": "percent"}, {"id": "decimals", "value": 2}]
+          },
+          {
+            "matcher": {"id": "byName", "options": "peak_equity"},
+            "properties": [{"id": "unit", "value": "currencyUSD"}, {"id": "decimals", "value": 2}]
+          },
+          {
+            "matcher": {"id": "byName", "options": "current_equity"},
+            "properties": [{"id": "unit", "value": "currencyUSD"}, {"id": "decimals", "value": 2}]
+          },
+          {
+            "matcher": {"id": "byName", "options": "state"},
+            "properties": [
+              {
+                "id": "mappings",
+                "value": [
+                  {"type": "value", "options": {"active": {"text": "ACTIVE", "color": "green"}}},
+                  {"type": "value", "options": {"warning": {"text": "WARNING", "color": "yellow"}}},
+                  {"type": "value", "options": {"reducing": {"text": "REDUCING", "color": "orange"}}},
+                  {"type": "value", "options": {"halted": {"text": "HALTED", "color": "red"}}}
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "showHeader": true,
+        "sortBy": [{"displayName": "timestamp", "desc": true}]
+      }
+    }
+  ]
+}

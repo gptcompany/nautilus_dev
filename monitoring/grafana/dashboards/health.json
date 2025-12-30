@@ -1,0 +1,245 @@
+{
+  "uid": "nautilus-health",
+  "title": "Infrastructure Health",
+  "description": "CCXT DaemonRunner health monitoring (US1)",
+  "tags": ["nautilus", "health", "daemon"],
+  "timezone": "browser",
+  "refresh": "10s",
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "templating": {
+    "list": [
+      {
+        "name": "host",
+        "type": "query",
+        "datasource": "QuestDB",
+        "query": "SELECT DISTINCT host FROM daemon_metrics WHERE timestamp > now() - interval '24h'",
+        "refresh": 1,
+        "multi": false,
+        "includeAll": true,
+        "allValue": "%"
+      },
+      {
+        "name": "env",
+        "type": "custom",
+        "options": [
+          {"text": "prod", "value": "prod"},
+          {"text": "staging", "value": "staging"},
+          {"text": "dev", "value": "dev"}
+        ],
+        "current": {"text": "prod", "value": "prod"}
+      }
+    ]
+  },
+  "panels": [
+    {
+      "id": 1,
+      "title": "Daemon Status",
+      "type": "stat",
+      "gridPos": {"x": 0, "y": 0, "w": 6, "h": 4},
+      "datasource": "QuestDB",
+      "targets": [
+        {
+          "rawSql": "SELECT running FROM daemon_metrics WHERE host LIKE '${host}' AND env = '${env}' ORDER BY timestamp DESC LIMIT 1",
+          "format": "table"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [
+            {"type": "value", "options": {"true": {"text": "RUNNING", "color": "green"}}},
+            {"type": "value", "options": {"false": {"text": "STOPPED", "color": "red"}}}
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"color": "red", "value": null},
+              {"color": "green", "value": 1}
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 2,
+      "title": "Uptime",
+      "type": "stat",
+      "gridPos": {"x": 6, "y": 0, "w": 6, "h": 4},
+      "datasource": "QuestDB",
+      "targets": [
+        {
+          "rawSql": "SELECT uptime_seconds / 3600 as uptime_hours FROM daemon_metrics WHERE host LIKE '${host}' AND env = '${env}' ORDER BY timestamp DESC LIMIT 1",
+          "format": "table"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "h",
+          "decimals": 1,
+          "color": {"mode": "thresholds"},
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"color": "red", "value": null},
+              {"color": "yellow", "value": 1},
+              {"color": "green", "value": 24}
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 3,
+      "title": "Total Fetches",
+      "type": "stat",
+      "gridPos": {"x": 12, "y": 0, "w": 6, "h": 4},
+      "datasource": "QuestDB",
+      "targets": [
+        {
+          "rawSql": "SELECT fetch_count FROM daemon_metrics WHERE host LIKE '${host}' AND env = '${env}' ORDER BY timestamp DESC LIMIT 1",
+          "format": "table"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": {"mode": "palette-classic"}
+        }
+      }
+    },
+    {
+      "id": 4,
+      "title": "Total Errors",
+      "type": "stat",
+      "gridPos": {"x": 18, "y": 0, "w": 6, "h": 4},
+      "datasource": "QuestDB",
+      "targets": [
+        {
+          "rawSql": "SELECT error_count FROM daemon_metrics WHERE host LIKE '${host}' AND env = '${env}' ORDER BY timestamp DESC LIMIT 1",
+          "format": "table"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": {"mode": "thresholds"},
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"color": "green", "value": null},
+              {"color": "yellow", "value": 10},
+              {"color": "red", "value": 100}
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 5,
+      "title": "Fetch Rate (per hour)",
+      "type": "timeseries",
+      "gridPos": {"x": 0, "y": 4, "w": 12, "h": 8},
+      "datasource": "QuestDB",
+      "targets": [
+        {
+          "rawSql": "SELECT timestamp, fetch_count - lag(fetch_count) OVER (ORDER BY timestamp) as fetch_rate FROM daemon_metrics WHERE timestamp > now() - interval '24h' AND host LIKE '${host}' AND env = '${env}' SAMPLE BY 1h",
+          "format": "time_series"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "smooth",
+            "fillOpacity": 20
+          }
+        }
+      }
+    },
+    {
+      "id": 6,
+      "title": "Error Rate (per hour)",
+      "type": "timeseries",
+      "gridPos": {"x": 12, "y": 4, "w": 12, "h": 8},
+      "datasource": "QuestDB",
+      "targets": [
+        {
+          "rawSql": "SELECT timestamp, error_count - lag(error_count) OVER (ORDER BY timestamp) as error_rate FROM daemon_metrics WHERE timestamp > now() - interval '24h' AND host LIKE '${host}' AND env = '${env}' SAMPLE BY 1h",
+          "format": "time_series"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "smooth",
+            "fillOpacity": 20
+          },
+          "color": {"mode": "thresholds"},
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"color": "green", "value": null},
+              {"color": "yellow", "value": 5},
+              {"color": "red", "value": 20}
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 7,
+      "title": "Recent Errors",
+      "type": "table",
+      "gridPos": {"x": 0, "y": 12, "w": 24, "h": 6},
+      "datasource": "QuestDB",
+      "targets": [
+        {
+          "rawSql": "SELECT timestamp, host, last_error FROM daemon_metrics WHERE last_error IS NOT NULL AND host LIKE '${host}' AND env = '${env}' AND timestamp > now() - interval '24h' ORDER BY timestamp DESC LIMIT 10",
+          "format": "table"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": [
+          {
+            "matcher": {"id": "byName", "options": "timestamp"},
+            "properties": [{"id": "custom.width", "value": 200}]
+          },
+          {
+            "matcher": {"id": "byName", "options": "host"},
+            "properties": [{"id": "custom.width", "value": 150}]
+          }
+        ]
+      }
+    },
+    {
+      "id": 8,
+      "title": "Liquidations Streamed",
+      "type": "timeseries",
+      "gridPos": {"x": 0, "y": 18, "w": 24, "h": 6},
+      "datasource": "QuestDB",
+      "targets": [
+        {
+          "rawSql": "SELECT timestamp, liquidation_count - lag(liquidation_count) OVER (ORDER BY timestamp) as liq_rate FROM daemon_metrics WHERE timestamp > now() - interval '24h' AND host LIKE '${host}' AND env = '${env}' SAMPLE BY 1h",
+          "format": "time_series"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "custom": {
+            "drawStyle": "bars",
+            "fillOpacity": 50
+          }
+        }
+      }
+    }
+  ],
+  "schemaVersion": 39,
+  "version": 1
+}

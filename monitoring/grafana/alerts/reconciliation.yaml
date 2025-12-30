@@ -1,0 +1,256 @@
+# Reconciliation Alert Rules for NautilusTrader
+# These alerts monitor order reconciliation health and position discrepancies
+
+apiVersion: 1
+
+groups:
+  - orgId: 1
+    name: NautilusTrader Reconciliation Alerts
+    folder: NautilusTrader
+    interval: 30s
+    rules:
+      # Alert: Reconciliation Not Complete
+      - uid: reconciliation-not-complete
+        title: Reconciliation Not Complete
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 300
+              to: 0
+            datasourceUid: prometheus
+            model:
+              expr: nautilus_reconciliation_status{trader_id=~".*"} == 0
+              refId: A
+          - refId: C
+            relativeTimeRange:
+              from: 0
+              to: 0
+            datasourceUid: __expr__
+            model:
+              conditions:
+                - evaluator:
+                    params: [0]
+                    type: gt
+                  operator:
+                    type: and
+                  query:
+                    params: [A]
+                  reducer:
+                    type: last
+              refId: C
+              type: threshold
+        noDataState: OK
+        execErrState: Error
+        for: 5m
+        annotations:
+          summary: "TradingNode {{ $labels.trader_id }} has not completed reconciliation"
+          description: "Reconciliation has not completed for trader {{ $labels.trader_id }} for more than 5 minutes. Check venue connectivity and Redis availability."
+        labels:
+          severity: critical
+          service: nautilus
+
+      # Alert: Position Discrepancies Detected
+      - uid: position-discrepancies
+        title: Position Discrepancies Detected
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 300
+              to: 0
+            datasourceUid: prometheus
+            model:
+              expr: nautilus_position_discrepancies{trader_id=~".*"} > 0
+              refId: A
+          - refId: C
+            relativeTimeRange:
+              from: 0
+              to: 0
+            datasourceUid: __expr__
+            model:
+              conditions:
+                - evaluator:
+                    params: [0]
+                    type: gt
+                  operator:
+                    type: and
+                  query:
+                    params: [A]
+                  reducer:
+                    type: last
+              refId: C
+              type: threshold
+        noDataState: OK
+        execErrState: Error
+        for: 1m
+        annotations:
+          summary: "Position discrepancies detected for {{ $labels.trader_id }}"
+          description: "{{ $value }} position discrepancies detected between internal state and exchange for trader {{ $labels.trader_id }}. Manual review required."
+        labels:
+          severity: warning
+          service: nautilus
+
+      # Alert: High In-Flight Orders
+      - uid: high-inflight-orders
+        title: High In-Flight Order Count
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 300
+              to: 0
+            datasourceUid: prometheus
+            model:
+              expr: nautilus_inflight_orders{trader_id=~".*"} > 10
+              refId: A
+          - refId: C
+            relativeTimeRange:
+              from: 0
+              to: 0
+            datasourceUid: __expr__
+            model:
+              conditions:
+                - evaluator:
+                    params: [0]
+                    type: gt
+                  operator:
+                    type: and
+                  query:
+                    params: [A]
+                  reducer:
+                    type: last
+              refId: C
+              type: threshold
+        noDataState: OK
+        execErrState: Error
+        for: 2m
+        annotations:
+          summary: "High in-flight order count for {{ $labels.trader_id }}"
+          description: "{{ $value }} orders are awaiting confirmation for trader {{ $labels.trader_id }}. This may indicate exchange latency or connectivity issues."
+        labels:
+          severity: warning
+          service: nautilus
+
+      # Alert: Reconciliation Duration Too Long
+      - uid: reconciliation-duration-high
+        title: Reconciliation Duration Too Long
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 300
+              to: 0
+            datasourceUid: prometheus
+            model:
+              expr: nautilus_reconciliation_duration_seconds{trader_id=~".*"} > 30
+              refId: A
+          - refId: C
+            relativeTimeRange:
+              from: 0
+              to: 0
+            datasourceUid: __expr__
+            model:
+              conditions:
+                - evaluator:
+                    params: [0]
+                    type: gt
+                  operator:
+                    type: and
+                  query:
+                    params: [A]
+                  reducer:
+                    type: last
+              refId: C
+              type: threshold
+        noDataState: OK
+        execErrState: Error
+        for: 1m
+        annotations:
+          summary: "Reconciliation taking too long for {{ $labels.trader_id }}"
+          description: "Startup reconciliation took {{ $value }}s for trader {{ $labels.trader_id }}, exceeding the 30s threshold. Consider reducing lookback_mins."
+        labels:
+          severity: warning
+          service: nautilus
+
+      # Alert: External Orders Detected
+      - uid: external-orders-detected
+        title: External Orders Detected
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 300
+              to: 0
+            datasourceUid: prometheus
+            model:
+              expr: increase(nautilus_external_orders{trader_id=~".*"}[5m]) > 0
+              refId: A
+          - refId: C
+            relativeTimeRange:
+              from: 0
+              to: 0
+            datasourceUid: __expr__
+            model:
+              conditions:
+                - evaluator:
+                    params: [0]
+                    type: gt
+                  operator:
+                    type: and
+                  query:
+                    params: [A]
+                  reducer:
+                    type: last
+              refId: C
+              type: threshold
+        noDataState: OK
+        execErrState: Error
+        for: 0s
+        annotations:
+          summary: "External orders detected for {{ $labels.trader_id }}"
+          description: "Orders placed outside NautilusTrader have been detected for trader {{ $labels.trader_id }}. Verify external_order_claims configuration if these should be claimed."
+        labels:
+          severity: info
+          service: nautilus
+
+      # Alert: Fill Reconciliation Failures
+      - uid: fill-reconciliation-failures
+        title: Fill Reconciliation Failures
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 300
+              to: 0
+            datasourceUid: prometheus
+            model:
+              expr: rate(nautilus_fills_missed_total{trader_id=~".*"}[5m]) > 0
+              refId: A
+          - refId: C
+            relativeTimeRange:
+              from: 0
+              to: 0
+            datasourceUid: __expr__
+            model:
+              conditions:
+                - evaluator:
+                    params: [0]
+                    type: gt
+                  operator:
+                    type: and
+                  query:
+                    params: [A]
+                  reducer:
+                    type: last
+              refId: C
+              type: threshold
+        noDataState: OK
+        execErrState: Error
+        for: 1m
+        annotations:
+          summary: "Fill reconciliation failures for {{ $labels.trader_id }}"
+          description: "Missed fills detected during reconciliation for trader {{ $labels.trader_id }}. This may indicate data inconsistency between internal state and exchange."
+        labels:
+          severity: critical
+          service: nautilus
