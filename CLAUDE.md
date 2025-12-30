@@ -14,6 +14,36 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Development Philosophy**: KISS (Keep It Simple) + YAGNI (You Ain't Gonna Need It)
 
+---
+
+## ⚠️ CRITICAL: Long-Running Processes (nohup/setsid)
+
+**ALWAYS use `setsid` for long-running processes to ensure they survive session termination!**
+
+```bash
+# ✅ CORRECT - Process survives session termination
+setsid python3 backtest_runner.py >> /tmp/backtest.log 2>&1 &
+
+# ✅ ALSO CORRECT - Alternative with nohup
+nohup python3 long_script.py >> /tmp/script.log 2>&1 &
+disown
+
+# ❌ WRONG - Process dies when session ends
+python3 long_script.py &
+```
+
+**Rules**:
+1. **setsid** creates new session (process immune to SIGHUP)
+2. **Always redirect output** to log file (`>> /tmp/logfile.log 2>&1`)
+3. **Verify with**: `ps -o pid,ppid,stat,cmd -p <PID>` - stat should include `s`
+
+**Long-running tasks in this project**:
+- Backtests (hours/days)
+- Data wrangling (Parquet ingestion)
+- Live trading nodes
+
+---
+
 ## Architecture Documentation
 
 > **Canonical Source**: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)
