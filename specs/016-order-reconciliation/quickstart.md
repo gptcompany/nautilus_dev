@@ -1,11 +1,29 @@
 # Quickstart: Order Reconciliation
 
 **Spec**: 016-order-reconciliation
+**Status**: ✅ IMPLEMENTED
 **Prerequisites**: NautilusTrader >= 1.222.0, Redis running
 
 ## 1. Basic Setup (5 minutes)
 
-### Minimal Configuration
+### Using the Configuration Module (Recommended)
+
+```python
+from config.reconciliation import ReconciliationPreset
+from config.trading_node import LiveTradingNodeConfig
+
+# Standard production settings
+config = LiveTradingNodeConfig(
+    trader_id="TRADER-001",
+    reconciliation=ReconciliationPreset.STANDARD,
+)
+
+# Get NautilusTrader-compatible config
+exec_config = config.build_exec_engine_config()
+cache_config = config.build_cache_config()
+```
+
+### Minimal Configuration (Direct NautilusTrader)
 
 ```python
 from nautilus_trader.config import (
@@ -142,8 +160,34 @@ async def test_reconciliation():
 asyncio.run(test_reconciliation())
 ```
 
+## 7. Available Presets
+
+| Preset | Use Case | Startup Delay | Lookback |
+|--------|----------|---------------|----------|
+| `STANDARD` | Production | 10s | Unlimited |
+| `CONSERVATIVE` | Initial setup | 15s | 120 min |
+| `AGGRESSIVE` | Low-latency | 10s | 30 min |
+| `DISABLED` | Testing only | - | - |
+
+## 8. Files Implemented
+
+| File | Purpose |
+|------|---------|
+| `config/reconciliation/config.py` | ReconciliationConfig Pydantic model |
+| `config/reconciliation/presets.py` | Preset configurations |
+| `config/reconciliation/external_claims.py` | External order claims config |
+| `config/trading_node/live_config.py` | TradingNode config builder |
+| `tests/unit/test_reconciliation_config.py` | Unit tests (22 tests) |
+| `tests/unit/test_external_claims.py` | External claims tests (9 tests) |
+| `tests/integration/test_reconciliation.py` | Integration tests (19 tests) |
+| `docs/guides/reconciliation.md` | User documentation |
+| `monitoring/grafana/dashboards/reconciliation.json` | Grafana dashboard |
+| `monitoring/grafana/alerts/reconciliation.yaml` | Alert rules |
+
 ## Next Steps
 
-- [ ] Read `research.md` for detailed findings
-- [ ] Review `data-model.md` for entity definitions
-- [ ] Check `plan.md` for full implementation phases
+- [X] Read `research.md` for detailed findings
+- [X] Review `data-model.md` for entity definitions
+- [X] Check `plan.md` for full implementation phases
+- [ ] Deploy to production environment
+- [ ] Configure Grafana dashboard with your Prometheus datasource

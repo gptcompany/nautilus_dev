@@ -156,16 +156,16 @@
 
 **Purpose**: End-to-end tests with TradingNode (NFR coverage)
 
-- [ ] T033 [P] Create integration test fixtures with mock venue in tests/integration/conftest.py
-- [ ] T034 Integration test TradingNode startup reconciliation in tests/integration/test_reconciliation.py
-- [ ] T035 Integration test continuous polling in tests/integration/test_reconciliation.py
-- [ ] T036 Integration test external order detection in tests/integration/test_reconciliation.py
-- [ ] T037 [NFR-001] Test 100% fill completeness (count comparison) in tests/integration/test_reconciliation.py
-- [ ] T038 [NFR-001] Test no duplicate fill events in tests/integration/test_reconciliation.py
-- [ ] T039 [NFR-002] Performance test: startup < 30s in tests/integration/test_reconciliation.py
-- [ ] T040 [NFR-002] Performance test: periodic check < 5s in tests/integration/test_reconciliation.py
-- [ ] T041 [NFR-002] Performance test: memory usage during purge cycles in tests/integration/test_reconciliation.py
-- [ ] T042 Integration test: disconnection simulation and recovery in tests/integration/test_reconciliation.py
+- [X] T033 [P] Create integration test fixtures with mock venue in tests/integration/conftest.py
+- [X] T034 Integration test TradingNode startup reconciliation in tests/integration/test_reconciliation.py
+- [X] T035 Integration test continuous polling in tests/integration/test_reconciliation.py
+- [X] T036 Integration test external order detection in tests/integration/test_reconciliation.py
+- [X] T037 [NFR-001] Test 100% fill completeness (count comparison) in tests/integration/test_reconciliation.py
+- [X] T038 [NFR-001] Test no duplicate fill events in tests/integration/test_reconciliation.py
+- [X] T039 [NFR-002] Performance test: startup < 30s in tests/integration/test_reconciliation.py
+- [X] T040 [NFR-002] Performance test: periodic check < 5s in tests/integration/test_reconciliation.py
+- [X] T041 [NFR-002] Performance test: memory usage during purge cycles in tests/integration/test_reconciliation.py
+- [X] T042 Integration test: disconnection simulation and recovery in tests/integration/test_reconciliation.py
 
 ---
 
