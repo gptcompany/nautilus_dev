@@ -18,12 +18,24 @@ from strategies.common.recovery.models import (
     RecoveryStatus,
     StrategySnapshot,
 )
+from strategies.common.recovery.provider import PositionRecoveryProvider
+from strategies.common.recovery.recoverable_strategy import (
+    RecoverableStrategy,
+    RecoverableStrategyConfig,
+)
 
 __all__ = [
+    # Config
     "RecoveryConfig",
+    # Models
     "RecoveryStatus",
     "RecoveryState",
     "PositionSnapshot",
     "IndicatorState",
     "StrategySnapshot",
+    # Provider
+    "PositionRecoveryProvider",
+    # Strategy
+    "RecoverableStrategy",
+    "RecoverableStrategyConfig",
 ]

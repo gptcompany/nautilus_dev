@@ -20,9 +20,9 @@
 
 **Purpose**: Project initialization and directory structure
 
-- [ ] T001 Create recovery module directory structure: `strategies/common/recovery/`
-- [ ] T002 Create `__init__.py` files for recovery module in `strategies/common/recovery/__init__.py`
-- [ ] T003 [P] Create test directory structure: `tests/unit/recovery/` and `tests/integration/recovery/`
+- [x] T001 Create recovery module directory structure: `strategies/common/recovery/`
+- [x] T002 Create `__init__.py` files for recovery module in `strategies/common/recovery/__init__.py`
+- [x] T003 [P] Create test directory structure: `tests/unit/recovery/` and `tests/integration/recovery/`
 
 ---
 
@@ -32,15 +32,15 @@
 
 **CRITICAL**: No FR implementation can begin until this phase is complete
 
-- [ ] T004 Create RecoveryConfig Pydantic model in `strategies/common/recovery/config.py` (from data-model.md)
-- [ ] T005 [P] Create RecoveryStatus enum in `strategies/common/recovery/models.py`
-- [ ] T006 [P] Create RecoveryState Pydantic model in `strategies/common/recovery/models.py`
-- [ ] T007 [P] Create PositionSnapshot Pydantic model in `strategies/common/recovery/models.py`
-- [ ] T007a [P] Create IndicatorState Pydantic model in `strategies/common/recovery/models.py` (from data-model.md)
-- [ ] T007b [P] Create StrategySnapshot Pydantic model in `strategies/common/recovery/models.py` (from data-model.md)
-- [ ] T008 Create recovery event schemas in `strategies/common/recovery/events.py` (from contracts/recovery_events.py)
-- [ ] T009 [P] Create test fixtures with NautilusTrader TestKit in `tests/conftest.py`
-- [ ] T010 Create TradingNode production config template with recovery settings in `config/trading_node_recovery.py`
+- [x] T004 Create RecoveryConfig Pydantic model in `strategies/common/recovery/config.py` (from data-model.md)
+- [x] T005 [P] Create RecoveryStatus enum in `strategies/common/recovery/models.py`
+- [x] T006 [P] Create RecoveryState Pydantic model in `strategies/common/recovery/models.py`
+- [x] T007 [P] Create PositionSnapshot Pydantic model in `strategies/common/recovery/models.py`
+- [x] T007a [P] Create IndicatorState Pydantic model in `strategies/common/recovery/models.py` (from data-model.md)
+- [x] T007b [P] Create StrategySnapshot Pydantic model in `strategies/common/recovery/models.py` (from data-model.md)
+- [x] T008 Create recovery event schemas in `strategies/common/recovery/events.py` (from contracts/recovery_events.py)
+- [x] T009 [P] Create test fixtures with NautilusTrader TestKit in `tests/conftest.py`
+- [x] T010 Create TradingNode production config template with recovery settings in `config/trading_node_recovery.py`
 
 **Checkpoint**: Foundation ready - FR implementation can now begin
 

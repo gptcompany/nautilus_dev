@@ -18,11 +18,16 @@ Implementation Note:
 
 from __future__ import annotations
 
+import logging
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     from nautilus_trader.model.identifiers import TraderId
     from nautilus_trader.model.position import Position
+
+
+# Module logger
+_log = logging.getLogger(__name__)
 
 
 class PositionRecoveryProvider:
@@ -33,6 +38,7 @@ class PositionRecoveryProvider:
 
     Attributes:
         cache: NautilusTrader cache instance for position access.
+        logger: Optional custom logger instance.
 
     Example:
         >>> provider = PositionRecoveryProvider(cache=node.cache)
@@ -41,13 +47,19 @@ class PositionRecoveryProvider:
         >>> reconciled, discrepancies = provider.reconcile_positions(cached, exchange)
     """
 
-    def __init__(self, cache: Any) -> None:
+    def __init__(
+        self,
+        cache: Any,
+        logger: logging.Logger | None = None,
+    ) -> None:
         """Initialize the PositionRecoveryProvider.
 
         Args:
             cache: NautilusTrader cache instance.
+            logger: Optional custom logger. If None, uses module logger.
         """
         self._cache = cache
+        self._log = logger or _log
 
     def get_cached_positions(self, trader_id: str | TraderId) -> list[Position]:
         """Load positions from cache.
@@ -62,7 +74,26 @@ class PositionRecoveryProvider:
         Returns:
             List of cached positions.
         """
-        return list(self._cache.positions())
+        self._log.info("Loading cached positions for trader_id=%s", trader_id)
+
+        positions = list(self._cache.positions())
+
+        self._log.info(
+            "Loaded %d positions from cache for trader_id=%s",
+            len(positions),
+            trader_id,
+        )
+
+        # Log individual positions at DEBUG level
+        for pos in positions:
+            self._log.debug(
+                "Cached position: instrument=%s side=%s qty=%s",
+                pos.instrument_id.value,
+                pos.side.value,
+                pos.quantity.as_decimal(),
+            )
+
+        return positions
 
     def get_exchange_positions(self, trader_id: str | TraderId) -> list[Position]:
         """Query current positions from exchange.
@@ -80,9 +111,28 @@ class PositionRecoveryProvider:
         Returns:
             List of positions reported by exchange.
         """
+        self._log.info("Querying exchange positions for trader_id=%s", trader_id)
+
         # Default implementation returns cache positions
         # In production, override to query exchange directly
-        return list(self._cache.positions())
+        positions = list(self._cache.positions())
+
+        self._log.info(
+            "Retrieved %d positions from exchange for trader_id=%s",
+            len(positions),
+            trader_id,
+        )
+
+        # Log individual positions at DEBUG level
+        for pos in positions:
+            self._log.debug(
+                "Exchange position: instrument=%s side=%s qty=%s",
+                pos.instrument_id.value,
+                pos.side.value,
+                pos.quantity.as_decimal(),
+            )
+
+        return positions
 
     def reconcile_positions(
         self,
@@ -117,6 +167,12 @@ class PositionRecoveryProvider:
             >>> for msg in discrepancies:
             ...     logger.warning(msg)
         """
+        self._log.info(
+            "Reconciling positions: cached=%d exchange=%d",
+            len(cached),
+            len(exchange),
+        )
+
         reconciled: list[Position] = []
         discrepancies: list[str] = []
 
@@ -141,22 +197,34 @@ class PositionRecoveryProvider:
 
                 # Check for quantity mismatch
                 if cached_qty != ex_qty:
-                    discrepancies.append(
+                    msg = (
                         f"Quantity mismatch for {instrument_id}: "
                         f"cached={cached_qty}, exchange={ex_qty}"
                     )
+                    discrepancies.append(msg)
+                    self._log.warning(msg)
 
                 # Check for side mismatch
                 if cached_side != ex_side:
-                    discrepancies.append(
+                    msg = (
                         f"Side mismatch for {instrument_id}: "
                         f"cached={cached_side}, exchange={ex_side}"
                     )
+                    discrepancies.append(msg)
+                    self._log.warning(msg)
+
+                if cached_qty == ex_qty and cached_side == ex_side:
+                    self._log.debug(
+                        "Position matches: %s %s %s",
+                        instrument_id,
+                        ex_side,
+                        ex_qty,
+                    )
             else:
                 # External position (on exchange but not in cache)
-                discrepancies.append(
-                    f"External position detected: {instrument_id} {ex_side} {ex_qty}"
-                )
+                msg = f"External position detected: {instrument_id} {ex_side} {ex_qty}"
+                discrepancies.append(msg)
+                self._log.warning(msg)
 
             # Exchange is source of truth - add to reconciled
             reconciled.append(ex_pos)
@@ -164,9 +232,17 @@ class PositionRecoveryProvider:
         # Find positions closed on exchange (in cache but not on exchange) - O(n)
         for instrument_id in cached_map:
             if instrument_id not in exchange_map:
-                discrepancies.append(
+                msg = (
                     f"Position closed on exchange: {instrument_id} "
                     f"(missing from exchange)"
                 )
+                discrepancies.append(msg)
+                self._log.warning(msg)
+
+        self._log.info(
+            "Reconciliation complete: reconciled=%d discrepancies=%d",
+            len(reconciled),
+            len(discrepancies),
+        )
 
         return reconciled, discrepancies

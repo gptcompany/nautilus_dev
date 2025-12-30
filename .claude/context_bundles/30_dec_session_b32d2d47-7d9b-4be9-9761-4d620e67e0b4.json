@@ -1,383 +1,293 @@
 {
   "session_id": "b32d2d47-7d9b-4be9-9761-4d620e67e0b4",
-  "created_at": "2025-12-30T13:42:26.044966",
+  "created_at": "2025-12-30T19:33:53.201732",
   "operations": [
     {
-      "operation": "bash",
-      "timestamp": "2025-12-30T13:42:26.044988",
-      "command": ".specify/scripts/bash/setup-plan.sh --json 017-position-recovery",
-      "description": "Setup plan for position recovery spec"
-    },
-    {
-      "operation": "bash",
-      "timestamp": "2025-12-30T13:42:32.708209",
-      "command": "git checkout -b 017-position-recovery",
-      "description": "Create feature branch for position recovery"
-    },
-    {
-      "operation": "bash",
-      "timestamp": "2025-12-30T13:42:40.333394",
-      "command": ".specify/scripts/bash/setup-plan.sh --json 017-position-recovery",
-      "description": "Setup plan for position recovery spec"
-    },
-    {
       "operation": "read",
-      "timestamp": "2025-12-30T13:42:47.165748",
-      "file_path": "/media/sam/1TB/nautilus_dev/specs/017-position-recovery/plan.md"
-    },
-    {
-      "operation": "todowrite",
-      "timestamp": "2025-12-30T13:42:56.786238",
-      "todo_count": 7
-    },
-    {
-      "operation": "glob",
-      "timestamp": "2025-12-30T13:43:03.324287",
-      "pattern": "specs/018-*/spec.md"
-    },
-    {
-      "operation": "glob",
-      "timestamp": "2025-12-30T18:20:58.172360",
-      "pattern": "specs/016-*/spec.md"
-    },
-    {
-      "operation": "glob",
-      "timestamp": "2025-12-30T18:20:58.178407",
-      "pattern": "specs/018-*/spec.md"
-    },
-    {
-      "operation": "task",
-      "timestamp": "2025-12-30T18:20:58.185466",
-      "subagent_type": "nautilus-docs-specialist",
-      "prompt": "Research NautilusTrader's native position recovery mechanisms using Context7 and Discord knowledge. ..."
-    },
-    {
-      "operation": "bash",
-      "timestamp": "2025-12-30T18:21:06.636008",
-      "command": "grep -r -l \"position.*recovery\\|recover.*position\\|reconcil\\|startup.*position\" /media/sam/1TB/nautilus_dev/docs/discord/ 2>/dev/null | head -20",
-      "description": "Search Discord for position recovery discussions"
-    },
-    {
-      "operation": "bash",
-      "timestamp": "2025-12-30T18:21:06.654480",
-      "command": "grep -r -l \"redis\\|cache.*position\\|persist\" /media/sam/1TB/nautilus_dev/docs/discord/ 2>/dev/null | head -20",
-      "description": "Search Discord for Redis/cache discussions"
-    },
-    {
-      "operation": "read",
-      "timestamp": "2025-12-30T18:21:06.697748",
-      "file_path": "/media/sam/1TB/nautilus_dev/docs/nautilus/nautilus-trader-changelog.json"
-    },
-    {
-      "operation": "bash",
-      "timestamp": "2025-12-30T18:21:17.678297",
-      "command": "grep -n -B5 -A15 \"reconcil\\|position.*recover\\|recover.*position\" /media/sam/1TB/nautilus_dev/docs/discord/help.md 2>/dev/null | head -200",
-      "description": "Extract reconciliation discussions from help.md"
-    },
-    {
-      "operation": "bash",
-      "timestamp": "2025-12-30T18:21:17.681588",
-      "command": "grep -n -B5 -A15 \"redis\\|cache.*config\\|CacheConfig\\|persist\" /media/sam/1TB/nautilus_dev/docs/discord/help.md 2>/dev/null | head -200",
-      "description": "Extract Redis/cache discussions from help.md"
-    },
-    {
-      "operation": "bash",
-      "timestamp": "2025-12-30T18:21:17.703339",
-      "command": "grep -n -B5 -A15 \"reconcil\\|position.*recover\" /media/sam/1TB/nautilus_dev/docs/discord/general.md 2>/dev/null | head -200",
-      "description": "Extract reconciliation from general.md"
-    },
-    {
-      "operation": "bash",
-      "timestamp": "2025-12-30T18:21:17.723167",
-      "command": "grep -n -B5 -A15 \"reconcil\\|startup\\|on_start\" /media/sam/1TB/nautilus_dev/docs/discord/binance.md 2>/dev/null | head -200",
-      "description": "Extract startup/reconciliation from binance.md"
-    },
-    {
-      "operation": "bash",
-      "timestamp": "2025-12-30T18:21:28.983767",
-      "command": "grep -n -B5 -A15 \"TradingNodeConfig\\|LiveExecEngineConfig\\|reconciliation_startup\" /media/sam/1TB/nautilus_dev/docs/discord/questions.md 2>/dev/null | head -200",
-      "description": "Extract TradingNode config from questions.md"
-    },
-    {
-      "operation": "bash",
-      "timestamp": "2025-12-30T18:21:29.000825",
-      "command": "grep -n -B3 -A20 \"on_start.*warm\\|warm.*up\\|request_bars\\|historical.*data\" /media/sam/1TB/nautilus_dev/docs/discord/help.md 2>/dev/null | head -150",
-      "description": "Extract warmup patterns from help.md"
-    },
-    {
-      "operation": "bash",
-      "timestamp": "2025-12-30T18:21:29.019769",
-      "command": "grep -n -B3 -A15 \"external_order_claims\\|strategy.*state\\|restore\\|recovery\" /media/sam/1TB/nautilus_dev/docs/discord/help.md 2>/dev/null | head -150",
-      "description": "Extract strategy state restoration patterns"
-    },
-    {
-      "operation": "webfetch",
-      "timestamp": "2025-12-30T18:21:39.351385",
-      "url": "https://nautilustrader.io/docs/nightly/concepts/live",
-      "prompt": "Extract all information about: 1) Position recovery on startup 2) Reconciliation system (reconciliat..."
-    },
-    {
-      "operation": "webfetch",
-      "timestamp": "2025-12-30T18:21:39.354018",
-      "url": "https://nautilustrader.io/docs/nightly/concepts/cache",
-      "prompt": "Extract all information about: 1) Redis database configuration for position persistence 2) CacheConf..."
-    },
-    {
-      "operation": "bash",
-      "timestamp": "2025-12-30T18:22:03.831699",
-      "command": "grep -n -B3 -A20 \"on_start\\|strategy.*state\\|StateMachine\\|FSM\\|component.*state\" /media/sam/1TB/nautilus_dev/docs/discord/questions.md 2>/dev/null | head -150",
-      "description": "Search strategy state patterns in questions"
-    },
-    {
-      "operation": "bash",
-      "timestamp": "2025-12-30T18:22:03.844378",
-      "command": "grep -n -B3 -A15 \"cache.position\\|cache.order\\|self.cache\\|cache_database\" /media/sam/1TB/nautilus_dev/docs/discord/help.md 2>/dev/null | head -150",
-      "description": "Search cache patterns for position access"
-    },
-    {
-      "operation": "read",
-      "timestamp": "2025-12-30T18:22:10.546233",
-      "file_path": "/media/sam/1TB/nautilus_dev/specs/017-position-recovery/plan.md"
-    },
-    {
-      "operation": "read",
-      "timestamp": "2025-12-30T18:23:16.036073",
-      "file_path": "/media/sam/1TB/nautilus_dev/specs/016-order-reconciliation/spec.md"
-    },
-    {
-      "operation": "read",
-      "timestamp": "2025-12-30T18:23:16.041067",
-      "file_path": "/media/sam/1TB/nautilus_dev/specs/018-redis-cache-backend/spec.md"
-    },
-    {
-      "operation": "todowrite",
-      "timestamp": "2025-12-30T18:23:26.622942",
-      "todo_count": 7
-    },
-    {
-      "operation": "write",
-      "timestamp": "2025-12-30T18:24:01.859484",
-      "file_path": "/media/sam/1TB/nautilus_dev/specs/017-position-recovery/research.md",
-      "content_length": 5834
-    },
-    {
-      "operation": "todowrite",
-      "timestamp": "2025-12-30T18:24:10.856432",
-      "todo_count": 7
-    },
-    {
-      "operation": "write",
-      "timestamp": "2025-12-30T18:24:44.566230",
-      "file_path": "/media/sam/1TB/nautilus_dev/specs/017-position-recovery/data-model.md",
-      "content_length": 8083
-    },
-    {
-      "operation": "todowrite",
-      "timestamp": "2025-12-30T18:24:51.919951",
-      "todo_count": 7
-    },
-    {
-      "operation": "bash",
-      "timestamp": "2025-12-30T18:24:59.507469",
-      "command": "mkdir -p /media/sam/1TB/nautilus_dev/specs/017-position-recovery/contracts",
-      "description": "Create contracts directory"
-    },
-    {
-      "operation": "write",
-      "timestamp": "2025-12-30T18:25:18.556124",
-      "file_path": "/media/sam/1TB/nautilus_dev/specs/017-position-recovery/contracts/recovery_interface.py",
-      "content_length": 4272
-    },
-    {
-      "operation": "write",
-      "timestamp": "2025-12-30T18:25:39.740398",
-      "file_path": "/media/sam/1TB/nautilus_dev/specs/017-position-recovery/contracts/recovery_events.py",
-      "content_length": 5669
-    },
-    {
-      "operation": "todowrite",
-      "timestamp": "2025-12-30T18:25:47.044923",
-      "todo_count": 7
-    },
-    {
-      "operation": "write",
-      "timestamp": "2025-12-30T18:26:22.345398",
-      "file_path": "/media/sam/1TB/nautilus_dev/specs/017-position-recovery/quickstart.md",
-      "content_length": 6242
-    },
-    {
-      "operation": "todowrite",
-      "timestamp": "2025-12-30T18:26:29.698329",
-      "todo_count": 7
-    },
-    {
-      "operation": "bash",
-      "timestamp": "2025-12-30T18:26:37.249897",
-      "command": ".specify/scripts/bash/update-agent-context.sh claude 2>&1 || echo \"Script exit code: $?\"",
-      "description": "Update agent context files"
-    },
-    {
-      "operation": "todowrite",
-      "timestamp": "2025-12-30T18:26:47.383086",
-      "todo_count": 7
-    },
-    {
-      "operation": "write",
-      "timestamp": "2025-12-30T18:27:37.224154",
-      "file_path": "/media/sam/1TB/nautilus_dev/specs/017-position-recovery/plan.md",
-      "content_length": 10230
-    },
-    {
-      "operation": "todowrite",
-      "timestamp": "2025-12-30T18:27:47.350721",
-      "todo_count": 7
-    },
-    {
-      "operation": "bash",
-      "timestamp": "2025-12-30T18:31:01.155402",
-      "command": ".specify/scripts/bash/check-prerequisites.sh --json 017",
-      "description": "Check prerequisites for task generation"
-    },
-    {
-      "operation": "bash",
-      "timestamp": "2025-12-30T18:31:08.163930",
-      "command": ".specify/scripts/bash/check-prerequisites.sh --json",
-      "description": "Check prerequisites for task generation"
-    },
-    {
-      "operation": "read",
-      "timestamp": "2025-12-30T18:31:17.774536",
-      "file_path": "/media/sam/1TB/nautilus_dev/specs/017-position-recovery/spec.md"
-    },
-    {
-      "operation": "read",
-      "timestamp": "2025-12-30T18:31:17.780613",
-      "file_path": "/media/sam/1TB/nautilus_dev/specs/017-position-recovery/plan.md"
-    },
-    {
-      "operation": "read",
-      "timestamp": "2025-12-30T18:31:17.787956",
-      "file_path": "/media/sam/1TB/nautilus_dev/specs/017-position-recovery/data-model.md"
-    },
-    {
-      "operation": "read",
-      "timestamp": "2025-12-30T18:31:17.795016",
-      "file_path": "/media/sam/1TB/nautilus_dev/specs/017-position-recovery/research.md"
-    },
-    {
-      "operation": "read",
-      "timestamp": "2025-12-30T18:31:17.802050",
-      "file_path": "/media/sam/1TB/nautilus_dev/.specify/templates/tasks-template.md"
-    },
-    {
-      "operation": "glob",
-      "timestamp": "2025-12-30T18:31:24.178687",
-      "pattern": "specs/017-position-recovery/contracts/*.py"
-    },
-    {
-      "operation": "read",
-      "timestamp": "2025-12-30T18:31:30.856321",
-      "file_path": "/media/sam/1TB/nautilus_dev/specs/017-position-recovery/contracts/recovery_interface.py"
-    },
-    {
-      "operation": "read",
-      "timestamp": "2025-12-30T18:31:30.883608",
+      "timestamp": "2025-12-30T19:33:53.201747",
       "file_path": "/media/sam/1TB/nautilus_dev/specs/017-position-recovery/contracts/recovery_events.py"
     },
     {
-      "operation": "write",
-      "timestamp": "2025-12-30T18:32:33.559014",
-      "file_path": "/media/sam/1TB/nautilus_dev/specs/017-position-recovery/tasks.md",
-      "content_length": 12477
+      "operation": "bash",
+      "timestamp": "2025-12-30T19:33:53.872110",
+      "command": "ls -la /media/sam/1TB/nautilus_dev/tests/unit/recovery/ 2>/dev/null",
+      "description": "List unit recovery tests"
     },
     {
       "operation": "bash",
-      "timestamp": "2025-12-30T18:32:51.928588",
-      "command": ".specify/scripts/bash/check-prerequisites.sh --json --require-tasks --include-tasks",
-      "description": "Check prerequisites for analysis"
+      "timestamp": "2025-12-30T19:33:53.892723",
+      "command": "ls -la /media/sam/1TB/nautilus_dev/tests/integration/recovery/ 2>/dev/null",
+      "description": "List integration recovery tests"
     },
     {
       "operation": "read",
-      "timestamp": "2025-12-30T18:33:01.675837",
-      "file_path": "/media/sam/1TB/nautilus_dev/specs/017-position-recovery/spec.md"
+      "timestamp": "2025-12-30T19:33:59.865432",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/unit/recovery/test_position_loading.py"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-30T19:34:01.699792",
+      "command": "grep -r \"request_bars\\|on_historical\\|request_\" /media/sam/1TB/nautilus_dev/docs/discord/ --include=\"*.md\" | head -20",
+      "description": "Search Discord for request_bars pattern"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-30T19:34:01.722299",
+      "command": "ls -la /media/sam/1TB/nautilus_dev/strategies/common/recovery/",
+      "description": "Check existing recovery files"
     },
     {
       "operation": "read",
-      "timestamp": "2025-12-30T18:33:01.685621",
-      "file_path": "/media/sam/1TB/nautilus_dev/specs/017-position-recovery/plan.md"
+      "timestamp": "2025-12-30T19:34:05.282596",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/unit/recovery/test_reconciliation.py"
     },
     {
       "operation": "read",
-      "timestamp": "2025-12-30T18:33:01.693734",
-      "file_path": "/media/sam/1TB/nautilus_dev/specs/017-position-recovery/tasks.md"
+      "timestamp": "2025-12-30T19:34:08.410821",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/recovery/events.py"
     },
     {
       "operation": "read",
-      "timestamp": "2025-12-30T18:33:01.701402",
-      "file_path": "/media/sam/1TB/nautilus_dev/.specify/memory/constitution.md"
+      "timestamp": "2025-12-30T19:34:08.423412",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/recovery/provider.py"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-30T19:34:11.639792",
+      "command": "find /media/sam/1TB/nautilus_dev/tests -name \"conftest.py\" | head -5",
+      "description": "Find conftest files"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-30T19:34:17.466013",
+      "command": "grep -r \"def on_bar\\|def on_historical\\|def request_bars\" /media/sam/1TB/nautilus_dev/strategies/ --include=\"*.py\" | head -20",
+      "description": "Find bar handling patterns"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-30T19:34:17.477891",
+      "command": "grep -r \"from nautilus_trader\" /media/sam/1TB/nautilus_dev/strategies/examples/risk_managed_strategy.py | head -20",
+      "description": "Check imports pattern"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-30T19:34:18.971134",
+      "command": "cat /media/sam/1TB/nautilus_dev/tests/unit/recovery/__init__.py 2>/dev/null || echo \"File not found\"",
+      "description": "Check unit recovery init"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-30T19:34:20.403313",
+      "command": "find /media/sam/1TB/nautilus_dev/tests -path \"*/unit/conftest.py\" 2>/dev/null | head -5",
+      "description": "Find unit conftest"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-30T19:34:23.393719",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/examples/risk_managed_strategy.py"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-30T19:34:28.374933",
+      "command": "ls -la /media/sam/1TB/nautilus_dev/tests/unit/ 2>/dev/null",
+      "description": "Check unit test directory"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-30T19:34:30.918153",
+      "command": "grep -rn \"request_bars\\|on_historical_data\\|request_aggregated_bars\" /media/sam/1TB/nautilus_dev/docs/discord/ --include=\"*.md\" -A 2 -B 2 | head -80",
+      "description": "Search for bar request patterns in Discord"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-30T19:34:34.150598",
+      "command": "cat /media/sam/1TB/nautilus_dev/tests/conftest.py 2>/dev/null | head -100",
+      "description": "Check root conftest"
     },
     {
       "operation": "todowrite",
-      "timestamp": "2025-12-30T18:35:56.074483",
-      "todo_count": 6
+      "timestamp": "2025-12-30T19:34:42.036074",
+      "todo_count": 8
     },
     {
-      "operation": "edit",
-      "timestamp": "2025-12-30T18:36:05.646823",
-      "file_path": "/media/sam/1TB/nautilus_dev/specs/017-position-recovery/spec.md",
-      "old_string": "#### FR-002: Strategy State Restoration\n- Restore indicator warmup state\n- Restore pending order ref..."
+      "operation": "bash",
+      "timestamp": "2025-12-30T19:34:43.599751",
+      "command": "grep -r \"mock_cache\" /media/sam/1TB/nautilus_dev/tests/ --include=\"*.py\" | head -20",
+      "description": "Search for mock_cache fixture"
     },
     {
-      "operation": "edit",
-      "timestamp": "2025-12-30T18:36:13.469552",
-      "file_path": "/media/sam/1TB/nautilus_dev/specs/017-position-recovery/spec.md",
-      "old_string": "#### NFR-001: Recovery Time\n- Position recovery < 5 seconds\n- Full state recovery < 30 seconds"
+      "operation": "bash",
+      "timestamp": "2025-12-30T19:34:48.248752",
+      "command": "grep -r \"OrderType\\|STOP_MARKET\\|STOP_LIMIT\" /media/sam/1TB/nautilus_dev/strategies/ --include=\"*.py\" | head -10",
+      "description": "Find OrderType imports"
     },
     {
-      "operation": "edit",
-      "timestamp": "2025-12-30T18:36:21.749172",
-      "file_path": "/media/sam/1TB/nautilus_dev/specs/017-position-recovery/spec.md",
-      "old_string": "    def on_start(self) -> None:\n        # Check if we have existing positions\n        positions = se..."
+      "operation": "read",
+      "timestamp": "2025-12-30T19:34:51.461538",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/integration/recovery/conftest.py"
     },
     {
-      "operation": "todowrite",
-      "timestamp": "2025-12-30T18:36:30.138702",
-      "todo_count": 6
+      "operation": "bash",
+      "timestamp": "2025-12-30T19:34:54.235313",
+      "command": "grep -rn \"OrderType\" /media/sam/1TB/nautilus_dev/docs/discord/ --include=\"*.md\" | head -10",
+      "description": "Find OrderType usage in Discord"
     },
     {
-      "operation": "edit",
-      "timestamp": "2025-12-30T18:36:43.575324",
-      "file_path": "/media/sam/1TB/nautilus_dev/specs/017-position-recovery/plan.md",
-      "old_string": "## File Structure\n\n```\nstrategies/\n├── common/\n│   ├── __init__.py\n│   ├── recoverable_strategy.py  ..."
-    },
-    {
-      "operation": "todowrite",
-      "timestamp": "2025-12-30T18:36:51.397207",
-      "todo_count": 6
-    },
-    {
-      "operation": "edit",
-      "timestamp": "2025-12-30T18:37:02.266188",
-      "file_path": "/media/sam/1TB/nautilus_dev/specs/017-position-recovery/tasks.md",
-      "old_string": "- [ ] T005 [P] Create RecoveryStatus enum in `strategies/common/recovery/models.py`\n- [ ] T006 [P] C..."
-    },
-    {
-      "operation": "edit",
-      "timestamp": "2025-12-30T18:37:12.085446",
-      "file_path": "/media/sam/1TB/nautilus_dev/specs/017-position-recovery/tasks.md",
-      "old_string": "## Phase 6: FR-004 - Event Replay (Priority: P3 - Optional)\n\n**Goal**: Replay missed events from cac..."
-    },
-    {
-      "operation": "edit",
-      "timestamp": "2025-12-30T18:37:24.670313",
-      "file_path": "/media/sam/1TB/nautilus_dev/specs/017-position-recovery/tasks.md",
-      "old_string": "## Summary\n\n| Metric | Count |\n|--------|-------|\n| **Total Tasks** | 51 |\n| **Setup Tasks** | 3 |\n|..."
+      "operation": "bash",
+      "timestamp": "2025-12-30T19:35:00.323738",
+      "command": "grep -rn \"from nautilus_trader.model.enums import\" /media/sam/1TB/nautilus_dev/strategies/ --include=\"*.py\" | head -10",
+      "description": "Find enum imports"
     },
     {
       "operation": "todowrite",
-      "timestamp": "2025-12-30T18:37:32.746186",
-      "todo_count": 6
+      "timestamp": "2025-12-30T19:35:01.289561",
+      "todo_count": 4
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-30T19:35:06.968398",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/recovery/provider.py"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-30T19:35:27.141523",
+      "command": "ls -la /media/sam/1TB/nautilus_dev/strategies/common/recovery/",
+      "description": "Check recovery module files"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-30T19:35:30.302541",
+      "command": "cat > /media/sam/1TB/nautilus_dev/strategies/common/recovery/provider.py << 'EOF'\n\"\"\"Position Recovery Provider (Spec 017).\n\nThis module implements the PositionRecoveryProvider for loading positions\nfrom cache and reconciling them with exchange state.\n\nKey Responsibilities:\n- Load cached positions from NautilusTrader cache\n- Query current exchange positions\n- Reconcile discrepancies (exchange is source of truth)\n- Generate discrepancy messages for logging\n\nImplementation Note:\n    Selected via Alpha-Evolve process from 3 approaches:\n    - Approach A: Simple Iterative (O(n*m)) - rejected for performance\n    - Approach B: Dictionary-Based (O(n+m)) - SELECTED (winner)\n    - Approach C: Dataclass-Based - rejected for over-engineering\n\"\"\"\n\nfrom __future__ import annotations\n\nimport logging\nfrom typing import TYPE_CHECKING, Any\n\nif TYPE_CHECKING:\n    from nautilus_trader.model.identifiers import TraderId\n    from nautilus_trader.model.position import Position\n\n\n# Module logger\n_log = logging.getLogger(__name__)\n\n\nclass PositionRecoveryProvider:\n    \"\"\"Provider for position recovery and reconciliation.\n\n    Implements the PositionRecoveryProvider interface from Spec 017.\n    Uses dictionary-based lookups for O(n+m) reconciliation complexity.\n\n    Attributes:\n        cache: NautilusTrader cache instance for position access.\n        logger: Optional custom logger instance.\n\n    Example:\n        >>> provider = PositionRecoveryProvider(cache=node.cache)\n        >>> cached = provider.get_cached_positions(trader_id=\"TRADER-001\")\n        >>> exchange = provider.get_exchange_positions(trader_id=\"TRADER-001\")\n        >>> reconciled, discrepancies = provider.reconcile_positions(cached, exchange)\n    \"\"\"\n\n    def __init__(\n        self,\n        cache: Any,\n        logger: logging.Logger | None = None,\n    ) -> None:\n        \"\"\"Initialize the PositionRecoveryProvider.\n\n        Args:\n            cache: NautilusTrader cache instance.\n            logger: Optional custom logger. If None, uses module logger.\n        \"\"\"\n        self._cache = cache\n        self._log = logger or _log\n\n    def get_cached_positions(self, trader_id: str | TraderId) -> list[Position]:\n        \"\"\"Load positions from cache.\n\n        Retrieves all positions from the NautilusTrader cache.\n        Both open and closed positions are returned; filtering is\n        the caller's responsibility.\n\n        Args:\n            trader_id: The trader identifier (used for logging context).\n\n        Returns:\n            List of cached positions.\n        \"\"\"\n        self._log.info(\"Loading cached positions for trader_id=%s\", trader_id)\n        \n        positions = list(self._cache.positions())\n        \n        self._log.info(\n            \"Loaded %d positions from cache for trader_id=%s\",\n            len(positions),\n            trader_id,\n        )\n        \n        # Log individual positions at DEBUG level\n        for pos in positions:\n            self._log.debug(\n                \"Cached position: instrument=%s side=%s qty=%s\",\n                pos.instrument_id.value,\n                pos.side.value,\n                pos.quantity.as_decimal(),\n            )\n        \n        return positions\n\n    def get_exchange_positions(self, trader_id: str | TraderId) -> list[Position]:\n        \"\"\"Query current positions from exchange.\n\n        In live trading, this would query the exchange directly.\n        For testing/simulation, returns positions from cache.\n\n        Note:\n            In production, this method should be overridden to query\n            the actual exchange via the execution client.\n\n        Args:\n            trader_id: The trader identifier.\n\n        Returns:\n            List of positions reported by exchange.\n        \"\"\"\n        self._log.info(\"Querying exchange positions for trader_id=%s\", trader_id)\n        \n        # Default implementation returns cache positions\n        # In production, override to query exchange directly\n        positions = list(self._cache.positions())\n        \n        self._log.info(\n            \"Retrieved %d positions from exchange for trader_id=%s\",\n            len(positions),\n            trader_id,\n        )\n        \n        # Log individual positions at DEBUG level\n        for pos in positions:\n            self._log.debug(\n                \"Exchange position: instrument=%s side=%s qty=%s\",\n                pos.instrument_id.value,\n                pos.side.value,\n                pos.quantity.as_decimal(),\n            )\n        \n        return positions\n\n    def reconcile_positions(\n        self,\n        cached: list[Position],\n        exchange: list[Position],\n    ) -> tuple[list[Position], list[str]]:\n        \"\"\"Reconcile cached positions with exchange positions.\n\n        Compares positions by instrument_id and detects discrepancies:\n        - Quantity mismatches (cache vs exchange quantity differs)\n        - Side mismatches (cache LONG but exchange SHORT, or vice versa)\n        - External positions (on exchange but not in cache)\n        - Closed positions (in cache but not on exchange)\n\n        The exchange is always the SOURCE OF TRUTH. Reconciled positions\n        are the exchange positions, not the cached ones.\n\n        Args:\n            cached: Positions loaded from cache.\n            exchange: Positions from exchange query.\n\n        Returns:\n            Tuple of (reconciled_positions, discrepancy_messages).\n            - reconciled_positions: List of exchange positions (source of truth)\n            - discrepancy_messages: List of human-readable discrepancy strings\n\n        Example:\n            >>> reconciled, discrepancies = provider.reconcile_positions(\n            ...     cached=[cached_btc],\n            ...     exchange=[exchange_btc, exchange_eth],\n            ... )\n            >>> for msg in discrepancies:\n            ...     logger.warning(msg)\n        \"\"\"\n        self._log.info(\n            \"Reconciling positions: cached=%d exchange=%d\",\n            len(cached),\n            len(exchange),\n        )\n        \n        reconciled: list[Position] = []\n        discrepancies: list[str] = []\n\n        # Build lookup maps for O(1) access - O(n) + O(m)\n        cached_map: dict[str, Position] = {\n            pos.instrument_id.value: pos for pos in cached\n        }\n        exchange_map: dict[str, Position] = {\n            pos.instrument_id.value: pos for pos in exchange\n        }\n\n        # Process exchange positions (source of truth) - O(m)\n        for instrument_id, ex_pos in exchange_map.items():\n            ex_qty = ex_pos.quantity.as_decimal()\n            ex_side = ex_pos.side.value\n\n            if instrument_id in cached_map:\n                # Position exists in both cache and exchange\n                cached_pos = cached_map[instrument_id]\n                cached_qty = cached_pos.quantity.as_decimal()\n                cached_side = cached_pos.side.value\n\n                # Check for quantity mismatch\n                if cached_qty != ex_qty:\n                    msg = (\n                        f\"Quantity mismatch for {instrument_id}: \"\n                        f\"cached={cached_qty}, exchange={ex_qty}\"\n                    )\n                    discrepancies.append(msg)\n                    self._log.warning(msg)\n\n                # Check for side mismatch\n                if cached_side != ex_side:\n                    msg = (\n                        f\"Side mismatch for {instrument_id}: \"\n                        f\"cached={cached_side}, exchange={ex_side}\"\n                    )\n                    discrepancies.append(msg)\n                    self._log.warning(msg)\n                \n                if cached_qty == ex_qty and cached_side == ex_side:\n                    self._log.debug(\n                        \"Position matches: %s %s %s\",\n                        instrument_id,\n                        ex_side,\n                        ex_qty,\n                    )\n            else:\n                # External position (on exchange but not in cache)\n                msg = f\"External position detected: {instrument_id} {ex_side} {ex_qty}\"\n                discrepancies.append(msg)\n                self._log.warning(msg)\n\n            # Exchange is source of truth - add to reconciled\n            reconciled.append(ex_pos)\n\n        # Find positions closed on exchange (in cache but not on exchange) - O(n)\n        for instrument_id in cached_map:\n            if instrument_id not in exchange_map:\n                msg = (\n                    f\"Position closed on exchange: {instrument_id} \"\n                    f\"(missing from exchange)\"\n                )\n                discrepancies.append(msg)\n                self._log.warning(msg)\n\n        self._log.info(\n            \"Reconciliation complete: reconciled=%d discrepancies=%d\",\n            len(reconciled),\n            len(discrepancies),\n        )\n\n        return reconciled, discrepancies\nEOF",
+      "description": "Write updated provider.py with logging"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-30T19:35:37.897437",
+      "todo_count": 4
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-30T19:35:48.247343",
+      "command": "cat > /media/sam/1TB/nautilus_dev/strategies/common/recovery/__init__.py << 'EOF'\n\"\"\"Position Recovery Module (Spec 017).\n\nThis module provides position recovery capabilities for NautilusTrader\nstrategies, enabling seamless state restoration after TradingNode restarts.\n\nKey Components:\n- RecoveryConfig: Configuration for recovery behavior\n- RecoverableStrategy: Base class with recovery support\n- PositionRecoveryProvider: Position loading and reconciliation\n- RecoveryEventEmitter: Event emission for monitoring\n\"\"\"\n\nfrom strategies.common.recovery.config import RecoveryConfig\nfrom strategies.common.recovery.models import (\n    IndicatorState,\n    PositionSnapshot,\n    RecoveryState,\n    RecoveryStatus,\n    StrategySnapshot,\n)\nfrom strategies.common.recovery.provider import PositionRecoveryProvider\n\n__all__ = [\n    # Config\n    \"RecoveryConfig\",\n    # Models\n    \"RecoveryStatus\",\n    \"RecoveryState\",\n    \"PositionSnapshot\",\n    \"IndicatorState\",\n    \"StrategySnapshot\",\n    # Provider\n    \"PositionRecoveryProvider\",\n]\nEOF",
+      "description": "Update __init__.py with PositionRecoveryProvider export"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-30T19:35:54.067583",
+      "command": "cat > /media/sam/1TB/nautilus_dev/strategies/common/recovery/recoverable_strategy.py << 'EOF'\n\"\"\"Recoverable Strategy Base Class (Spec 017 - FR-002).\n\nThis module provides a Strategy base class with position recovery support.\nImplements FR-002 (Strategy State Restoration) from Spec 017.\n\nKey Features:\n- Automatic position detection on startup\n- Historical data warmup for indicators\n- Exit order recreation for recovered positions\n- Trading blocked until warmup completes\n\nUsage:\n    class MyStrategy(RecoverableStrategy):\n        def __init__(self, config: MyConfig) -> None:\n            super().__init__(config, recovery_config)\n            self.ema = ExponentialMovingAverage(period=20)\n\n        def on_position_recovered(self, position: Position) -> None:\n            self.log.info(f\"Recovered position: {position.instrument_id}\")\n\n        def on_warmup_complete(self) -> None:\n            self.log.info(\"Warmup complete, ready to trade\")\n\n        def on_bar(self, bar: Bar) -> None:\n            if not self._warmup_complete:\n                return  # Skip until warmup completes\n            # Trading logic here\n\"\"\"\n\nfrom __future__ import annotations\n\nfrom datetime import timedelta\nfrom typing import TYPE_CHECKING, Any\n\nfrom nautilus_trader.config import StrategyConfig\nfrom nautilus_trader.model.data import Bar, BarType\nfrom nautilus_trader.model.enums import OrderSide, OrderType, TimeInForce\nfrom nautilus_trader.model.identifiers import InstrumentId\nfrom nautilus_trader.model.position import Position\nfrom nautilus_trader.trading.strategy import Strategy\n\nfrom strategies.common.recovery.config import RecoveryConfig\nfrom strategies.common.recovery.models import RecoveryState, RecoveryStatus\n\nif TYPE_CHECKING:\n    from nautilus_trader.model.instruments import Instrument\n    from nautilus_trader.model.orders import Order\n\n\nclass RecoverableStrategyConfig(StrategyConfig, frozen=True):\n    \"\"\"Configuration for RecoverableStrategy.\n\n    Attributes:\n        instrument_id: The instrument to trade.\n        bar_type: The bar type for data subscription and warmup.\n        recovery: Recovery configuration settings.\n    \"\"\"\n\n    instrument_id: str\n    bar_type: str\n    recovery: RecoveryConfig | None = None\n\n\nclass RecoverableStrategy(Strategy):\n    \"\"\"Strategy base class with position recovery support.\n\n    Implements FR-002 (Strategy State Restoration) from Spec 017:\n    - Detects recovered positions from cache on startup\n    - Requests historical data for indicator warmup\n    - Recreates exit orders (stop-loss) for recovered positions\n    - Blocks trading until warmup completes\n\n    Attributes:\n        instrument_id: The instrument being traded.\n        bar_type: The bar type for data and warmup.\n        recovery_config: Recovery configuration.\n        recovery_state: Current recovery state.\n\n    Example:\n        >>> class MyStrategy(RecoverableStrategy):\n        ...     def on_bar(self, bar: Bar) -> None:\n        ...         if not self._warmup_complete:\n        ...             return  # Skip until ready\n        ...         # Trading logic\n    \"\"\"\n\n    def __init__(\n        self,\n        config: RecoverableStrategyConfig,\n    ) -> None:\n        \"\"\"Initialize RecoverableStrategy.\n\n        Args:\n            config: Strategy configuration with recovery settings.\n        \"\"\"\n        super().__init__(config)\n\n        self.instrument_id = InstrumentId.from_str(config.instrument_id)\n        self.bar_type = BarType.from_str(config.bar_type)\n\n        # Recovery configuration (use defaults if not provided)\n        self.recovery_config = config.recovery or RecoveryConfig(\n            trader_id=str(self.trader_id) if hasattr(self, \"trader_id\") else \"TRADER-001\"\n        )\n\n        # Recovery state tracking\n        self.recovery_state = RecoveryState()\n        self._warmup_complete: bool = False\n        self._warmup_bars_processed: int = 0\n        self._warmup_start_ns: int | None = None\n        self._recovered_positions: list[Position] = []\n\n        # Instrument reference (set in on_start)\n        self.instrument: Instrument | None = None\n\n    # ─────────────────────────────────────────────────────────────────\n    # Lifecycle Hooks\n    # ─────────────────────────────────────────────────────────────────\n\n    def on_start(self) -> None:\n        \"\"\"Initialize strategy and detect recovered positions.\n\n        Called when the strategy starts. Performs:\n        1. Load instrument from cache\n        2. Detect recovered positions\n        3. Handle each recovered position (log + call hook)\n        4. Request historical data for indicator warmup\n        \"\"\"\n        # Load instrument\n        self.instrument = self.cache.instrument(self.instrument_id)\n        if self.instrument is None:\n            self.log.error(f\"Instrument {self.instrument_id} not found in cache\")\n            self.stop()\n            return\n\n        # Start recovery tracking\n        self.recovery_state = RecoveryState(\n            status=RecoveryStatus.IN_PROGRESS,\n            ts_started=self.clock.timestamp_ns(),\n        )\n        self._warmup_start_ns = self.clock.timestamp_ns()\n\n        # Check for recovered positions from cache\n        if self.recovery_config.recovery_enabled:\n            self._detect_recovered_positions()\n\n        # Request historical data for indicator warmup\n        self._request_warmup_data()\n\n        # Subscribe to bars for live trading\n        self.subscribe_bars(self.bar_type)\n\n        self.log.info(\n            f\"RecoverableStrategy started: \"\n            f\"instrument={self.instrument_id}, \"\n            f\"recovery_enabled={self.recovery_config.recovery_enabled}, \"\n            f\"warmup_days={self.recovery_config.warmup_lookback_days}\"\n        )\n\n    def on_stop(self) -> None:\n        \"\"\"Clean up on strategy stop.\"\"\"\n        self.log.info(\n            f\"RecoverableStrategy stopped: \"\n            f\"positions_recovered={self.recovery_state.positions_recovered}, \"\n            f\"warmup_complete={self._warmup_complete}\"\n        )\n\n    # ─────────────────────────────────────────────────────────────────\n    # Position Recovery (FR-002)\n    # ─────────────────────────────────────────────────────────────────\n\n    def _detect_recovered_positions(self) -> None:\n        \"\"\"Detect and process positions from cache.\n\n        Iterates over cached positions for this instrument and\n        handles each open position as recovered.\n        \"\"\"\n        positions = self.cache.positions(instrument_id=self.instrument_id)\n\n        for position in positions:\n            if position.is_open:\n                self._handle_recovered_position(position)\n\n        self.log.info(\n            f\"Position detection complete: \"\n            f\"found {len(self._recovered_positions)} open positions\"\n        )\n\n    def _handle_recovered_position(self, position: Position) -> None:\n        \"\"\"Internal handler for a recovered position.\n\n        Logs the recovery, updates state, sets up exit orders,\n        and calls the subclass hook.\n\n        Args:\n            position: The recovered position.\n        \"\"\"\n        self._recovered_positions.append(position)\n        self.recovery_state = RecoveryState(\n            status=self.recovery_state.status,\n            positions_recovered=self.recovery_state.positions_recovered + 1,\n            indicators_warmed=self.recovery_state.indicators_warmed,\n            orders_reconciled=self.recovery_state.orders_reconciled,\n            ts_started=self.recovery_state.ts_started,\n            ts_completed=self.recovery_state.ts_completed,\n        )\n\n        # Log recovery details\n        self.log.info(\n            f\"Recovered position: \"\n            f\"instrument={position.instrument_id}, \"\n            f\"side={position.side.value}, \"\n            f\"quantity={position.quantity}, \"\n            f\"avg_price={position.avg_px_open}\"\n        )\n\n        # Setup exit orders if needed\n        self._setup_exit_orders(position)\n\n        # Call subclass hook\n        self.on_position_recovered(position)\n\n    def on_position_recovered(self, position: Position) -> None:\n        \"\"\"Hook for subclasses to handle recovered positions.\n\n        Override this method to implement custom recovery logic,\n        such as restoring strategy-specific state or adjusting\n        risk parameters.\n\n        Args:\n            position: The recovered position.\n\n        Example:\n            >>> def on_position_recovered(self, position: Position) -> None:\n            ...     self._position_size = position.quantity\n            ...     self._entry_price = position.avg_px_open\n        \"\"\"\n        pass  # Override in subclass\n\n    def _setup_exit_orders(self, position: Position) -> None:\n        \"\"\"Setup exit orders (stop-loss) for a recovered position.\n\n        Checks if a stop-loss order already exists for the position.\n        If not, this method can be overridden to create one.\n\n        Note:\n            This base implementation only checks for existing orders.\n            Subclasses should override to implement actual stop-loss\n            creation logic based on their risk parameters.\n\n        Args:\n            position: The recovered position needing exit orders.\n        \"\"\"\n        # Check if stop-loss already exists\n        open_orders = self.cache.orders_open(instrument_id=position.instrument_id)\n        has_stop = any(\n            self._is_stop_order(order) for order in open_orders\n        )\n\n        if has_stop:\n            self.log.info(\n                f\"Stop-loss already exists for {position.instrument_id}\"\n            )\n        else:\n            self.log.warning(\n                f\"No stop-loss found for recovered position: \"\n                f\"{position.instrument_id}. Override _setup_exit_orders() \"\n                f\"to create one.\"\n            )\n\n    def _is_stop_order(self, order: Order) -> bool:\n        \"\"\"Check if an order is a stop-type order.\n\n        Args:\n            order: The order to check.\n\n        Returns:\n            True if order is STOP_MARKET or STOP_LIMIT.\n        \"\"\"\n        return order.order_type in (OrderType.STOP_MARKET, OrderType.STOP_LIMIT)\n\n    # ─────────────────────────────────────────────────────────────────\n    # Historical Data Warmup (FR-002)\n    # ─────────────────────────────────────────────────────────────────\n\n    def _request_warmup_data(self) -> None:\n        \"\"\"Request historical bars for indicator warmup.\n\n        Requests bars from (now - warmup_lookback_days) to now.\n        Results are delivered to on_historical_data().\n        \"\"\"\n        lookback_days = self.recovery_config.warmup_lookback_days\n        start_time = self.clock.utc_now() - timedelta(days=lookback_days)\n\n        self.log.info(\n            f\"Requesting warmup data: \"\n            f\"bar_type={self.bar_type}, \"\n            f\"start={start_time}, \"\n            f\"lookback_days={lookback_days}\"\n        )\n\n        # Request historical bars with callback\n        self.request_bars(\n            bar_type=self.bar_type,\n            start=start_time,\n            callback=self._on_warmup_data_received,\n        )\n\n    def _on_warmup_data_received(self, bars: list[Bar]) -> None:\n        \"\"\"Callback when historical warmup data is received.\n\n        Processes bars for indicator warmup and marks warmup complete.\n\n        Args:\n            bars: List of historical bars for warmup.\n        \"\"\"\n        if not bars:\n            self.log.warning(\"No warmup bars received\")\n            self._complete_warmup()\n            return\n\n        self.log.info(f\"Received {len(bars)} warmup bars\")\n\n        # Sort bars by timestamp (oldest first) for correct indicator warmup\n        sorted_bars = sorted(bars, key=lambda b: b.ts_event)\n\n        # Process each bar for indicator warmup\n        for bar in sorted_bars:\n            self.on_historical_data(bar)\n            self._warmup_bars_processed += 1\n\n        # Mark warmup complete\n        self._complete_warmup()\n\n    def on_historical_data(self, bar: Bar) -> None:\n        \"\"\"Process a historical bar for indicator warmup.\n\n        Override this method to feed bars to your indicators.\n\n        Args:\n            bar: A historical bar for warmup.\n\n        Example:\n            >>> def on_historical_data(self, bar: Bar) -> None:\n            ...     self.ema.handle_bar(bar)\n            ...     self.rsi.handle_bar(bar)\n        \"\"\"\n        pass  # Override in subclass to warm up indicators\n\n    def _complete_warmup(self) -> None:\n        \"\"\"Complete the warmup phase and enable trading.\n\n        Updates recovery state, calculates warmup duration,\n        and calls the on_warmup_complete() hook.\n        \"\"\"\n        self._warmup_complete = True\n\n        # Calculate warmup duration\n        warmup_duration_ns = 0\n        if self._warmup_start_ns is not None:\n            warmup_duration_ns = self.clock.timestamp_ns() - self._warmup_start_ns\n        warmup_duration_ms = warmup_duration_ns / 1_000_000\n\n        # Update recovery state\n        self.recovery_state = RecoveryState(\n            status=RecoveryStatus.COMPLETED,\n            positions_recovered=self.recovery_state.positions_recovered,\n            indicators_warmed=True,\n            orders_reconciled=True,\n            ts_started=self.recovery_state.ts_started,\n            ts_completed=self.clock.timestamp_ns(),\n        )\n\n        self.log.info(\n            f\"Warmup complete: \"\n            f\"bars_processed={self._warmup_bars_processed}, \"\n            f\"duration_ms={warmup_duration_ms:.1f}\"\n        )\n\n        # Call subclass hook\n        self.on_warmup_complete()\n\n    def on_warmup_complete(self) -> None:\n        \"\"\"Hook called when warmup phase completes.\n\n        Override this method to perform post-warmup initialization,\n        such as subscribing to additional data feeds or enabling\n        trading signals.\n\n        Example:\n            >>> def on_warmup_complete(self) -> None:\n            ...     self.log.info(\"Strategy ready to trade\")\n            ...     self._can_trade = True\n        \"\"\"\n        pass  # Override in subclass\n\n    # ─────────────────────────────────────────────────────────────────\n    # Helper Properties\n    # ─────────────────────────────────────────────────────────────────\n\n    @property\n    def is_warming_up(self) -> bool:\n        \"\"\"Check if strategy is still in warmup phase.\n\n        Returns:\n            True if warmup is not yet complete.\n        \"\"\"\n        return not self._warmup_complete\n\n    @property\n    def is_ready(self) -> bool:\n        \"\"\"Check if strategy is ready to trade.\n\n        Returns:\n            True if warmup is complete and recovery succeeded.\n        \"\"\"\n        return (\n            self._warmup_complete\n            and self.recovery_state.status == RecoveryStatus.COMPLETED\n        )\n\n    @property\n    def recovered_positions_count(self) -> int:\n        \"\"\"Get the number of recovered positions.\n\n        Returns:\n            Number of positions recovered during startup.\n        \"\"\"\n        return len(self._recovered_positions)\nEOF\necho \"Created: /media/sam/1TB/nautilus_dev/strategies/common/recovery/recoverable_strategy.py\"",
+      "description": "Create RecoverableStrategy class"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-30T19:35:54.430090",
+      "todo_count": 4
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-30T19:36:03.567323",
+      "todo_count": 10
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-30T19:36:09.628151",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/recovery/__init__.py"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-30T19:36:17.751720",
+      "command": "cat > /media/sam/1TB/nautilus_dev/strategies/common/recovery/__init__.py << 'EOF'\n\"\"\"Position Recovery Module (Spec 017).\n\nThis module provides position recovery capabilities for NautilusTrader\nstrategies, enabling seamless state restoration after TradingNode restarts.\n\nKey Components:\n- RecoveryConfig: Configuration for recovery behavior\n- RecoverableStrategy: Base class with recovery support\n- PositionRecoveryProvider: Position loading and reconciliation\n- RecoveryEventEmitter: Event emission for monitoring\n\"\"\"\n\nfrom strategies.common.recovery.config import RecoveryConfig\nfrom strategies.common.recovery.models import (\n    IndicatorState,\n    PositionSnapshot,\n    RecoveryState,\n    RecoveryStatus,\n    StrategySnapshot,\n)\nfrom strategies.common.recovery.provider import PositionRecoveryProvider\nfrom strategies.common.recovery.recoverable_strategy import (\n    RecoverableStrategy,\n    RecoverableStrategyConfig,\n)\n\n__all__ = [\n    # Config\n    \"RecoveryConfig\",\n    # Models\n    \"RecoveryStatus\",\n    \"RecoveryState\",\n    \"PositionSnapshot\",\n    \"IndicatorState\",\n    \"StrategySnapshot\",\n    # Provider\n    \"PositionRecoveryProvider\",\n    # Strategy\n    \"RecoverableStrategy\",\n    \"RecoverableStrategyConfig\",\n]\nEOF\necho \"Updated: /media/sam/1TB/nautilus_dev/strategies/common/recovery/__init__.py\"",
+      "description": "Update __init__.py exports"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-30T19:36:22.667056",
+      "command": "cat > /media/sam/1TB/nautilus_dev/tests/unit/recovery/conftest.py << 'EOF'\n\"\"\"Unit test fixtures for recovery module (Spec 017).\n\nThese fixtures provide mocks for unit testing position recovery\nwithout requiring NautilusTrader adapter dependencies.\n\"\"\"\n\nfrom __future__ import annotations\n\nfrom datetime import datetime, timezone\nfrom decimal import Decimal\nfrom unittest.mock import MagicMock\n\nimport pytest\n\n\n@pytest.fixture\ndef mock_cache():\n    \"\"\"Create a mock NautilusTrader cache for testing.\n    \n    Returns a MagicMock with common cache methods stubbed:\n    - positions(): Returns empty list by default\n    - positions_open(): Returns empty list by default\n    - orders_open(): Returns empty list by default\n    - account(): Returns None by default\n    \"\"\"\n    cache = MagicMock()\n    cache.positions.return_value = []\n    cache.positions_open.return_value = []\n    cache.orders_open.return_value = []\n    cache.account.return_value = None\n    return cache\n\n\n@pytest.fixture\ndef mock_clock():\n    \"\"\"Create a mock clock for testing.\n    \n    Returns a MagicMock with:\n    - timestamp_ns(): Returns fixed nanosecond timestamp\n    - utc_now(): Returns fixed datetime (2024-01-02 00:00:00 UTC)\n    \"\"\"\n    clock = MagicMock()\n    clock.timestamp_ns.return_value = 1704153600000000000\n    clock.utc_now.return_value = datetime(2024, 1, 2, 0, 0, 0, tzinfo=timezone.utc)\n    return clock\n\n\n@pytest.fixture\ndef mock_logger():\n    \"\"\"Create a mock logger for testing log output.\n    \n    Returns a MagicMock with standard logging methods stubbed.\n    \"\"\"\n    logger = MagicMock()\n    logger.debug = MagicMock()\n    logger.info = MagicMock()\n    logger.warning = MagicMock()\n    logger.error = MagicMock()\n    return logger\n\n\n@pytest.fixture\ndef recovery_config():\n    \"\"\"Create a default RecoveryConfig for testing.\"\"\"\n    from strategies.common.recovery.config import RecoveryConfig\n\n    return RecoveryConfig(\n        trader_id=\"TESTER-001\",\n        recovery_enabled=True,\n        warmup_lookback_days=2,\n        startup_delay_secs=10.0,\n        max_recovery_time_secs=30.0,\n        claim_external_positions=True,\n    )\n\n\n@pytest.fixture\ndef position_snapshot():\n    \"\"\"Create a sample PositionSnapshot for testing.\"\"\"\n    from strategies.common.recovery.models import PositionSnapshot\n\n    return PositionSnapshot(\n        instrument_id=\"BTCUSDT-PERP.BINANCE\",\n        side=\"LONG\",\n        quantity=Decimal(\"1.5\"),\n        avg_entry_price=Decimal(\"42000.00\"),\n        unrealized_pnl=Decimal(\"500.00\"),\n        realized_pnl=Decimal(\"0.00\"),\n        ts_opened=1704067200000000000,\n        ts_last_updated=1704153600000000000,\n    )\n\n\n@pytest.fixture\ndef recovery_state_pending():\n    \"\"\"Create a pending RecoveryState for testing.\"\"\"\n    from strategies.common.recovery.models import RecoveryState, RecoveryStatus\n\n    return RecoveryState(\n        status=RecoveryStatus.PENDING,\n        positions_recovered=0,\n        indicators_warmed=False,\n        orders_reconciled=False,\n    )\n\n\n@pytest.fixture\ndef recovery_state_complete():\n    \"\"\"Create a completed RecoveryState for testing.\"\"\"\n    from strategies.common.recovery.models import RecoveryState, RecoveryStatus\n\n    return RecoveryState(\n        status=RecoveryStatus.COMPLETED,\n        positions_recovered=2,\n        indicators_warmed=True,\n        orders_reconciled=True,\n        ts_started=1704067200000000000,\n        ts_completed=1704067205000000000,\n    )\n\n\ndef create_mock_position(\n    instrument_id: str,\n    side: str = \"LONG\",\n    quantity: Decimal = Decimal(\"1.0\"),\n    avg_px_open: Decimal = Decimal(\"1000.00\"),\n    is_open: bool = True,\n) -> MagicMock:\n    \"\"\"Factory function to create mock positions.\n    \n    Args:\n        instrument_id: Full instrument ID (e.g., BTCUSDT-PERP.BINANCE)\n        side: Position side (LONG or SHORT)\n        quantity: Position quantity\n        avg_px_open: Average entry price\n        is_open: Whether position is currently open\n        \n    Returns:\n        MagicMock configured as a Position object\n    \"\"\"\n    pos = MagicMock()\n    pos.instrument_id = MagicMock()\n    pos.instrument_id.value = instrument_id\n    pos.side = MagicMock()\n    pos.side.value = side\n    pos.quantity = MagicMock()\n    pos.quantity.as_decimal.return_value = quantity\n    pos.avg_px_open = MagicMock()\n    pos.avg_px_open.as_decimal.return_value = avg_px_open\n    pos.is_open = is_open\n    return pos\n\n\n@pytest.fixture\ndef mock_btc_position():\n    \"\"\"Create a mock BTC position.\"\"\"\n    return create_mock_position(\n        instrument_id=\"BTCUSDT-PERP.BINANCE\",\n        side=\"LONG\",\n        quantity=Decimal(\"1.5\"),\n        avg_px_open=Decimal(\"42000.00\"),\n    )\n\n\n@pytest.fixture\ndef mock_eth_position():\n    \"\"\"Create a mock ETH position.\"\"\"\n    return create_mock_position(\n        instrument_id=\"ETHUSDT-PERP.BINANCE\",\n        side=\"SHORT\",\n        quantity=Decimal(\"10.0\"),\n        avg_px_open=Decimal(\"2200.00\"),\n    )\nEOF",
+      "description": "Create unit test conftest with fixtures"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-30T19:36:26.417895",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && ruff check strategies/common/recovery/recoverable_strategy.py --fix 2>&1",
+      "description": "Run ruff check on recoverable_strategy.py"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-30T19:36:29.724892",
+      "todo_count": 4
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-30T19:36:33.768407",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && ruff format /media/sam/1TB/nautilus_dev/strategies/common/recovery/recoverable_strategy.py 2>&1",
+      "description": "Run ruff format on recoverable_strategy.py"
+    },
+    {
+      "operation": "taskoutput",
+      "timestamp": "2025-12-30T19:36:36.207950",
+      "task_id": "aa47bef",
+      "block": false,
+      "timeout": 30000
+    },
+    {
+      "operation": "taskoutput",
+      "timestamp": "2025-12-30T19:36:36.214350",
+      "task_id": "a016601",
+      "block": false,
+      "timeout": 30000
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-30T19:36:37.138272",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -m pytest tests/unit/recovery/ -v --tb=short 2>&1 | head -100",
+      "description": "Run unit recovery tests"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-30T19:36:41.299263",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && ruff check strategies/common/recovery/ --fix && ruff format strategies/common/recovery/ 2>&1",
+      "description": "Run ruff on entire recovery module"
+    },
+    {
+      "operation": "taskoutput",
+      "timestamp": "2025-12-30T19:36:43.945396",
+      "task_id": "aa47bef",
+      "block": true,
+      "timeout": 120000
+    },
+    {
+      "operation": "taskoutput",
+      "timestamp": "2025-12-30T19:36:43.953705",
+      "task_id": "a016601",
+      "block": true,
+      "timeout": 120000
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-30T19:36:48.018084",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -m pytest tests/integration/recovery/ -v --tb=short 2>&1 | head -100",
+      "description": "Run integration recovery tests"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-30T19:36:53.173675",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -c \"\nfrom strategies.common.recovery import (\n    RecoveryConfig,\n    RecoveryStatus,\n    RecoveryState,\n    PositionSnapshot,\n    IndicatorState,\n    StrategySnapshot,\n    PositionRecoveryProvider,\n    RecoverableStrategy,\n    RecoverableStrategyConfig,\n)\nprint('All imports successful!')\nprint(f'RecoverableStrategy: {RecoverableStrategy}')\nprint(f'RecoverableStrategyConfig: {RecoverableStrategyConfig}')\n\" 2>&1",
+      "description": "Verify imports work"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-30T19:36:54.575997",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/integration/recovery/test_cold_start.py"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-30T19:37:02.716059",
+      "todo_count": 10
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-30T19:37:09.613153",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/recovery/recoverable_strategy.py"
     }
   ],
-  "last_updated": "2025-12-30T18:37:32.746206"
+  "last_updated": "2025-12-30T19:37:09.613168"
 }
