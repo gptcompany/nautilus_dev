@@ -115,7 +115,7 @@ def strategy_config():
             trader_id="PERF-TESTER-001",
             recovery_enabled=True,
             warmup_lookback_days=2,  # 2 days of warmup
-            startup_delay_secs=0.0,
+            startup_delay_secs=5.0,  # Minimum valid value
             max_recovery_time_secs=30.0,
         ),
     )
