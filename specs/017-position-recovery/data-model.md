@@ -1,292 +1,271 @@
 # Data Model: Position Recovery (Spec 017)
 
-**Date**: 2025-12-30
+**Created**: 2025-12-30
 **Status**: Complete
+
+---
 
 ## Entity Relationship Diagram
 
 ```
-┌─────────────────────┐       ┌─────────────────────┐
-│   RecoveryConfig    │       │  PositionSnapshot   │
-├─────────────────────┤       ├─────────────────────┤
-│ trader_id           │       │ instrument_id       │
-│ recovery_enabled    │       │ side                │
-│ warmup_lookback_days│◄──────│ quantity            │
-│ startup_delay_secs  │       │ avg_entry_price     │
-│ max_recovery_time   │       │ unrealized_pnl      │
-└─────────────────────┘       │ realized_pnl        │
-         │                    │ ts_opened           │
-         │                    │ ts_last_updated     │
-         ▼                    └─────────────────────┘
-┌─────────────────────┐                │
-│   RecoveryState     │                │
-├─────────────────────┤                │
-│ status              │◄───────────────┘
-│ positions_recovered │
-│ indicators_warmed   │
-│ orders_reconciled   │
-│ ts_started          │
-│ ts_completed        │
-└─────────────────────┘
+┌─────────────────────────────────────────────────────────────────┐
+│                        TradingNode                              │
+│  ┌──────────────────┐  ┌──────────────────┐  ┌───────────────┐ │
+│  │  CacheDatabase   │  │  ExecEngine      │  │   Strategy    │ │
+│  │  (Redis)         │◄─┤  (Reconciliation)│◄─┤   (Recovery)  │ │
+│  └────────┬─────────┘  └────────┬─────────┘  └───────┬───────┘ │
+│           │                     │                     │         │
+└───────────┼─────────────────────┼─────────────────────┼─────────┘
+            │                     │                     │
+            ▼                     ▼                     ▼
+      ┌───────────┐        ┌───────────┐        ┌───────────────┐
+      │ Position  │        │ Order     │        │ StrategyState │
+      │ Snapshot  │        │ Snapshot  │        │ (Custom)      │
+      └───────────┘        └───────────┘        └───────────────┘
+```
+
+---
+
+## Entity: PositionSnapshot
+
+Persisted to Redis cache for recovery.
+
+| Field | Type | Constraints | Description |
+|-------|------|-------------|-------------|
+| `position_id` | PositionId | Required, unique | Position identifier |
+| `instrument_id` | InstrumentId | Required | Trading instrument |
+| `strategy_id` | StrategyId | Required | Owning strategy ("EXTERNAL" for unclaimed) |
+| `account_id` | AccountId | Required | Trading account |
+| `opening_order_id` | ClientOrderId | Required | Order that opened position |
+| `closing_order_id` | ClientOrderId | Optional | Order that closed position |
+| `side` | PositionSide | LONG / SHORT / FLAT | Current position side |
+| `signed_qty` | Decimal | Signed value | Signed quantity (+long, -short) |
+| `quantity` | Quantity | >= 0 | Absolute position size |
+| `peak_qty` | Quantity | >= 0 | Maximum position size reached |
+| `avg_px_open` | Decimal | > 0 | Average entry price |
+| `avg_px_close` | Decimal | Optional, > 0 | Average exit price |
+| `realized_pnl` | Money | Signed | Realized profit/loss |
+| `unrealized_pnl` | Money | Optional, signed | Unrealized profit/loss |
+| `ts_opened` | int (ns) | Unix epoch nanoseconds | Position open timestamp |
+| `ts_closed` | int (ns) | Optional, Unix epoch ns | Position close timestamp |
+| `ts_last` | int (ns) | Unix epoch nanoseconds | Last update timestamp |
+
+**Redis Key Pattern**: `trader-position:{position_id}`
+
+---
+
+## Entity: OrderSnapshot
+
+Persisted to Redis cache for recovery.
+
+| Field | Type | Constraints | Description |
+|-------|------|-------------|-------------|
+| `client_order_id` | ClientOrderId | Required, unique | Client-assigned order ID |
+| `venue_order_id` | VenueOrderId | Optional | Exchange-assigned order ID |
+| `instrument_id` | InstrumentId | Required | Trading instrument |
+| `strategy_id` | StrategyId | Required | Owning strategy |
+| `account_id` | AccountId | Required | Trading account |
+| `order_type` | OrderType | MARKET / LIMIT / STOP_MARKET / etc. | Order type |
+| `side` | OrderSide | BUY / SELL | Order direction |
+| `quantity` | Quantity | > 0 | Order size |
+| `filled_qty` | Quantity | >= 0 | Amount filled |
+| `avg_px` | Decimal | Optional, > 0 | Average fill price |
+| `price` | Price | Optional, > 0 | Limit price |
+| `trigger_price` | Price | Optional, > 0 | Stop trigger price |
+| `time_in_force` | TimeInForce | GTC / IOC / FOK / GTD | Order validity |
+| `status` | OrderStatus | PENDING / OPEN / FILLED / etc. | Current status |
+| `events` | list[OrderEvent] | Event history | Full event sequence |
+| `tags` | list[str] | Optional | Order tags (e.g., "RECONCILIATION") |
+| `ts_init` | int (ns) | Unix epoch nanoseconds | Order creation time |
+| `ts_last` | int (ns) | Unix epoch nanoseconds | Last update time |
+
+**Redis Key Pattern**: `trader-order:{client_order_id}`
+
+---
+
+## Entity: AccountSnapshot
+
+Persisted to Redis cache for recovery.
+
+| Field | Type | Constraints | Description |
+|-------|------|-------------|-------------|
+| `account_id` | AccountId | Required, unique | Account identifier |
+| `account_type` | AccountType | CASH / MARGIN | Account type |
+| `base_currency` | Currency | Optional | Base currency (margin accounts) |
+| `balances` | dict[Currency, Money] | Required | Currency balances |
+| `margins` | dict[InstrumentId, Money] | Optional | Position margins |
+| `is_reported` | bool | Default: False | Venue-reported state |
+| `ts_last` | int (ns) | Unix epoch nanoseconds | Last update time |
+
+**Redis Key Pattern**: `trader-account:{account_id}`
+
+---
+
+## Entity: RecoveryConfig
+
+Strategy-side configuration for recovery behavior.
+
+| Field | Type | Constraints | Description |
+|-------|------|-------------|-------------|
+| `external_order_claims` | list[InstrumentId] | Optional | Instruments to claim external orders |
+| `oms_type` | OmsType | NETTING / HEDGING | Order management system type |
+| `manage_contingent_orders` | bool | Default: True | Manage OUO/OCO orders |
+| `manage_gtd_expiry` | bool | Default: True | Re-activate GTD timers |
+| `warmup_bars` | int | >= 0 | Number of bars for indicator warmup |
+| `warmup_timeframe` | timedelta | Optional | Historical data lookback period |
+
+---
+
+## Entity: ReconciliationReport
+
+Generated during startup reconciliation.
+
+| Field | Type | Constraints | Description |
+|-------|------|-------------|-------------|
+| `venue` | Venue | Required | Exchange venue |
+| `account_id` | AccountId | Required | Trading account |
+| `timestamp` | datetime | UTC | Report generation time |
+| `cached_positions` | list[PositionSnapshot] | Required | Positions from cache |
+| `venue_positions` | list[PositionReport] | Required | Positions from exchange |
+| `discrepancies` | list[PositionDiscrepancy] | Required | Detected mismatches |
+| `synthetic_fills` | list[OrderFilled] | Required | Generated alignment fills |
+| `status` | ReconciliationStatus | SUCCESS / PARTIAL / FAILED | Overall result |
+
+---
+
+## Entity: PositionDiscrepancy
+
+Details of a single position mismatch.
+
+| Field | Type | Constraints | Description |
+|-------|------|-------------|-------------|
+| `instrument_id` | InstrumentId | Required | Affected instrument |
+| `cached_qty` | Decimal | Signed | Quantity in cache |
+| `venue_qty` | Decimal | Signed | Quantity on exchange |
+| `delta` | Decimal | Signed | Difference (venue - cached) |
+| `resolution` | ResolutionType | SYNTHETIC_FILL / MANUAL / IGNORED | How resolved |
+| `synthetic_order_id` | ClientOrderId | Optional | Generated fill order ID |
+
+---
+
+## State Transitions
+
+### Position Lifecycle
+
+```
+                 ┌─────────────┐
+                 │    FLAT     │
+                 │  (No pos)   │
+                 └──────┬──────┘
+                        │ BUY/SELL order filled
+                        ▼
+                 ┌─────────────┐
+                 │    OPEN     │
+                 │  (LONG or   │◄─┐ Partial close
+                 │   SHORT)    │──┘
+                 └──────┬──────┘
+                        │ Fully closed
+                        ▼
+                 ┌─────────────┐
+                 │   CLOSED    │
+                 │  (Realized) │
+                 └─────────────┘
+```
+
+### Recovery State Machine
+
+```
+┌─────────────────┐
+│   NODE_START    │
+└────────┬────────┘
          │
          ▼
-┌─────────────────────┐
-│  StrategySnapshot   │
-├─────────────────────┤
-│ strategy_id         │
-│ indicator_states    │
-│ custom_state        │
-│ pending_signals     │
-│ ts_saved            │
-└─────────────────────┘
-```
-
----
-
-## Entities
-
-### RecoveryConfig
-
-Configuration for position recovery behavior.
-
-```python
-from pydantic import BaseModel, Field
-
-class RecoveryConfig(BaseModel):
-    """Configuration for position recovery on TradingNode restart."""
-
-    trader_id: str = Field(
-        description="Unique identifier for the trader instance"
-    )
-    recovery_enabled: bool = Field(
-        default=True,
-        description="Enable position recovery from cache"
-    )
-    warmup_lookback_days: int = Field(
-        default=2,
-        ge=1,
-        le=30,
-        description="Days of historical data for indicator warmup"
-    )
-    startup_delay_secs: float = Field(
-        default=10.0,
-        ge=5.0,
-        le=60.0,
-        description="Delay before reconciliation starts"
-    )
-    max_recovery_time_secs: float = Field(
-        default=30.0,
-        ge=10.0,
-        le=120.0,
-        description="Maximum time allowed for full recovery"
-    )
-    claim_external_positions: bool = Field(
-        default=True,
-        description="Claim positions opened outside NautilusTrader"
-    )
-```
-
-### PositionSnapshot
-
-Snapshot of position state stored in Redis cache.
-
-```python
-from decimal import Decimal
-from pydantic import BaseModel, Field
-
-class PositionSnapshot(BaseModel):
-    """Position state snapshot for cache persistence."""
-
-    instrument_id: str = Field(
-        description="Full instrument ID (e.g., BTCUSDT-PERP.BINANCE)"
-    )
-    side: str = Field(
-        description="Position side: LONG, SHORT, or FLAT"
-    )
-    quantity: Decimal = Field(
-        ge=0,
-        description="Position quantity (absolute value)"
-    )
-    avg_entry_price: Decimal = Field(
-        gt=0,
-        description="Volume-weighted average entry price"
-    )
-    unrealized_pnl: Decimal = Field(
-        default=Decimal("0"),
-        description="Current unrealized P&L"
-    )
-    realized_pnl: Decimal = Field(
-        default=Decimal("0"),
-        description="Accumulated realized P&L"
-    )
-    ts_opened: int = Field(
-        description="Timestamp position opened (nanoseconds)"
-    )
-    ts_last_updated: int = Field(
-        description="Timestamp of last update (nanoseconds)"
-    )
-
-    class Config:
-        json_encoders = {Decimal: str}
-```
-
-### RecoveryState
-
-Tracks the current state of the recovery process.
-
-```python
-from enum import Enum
-from pydantic import BaseModel, Field
-
-class RecoveryStatus(str, Enum):
-    """Status of the recovery process."""
-    PENDING = "pending"
-    IN_PROGRESS = "in_progress"
-    COMPLETED = "completed"
-    FAILED = "failed"
-    TIMEOUT = "timeout"
-
-class RecoveryState(BaseModel):
-    """Current state of the recovery process."""
-
-    status: RecoveryStatus = Field(
-        default=RecoveryStatus.PENDING,
-        description="Current recovery status"
-    )
-    positions_recovered: int = Field(
-        default=0,
-        ge=0,
-        description="Number of positions successfully recovered"
-    )
-    indicators_warmed: bool = Field(
-        default=False,
-        description="Whether indicators have completed warmup"
-    )
-    orders_reconciled: bool = Field(
-        default=False,
-        description="Whether order reconciliation completed (Spec 016)"
-    )
-    ts_started: int | None = Field(
-        default=None,
-        description="Timestamp recovery started (nanoseconds)"
-    )
-    ts_completed: int | None = Field(
-        default=None,
-        description="Timestamp recovery completed (nanoseconds)"
-    )
-    error_message: str | None = Field(
-        default=None,
-        description="Error message if recovery failed"
-    )
-
-    @property
-    def recovery_duration_ms(self) -> float | None:
-        """Calculate recovery duration in milliseconds."""
-        if self.ts_started and self.ts_completed:
-            return (self.ts_completed - self.ts_started) / 1_000_000
-        return None
-```
-
-### StrategySnapshot
-
-Optional strategy-specific state for advanced recovery.
-
-```python
-from typing import Any
-from pydantic import BaseModel, Field
-
-class IndicatorState(BaseModel):
-    """State of a single indicator for recovery."""
-
-    name: str = Field(description="Indicator name (e.g., EMA-20)")
-    period: int = Field(ge=1, description="Indicator period")
-    value: float | None = Field(default=None, description="Current value")
-    is_ready: bool = Field(default=False, description="Indicator initialized")
-    warmup_count: int = Field(default=0, ge=0, description="Warmup bar count")
-
-class StrategySnapshot(BaseModel):
-    """Strategy state snapshot for advanced recovery."""
-
-    strategy_id: str = Field(
-        description="Strategy identifier"
-    )
-    indicator_states: list[IndicatorState] = Field(
-        default_factory=list,
-        description="State of all strategy indicators"
-    )
-    custom_state: dict[str, Any] = Field(
-        default_factory=dict,
-        description="Strategy-specific custom state"
-    )
-    pending_signals: list[str] = Field(
-        default_factory=list,
-        description="Pending signal identifiers"
-    )
-    ts_saved: int = Field(
-        description="Timestamp snapshot saved (nanoseconds)"
-    )
-```
-
----
-
-## Redis Key Schema
-
-Extends Spec 018 key schema for position recovery:
-
-```
-# Base namespace
-nautilus:{trader_id}:
-
-# Position snapshots (from Spec 018)
-nautilus:{trader_id}:positions:{venue}:{instrument_id}
-
-# Recovery state
-nautilus:{trader_id}:recovery:state
-
-# Strategy snapshots (optional, advanced)
-nautilus:{trader_id}:recovery:strategy:{strategy_id}
-
-# Recovery metrics
-nautilus:{trader_id}:recovery:metrics
+┌─────────────────┐
+│  CACHE_LOADING  │
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐     ┌─────────────────┐
+│  RECONCILING    │────►│  DISCREPANCY    │
+│                 │     │   DETECTED      │
+└────────┬────────┘     └────────┬────────┘
+         │                       │ Synthetic fill
+         │                       ▼
+         │              ┌─────────────────┐
+         └─────────────►│    ALIGNED      │
+                        └────────┬────────┘
+                                 │
+                                 ▼
+                        ┌─────────────────┐
+                        │  WARMING_UP     │
+                        │  (Indicators)   │
+                        └────────┬────────┘
+                                 │
+                                 ▼
+                        ┌─────────────────┐
+                        │    READY        │
+                        │  (Trading)      │
+                        └─────────────────┘
 ```
 
 ---
 
 ## Validation Rules
 
-### PositionSnapshot
+### Position Validation
+- `quantity` must equal `abs(signed_qty)`
+- `side` must match sign of `signed_qty` (positive = LONG, negative = SHORT)
+- `ts_opened` <= `ts_last`
+- If `ts_closed` set, `ts_closed` >= `ts_opened`
 
-| Field | Rule | Error Message |
-|-------|------|---------------|
-| quantity | >= 0 | "Quantity cannot be negative" |
-| avg_entry_price | > 0 | "Entry price must be positive" |
-| side | in [LONG, SHORT, FLAT] | "Invalid position side" |
-| ts_opened | <= ts_last_updated | "Opened time cannot be after last update" |
+### Order Validation
+- `filled_qty` <= `quantity`
+- If `status == FILLED`, `filled_qty == quantity`
+- If `order_type == LIMIT`, `price` required
+- If `order_type == STOP_MARKET`, `trigger_price` required
 
-### RecoveryConfig
-
-| Field | Rule | Error Message |
-|-------|------|---------------|
-| startup_delay_secs | >= 5.0 | "Startup delay must be at least 5 seconds" |
-| max_recovery_time_secs | > startup_delay_secs | "Max recovery time must exceed startup delay" |
-| warmup_lookback_days | 1-30 | "Warmup lookback must be 1-30 days" |
+### Reconciliation Validation
+- `delta` must equal `venue_qty - cached_qty`
+- If `resolution == SYNTHETIC_FILL`, `synthetic_order_id` required
+- Total reconciled position must match venue position exactly
 
 ---
 
-## State Transitions
+## Serialization
 
-### RecoveryStatus State Machine
+### Msgpack Encoding (Default)
 
+```python
+# Position snapshot serialization
+snapshot_bytes = msgpack.packb({
+    "position_id": str(position.id),
+    "instrument_id": str(position.instrument_id),
+    "strategy_id": str(position.strategy_id),
+    "account_id": str(position.account_id),
+    "side": position.side.value,
+    "signed_qty": str(position.signed_qty),
+    "quantity": str(position.quantity),
+    "avg_px_open": str(position.avg_px_open),
+    "realized_pnl": str(position.realized_pnl),
+    "ts_opened": position.ts_opened,
+    "ts_last": position.ts_last,
+})
 ```
-PENDING ──────────► IN_PROGRESS
-                        │
-         ┌──────────────┼──────────────┐
-         ▼              ▼              ▼
-     COMPLETED       FAILED        TIMEOUT
-```
 
-**Transitions**:
-- `PENDING → IN_PROGRESS`: Recovery process starts
-- `IN_PROGRESS → COMPLETED`: All positions recovered, indicators warmed
-- `IN_PROGRESS → FAILED`: Unrecoverable error occurred
-- `IN_PROGRESS → TIMEOUT`: max_recovery_time_secs exceeded
+### JSON Encoding (Debug Mode)
+
+```json
+{
+  "position_id": "BTCUSDT-PERP.BINANCE-001",
+  "instrument_id": "BTCUSDT-PERP.BINANCE",
+  "strategy_id": "MOMENTUM-001",
+  "account_id": "BINANCE-USDT_FUTURES-master",
+  "side": "LONG",
+  "signed_qty": "0.5",
+  "quantity": "0.5",
+  "avg_px_open": "42500.00",
+  "realized_pnl": "0.00",
+  "ts_opened": 1703721600000000000,
+  "ts_last": 1703725200000000000
+}
+```

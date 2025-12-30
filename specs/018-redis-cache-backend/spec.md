@@ -2,73 +2,90 @@
 
 ## Overview
 
-Configure Redis as the cache backend for NautilusTrader, enabling state persistence across restarts.
+Configure Redis as the persistent cache backend for NautilusTrader TradingNode, enabling position recovery and state persistence across restarts.
 
 ## Problem Statement
 
-Default in-memory cache loses all state on restart. For production, we need persistent cache that survives restarts and enables fast recovery.
+Without a persistent cache backend, all trading state (positions, orders, account balances) is lost when TradingNode restarts. Redis provides fast, reliable state persistence.
 
 ## Goals
 
-1. **State Persistence**: All trading state persisted to Redis
-2. **Fast Recovery**: Sub-second state loading on restart
-3. **Multi-Node Support**: Enable multiple TradingNode instances (future)
+1. **State Persistence**: Persist positions, orders, accounts to Redis
+2. **Fast Recovery**: Sub-second cache reads on startup
+3. **Production Ready**: Battle-tested configuration for live trading
 
 ## Requirements
 
 ### Functional Requirements
 
-#### FR-001: Redis Configuration
-```python
-DatabaseConfig(
-    type="redis",
-    host=os.environ.get("REDIS_HOST", "localhost"),
-    port=int(os.environ.get("REDIS_PORT", 6379)),
-    username=os.environ.get("REDIS_USER"),
-    password=os.environ.get("REDIS_PASSWORD"),
-    timeout=2.0,
-    ssl=os.environ.get("REDIS_SSL", "false").lower() == "true",
-)
-```
+#### FR-001: Redis Connection
+- Connect to Redis server (local or remote)
+- Support authentication (password, TLS)
+- Handle connection failures gracefully
 
-#### FR-002: Cache Configuration
-```python
-CacheConfig(
-    database=DatabaseConfig(...),
-    encoding="msgpack",  # Faster than JSON
-    timestamps_as_iso8601=True,
-    buffer_interval_ms=100,  # Batch writes
-    persist_account_events=True,
-    persist_orders=True,
-    persist_positions=True,
-    persist_quotes=False,  # High volume, skip
-    persist_trades=False,  # High volume, skip
-)
-```
+#### FR-002: Data Persistence
+- Persist positions with msgpack serialization
+- Persist orders with full event history
+- Persist account balances and margins
+- Persist instrument definitions
 
-#### FR-003: Data Retention
-- Orders: 7 days (configurable)
-- Positions: Until closed + 24h
-- Account events: 30 days
-- Quotes/trades: Not persisted (high volume)
-
-#### FR-004: Redis Deployment
-- Docker container for development
-- Redis Cluster for production (optional)
-- Sentinel for HA (optional)
+#### FR-003: Key Structure
+- Use trader-prefixed keys for multi-tenant support
+- Support instance ID for multiple nodes per trader
+- Configurable TTL for cached data
 
 ### Non-Functional Requirements
 
 #### NFR-001: Performance
-- Write latency < 1ms (buffered)
-- Read latency < 1ms
-- Throughput > 10,000 ops/sec
+- Write latency < 1ms (p95)
+- Read latency < 1ms (p95)
+- Support 10,000+ keys without degradation
 
 #### NFR-002: Reliability
-- Connection pooling with auto-reconnect
-- Graceful handling of Redis unavailability
+- Automatic reconnection on failure
+- Buffered writes to handle burst traffic
+- No data loss on graceful shutdown
 
 ## Technical Design
+
+### CacheConfig
+
+```python
+from nautilus_trader.config import CacheConfig
+from nautilus_trader.common.config import DatabaseConfig
+
+cache_config = CacheConfig(
+    database=DatabaseConfig(
+        type="redis",
+        host="localhost",
+        port=6379,
+        password=None,  # Optional
+        ssl=False,      # Enable for production
+        timeout=2,      # Connection timeout seconds
+    ),
+    encoding="msgpack",           # or "json" for debugging
+    timestamps_as_iso8601=False,  # Use nanoseconds
+    persist_account_events=True,  # CRITICAL for recovery
+    buffer_interval_ms=100,       # Batch writes
+    use_trader_prefix=True,       # Namespace by trader
+    use_instance_id=False,        # Multi-instance support
+    flush_on_start=False,         # Preserve state on restart
+    tick_capacity=10_000,         # Market data buffer
+    bar_capacity=10_000,          # Bar data buffer
+)
+```
+
+### Redis Key Structure
+
+```
+trader-{type}:{identifier}
+
+Examples:
+  trader-position:BTCUSDT-PERP.BINANCE-001
+  trader-order:O-20251230-001
+  trader-account:BINANCE-USDT_FUTURES-master
+  trader-instrument:BTCUSDT-PERP.BINANCE
+```
 
 ### Docker Compose
 
@@ -81,84 +98,23 @@ services:
     volumes:
       - redis_data:/data
     command: redis-server --appendonly yes
-    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
 volumes:
   redis_data:
 ```
 
-### Connection Management
-
-```python
-class RedisCacheManager:
-    """Manages Redis connection for NautilusTrader cache."""
-
-    def __init__(self, config: DatabaseConfig):
-        self.config = config
-        self._pool: redis.ConnectionPool | None = None
-
-    def get_connection(self) -> redis.Redis:
-        if self._pool is None:
-            self._pool = redis.ConnectionPool(
-                host=self.config.host,
-                port=self.config.port,
-                password=self.config.password,
-                socket_timeout=self.config.timeout,
-                max_connections=20,
-            )
-        return redis.Redis(connection_pool=self._pool)
-
-    def health_check(self) -> bool:
-        try:
-            return self.get_connection().ping()
-        except redis.ConnectionError:
-            return False
-```
-
-### Key Schema
-
-```
-# Namespace: nautilus:{trader_id}:
-
-# Positions
-nautilus:PROD-001:positions:{venue}:{instrument_id}
-
-# Orders
-nautilus:PROD-001:orders:{client_order_id}
-nautilus:PROD-001:orders_open:{venue}:{instrument_id}
-
-# Account
-nautilus:PROD-001:account:{venue}
-
-# Events (list)
-nautilus:PROD-001:events:account:{venue}
-nautilus:PROD-001:events:order:{client_order_id}
-```
-
-### Monitoring
-
-```python
-# Prometheus metrics for Redis
-redis_operations_total = Counter("redis_operations_total", ["operation"])
-redis_latency_seconds = Histogram("redis_latency_seconds", ["operation"])
-redis_connection_pool_size = Gauge("redis_connection_pool_size")
-```
-
-## Testing Strategy
-
-1. **Connection Tests**: Connect/disconnect/reconnect
-2. **Persistence Tests**: Write -> restart -> read
-3. **Performance Tests**: Latency and throughput benchmarks
-4. **Failure Tests**: Redis unavailable during operation
-
 ## Dependencies
 
-- Docker (for Redis container)
-- Spec 014 (TradingNode Configuration)
+- Redis 7.x
+- NautilusTrader >= 1.222.0
 
 ## Success Metrics
 
-- Write latency p99 < 5ms
-- Read latency p99 < 2ms
-- 100% state recovery after restart
-- Zero data loss during Redis failover
+- Connection success rate: 99.9%
+- Write latency < 1ms (p95)
+- Zero data loss on restart

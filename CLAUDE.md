@@ -162,6 +162,31 @@ config = TradingNodeConfig(
 )
 ```
 
+### Redis Cache Backend (Spec 018)
+
+**Quick Start**:
+```bash
+# Start Redis
+docker-compose -f config/cache/docker-compose.redis.yml up -d
+
+# Test connection
+python scripts/test_redis_connection.py
+```
+
+**Use Factory**:
+```python
+from config.cache import create_redis_cache_config
+
+config = TradingNodeConfig(
+    trader_id="TRADER-001",
+    cache=create_redis_cache_config(),  # Loads from env vars
+)
+```
+
+**Environment Variables**: `REDIS_HOST`, `REDIS_PORT`, `REDIS_PASSWORD`
+
+**Docs**: `docs/018-redis-keys.md`, `docs/018-recovery-guide.md`
+
 ## Repository Organization
 
 ```
