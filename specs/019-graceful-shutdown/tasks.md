@@ -146,3 +146,16 @@ T018 Run alpha-debug
 | Phase 6 (Polish) | 2 |
 | Parallel Opportunities | 5 |
 | MVP Scope | T001-T010 (10 tasks) |
+
+---
+
+## Implementation Status
+
+**Completed**: 18/18 tasks (100%) ✅
+
+**Alpha-Debug Fixes Applied**:
+- B2: Added None check for `_shutdown_started_at` before elapsed calculation
+- B4: Added try/except with fallback for unknown shutdown reasons
+- B5: Added `asyncio.Lock` to prevent TOCTOU race condition
+- B9: Added defensive `or []` for cache method returns
+- B10: Added callback for fire-and-forget task exception handling
