@@ -52,16 +52,16 @@
 
 ### Tests for User Story 1
 
-- [ ] T011 [P] [US1] Unit test ReconciliationConfig defaults in tests/unit/test_reconciliation_config.py
-- [ ] T012 [P] [US1] Unit test ReconciliationConfig validation in tests/unit/test_reconciliation_config.py
-- [ ] T013 [P] [US1] Unit test to_live_exec_engine_config() conversion in tests/unit/test_reconciliation_config.py
+- [X] T011 [P] [US1] Unit test ReconciliationConfig defaults in tests/unit/test_reconciliation_config.py
+- [X] T012 [P] [US1] Unit test ReconciliationConfig validation in tests/unit/test_reconciliation_config.py
+- [X] T013 [P] [US1] Unit test to_live_exec_engine_config() conversion in tests/unit/test_reconciliation_config.py
 
 ### Implementation for User Story 1
 
-- [ ] T014 [US1] Create LiveTradingNodeConfig builder in config/trading_node/live_config.py
-- [ ] T015 [US1] Implement build_exec_engine_config() using ReconciliationConfig in config/trading_node/live_config.py
-- [ ] T016 [US1] Implement build_cache_config() with Redis in config/trading_node/live_config.py
-- [ ] T017 [US1] Add logging for reconciliation parameters in config/trading_node/live_config.py
+- [X] T014 [US1] Create LiveTradingNodeConfig builder in config/trading_node/live_config.py
+- [X] T015 [US1] Implement build_exec_engine_config() using ReconciliationConfig in config/trading_node/live_config.py
+- [X] T016 [US1] Implement build_cache_config() with Redis in config/trading_node/live_config.py
+- [X] T017 [US1] Add logging for reconciliation parameters in config/trading_node/live_config.py
 
 **Checkpoint**: Startup reconciliation configurable and testable
 
@@ -75,11 +75,11 @@
 
 ### Tests for User Story 2
 
-- [ ] T018 [US2] Unit test startup_delay_secs constraint (>= 10.0) in tests/unit/test_reconciliation_config.py
+- [X] T018 [US2] Unit test startup_delay_secs constraint (>= 10.0) in tests/unit/test_reconciliation_config.py
 
 ### Implementation for User Story 2
 
-- [ ] T019 [US2] Add graceful_shutdown_on_exception setting in config/trading_node/live_config.py
+- [X] T019 [US2] Add graceful_shutdown_on_exception setting in config/trading_node/live_config.py
 
 **Checkpoint**: Reconciliation delay configurable
 
@@ -95,13 +95,13 @@
 
 ### Tests for User Story 3
 
-- [ ] T020 [US3] Unit test open_check_* fields validation in tests/unit/test_reconciliation_config.py
-- [ ] T021 [US3] Unit test STANDARD preset values in tests/unit/test_reconciliation_config.py
+- [X] T020 [US3] Unit test open_check_* fields validation in tests/unit/test_reconciliation_config.py
+- [X] T021 [US3] Unit test STANDARD preset values in tests/unit/test_reconciliation_config.py
 
 ### Implementation for User Story 3
 
-- [ ] T022 [US3] Verify open_check fields included in to_live_exec_engine_config() in config/reconciliation/config.py
-- [ ] T023 [US3] Verify memory purge settings included in to_live_exec_engine_config() in config/reconciliation/config.py
+- [X] T022 [US3] Verify open_check fields included in to_live_exec_engine_config() in config/reconciliation/config.py
+- [X] T023 [US3] Verify memory purge settings included in to_live_exec_engine_config() in config/reconciliation/config.py
 
 **Checkpoint**: Continuous reconciliation configurable
 
@@ -117,12 +117,12 @@
 
 ### Tests for User Story 4
 
-- [ ] T024 [US4] Unit test inflight_check_* fields validation in tests/unit/test_reconciliation_config.py
-- [ ] T025 [US4] Unit test inflight threshold >= interval constraint in tests/unit/test_reconciliation_config.py
+- [X] T024 [US4] Unit test inflight_check_* fields validation in tests/unit/test_reconciliation_config.py
+- [X] T025 [US4] Unit test inflight threshold >= interval constraint in tests/unit/test_reconciliation_config.py
 
 ### Implementation for User Story 4
 
-- [ ] T026 [US4] Verify inflight_check fields included in to_live_exec_engine_config() in config/reconciliation/config.py
+- [X] T026 [US4] Verify inflight_check fields included in to_live_exec_engine_config() in config/reconciliation/config.py
 
 **Checkpoint**: In-flight monitoring configurable
 
