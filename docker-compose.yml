@@ -1,0 +1,41 @@
+# TradingNode Docker Compose (T046)
+# Production deployment with Redis + TradingNode
+
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: nautilus-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  trading-node:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: nautilus-trading-node
+    env_file:
+      - .env
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    volumes:
+      - ./logs:/var/log/nautilus
+      - ./data/catalog:/data/nautilus/catalog
+      - ./strategies:/app/strategies:ro
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  redis_data:
+    driver: local

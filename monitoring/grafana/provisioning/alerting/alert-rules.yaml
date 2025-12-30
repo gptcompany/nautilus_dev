@@ -1,0 +1,652 @@
+# monitoring/grafana/provisioning/alerting/alert-rules.yaml
+# T040-T042: Alert rules for daemon health, exchange connectivity, pipeline gaps
+#
+# Provisioned via Grafana alerting provisioning system
+# Docs: https://grafana.com/docs/grafana/latest/alerting/set-up/provision-alerting-resources/file-provisioning/
+
+apiVersion: 1
+
+groups:
+  # ============================================
+  # T040: Daemon Health Alert Rules
+  # ============================================
+  - orgId: 1
+    name: daemon_health
+    folder: Nautilus Alerts
+    interval: 30s
+    rules:
+      # Critical: Daemon not running (no metrics for 2 minutes)
+      - uid: daemon-down
+        title: Daemon Down
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 120
+              to: 0
+            datasourceUid: questdb
+            model:
+              rawSql: |
+                SELECT count(*) as metric_count
+                FROM daemon_metrics
+                WHERE timestamp > now() - interval '2m'
+                AND env = 'prod'
+              format: table
+          - refId: B
+            relativeTimeRange:
+              from: 0
+              to: 0
+            datasourceUid: __expr__
+            model:
+              type: reduce
+              expression: A
+              reducer: last
+          - refId: C
+            relativeTimeRange:
+              from: 0
+              to: 0
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: B
+              conditions:
+                - evaluator:
+                    type: lt
+                    params: [1]
+                  operator:
+                    type: and
+        noDataState: Alerting
+        execErrState: Alerting
+        for: 2m
+        annotations:
+          summary: "Daemon {{ $labels.daemon_name }} is not sending metrics"
+          description: "No metrics received from daemon in the last 2 minutes. Check if the daemon process is running."
+        labels:
+          severity: critical
+          category: infrastructure
+
+      # Warning: High memory usage (>80%)
+      - uid: daemon-high-memory
+        title: Daemon High Memory Usage
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 300
+              to: 0
+            datasourceUid: questdb
+            model:
+              rawSql: |
+                SELECT daemon_name, memory_mb
+                FROM daemon_metrics
+                WHERE timestamp > now() - interval '1m'
+                AND env = 'prod'
+                LATEST BY daemon_name
+              format: table
+          - refId: B
+            relativeTimeRange:
+              from: 0
+              to: 0
+            datasourceUid: __expr__
+            model:
+              type: reduce
+              expression: A
+              reducer: max
+          - refId: C
+            relativeTimeRange:
+              from: 0
+              to: 0
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: B
+              conditions:
+                - evaluator:
+                    type: gt
+                    params: [800]  # 800MB threshold
+                  operator:
+                    type: and
+        noDataState: OK
+        execErrState: Alerting
+        for: 5m
+        annotations:
+          summary: "Daemon {{ $labels.daemon_name }} memory usage is high"
+          description: "Memory usage exceeded 800MB for more than 5 minutes. Current: {{ $values.B }}MB"
+        labels:
+          severity: warning
+          category: infrastructure
+
+      # Critical: Very high memory usage (>1200MB)
+      - uid: daemon-critical-memory
+        title: Daemon Critical Memory Usage
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 300
+              to: 0
+            datasourceUid: questdb
+            model:
+              rawSql: |
+                SELECT daemon_name, memory_mb
+                FROM daemon_metrics
+                WHERE timestamp > now() - interval '1m'
+                AND env = 'prod'
+                LATEST BY daemon_name
+              format: table
+          - refId: B
+            relativeTimeRange:
+              from: 0
+              to: 0
+            datasourceUid: __expr__
+            model:
+              type: reduce
+              expression: A
+              reducer: max
+          - refId: C
+            relativeTimeRange:
+              from: 0
+              to: 0
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: B
+              conditions:
+                - evaluator:
+                    type: gt
+                    params: [1200]  # 1200MB critical threshold
+                  operator:
+                    type: and
+        noDataState: OK
+        execErrState: Alerting
+        for: 2m
+        annotations:
+          summary: "CRITICAL: Daemon {{ $labels.daemon_name }} memory critically high"
+          description: "Memory usage exceeded 1200MB. Immediate action required. Current: {{ $values.B }}MB"
+        labels:
+          severity: critical
+          category: infrastructure
+
+      # Warning: High error rate (>5 errors/minute)
+      - uid: daemon-high-errors
+        title: Daemon High Error Rate
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 300
+              to: 0
+            datasourceUid: questdb
+            model:
+              rawSql: |
+                SELECT daemon_name,
+                       max(error_count) - min(error_count) as error_delta
+                FROM daemon_metrics
+                WHERE timestamp > now() - interval '5m'
+                AND env = 'prod'
+                GROUP BY daemon_name
+              format: table
+          - refId: B
+            relativeTimeRange:
+              from: 0
+              to: 0
+            datasourceUid: __expr__
+            model:
+              type: reduce
+              expression: A
+              reducer: max
+          - refId: C
+            relativeTimeRange:
+              from: 0
+              to: 0
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: B
+              conditions:
+                - evaluator:
+                    type: gt
+                    params: [25]  # >5 errors/min over 5 minutes
+                  operator:
+                    type: and
+        noDataState: OK
+        execErrState: Alerting
+        for: 5m
+        annotations:
+          summary: "Daemon {{ $labels.daemon_name }} has high error rate"
+          description: "More than 5 errors per minute detected in the last 5 minutes."
+        labels:
+          severity: warning
+          category: infrastructure
+
+  # ============================================
+  # T041: Exchange Connectivity Alert Rules
+  # ============================================
+  - orgId: 1
+    name: exchange_connectivity
+    folder: Nautilus Alerts
+    interval: 15s
+    rules:
+      # Critical: Exchange disconnected
+      - uid: exchange-disconnected
+        title: Exchange Disconnected
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 60
+              to: 0
+            datasourceUid: questdb
+            model:
+              rawSql: |
+                SELECT exchange,
+                       CASE WHEN connected THEN 1 ELSE 0 END as is_connected
+                FROM exchange_status
+                WHERE timestamp > now() - interval '1m'
+                AND env = 'prod'
+                LATEST BY exchange
+              format: table
+          - refId: B
+            relativeTimeRange:
+              from: 0
+              to: 0
+            datasourceUid: __expr__
+            model:
+              type: reduce
+              expression: A
+              reducer: min
+          - refId: C
+            relativeTimeRange:
+              from: 0
+              to: 0
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: B
+              conditions:
+                - evaluator:
+                    type: lt
+                    params: [1]
+                  operator:
+                    type: and
+        noDataState: Alerting
+        execErrState: Alerting
+        for: 30s
+        annotations:
+          summary: "Exchange {{ $labels.exchange }} disconnected"
+          description: "WebSocket connection to {{ $labels.exchange }} has been lost. Check network and exchange status."
+        labels:
+          severity: critical
+          category: connectivity
+
+      # Warning: High latency (>300ms)
+      - uid: exchange-high-latency
+        title: Exchange High Latency
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 300
+              to: 0
+            datasourceUid: questdb
+            model:
+              rawSql: |
+                SELECT exchange, avg(latency_ms) as avg_latency
+                FROM exchange_status
+                WHERE timestamp > now() - interval '5m'
+                AND env = 'prod'
+                AND connected = true
+                GROUP BY exchange
+              format: table
+          - refId: B
+            relativeTimeRange:
+              from: 0
+              to: 0
+            datasourceUid: __expr__
+            model:
+              type: reduce
+              expression: A
+              reducer: max
+          - refId: C
+            relativeTimeRange:
+              from: 0
+              to: 0
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: B
+              conditions:
+                - evaluator:
+                    type: gt
+                    params: [300]
+                  operator:
+                    type: and
+        noDataState: OK
+        execErrState: Alerting
+        for: 5m
+        annotations:
+          summary: "Exchange {{ $labels.exchange }} has high latency"
+          description: "Average latency to {{ $labels.exchange }} exceeded 300ms for 5 minutes. Current: {{ $values.B }}ms"
+        labels:
+          severity: warning
+          category: connectivity
+
+      # Warning: Frequent reconnections (>5 in 1 hour)
+      - uid: exchange-frequent-reconnects
+        title: Exchange Frequent Reconnections
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 3600
+              to: 0
+            datasourceUid: questdb
+            model:
+              rawSql: |
+                SELECT exchange,
+                       max(reconnect_count) - min(reconnect_count) as reconnect_delta
+                FROM exchange_status
+                WHERE timestamp > now() - interval '1h'
+                AND env = 'prod'
+                GROUP BY exchange
+              format: table
+          - refId: B
+            relativeTimeRange:
+              from: 0
+              to: 0
+            datasourceUid: __expr__
+            model:
+              type: reduce
+              expression: A
+              reducer: max
+          - refId: C
+            relativeTimeRange:
+              from: 0
+              to: 0
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: B
+              conditions:
+                - evaluator:
+                    type: gt
+                    params: [5]
+                  operator:
+                    type: and
+        noDataState: OK
+        execErrState: Alerting
+        for: 0s
+        annotations:
+          summary: "Exchange {{ $labels.exchange }} has frequent reconnections"
+          description: "More than 5 reconnections in the last hour. This may indicate network instability."
+        labels:
+          severity: warning
+          category: connectivity
+
+      # Warning: Stale data (no messages for 60 seconds)
+      - uid: exchange-stale-data
+        title: Exchange Stale Data
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 120
+              to: 0
+            datasourceUid: questdb
+            model:
+              rawSql: |
+                SELECT exchange,
+                       extract(epoch from (now() - last_message_at)) as seconds_since_message
+                FROM exchange_status
+                WHERE timestamp > now() - interval '1m'
+                AND env = 'prod'
+                AND connected = true
+                LATEST BY exchange
+              format: table
+          - refId: B
+            relativeTimeRange:
+              from: 0
+              to: 0
+            datasourceUid: __expr__
+            model:
+              type: reduce
+              expression: A
+              reducer: max
+          - refId: C
+            relativeTimeRange:
+              from: 0
+              to: 0
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: B
+              conditions:
+                - evaluator:
+                    type: gt
+                    params: [60]
+                  operator:
+                    type: and
+        noDataState: OK
+        execErrState: Alerting
+        for: 1m
+        annotations:
+          summary: "Exchange {{ $labels.exchange }} has stale data"
+          description: "No messages received from {{ $labels.exchange }} for over 60 seconds despite being connected."
+        labels:
+          severity: warning
+          category: connectivity
+
+  # ============================================
+  # T042: Data Pipeline Gap Alert Rules
+  # ============================================
+  - orgId: 1
+    name: pipeline_gaps
+    folder: Nautilus Alerts
+    interval: 60s
+    rules:
+      # Warning: Data gap detected
+      - uid: pipeline-data-gap
+        title: Pipeline Data Gap Detected
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 3600
+              to: 0
+            datasourceUid: questdb
+            model:
+              rawSql: |
+                SELECT exchange, data_type, count(*) as gap_count
+                FROM pipeline_metrics
+                WHERE gap_detected = true
+                AND timestamp > now() - interval '1h'
+                AND env = 'prod'
+                GROUP BY exchange, data_type
+              format: table
+          - refId: B
+            relativeTimeRange:
+              from: 0
+              to: 0
+            datasourceUid: __expr__
+            model:
+              type: reduce
+              expression: A
+              reducer: sum
+          - refId: C
+            relativeTimeRange:
+              from: 0
+              to: 0
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: B
+              conditions:
+                - evaluator:
+                    type: gt
+                    params: [0]
+                  operator:
+                    type: and
+        noDataState: OK
+        execErrState: Alerting
+        for: 0s
+        annotations:
+          summary: "Data gap detected for {{ $labels.exchange }} {{ $labels.data_type }}"
+          description: "Data pipeline detected a gap in {{ $labels.data_type }} data from {{ $labels.exchange }}."
+        labels:
+          severity: warning
+          category: data_quality
+
+      # Critical: Large data gap (>5 minutes)
+      - uid: pipeline-large-gap
+        title: Pipeline Large Data Gap
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 3600
+              to: 0
+            datasourceUid: questdb
+            model:
+              rawSql: |
+                SELECT exchange, data_type, max(gap_duration_seconds) as max_gap
+                FROM pipeline_metrics
+                WHERE gap_detected = true
+                AND timestamp > now() - interval '1h'
+                AND env = 'prod'
+                GROUP BY exchange, data_type
+              format: table
+          - refId: B
+            relativeTimeRange:
+              from: 0
+              to: 0
+            datasourceUid: __expr__
+            model:
+              type: reduce
+              expression: A
+              reducer: max
+          - refId: C
+            relativeTimeRange:
+              from: 0
+              to: 0
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: B
+              conditions:
+                - evaluator:
+                    type: gt
+                    params: [300]  # 5 minutes
+                  operator:
+                    type: and
+        noDataState: OK
+        execErrState: Alerting
+        for: 1m
+        annotations:
+          summary: "CRITICAL: Large data gap for {{ $labels.exchange }} {{ $labels.data_type }}"
+          description: "Data gap of more than 5 minutes detected. Gap duration: {{ $values.B }}s"
+        labels:
+          severity: critical
+          category: data_quality
+
+      # Warning: Low throughput (no records for 10 minutes)
+      - uid: pipeline-low-throughput
+        title: Pipeline Low Throughput
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 600
+              to: 0
+            datasourceUid: questdb
+            model:
+              rawSql: |
+                SELECT exchange, data_type, sum(records_count) as total_records
+                FROM pipeline_metrics
+                WHERE timestamp > now() - interval '10m'
+                AND env = 'prod'
+                AND data_type IN ('oi', 'funding')
+                GROUP BY exchange, data_type
+              format: table
+          - refId: B
+            relativeTimeRange:
+              from: 0
+              to: 0
+            datasourceUid: __expr__
+            model:
+              type: reduce
+              expression: A
+              reducer: min
+          - refId: C
+            relativeTimeRange:
+              from: 0
+              to: 0
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: B
+              conditions:
+                - evaluator:
+                    type: lt
+                    params: [1]
+                  operator:
+                    type: and
+        noDataState: Alerting
+        execErrState: Alerting
+        for: 10m
+        annotations:
+          summary: "Pipeline {{ $labels.exchange }} {{ $labels.data_type }} has low throughput"
+          description: "No records received for {{ $labels.data_type }} from {{ $labels.exchange }} in the last 10 minutes."
+        labels:
+          severity: warning
+          category: data_quality
+
+      # Warning: High pipeline latency (>500ms average)
+      - uid: pipeline-high-latency
+        title: Pipeline High Latency
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 300
+              to: 0
+            datasourceUid: questdb
+            model:
+              rawSql: |
+                SELECT exchange, data_type, avg(latency_ms) as avg_latency
+                FROM pipeline_metrics
+                WHERE timestamp > now() - interval '5m'
+                AND env = 'prod'
+                GROUP BY exchange, data_type
+              format: table
+          - refId: B
+            relativeTimeRange:
+              from: 0
+              to: 0
+            datasourceUid: __expr__
+            model:
+              type: reduce
+              expression: A
+              reducer: max
+          - refId: C
+            relativeTimeRange:
+              from: 0
+              to: 0
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: B
+              conditions:
+                - evaluator:
+                    type: gt
+                    params: [500]
+                  operator:
+                    type: and
+        noDataState: OK
+        execErrState: Alerting
+        for: 5m
+        annotations:
+          summary: "Pipeline {{ $labels.exchange }} {{ $labels.data_type }} has high latency"
+          description: "Average processing latency exceeded 500ms. Current: {{ $values.B }}ms"
+        labels:
+          severity: warning
+          category: data_quality

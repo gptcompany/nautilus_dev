@@ -1,0 +1,98 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://nautilus_dev/schemas/reconciliation_config.json",
+  "title": "ReconciliationConfig",
+  "description": "Configuration schema for NautilusTrader order reconciliation",
+  "type": "object",
+  "properties": {
+    "enabled": {
+      "type": "boolean",
+      "default": true,
+      "description": "Enable startup reconciliation"
+    },
+    "startup_delay_secs": {
+      "type": "number",
+      "minimum": 10.0,
+      "default": 10.0,
+      "description": "Delay in seconds before reconciliation starts (minimum 10s)"
+    },
+    "lookback_mins": {
+      "type": ["integer", "null"],
+      "minimum": 0,
+      "default": null,
+      "description": "History lookback in minutes (null = maximum available)"
+    },
+    "inflight_check_interval_ms": {
+      "type": "integer",
+      "minimum": 1000,
+      "default": 2000,
+      "description": "Interval for checking in-flight orders (milliseconds)"
+    },
+    "inflight_check_threshold_ms": {
+      "type": "integer",
+      "minimum": 1000,
+      "default": 5000,
+      "description": "Threshold before querying venue for in-flight orders (milliseconds)"
+    },
+    "inflight_check_retries": {
+      "type": "integer",
+      "minimum": 1,
+      "default": 5,
+      "description": "Maximum retry attempts for in-flight order resolution"
+    },
+    "open_check_interval_secs": {
+      "type": ["number", "null"],
+      "minimum": 1.0,
+      "default": 5.0,
+      "description": "Interval for continuous open order polling (seconds, null = disabled)"
+    },
+    "open_check_lookback_mins": {
+      "type": "integer",
+      "minimum": 60,
+      "default": 60,
+      "description": "Lookback window for open order checks (minimum 60 minutes)"
+    },
+    "open_check_threshold_ms": {
+      "type": "integer",
+      "minimum": 1000,
+      "default": 5000,
+      "description": "Threshold before acting on discrepancies (milliseconds)"
+    },
+    "purge_closed_orders_interval_mins": {
+      "type": "integer",
+      "minimum": 1,
+      "default": 10,
+      "description": "Interval for purging closed orders from memory (minutes)"
+    },
+    "purge_closed_orders_buffer_mins": {
+      "type": "integer",
+      "minimum": 1,
+      "default": 60,
+      "description": "Grace period before purging closed orders (minutes)"
+    }
+  },
+  "required": [],
+  "additionalProperties": false,
+  "examples": [
+    {
+      "enabled": true,
+      "startup_delay_secs": 10.0,
+      "lookback_mins": null,
+      "inflight_check_interval_ms": 2000,
+      "inflight_check_threshold_ms": 5000,
+      "inflight_check_retries": 5,
+      "open_check_interval_secs": 5.0,
+      "open_check_lookback_mins": 60,
+      "open_check_threshold_ms": 5000,
+      "purge_closed_orders_interval_mins": 10,
+      "purge_closed_orders_buffer_mins": 60
+    },
+    {
+      "enabled": true,
+      "startup_delay_secs": 15.0,
+      "lookback_mins": 120,
+      "open_check_interval_secs": 10.0,
+      "open_check_lookback_mins": 120
+    }
+  ]
+}

@@ -1,0 +1,194 @@
+# monitoring/grafana/provisioning/alerting/contact-points.yaml
+# T043-T046: Contact points configuration for Telegram, Discord, Email
+#
+# Configure notification channels for alerting
+# Docs: https://grafana.com/docs/grafana/latest/alerting/set-up/provision-alerting-resources/file-provisioning/
+
+apiVersion: 1
+
+contactPoints:
+  # ============================================
+  # T044: Telegram Notification Channel
+  # ============================================
+  - orgId: 1
+    name: telegram-critical
+    receivers:
+      - uid: telegram-critical-receiver
+        type: telegram
+        settings:
+          # Bot token from @BotFather - set via environment variable
+          bottoken: "${TELEGRAM_BOT_TOKEN}"
+          # Chat ID - can be user ID or group ID (negative for groups)
+          chatid: "${TELEGRAM_CHAT_ID}"
+          # Message format
+          message: |
+            🚨 *{{ .Status | toUpper }}* - {{ .CommonLabels.alertname }}
+
+            *Severity*: {{ .CommonLabels.severity }}
+            *Category*: {{ .CommonLabels.category }}
+
+            {{ range .Alerts }}
+            📍 *{{ .Annotations.summary }}*
+            {{ .Annotations.description }}
+            {{ end }}
+
+            🕐 {{ .CommonAnnotations.runbook_url | default "No runbook" }}
+          # Parse mode for markdown
+          parse_mode: Markdown
+          # Disable link previews for cleaner messages
+          disable_web_page_preview: true
+        disableResolveMessage: false
+
+  - orgId: 1
+    name: telegram-warning
+    receivers:
+      - uid: telegram-warning-receiver
+        type: telegram
+        settings:
+          bottoken: "${TELEGRAM_BOT_TOKEN}"
+          chatid: "${TELEGRAM_CHAT_ID}"
+          message: |
+            ⚠️ *{{ .Status | toUpper }}* - {{ .CommonLabels.alertname }}
+
+            *Severity*: {{ .CommonLabels.severity }}
+
+            {{ range .Alerts }}
+            {{ .Annotations.summary }}
+            {{ end }}
+          parse_mode: Markdown
+          disable_web_page_preview: true
+        disableResolveMessage: false
+
+  # ============================================
+  # T045: Discord Notification Channel
+  # ============================================
+  - orgId: 1
+    name: discord-critical
+    receivers:
+      - uid: discord-critical-receiver
+        type: discord
+        settings:
+          # Discord webhook URL - set via environment variable
+          url: "${DISCORD_WEBHOOK_URL}"
+          # Avatar URL for the bot
+          avatar_url: "https://grafana.com/static/img/fav32.png"
+          # Use Discord embeds for rich formatting
+          use_discord_username: true
+          message: |
+            🚨 **{{ .Status | toUpper }}** - {{ .CommonLabels.alertname }}
+
+            **Severity**: {{ .CommonLabels.severity }}
+            **Category**: {{ .CommonLabels.category }}
+
+            {{ range .Alerts }}
+            📍 **{{ .Annotations.summary }}**
+            {{ .Annotations.description }}
+            {{ end }}
+        disableResolveMessage: false
+
+  - orgId: 1
+    name: discord-all
+    receivers:
+      - uid: discord-all-receiver
+        type: discord
+        settings:
+          url: "${DISCORD_WEBHOOK_URL}"
+          avatar_url: "https://grafana.com/static/img/fav32.png"
+          use_discord_username: true
+          message: |
+            {{ if eq .Status "firing" }}🔴{{ else }}🟢{{ end }} **{{ .Status | toUpper }}** - {{ .CommonLabels.alertname }}
+
+            {{ range .Alerts }}
+            {{ .Annotations.summary }}
+            {{ end }}
+        disableResolveMessage: false
+
+  # ============================================
+  # T046: Email Notification Channel
+  # ============================================
+  - orgId: 1
+    name: email-critical
+    receivers:
+      - uid: email-critical-receiver
+        type: email
+        settings:
+          # Comma-separated list of email addresses
+          addresses: "${ALERT_EMAIL_ADDRESSES}"
+          # Send a single email for all alerts (not one per alert)
+          singleEmail: true
+          # Custom subject line
+          subject: "[CRITICAL] {{ .CommonLabels.alertname }} - Nautilus Trading"
+          # HTML message body
+          message: |
+            <h2>🚨 Alert: {{ .CommonLabels.alertname }}</h2>
+
+            <table style="border-collapse: collapse; width: 100%;">
+              <tr>
+                <td style="padding: 8px; border: 1px solid #ddd;"><strong>Status</strong></td>
+                <td style="padding: 8px; border: 1px solid #ddd;">{{ .Status | toUpper }}</td>
+              </tr>
+              <tr>
+                <td style="padding: 8px; border: 1px solid #ddd;"><strong>Severity</strong></td>
+                <td style="padding: 8px; border: 1px solid #ddd; color: red;">{{ .CommonLabels.severity }}</td>
+              </tr>
+              <tr>
+                <td style="padding: 8px; border: 1px solid #ddd;"><strong>Category</strong></td>
+                <td style="padding: 8px; border: 1px solid #ddd;">{{ .CommonLabels.category }}</td>
+              </tr>
+            </table>
+
+            <h3>Alert Details</h3>
+            {{ range .Alerts }}
+            <div style="background: #f8f8f8; padding: 10px; margin: 10px 0; border-left: 4px solid red;">
+              <strong>{{ .Annotations.summary }}</strong>
+              <p>{{ .Annotations.description }}</p>
+            </div>
+            {{ end }}
+
+            <hr>
+            <p style="color: #666; font-size: 12px;">
+              Sent by Nautilus Monitoring System<br>
+              <a href="{{ .ExternalURL }}">View in Grafana</a>
+            </p>
+        disableResolveMessage: false
+
+  - orgId: 1
+    name: email-daily-digest
+    receivers:
+      - uid: email-digest-receiver
+        type: email
+        settings:
+          addresses: "${ALERT_EMAIL_ADDRESSES}"
+          singleEmail: true
+          subject: "[INFO] Daily Alert Summary - Nautilus Trading"
+          message: |
+            <h2>📊 Daily Alert Summary</h2>
+
+            <p>This is a summary of alerts from the last 24 hours.</p>
+
+            {{ range .Alerts }}
+            <div style="background: #f0f0f0; padding: 10px; margin: 5px 0;">
+              <strong>{{ .Labels.alertname }}</strong> - {{ .Labels.severity }}
+              <p>{{ .Annotations.summary }}</p>
+            </div>
+            {{ end }}
+
+            <hr>
+            <p style="color: #666; font-size: 12px;">
+              Sent by Nautilus Monitoring System
+            </p>
+        disableResolveMessage: true
+
+  # ============================================
+  # Default/Fallback Contact Point
+  # ============================================
+  - orgId: 1
+    name: default-alerting
+    receivers:
+      - uid: default-receiver
+        type: email
+        settings:
+          addresses: "${ALERT_EMAIL_ADDRESSES}"
+          singleEmail: true
+          subject: "[ALERT] {{ .CommonLabels.alertname }}"
+        disableResolveMessage: false

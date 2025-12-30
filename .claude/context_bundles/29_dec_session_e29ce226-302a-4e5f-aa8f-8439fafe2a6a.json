@@ -1,0 +1,562 @@
+{
+  "session_id": "e29ce226-302a-4e5f-aa8f-8439fafe2a6a",
+  "created_at": "2025-12-29T19:39:02.559440",
+  "operations": [
+    {
+      "operation": "read",
+      "timestamp": "2025-12-29T19:39:02.559461",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/walk_forward/report.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-29T19:39:02.568488",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/walk_forward/cli.py"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-29T19:49:19.819972",
+      "command": "git push origin master && git push origin 020-walk-forward-validation",
+      "description": "Push master and feature branch"
+    },
+    {
+      "operation": "task",
+      "timestamp": "2025-12-29T19:50:11.796071",
+      "subagent_type": "alpha-debug",
+      "prompt": "## Alpha-Debug: Walk-Forward Validation Module\n\nRun iterative bug hunting on the recently committed ..."
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-29T19:50:20.151185",
+      "todo_count": 4
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-29T19:50:30.562336",
+      "command": "git diff HEAD~5 --stat 2>/dev/null | tail -20",
+      "description": "Show recent changes stats"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-29T19:50:30.587335",
+      "command": "find scripts/alpha_evolve/walk_forward tests/test_walk_forward -name \"*.py\" 2>/dev/null | head -20",
+      "description": "List walk-forward Python files"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-29T19:50:31.900021",
+      "command": "wc -l scripts/alpha_evolve/walk_forward/*.py tests/test_walk_forward/*.py 2>/dev/null | tail -5",
+      "description": "Count lines in walk-forward modules"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-29T19:50:43.694174",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/walk_forward/validator.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-29T19:50:43.700505",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/walk_forward/metrics.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-29T19:50:43.708632",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/walk_forward/config.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-29T19:50:43.721167",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/walk_forward/models.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-29T19:50:50.511060",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/walk_forward/cli.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-29T19:50:50.517427",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/walk_forward/report.py"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-29T19:50:58.242432",
+      "todo_count": 4
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-29T19:51:08.494539",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run pytest tests/test_walk_forward/ -v --tb=short 2>&1 | tail -100",
+      "description": "Run walk-forward tests"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-29T19:51:11.136453",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run ruff check scripts/alpha_evolve/walk_forward/ 2>&1 | head -50",
+      "description": "Run ruff linter on walk-forward"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-29T19:51:12.687244",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run pyright scripts/alpha_evolve/walk_forward/ 2>&1 | head -50",
+      "description": "Run pyright type checker"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-29T19:51:25.317304",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && PYTHONPATH=/media/sam/1TB/nautilus_dev python -c \"\nfrom scripts.alpha_evolve.walk_forward.config import WalkForwardConfig\nfrom scripts.alpha_evolve.walk_forward.models import WindowMetrics, Window, WindowResult, WalkForwardResult\nfrom scripts.alpha_evolve.walk_forward.metrics import calculate_robustness_score, calculate_deflated_sharpe_ratio, estimate_probability_backtest_overfitting\nfrom datetime import datetime, timedelta\n\n# Test 1: Basic config creation\nconfig = WalkForwardConfig(\n    data_start=datetime(2023, 1, 1),\n    data_end=datetime(2024, 12, 1),\n)\nprint('Config created successfully')\n\n# Test 2: Window generation\nfrom scripts.alpha_evolve.walk_forward.validator import WalkForwardValidator\nfrom unittest.mock import AsyncMock\n\nevaluator = AsyncMock()\nvalidator = WalkForwardValidator(config, evaluator)\nwindows = validator._generate_windows()\nprint(f'Generated {len(windows)} windows')\nfor w in windows[:3]:\n    print(f'  Window {w.window_id}: train {w.train_start.date()} - {w.train_end.date()}, test {w.test_start.date()} - {w.test_end.date()}')\n\" 2>&1",
+      "description": "Test walk-forward modules directly"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-29T19:51:44.533169",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && PYTHONPATH=/media/sam/1TB/nautilus_dev python -c \"\nfrom scripts.alpha_evolve.walk_forward.config import WalkForwardConfig\nfrom scripts.alpha_evolve.walk_forward.validator import WalkForwardValidator\nfrom scripts.alpha_evolve.walk_forward.models import WindowMetrics, WindowResult\nfrom datetime import datetime, timedelta\nfrom unittest.mock import AsyncMock\nimport asyncio\n\n# Test EDGE CASE 1: Very short date range - should this fail?\nprint('=== Edge Case 1: Short date range ===')\ntry:\n    short_config = WalkForwardConfig(\n        data_start=datetime(2024, 1, 1),\n        data_end=datetime(2024, 3, 1),  # Only 2 months\n    )\n    print(f'UNEXPECTED: Config created with 2 months of data')\nexcept ValueError as e:\n    print(f'Expected error: {e}')\n\n# Test EDGE CASE 2: Month approximation (30 days per month)\nprint()\nprint('=== Edge Case 2: Month approximation ===')\nconfig = WalkForwardConfig(\n    data_start=datetime(2023, 1, 1),\n    data_end=datetime(2025, 1, 1),\n    train_months=12,  # 360 days\n    test_months=3,    # 90 days\n    step_months=3,\n)\nvalidator = WalkForwardValidator(config, AsyncMock())\nwindows = validator._generate_windows()\nprint(f'Generated {len(windows)} windows')\n\n# Check actual vs expected train period length\nfor w in windows[:2]:\n    actual_train_days = (w.train_end - w.train_start).days\n    expected_train_days = 12 * 30  # 360\n    print(f'Window {w.window_id}: train_days={actual_train_days}, expected={expected_train_days}')\n    if actual_train_days != expected_train_days:\n        print(f'  WARNING: Month approximation may cause issues with actual calendar months')\n\n# Test EDGE CASE 3: Embargo period at boundaries\nprint()\nprint('=== Edge Case 3: Embargo handling ===')\nconfig = WalkForwardConfig(\n    data_start=datetime(2023, 1, 1),\n    data_end=datetime(2024, 12, 1),\n    embargo_before_days=30,  # Large embargo\n    embargo_after_days=30,\n)\nvalidator = WalkForwardValidator(config, AsyncMock())\nwindows = validator._generate_windows()\nprint(f'Generated {len(windows)} windows with 30-day embargo')\nfor w in windows[:2]:\n    gap_days = (w.test_start - w.train_end).days\n    print(f'Window {w.window_id}: embargo gap = {gap_days} days (expected 30)')\n\" 2>&1",
+      "description": "Test edge cases in date arithmetic"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-29T19:52:05.799181",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && PYTHONPATH=/media/sam/1TB/nautilus_dev python -c \"\nfrom scripts.alpha_evolve.walk_forward.metrics import (\n    calculate_robustness_score,\n    calculate_deflated_sharpe_ratio,\n    estimate_probability_backtest_overfitting,\n    _norm_cdf,\n    _norm_ppf,\n    _median,\n    _std_dev,\n)\nfrom scripts.alpha_evolve.walk_forward.models import WindowMetrics, Window, WindowResult\nfrom datetime import datetime\nimport math\n\nprint('=== Edge Case 4: Division by zero in metrics ===')\n\n# Create window results with zero values\ndef make_window_result(train_sharpe, test_sharpe, train_return, test_return):\n    return WindowResult(\n        window=Window(\n            window_id=1,\n            train_start=datetime(2023, 1, 1),\n            train_end=datetime(2023, 6, 30),\n            test_start=datetime(2023, 7, 5),\n            test_end=datetime(2023, 10, 3),\n        ),\n        train_metrics=WindowMetrics(\n            sharpe_ratio=train_sharpe,\n            calmar_ratio=0.0,\n            max_drawdown=0.0,\n            total_return=train_return,\n            win_rate=0.5,\n            trade_count=10,\n        ),\n        test_metrics=WindowMetrics(\n            sharpe_ratio=test_sharpe,\n            calmar_ratio=0.0,\n            max_drawdown=0.0,\n            total_return=test_return,\n            win_rate=0.5,\n            trade_count=10,\n        ),\n    )\n\n# Test all-zero sharpe ratios\nprint('Test: All zero Sharpe ratios')\nresults = [make_window_result(0.0, 0.0, 0.0, 0.0) for _ in range(3)]\ntry:\n    score = calculate_robustness_score(results)\n    print(f'  Robustness score with zero sharpes: {score}')\nexcept ZeroDivisionError as e:\n    print(f'  BUG: Division by zero! {e}')\n\n# Test negative train sharpe\nprint()\nprint('Test: Negative train Sharpe')\nresults = [make_window_result(-1.0, 0.5, 0.1, 0.05) for _ in range(3)]\nscore = calculate_robustness_score(results)\nprint(f'  Robustness score with negative train sharpe: {score}')\n\n# Test zero returns everywhere\nprint()\nprint('Test: All zero returns')\nresults = [make_window_result(0.0, 0.0, 0.0, 0.0) for _ in range(3)]\nscore = calculate_robustness_score(results)\nprint(f'  Robustness score with all zeros: {score}')\n\n# Test DSR edge cases\nprint()\nprint('=== Edge Case 5: DSR with extreme n_trials ===')\nprint(f'DSR(2.0, 1) = {calculate_deflated_sharpe_ratio(2.0, 1)}')\nprint(f'DSR(2.0, 0) = {calculate_deflated_sharpe_ratio(2.0, 0)}')\nprint(f'DSR(2.0, -1) = {calculate_deflated_sharpe_ratio(2.0, -1)}')\nprint(f'DSR(2.0, 10**20) = {calculate_deflated_sharpe_ratio(2.0, 10**20)}')\nprint(f'DSR(-1.0, 10) = {calculate_deflated_sharpe_ratio(-1.0, 10)}')\n\n# Test norm functions\nprint()\nprint('=== Edge Case 6: Normal distribution functions ===')\nprint(f'norm_cdf(0) = {_norm_cdf(0)} (expected: 0.5)')\nprint(f'norm_cdf(-inf) = {_norm_cdf(float(\\\"-inf\\\"))} (expected: 0)')\nprint(f'norm_cdf(inf) = {_norm_cdf(float(\\\"inf\\\"))} (expected: 1)')\nprint(f'norm_ppf(0.5) = {_norm_ppf(0.5)} (expected: 0)')\nprint(f'norm_ppf(0) = {_norm_ppf(0)} (expected: -inf)')\nprint(f'norm_ppf(1) = {_norm_ppf(1)} (expected: inf)')\nprint(f'norm_ppf(0.975) = {_norm_ppf(0.975):.4f} (expected: ~1.96)')\n\" 2>&1",
+      "description": "Test metrics edge cases"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-29T19:52:26.519044",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && PYTHONPATH=/media/sam/1TB/nautilus_dev python -c \"\nfrom scripts.alpha_evolve.walk_forward.metrics import (\n    estimate_probability_backtest_overfitting,\n    simulate_combinatorial_paths,\n)\nfrom scripts.alpha_evolve.walk_forward.models import WindowMetrics, Window, WindowResult\nfrom datetime import datetime\n\n# Create window results\ndef make_window_result(window_id, train_sharpe, test_sharpe):\n    return WindowResult(\n        window=Window(\n            window_id=window_id,\n            train_start=datetime(2023, 1, 1),\n            train_end=datetime(2023, 6, 30),\n            test_start=datetime(2023, 7, 5),\n            test_end=datetime(2023, 10, 3),\n        ),\n        train_metrics=WindowMetrics(\n            sharpe_ratio=train_sharpe,\n            calmar_ratio=0.0,\n            max_drawdown=0.0,\n            total_return=0.1,\n            win_rate=0.5,\n            trade_count=10,\n        ),\n        test_metrics=WindowMetrics(\n            sharpe_ratio=test_sharpe,\n            calmar_ratio=0.0,\n            max_drawdown=0.0,\n            total_return=0.05,\n            win_rate=0.5,\n            trade_count=10,\n        ),\n    )\n\nprint('=== Edge Case 7: PBO with few windows ===')\n# Empty list\npbo = estimate_probability_backtest_overfitting([], seed=42)\nprint(f'PBO(empty) = {pbo} (expected: 0.0)')\n\n# Single window\nresults = [make_window_result(1, 1.5, 0.8)]\npbo = estimate_probability_backtest_overfitting(results, seed=42)\nprint(f'PBO(1 window) = {pbo} (expected: 0.0)')\n\n# Two windows\nresults = [make_window_result(1, 1.5, 0.8), make_window_result(2, 1.2, 0.6)]\npbo = estimate_probability_backtest_overfitting(results, seed=42)\nprint(f'PBO(2 windows) = {pbo}')\n\n# Clearly overfit (high train sharpe, low test sharpe)\nresults = [make_window_result(i, 3.0, 0.5) for i in range(5)]\npbo = estimate_probability_backtest_overfitting(results, seed=42, n_permutations=1000)\nprint(f'PBO(overfit, 5 windows) = {pbo} (expected: high, >0.5)')\n\n# Clearly good (test nearly matches train)\nresults = [make_window_result(i, 1.5, 1.4) for i in range(5)]\npbo = estimate_probability_backtest_overfitting(results, seed=42, n_permutations=1000)\nprint(f'PBO(good strategy, 5 windows) = {pbo} (expected: low, <0.5)')\n\nprint()\nprint('=== Edge Case 8: PBO logic review ===')\n# The PBO formula seems inverted. We want P[IS_best_rank > OOS_best_rank]\n# Current: P[median(IS) < median(OOS)] - this measures OOS better than IS\n# This is backwards for overfitting detection!\nprint('CHECKING: If IS > OOS consistently (overfitting), what does current code report?')\nresults = [make_window_result(i, 3.0, 0.5) for i in range(10)]  # Clear overfitting\npbo = estimate_probability_backtest_overfitting(results, seed=42, n_permutations=1000)\nprint(f'With train_sharpe=3.0, test_sharpe=0.5: PBO = {pbo}')\nprint(f'If PBO < 0.5 for clear overfitting, the logic may be INVERTED')\n\" 2>&1",
+      "description": "Test PBO calculation logic"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-29T19:52:45.677642",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && PYTHONPATH=/media/sam/1TB/nautilus_dev python -c \"\nfrom scripts.alpha_evolve.walk_forward.metrics import _median\nimport random\n\n# Debug the PBO algorithm step by step\ndef debug_pbo(window_results, n_permutations=10, seed=42):\n    n = len(window_results)\n    \n    train_sharpes = [w.train_metrics.sharpe_ratio for w in window_results]\n    test_sharpes = [w.test_metrics.sharpe_ratio for w in window_results]\n    \n    print(f'Train Sharpes: {train_sharpes}')\n    print(f'Test Sharpes: {test_sharpes}')\n    print()\n    \n    rng = random.Random(seed)\n    overfit_count = 0\n    indices = list(range(n))\n    \n    for perm in range(n_permutations):\n        rng.shuffle(indices)\n        mid = n // 2\n        is_indices = indices[:mid] if mid > 0 else [indices[0]]\n        oos_indices = indices[mid:] if mid < n else [indices[-1]]\n        \n        is_sharpes = [train_sharpes[i] for i in is_indices]\n        oos_sharpes = [test_sharpes[i] for i in oos_indices]\n        \n        is_median = _median(is_sharpes)\n        oos_median = _median(oos_sharpes)\n        \n        print(f'Perm {perm}: IS_indices={is_indices}, OOS_indices={oos_indices}')\n        print(f'          IS_sharpes={is_sharpes} -> median={is_median}')\n        print(f'          OOS_sharpes={oos_sharpes} -> median={oos_median}')\n        print(f'          IS_median < OOS_median? {is_median < oos_median}')\n        \n        if is_median < oos_median:\n            overfit_count += 1\n        print()\n    \n    print(f'Overfit count: {overfit_count}/{n_permutations}')\n    print(f'PBO: {overfit_count / n_permutations}')\n\nfrom scripts.alpha_evolve.walk_forward.models import WindowMetrics, Window, WindowResult\nfrom datetime import datetime\n\ndef make_window_result(window_id, train_sharpe, test_sharpe):\n    return WindowResult(\n        window=Window(\n            window_id=window_id,\n            train_start=datetime(2023, 1, 1),\n            train_end=datetime(2023, 6, 30),\n            test_start=datetime(2023, 7, 5),\n            test_end=datetime(2023, 10, 3),\n        ),\n        train_metrics=WindowMetrics(\n            sharpe_ratio=train_sharpe,\n            calmar_ratio=0.0,\n            max_drawdown=0.0,\n            total_return=0.1,\n            win_rate=0.5,\n            trade_count=10,\n        ),\n        test_metrics=WindowMetrics(\n            sharpe_ratio=test_sharpe,\n            calmar_ratio=0.0,\n            max_drawdown=0.0,\n            total_return=0.05,\n            win_rate=0.5,\n            trade_count=10,\n        ),\n    )\n\nprint('=== Debug PBO with overfit strategy ===')\nresults = [make_window_result(i, 3.0, 0.5) for i in range(4)]\ndebug_pbo(results, n_permutations=5)\n\" 2>&1",
+      "description": "Debug PBO calculation"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-29T19:53:16.274190",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && PYTHONPATH=/media/sam/1TB/nautilus_dev python -c \"\nfrom scripts.alpha_evolve.walk_forward.config import WalkForwardConfig\nfrom scripts.alpha_evolve.walk_forward.validator import WalkForwardValidator\nfrom scripts.alpha_evolve.walk_forward.models import WindowMetrics, Window, WindowResult\nfrom datetime import datetime\nfrom unittest.mock import AsyncMock\nimport asyncio\n\ndef make_window_result(window_id, test_return, test_sharpe, test_dd):\n    return WindowResult(\n        window=Window(\n            window_id=window_id,\n            train_start=datetime(2023, 1, 1),\n            train_end=datetime(2023, 6, 30),\n            test_start=datetime(2023, 7, 5),\n            test_end=datetime(2023, 10, 3),\n        ),\n        train_metrics=WindowMetrics(\n            sharpe_ratio=1.5,\n            calmar_ratio=2.0,\n            max_drawdown=0.1,\n            total_return=0.15,\n            win_rate=0.55,\n            trade_count=10,\n        ),\n        test_metrics=WindowMetrics(\n            sharpe_ratio=test_sharpe,\n            calmar_ratio=1.0,\n            max_drawdown=test_dd,\n            total_return=test_return,\n            win_rate=0.5,\n            trade_count=8,\n        ),\n    )\n\nconfig = WalkForwardConfig(\n    data_start=datetime(2023, 1, 1),\n    data_end=datetime(2024, 12, 1),\n)\nvalidator = WalkForwardValidator(config, AsyncMock())\n\nprint('=== Edge Case 9: Check criteria logic ===')\n\n# Test Criterion 4: Majority with adequate Sharpe (off-by-one check)\nprint('Test: Sharpe majority logic with 4 windows')\n# With 4 windows, len(window_results) // 2 = 2\n# Code: if sharpe_ok <= len(window_results) // 2\n# So need sharpe_ok > 2, meaning 3+ windows need adequate Sharpe\n# This means 50% is NOT enough, need >50%\n\n# Exactly 50% pass Sharpe\nresults = [\n    make_window_result(1, 0.1, 0.6, 0.1),  # Good Sharpe\n    make_window_result(2, 0.1, 0.6, 0.1),  # Good Sharpe  \n    make_window_result(3, 0.1, 0.3, 0.1),  # Bad Sharpe\n    make_window_result(4, 0.1, 0.3, 0.1),  # Bad Sharpe\n]\nfrom scripts.alpha_evolve.walk_forward.metrics import calculate_robustness_score\nrobustness = calculate_robustness_score(results)\npassed = validator._check_criteria(results, robustness)\nprint(f'  50% windows pass Sharpe (2/4): passed={passed} (expected: False per >50% rule)')\n\n# Exactly 3 out of 4 pass (75%)\nresults = [\n    make_window_result(1, 0.1, 0.6, 0.1),\n    make_window_result(2, 0.1, 0.6, 0.1),\n    make_window_result(3, 0.1, 0.6, 0.1),  # Good\n    make_window_result(4, 0.1, 0.3, 0.1),  # Bad\n]\nrobustness = calculate_robustness_score(results)\npassed = validator._check_criteria(results, robustness)\nprint(f'  75% windows pass Sharpe (3/4): passed={passed} (expected: True)')\n\n# With 5 windows - len // 2 = 2, need > 2 = 3 windows\nprint()\nprint('Test: Sharpe majority logic with 5 windows')\nresults = [\n    make_window_result(1, 0.1, 0.6, 0.1),  # Good\n    make_window_result(2, 0.1, 0.6, 0.1),  # Good\n    make_window_result(3, 0.1, 0.3, 0.1),  # Bad\n    make_window_result(4, 0.1, 0.3, 0.1),  # Bad\n    make_window_result(5, 0.1, 0.3, 0.1),  # Bad\n]\nrobustness = calculate_robustness_score(results)\npassed = validator._check_criteria(results, robustness)\nprint(f'  40% pass Sharpe (2/5): passed={passed} (expected: False)')\n\nresults = [\n    make_window_result(1, 0.1, 0.6, 0.1),\n    make_window_result(2, 0.1, 0.6, 0.1),\n    make_window_result(3, 0.1, 0.6, 0.1),  # Good\n    make_window_result(4, 0.1, 0.3, 0.1),\n    make_window_result(5, 0.1, 0.3, 0.1),\n]\nrobustness = calculate_robustness_score(results)\npassed = validator._check_criteria(results, robustness)\nprint(f'  60% pass Sharpe (3/5): passed={passed} (expected: True since 3 > 2)')\n\nprint()\nprint('=== Edge Case 10: Drawdown is absolute value ===')\n# max_drawdown should be positive (0.30 = 30% drawdown)\n# But what if test_metrics has negative max_drawdown by mistake?\nresults = [\n    make_window_result(1, 0.1, 0.6, -0.25),  # Negative DD - is this handled?\n]\nprint(f'With negative drawdown -0.25 vs threshold 0.30:')\nprint(f'  Check: -0.25 > 0.30 is {-0.25 > 0.30}')\nprint(f'  This would PASS but is semantically wrong if DD is truly 25%')\n\" 2>&1",
+      "description": "Test validator criteria logic"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-29T19:53:27.714446",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && PYTHONPATH=/media/sam/1TB/nautilus_dev python -c \"\nfrom scripts.alpha_evolve.walk_forward.cli import parse_date, create_parser\nimport sys\n\nprint('=== Edge Case 11: CLI argument parsing ===')\n\nparser = create_parser()\n\n# Test invalid date format\nprint('Test: Invalid date format')\ntry:\n    d = parse_date('01-15-2024')\n    print(f'  UNEXPECTED: Parsed \\\"{d}\\\" from MM-DD-YYYY format')\nexcept ValueError as e:\n    print(f'  Expected error: {e}')\n\n# Test ISO format (should work per spec)\nprint()\nprint('Test: ISO date format')\nd = parse_date('2024-01-15')\nprint(f'  Parsed: {d}')\n\n# Test edge dates\nprint()\nprint('Test: Leap year date')\nd = parse_date('2024-02-29')\nprint(f'  Parsed leap day: {d}')\n\nprint()\nprint('Test: Invalid leap year date')\ntry:\n    d = parse_date('2023-02-29')  # 2023 is not a leap year\n    print(f'  UNEXPECTED: Parsed invalid date {d}')\nexcept ValueError as e:\n    print(f'  Expected error: day is out of range for month')\n\" 2>&1",
+      "description": "Test CLI parsing"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-29T19:53:44.678202",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && PYTHONPATH=/media/sam/1TB/nautilus_dev python -c \"\nfrom scripts.alpha_evolve.walk_forward.config import WalkForwardConfig\nfrom scripts.alpha_evolve.walk_forward.validator import WalkForwardValidator\nfrom datetime import datetime\nfrom unittest.mock import AsyncMock\n\nprint('=== Edge Case 12: Check embargo_after_days usage ===')\n# The ruff linter flagged embargo_after as unused\n# Let's see if it should be used\n\nconfig = WalkForwardConfig(\n    data_start=datetime(2023, 1, 1),\n    data_end=datetime(2025, 1, 1),\n    train_months=6,\n    test_months=3,\n    step_months=3,\n    embargo_before_days=5,\n    embargo_after_days=10,  # Should this affect window generation?\n)\nvalidator = WalkForwardValidator(config, AsyncMock())\nwindows = validator._generate_windows()\n\nprint('Windows without embargo_after effect:')\nfor w in windows[:3]:\n    print(f'  W{w.window_id}: test_end={w.test_end.date()}')\n\nprint()\nprint('Next train_start should be after test_end + embargo_after_days')\nprint(f'  Window 1 test_end: {windows[0].test_end.date()}')\nprint(f'  Window 1 test_end + 10 days: {(windows[0].test_end + __import__(\\\"datetime\\\").timedelta(days=10)).date()}')\nprint(f'  Window 2 train_start: {windows[1].train_start.date()}')\n\ngap = (windows[1].train_start - windows[0].test_end).days\nprint(f'  Actual gap between W1 test_end and W2 train_start: {gap} days')\nif gap < config.embargo_after_days:\n    print(f'  WARNING: Gap ({gap}) < embargo_after_days ({config.embargo_after_days})!')\n    print(f'  This could cause data leakage from Window 1 test period into Window 2 training!')\nelse:\n    print(f'  OK: Gap ({gap}) >= embargo_after_days ({config.embargo_after_days})')\n\" 2>&1",
+      "description": "Check embargo_after_days usage"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-29T19:54:00.171317",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && PYTHONPATH=/media/sam/1TB/nautilus_dev python -c \"\nfrom scripts.alpha_evolve.walk_forward.config import WalkForwardConfig\nfrom scripts.alpha_evolve.walk_forward.validator import WalkForwardValidator\nfrom datetime import datetime\nfrom unittest.mock import AsyncMock\n\nprint('=== Checking window overlap and embargo_after semantics ===')\n\nconfig = WalkForwardConfig(\n    data_start=datetime(2023, 1, 1),\n    data_end=datetime(2025, 1, 1),\n    train_months=6,\n    test_months=3,\n    step_months=3,\n    embargo_before_days=5,\n    embargo_after_days=10,\n)\nvalidator = WalkForwardValidator(config, AsyncMock())\nwindows = validator._generate_windows()\n\nprint('All windows:')\nfor w in windows:\n    print(f'  W{w.window_id}: train=[{w.train_start.date()}, {w.train_end.date()}), test=[{w.test_start.date()}, {w.test_end.date()})')\n\nprint()\nprint('Window overlap analysis:')\nfor i in range(len(windows)-1):\n    w1, w2 = windows[i], windows[i+1]\n    \n    # Does W2 train period overlap with W1 test period?\n    overlap_start = max(w1.test_start, w2.train_start)\n    overlap_end = min(w1.test_end, w2.train_end)\n    \n    if overlap_start < overlap_end:\n        overlap_days = (overlap_end - overlap_start).days\n        print(f'  W{w1.window_id} test OVERLAPS with W{w2.window_id} train by {overlap_days} days!')\n        print(f'    This is a POTENTIAL lookahead bias concern if strategy learns from W1 test data')\n    else:\n        print(f'  W{w1.window_id} test does NOT overlap with W{w2.window_id} train')\n\" 2>&1",
+      "description": "Check window overlap patterns"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-29T19:54:10.808122",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/020-walk-forward-validation/plan.md"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-29T19:54:16.856096",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/020-walk-forward-validation/plan.md"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-29T19:54:33.737143",
+      "todo_count": 5
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-29T19:54:54.175014",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && PYTHONPATH=/media/sam/1TB/nautilus_dev python -c \"\n# Let's understand the correct PBO algorithm from Lopez de Prado\n\n# The CORRECT PBO algorithm (Lopez de Prado Ch. 11):\n# 1. Take N backtest configurations/trials\n# 2. For each trial, record IS (in-sample) and OOS (out-of-sample) performance\n# 3. Use Combinatorial Symmetric Cross-Validation (CSCV):\n#    - Split N observations into S sub-matrices\n#    - Choose half of S columns as IS, other half as OOS\n#    - Calculate performance for each combination\n# 4. PBO = proportion of combinations where best IS rank underperforms in OOS\n\n# The CURRENT implementation:\n# - Uses train_sharpes as 'IS' and test_sharpes as 'OOS'\n# - BUT: These are different metrics for the same window, not different trials\n# - The shuffle just mixes indices, comparing train[i] to test[j] which is meaningless\n\n# What SHOULD happen for WF validation:\n# - Each window IS its own 'trial' with IS=train_sharpe and OOS=test_sharpe\n# - PBO should measure: P[rank(best_train_sharpe) != rank(best_test_sharpe)]\n# - i.e., if the window that looked best in training also performs best in testing\n\n# A SIMPLER interpretation for WF validation:\n# - Calculate performance difference for each window: degradation = test - train\n# - PBO = P[degradation < 0] (proportion of windows that underperform OOS)\n# - This is actually similar to existing profitability check\n\nprint('=== Analysis of PBO Algorithm ===')\nprint()\nprint('The current PBO implementation has several issues:')\nprint()\nprint('1. CONCEPTUAL FLAW: PBO is for comparing MULTIPLE strategies/configs,')\nprint('   not for analyzing one strategy across multiple windows.')\nprint()\nprint('2. ALGORITHMIC FLAW: The permutation test compares train sharpes')\nprint('   of one window subset with test sharpes of another subset.')\nprint('   This is meaningless - train[i] and test[j] are unrelated.')\nprint()\nprint('3. For walk-forward validation, what we want is:')\nprint('   - Degradation ratio: test_sharpe / train_sharpe')\nprint('   - This is already implemented in calculate_robustness_score()')\nprint()\nprint('RECOMMENDED ACTIONS:')\nprint('A) Rename function to clarify its purpose')\nprint('B) Implement correct PBO when comparing multiple strategies')\nprint('C) Or simplify to measure degradation consistency')\n\" 2>&1",
+      "description": "Analyze PBO algorithm correctness"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-29T19:55:11.082087",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && PYTHONPATH=/media/sam/1TB/nautilus_dev python -c \"\n# Let me test the DSR calculation more thoroughly\nfrom scripts.alpha_evolve.walk_forward.metrics import calculate_deflated_sharpe_ratio\nimport math\n\nprint('=== Edge Cases for Deflated Sharpe Ratio ===')\nprint()\n\n# The DSR formula in code: dsr = sharpe - 0.15 * log(n_trials)\n# This is a simplified approximation. Let's verify the penalty scale.\n\nprint('DSR penalty analysis:')\nfor n in [1, 2, 5, 10, 25, 50, 100, 500, 1000]:\n    dsr = calculate_deflated_sharpe_ratio(2.0, n)\n    penalty = 2.0 - dsr if n > 1 else 0\n    pct_reduction = penalty / 2.0 * 100 if n > 1 else 0\n    print(f'  n={n:4d}: DSR={dsr:.3f}, penalty={penalty:.3f} ({pct_reduction:.1f}% reduction)')\n\nprint()\nprint('Edge case: n_trials = 0 or negative')\nfor n in [0, -1, -100]:\n    dsr = calculate_deflated_sharpe_ratio(2.0, n)\n    print(f'  n={n}: DSR={dsr} (expected: 2.0, no penalty)')\n\nprint()\nprint('Edge case: Very negative Sharpe')\nfor sharpe in [-1.0, -5.0, -10.0]:\n    dsr = calculate_deflated_sharpe_ratio(sharpe, 100)\n    print(f'  sharpe={sharpe}, n=100: DSR={dsr}')\n    # Note: For negative sharpe, the penalty ADDS to negativity\n    # This may or may not be intended behavior\n\nprint()\nprint('=== Bug Analysis: Penalty on Negative Sharpe ===')\nprint('The penalty is SUBTRACTED regardless of sharpe sign.')\nprint('For negative sharpe, this makes it MORE negative.')\nprint('This may be intentional (bad strategy + more trials = worse),')\nprint('but it could also be a semantic error.')\n\" 2>&1",
+      "description": "Analyze DSR edge cases"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-29T19:55:27.744050",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && PYTHONPATH=/media/sam/1TB/nautilus_dev python -c \"\n# Check more edge cases in metrics\nfrom scripts.alpha_evolve.walk_forward.metrics import _std_dev, _median\n\nprint('=== Edge Cases for Helper Functions ===')\nprint()\n\n# Standard deviation edge cases\nprint('Standard Deviation:')\nprint(f'  std_dev([]) = {_std_dev([])} (expected: 0.0)')\nprint(f'  std_dev([5]) = {_std_dev([5])} (expected: 0.0, single element)')\nprint(f'  std_dev([1, 1, 1]) = {_std_dev([1, 1, 1])} (expected: 0.0, all same)')\nprint(f'  std_dev([1, 2, 3]) = {_std_dev([1, 2, 3]):.6f}')\n\n# Check: is this population or sample std dev?\nimport math\nvalues = [1, 2, 3, 4, 5]\npop_std = math.sqrt(sum((x - 3)**2 for x in values) / 5)\nsample_std = math.sqrt(sum((x - 3)**2 for x in values) / 4)\ncalc_std = _std_dev(values)\nprint(f'  For [1,2,3,4,5]: pop_std={pop_std:.6f}, sample_std={sample_std:.6f}, calc={calc_std:.6f}')\nprint(f'  Using: {\\\"Population\\\" if abs(calc_std - pop_std) < 0.001 else \\\"Sample\\\"} std dev')\n\nprint()\nprint('Median:')\nprint(f'  median([]) = {_median([])} (expected: 0.0)')\nprint(f'  median([5]) = {_median([5])} (expected: 5)')\nprint(f'  median([1, 2]) = {_median([1, 2])} (expected: 1.5)')\nprint(f'  median([1, 2, 3]) = {_median([1, 2, 3])} (expected: 2)')\nprint(f'  median([1, 2, 3, 4]) = {_median([1, 2, 3, 4])} (expected: 2.5)')\n\n# Test with floats\nprint(f'  median([0.1, 0.2, 0.3]) = {_median([0.1, 0.2, 0.3])}')\n\n# Test with negative values\nprint(f'  median([-5, -2, 0, 3]) = {_median([-5, -2, 0, 3])} (expected: -1)')\n\" 2>&1",
+      "description": "Test helper function edge cases"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-29T19:55:48.013368",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && PYTHONPATH=/media/sam/1TB/nautilus_dev python -c \"\nfrom scripts.alpha_evolve.walk_forward.report import generate_report, export_json\nfrom scripts.alpha_evolve.walk_forward.config import WalkForwardConfig\nfrom scripts.alpha_evolve.walk_forward.models import WalkForwardResult, WindowResult, WindowMetrics, Window\nfrom datetime import datetime\nimport json\n\ndef make_window_result(window_id, train_sharpe, test_sharpe, test_return, test_dd):\n    return WindowResult(\n        window=Window(\n            window_id=window_id,\n            train_start=datetime(2023, 1, 1),\n            train_end=datetime(2023, 6, 30),\n            test_start=datetime(2023, 7, 5),\n            test_end=datetime(2023, 10, 3),\n        ),\n        train_metrics=WindowMetrics(\n            sharpe_ratio=train_sharpe,\n            calmar_ratio=2.0,\n            max_drawdown=0.1,\n            total_return=0.15,\n            win_rate=0.55,\n            trade_count=10,\n        ),\n        test_metrics=WindowMetrics(\n            sharpe_ratio=test_sharpe,\n            calmar_ratio=1.0,\n            max_drawdown=test_dd,\n            total_return=test_return,\n            win_rate=0.5,\n            trade_count=8,\n        ),\n    )\n\nprint('=== Edge Case 13: Report with empty windows ===')\nconfig = WalkForwardConfig(\n    data_start=datetime(2023, 1, 1),\n    data_end=datetime(2025, 1, 1),\n)\nresult = WalkForwardResult(\n    config=config,\n    windows=[],\n    robustness_score=0.0,\n    passed=False,\n)\ntry:\n    report = generate_report(result)\n    print('Empty windows report generated successfully')\n    print(f'Report length: {len(report)} chars')\nexcept Exception as e:\n    print(f'BUG: Empty windows caused error: {e}')\n\nprint()\nprint('=== Edge Case 14: Report with None metrics ===')\nresult = WalkForwardResult(\n    config=config,\n    windows=[make_window_result(1, 1.5, 1.0, 0.1, 0.1)],\n    robustness_score=70.0,\n    passed=True,\n    deflated_sharpe_ratio=None,\n    probability_backtest_overfitting=None,\n)\ntry:\n    report = generate_report(result)\n    print('Report with None advanced metrics generated successfully')\nexcept Exception as e:\n    print(f'BUG: None metrics caused error: {e}')\n\nprint()\nprint('=== Edge Case 15: JSON export ===')\ntry:\n    json_str = export_json(result)\n    data = json.loads(json_str)\n    print('JSON export successful')\n    print(f'Keys: {list(data.keys())}')\nexcept Exception as e:\n    print(f'BUG: JSON export failed: {e}')\n\nprint()\nprint('=== Edge Case 16: Very high degradation ratio ===')\nresult = WalkForwardResult(\n    config=config,\n    windows=[make_window_result(1, 0.1, 10.0, 0.5, 0.05)],  # 100x improvement\n    robustness_score=100.0,\n    passed=True,\n)\nreport = generate_report(result)\nif '>200%' in report:\n    print('Very high degradation capped at >200% (correct)')\nelse:\n    print('WARNING: High degradation not capped')\n\" 2>&1",
+      "description": "Test report generation edge cases"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-29T19:56:03.552436",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && PYTHONPATH=/media/sam/1TB/nautilus_dev python -c \"\nfrom scripts.alpha_evolve.walk_forward.config import WalkForwardConfig\nfrom datetime import datetime\n\nprint('=== Edge Case 17: Config validation ===')\n\n# Test min_windows edge\nprint('Test: min_windows=2 (minimum allowed)')\ntry:\n    config = WalkForwardConfig(\n        data_start=datetime(2023, 1, 1),\n        data_end=datetime(2024, 6, 1),  # 17 months\n        train_months=6,\n        test_months=3,\n        step_months=6,\n        min_windows=2,\n    )\n    print(f'  Created config with min_windows=2')\nexcept ValueError as e:\n    print(f'  Error: {e}')\n\n# Test embargo large enough to prevent test period\nprint()\nprint('Test: Embargo larger than test period')\ntry:\n    config = WalkForwardConfig(\n        data_start=datetime(2023, 1, 1),\n        data_end=datetime(2025, 1, 1),\n        train_months=6,\n        test_months=3,\n        embargo_before_days=100,  # Larger than test_months * 30 = 90\n        min_windows=4,\n    )\n    print(f'  Created config with embargo > test period - may cause issues')\nexcept ValueError as e:\n    print(f'  Error: {e}')\n\n# Test data_end == data_start\nprint()\nprint('Test: data_end == data_start')\ntry:\n    config = WalkForwardConfig(\n        data_start=datetime(2023, 1, 1),\n        data_end=datetime(2023, 1, 1),  # Same day\n    )\n    print(f'  UNEXPECTED: Created config with zero-length data range')\nexcept ValueError as e:\n    print(f'  Expected error for same dates')\n\n# Test data_start > data_end\nprint()\nprint('Test: data_start > data_end')\ntry:\n    config = WalkForwardConfig(\n        data_start=datetime(2024, 1, 1),\n        data_end=datetime(2023, 1, 1),  # Start after end\n    )\n    print(f'  UNEXPECTED: Created config with inverted dates')\nexcept ValueError as e:\n    print(f'  Expected error for inverted dates')\n\" 2>&1",
+      "description": "Test config validation edge cases"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-29T19:56:16.530460",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && PYTHONPATH=/media/sam/1TB/nautilus_dev python -c \"\nfrom scripts.alpha_evolve.walk_forward.config import WalkForwardConfig\nfrom scripts.alpha_evolve.walk_forward.validator import WalkForwardValidator\nfrom datetime import datetime\nfrom unittest.mock import AsyncMock\n\nprint('=== Edge Case 18: Embargo larger than test period window generation ===')\n\nconfig = WalkForwardConfig(\n    data_start=datetime(2023, 1, 1),\n    data_end=datetime(2025, 1, 1),\n    train_months=6,\n    test_months=3,\n    embargo_before_days=100,  # Larger than test period\n    min_windows=4,\n)\nvalidator = WalkForwardValidator(config, AsyncMock())\nwindows = validator._generate_windows()\n\nprint(f'Generated {len(windows)} windows with 100-day embargo:')\nfor w in windows[:3]:\n    print(f'  W{w.window_id}: train_end={w.train_end.date()}, test_start={w.test_start.date()}, test_end={w.test_end.date()}')\n    gap = (w.test_start - w.train_end).days\n    test_days = (w.test_end - w.test_start).days\n    print(f'         embargo_gap={gap} days, test_period={test_days} days')\n    if gap > test_days:\n        print(f'         WARNING: Embargo ({gap}) > test period ({test_days})')\n\" 2>&1",
+      "description": "Test large embargo window generation"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-29T19:56:36.421428",
+      "todo_count": 6
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-29T19:56:53.995878",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && PYTHONPATH=/media/sam/1TB/nautilus_dev python -c \"\nimport asyncio\nfrom scripts.alpha_evolve.walk_forward.config import WalkForwardConfig\nfrom scripts.alpha_evolve.walk_forward.validator import WalkForwardValidator\nfrom scripts.alpha_evolve.walk_forward.models import WindowMetrics\nfrom datetime import datetime\nfrom unittest.mock import AsyncMock, MagicMock\n\nprint('=== Edge Case 19: Async evaluator error handling ===')\n\nasync def test_evaluator_exception():\n    config = WalkForwardConfig(\n        data_start=datetime(2023, 1, 1),\n        data_end=datetime(2024, 12, 1),\n    )\n    \n    # Evaluator that raises exception\n    evaluator = AsyncMock()\n    evaluator.evaluate.side_effect = Exception('Network error')\n    \n    validator = WalkForwardValidator(config, evaluator)\n    \n    try:\n        result = await validator.validate('strategy_code')\n        print(f'UNEXPECTED: Validation succeeded despite evaluator error')\n    except Exception as e:\n        print(f'Evaluator exception propagated: {type(e).__name__}: {e}')\n\nasyncio.run(test_evaluator_exception())\n\nprint()\nprint('=== Edge Case 20: Evaluator returns None ===')\n\nasync def test_evaluator_returns_none():\n    config = WalkForwardConfig(\n        data_start=datetime(2023, 1, 1),\n        data_end=datetime(2024, 12, 1),\n    )\n    \n    # Evaluator that returns None instead of WindowMetrics\n    evaluator = AsyncMock()\n    evaluator.evaluate.return_value = None\n    \n    validator = WalkForwardValidator(config, evaluator)\n    \n    try:\n        result = await validator.validate('strategy_code')\n        print(f'UNEXPECTED: Validation succeeded with None metrics')\n    except AttributeError as e:\n        print(f'Expected error when accessing None.sharpe_ratio: {e}')\n    except Exception as e:\n        print(f'Other error: {type(e).__name__}: {e}')\n\nasyncio.run(test_evaluator_returns_none())\n\nprint()\nprint('=== Edge Case 21: Evaluator returns invalid metrics ===')\n\nasync def test_evaluator_invalid_metrics():\n    config = WalkForwardConfig(\n        data_start=datetime(2023, 1, 1),\n        data_end=datetime(2024, 12, 1),\n    )\n    \n    # Evaluator returns object without required fields\n    evaluator = AsyncMock()\n    evaluator.evaluate.return_value = {'sharpe': 1.0}  # Wrong format\n    \n    validator = WalkForwardValidator(config, evaluator)\n    \n    try:\n        result = await validator.validate('strategy_code')\n        print(f'UNEXPECTED: Validation succeeded with dict instead of WindowMetrics')\n    except AttributeError as e:\n        print(f'Expected error: {e}')\n    except Exception as e:\n        print(f'Other error: {type(e).__name__}: {e}')\n\nasyncio.run(test_evaluator_invalid_metrics())\n\" 2>&1",
+      "description": "Test async validator error handling"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-29T19:57:10.791062",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && PYTHONPATH=/media/sam/1TB/nautilus_dev python -c \"\nimport asyncio\nfrom scripts.alpha_evolve.walk_forward.config import WalkForwardConfig\nfrom scripts.alpha_evolve.walk_forward.validator import WalkForwardValidator\nfrom scripts.alpha_evolve.walk_forward.models import WindowMetrics\nfrom datetime import datetime\nfrom unittest.mock import AsyncMock\n\nprint('=== Edge Case 22: Metrics with NaN values ===')\n\nasync def test_nan_metrics():\n    config = WalkForwardConfig(\n        data_start=datetime(2023, 1, 1),\n        data_end=datetime(2024, 12, 1),\n    )\n    \n    # Return metrics with NaN\n    import math\n    nan_metrics = WindowMetrics(\n        sharpe_ratio=float('nan'),\n        calmar_ratio=1.0,\n        max_drawdown=0.1,\n        total_return=0.1,\n        win_rate=0.5,\n        trade_count=10,\n    )\n    \n    evaluator = AsyncMock()\n    evaluator.evaluate.return_value = nan_metrics\n    \n    validator = WalkForwardValidator(config, evaluator)\n    result = await validator.validate('strategy_code')\n    \n    print(f'Validation with NaN sharpe completed: passed={result.passed}')\n    print(f'Robustness score: {result.robustness_score}')\n    print(f'DSR: {result.deflated_sharpe_ratio}')\n    \n    # Check for NaN propagation issues\n    if math.isnan(result.robustness_score):\n        print('WARNING: NaN propagated to robustness_score')\n    if result.deflated_sharpe_ratio is not None and math.isnan(result.deflated_sharpe_ratio):\n        print('WARNING: NaN propagated to DSR')\n\nasyncio.run(test_nan_metrics())\n\nprint()\nprint('=== Edge Case 23: Metrics with infinity ===')\n\nasync def test_inf_metrics():\n    config = WalkForwardConfig(\n        data_start=datetime(2023, 1, 1),\n        data_end=datetime(2024, 12, 1),\n    )\n    \n    inf_metrics = WindowMetrics(\n        sharpe_ratio=float('inf'),\n        calmar_ratio=1.0,\n        max_drawdown=0.1,\n        total_return=0.1,\n        win_rate=0.5,\n        trade_count=10,\n    )\n    \n    evaluator = AsyncMock()\n    evaluator.evaluate.return_value = inf_metrics\n    \n    validator = WalkForwardValidator(config, evaluator)\n    result = await validator.validate('strategy_code')\n    \n    print(f'Validation with inf sharpe completed: passed={result.passed}')\n    print(f'Robustness score: {result.robustness_score}')\n\nasyncio.run(test_inf_metrics())\n\" 2>&1",
+      "description": "Test NaN and infinity edge cases"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-29T19:57:34.214460",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && PYTHONPATH=/media/sam/1TB/nautilus_dev python -c \"\nfrom scripts.alpha_evolve.walk_forward.metrics import calculate_robustness_score\nfrom scripts.alpha_evolve.walk_forward.models import WindowMetrics, Window, WindowResult\nfrom datetime import datetime\nimport math\n\ndef make_window_result(window_id, train_sharpe, test_sharpe, test_return):\n    return WindowResult(\n        window=Window(\n            window_id=window_id,\n            train_start=datetime(2023, 1, 1),\n            train_end=datetime(2023, 6, 30),\n            test_start=datetime(2023, 7, 5),\n            test_end=datetime(2023, 10, 3),\n        ),\n        train_metrics=WindowMetrics(\n            sharpe_ratio=train_sharpe,\n            calmar_ratio=2.0,\n            max_drawdown=0.1,\n            total_return=0.15,\n            win_rate=0.55,\n            trade_count=10,\n        ),\n        test_metrics=WindowMetrics(\n            sharpe_ratio=test_sharpe,\n            calmar_ratio=1.0,\n            max_drawdown=0.1,\n            total_return=test_return,\n            win_rate=0.5,\n            trade_count=8,\n        ),\n    )\n\nprint('=== Edge Case 24: Robustness score with NaN/inf in sharpes ===')\n\n# NaN in sharpe\nresults = [make_window_result(i, float('nan'), 1.0, 0.1) for i in range(5)]\nscore = calculate_robustness_score(results)\nprint(f'With NaN train_sharpe: score={score}')\nif math.isnan(score):\n    print('  BUG: NaN propagated to score')\n\n# Inf in sharpe\nresults = [make_window_result(i, float('inf'), 1.0, 0.1) for i in range(5)]\nscore = calculate_robustness_score(results)\nprint(f'With inf train_sharpe: score={score}')\n\n# Negative inf\nresults = [make_window_result(i, float('-inf'), 1.0, 0.1) for i in range(5)]\nscore = calculate_robustness_score(results)\nprint(f'With -inf train_sharpe: score={score}')\n\nprint()\nprint('=== Edge Case 25: Robustness score with NaN/inf in returns ===')\n\n# NaN in return\nresults = [make_window_result(i, 1.5, 1.0, float('nan')) for i in range(5)]\nscore = calculate_robustness_score(results)\nprint(f'With NaN test_return: score={score}')\nif math.isnan(score):\n    print('  BUG: NaN propagated to score')\n\n# Inf in return\nresults = [make_window_result(i, 1.5, 1.0, float('inf')) for i in range(5)]\nscore = calculate_robustness_score(results)\nprint(f'With inf test_return: score={score}')\n\n# Very large return (potential overflow)\nresults = [make_window_result(i, 1.5, 1.0, 1e308) for i in range(5)]\nscore = calculate_robustness_score(results)\nprint(f'With 1e308 test_return: score={score}')\n\" 2>&1",
+      "description": "Test robustness score with extreme values"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-29T19:57:55.710268",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && PYTHONPATH=/media/sam/1TB/nautilus_dev python -c \"\nfrom scripts.alpha_evolve.walk_forward.cli import create_parser, run_report\nimport argparse\nfrom pathlib import Path\nfrom datetime import datetime\n\nprint('=== Edge Case 26: CLI parser edge cases ===')\n\nparser = create_parser()\n\n# Test no command\nprint('Test: No command (help should show)')\nargs = parser.parse_args([])\nprint(f'  args.command = {args.command}')\n\n# Test validate without required args\nprint()\nprint('Test: validate without --strategy (should fail)')\ntry:\n    args = parser.parse_args(['validate'])\n    print('  UNEXPECTED: Parsed without required --strategy')\nexcept SystemExit as e:\n    print(f'  Expected: SystemExit with code {e.code}')\n\n# Test report command\nprint()\nprint('Test: report command structure')\ntry:\n    args = parser.parse_args(['report', '--strategy', '/tmp/test.py', '--output', '/tmp/out.md', '--start', '2023-01-01', '--end', '2024-01-01'])\n    print(f'  Report command parsed: strategy={args.strategy}')\nexcept SystemExit as e:\n    print(f'  Failed: {e}')\n\n# Test unknown option\nprint()\nprint('Test: unknown option')\ntry:\n    args = parser.parse_args(['validate', '--unknown-option'])\nexcept SystemExit as e:\n    print(f'  Expected: SystemExit for unknown option')\n\" 2>&1",
+      "description": "Test CLI parser edge cases"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-29T19:58:07.772704",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && PYTHONPATH=/media/sam/1TB/nautilus_dev python -c \"\nfrom scripts.alpha_evolve.walk_forward.cli import run_report\nfrom pathlib import Path\nimport argparse\n\nprint('=== Edge Case 27: run_report shares args with run_validate ===')\nprint('The run_report function modifies args.json = False')\nprint('This is a side effect that could cause issues if args is reused')\n\n# Create mock args\nclass MockArgs:\n    strategy = Path('/tmp/nonexistent.py')\n    start = None\n    end = None\n    output = None\n    \nargs = MockArgs()\nprint(f'Before run_report: hasattr(args, \\\"json\\\") = {hasattr(args, \\\"json\\\")}')\n\n# run_report sets args.json = False\n# This modifies the original args object\nprint('run_report sets args.json = False on the passed args object')\nprint('This is a minor code smell but not a bug')\n\" 2>&1",
+      "description": "Check CLI side effects"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-29T19:58:28.680619",
+      "todo_count": 7
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-29T19:58:50.110250",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && PYTHONPATH=/media/sam/1TB/nautilus_dev python -c \"\nfrom scripts.alpha_evolve.walk_forward.metrics import calculate_robustness_score\nfrom scripts.alpha_evolve.walk_forward.models import WindowMetrics, Window, WindowResult\nfrom datetime import datetime\n\ndef make_window_result(window_id, train_sharpe, test_sharpe, test_return):\n    return WindowResult(\n        window=Window(\n            window_id=window_id,\n            train_start=datetime(2023, 1, 1),\n            train_end=datetime(2023, 6, 30),\n            test_start=datetime(2023, 7, 5),\n            test_end=datetime(2023, 10, 3),\n        ),\n        train_metrics=WindowMetrics(\n            sharpe_ratio=train_sharpe,\n            calmar_ratio=2.0,\n            max_drawdown=0.1,\n            total_return=0.15,\n            win_rate=0.55,\n            trade_count=10,\n        ),\n        test_metrics=WindowMetrics(\n            sharpe_ratio=test_sharpe,\n            calmar_ratio=1.0,\n            max_drawdown=0.1,\n            total_return=test_return,\n            win_rate=0.5,\n            trade_count=8,\n        ),\n    )\n\nprint('=== Edge Case 28: Robustness score component breakdown ===')\nprint()\n\n# Perfect strategy: high sharpe, all profitable, no degradation\nprint('Perfect strategy (all profitable, no degradation):')\nresults = [make_window_result(i, 1.5, 1.5, 0.1) for i in range(5)]\nscore = calculate_robustness_score(results)\nprint(f'  Score: {score} (expected: 100)')\n\n# Worst strategy: negative sharpe, all losing, severe degradation\nprint()\nprint('Worst strategy (all losing, severe degradation):')\nresults = [make_window_result(i, 1.5, 0.0, -0.1) for i in range(5)]\nscore = calculate_robustness_score(results)\nprint(f'  Score: {score} (expected: close to 0)')\n\n# Mixed: 50% profitable\nprint()\nprint('Mixed strategy (50% profitable):')\nresults = [\n    make_window_result(1, 1.5, 1.0, 0.1),\n    make_window_result(2, 1.5, 1.0, 0.1),\n    make_window_result(3, 1.5, 0.5, -0.1),\n    make_window_result(4, 1.5, 0.5, -0.1),\n]\nscore = calculate_robustness_score(results)\nprint(f'  Score: {score}')\n\nprint()\nprint('=== Edge Case 29: Consistency component edge case ===')\n# All same positive returns (high consistency)\nresults = [make_window_result(i, 1.5, 1.0, 0.1) for i in range(5)]\nscore1 = calculate_robustness_score(results)\nprint(f'All same positive returns: score={score1}')\n\n# All same negative returns (high consistency but unprofitable)\nresults = [make_window_result(i, 1.5, 0.5, -0.1) for i in range(5)]\nscore2 = calculate_robustness_score(results)\nprint(f'All same negative returns: score={score2}')\n\n# Highly variable returns\nresults = [\n    make_window_result(1, 1.5, 1.0, 0.5),\n    make_window_result(2, 1.5, 0.5, -0.5),\n    make_window_result(3, 1.5, 1.0, 0.3),\n    make_window_result(4, 1.5, 0.5, -0.3),\n]\nscore3 = calculate_robustness_score(results)\nprint(f'High variability: score={score3}')\n\" 2>&1",
+      "description": "Analyze robustness score components"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-29T19:59:10.940145",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && PYTHONPATH=/media/sam/1TB/nautilus_dev python -c \"\nfrom scripts.alpha_evolve.walk_forward.metrics import calculate_robustness_score\nfrom scripts.alpha_evolve.walk_forward.models import WindowMetrics, Window, WindowResult\nfrom datetime import datetime\n\ndef make_window_result(window_id, train_sharpe, test_sharpe, test_return):\n    return WindowResult(\n        window=Window(\n            window_id=window_id,\n            train_start=datetime(2023, 1, 1),\n            train_end=datetime(2023, 6, 30),\n            test_start=datetime(2023, 7, 5),\n            test_end=datetime(2023, 10, 3),\n        ),\n        train_metrics=WindowMetrics(\n            sharpe_ratio=train_sharpe,\n            calmar_ratio=2.0,\n            max_drawdown=0.1,\n            total_return=0.15,\n            win_rate=0.55,\n            trade_count=10,\n        ),\n        test_metrics=WindowMetrics(\n            sharpe_ratio=test_sharpe,\n            calmar_ratio=1.0,\n            max_drawdown=0.1,\n            total_return=test_return,\n            win_rate=0.5,\n            trade_count=8,\n        ),\n    )\n\nprint('=== Edge Case 30: Degradation component edge cases ===')\nprint()\n\n# Test performance IMPROVES in out-of-sample (rare but possible)\nprint('Test sharpe > train sharpe (OOS better than IS):')\nresults = [make_window_result(i, 0.5, 1.5, 0.1) for i in range(5)]\nscore = calculate_robustness_score(results)\nprint(f'  Score: {score}')\nprint('  Note: Degradation capped at 1.0 (no bonus for improvement)')\n\n# Zero train sharpe\nprint()\nprint('Zero train sharpe:')\nresults = [make_window_result(i, 0.0, 1.0, 0.1) for i in range(5)]\nscore = calculate_robustness_score(results)\nprint(f'  Score: {score}')\n\n# Negative train sharpe, positive test sharpe\nprint()\nprint('Negative train sharpe, positive test sharpe:')\nresults = [make_window_result(i, -1.0, 1.0, 0.1) for i in range(5)]\nscore = calculate_robustness_score(results)\nprint(f'  Score: {score}')\n\n# Both negative (train and test)\nprint()\nprint('Both negative sharpes:')\nresults = [make_window_result(i, -2.0, -1.0, -0.05) for i in range(5)]\nscore = calculate_robustness_score(results)\nprint(f'  Score: {score}')\nprint('  Note: -1/-2 = 0.5, but train_sharpe <= 0 triggers special handling')\n\" 2>&1",
+      "description": "Test degradation component edge cases"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-29T19:59:31.271621",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && PYTHONPATH=/media/sam/1TB/nautilus_dev python -c \"\n# Let me check the specific degradation handling code path\nfrom scripts.alpha_evolve.walk_forward.models import WindowMetrics, Window, WindowResult\nfrom datetime import datetime\n\ndef make_window_result(train_sharpe, test_sharpe, test_return):\n    return WindowResult(\n        window=Window(\n            window_id=1,\n            train_start=datetime(2023, 1, 1),\n            train_end=datetime(2023, 6, 30),\n            test_start=datetime(2023, 7, 5),\n            test_end=datetime(2023, 10, 3),\n        ),\n        train_metrics=WindowMetrics(\n            sharpe_ratio=train_sharpe,\n            calmar_ratio=2.0,\n            max_drawdown=0.1,\n            total_return=0.15,\n            win_rate=0.55,\n            trade_count=10,\n        ),\n        test_metrics=WindowMetrics(\n            sharpe_ratio=test_sharpe,\n            calmar_ratio=1.0,\n            max_drawdown=0.1,\n            total_return=test_return,\n            win_rate=0.5,\n            trade_count=8,\n        ),\n    )\n\nprint('=== Edge Case 31: Degradation special case analysis ===')\nprint()\nprint('When train_sharpe <= 0, the code has special handling:')\nprint('  - If test_sharpe > 0: degradation = 1.0')\nprint('  - If test_sharpe < train_sharpe: degradation = 0.0')\nprint('  - Else: degradation = 0.5')\nprint()\n\ntest_cases = [\n    (0.0, 1.0, 'train=0, test=1 -> should be 1.0'),\n    (0.0, 0.0, 'train=0, test=0 -> should be 0.5'),\n    (0.0, -1.0, 'train=0, test=-1 -> should be 0.0 (test < train)'),\n    (-1.0, 1.0, 'train=-1, test=1 -> should be 1.0'),\n    (-1.0, 0.0, 'train=-1, test=0 -> should be 0.5 (not < train)'),\n    (-1.0, -0.5, 'train=-1, test=-0.5 -> should be 0.5 (not < train)'),\n    (-1.0, -2.0, 'train=-1, test=-2 -> should be 0.0 (test < train)'),\n]\n\n_EPSILON = 1e-10\n\nfor train_sharpe, test_sharpe, description in test_cases:\n    # Replicate the logic from metrics.py\n    if train_sharpe <= 0:\n        if test_sharpe > 0:\n            ratio = 1.0\n        elif test_sharpe < train_sharpe:\n            ratio = 0.0\n        else:\n            ratio = 0.5\n    else:\n        ratio = max(0.0, min(test_sharpe / train_sharpe, 1.0))\n    \n    print(f'{description}')\n    print(f'  -> degradation ratio = {ratio}')\n\" 2>&1",
+      "description": "Analyze degradation special case logic"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-29T19:59:50.443127",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && PYTHONPATH=/media/sam/1TB/nautilus_dev python -c \"\nfrom scripts.alpha_evolve.walk_forward.config import WalkForwardConfig\nfrom scripts.alpha_evolve.walk_forward.validator import WalkForwardValidator\nfrom datetime import datetime\nfrom unittest.mock import AsyncMock\n\nprint('=== Edge Case 32: Window boundary precision ===')\nprint()\n\n# Test with Feb 28/29 edge case\nconfig = WalkForwardConfig(\n    data_start=datetime(2024, 1, 1),  # Leap year\n    data_end=datetime(2025, 6, 1),\n    train_months=2,\n    test_months=1,\n    step_months=1,\n    min_windows=2,\n    embargo_before_days=0,\n)\nvalidator = WalkForwardValidator(config, AsyncMock())\nwindows = validator._generate_windows()\n\nprint(f'Windows starting Jan 1, 2024 (leap year):')\nfor w in windows[:5]:\n    print(f'  W{w.window_id}: train {w.train_start.date()} to {w.train_end.date()}, test {w.test_start.date()} to {w.test_end.date()}')\n    # Check if windows cross month boundaries correctly\n    train_days = (w.train_end - w.train_start).days\n    test_days = (w.test_end - w.test_start).days\n    print(f'         train={train_days} days, test={test_days} days')\n\nprint()\nprint('NOTE: Using 30 days per month approximation, so Feb is treated as 30 days')\nprint('This is documented behavior but may not match calendar months exactly')\n\" 2>&1",
+      "description": "Test window generation precision"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-29T20:00:08.086942",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && PYTHONPATH=/media/sam/1TB/nautilus_dev python -c \"\nfrom scripts.alpha_evolve.walk_forward.config import WalkForwardConfig\nfrom scripts.alpha_evolve.walk_forward.validator import WalkForwardValidator\nfrom datetime import datetime\nfrom unittest.mock import AsyncMock\n\nprint('=== Edge Case 33: Minimum data range edge ===')\nprint()\n\n# Calculate exact minimum data needed\ntrain_months = 6\ntest_months = 3\nstep_months = 3\nembargo_before = 5\nembargo_after = 3\nmin_windows = 4\n\n# Using 30 days/month\ntrain_days = train_months * 30\ntest_days = test_months * 30\nstep_days = step_months * 30\nembargo_total = embargo_before + embargo_after\n\nfirst_window = train_days + embargo_total + test_days\nadditional = (min_windows - 1) * step_days\nmin_required = first_window + additional\n\nprint(f'Calculated minimum days needed:')\nprint(f'  First window: {train_days} + {embargo_total} + {test_days} = {first_window}')\nprint(f'  Additional windows: {min_windows - 1} x {step_days} = {additional}')\nprint(f'  Total: {min_required} days')\n\n# Try to create config with exactly min required\ndata_start = datetime(2023, 1, 1)\nfrom datetime import timedelta\ndata_end = data_start + timedelta(days=min_required)\n\nprint()\nprint(f'Testing with exactly {min_required} days: {data_start.date()} to {data_end.date()}')\ntry:\n    config = WalkForwardConfig(\n        data_start=data_start,\n        data_end=data_end,\n    )\n    validator = WalkForwardValidator(config, AsyncMock())\n    windows = validator._generate_windows()\n    print(f'  Config created successfully, generated {len(windows)} windows')\nexcept ValueError as e:\n    print(f'  Error: {e}')\n\n# Try with one fewer day\nprint()\nprint(f'Testing with {min_required - 1} days (should fail):')\ndata_end_short = data_start + timedelta(days=min_required - 1)\ntry:\n    config = WalkForwardConfig(\n        data_start=data_start,\n        data_end=data_end_short,\n    )\n    print(f'  UNEXPECTED: Config created with insufficient data')\nexcept ValueError as e:\n    print(f'  Expected error: insufficient data')\n\" 2>&1",
+      "description": "Test minimum data range edge case"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-29T20:00:15.872819",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/test_walk_forward/test_metrics.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-29T20:00:20.438422",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/test_walk_forward/test_metrics.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-29T20:00:26.326123",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/test_walk_forward/test_metrics.py"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-29T20:00:47.203999",
+      "todo_count": 7
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-29T20:00:52.809386",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/walk_forward/__init__.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-29T20:00:52.816009",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/test_walk_forward/conftest.py"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-29T20:01:13.675760",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && PYTHONPATH=/media/sam/1TB/nautilus_dev python -c \"\n# Final edge case checks\nfrom scripts.alpha_evolve.walk_forward.config import WalkForwardConfig\nfrom scripts.alpha_evolve.walk_forward.validator import WalkForwardValidator\nfrom scripts.alpha_evolve.walk_forward.models import WindowMetrics\nfrom datetime import datetime\nfrom unittest.mock import AsyncMock\nimport asyncio\n\nprint('=== Edge Case 34: Very large window counts ===')\n\nasync def test_many_windows():\n    # Create config that generates many windows\n    config = WalkForwardConfig(\n        data_start=datetime(2015, 1, 1),\n        data_end=datetime(2025, 1, 1),  # 10 years\n        train_months=6,\n        test_months=1,\n        step_months=1,  # Monthly steps\n        min_windows=2,\n    )\n    \n    evaluator = AsyncMock()\n    evaluator.evaluate.return_value = WindowMetrics(\n        sharpe_ratio=1.0,\n        calmar_ratio=2.0,\n        max_drawdown=0.1,\n        total_return=0.05,\n        win_rate=0.55,\n        trade_count=20,\n    )\n    \n    validator = WalkForwardValidator(config, evaluator)\n    windows = validator._generate_windows()\n    print(f'Generated {len(windows)} windows from 10 years of data')\n    \n    # Run full validation (should not crash)\n    result = await validator.validate('test_strategy')\n    print(f'Validation completed: passed={result.passed}, robustness={result.robustness_score:.1f}')\n\nasyncio.run(test_many_windows())\n\nprint()\nprint('=== Edge Case 35: Check models.py degradation_ratio property ===')\nfrom scripts.alpha_evolve.walk_forward.models import WindowResult, Window\n\n# The degradation_ratio property has its own edge case handling\ndef make_result(train_sharpe, test_sharpe):\n    return WindowResult(\n        window=Window(\n            window_id=1,\n            train_start=datetime(2023, 1, 1),\n            train_end=datetime(2023, 6, 30),\n            test_start=datetime(2023, 7, 1),\n            test_end=datetime(2023, 9, 30),\n        ),\n        train_metrics=WindowMetrics(\n            sharpe_ratio=train_sharpe,\n            calmar_ratio=1.0,\n            max_drawdown=0.1,\n            total_return=0.1,\n            win_rate=0.5,\n            trade_count=10,\n        ),\n        test_metrics=WindowMetrics(\n            sharpe_ratio=test_sharpe,\n            calmar_ratio=1.0,\n            max_drawdown=0.1,\n            total_return=0.05,\n            win_rate=0.5,\n            trade_count=8,\n        ),\n    )\n\n# Test degradation_ratio property\ntest_cases = [\n    (1.5, 1.0, 'normal case'),\n    (0.0, 1.0, 'zero train'),\n    (-1.0, 1.0, 'negative train'),\n    (1.0, 0.0, 'zero test'),\n]\n\nfor train_s, test_s, desc in test_cases:\n    result = make_result(train_s, test_s)\n    print(f'{desc}: train={train_s}, test={test_s} -> degradation_ratio={result.degradation_ratio}')\n\" 2>&1",
+      "description": "Final edge case verification"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-29T20:01:38.881036",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && PYTHONPATH=/media/sam/1TB/nautilus_dev python -c \"\n# Compare degradation_ratio property vs metrics.py calculation\nfrom scripts.alpha_evolve.walk_forward.models import WindowResult, Window, WindowMetrics\nfrom datetime import datetime\n\ndef make_result(train_sharpe, test_sharpe):\n    return WindowResult(\n        window=Window(\n            window_id=1,\n            train_start=datetime(2023, 1, 1),\n            train_end=datetime(2023, 6, 30),\n            test_start=datetime(2023, 7, 1),\n            test_end=datetime(2023, 9, 30),\n        ),\n        train_metrics=WindowMetrics(\n            sharpe_ratio=train_sharpe,\n            calmar_ratio=1.0,\n            max_drawdown=0.1,\n            total_return=0.1,\n            win_rate=0.5,\n            trade_count=10,\n        ),\n        test_metrics=WindowMetrics(\n            sharpe_ratio=test_sharpe,\n            calmar_ratio=1.0,\n            max_drawdown=0.1,\n            total_return=0.05,\n            win_rate=0.5,\n            trade_count=8,\n        ),\n    )\n\nprint('=== Edge Case 36: Inconsistency between model and metrics ===')\nprint()\nprint('models.py degradation_ratio property:')\nprint('  - Returns 1.0 if train_sharpe <= 0')\nprint('  - Returns test_sharpe / train_sharpe otherwise')\nprint()\nprint('metrics.py calculate_robustness_score degradation:')\nprint('  - If train_sharpe <= 0 AND test_sharpe > 0: ratio = 1.0')\nprint('  - If train_sharpe <= 0 AND test_sharpe < train_sharpe: ratio = 0.0')\nprint('  - If train_sharpe <= 0 AND else: ratio = 0.5')\nprint('  - Otherwise: ratio = max(0, min(test/train, 1.0))')\nprint()\n\n# Test case where they differ: negative train, negative test\nresult = make_result(-1.0, -0.5)\nmodel_ratio = result.degradation_ratio\nprint(f'train=-1.0, test=-0.5:')\nprint(f'  model.degradation_ratio = {model_ratio}')\n\n# What would metrics.py calculate?\n# train_sharpe <= 0, test_sharpe = -0.5 which is not > 0\n# test_sharpe (-0.5) < train_sharpe (-1.0)? No, -0.5 > -1.0\n# So else clause: ratio = 0.5\nprint(f'  metrics.py would calculate = 0.5')\nif abs(model_ratio - 0.5) > 0.01:\n    print(f'  INCONSISTENCY: model returns {model_ratio}, metrics would return 0.5')\nelse:\n    print(f'  Consistent')\n\n# Another test case\nresult = make_result(-1.0, -2.0)\nmodel_ratio = result.degradation_ratio\nprint()\nprint(f'train=-1.0, test=-2.0:')\nprint(f'  model.degradation_ratio = {model_ratio}')\n# metrics.py: test (-2.0) < train (-1.0)? Yes! So ratio = 0.0\nprint(f'  metrics.py would calculate = 0.0')\nif abs(model_ratio - 0.0) > 0.01:\n    print(f'  INCONSISTENCY: model returns {model_ratio}, metrics would return 0.0')\nelse:\n    print(f'  Consistent')\n\" 2>&1",
+      "description": "Check model vs metrics inconsistency"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-29T20:01:57.755597",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && PYTHONPATH=/media/sam/1TB/nautilus_dev python -c \"\n# Final check - look for any floating point precision issues\nfrom scripts.alpha_evolve.walk_forward.metrics import _EPSILON\nimport math\n\nprint('=== Edge Case 37: Epsilon and floating point precision ===')\nprint(f'_EPSILON = {_EPSILON}')\n\n# Test if epsilon is appropriate\ntest_values = [1e-9, 1e-10, 1e-11, 1e-15]\nfor v in test_values:\n    close_to_half = abs(v - 0.5) < _EPSILON\n    print(f'{v} close to 0.5 with epsilon? {close_to_half}')\n\n# Check numerical stability with very small numbers\nfrom scripts.alpha_evolve.walk_forward.metrics import calculate_robustness_score\nfrom scripts.alpha_evolve.walk_forward.models import WindowMetrics, Window, WindowResult\nfrom datetime import datetime\n\ndef make_result(test_return):\n    return WindowResult(\n        window=Window(\n            window_id=1,\n            train_start=datetime(2023, 1, 1),\n            train_end=datetime(2023, 6, 30),\n            test_start=datetime(2023, 7, 1),\n            test_end=datetime(2023, 9, 30),\n        ),\n        train_metrics=WindowMetrics(\n            sharpe_ratio=1.0, calmar_ratio=1.0, max_drawdown=0.1,\n            total_return=0.1, win_rate=0.5, trade_count=10,\n        ),\n        test_metrics=WindowMetrics(\n            sharpe_ratio=1.0, calmar_ratio=1.0, max_drawdown=0.1,\n            total_return=test_return, win_rate=0.5, trade_count=8,\n        ),\n    )\n\nprint()\nprint('Test robustness score with very small returns:')\nfor ret in [1e-10, 1e-15, 0.0, -1e-15, -1e-10]:\n    results = [make_result(ret) for _ in range(5)]\n    score = calculate_robustness_score(results)\n    print(f'  return={ret}: score={score}')\n\" 2>&1",
+      "description": "Check floating point precision"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-29T20:02:18.372904",
+      "todo_count": 8
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-29T20:02:32.505518",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && PYTHONPATH=/media/sam/1TB/nautilus_dev python -c \"\n# Look for any remaining edge cases I might have missed\nfrom scripts.alpha_evolve.walk_forward.config import WalkForwardConfig\nfrom scripts.alpha_evolve.walk_forward.validator import WalkForwardValidator\nfrom scripts.alpha_evolve.walk_forward.models import WindowMetrics\nfrom datetime import datetime, timedelta\nfrom unittest.mock import AsyncMock\nimport asyncio\n\nprint('=== Edge Case 38: step_months = 0 (if allowed) ===')\ntry:\n    config = WalkForwardConfig(\n        data_start=datetime(2023, 1, 1),\n        data_end=datetime(2024, 12, 1),\n        step_months=0,  # Invalid\n    )\n    print('UNEXPECTED: Created config with step_months=0')\nexcept ValueError as e:\n    print('Expected validation error for step_months=0')\n\nprint()\nprint('=== Edge Case 39: Timezone handling ===')\n# Test that datetime objects work consistently\nfrom datetime import timezone\ntz_aware = datetime(2023, 1, 1, tzinfo=timezone.utc)\ntz_naive = datetime(2023, 1, 1)\n\ntry:\n    config = WalkForwardConfig(\n        data_start=tz_aware,\n        data_end=datetime(2024, 12, 1, tzinfo=timezone.utc),\n    )\n    print('Timezone-aware dates accepted')\nexcept Exception as e:\n    print(f'Error with timezone-aware dates: {e}')\n\nprint()\nprint('=== Edge Case 40: String instead of datetime ===')\ntry:\n    config = WalkForwardConfig(\n        data_start='2023-01-01',\n        data_end='2024-12-01',\n    )\n    print('UNEXPECTED: String dates accepted')\nexcept Exception as e:\n    print('Expected: String dates rejected by Pydantic')\n\" 2>&1",
+      "description": "Additional edge case verification"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-29T20:02:42.409146",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && PYTHONPATH=/media/sam/1TB/nautilus_dev python -c \"\nfrom scripts.alpha_evolve.walk_forward.config import WalkForwardConfig\nfrom datetime import datetime\n\n# Check what happens with string dates\nconfig = WalkForwardConfig(\n    data_start='2023-01-01',\n    data_end='2024-12-01',\n)\nprint(f'data_start type: {type(config.data_start)}')\nprint(f'data_start value: {config.data_start}')\nprint()\nprint('Pydantic auto-converts strings to datetime - this is expected behavior')\nprint('Not a bug, but good to document')\n\" 2>&1",
+      "description": "Verify string date handling"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-29T20:03:06.633438",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && PYTHONPATH=/media/sam/1TB/nautilus_dev python -c \"\n# Final check - any issues with the report formatting\nfrom scripts.alpha_evolve.walk_forward.report import generate_report\nfrom scripts.alpha_evolve.walk_forward.config import WalkForwardConfig\nfrom scripts.alpha_evolve.walk_forward.models import WalkForwardResult, WindowResult, WindowMetrics, Window\nfrom datetime import datetime\n\ndef make_result(window_id, train_sharpe, test_sharpe, test_return, test_dd):\n    return WindowResult(\n        window=Window(\n            window_id=window_id,\n            train_start=datetime(2023, 1, 1),\n            train_end=datetime(2023, 6, 30),\n            test_start=datetime(2023, 7, 5),\n            test_end=datetime(2023, 10, 3),\n        ),\n        train_metrics=WindowMetrics(\n            sharpe_ratio=train_sharpe,\n            calmar_ratio=2.0,\n            max_drawdown=0.1,\n            total_return=0.15,\n            win_rate=0.55,\n            trade_count=10,\n        ),\n        test_metrics=WindowMetrics(\n            sharpe_ratio=test_sharpe,\n            calmar_ratio=1.0,\n            max_drawdown=test_dd,\n            total_return=test_return,\n            win_rate=0.5,\n            trade_count=8,\n        ),\n    )\n\nprint('=== Edge Case 41: Report with special characters in floats ===')\nconfig = WalkForwardConfig(\n    data_start=datetime(2023, 1, 1),\n    data_end=datetime(2025, 1, 1),\n)\n\n# Create result with very precise floats\nresult = WalkForwardResult(\n    config=config,\n    windows=[make_result(1, 1.5555555, 1.333333, 0.123456789, 0.0987654321)],\n    robustness_score=87.123456789,\n    passed=True,\n    deflated_sharpe_ratio=1.23456789,\n    probability_backtest_overfitting=0.4567890123,\n)\n\nreport = generate_report(result)\nprint('Report generated successfully with precise floats')\nprint(f'Report length: {len(report)} chars')\n\n# Check for any formatting issues in the report\nif '\\\\n' in repr(report):\n    pass  # Normal - has newlines\nif 'nan' in report.lower() or 'inf' in report.lower():\n    print('WARNING: NaN or Inf found in report')\nelse:\n    print('No NaN/Inf in report - good')\n\" 2>&1",
+      "description": "Check report formatting edge cases"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-29T20:03:21.987296",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && PYTHONPATH=/media/sam/1TB/nautilus_dev python -c \"\n# Find where the 'inf' or 'nan' is in the report\nfrom scripts.alpha_evolve.walk_forward.report import generate_report\nfrom scripts.alpha_evolve.walk_forward.config import WalkForwardConfig\nfrom scripts.alpha_evolve.walk_forward.models import WalkForwardResult, WindowResult, WindowMetrics, Window\nfrom datetime import datetime\n\ndef make_result(window_id, train_sharpe, test_sharpe, test_return, test_dd):\n    return WindowResult(\n        window=Window(\n            window_id=window_id,\n            train_start=datetime(2023, 1, 1),\n            train_end=datetime(2023, 6, 30),\n            test_start=datetime(2023, 7, 5),\n            test_end=datetime(2023, 10, 3),\n        ),\n        train_metrics=WindowMetrics(\n            sharpe_ratio=train_sharpe,\n            calmar_ratio=2.0,\n            max_drawdown=0.1,\n            total_return=0.15,\n            win_rate=0.55,\n            trade_count=10,\n        ),\n        test_metrics=WindowMetrics(\n            sharpe_ratio=test_sharpe,\n            calmar_ratio=1.0,\n            max_drawdown=test_dd,\n            total_return=test_return,\n            win_rate=0.5,\n            trade_count=8,\n        ),\n    )\n\nconfig = WalkForwardConfig(\n    data_start=datetime(2023, 1, 1),\n    data_end=datetime(2025, 1, 1),\n)\n\nresult = WalkForwardResult(\n    config=config,\n    windows=[make_result(1, 1.5555555, 1.333333, 0.123456789, 0.0987654321)],\n    robustness_score=87.123456789,\n    passed=True,\n    deflated_sharpe_ratio=1.23456789,\n    probability_backtest_overfitting=0.4567890123,\n)\n\nreport = generate_report(result)\n\n# Find the context around 'inf' or 'nan'\nfor i, line in enumerate(report.split('\\\\n')):\n    if 'nan' in line.lower() or 'inf' in line.lower():\n        print(f'Line {i}: {line}')\n\" 2>&1",
+      "description": "Find NaN/Inf location in report"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-29T20:03:39.951880",
+      "todo_count": 9
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-29T20:04:00.372347",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && PYTHONPATH=/media/sam/1TB/nautilus_dev python -c \"\n# Final comprehensive verification\nprint('=== Final Comprehensive Verification ===')\nprint()\n\n# 1. Import all modules without error\nprint('1. Testing all imports...')\ntry:\n    from scripts.alpha_evolve.walk_forward import (\n        WalkForwardConfig,\n        WalkForwardValidator,\n        WalkForwardResult,\n        Window,\n        WindowMetrics,\n        WindowResult,\n        generate_report,\n        export_json,\n    )\n    print('   All imports successful')\nexcept Exception as e:\n    print(f'   Import error: {e}')\n\n# 2. Test end-to-end workflow\nprint()\nprint('2. Testing end-to-end workflow...')\nfrom datetime import datetime\nfrom unittest.mock import AsyncMock\nimport asyncio\n\nasync def test_workflow():\n    config = WalkForwardConfig(\n        data_start=datetime(2023, 1, 1),\n        data_end=datetime(2024, 12, 1),\n    )\n    \n    evaluator = AsyncMock()\n    evaluator.evaluate.return_value = WindowMetrics(\n        sharpe_ratio=1.2,\n        calmar_ratio=2.0,\n        max_drawdown=0.08,\n        total_return=0.10,\n        win_rate=0.55,\n        trade_count=30,\n    )\n    \n    validator = WalkForwardValidator(config, evaluator)\n    result = await validator.validate('test_strategy_code')\n    \n    report = generate_report(result)\n    json_export = export_json(result)\n    \n    return result, len(report), len(json_export)\n\nresult, report_len, json_len = asyncio.run(test_workflow())\nprint(f'   Validation passed: {result.passed}')\nprint(f'   Robustness score: {result.robustness_score:.1f}')\nprint(f'   Windows: {len(result.windows)}')\nprint(f'   Report length: {report_len} chars')\nprint(f'   JSON length: {json_len} chars')\n\n# 3. Verify all known bugs are documented\nprint()\nprint('3. Known bugs summary:')\nbugs = [\n    ('B1', 'CRITICAL', 'metrics.py:277-349', 'PBO algorithm fundamentally flawed'),\n    ('B2', 'HIGH', 'validator.py:171', 'embargo_after_days not implemented'),\n    ('B3', 'LOW', 'validator.py:171', 'Unused variable (ruff warning)'),\n    ('B4', 'MEDIUM', 'config.py', 'No validation embargo < test period'),\n    ('B5', 'MEDIUM', 'validator.py:95-106', 'No evaluator result validation'),\n    ('B6', 'MEDIUM', 'validator.py/metrics.py', 'NaN propagates to DSR'),\n    ('B7', 'LOW', 'metrics.py', 'NaN/inf affects score silently'),\n    ('B8', 'LOW', 'test_metrics.py:353', 'Test acknowledges PBO issue'),\n    ('B9', 'MEDIUM', 'models.py vs metrics.py', 'Inconsistent degradation_ratio for negative Sharpe'),\n]\n\nfor bid, sev, loc, desc in bugs:\n    print(f'   {bid} [{sev:8}] {loc}: {desc[:50]}')\n\nprint()\nprint('=== Verification Complete ===')\n\" 2>&1",
+      "description": "Final comprehensive verification"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-29T20:04:16.260571",
+      "todo_count": 9
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-29T20:04:51.312917",
+      "todo_count": 9
+    },
+    {
+      "operation": "task",
+      "timestamp": "2025-12-29T20:05:10.646489",
+      "subagent_type": "alpha-debug",
+      "prompt": "Please provide the full detailed bug report with:\n1. All 9 bugs with their IDs, severity, file locat..."
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-29T20:05:17.874102",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/walk_forward/metrics.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-29T20:05:17.885251",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/walk_forward/validator.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-29T20:05:17.904976",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/020-walk-forward-validation/spec.md"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-29T20:05:24.993184",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/walk_forward/config.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-29T20:05:25.006239",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/walk_forward/models.py"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-29T20:07:03.105762",
+      "todo_count": 4
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-29T20:07:10.210699",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/walk_forward/metrics.py"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-29T20:07:37.156276",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/walk_forward/metrics.py",
+      "old_string": "def estimate_probability_backtest_overfitting(\n    window_results: list[WindowResult],\n    n_permuta..."
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-29T20:07:45.636182",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/walk_forward/validator.py"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-29T20:08:03.950985",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/walk_forward/validator.py",
+      "old_string": "    def _generate_windows(self) -> list[Window]:\n        \"\"\"Generate walk-forward windows from confi..."
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-29T20:08:10.618730",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/walk_forward/validator.py"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-29T20:08:17.459985",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/walk_forward/validator.py",
+      "old_string": "        pbo = estimate_probability_backtest_overfitting(window_results)"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-29T20:08:23.899655",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/walk_forward/validator.py"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-29T20:08:32.592334",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/walk_forward/validator.py",
+      "old_string": "        # Criterion 4: Majority with adequate Sharpe\n        sharpe_ok = sum(\n            1\n        ..."
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-29T20:08:40.475675",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -m pytest tests/test_walk_forward/ -v --tb=short 2>&1 | tail -60",
+      "description": "Run tests to verify bug fixes"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-29T20:08:57.300367",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/test_walk_forward/conftest.py"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-29T20:09:11.869376",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/test_walk_forward/conftest.py",
+      "old_string": "@pytest.fixture\ndef sample_config() -> WalkForwardConfig:\n    \"\"\"Sample WalkForwardConfig for testin..."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-29T20:09:20.983808",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/walk_forward/validator.py",
+      "old_string": "        windows: list[Window] = []\n        current_start = self.config.data_start\n        window_id ..."
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-29T20:09:28.399622",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/test_walk_forward/test_window_generation.py"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-29T20:09:36.801908",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -m pytest tests/test_walk_forward/test_window_generation.py -v --tb=short 2>&1",
+      "description": "Run window generation tests"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-29T20:10:06.943813",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/walk_forward/validator.py",
+      "old_string": "            # Move to next window start position\n            # Use max to ensure next train respects..."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-29T20:10:22.539548",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/walk_forward/validator.py",
+      "old_string": "            # Move to next window by step size\n            # embargo_after is applied to ensure gap ..."
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-29T20:10:31.586006",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -m pytest tests/test_walk_forward/ -v --tb=short 2>&1 | tail -30",
+      "description": "Run all walk-forward tests"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-29T20:10:59.512269",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/test_walk_forward/conftest.py",
+      "old_string": "@pytest.fixture\ndef sample_config() -> WalkForwardConfig:\n    \"\"\"Sample WalkForwardConfig for testin..."
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-29T20:11:20.998078",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/test_walk_forward/test_window_generation.py"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-29T20:11:32.866752",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/test_walk_forward/test_window_generation.py",
+      "old_string": "    def test_24_month_data_produces_5_windows(self) -> None:\n        \"\"\"Test 24-month data with 6-mo..."
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-29T20:11:41.039295",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -m pytest tests/test_walk_forward/ -v --tb=short 2>&1 | tail -25",
+      "description": "Run walk-forward tests after fixture updates"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-29T20:11:52.319320",
+      "todo_count": 4
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-29T20:11:59.201972",
+      "command": "git status",
+      "description": "Check git status for bug fix commit"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-29T20:12:11.509594",
+      "command": "git add scripts/alpha_evolve/walk_forward/metrics.py scripts/alpha_evolve/walk_forward/validator.py tests/test_walk_forward/conftest.py tests/test_walk_forward/test_window_generation.py && git commit -m \"$(cat <<'EOF'\nfix(walk-forward): Address alpha-debug findings\n\nBug fixes from alpha-debug analysis:\n\nB1 (CRITICAL): Fix PBO algorithm\n- Replaced broken cross-window comparison with degradation-based analysis\n- Now properly detects overfitting when test << train performance\n\nB2 (HIGH): Implement embargo_after_days\n- Now enforces gap between prev test_end and next train_start\n- Prevents training on recently tested data\n\nB4 (MEDIUM): Fix majority check\n- Use float division for consistent > 50% threshold\n\nB7 (LOW): Pass seed to PBO function\n- Enables reproducible PBO calculations\n\nUpdated test fixtures for correct embargo behavior.\nAll 102 tests passing.\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n)\"",
+      "description": "Commit alpha-debug bug fixes"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-29T20:12:18.655299",
+      "command": "git push origin master",
+      "description": "Push bug fixes to origin"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-29T20:15:53.878987",
+      "command": "git log --oneline -3 && echo \"---\" && git status",
+      "description": "Verify final git status"
+    }
+  ],
+  "last_updated": "2025-12-29T20:15:53.879011"
+}

@@ -1,0 +1,31 @@
+{
+  "mcpServers": {
+    "firecrawl-mcp": {
+      "command": "npx",
+      "args": [
+        "firecrawl-mcp"
+      ],
+      "env": {}
+    },
+  "playwright": {
+        "command": "npx",
+        "args": [
+          "@playwright/mcp@latest"
+        ],
+        "env": {}
+      },
+    "youtube": {
+      "command": "npx",
+      "args": [
+        "@anaisbetts/mcp-youtube"
+      ],
+      "env": {}
+    },
+    "download-mcp": {
+      "command": "python3",
+      "args": [
+        "/media/sam/1TB1/mcpservers/mcp-download/bridging_download_mcp.py"
+      ]
+    }
+  }
+}

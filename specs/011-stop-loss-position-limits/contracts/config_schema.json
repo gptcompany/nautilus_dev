@@ -1,0 +1,92 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://nautilus_dev/schemas/risk-config.json",
+  "title": "RiskConfig",
+  "description": "Configuration for risk management (stop-loss and position limits)",
+  "type": "object",
+  "properties": {
+    "stop_loss_enabled": {
+      "type": "boolean",
+      "default": true,
+      "description": "Enable automatic stop-loss order generation on position open"
+    },
+    "stop_loss_pct": {
+      "type": "string",
+      "pattern": "^0\\.[0-9]+$",
+      "default": "0.02",
+      "description": "Stop-loss distance as decimal fraction (0.02 = 2%)",
+      "examples": ["0.02", "0.05", "0.10"]
+    },
+    "stop_loss_type": {
+      "type": "string",
+      "enum": ["market", "limit", "emulated"],
+      "default": "market",
+      "description": "Type of stop order to use. 'market' = STOP_MARKET (recommended), 'limit' = STOP_LIMIT, 'emulated' = strategy-managed"
+    },
+    "trailing_stop": {
+      "type": "boolean",
+      "default": false,
+      "description": "Enable trailing stop mode (stop moves with favorable price action)"
+    },
+    "trailing_distance_pct": {
+      "type": "string",
+      "pattern": "^0\\.[0-9]+$",
+      "default": "0.01",
+      "description": "Trailing stop distance as decimal fraction"
+    },
+    "trailing_offset_type": {
+      "type": "string",
+      "enum": ["price", "basis_points"],
+      "default": "price",
+      "description": "How trailing distance is measured"
+    },
+    "max_position_size": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string",
+        "pattern": "^[0-9]+\\.?[0-9]*$"
+      },
+      "description": "Maximum position size per instrument (key = instrument ID string, value = max quantity)",
+      "examples": [
+        {"BTC/USDT.BINANCE": "0.5", "ETH/USDT.BINANCE": "5.0"}
+      ]
+    },
+    "max_total_exposure": {
+      "type": ["string", "null"],
+      "pattern": "^[0-9]+\\.?[0-9]*$",
+      "description": "Maximum total portfolio exposure in quote currency"
+    },
+    "dynamic_boundaries": {
+      "type": "boolean",
+      "default": false,
+      "description": "Enable OU-based optimal stopping boundaries (Phase 5 feature)"
+    },
+    "ou_lookback_days": {
+      "type": "integer",
+      "minimum": 7,
+      "maximum": 365,
+      "default": 30,
+      "description": "Days of historical data for OU parameter estimation"
+    }
+  },
+  "required": [],
+  "additionalProperties": false,
+  "examples": [
+    {
+      "stop_loss_enabled": true,
+      "stop_loss_pct": "0.02",
+      "stop_loss_type": "market",
+      "max_position_size": {
+        "BTC/USDT.BINANCE": "0.5"
+      },
+      "max_total_exposure": "10000"
+    },
+    {
+      "stop_loss_enabled": true,
+      "stop_loss_pct": "0.03",
+      "trailing_stop": true,
+      "trailing_distance_pct": "0.015",
+      "trailing_offset_type": "price"
+    }
+  ]
+}

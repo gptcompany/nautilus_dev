@@ -1,0 +1,289 @@
+{
+  "timestamp": "2025-10-17T13:59:34.738Z",
+  "stable_version": "v1.220.0",
+  "nightly_commits": 50,
+  "breaking_changes": [
+    {
+      "title": "Refine OKX VIP level handling and order book subscriptions",
+      "message": "Refine OKX VIP level handling and order book subscriptions\n\n- Add VIP-aware order book channel selection with depth support\n- Add VIP level query endpoint and automatic detection on connect\n- Fix account state parsing for some account types\n- BREAKING: Removed `vip_level` config option (now redundant)",
+      "sha": "aaf5a29",
+      "date": "2025-10-14T12:07:33Z",
+      "url": "https://github.com/nautechsystems/nautilus_trader/commit/aaf5a294cc0465f47a21749748fb8a0616a5f012"
+    }
+  ],
+  "open_issues": {
+    "total": 19250,
+    "bugs": 1500,
+    "features": 16500,
+    "issues_list": [
+      {
+        "number": 3081,
+        "title": "[dYdX] Strategy fails to restart due error while loading the cache",
+        "state": "open",
+        "labels": [
+          "bug"
+        ],
+        "created_at": "2025-10-14T03:34:50Z",
+        "updated_at": "2025-10-15T04:32:36Z",
+        "author": "SarunasSS",
+        "url": "https://github.com/nautechsystems/nautilus_trader/issues/3081",
+        "comments": 6
+      },
+      {
+        "number": 3074,
+        "title": "[Binance] BBO (priceMatch) does not update limit order price on accept",
+        "state": "open",
+        "labels": [
+          "bug"
+        ],
+        "created_at": "2025-10-13T02:28:16Z",
+        "updated_at": "2025-10-13T02:36:33Z",
+        "author": "cjdsellers",
+        "url": "https://github.com/nautechsystems/nautilus_trader/issues/3074",
+        "comments": 0
+      },
+      {
+        "number": 3061,
+        "title": "Add base currency conversion for positions and portfolio with cross-pair support",
+        "state": "open",
+        "labels": [
+          "enhancement"
+        ],
+        "created_at": "2025-10-10T23:25:56Z",
+        "updated_at": "2025-10-12T22:01:59Z",
+        "author": "bmlquant",
+        "url": "https://github.com/nautechsystems/nautilus_trader/issues/3061",
+        "comments": 0
+      },
+      {
+        "number": 3054,
+        "title": "[Interactive Brokers, Reconciliation] Flat positions not closed entirely",
+        "state": "open",
+        "labels": [],
+        "created_at": "2025-10-09T12:15:34Z",
+        "updated_at": "2025-10-09T12:15:34Z",
+        "author": "idobz",
+        "url": "https://github.com/nautechsystems/nautilus_trader/issues/3054",
+        "comments": 0
+      },
+      {
+        "number": 3046,
+        "title": "[Reconciliation] Duplicate trade IDs and fill replay on node restart",
+        "state": "open",
+        "labels": [
+          "bug",
+          "enhancement"
+        ],
+        "created_at": "2025-10-08T00:47:15Z",
+        "updated_at": "2025-10-13T19:48:24Z",
+        "author": "cjdsellers",
+        "url": "https://github.com/nautechsystems/nautilus_trader/issues/3046",
+        "comments": 1
+      },
+      {
+        "number": 3042,
+        "title": "[Reconciliation] Fails for routing clients when instrument venue differs from client venue",
+        "state": "open",
+        "labels": [
+          "bug",
+          "enhancement"
+        ],
+        "created_at": "2025-10-07T03:10:04Z",
+        "updated_at": "2025-10-14T07:42:30Z",
+        "author": "cjdsellers",
+        "url": "https://github.com/nautechsystems/nautilus_trader/issues/3042",
+        "comments": 1
+      },
+      {
+        "number": 3026,
+        "title": "Support schwab broker",
+        "state": "open",
+        "labels": [
+          "enhancement"
+        ],
+        "created_at": "2025-10-03T23:39:30Z",
+        "updated_at": "2025-10-12T23:32:10Z",
+        "author": "aixohub",
+        "url": "https://github.com/nautechsystems/nautilus_trader/issues/3026",
+        "comments": 5
+      },
+      {
+        "number": 3006,
+        "title": "Binance US adapter does not process fill correctly",
+        "state": "open",
+        "labels": [
+          "bug"
+        ],
+        "created_at": "2025-09-30T22:11:04Z",
+        "updated_at": "2025-10-16T11:55:45Z",
+        "author": "bmlquant",
+        "url": "https://github.com/nautechsystems/nautilus_trader/issues/3006",
+        "comments": 13
+      },
+      {
+        "number": 2997,
+        "title": "[OKX] Implement historical trades requests",
+        "state": "open",
+        "labels": [
+          "enhancement"
+        ],
+        "created_at": "2025-09-27T10:24:52Z",
+        "updated_at": "2025-09-27T10:25:06Z",
+        "author": "cjdsellers",
+        "url": "https://github.com/nautechsystems/nautilus_trader/issues/2997",
+        "comments": 0
+      },
+      {
+        "number": 2982,
+        "title": "Implement dynamic rate limiting for API clients",
+        "state": "open",
+        "labels": [
+          "enhancement"
+        ],
+        "created_at": "2025-09-23T06:06:40Z",
+        "updated_at": "2025-10-08T06:13:03Z",
+        "author": "woung717",
+        "url": "https://github.com/nautechsystems/nautilus_trader/issues/2982",
+        "comments": 7
+      }
+    ],
+    "bug_list": [
+      {
+        "number": 3081,
+        "title": "[dYdX] Strategy fails to restart due error while loading the cache",
+        "state": "open",
+        "labels": [
+          "bug"
+        ],
+        "created_at": "2025-10-14T03:34:50Z",
+        "updated_at": "2025-10-15T04:32:36Z",
+        "author": "SarunasSS",
+        "url": "https://github.com/nautechsystems/nautilus_trader/issues/3081",
+        "comments": 6
+      },
+      {
+        "number": 3074,
+        "title": "[Binance] BBO (priceMatch) does not update limit order price on accept",
+        "state": "open",
+        "labels": [
+          "bug"
+        ],
+        "created_at": "2025-10-13T02:28:16Z",
+        "updated_at": "2025-10-13T02:36:33Z",
+        "author": "cjdsellers",
+        "url": "https://github.com/nautechsystems/nautilus_trader/issues/3074",
+        "comments": 0
+      },
+      {
+        "number": 3046,
+        "title": "[Reconciliation] Duplicate trade IDs and fill replay on node restart",
+        "state": "open",
+        "labels": [
+          "bug",
+          "enhancement"
+        ],
+        "created_at": "2025-10-08T00:47:15Z",
+        "updated_at": "2025-10-13T19:48:24Z",
+        "author": "cjdsellers",
+        "url": "https://github.com/nautechsystems/nautilus_trader/issues/3046",
+        "comments": 1
+      },
+      {
+        "number": 3042,
+        "title": "[Reconciliation] Fails for routing clients when instrument venue differs from client venue",
+        "state": "open",
+        "labels": [
+          "bug",
+          "enhancement"
+        ],
+        "created_at": "2025-10-07T03:10:04Z",
+        "updated_at": "2025-10-14T07:42:30Z",
+        "author": "cjdsellers",
+        "url": "https://github.com/nautechsystems/nautilus_trader/issues/3042",
+        "comments": 1
+      },
+      {
+        "number": 3006,
+        "title": "Binance US adapter does not process fill correctly",
+        "state": "open",
+        "labels": [
+          "bug"
+        ],
+        "created_at": "2025-09-30T22:11:04Z",
+        "updated_at": "2025-10-16T11:55:45Z",
+        "author": "bmlquant",
+        "url": "https://github.com/nautechsystems/nautilus_trader/issues/3006",
+        "comments": 13
+      }
+    ],
+    "feature_list": [
+      {
+        "number": 3061,
+        "title": "Add base currency conversion for positions and portfolio with cross-pair support",
+        "state": "open",
+        "labels": [
+          "enhancement"
+        ],
+        "created_at": "2025-10-10T23:25:56Z",
+        "updated_at": "2025-10-12T22:01:59Z",
+        "author": "bmlquant",
+        "url": "https://github.com/nautechsystems/nautilus_trader/issues/3061",
+        "comments": 0
+      },
+      {
+        "number": 3046,
+        "title": "[Reconciliation] Duplicate trade IDs and fill replay on node restart",
+        "state": "open",
+        "labels": [
+          "bug",
+          "enhancement"
+        ],
+        "created_at": "2025-10-08T00:47:15Z",
+        "updated_at": "2025-10-13T19:48:24Z",
+        "author": "cjdsellers",
+        "url": "https://github.com/nautechsystems/nautilus_trader/issues/3046",
+        "comments": 1
+      },
+      {
+        "number": 3042,
+        "title": "[Reconciliation] Fails for routing clients when instrument venue differs from client venue",
+        "state": "open",
+        "labels": [
+          "bug",
+          "enhancement"
+        ],
+        "created_at": "2025-10-07T03:10:04Z",
+        "updated_at": "2025-10-14T07:42:30Z",
+        "author": "cjdsellers",
+        "url": "https://github.com/nautechsystems/nautilus_trader/issues/3042",
+        "comments": 1
+      },
+      {
+        "number": 3026,
+        "title": "Support schwab broker",
+        "state": "open",
+        "labels": [
+          "enhancement"
+        ],
+        "created_at": "2025-10-03T23:39:30Z",
+        "updated_at": "2025-10-12T23:32:10Z",
+        "author": "aixohub",
+        "url": "https://github.com/nautechsystems/nautilus_trader/issues/3026",
+        "comments": 5
+      },
+      {
+        "number": 2997,
+        "title": "[OKX] Implement historical trades requests",
+        "state": "open",
+        "labels": [
+          "enhancement"
+        ],
+        "created_at": "2025-09-27T10:24:52Z",
+        "updated_at": "2025-09-27T10:25:06Z",
+        "author": "cjdsellers",
+        "url": "https://github.com/nautechsystems/nautilus_trader/issues/2997",
+        "comments": 0
+      }
+    ]
+  }
+}

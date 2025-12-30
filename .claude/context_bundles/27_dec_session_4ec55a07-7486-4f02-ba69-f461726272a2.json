@@ -1,0 +1,480 @@
+{
+  "session_id": "4ec55a07-7486-4f02-ba69-f461726272a2",
+  "created_at": "2025-12-27T15:00:01.718933",
+  "operations": [
+    {
+      "operation": "read",
+      "timestamp": "2025-12-27T15:00:01.718951",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/006-alpha-evolve-core/checklists/requirements.md"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-27T15:00:01.738708",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/006-alpha-evolve-core/data-model.md"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-27T15:00:09.038717",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/006-alpha-evolve-core/contracts/patching.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-27T15:00:09.044367",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/006-alpha-evolve-core/contracts/store.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-27T15:00:09.076187",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/006-alpha-evolve-core/contracts/config.py"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-27T15:00:20.668268",
+      "todo_count": 9
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T15:00:25.877220",
+      "command": "mkdir -p /media/sam/1TB/nautilus_dev/scripts/alpha_evolve && mkdir -p /media/sam/1TB/nautilus_dev/tests/alpha_evolve",
+      "description": "Create package directories"
+    },
+    {
+      "operation": "write",
+      "timestamp": "2025-12-27T15:00:33.338190",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/__init__.py",
+      "content_length": 381
+    },
+    {
+      "operation": "write",
+      "timestamp": "2025-12-27T15:00:33.814184",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/alpha_evolve/__init__.py",
+      "content_length": 50
+    },
+    {
+      "operation": "write",
+      "timestamp": "2025-12-27T15:00:55.723688",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/alpha_evolve/conftest.py",
+      "content_length": 4141
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-27T15:01:03.556093",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/006-alpha-evolve-core/tasks.md",
+      "old_string": "- [ ] T001 Create package directory at scripts/alpha_evolve/\n- [ ] T002 Create package __init__.py w..."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-27T15:01:10.904388",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/006-alpha-evolve-core/tasks.md",
+      "old_string": "- [ ] T005 Create sample strategy code fixture with EVOLVE-BLOCK markers in tests/alpha_evolve/conft..."
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-27T15:01:18.485851",
+      "todo_count": 9
+    },
+    {
+      "operation": "write",
+      "timestamp": "2025-12-27T15:01:49.454333",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/alpha_evolve/test_patching.py",
+      "content_length": 6009
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T15:01:55.562576",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run pytest tests/alpha_evolve/test_patching.py -v --tb=short 2>&1 | head -50",
+      "description": "Run patching tests (should fail)"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-27T15:02:10.240840",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/006-alpha-evolve-core/tasks.md",
+      "old_string": "- [ ] T007 [P] [US1] Write test_apply_patch_full_replace in tests/alpha_evolve/test_patching.py\n- [ ..."
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-27T15:02:17.214894",
+      "todo_count": 9
+    },
+    {
+      "operation": "write",
+      "timestamp": "2025-12-27T15:02:46.967794",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/patching.py",
+      "content_length": 4608
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T15:02:52.611072",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run pytest tests/alpha_evolve/test_patching.py -v --tb=short 2>&1",
+      "description": "Run patching tests (should pass)"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-27T15:03:05.569694",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/006-alpha-evolve-core/tasks.md",
+      "old_string": "- [ ] T014 [US1] Implement BLOCK_RE regex pattern in scripts/alpha_evolve/patching.py\n- [ ] T015 [US..."
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-27T15:03:08.726371",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/__init__.py"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-27T15:03:13.604559",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/__init__.py",
+      "old_string": "__version__ = \"0.1.0\"\n\n# Lazy imports to avoid circular dependencies\n# Actual exports will be added ..."
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-27T15:03:20.188127",
+      "todo_count": 8
+    },
+    {
+      "operation": "write",
+      "timestamp": "2025-12-27T15:04:18.479028",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/alpha_evolve/test_store.py",
+      "content_length": 12261
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T15:04:23.561088",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run pytest tests/alpha_evolve/test_store.py -v --tb=short 2>&1 | head -60",
+      "description": "Run store tests (should fail)"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-27T15:04:40.385726",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/006-alpha-evolve-core/tasks.md",
+      "old_string": "- [ ] T019 [P] [US2] Write test_program_store_insert_and_get in tests/alpha_evolve/test_store.py\n- [..."
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-27T15:04:48.903134",
+      "todo_count": 8
+    },
+    {
+      "operation": "write",
+      "timestamp": "2025-12-27T15:05:50.776622",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/store.py",
+      "content_length": 16046
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T15:05:55.689845",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run pytest tests/alpha_evolve/test_store.py -v --tb=short 2>&1",
+      "description": "Run store tests"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-27T15:06:13.393281",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/006-alpha-evolve-core/tasks.md",
+      "old_string": "- [ ] T028 [US2] Implement FitnessMetrics dataclass in scripts/alpha_evolve/store.py\n- [ ] T029 [US2..."
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-27T15:06:17.138516",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/__init__.py"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-27T15:06:24.099374",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/__init__.py",
+      "old_string": "# Patching exports\nfrom scripts.alpha_evolve.patching import (\n    BLOCK_RE,\n    apply_patch,\n    ex..."
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-27T15:06:31.646652",
+      "todo_count": 7
+    },
+    {
+      "operation": "write",
+      "timestamp": "2025-12-27T15:07:00.984179",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/alpha_evolve/test_config.py",
+      "content_length": 5280
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T15:07:05.754177",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run pytest tests/alpha_evolve/test_config.py -v --tb=short 2>&1 | head -50",
+      "description": "Run config tests (should fail)"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-27T15:07:16.884795",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/006-alpha-evolve-core/tasks.md",
+      "old_string": "- [ ] T040 [P] [US3] Write test_config_load_defaults in tests/alpha_evolve/test_config.py\n- [ ] T041..."
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-27T15:07:24.321311",
+      "todo_count": 7
+    },
+    {
+      "operation": "write",
+      "timestamp": "2025-12-27T15:07:31.476351",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/config.yaml",
+      "content_length": 471
+    },
+    {
+      "operation": "write",
+      "timestamp": "2025-12-27T15:07:51.525515",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/config.py",
+      "content_length": 3711
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T15:07:56.075147",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run pytest tests/alpha_evolve/test_config.py -v --tb=short 2>&1",
+      "description": "Run config tests"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-27T15:08:02.280015",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/config.py"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-27T15:08:17.693026",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/config.py",
+      "old_string": "    @classmethod\n    def load(cls, config_path: Path | None = None) -> \"EvolutionConfig\":\n        \"\"..."
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T15:08:22.376700",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run pytest tests/alpha_evolve/test_config.py -v --tb=short 2>&1",
+      "description": "Run config tests"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-27T15:08:33.242557",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/006-alpha-evolve-core/tasks.md",
+      "old_string": "- [ ] T045 [US3] Create default config.yaml at scripts/alpha_evolve/config.yaml\n- [ ] T046 [US3] Imp..."
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-27T15:08:36.960221",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/__init__.py"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-27T15:08:44.581390",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/__init__.py",
+      "old_string": "# Store exports\nfrom scripts.alpha_evolve.store import (\n    FitnessMetrics,\n    Program,\n    Progra..."
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-27T15:08:51.130236",
+      "todo_count": 6
+    },
+    {
+      "operation": "write",
+      "timestamp": "2025-12-27T15:09:28.431306",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/alpha_evolve/test_integration.py",
+      "content_length": 6898
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T15:09:33.023572",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run pytest tests/alpha_evolve/ -v --tb=short 2>&1",
+      "description": "Run all alpha_evolve tests"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T15:09:42.774944",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run pytest tests/alpha_evolve/ --cov=scripts/alpha_evolve --cov-report=term-missing 2>&1",
+      "description": "Run tests with coverage"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T15:09:49.190279",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run pytest tests/alpha_evolve/ -v 2>&1 | tail -10",
+      "description": "Run full test suite"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-27T15:10:03.616246",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/006-alpha-evolve-core/tasks.md",
+      "old_string": "- [ ] T050 [P] Write integration test patch->insert->sample cycle in tests/alpha_evolve/test_integra..."
+    },
+    {
+      "operation": "task",
+      "timestamp": "2025-12-27T15:10:09.920425",
+      "subagent_type": "alpha-debug",
+      "prompt": "Run alpha-debug verification on scripts/alpha_evolve/ - analyze the patching.py, store.py, and confi..."
+    },
+    {
+      "operation": "glob",
+      "timestamp": "2025-12-27T15:10:15.129356",
+      "pattern": "scripts/alpha_evolve/*.py"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T15:10:15.137365",
+      "command": "git diff HEAD~3 --stat 2>/dev/null | head -30",
+      "description": "Check recent changes for complexity assessment"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-27T15:10:22.102279",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/patching.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-27T15:10:22.110343",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/store.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-27T15:10:22.139228",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/config.py"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T15:10:29.831666",
+      "command": "uv run pyright scripts/alpha_evolve/ 2>&1 | head -80",
+      "description": "Run pyright type checking"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T15:10:32.181910",
+      "command": "uv run ruff check scripts/alpha_evolve/ 2>&1",
+      "description": "Run ruff linting"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T15:10:40.024625",
+      "command": "python3 -c \"\nimport ast\nimport sys\n\n# Check for syntax errors in all three files\nfiles = [\n    'scripts/alpha_evolve/patching.py',\n    'scripts/alpha_evolve/store.py', \n    'scripts/alpha_evolve/config.py'\n]\n\nfor f in files:\n    with open(f) as fp:\n        code = fp.read()\n    try:\n        ast.parse(code)\n        print(f'{f}: Syntax OK')\n    except SyntaxError as e:\n        print(f'{f}: Syntax Error at line {e.lineno}: {e.msg}')\n\"",
+      "description": "Validate Python syntax"
+    },
+    {
+      "operation": "glob",
+      "timestamp": "2025-12-27T15:10:41.176254",
+      "pattern": "scripts/alpha_evolve/tests/*.py",
+      "path": "/media/sam/1TB/nautilus_dev"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-27T15:10:49.161930",
+      "todo_count": 4
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T15:11:07.516153",
+      "command": "python3 << 'EOF'\nimport re\n\n# Test the BLOCK_RE pattern for edge cases\nBLOCK_RE = re.compile(\n    r\"(^[ \\t]*# === EVOLVE-BLOCK:\\s*(?P<name>\\w+).*?$\\n)\"\n    r\"(?P<body>.*?)\"\n    r\"(^[ \\t]*# === END EVOLVE-BLOCK.*?$)\",\n    re.M | re.S,\n)\n\n# Test cases\ntest_cases = [\n    # Normal case\n    (\"normal\", '''# === EVOLVE-BLOCK: test ===\ndef foo():\n    pass\n# === END EVOLVE-BLOCK ==='''),\n    \n    # Empty body\n    (\"empty_body\", '''# === EVOLVE-BLOCK: test ===\n# === END EVOLVE-BLOCK ==='''),\n    \n    # Indented block (inside class)\n    (\"indented\", '''    # === EVOLVE-BLOCK: test ===\n    def foo():\n        pass\n    # === END EVOLVE-BLOCK ==='''),\n    \n    # Block name with numbers\n    (\"numeric_name\", '''# === EVOLVE-BLOCK: block123 ===\ncode\n# === END EVOLVE-BLOCK ==='''),\n    \n    # Block name with hyphens (should NOT match due to \\w+)\n    (\"hyphen_name\", '''# === EVOLVE-BLOCK: block-name ===\ncode\n# === END EVOLVE-BLOCK ==='''),\n    \n    # Nested blocks (potential issue)\n    (\"nested\", '''# === EVOLVE-BLOCK: outer ===\n# === EVOLVE-BLOCK: inner ===\ncode\n# === END EVOLVE-BLOCK ===\n# === END EVOLVE-BLOCK ==='''),\n    \n    # Missing end marker\n    (\"no_end\", '''# === EVOLVE-BLOCK: test ===\ncode without end'''),\n    \n    # Extra whitespace in marker\n    (\"extra_space\", '''# === EVOLVE-BLOCK:   test   ===\ncode\n# === END EVOLVE-BLOCK ==='''),\n    \n    # Multiple blocks\n    (\"multiple\", '''# === EVOLVE-BLOCK: first ===\ncode1\n# === END EVOLVE-BLOCK ===\n# === EVOLVE-BLOCK: second ===\ncode2\n# === END EVOLVE-BLOCK ==='''),\n\n    # Special chars in body\n    (\"special_chars\", '''# === EVOLVE-BLOCK: test ===\ns = \"# === END EVOLVE-BLOCK ===\"\n# === END EVOLVE-BLOCK ==='''),\n]\n\nfor name, code in test_cases:\n    matches = list(BLOCK_RE.finditer(code))\n    print(f\"\\n{name}:\")\n    if matches:\n        for m in matches:\n            print(f\"  Name: {m.group('name')}\")\n            print(f\"  Body: {repr(m.group('body')[:50])}...\")\n    else:\n        print(\"  NO MATCH\")\nEOF\n",
+      "description": "Test regex edge cases"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T15:11:21.594816",
+      "command": "python3 << 'EOF'\n# Test _indent_code function behavior\ndef _indent_code(code: str, indent_str: str) -> str:\n    \"\"\"Add indentation to each line of code.\"\"\"\n    lines = code.split(\"\\n\")\n    indented_lines = []\n    for line in lines:\n        if line.strip():  # Non-empty line\n            indented_lines.append(indent_str + line)\n        else:  # Empty line\n            indented_lines.append(\"\")\n    return \"\\n\".join(indented_lines)\n\n# Test cases\ntests = [\n    (\"normal\", \"def foo():\\n    pass\", \"    \"),\n    (\"already_indented\", \"    def foo():\\n        pass\", \"    \"),  # Double indent!\n    (\"empty_string\", \"\", \"    \"),\n    (\"only_whitespace\", \"   \\n   \", \"    \"),\n    (\"tabs_and_spaces\", \"\\tdef foo():\\n    pass\", \"    \"),\n]\n\nfor name, code, indent in tests:\n    result = _indent_code(code, indent)\n    print(f\"\\n{name}:\")\n    print(f\"  Input: {repr(code)}\")\n    print(f\"  Output: {repr(result)}\")\nEOF\n",
+      "description": "Test indent code edge cases"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-27T15:11:29.246123",
+      "todo_count": 4
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T15:11:41.071670",
+      "command": "python3 << 'EOF'\nimport sqlite3\nimport tempfile\nimport os\n\n# Test SQL injection vectors in _get_metric_column\ndef _get_metric_column(metric: str) -> str:\n    \"\"\"Map metric name to column name.\"\"\"\n    mapping = {\n        \"calmar\": \"calmar\",\n        \"sharpe\": \"sharpe\",\n        \"cagr\": \"cagr\",\n        \"max_dd\": \"max_dd\",\n        \"total_return\": \"total_return\",\n    }\n    return mapping.get(metric, \"calmar\")  # Falls back to \"calmar\" - SAFE\n\n# Test malicious input\nmalicious_inputs = [\n    \"calmar; DROP TABLE programs;--\",\n    \"calmar OR 1=1\",\n    \"'; DELETE FROM programs; --\",\n    \"unknown_metric\",\n]\n\nprint(\"SQL Column Mapping Tests:\")\nfor mi in malicious_inputs:\n    result = _get_metric_column(mi)\n    print(f\"  Input: {repr(mi)}\")\n    print(f\"  Output: {repr(result)}\")\n    print()\n\n# Test race condition in prune()\nprint(\"\\nRace Condition Analysis in prune():\")\nprint(\"  Issue: count() and delete happen in separate transactions\")\nprint(\"  Impact: If records inserted between count() and delete, may delete wrong count\")\nprint(\"  Severity: LOW (cosmetic, won't break data integrity)\")\nEOF\n",
+      "description": "Test store.py security and race conditions"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T15:11:59.023957",
+      "command": "python3 << 'EOF'\nimport tempfile\nimport os\nimport sys\nsys.path.insert(0, '/media/sam/1TB/nautilus_dev')\n\nfrom scripts.alpha_evolve.store import ProgramStore, FitnessMetrics\n\n# Create temp database\nwith tempfile.NamedTemporaryFile(suffix='.db', delete=False) as f:\n    db_path = f.name\n\ntry:\n    store = ProgramStore(db_path, population_size=100, archive_size=10)\n    \n    # Test 1: Insert with None metrics\n    print(\"Test 1: Insert with None metrics\")\n    id1 = store.insert(\"code1\", None, None)\n    prog = store.get(id1)\n    print(f\"  Inserted: {id1[:8]}... metrics={prog.metrics}\")\n    \n    # Test 2: Update non-existent program\n    print(\"\\nTest 2: Update non-existent program\")\n    try:\n        store.update_metrics(\"non-existent-id\", FitnessMetrics(1.0, 2.0, 0.1, 0.15, 0.2))\n        print(\"  ERROR: Should have raised KeyError\")\n    except KeyError as e:\n        print(f\"  Correctly raised KeyError: {e}\")\n    \n    # Test 3: Get non-existent program\n    print(\"\\nTest 3: Get non-existent program\")\n    prog = store.get(\"non-existent-id\")\n    print(f\"  Result: {prog} (should be None)\")\n    \n    # Test 4: Sample from empty store (with metrics filter)\n    print(\"\\nTest 4: Sample strategies\")\n    for strategy in [\"elite\", \"exploit\", \"explore\"]:\n        result = store.sample(strategy=strategy)\n        # Programs without metrics won't be returned for elite/exploit\n        print(f\"  {strategy}: {result is not None} (id={result.id[:8] if result else None})\")\n    \n    # Test 5: Insert with parent_id that doesn't exist\n    print(\"\\nTest 5: Insert with non-existent parent_id\")\n    id2 = store.insert(\"code2\", None, \"non-existent-parent\")\n    prog = store.get(id2)\n    print(f\"  Generation: {prog.generation} (should be 0, parent lookup failed)\")\n    \n    # Test 6: Lineage with broken chain\n    print(\"\\nTest 6: Lineage with broken chain\")\n    lineage = store.get_lineage(id2)\n    print(f\"  Lineage length: {len(lineage)} (should be 1)\")\n    \n    # Test 7: Negative metrics\n    print(\"\\nTest 7: Negative calmar ratio for fitness-weighted sampling\")\n    id3 = store.insert(\"code3\", FitnessMetrics(-5.0, -5.0, 0.5, -0.1, -0.2))\n    id4 = store.insert(\"code4\", FitnessMetrics(-2.0, -2.0, 0.3, -0.05, -0.1))\n    result = store.sample(strategy=\"exploit\")\n    print(f\"  Sample result: {result.id[:8] if result else None}\")\n    print(\"  (Negative weights are clamped to 0, fallback to uniform)\")\n    \n    # Test 8: Prune with all negative calmar\n    print(\"\\nTest 8: Prune behavior\")\n    count_before = store.count()\n    deleted = store.prune()\n    print(f\"  Count before: {count_before}, Deleted: {deleted}\")\n\nfinally:\n    os.unlink(db_path)\n    \nprint(\"\\nAll tests completed!\")\nEOF\n",
+      "description": "Test store.py edge cases"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-27T15:12:06.418958",
+      "todo_count": 4
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T15:12:23.258650",
+      "command": "python3 << 'EOF'\nimport sys\nimport os\nimport tempfile\nsys.path.insert(0, '/media/sam/1TB/nautilus_dev')\n\nfrom scripts.alpha_evolve.config import EvolutionConfig\n\n# Test 1: Default values\nprint(\"Test 1: Default configuration\")\nconfig = EvolutionConfig()\nprint(f\"  population_size: {config.population_size}\")\nprint(f\"  archive_size: {config.archive_size}\")\nprint(f\"  elite_ratio: {config.elite_ratio}\")\nprint(f\"  exploration_ratio: {config.exploration_ratio}\")\nprint(f\"  max_concurrent: {config.max_concurrent}\")\n\n# Test 2: Invalid archive_size >= population_size\nprint(\"\\nTest 2: archive_size >= population_size\")\ntry:\n    EvolutionConfig(population_size=50, archive_size=50)\n    print(\"  ERROR: Should have raised ValueError\")\nexcept ValueError as e:\n    print(f\"  Correctly raised ValueError: {e}\")\n\n# Test 3: Ratios sum > 1.0\nprint(\"\\nTest 3: Ratios sum > 1.0\")\ntry:\n    EvolutionConfig(elite_ratio=0.6, exploration_ratio=0.5)\n    print(\"  ERROR: Should have raised ValueError\")\nexcept ValueError as e:\n    print(f\"  Correctly raised ValueError: {e}\")\n\n# Test 4: Boundary values\nprint(\"\\nTest 4: Boundary values\")\ntry:\n    c = EvolutionConfig(population_size=10, archive_size=1)  # Minimum valid\n    print(f\"  Min valid: pop={c.population_size}, arch={c.archive_size}\")\nexcept Exception as e:\n    print(f\"  Error: {e}\")\n\ntry:\n    EvolutionConfig(population_size=9)  # Below minimum\n    print(\"  ERROR: pop_size=9 should have failed\")\nexcept Exception as e:\n    print(f\"  Correctly rejected pop_size=9: {type(e).__name__}\")\n\n# Test 5: YAML loading with malformed file\nprint(\"\\nTest 5: YAML loading edge cases\")\nfrom pathlib import Path\nimport yaml\n\nwith tempfile.NamedTemporaryFile(mode='w', suffix='.yaml', delete=False) as f:\n    yaml.dump({\"population_size\": 200, \"archive_size\": 20}, f)\n    yaml_path = f.name\n\ntry:\n    config = EvolutionConfig.load(Path(yaml_path))\n    print(f\"  Loaded from YAML: pop={config.population_size}, arch={config.archive_size}\")\nfinally:\n    os.unlink(yaml_path)\n\n# Test 6: Empty YAML file\nwith tempfile.NamedTemporaryFile(mode='w', suffix='.yaml', delete=False) as f:\n    f.write(\"\")  # Empty file\n    yaml_path = f.name\n\ntry:\n    config = EvolutionConfig.load(Path(yaml_path))\n    print(f\"  Empty YAML -> defaults: pop={config.population_size}\")\nfinally:\n    os.unlink(yaml_path)\n\n# Test 7: YAML with invalid values\nprint(\"\\nTest 7: YAML with invalid values\")\nwith tempfile.NamedTemporaryFile(mode='w', suffix='.yaml', delete=False) as f:\n    yaml.dump({\"population_size\": 5}, f)  # Below minimum\n    yaml_path = f.name\n\ntry:\n    config = EvolutionConfig.load(Path(yaml_path))\n    print(f\"  ERROR: Should have failed with pop_size=5\")\nexcept Exception as e:\n    print(f\"  Correctly rejected: {type(e).__name__}\")\nfinally:\n    os.unlink(yaml_path)\n\n# Test 8: Environment variable override\nprint(\"\\nTest 8: Environment variable override\")\nos.environ[\"EVOLVE_POPULATION_SIZE\"] = \"1000\"\ntry:\n    config = EvolutionConfig.load(None)\n    print(f\"  Env override: pop={config.population_size}\")\nfinally:\n    del os.environ[\"EVOLVE_POPULATION_SIZE\"]\n\nprint(\"\\nAll config tests completed!\")\nEOF\n",
+      "description": "Test config.py validation"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T15:12:35.621887",
+      "command": "python3 << 'EOF'\nimport sys\nsys.path.insert(0, '/media/sam/1TB/nautilus_dev')\n\n# Test potential issue: validate() method does nothing\nprint(\"Test: validate() method\")\nfrom scripts.alpha_evolve.config import EvolutionConfig\n\nconfig = EvolutionConfig()\nresult = config.validate()\nprint(f\"  validate() returns: {result}\")\nprint(\"  NOTE: Method exists for API but does nothing (Pydantic validates on construction)\")\nprint(\"  This is a code smell - either remove the method or make it do something\")\n\n# Test: YAML with unknown keys\nprint(\"\\nTest: YAML with unknown keys (extra='ignore')\")\nimport tempfile\nimport yaml\nimport os\nfrom pathlib import Path\n\nwith tempfile.NamedTemporaryFile(mode='w', suffix='.yaml', delete=False) as f:\n    yaml.dump({\n        \"population_size\": 100,\n        \"unknown_key\": \"should_be_ignored\",\n        \"another_unknown\": 12345\n    }, f)\n    yaml_path = f.name\n\ntry:\n    config = EvolutionConfig.load(Path(yaml_path))\n    print(f\"  Config loaded: pop={config.population_size}\")\n    print(\"  Unknown keys were silently ignored (as configured)\")\nexcept Exception as e:\n    print(f\"  Error: {e}\")\nfinally:\n    os.unlink(yaml_path)\n\n# Test: Type coercion\nprint(\"\\nTest: Type coercion\")\nconfig = EvolutionConfig(population_size=\"300\")  # String -> int\nprint(f\"  String '300' -> int: {config.population_size}, type={type(config.population_size)}\")\n\nconfig = EvolutionConfig(elite_ratio=\"0.15\")  # String -> float\nprint(f\"  String '0.15' -> float: {config.elite_ratio}, type={type(config.elite_ratio)}\")\nEOF\n",
+      "description": "Test config edge cases"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-27T15:12:42.792043",
+      "todo_count": 4
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-27T15:12:50.070330",
+      "todo_count": 4
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-27T15:13:55.391989",
+      "todo_count": 3
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-27T15:13:59.374142",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/patching.py"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-27T15:14:10.619339",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/patching.py",
+      "old_string": "BLOCK_RE = re.compile(\n    r\"(^[ \\t]*# === EVOLVE-BLOCK:\\s*(?P<name>\\w+).*?$\\n)\"  # head with name\n ..."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-27T15:14:19.917873",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/patching.py",
+      "old_string": "    # Detect indentation from the marker line\n    head = target_match.group(1)\n    indent = len(head..."
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-27T15:14:24.349467",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/store.py"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-27T15:14:35.013334",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/store.py",
+      "old_string": "        # Calculate generation from parent\n        generation = 0\n        if parent_id:\n            ..."
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-27T15:14:39.238367",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/config.py"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-27T15:14:48.123786",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/alpha_evolve/config.py",
+      "old_string": "    def validate(self) -> None:\n        \"\"\"\n        Validate configuration parameters.\n\n        Rais..."
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-27T15:14:55.672637",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run pytest tests/alpha_evolve/ -v --tb=short 2>&1",
+      "description": "Run all tests after fixes"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-27T15:15:05.520553",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/006-alpha-evolve-core/tasks.md",
+      "old_string": "- [ ] T054 Run alpha-debug verification on scripts/alpha_evolve/"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-27T15:15:10.282348",
+      "todo_count": 3
+    }
+  ],
+  "last_updated": "2025-12-27T15:15:10.282366"
+}

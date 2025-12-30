@@ -1,0 +1,20 @@
+# NautilusTrader Auto-Update Pipeline Configuration
+# This file is loaded automatically by the CLI
+
+[paths]
+changelog_path = "docs/nautilus/nautilus-trader-changelog.json"
+source_dirs = ["strategies/", "scripts/"]
+
+[confidence]
+# Thresholds for automatic actions
+auto_merge_threshold = 85      # >= 85: Auto-merge without review
+delayed_merge_threshold = 65   # >= 65: Create PR, merge after 24h
+# < 65: Create PR, require manual review
+
+[notifications]
+discord_webhook_url = "https://discord.com/api/webhooks/1432322262949695508/v0-mhd2qIdpPY0rfoheN_EGrjRKAiXZUoJgR_9FAZimW9atKHpSPjtHxx8l0bSd4c5-A"
+
+[git]
+auto_push = true
+create_pr = true
+base_branch = "master"

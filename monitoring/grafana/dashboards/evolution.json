@@ -1,0 +1,909 @@
+{
+  "uid": "alpha-evolve-evolution",
+  "title": "Alpha-Evolve Evolution",
+  "description": "Real-time strategy evolution monitoring (spec-010)",
+  "tags": [
+    "alpha-evolve",
+    "evolution",
+    "strategy"
+  ],
+  "timezone": "browser",
+  "refresh": "5s",
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "templating": {
+    "list": [
+      {
+        "name": "experiment",
+        "type": "query",
+        "datasource": "QuestDB",
+        "query": "SELECT DISTINCT experiment FROM evolution_metrics WHERE timestamp > now() - interval '7d'",
+        "refresh": 1,
+        "multi": false,
+        "includeAll": true,
+        "current": {
+          "selected": true,
+          "text": "test_exp",
+          "value": "test_exp"
+        },
+        "options": [
+          {
+            "selected": true,
+            "text": "test_exp",
+            "value": "test_exp"
+          }
+        ],
+        "allValue": "*"
+      }
+    ]
+  },
+  "panels": [
+    {
+      "id": 1,
+      "title": "Fitness Progress",
+      "description": "Best fitness (Calmar ratio) over time with trend line",
+      "type": "timeseries",
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": "QuestDB",
+      "targets": [
+        {
+          "refId": "A",
+          "rawSql": "SELECT timestamp, max(calmar) as best_calmar FROM evolution_metrics WHERE timestamp > dateadd('d', -7, now())",
+          "datasource": {
+            "type": "questdb-questdb-datasource",
+            "uid": "P2596F1C8E12435D2"
+          }
+        },
+        {
+          "refId": "B",
+          "rawSql": "SELECT timestamp, max(sharpe) as best_sharpe FROM evolution_metrics WHERE mutation_outcome = 'success' AND timestamp > dateadd('d', -7, now())",
+          "hide": true,
+          "datasource": {
+            "type": "questdb-questdb-datasource",
+            "uid": "P2596F1C8E12435D2"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "smooth",
+            "fillOpacity": 10,
+            "gradientMode": "scheme",
+            "lineWidth": 2,
+            "showPoints": "auto"
+          },
+          "color": {
+            "mode": "palette-classic"
+          },
+          "unit": "none",
+          "decimals": 3
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "best_calmar"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Calmar Ratio"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "green",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "best_sharpe"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Sharpe Ratio"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "blue",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "legend": {
+          "showLegend": true,
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      }
+    },
+    {
+      "id": 2,
+      "title": "Top 10 Strategies",
+      "description": "Best performing strategies by Calmar ratio",
+      "type": "table",
+      "gridPos": {
+        "x": 12,
+        "y": 0,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": "QuestDB",
+      "targets": [
+        {
+          "refId": "A",
+          "rawSql": "SELECT program_id, generation, sharpe, calmar, max_dd, cagr, total_return FROM evolution_metrics WHERE mutation_outcome = 'success' AND timestamp > dateadd('h', -1, now()) LATEST BY program_id ORDER BY calmar DESC LIMIT 10",
+          "datasource": {
+            "type": "questdb-questdb-datasource",
+            "uid": "P2596F1C8E12435D2"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "program_id"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Strategy ID"
+              },
+              {
+                "id": "custom.width",
+                "value": 120
+              },
+              {
+                "id": "links",
+                "value": [
+                  {
+                    "title": "Copy ID",
+                    "url": "javascript:navigator.clipboard.writeText('${__value.text}')"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "generation"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Gen"
+              },
+              {
+                "id": "custom.width",
+                "value": 50
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "sharpe"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Sharpe"
+              },
+              {
+                "id": "decimals",
+                "value": 3
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text"
+                }
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "red",
+                      "value": null
+                    },
+                    {
+                      "color": "yellow",
+                      "value": 0
+                    },
+                    {
+                      "color": "green",
+                      "value": 1
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "calmar"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Calmar"
+              },
+              {
+                "id": "decimals",
+                "value": 3
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text"
+                }
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "red",
+                      "value": null
+                    },
+                    {
+                      "color": "yellow",
+                      "value": 0
+                    },
+                    {
+                      "color": "green",
+                      "value": 1
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "max_dd"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "MaxDD %"
+              },
+              {
+                "id": "unit",
+                "value": "percent"
+              },
+              {
+                "id": "decimals",
+                "value": 1
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text"
+                }
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green",
+                      "value": null
+                    },
+                    {
+                      "color": "yellow",
+                      "value": 10
+                    },
+                    {
+                      "color": "red",
+                      "value": 20
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "cagr"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "CAGR"
+              },
+              {
+                "id": "unit",
+                "value": "percentunit"
+              },
+              {
+                "id": "decimals",
+                "value": 1
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text"
+                }
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "red",
+                      "value": null
+                    },
+                    {
+                      "color": "green",
+                      "value": 0
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "total_return"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Return"
+              },
+              {
+                "id": "unit",
+                "value": "percentunit"
+              },
+              {
+                "id": "decimals",
+                "value": 1
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "showHeader": true,
+        "sortBy": [
+          {
+            "displayName": "Calmar",
+            "desc": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 3,
+      "title": "Population Size",
+      "description": "Total number of evaluated strategies",
+      "type": "stat",
+      "gridPos": {
+        "x": 0,
+        "y": 8,
+        "w": 4,
+        "h": 4
+      },
+      "datasource": "QuestDB",
+      "targets": [
+        {
+          "refId": "A",
+          "rawSql": "SELECT count() as population FROM evolution_metrics WHERE mutation_outcome = 'success' AND timestamp > dateadd('h', -24, now()) LATEST BY program_id",
+          "datasource": {
+            "type": "questdb-questdb-datasource",
+            "uid": "P2596F1C8E12435D2"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          }
+        }
+      },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none"
+      }
+    },
+    {
+      "id": 4,
+      "title": "Generation",
+      "description": "Current maximum generation number",
+      "type": "stat",
+      "gridPos": {
+        "x": 4,
+        "y": 8,
+        "w": 4,
+        "h": 4
+      },
+      "datasource": "QuestDB",
+      "targets": [
+        {
+          "refId": "A",
+          "rawSql": "SELECT max(generation) as max_gen FROM evolution_metrics WHERE mutation_outcome = 'success'",
+          "datasource": {
+            "type": "questdb-questdb-datasource",
+            "uid": "P2596F1C8E12435D2"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "purple",
+                "value": null
+              }
+            ]
+          }
+        }
+      },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none"
+      }
+    },
+    {
+      "id": 5,
+      "title": "Avg Fitness",
+      "description": "Average Calmar ratio across population",
+      "type": "stat",
+      "gridPos": {
+        "x": 8,
+        "y": 8,
+        "w": 4,
+        "h": 4
+      },
+      "datasource": "QuestDB",
+      "targets": [
+        {
+          "refId": "A",
+          "rawSql": "SELECT avg(calmar) as avg_fitness FROM evolution_metrics WHERE mutation_outcome = 'success' AND timestamp > dateadd('h', -1, now()) LATEST BY program_id",
+          "datasource": {
+            "type": "questdb-questdb-datasource",
+            "uid": "P2596F1C8E12435D2"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "decimals": 3,
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 0
+              },
+              {
+                "color": "green",
+                "value": 1
+              }
+            ]
+          }
+        }
+      },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area"
+      }
+    },
+    {
+      "id": 6,
+      "title": "Best vs Avg",
+      "description": "Best fitness compared to average",
+      "type": "stat",
+      "gridPos": {
+        "x": 12,
+        "y": 8,
+        "w": 4,
+        "h": 4
+      },
+      "datasource": "QuestDB",
+      "targets": [
+        {
+          "refId": "A",
+          "rawSql": "SELECT max(calmar) - avg(calmar) as fitness_gap FROM evolution_metrics WHERE mutation_outcome = 'success' AND timestamp > dateadd('h', -1, now()) LATEST BY program_id",
+          "datasource": {
+            "type": "questdb-questdb-datasource",
+            "uid": "P2596F1C8E12435D2"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "decimals": 3,
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "yellow",
+                "value": null
+              },
+              {
+                "color": "green",
+                "value": 0.5
+              }
+            ]
+          }
+        }
+      },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none"
+      }
+    },
+    {
+      "id": 7,
+      "title": "Fitness Distribution",
+      "description": "Distribution of Calmar ratios in population",
+      "type": "histogram",
+      "gridPos": {
+        "x": 16,
+        "y": 8,
+        "w": 8,
+        "h": 4
+      },
+      "datasource": "QuestDB",
+      "targets": [
+        {
+          "refId": "A",
+          "rawSql": "SELECT calmar FROM evolution_metrics WHERE mutation_outcome = 'success' AND timestamp > dateadd('h', -1, now()) LATEST BY program_id",
+          "datasource": {
+            "type": "questdb-questdb-datasource",
+            "uid": "P2596F1C8E12435D2"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          }
+        }
+      },
+      "options": {
+        "bucketSize": 0.5,
+        "combine": false
+      }
+    },
+    {
+      "id": 8,
+      "title": "Avg Mutations/Lineage",
+      "description": "Average number of mutations per lineage",
+      "type": "stat",
+      "gridPos": {
+        "x": 0,
+        "y": 12,
+        "w": 4,
+        "h": 4
+      },
+      "datasource": "QuestDB",
+      "targets": [
+        {
+          "refId": "A",
+          "rawSql": "SELECT avg(generation) as avg_mutations FROM evolution_metrics WHERE mutation_outcome = 'success' AND timestamp > dateadd('h', -1, now()) LATEST BY program_id",
+          "datasource": {
+            "type": "questdb-questdb-datasource",
+            "uid": "P2596F1C8E12435D2"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "decimals": 1,
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          }
+        }
+      },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none"
+      }
+    },
+    {
+      "id": 9,
+      "title": "Mutation Outcomes",
+      "description": "Distribution of mutation results",
+      "type": "piechart",
+      "gridPos": {
+        "x": 4,
+        "y": 12,
+        "w": 8,
+        "h": 8
+      },
+      "datasource": "QuestDB",
+      "targets": [
+        {
+          "refId": "A",
+          "rawSql": "SELECT mutation_outcome, count() as count FROM evolution_metrics WHERE timestamp > dateadd('h', -24, now()) GROUP BY mutation_outcome",
+          "datasource": {
+            "type": "questdb-questdb-datasource",
+            "uid": "P2596F1C8E12435D2"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "success"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "green",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "syntax_error"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "yellow",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "runtime_error"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "red",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "timeout"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "orange",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "seed"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "blue",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "legend": {
+          "showLegend": true,
+          "placement": "right"
+        },
+        "pieType": "pie",
+        "tooltip": {
+          "mode": "single"
+        }
+      }
+    },
+    {
+      "id": 10,
+      "title": "Success Rate",
+      "description": "Percentage of successful mutations",
+      "type": "gauge",
+      "gridPos": {
+        "x": 12,
+        "y": 12,
+        "w": 4,
+        "h": 4
+      },
+      "datasource": "QuestDB",
+      "targets": [
+        {
+          "refId": "A",
+          "rawSql": "SELECT 100.0 * sum(CASE WHEN mutation_outcome = 'success' THEN 1 ELSE 0 END) / count() as success_rate FROM evolution_metrics WHERE timestamp > dateadd('h', -24, now())",
+          "datasource": {
+            "type": "questdb-questdb-datasource",
+            "uid": "P2596F1C8E12435D2"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "decimals": 1,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 30
+              },
+              {
+                "color": "green",
+                "value": 60
+              }
+            ]
+          }
+        }
+      },
+      "options": {
+        "orientation": "auto",
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true
+      }
+    },
+    {
+      "id": 11,
+      "title": "Success Rate Trend",
+      "description": "Mutation success rate over time",
+      "type": "timeseries",
+      "gridPos": {
+        "x": 16,
+        "y": 12,
+        "w": 8,
+        "h": 8
+      },
+      "datasource": "QuestDB",
+      "targets": [
+        {
+          "refId": "A",
+          "rawSql": "SELECT timestamp, 100.0 * sum(CASE WHEN mutation_outcome = 'success' THEN 1 ELSE 0 END) / count() as success_rate FROM evolution_metrics WHERE timestamp > dateadd('h', -24, now())",
+          "datasource": {
+            "type": "questdb-questdb-datasource",
+            "uid": "P2596F1C8E12435D2"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "smooth",
+            "fillOpacity": 20
+          },
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 30
+              },
+              {
+                "color": "green",
+                "value": 60
+              }
+            ]
+          }
+        }
+      },
+      "options": {
+        "legend": {
+          "showLegend": false
+        }
+      }
+    }
+  ],
+  "schemaVersion": 39,
+  "version": 1
+}

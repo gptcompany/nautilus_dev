@@ -1,0 +1,285 @@
+{
+  "timestamp": "2025-11-05T00:00:50.390Z",
+  "stable_version": "v1.221.0",
+  "nightly_commits": 50,
+  "breaking_changes": [
+    {
+      "title": "Improve Polymarket backtest docs and example",
+      "message": "Improve Polymarket backtest docs and example\n\n- BREAKING: Renamed `parse_instrument` to `parse_polymarket_instrument`\n- Add warning against running live trading nodes in Jupyter notebooks\n- Fix Polymarket backtest docs: added missing imports\n- Reexport `parse_polymarket_instrument` and loader from adapter init",
+      "sha": "9ceade1",
+      "date": "2025-11-04T21:28:34Z",
+      "url": "https://github.com/nautechsystems/nautilus_trader/commit/9ceade1bf0c9e34bba821e7620514fb051e351fc"
+    }
+  ],
+  "open_issues": {
+    "total": 20000,
+    "bugs": 2000,
+    "features": 17250,
+    "issues_list": [
+      {
+        "number": 3152,
+        "title": "[Hyperliquid] Execution and reconciliation testing",
+        "state": "open",
+        "labels": [
+          "enhancement"
+        ],
+        "created_at": "2025-11-04T07:23:22Z",
+        "updated_at": "2025-11-04T07:23:29Z",
+        "author": "cjdsellers",
+        "url": "https://github.com/nautechsystems/nautilus_trader/issues/3152",
+        "comments": 0
+      },
+      {
+        "number": 3151,
+        "title": "[dYdX] Upgrade and Rust port",
+        "state": "open",
+        "labels": [
+          "enhancement"
+        ],
+        "created_at": "2025-11-04T07:19:06Z",
+        "updated_at": "2025-11-04T07:19:53Z",
+        "author": "cjdsellers",
+        "url": "https://github.com/nautechsystems/nautilus_trader/issues/3151",
+        "comments": 0
+      },
+      {
+        "number": 3150,
+        "title": "[BitMEX] Trailing stop orders",
+        "state": "open",
+        "labels": [
+          "enhancement"
+        ],
+        "created_at": "2025-11-04T04:47:47Z",
+        "updated_at": "2025-11-04T04:47:47Z",
+        "author": "cjdsellers",
+        "url": "https://github.com/nautechsystems/nautilus_trader/issues/3150",
+        "comments": 0
+      },
+      {
+        "number": 3149,
+        "title": "[BitMEX] Pegged orders (BBO) and advanced execution instructions",
+        "state": "open",
+        "labels": [
+          "enhancement"
+        ],
+        "created_at": "2025-11-04T04:45:40Z",
+        "updated_at": "2025-11-04T04:46:01Z",
+        "author": "cjdsellers",
+        "url": "https://github.com/nautechsystems/nautilus_trader/issues/3149",
+        "comments": 0
+      },
+      {
+        "number": 3148,
+        "title": "Difference between logged number of positions and `BacktestResult.total_positions`",
+        "state": "open",
+        "labels": [
+          "bug"
+        ],
+        "created_at": "2025-11-03T20:30:58Z",
+        "updated_at": "2025-11-03T20:30:58Z",
+        "author": "2-5",
+        "url": "https://github.com/nautechsystems/nautilus_trader/issues/3148",
+        "comments": 0
+      },
+      {
+        "number": 3143,
+        "title": "Add support for `Quantity.from_decimal`",
+        "state": "open",
+        "labels": [
+          "enhancement"
+        ],
+        "created_at": "2025-11-03T10:07:06Z",
+        "updated_at": "2025-11-03T10:07:06Z",
+        "author": "2-5",
+        "url": "https://github.com/nautechsystems/nautilus_trader/issues/3143",
+        "comments": 0
+      },
+      {
+        "number": 3129,
+        "title": "Support for Python 3.14 on Windows",
+        "state": "open",
+        "labels": [
+          "enhancement"
+        ],
+        "created_at": "2025-10-30T02:43:52Z",
+        "updated_at": "2025-10-30T02:43:58Z",
+        "author": "cjdsellers",
+        "url": "https://github.com/nautechsystems/nautilus_trader/issues/3129",
+        "comments": 0
+      },
+      {
+        "number": 3120,
+        "title": "Support custom S3 endpoints for DataFusion object store",
+        "state": "open",
+        "labels": [
+          "enhancement"
+        ],
+        "created_at": "2025-10-28T18:38:02Z",
+        "updated_at": "2025-10-31T07:38:39Z",
+        "author": "rgauny",
+        "url": "https://github.com/nautechsystems/nautilus_trader/issues/3120",
+        "comments": 2
+      },
+      {
+        "number": 3116,
+        "title": "SpreadQuoteAggregator FuturesSpread error",
+        "state": "open",
+        "labels": [
+          "bug"
+        ],
+        "created_at": "2025-10-27T16:50:36Z",
+        "updated_at": "2025-11-02T22:01:49Z",
+        "author": "q351941406",
+        "url": "https://github.com/nautechsystems/nautilus_trader/issues/3116",
+        "comments": 5
+      },
+      {
+        "number": 3104,
+        "title": "[Reconciliation] LiveExecEngine fails to reconcile long-lived Binance Futures positions for HEDGING",
+        "state": "open",
+        "labels": [
+          "bug"
+        ],
+        "created_at": "2025-10-21T09:12:48Z",
+        "updated_at": "2025-10-24T02:31:26Z",
+        "author": "willjay97",
+        "url": "https://github.com/nautechsystems/nautilus_trader/issues/3104",
+        "comments": 2
+      }
+    ],
+    "bug_list": [
+      {
+        "number": 3148,
+        "title": "Difference between logged number of positions and `BacktestResult.total_positions`",
+        "state": "open",
+        "labels": [
+          "bug"
+        ],
+        "created_at": "2025-11-03T20:30:58Z",
+        "updated_at": "2025-11-03T20:30:58Z",
+        "author": "2-5",
+        "url": "https://github.com/nautechsystems/nautilus_trader/issues/3148",
+        "comments": 0
+      },
+      {
+        "number": 3116,
+        "title": "SpreadQuoteAggregator FuturesSpread error",
+        "state": "open",
+        "labels": [
+          "bug"
+        ],
+        "created_at": "2025-10-27T16:50:36Z",
+        "updated_at": "2025-11-02T22:01:49Z",
+        "author": "q351941406",
+        "url": "https://github.com/nautechsystems/nautilus_trader/issues/3116",
+        "comments": 5
+      },
+      {
+        "number": 3104,
+        "title": "[Reconciliation] LiveExecEngine fails to reconcile long-lived Binance Futures positions for HEDGING",
+        "state": "open",
+        "labels": [
+          "bug"
+        ],
+        "created_at": "2025-10-21T09:12:48Z",
+        "updated_at": "2025-10-24T02:31:26Z",
+        "author": "willjay97",
+        "url": "https://github.com/nautechsystems/nautilus_trader/issues/3104",
+        "comments": 2
+      },
+      {
+        "number": 3091,
+        "title": "Could not generate catalog as described in Quickstart",
+        "state": "open",
+        "labels": [
+          "bug"
+        ],
+        "created_at": "2025-10-17T19:21:45Z",
+        "updated_at": "2025-10-31T01:45:37Z",
+        "author": "semihtekten",
+        "url": "https://github.com/nautechsystems/nautilus_trader/issues/3091",
+        "comments": 1
+      },
+      {
+        "number": 3081,
+        "title": "[dYdX] Strategy fails to restart due error while loading the cache",
+        "state": "open",
+        "labels": [
+          "bug"
+        ],
+        "created_at": "2025-10-14T03:34:50Z",
+        "updated_at": "2025-11-04T05:07:54Z",
+        "author": "SarunasSS",
+        "url": "https://github.com/nautechsystems/nautilus_trader/issues/3081",
+        "comments": 6
+      }
+    ],
+    "feature_list": [
+      {
+        "number": 3152,
+        "title": "[Hyperliquid] Execution and reconciliation testing",
+        "state": "open",
+        "labels": [
+          "enhancement"
+        ],
+        "created_at": "2025-11-04T07:23:22Z",
+        "updated_at": "2025-11-04T07:23:29Z",
+        "author": "cjdsellers",
+        "url": "https://github.com/nautechsystems/nautilus_trader/issues/3152",
+        "comments": 0
+      },
+      {
+        "number": 3151,
+        "title": "[dYdX] Upgrade and Rust port",
+        "state": "open",
+        "labels": [
+          "enhancement"
+        ],
+        "created_at": "2025-11-04T07:19:06Z",
+        "updated_at": "2025-11-04T07:19:53Z",
+        "author": "cjdsellers",
+        "url": "https://github.com/nautechsystems/nautilus_trader/issues/3151",
+        "comments": 0
+      },
+      {
+        "number": 3150,
+        "title": "[BitMEX] Trailing stop orders",
+        "state": "open",
+        "labels": [
+          "enhancement"
+        ],
+        "created_at": "2025-11-04T04:47:47Z",
+        "updated_at": "2025-11-04T04:47:47Z",
+        "author": "cjdsellers",
+        "url": "https://github.com/nautechsystems/nautilus_trader/issues/3150",
+        "comments": 0
+      },
+      {
+        "number": 3149,
+        "title": "[BitMEX] Pegged orders (BBO) and advanced execution instructions",
+        "state": "open",
+        "labels": [
+          "enhancement"
+        ],
+        "created_at": "2025-11-04T04:45:40Z",
+        "updated_at": "2025-11-04T04:46:01Z",
+        "author": "cjdsellers",
+        "url": "https://github.com/nautechsystems/nautilus_trader/issues/3149",
+        "comments": 0
+      },
+      {
+        "number": 3143,
+        "title": "Add support for `Quantity.from_decimal`",
+        "state": "open",
+        "labels": [
+          "enhancement"
+        ],
+        "created_at": "2025-11-03T10:07:06Z",
+        "updated_at": "2025-11-03T10:07:06Z",
+        "author": "2-5",
+        "url": "https://github.com/nautechsystems/nautilus_trader/issues/3143",
+        "comments": 0
+      }
+    ]
+  }
+}

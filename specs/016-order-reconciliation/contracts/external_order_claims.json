@@ -1,0 +1,55 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://nautilus_dev/schemas/external_order_claims.json",
+  "title": "ExternalOrderClaimsConfig",
+  "description": "Configuration for claiming external orders placed outside NautilusTrader",
+  "type": "object",
+  "properties": {
+    "instrument_ids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[A-Z0-9_-]+\\.[A-Z]+$",
+        "description": "NautilusTrader instrument ID format (e.g., BTCUSDT-PERP.BINANCE)"
+      },
+      "default": [],
+      "description": "List of instrument IDs to claim external orders for"
+    },
+    "claim_all": {
+      "type": "boolean",
+      "default": false,
+      "description": "Claim all external orders regardless of instrument"
+    }
+  },
+  "required": [],
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "claim_all": { "const": true }
+        }
+      },
+      "then": {
+        "properties": {
+          "instrument_ids": {
+            "maxItems": 0,
+            "description": "Cannot specify instrument_ids when claim_all is true"
+          }
+        }
+      }
+    }
+  ],
+  "examples": [
+    {
+      "instrument_ids": [
+        "BTCUSDT-PERP.BINANCE",
+        "ETHUSDT-PERP.BINANCE"
+      ],
+      "claim_all": false
+    },
+    {
+      "claim_all": true
+    }
+  ]
+}

@@ -1,0 +1,233 @@
+# Binance Exec Client API Contract (Spec 015)
+# Internal Python API for order execution
+
+openapi: 3.0.3
+info:
+  title: Binance Exec Client API
+  description: Internal API contract for NautilusTrader Binance execution client
+  version: 1.0.0
+
+components:
+  schemas:
+    BinanceExecClientConfig:
+      type: object
+      required:
+        - account_type
+      properties:
+        api_key:
+          type: string
+          nullable: true
+          description: Binance API key (env BINANCE_API_KEY if null)
+        api_secret:
+          type: string
+          nullable: true
+          description: Binance API secret (env BINANCE_API_SECRET if null)
+        account_type:
+          $ref: '#/components/schemas/BinanceAccountType'
+        testnet:
+          type: boolean
+          default: false
+        us:
+          type: boolean
+          default: false
+          description: Binance.US (cannot combine with testnet)
+        use_position_ids:
+          type: boolean
+          default: true
+          description: Required for HEDGE mode
+        max_retries:
+          type: integer
+          minimum: 1
+          maximum: 10
+          nullable: true
+        retry_delay_initial_ms:
+          type: integer
+          minimum: 100
+          nullable: true
+        retry_delay_max_ms:
+          type: integer
+          minimum: 1000
+          nullable: true
+        futures_leverages:
+          type: object
+          additionalProperties:
+            type: integer
+            minimum: 1
+            maximum: 125
+          nullable: true
+          example:
+            BTCUSDT: 10
+            ETHUSDT: 5
+        futures_margin_types:
+          type: object
+          additionalProperties:
+            type: string
+            enum: [CROSS, ISOLATED]
+          nullable: true
+          example:
+            BTCUSDT: CROSS
+
+    BinanceAccountType:
+      type: string
+      enum:
+        - SPOT
+        - USDT_FUTURES
+        - COIN_FUTURES
+      default: USDT_FUTURES
+
+    OrderSubmission:
+      type: object
+      required:
+        - instrument_id
+        - order_side
+        - order_type
+        - quantity
+      properties:
+        instrument_id:
+          type: string
+          pattern: '^[A-Z]+-PERP\\.BINANCE$'
+          example: BTCUSDT-PERP.BINANCE
+        order_side:
+          type: string
+          enum: [BUY, SELL]
+        order_type:
+          $ref: '#/components/schemas/OrderType'
+        quantity:
+          type: number
+          exclusiveMinimum: 0
+        price:
+          type: number
+          exclusiveMinimum: 0
+          nullable: true
+          description: Required for LIMIT orders
+        trigger_price:
+          type: number
+          exclusiveMinimum: 0
+          nullable: true
+          description: Required for STOP orders
+        time_in_force:
+          type: string
+          enum: [GTC, IOC, FOK, GTD]
+          default: GTC
+        reduce_only:
+          type: boolean
+          default: false
+        post_only:
+          type: boolean
+          default: false
+
+    OrderType:
+      type: string
+      enum:
+        - MARKET
+        - LIMIT
+        - STOP_MARKET
+        - STOP_LIMIT
+        - TAKE_PROFIT_MARKET
+        - TAKE_PROFIT_LIMIT
+        - TRAILING_STOP_MARKET
+
+    OrderResponse:
+      type: object
+      properties:
+        order_id:
+          type: string
+        client_order_id:
+          type: string
+        status:
+          $ref: '#/components/schemas/OrderStatus'
+        filled_qty:
+          type: number
+        avg_price:
+          type: number
+          nullable: true
+        error_code:
+          type: integer
+          nullable: true
+        error_msg:
+          type: string
+          nullable: true
+
+    OrderStatus:
+      type: string
+      enum:
+        - INITIALIZED
+        - SUBMITTED
+        - ACCEPTED
+        - PARTIALLY_FILLED
+        - FILLED
+        - CANCELED
+        - REJECTED
+        - EXPIRED
+
+    ErrorResponse:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: integer
+          description: Binance error code
+        message:
+          type: string
+        retryable:
+          type: boolean
+          default: false
+
+  # Common error codes
+  x-binance-error-codes:
+    '-1000': UNKNOWN - Unknown error
+    '-1001': DISCONNECTED - Connection lost
+    '-1002': UNAUTHORIZED - Invalid API key
+    '-1003': TOO_MANY_REQUESTS - Rate limited
+    '-1021': INVALID_TIMESTAMP - Timestamp out of recv_window
+    '-2010': NEW_ORDER_REJECTED - Order rejected
+    '-2011': CANCEL_REJECTED - Cancel rejected
+    '-4120': ALGO_ORDER_REQUIRED - Use Algo Order API
+
+paths:
+  /internal/submit_order:
+    post:
+      summary: Submit order to Binance
+      description: Internal order submission through NautilusTrader
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderSubmission'
+      responses:
+        '200':
+          description: Order accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderResponse'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limited
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /internal/cancel_order:
+    delete:
+      summary: Cancel order on Binance
+      parameters:
+        - name: client_order_id
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Order canceled
+        '404':
+          description: Order not found
