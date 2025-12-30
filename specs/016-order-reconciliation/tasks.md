@@ -138,15 +138,15 @@
 
 ### Tests for User Story 5
 
-- [ ] T027 [P] [US5] Unit test ExternalOrderClaimConfig in tests/unit/test_external_claims.py
-- [ ] T028 [P] [US5] Unit test claim_all/instrument_ids mutual exclusion in tests/unit/test_external_claims.py
+- [X] T027 [P] [US5] Unit test ExternalOrderClaimConfig in tests/unit/test_external_claims.py
+- [X] T028 [P] [US5] Unit test claim_all/instrument_ids mutual exclusion in tests/unit/test_external_claims.py
 
 ### Implementation for User Story 5
 
-- [ ] T029 [US5] Implement ExternalOrderClaimConfig Pydantic model in config/reconciliation/external_claims.py
-- [ ] T030 [US5] Add instrument_ids validation (pattern match) in config/reconciliation/external_claims.py
-- [ ] T031 [US5] Add claim_all/instrument_ids mutual exclusion validator in config/reconciliation/external_claims.py
-- [ ] T032 [US5] Create example strategy config with external claims in config/strategies/example_with_claims.py
+- [X] T029 [US5] Implement ExternalOrderClaimConfig Pydantic model in config/reconciliation/external_claims.py
+- [X] T030 [US5] Add instrument_ids validation (pattern match) in config/reconciliation/external_claims.py
+- [X] T031 [US5] Add claim_all/instrument_ids mutual exclusion validator in config/reconciliation/external_claims.py
+- [X] T032 [US5] Create example strategy config with external claims in config/strategies/example_with_claims.py
 
 **Checkpoint**: External order claims configurable
 
