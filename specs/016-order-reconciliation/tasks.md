@@ -173,11 +173,11 @@
 
 **Purpose**: Documentation, monitoring, final validation
 
-- [ ] T043 [P] Create user documentation in docs/guides/reconciliation.md
-- [ ] T044 [P] Add Grafana dashboard panel for reconciliation status in monitoring/grafana/dashboards/reconciliation.json
-- [ ] T045 [P] Add alert rules for position discrepancies in monitoring/grafana/alerts/reconciliation.yaml
-- [ ] T046 Update quickstart.md with final examples in specs/016-order-reconciliation/quickstart.md
-- [ ] T047 Run alpha-debug verification on config/reconciliation/
+- [X] T043 [P] Create user documentation in docs/guides/reconciliation.md
+- [X] T044 [P] Add Grafana dashboard panel for reconciliation status in monitoring/grafana/dashboards/reconciliation.json
+- [X] T045 [P] Add alert rules for position discrepancies in monitoring/grafana/alerts/reconciliation.yaml
+- [X] T046 Update quickstart.md with final examples in specs/016-order-reconciliation/quickstart.md
+- [X] T047 Run alpha-debug verification on config/reconciliation/
 
 ---
 
