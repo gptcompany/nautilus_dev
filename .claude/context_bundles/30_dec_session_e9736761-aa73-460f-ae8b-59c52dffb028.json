@@ -444,7 +444,25 @@
       "timestamp": "2025-12-30T18:49:40.443965",
       "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && pytest tests/unit/recovery/ -v --tb=short --cov=strategies/common/recovery --cov-report=term-missing 2>&1",
       "description": "Run unit tests with coverage"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-30T18:50:19.605420",
+      "command": "ls -la /media/sam/1TB/nautilus_dev/tests/integration/conftest.py 2>/dev/null && head -50 /media/sam/1TB/nautilus_dev/tests/integration/conftest.py || echo \"NO_CONFTEST\"",
+      "description": "Check integration conftest"
+    },
+    {
+      "operation": "write",
+      "timestamp": "2025-12-30T18:50:36.511601",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/integration/recovery/conftest.py",
+      "content_length": 2592
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-30T18:50:44.038119",
+      "command": "uv run pytest tests/unit/recovery/ tests/integration/recovery/ -v --tb=short 2>&1 | head -80",
+      "description": "Run FR-001 tests"
     }
   ],
-  "last_updated": "2025-12-30T18:49:40.443981"
+  "last_updated": "2025-12-30T18:50:44.038135"
 }
