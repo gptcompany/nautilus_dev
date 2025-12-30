@@ -16,7 +16,7 @@ import pytest
 @pytest.fixture
 def mock_cache():
     """Create a mock NautilusTrader cache for testing.
-    
+
     Returns a MagicMock with common cache methods stubbed:
     - positions(): Returns empty list by default
     - positions_open(): Returns empty list by default
@@ -34,7 +34,7 @@ def mock_cache():
 @pytest.fixture
 def mock_clock():
     """Create a mock clock for testing.
-    
+
     Returns a MagicMock with:
     - timestamp_ns(): Returns fixed nanosecond timestamp
     - utc_now(): Returns fixed datetime (2024-01-02 00:00:00 UTC)
@@ -48,7 +48,7 @@ def mock_clock():
 @pytest.fixture
 def mock_logger():
     """Create a mock logger for testing log output.
-    
+
     Returns a MagicMock with standard logging methods stubbed.
     """
     logger = MagicMock()
@@ -127,14 +127,14 @@ def create_mock_position(
     is_open: bool = True,
 ) -> MagicMock:
     """Factory function to create mock positions.
-    
+
     Args:
         instrument_id: Full instrument ID (e.g., BTCUSDT-PERP.BINANCE)
         side: Position side (LONG or SHORT)
         quantity: Position quantity
         avg_px_open: Average entry price
         is_open: Whether position is currently open
-        
+
     Returns:
         MagicMock configured as a Position object
     """

@@ -39,6 +39,7 @@ class PositionRecoveryProvider:
     Attributes:
         cache: NautilusTrader cache instance for position access.
         logger: Optional custom logger instance.
+        discrepancy_count: Number of discrepancies found in last reconciliation.
 
     Example:
         >>> provider = PositionRecoveryProvider(cache=node.cache)
@@ -60,6 +61,16 @@ class PositionRecoveryProvider:
         """
         self._cache = cache
         self._log = logger or _log
+        self._discrepancy_count: int = 0
+
+    @property
+    def discrepancy_count(self) -> int:
+        """Number of discrepancies found in the last reconciliation.
+
+        Returns:
+            Count of discrepancies from the most recent reconcile_positions() call.
+        """
+        return self._discrepancy_count
 
     def get_cached_positions(self, trader_id: str | TraderId) -> list[Position]:
         """Load positions from cache.
@@ -238,6 +249,9 @@ class PositionRecoveryProvider:
                 )
                 discrepancies.append(msg)
                 self._log.warning(msg)
+
+        # Update discrepancy count
+        self._discrepancy_count = len(discrepancies)
 
         self._log.info(
             "Reconciliation complete: reconciled=%d discrepancies=%d",
