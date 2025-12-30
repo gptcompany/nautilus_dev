@@ -2,7 +2,7 @@
 
 ## Overview
 
-Implement robust order reconciliation to ensure internal order state matches exchange state after restarts or disconnections.
+Implement order reconciliation with 100% fill coverage and < 30s recovery time to ensure internal order state matches exchange state after restarts or disconnections.
 
 ## Problem Statement
 
@@ -33,15 +33,16 @@ LiveExecEngineConfig(
 ```
 
 #### FR-003: Continuous Reconciliation
-- Periodic check every N minutes (configurable)
+- Periodic check every 5 seconds (configurable via `open_check_interval_secs`)
 - Compare internal open orders vs exchange
-- Alert on discrepancies
+- Alert on discrepancies via Grafana dashboard and configured alert rules
 
 #### FR-004: In-Flight Order Monitoring
 ```python
 LiveExecEngineConfig(
-    inflight_check_interval_secs=5.0,
-    inflight_timeout_ms=5000,
+    inflight_check_interval_ms=2000,  # Check every 2 seconds
+    inflight_check_threshold_ms=5000,  # Query venue after 5s without response
+    inflight_check_retries=5,
 )
 ```
 
@@ -110,9 +111,11 @@ TradingNode Start
 reconciliation_config = LiveExecEngineConfig(
     reconciliation=True,
     reconciliation_startup_delay_secs=10.0,
-    reconciliation_interval_secs=300,  # Every 5 minutes
-    inflight_check_interval_secs=5.0,
-    inflight_timeout_ms=5000,
+    open_check_interval_secs=5.0,  # Continuous polling every 5 seconds
+    open_check_lookback_mins=60,
+    inflight_check_interval_ms=2000,
+    inflight_check_threshold_ms=5000,
+    inflight_check_retries=5,
 )
 ```
 

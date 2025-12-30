@@ -1,170 +1,324 @@
-# Implementation Plan: [FEATURE NAME]
+# Implementation Plan: Order Reconciliation System
 
-**Feature Branch**: `[###-feature-name]`
-**Created**: [DATE]
-**Status**: Draft
-**Spec Reference**: `specs/[###-feature-name]/spec.md`
+**Feature Branch**: `016-order-reconciliation`
+**Created**: 2025-12-30
+**Status**: Phase 1 Complete
+**Spec Reference**: `specs/016-order-reconciliation/spec.md`
+
+## Constitution Check
+
+| Principle | Status | Notes |
+|-----------|--------|-------|
+| Black Box Design | PASS | Reconciler as independent module with clean API |
+| KISS & YAGNI | PASS | Using existing NautilusTrader reconciliation - no reinventing |
+| Native First | PASS | Leveraging native `LiveExecEngineConfig` parameters |
+| Performance Constraints | PASS | Async polling, no blocking operations |
+| TDD Discipline | PLANNED | Integration tests with mocked venue responses |
 
 ## Architecture Overview
 
-<!--
-  Describe the high-level architecture and how this feature integrates
-  with the existing NautilusTrader codebase.
--->
+This feature configures and extends NautilusTrader's built-in reconciliation capabilities rather than building a custom reconciliation system. NautilusTrader already provides:
+
+1. **Startup Reconciliation** - via `generate_order_status_reports`, `generate_fill_reports`, `generate_position_status_reports`
+2. **In-Flight Monitoring** - via `inflight_check_*` parameters
+3. **Continuous Polling** - via `open_check_*` parameters
+4. **External Order Claims** - via `StrategyConfig.external_order_claims`
 
 ### System Context
 
 ```
-[Describe how the feature fits into the NautilusTrader ecosystem]
+                    TradingNode
+                         │
+    ┌────────────────────┼────────────────────┐
+    │                    │                    │
+    ▼                    ▼                    ▼
+┌─────────┐      ┌──────────────┐      ┌─────────┐
+│  Cache  │◄────►│ ExecEngine   │◄────►│ Venue   │
+│ (Redis) │      │              │      │  API    │
+└─────────┘      │ Reconciler   │      └─────────┘
+                 │ - startup    │
+                 │ - in-flight  │
+                 │ - continuous │
+                 └──────────────┘
 ```
 
 ### Component Diagram
 
 ```
-[ASCII art or description of component relationships]
+┌─────────────────────────────────────────────────────────────────┐
+│                        TradingNode                               │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  ┌──────────────────────────────────────────────────────────┐   │
+│  │                LiveExecEngineConfig                       │   │
+│  ├───────────────┬────────────────┬─────────────────────────┤   │
+│  │ Startup       │ In-Flight      │ Continuous              │   │
+│  │ Reconciliation│ Monitoring     │ Polling                 │   │
+│  │               │                │                         │   │
+│  │ - delay: 10s  │ - interval: 2s │ - interval: 5s          │   │
+│  │ - lookback:   │ - threshold: 5s│ - lookback: 60min       │   │
+│  │   unlimited   │ - retries: 5   │ - threshold: 5s         │   │
+│  └───────────────┴────────────────┴─────────────────────────┘   │
+│                                                                  │
+│  ┌──────────────────────────────────────────────────────────┐   │
+│  │                    CacheConfig                            │   │
+│  │  database: Redis (localhost:6379)                         │   │
+│  │  persist_account_events: True  <- CRITICAL for recovery   │   │
+│  └──────────────────────────────────────────────────────────┘   │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
 ```
 
 ## Technical Decisions
 
-### Decision 1: [Topic]
+### Decision 1: Position Mode
 
 **Options Considered**:
-1. **Option A**: [Description]
-   - Pros: [list]
-   - Cons: [list]
-2. **Option B**: [Description]
-   - Pros: [list]
-   - Cons: [list]
+1. **NETTING Mode**: Single position per instrument
+   - Pros: Fully supported, no known bugs, simpler state management
+   - Cons: Cannot hold simultaneous long/short
+2. **HEDGING Mode**: Separate long/short positions
+   - Pros: More flexible trading strategies
+   - Cons: Bug #3104 (long-lived positions fail), Bybit not supported
 
-**Selected**: Option [X]
+**Selected**: NETTING Mode
 
-**Rationale**: [Why this option was chosen]
+**Rationale**: HEDGING mode has critical open bug #3104 affecting positions >10 days. Bybit doesn't support hedge mode at all. NETTING mode is stable and fully tested.
 
 ---
 
-### Decision 2: [Topic]
+### Decision 2: Reconciliation Strategy
 
 **Options Considered**:
-1. **Option A**: [Description]
-2. **Option B**: [Description]
+1. **Native NautilusTrader Reconciliation**: Use existing `LiveExecEngineConfig`
+   - Pros: Battle-tested, maintained by core team, comprehensive
+   - Cons: Limited customization
+2. **Custom Reconciliation Module**: Build separate reconciler
+   - Pros: Full control, custom logic
+   - Cons: Reinventing wheel, maintenance burden, more bugs
 
-**Selected**: Option [X]
+**Selected**: Native NautilusTrader Reconciliation
 
-**Rationale**: [Why this option was chosen]
+**Rationale**: NautilusTrader's reconciliation is mature with three standardized methods. Custom implementation would violate KISS/YAGNI principles and introduce new bugs.
+
+---
+
+### Decision 3: Cache Backend
+
+**Options Considered**:
+1. **Redis**: Persistent, fast, battle-tested
+   - Pros: Fast recovery, distributed support, persistence
+   - Cons: External dependency
+2. **SQLite/File-based**: Local, no external deps
+   - Pros: Simple setup
+   - Cons: Slower, no distributed support
+
+**Selected**: Redis
+
+**Rationale**: Required for production recovery. Discord community strongly recommends Redis for `persist_account_events=True`.
 
 ---
 
 ## Implementation Strategy
 
-### Phase 1: Foundation
+### Phase 1: Foundation (Configuration Layer)
 
-**Goal**: [What this phase achieves]
+**Goal**: Create production-ready TradingNode configuration with reconciliation enabled.
 
 **Deliverables**:
-- [ ] [Deliverable 1]
-- [ ] [Deliverable 2]
+- [x] `config/reconciliation_config.py` - Pydantic model for reconciliation settings
+- [x] `config/trading_node_config.py` - Production TradingNode configuration
+- [ ] Unit tests for configuration validation
 
-**Dependencies**: None / [List dependencies]
+**Dependencies**: Spec 014 (TradingNode Configuration)
 
 ---
 
-### Phase 2: Core Implementation
+### Phase 2: Integration & Monitoring
 
-**Goal**: [What this phase achieves]
+**Goal**: Integrate reconciliation with monitoring and alerting.
 
 **Deliverables**:
-- [ ] [Deliverable 1]
-- [ ] [Deliverable 2]
+- [ ] Reconciliation event handlers (log discrepancies)
+- [ ] Grafana dashboard panel for reconciliation status
+- [ ] Alert rules for position discrepancies
 
-**Dependencies**: Phase 1
+**Dependencies**: Phase 1, Spec 005 (Grafana Monitoring)
 
 ---
 
-### Phase 3: Integration & Testing
+### Phase 3: External Order Handling
 
-**Goal**: [What this phase achieves]
+**Goal**: Configure external order claims for web/app-placed orders.
 
 **Deliverables**:
-- [ ] [Deliverable 1]
-- [ ] [Deliverable 2]
+- [ ] Strategy configuration with `external_order_claims`
+- [ ] Documentation for claiming external positions
+- [ ] Integration tests with mock external orders
 
 **Dependencies**: Phase 2
+
+---
+
+### Phase 4: Testing & Validation
+
+**Goal**: Comprehensive testing of reconciliation scenarios.
+
+**Deliverables**:
+- [ ] Restart recovery tests
+- [ ] Disconnection simulation tests
+- [ ] Position discrepancy detection tests
+- [ ] Performance benchmarks (< 30s startup, < 5s periodic)
+
+**Dependencies**: Phase 3
 
 ---
 
 ## File Structure
 
 ```
-strategies/                    # or appropriate directory
-├── {feature_name}/
+config/
+├── reconciliation/
 │   ├── __init__.py
-│   ├── strategy.py           # Main strategy implementation
-│   ├── config.py             # Configuration models
-│   └── indicators.py         # Custom indicators (if needed)
+│   ├── config.py              # ReconciliationConfig Pydantic model
+│   └── presets.py             # Conservative/Aggressive presets
+├── trading_node/
+│   ├── __init__.py
+│   └── live_config.py         # LiveTradingNodeConfig
 tests/
-├── test_{feature_name}.py    # Unit tests
-└── integration/
-    └── test_{feature_name}_integration.py
+├── integration/
+│   └── test_reconciliation.py # Integration tests
+└── unit/
+    └── test_reconciliation_config.py
+docs/
+└── guides/
+    └── reconciliation.md      # User documentation
 ```
 
 ## API Design
 
-### Public Interface
+### Configuration Interface
 
 ```python
-# Example API surface
-class {FeatureName}Strategy(Strategy):
-    def __init__(self, config: {FeatureName}Config) -> None: ...
-    def on_start(self) -> None: ...
-    def on_bar(self, bar: Bar) -> None: ...
-    def on_stop(self) -> None: ...
+from pydantic import BaseModel, Field
+from typing import Optional, List
+
+class ReconciliationConfig(BaseModel):
+    """Reconciliation configuration with production defaults."""
+
+    # Startup
+    enabled: bool = True
+    startup_delay_secs: float = Field(default=10.0, ge=10.0)
+    lookback_mins: Optional[int] = None  # None = max history
+
+    # In-Flight
+    inflight_check_interval_ms: int = Field(default=2000, ge=1000)
+    inflight_check_threshold_ms: int = Field(default=5000, ge=1000)
+    inflight_check_retries: int = Field(default=5, ge=1)
+
+    # Continuous Polling
+    open_check_interval_secs: Optional[float] = Field(default=5.0, ge=1.0)
+    open_check_lookback_mins: int = Field(default=60, ge=60)
+    open_check_threshold_ms: int = Field(default=5000, ge=1000)
+
+    # Memory Management
+    purge_closed_orders_interval_mins: int = 10
+    purge_closed_orders_buffer_mins: int = 60
+
+    def to_live_exec_engine_config(self) -> dict:
+        """Convert to LiveExecEngineConfig kwargs."""
+        return {
+            "reconciliation": self.enabled,
+            "reconciliation_startup_delay_secs": self.startup_delay_secs,
+            "reconciliation_lookback_mins": self.lookback_mins,
+            "inflight_check_interval_ms": self.inflight_check_interval_ms,
+            "inflight_check_threshold_ms": self.inflight_check_threshold_ms,
+            "inflight_check_retries": self.inflight_check_retries,
+            "open_check_interval_secs": self.open_check_interval_secs,
+            "open_check_lookback_mins": self.open_check_lookback_mins,
+            "open_check_threshold_ms": self.open_check_threshold_ms,
+            "purge_closed_orders_interval_mins": self.purge_closed_orders_interval_mins,
+            "purge_closed_orders_buffer_mins": self.purge_closed_orders_buffer_mins,
+        }
 ```
 
-### Configuration
+### Strategy Configuration (External Claims)
 
 ```python
-class {FeatureName}Config(BaseModel):
-    instrument_id: str
-    # ... other config fields
+from nautilus_trader.config import StrategyConfig
+
+class MyStrategyConfig(StrategyConfig):
+    """Strategy with external order claims."""
+
+    instrument_ids: List[str]
+
+    @property
+    def external_order_claims(self) -> List[str]:
+        """Claim all configured instruments."""
+        return self.instrument_ids
 ```
 
 ## Testing Strategy
 
 ### Unit Tests
-- [ ] Test strategy initialization
-- [ ] Test indicator calculations
-- [ ] Test signal generation
-- [ ] Test order management
+- [ ] ReconciliationConfig validation (min values, types)
+- [ ] Config conversion to LiveExecEngineConfig
+- [ ] Preset configurations (conservative, aggressive)
 
 ### Integration Tests
-- [ ] Test with BacktestNode
-- [ ] Test with sample data
-- [ ] Test edge cases (empty data, gaps)
+- [ ] TradingNode startup with reconciliation
+- [ ] Mock venue returning discrepancies
+- [ ] External order detection and claiming
+- [ ] In-flight order timeout handling
 
 ### Performance Tests
-- [ ] Benchmark against baseline
-- [ ] Memory usage profiling
+- [ ] Startup reconciliation < 30 seconds
+- [ ] Periodic reconciliation < 5 seconds
+- [ ] Memory usage during purge cycles
 
 ## Risk Assessment
 
 | Risk | Impact | Likelihood | Mitigation |
 |------|--------|------------|------------|
-| [Risk 1] | High/Medium/Low | High/Medium/Low | [Mitigation strategy] |
-| [Risk 2] | High/Medium/Low | High/Medium/Low | [Mitigation strategy] |
+| Bug #3104 (HEDGING) | High | N/A | Use NETTING mode only |
+| Bug #3042 (IB routing) | Medium | Low | Monitor for fix, not using IB initially |
+| Redis unavailable | High | Low | Health checks, graceful degradation |
+| Long reconciliation time | Medium | Medium | Optimize lookback window, parallel queries |
+| False discrepancy alerts | Low | Medium | Use threshold delays, retry logic |
 
 ## Dependencies
 
 ### External Dependencies
-- NautilusTrader >= 1.220.0
-- [Other dependencies]
+- NautilusTrader >= 1.222.0 (nightly)
+- Redis >= 6.0
 
 ### Internal Dependencies
-- [List internal modules/features this depends on]
+- Spec 014 (TradingNode Configuration) - REQUIRED
+- Spec 015 (Binance Exec Client) - REQUIRED
+- Spec 005 (Grafana Monitoring) - OPTIONAL
+- Spec 018 (Redis Cache) - REQUIRED
+
+## Known Issues & Workarounds
+
+### Issue: Binance HEDGING Mode (Bug #3104)
+**Workaround**: Use NETTING mode only. Do not enable `dualSidePosition=true`.
+
+### Issue: Bybit Hedge Mode
+**Workaround**: Not supported. Use NETTING mode.
+
+### Issue: IB Venue Routing (Bug #3042)
+**Workaround**: Not using Interactive Brokers initially. Monitor for fix.
+
+### Issue: INTERNAL-DIFF Positions
+**Workaround**: Use develop branch for latest fixes. Set appropriate lookback window.
 
 ## Acceptance Criteria
 
+- [x] Research complete (research.md)
 - [ ] All unit tests passing (coverage > 80%)
 - [ ] All integration tests passing
+- [ ] Startup reconciliation < 30 seconds
+- [ ] Periodic check < 5 seconds
 - [ ] Documentation updated
 - [ ] Code review approved
-- [ ] Performance benchmarks met
+- [ ] Grafana dashboard shows reconciliation status
