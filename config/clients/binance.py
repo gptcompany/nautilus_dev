@@ -6,7 +6,7 @@ Builds NautilusTrader Binance data and exec client configurations.
 
 from __future__ import annotations
 
-from nautilus_trader.adapters.binance import BinanceAccountType
+from nautilus_trader.adapters.binance.common.enums import BinanceAccountType
 from nautilus_trader.adapters.binance.config import (
     BinanceDataClientConfig,
     BinanceExecClientConfig,

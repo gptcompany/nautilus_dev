@@ -7,15 +7,15 @@ from validated settings.
 
 from __future__ import annotations
 
-from nautilus_trader.adapters.binance import BinanceAccountType
+from nautilus_trader.adapters.binance.common.enums import BinanceAccountType
 from nautilus_trader.adapters.binance.config import (
     BinanceDataClientConfig,
     BinanceExecClientConfig,
 )
-from nautilus_trader.adapters.bybit import BybitProductType
 from nautilus_trader.adapters.bybit.config import (
     BybitDataClientConfig,
     BybitExecClientConfig,
+    BybitProductType,
 )
 from nautilus_trader.config import (
     DatabaseConfig,

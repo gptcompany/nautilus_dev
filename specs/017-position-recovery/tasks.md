@@ -164,7 +164,7 @@
 - [x] T047 [P] Create RecoveryStateManager implementation in `strategies/common/recovery/state_manager.py`
 - [ ] T048 Update quickstart.md with implementation examples in `specs/017-position-recovery/quickstart.md`
 - [ ] T049 [P] Add type hints validation with mypy in `strategies/common/recovery/`
-- [ ] T050 Run ruff format and check on recovery module
+- [x] T050 Run ruff format and check on recovery module
 - [ ] T051 Run alpha-debug verification on recovery implementation
 
 ---
