@@ -107,14 +107,14 @@
 
 ### Tests for FR-003
 
-- [ ] T032 [P] [FR3] Unit test for balance loading in `tests/unit/recovery/test_balance_restoration.py`
-- [ ] T033 [FR3] Unit test for balance change tracking in `tests/unit/recovery/test_balance_tracking.py`
+- [x] T032 [P] [FR3] Unit test for balance loading in `tests/unit/recovery/test_balance_restoration.py`
+- [x] T033 [FR3] Unit test for balance change tracking in `tests/unit/recovery/test_balance_tracking.py`
 
 ### Implementation for FR-003
 
-- [ ] T034 [FR3] Implement balance loading from cache in `strategies/common/recovery/provider.py`
-- [ ] T035 [FR3] Implement balance update with exchange state in `strategies/common/recovery/provider.py`
-- [ ] T036 [FR3] Add balance change tracking during downtime in `strategies/common/recovery/provider.py`
+- [x] T034 [FR3] Implement balance loading from cache in `strategies/common/recovery/provider.py`
+- [x] T035 [FR3] Implement balance update with exchange state in `strategies/common/recovery/provider.py`
+- [x] T036 [FR3] Add balance change tracking during downtime in `strategies/common/recovery/provider.py`
 
 **Checkpoint**: Account balances are correctly restored and tracked
 
@@ -130,14 +130,14 @@
 
 ### Tests for FR-004
 
-- [ ] T037 [P] [FR4] Unit test for event replay logic in `tests/unit/recovery/test_event_replay.py`
-- [ ] T038 [FR4] Unit test for synthetic event generation in `tests/unit/recovery/test_synthetic_events.py`
+- [x] T037 [P] [FR4] Unit test for event replay logic in `tests/unit/recovery/test_event_replay.py`
+- [x] T038 [FR4] Unit test for synthetic event generation in `tests/unit/recovery/test_synthetic_events.py`
 
 ### Implementation for FR-004
 
-- [ ] T039 [FR4] Implement event replay from cache in `strategies/common/recovery/event_replay.py`
-- [ ] T040 [FR4] Implement synthetic event generation for gap filling in `strategies/common/recovery/event_replay.py`
-- [ ] T041 [FR4] Implement event sequence maintenance in `strategies/common/recovery/event_replay.py`
+- [x] T039 [FR4] Implement event replay from cache in `strategies/common/recovery/event_replay.py`
+- [x] T040 [FR4] Implement synthetic event generation for gap filling in `strategies/common/recovery/event_replay.py`
+- [x] T041 [FR4] Implement event sequence maintenance in `strategies/common/recovery/event_replay.py`
 
 **Checkpoint**: Event replay works - missed events are replayed correctly
 
@@ -162,8 +162,8 @@
 
 - [x] T046 [P] Create RecoveryEventEmitter implementation in `strategies/common/recovery/event_emitter.py`
 - [x] T047 [P] Create RecoveryStateManager implementation in `strategies/common/recovery/state_manager.py`
-- [ ] T048 Update quickstart.md with implementation examples in `specs/017-position-recovery/quickstart.md`
-- [ ] T049 [P] Add type hints validation with mypy in `strategies/common/recovery/`
+- [x] T048 Update quickstart.md with implementation examples in `specs/017-position-recovery/quickstart.md`
+- [x] T049 [P] Add type hints validation with mypy in `strategies/common/recovery/`
 - [x] T050 Run ruff format and check on recovery module
 - [x] T051 Run alpha-debug verification on recovery implementation
 
