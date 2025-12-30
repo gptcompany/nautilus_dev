@@ -321,7 +321,24 @@
       "operation": "read",
       "timestamp": "2025-12-30T19:38:11.185751",
       "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/recovery/provider.py"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-30T19:38:34.245975",
+      "todo_count": 6
+    },
+    {
+      "operation": "task",
+      "timestamp": "2025-12-30T19:38:42.403386",
+      "subagent_type": "test-runner",
+      "prompt": "Run all recovery module tests (unit + integration) and provide a summary of results.\n\nCommands to ru..."
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-30T19:38:48.988867",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -m pytest tests/unit/recovery/ tests/integration/recovery/ -v --tb=short 2>&1",
+      "description": "Run recovery module unit and integration tests"
     }
   ],
-  "last_updated": "2025-12-30T19:38:11.185767"
+  "last_updated": "2025-12-30T19:38:48.988890"
 }
