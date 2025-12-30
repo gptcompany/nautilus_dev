@@ -222,9 +222,9 @@ The logging system uses reference counting to track active `LogGuard` instances:
 
 This mechanism ensures that:
 
-1. Log messages are never lost due to premature thread termination.
+1. `LogGuard` keeps the logging thread alive and flushes on drop; abrupt termination (crashes, kill signals) can still lose buffered logs.
 2. The logging thread remains active as long as any `LogGuard` exists.
-3. All buffered logs are properly flushed to their destinations when the program ends.
+3. On graceful shutdown, all buffered logs are properly flushed to their destinations.
 
 ### Why use LogGuard?
 

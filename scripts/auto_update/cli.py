@@ -633,7 +633,6 @@ def dispatch(
     default="info",
     help="Notification level",
 )
-@click.option("--embed", "use_embed", is_flag=True, help="Use rich embed (Discord only)")
 @click.option("--pr-url", type=str, help="Include PR link")
 @click.option("--webhook-url", type=str, envvar="DISCORD_WEBHOOK_URL", help="Discord webhook URL")
 @click.pass_context
@@ -642,7 +641,6 @@ def notify(
     message: str,
     channel: str,
     level: str,
-    use_embed: bool,
     pr_url: str | None,
     webhook_url: str | None,
 ) -> None:

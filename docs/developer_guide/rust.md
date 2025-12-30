@@ -514,6 +514,18 @@ pub use crate::identifiers::{
 
 Use third-person declarative voice for all doc comments (e.g., "Returns the account ID" not "Return the account ID").
 
+#### Section header casing
+
+Rustdoc section headers use Title Case, matching the Rust standard library convention:
+
+- `# Examples`
+- `# Errors`
+- `# Panics`
+- `# Safety`
+- `# Notes`
+- `# Thread Safety`
+- `# Feature Flags`
+
 #### Module-Level documentation
 
 All modules must have module-level documentation starting with a brief description:

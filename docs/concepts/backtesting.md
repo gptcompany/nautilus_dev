@@ -125,7 +125,7 @@ For a backtest with 10 instruments, each with 1M bars:
 - Sorting on each call: ~10 sorts of increasing size (1M, 2M, 3M, ... 10M bars).
 - Sorting once at the end: 1 sort of 10M bars.
 
-The deferred sorting approach can be **orders of magnitude faster** for large datasets.
+The deferred sorting approach can be **significantly faster** for large datasets.
 :::
 
 ### Data loading contract
@@ -261,7 +261,7 @@ Mismatches between data and configuration can lead to unexpected behavior during
 
 NautilusTrader is primarily designed and optimized for order book data, which provides
 a complete representation of every price level or order in the market, reflecting the real-time behavior of a trading venue.
-This ensures the highest level of execution granularity and realism. However, if granular order book data is either not
+This provides the greatest execution granularity and realism. However, if granular order book data is either not
 available or necessary, then the platform has the capability of processing market data in the following descending order of detail:
 
 ```mermaid
@@ -349,7 +349,7 @@ This addresses a gap in academic literature: most research focuses on live marke
 
 - **Immutable historical data**: Order book and trade data are never modified.
 - **Optional consumption tracking**: When `liquidity_consumption=True`, the engine tracks consumed liquidity per price level to prevent duplicate fills. See [Order book immutability](#order-book-immutability) for configuration.
-- **Deterministic results**: The same backtest with the same data always produces identical results.
+- **Deterministic results**: The same backtest with the same data and configuration produces identical results when probabilistic fill models use a fixed `random_seed`.
 
 ### Fill price determination
 
