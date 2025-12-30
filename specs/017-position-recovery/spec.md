@@ -24,9 +24,9 @@ When TradingNode restarts, strategies need to know their current positions to ma
 - Resolve discrepancies
 
 #### FR-002: Strategy State Restoration
-- Restore indicator warmup state
-- Restore pending order references
-- Restore custom strategy state
+- Restore indicator warmup state (via historical data request)
+- Restore pending order references (stop-loss, take-profit orders)
+- Restore custom strategy state (user-defined variables, signal flags, position tracking state)
 
 #### FR-003: Account Balance Restoration
 - Load last known balances from cache
@@ -41,8 +41,8 @@ When TradingNode restarts, strategies need to know their current positions to ma
 ### Non-Functional Requirements
 
 #### NFR-001: Recovery Time
-- Position recovery < 5 seconds
-- Full state recovery < 30 seconds
+- Position recovery < 5 seconds (p95)
+- Full state recovery < 30 seconds (p95)
 
 #### NFR-002: Consistency
 - No duplicate orders after recovery
@@ -108,8 +108,8 @@ class RecoverableStrategy(Strategy):
     """Base class for strategies with recovery support."""
 
     def on_start(self) -> None:
-        # Check if we have existing positions
-        positions = self.portfolio.positions(self.instrument_id)
+        # Check if we have existing positions (use cache, not portfolio)
+        positions = self.cache.positions(instrument_id=self.instrument_id)
         if positions:
             self._restore_state(positions)
         else:
