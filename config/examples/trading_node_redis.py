@@ -13,7 +13,10 @@ from nautilus_trader.config import (
 # Import our Redis cache config factory
 import sys
 import os
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+
+sys.path.insert(
+    0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+)
 from config.cache.redis_config import create_redis_cache_config
 
 
@@ -58,7 +61,7 @@ def create_trading_node_config(
 # Example usage
 if __name__ == "__main__":
     config = create_trading_node_config()
-    print(f"TradingNode config created:")
+    print("TradingNode config created:")
     print(f"  Trader ID: {config.trader_id}")
     print(f"  Cache type: {config.cache.database.type}")
     print(f"  Encoding: {config.cache.encoding}")

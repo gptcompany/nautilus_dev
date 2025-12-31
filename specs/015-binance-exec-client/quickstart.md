@@ -21,22 +21,26 @@ source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/a
 ## Basic Configuration
 
 ```python
-from nautilus_trader.adapters.binance.config import BinanceExecClientConfig
-from nautilus_trader.adapters.binance.common.enums import BinanceAccountType
+from config import TradingNodeConfigFactory
+from config.models import BinanceCredentials
+from config.clients.binance import build_binance_exec_client_config
 
-# Minimal configuration (uses env vars for API keys)
-binance_exec = BinanceExecClientConfig(
-    account_type=BinanceAccountType.USDT_FUTURES,
+# Create credentials (uses env vars if api_key/api_secret not provided)
+credentials = BinanceCredentials(
+    api_key="your_api_key",  # Or set BINANCE_API_KEY env var
+    api_secret="your_api_secret",  # Or set BINANCE_API_SECRET env var
+    account_type="USDT_FUTURES",
     testnet=True,  # Start with testnet!
 )
 
-# Production configuration
-binance_exec_prod = BinanceExecClientConfig(
-    account_type=BinanceAccountType.USDT_FUTURES,
-    testnet=False,
+# Build exec client config using helper
+binance_exec = build_binance_exec_client_config(
+    credentials,
     max_retries=3,
-    use_position_ids=True,
-    futures_leverages={"BTCUSDT": 10},
+    retry_delay_initial_ms=500,
+    retry_delay_max_ms=5000,
+    futures_leverages={"BTCUSDT": 10, "ETHUSDT": 5},
+    futures_margin_types={"BTCUSDT": "CROSS"},
 )
 ```
 
@@ -61,40 +65,65 @@ node.run()
 ## Order Submission Pattern
 
 ```python
-from nautilus_trader.model.enums import OrderSide, TimeInForce
+from nautilus_trader.model.enums import OrderSide
+from nautilus_trader.model.objects import Price, Quantity
+from config import (
+    create_market_order,
+    create_limit_order,
+    create_stop_market_order,
+    create_external_claims,
+)
 
 class MyStrategy(Strategy):
     def submit_market_buy(self, quantity: Quantity) -> None:
-        """Submit market buy order."""
-        order = self.order_factory.market(
-            instrument_id=self.instrument_id,
-            order_side=OrderSide.BUY,
-            quantity=quantity,
-            time_in_force=TimeInForce.GTC,
+        """Submit market buy order using helper."""
+        order = create_market_order(
+            self.order_factory,
+            self.instrument_id,
+            OrderSide.BUY,
+            quantity,
         )
         self.submit_order(order)
 
     def submit_limit_sell(self, quantity: Quantity, price: Price) -> None:
-        """Submit limit sell order."""
-        order = self.order_factory.limit(
-            instrument_id=self.instrument_id,
-            order_side=OrderSide.SELL,
-            quantity=quantity,
-            price=price,
-            time_in_force=TimeInForce.GTC,
+        """Submit limit sell order using helper."""
+        order = create_limit_order(
+            self.order_factory,
+            self.instrument_id,
+            OrderSide.SELL,
+            quantity,
+            price,
             post_only=True,  # Maker only
         )
         self.submit_order(order)
 
-    def submit_stop_market(self, side: OrderSide, quantity: Quantity, trigger: Price) -> None:
-        """Submit stop market order (uses Algo Order API)."""
-        order = self.order_factory.stop_market(
-            instrument_id=self.instrument_id,
-            order_side=side,
-            quantity=quantity,
-            trigger_price=trigger,
+    def submit_stop_loss(self, quantity: Quantity, trigger: Price) -> None:
+        """Submit stop-loss (uses Algo Order API)."""
+        order = create_stop_market_order(
+            self.order_factory,
+            self.instrument_id,
+            OrderSide.SELL,  # For long positions
+            quantity,
+            trigger,
+            reduce_only=True,  # Close position only
         )
         self.submit_order(order)
+```
+
+## External Order Claims (Position Recovery)
+
+```python
+from config import create_external_claims
+
+# For strategy config - claim positions on restart
+external_claims = create_external_claims([
+    "BTCUSDT-PERP.BINANCE",
+    "ETHUSDT-PERP.BINANCE",
+])
+
+# Use in strategy configuration
+class MyStrategyConfig(StrategyConfig):
+    external_order_claims = external_claims
 ```
 
 ## Testnet Validation Checklist
@@ -112,8 +141,20 @@ class MyStrategy(Strategy):
 ### Rate Limiting
 ```python
 # Error: -1003 TOO_MANY_REQUESTS
-# Solution: Increase retry delays
-binance_exec = BinanceExecClientConfig(
+# Use error handling helpers
+from config import is_retryable_error, calculate_backoff_delay, should_retry
+
+error_code = -1003  # TOO_MANY_REQUESTS
+
+# Check if retryable
+if is_retryable_error(error_code):
+    should, delay_ms = should_retry(error_code, attempt=1, max_retries=3)
+    if should:
+        print(f"Retrying in {delay_ms}ms")
+
+# Or configure client with longer delays
+binance_exec = build_binance_exec_client_config(
+    credentials,
     max_retries=3,
     retry_delay_initial_ms=1000,  # 1 second
     retry_delay_max_ms=10000,     # 10 seconds max
