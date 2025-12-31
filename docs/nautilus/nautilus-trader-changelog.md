@@ -1,36 +1,36 @@
 # NautilusTrader Status Feed
 
-## Last Update: 12/30/2025, 12:00:30 AM UTC
+## Last Update: 12/31/2025, 12:00:55 AM UTC
 
 ### Current Versions
 - **Stable**: v1.221.0
 - **Nightly Commits**: 50 commits ahead
 
 ### Open Issues Summary
-- **Total Open Issues**: 15500
-- **Bugs**: 500
-- **Feature Requests**: 15250
+- **Total Open Issues**: 16000
+- **Bugs**: 750
+- **Feature Requests**: 15500
 
 ### Recent Open Issues (Top 5)
-- [#3307](https://github.com/nautechsystems/nautilus_trader/issues/3307) Add support for ticker name changes, stock splits and corporate actions in general [enhancement]
+- [#3361](https://github.com/nautechsystems/nautilus_trader/issues/3361) Converting an option from Databento to a Nautilus legacy results in a `pandas._libs.tslibs.np_datetime.OutOfBoundsDatetime` when printed [bug]
+- [#3359](https://github.com/nautechsystems/nautilus_trader/issues/3359) Allow the instrument universe to be updated dynamically during backtesting [enhancement]
+- [#3307](https://github.com/nautechsystems/nautilus_trader/issues/3307) Add support for ticker name changes, stock splits, and corporate actions in general [enhancement]
 - [#3269](https://github.com/nautechsystems/nautilus_trader/issues/3269) [Deribit] Initial integration [enhancement, rust]
 - [#3180](https://github.com/nautechsystems/nautilus_trader/issues/3180) RFC: Comparison of Bybit Python vs Rust adapter performance [enhancement, RFC, rust, python, adapter]
-- [#3177](https://github.com/nautechsystems/nautilus_trader/issues/3177) Support for generating time-indexed (daily/per bar) backtest reports [enhancement]
-- [#3152](https://github.com/nautechsystems/nautilus_trader/issues/3152) [Hyperliquid] Execution and reconciliation testing [enhancement, rust]
 
 ### Active Bug Reports
+- [#3361](https://github.com/nautechsystems/nautilus_trader/issues/3361) Converting an option from Databento to a Nautilus legacy results in a `pandas._libs.tslibs.np_datetime.OutOfBoundsDatetime` when printed
 - [#3104](https://github.com/nautechsystems/nautilus_trader/issues/3104) [Reconciliation] LiveExecEngine fails to reconcile long-lived Binance Futures positions for HEDGING
 - [#3042](https://github.com/nautechsystems/nautilus_trader/issues/3042) [Reconciliation] Fails for routing clients when instrument venue differs from client venue
-- [#3104](https://github.com/nautechsystems/nautilus_trader/issues/3104) [Reconciliation] LiveExecEngine fails to reconcile long-lived Binance Futures positions for HEDGING
-- [#3042](https://github.com/nautechsystems/nautilus_trader/issues/3042) [Reconciliation] Fails for routing clients when instrument venue differs from client venue
+- [#3361](https://github.com/nautechsystems/nautilus_trader/issues/3361) Converting an option from Databento to a Nautilus legacy results in a `pandas._libs.tslibs.np_datetime.OutOfBoundsDatetime` when printed
 - [#3104](https://github.com/nautechsystems/nautilus_trader/issues/3104) [Reconciliation] LiveExecEngine fails to reconcile long-lived Binance Futures positions for HEDGING
 
 ### Requested Features
-- [#3307](https://github.com/nautechsystems/nautilus_trader/issues/3307) Add support for ticker name changes, stock splits and corporate actions in general
+- [#3359](https://github.com/nautechsystems/nautilus_trader/issues/3359) Allow the instrument universe to be updated dynamically during backtesting
+- [#3307](https://github.com/nautechsystems/nautilus_trader/issues/3307) Add support for ticker name changes, stock splits, and corporate actions in general
 - [#3269](https://github.com/nautechsystems/nautilus_trader/issues/3269) [Deribit] Initial integration
 - [#3180](https://github.com/nautechsystems/nautilus_trader/issues/3180) RFC: Comparison of Bybit Python vs Rust adapter performance
 - [#3177](https://github.com/nautechsystems/nautilus_trader/issues/3177) Support for generating time-indexed (daily/per bar) backtest reports
-- [#3152](https://github.com/nautechsystems/nautilus_trader/issues/3152) [Hyperliquid] Execution and reconciliation testing
 
 ### Breaking Changes (Last 7 Days)
 - ✅ None detected

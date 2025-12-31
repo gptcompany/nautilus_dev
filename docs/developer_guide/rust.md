@@ -724,6 +724,27 @@ fn test_sma_with_single_input()
 fn test_symbol_is_composite()
 ```
 
+### Box-style banner comments
+
+Do not use box-style banner or separator comments. If code requires visual
+separation, consider splitting it into separate modules or files. Instead use:
+
+- Clear function names that convey purpose.
+- Module structure for logical groupings (`mod tests { mod fixtures { } }`).
+- Impl blocks to group related methods.
+- Doc comments (`///`) for semantic documentation.
+- IDE navigation and code folding.
+
+Patterns to avoid:
+
+```rust
+// ============================================================================
+// Some Section
+// ============================================================================
+
+// ========== Test Fixtures ==========
+```
+
 ## Rust-Python memory management
 
 When working with PyO3 bindings, it's critical to understand and avoid reference cycles between Rust's `Arc` reference counting and Python's garbage collector.
