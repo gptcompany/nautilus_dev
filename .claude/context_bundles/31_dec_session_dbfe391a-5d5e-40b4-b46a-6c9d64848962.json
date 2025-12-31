@@ -490,7 +490,123 @@
       "timestamp": "2025-12-31T17:17:07.419913",
       "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -m pytest tests/tradingnode_config/test_binance_errors.py -v 2>&1",
       "description": "Run tests with activated nightly environment"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-31T17:17:37.885764",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/015-binance-exec-client/tasks.md",
+      "old_string": "- [ ] T022 [FR3] Add use_reduce_only=True to ensure NETTING mode in config/clients/binance.py\n- [ ] ..."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-31T17:17:50.437269",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/015-binance-exec-client/tasks.md",
+      "old_string": "- [ ] T026 [P] [FR4] Create config/binance_errors.py with module docstring\n- [ ] T027 [FR4] Define B..."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-31T17:18:05.055190",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/015-binance-exec-client/tasks.md",
+      "old_string": "- [ ] T033 [FR5] Add create_external_claims() helper in config/order_helpers.py\n- [ ] T034 [FR5] Doc..."
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-31T17:18:05.367997",
+      "todo_count": 9
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-31T17:18:10.703876",
+      "command": "mkdir -p /media/sam/1TB/nautilus_dev/tests/integration",
+      "description": "Create integration tests directory"
+    },
+    {
+      "operation": "write",
+      "timestamp": "2025-12-31T17:18:51.159933",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/integration/test_binance_testnet.py",
+      "content_length": 8045
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-31T17:19:07.011529",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/015-binance-exec-client/tasks.md",
+      "old_string": "- [ ] T036 [P] Create tests/integration/test_binance_testnet.py with base fixtures and skip marker\n-..."
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-31T17:19:17.053307",
+      "todo_count": 9
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-31T17:19:21.769543",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/015-binance-exec-client/quickstart.md"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-31T17:19:37.156127",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/015-binance-exec-client/quickstart.md",
+      "old_string": "## Basic Configuration\n\n```python\nfrom nautilus_trader.adapters.binance.config import BinanceExecCli..."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-31T17:19:55.312461",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/015-binance-exec-client/quickstart.md",
+      "old_string": "## Order Submission Pattern\n\n```python\nfrom nautilus_trader.model.enums import OrderSide, TimeInForc..."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-31T17:20:08.021439",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/015-binance-exec-client/quickstart.md",
+      "old_string": "### Rate Limiting\n```python\n# Error: -1003 TOO_MANY_REQUESTS\n# Solution: Increase retry delays\nbinan..."
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-31T17:20:14.380325",
+      "command": "ruff check config/ tests/tradingnode_config/ --fix && ruff format config/ tests/tradingnode_config/",
+      "description": "Run ruff check and format"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-31T17:20:21.061119",
+      "command": "ruff check config/ --fix && ruff format config/",
+      "description": "Run ruff on config only"
+    },
+    {
+      "operation": "task",
+      "timestamp": "2025-12-31T17:20:32.284742",
+      "subagent_type": "test-runner",
+      "prompt": "Run all tests related to Spec 015 Binance Exec Client. This includes:\n- tests/tradingnode_config/tes..."
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-31T17:20:39.607549",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run pytest tests/tradingnode_config/test_config_clients.py tests/tradingnode_config/test_order_helpers.py tests/tradingnode_config/test_binance_errors.py --cov=config --cov-report=term-missing -v 2>&1",
+      "description": "Run Spec 015 Binance Exec Client tests with coverage"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-31T17:20:49.843876",
+      "file_path": "/media/sam/1TB/nautilus_dev/config/factory.py"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-31T17:20:50.157202",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -c \"from nautilus_trader.adapters.binance.common.enums import BinanceAccountType; print([e.name for e in BinanceAccountType])\"",
+      "description": "Check correct BinanceAccountType enum values"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-31T17:21:00.502203",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -c \"import nautilus_trader; print(nautilus_trader.__version__)\" 2>&1",
+      "description": "Check NautilusTrader version"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-31T17:21:08.902940",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -m pytest tests/tradingnode_config/test_config_clients.py tests/tradingnode_config/test_order_helpers.py tests/tradingnode_config/test_binance_errors.py --cov=config --cov-report=term-missing -v 2>&1",
+      "description": "Run Spec 015 tests with activated nightly env"
     }
   ],
-  "last_updated": "2025-12-31T17:17:07.419934"
+  "last_updated": "2025-12-31T17:21:08.902959"
 }
