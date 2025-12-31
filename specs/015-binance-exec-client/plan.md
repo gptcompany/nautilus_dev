@@ -1,302 +1,170 @@
-# Implementation Plan: Binance Exec Client (Spec 015)
+# Implementation Plan: [FEATURE NAME]
 
-**Feature Branch**: `015-binance-exec-client`
-**Created**: 2025-12-28
+**Feature Branch**: `[###-feature-name]`
+**Created**: [DATE]
 **Status**: Draft
-**Spec Reference**: `specs/015-binance-exec-client/spec.md`
-
----
+**Spec Reference**: `specs/[###-feature-name]/spec.md`
 
 ## Architecture Overview
 
+<!--
+  Describe the high-level architecture and how this feature integrates
+  with the existing NautilusTrader codebase.
+-->
+
 ### System Context
 
-The Binance Exec Client integrates NautilusTrader with Binance USDT Futures for live order execution. It builds on Spec 014 (TradingNode Configuration) to provide a complete live trading setup.
-
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                      TradingNode                            │
-│  ┌─────────────┐  ┌──────────────┐  ┌─────────────────────┐ │
-│  │  Strategy   │  │  ExecEngine  │  │   BinanceExecClient │ │
-│  │  (User)     │──│  (Core)      │──│   (Adapter)         │ │
-│  └─────────────┘  └──────────────┘  └─────────────────────┘ │
-│        │                │                    │              │
-│        ▼                ▼                    ▼              │
-│   ┌─────────┐    ┌───────────┐      ┌──────────────────┐   │
-│   │ Orders  │    │   Cache   │      │   Binance API    │   │
-│   │ Events  │    │  (Redis)  │      │   HTTP + WS      │   │
-│   └─────────┘    └───────────┘      └──────────────────┘   │
-└─────────────────────────────────────────────────────────────┘
+[Describe how the feature fits into the NautilusTrader ecosystem]
 ```
 
 ### Component Diagram
 
 ```
-┌─────────────────────────────────────────────────────┐
-│                 config/binance_exec.py              │
-│  ┌───────────────────────────────────────────────┐  │
-│  │  create_binance_exec_client()                 │  │
-│  │    → BinanceExecClientConfig                  │  │
-│  │    → InstrumentProviderConfig                 │  │
-│  └───────────────────────────────────────────────┘  │
-└─────────────────────────────────────────────────────┘
-                        │
-                        ▼
-┌─────────────────────────────────────────────────────┐
-│           Integration with Spec 014                 │
-│  ┌───────────────────────────────────────────────┐  │
-│  │  create_tradingnode_config(                   │  │
-│  │      exec_clients={"BINANCE": binance_exec},  │  │
-│  │  )                                            │  │
-│  └───────────────────────────────────────────────┘  │
-└─────────────────────────────────────────────────────┘
+[ASCII art or description of component relationships]
 ```
-
----
 
 ## Technical Decisions
 
-### Decision 1: Position Mode
+### Decision 1: [Topic]
 
 **Options Considered**:
-1. **ONE-WAY (NETTING)**
-   - Pros: Works correctly, simple mental model
-   - Cons: Can't have simultaneous long/short on same instrument
-2. **HEDGE mode**
-   - Pros: Flexible position management
-   - Cons: Known reconciliation bug (#3104)
+1. **Option A**: [Description]
+   - Pros: [list]
+   - Cons: [list]
+2. **Option B**: [Description]
+   - Pros: [list]
+   - Cons: [list]
 
-**Selected**: Option 1 (ONE-WAY/NETTING)
+**Selected**: Option [X]
 
-**Rationale**: HEDGE mode has unresolved reconciliation bug. ONE-WAY mode is reliable and meets requirements.
+**Rationale**: [Why this option was chosen]
 
 ---
 
-### Decision 2: Order Types Implementation
+### Decision 2: [Topic]
 
 **Options Considered**:
-1. **MARKET + LIMIT only**
-   - Pros: Simple, well-tested
-   - Cons: No stop-loss automation
-2. **Include STOP_MARKET and STOP_LIMIT**
-   - Pros: Full trading capability
-   - Cons: Requires nightly >= 2025-12-10 (Algo Order API fix)
+1. **Option A**: [Description]
+2. **Option B**: [Description]
 
-**Selected**: Option 2 (MVP scope)
+**Selected**: Option [X]
 
-**Rationale**: STOP orders essential for risk management. Algo API fix is already merged.
-
-**MVP Scope**: MARKET, LIMIT, STOP_MARKET, STOP_LIMIT
-**Deferred to v2**: TAKE_PROFIT_MARKET, TRAILING_STOP_MARKET (same Algo API, minimal changes)
-
----
-
-### Decision 3: Error Handling Strategy
-
-**Options Considered**:
-1. **Fail fast on all errors**
-   - Pros: Simple, predictable
-   - Cons: Transient errors crash system
-2. **Retry with exponential backoff**
-   - Pros: Handles rate limits, network issues
-   - Cons: More complex, potential delays
-
-**Selected**: Option 2 with limits
-
-**Rationale**: Production systems need resilience. Max 3 retries prevents account bans.
+**Rationale**: [Why this option was chosen]
 
 ---
 
 ## Implementation Strategy
 
-### Phase 1: Client Factory Module
+### Phase 1: Foundation
 
-**Goal**: Create factory function for BinanceExecClientConfig
+**Goal**: [What this phase achieves]
 
 **Deliverables**:
-- [ ] `config/binance_exec.py` with `create_binance_exec_client()`
-- [ ] Environment variable validation
-- [ ] Default configuration for testnet vs production
-- [ ] Unit tests for factory function
+- [ ] [Deliverable 1]
+- [ ] [Deliverable 2]
 
-**Dependencies**: Spec 014 (TradingNodeConfigFactory)
+**Dependencies**: None / [List dependencies]
 
 ---
 
-### Phase 2: Order Submission Utilities
+### Phase 2: Core Implementation
 
-**Goal**: Helper functions for common order types
+**Goal**: [What this phase achieves]
 
 **Deliverables**:
-- [ ] Market order helper
-- [ ] Limit order helper
-- [ ] Stop market order helper (Algo API)
-- [ ] Stop limit order helper
-- [ ] Order validation utilities
+- [ ] [Deliverable 1]
+- [ ] [Deliverable 2]
 
 **Dependencies**: Phase 1
 
 ---
 
-### Phase 3: Error Handling & Logging
+### Phase 3: Integration & Testing
 
-**Goal**: Robust error handling for Binance-specific errors
+**Goal**: [What this phase achieves]
 
 **Deliverables**:
-- [ ] Rate limit handling with backoff
-- [ ] Insufficient balance handling
-- [ ] Invalid symbol/order validation
-- [ ] Network error retry logic
-- [ ] Comprehensive logging
+- [ ] [Deliverable 1]
+- [ ] [Deliverable 2]
 
 **Dependencies**: Phase 2
-
----
-
-### Phase 4: Integration Testing
-
-**Goal**: Validate complete order lifecycle on testnet
-
-**Deliverables**:
-- [ ] Testnet connection test
-- [ ] Market order round-trip test
-- [ ] Limit order lifecycle test
-- [ ] Stop order (Algo API) test
-- [ ] Error scenario tests
-
-**Dependencies**: Phase 3
 
 ---
 
 ## File Structure
 
 ```
-config/
-├── binance_exec.py           # BinanceExecClient factory
-├── tradingnode_factory.py    # From Spec 014 (updated)
-└── __init__.py
-
+strategies/                    # or appropriate directory
+├── {feature_name}/
+│   ├── __init__.py
+│   ├── strategy.py           # Main strategy implementation
+│   ├── config.py             # Configuration models
+│   └── indicators.py         # Custom indicators (if needed)
 tests/
-├── test_binance_exec.py      # Unit tests
+├── test_{feature_name}.py    # Unit tests
 └── integration/
-    └── test_binance_testnet.py  # Testnet integration
+    └── test_{feature_name}_integration.py
 ```
-
----
 
 ## API Design
 
 ### Public Interface
 
 ```python
-def create_binance_exec_client(
-    account_type: BinanceAccountType = BinanceAccountType.USDT_FUTURES,
-    testnet: bool = False,
-    max_retries: int = 3,
-    leverages: dict[str, int] | None = None,
-    margin_types: dict[str, str] | None = None,
-) -> dict[str, BinanceExecClientConfig]:
-    """
-    Factory for Binance execution client configuration.
-
-    Args:
-        account_type: SPOT, USDT_FUTURES, or COIN_FUTURES
-        testnet: Use Binance testnet
-        max_retries: Max retry attempts for orders
-        leverages: Symbol to leverage mapping
-        margin_types: Symbol to margin type (CROSS/ISOLATED)
-
-    Returns:
-        Dict mapping venue name to client config
-    """
+# Example API surface
+class {FeatureName}Strategy(Strategy):
+    def __init__(self, config: {FeatureName}Config) -> None: ...
+    def on_start(self) -> None: ...
+    def on_bar(self, bar: Bar) -> None: ...
+    def on_stop(self) -> None: ...
 ```
 
-### Configuration Model
+### Configuration
 
 ```python
-# Uses native BinanceExecClientConfig from NautilusTrader
-# No custom wrapper needed - follow KISS principle
+class {FeatureName}Config(BaseModel):
+    instrument_id: str
+    # ... other config fields
 ```
-
----
 
 ## Testing Strategy
 
 ### Unit Tests
-- [ ] Factory creates valid config
-- [ ] Environment variables sourced correctly
-- [ ] Testnet vs production URLs
-- [ ] Leverage and margin type mapping
+- [ ] Test strategy initialization
+- [ ] Test indicator calculations
+- [ ] Test signal generation
+- [ ] Test order management
 
-### Integration Tests (Testnet)
-- [ ] Connect to Binance testnet
-- [ ] Submit and fill MARKET order
-- [ ] Submit, modify, cancel LIMIT order
-- [ ] Submit STOP_MARKET (Algo API)
-- [ ] Handle rate limit gracefully
-- [ ] Recover from WebSocket disconnect
+### Integration Tests
+- [ ] Test with BacktestNode
+- [ ] Test with sample data
+- [ ] Test edge cases (empty data, gaps)
 
 ### Performance Tests
-- [ ] Order submission latency < 100ms
-- [ ] Fill notification latency < 50ms
-
----
+- [ ] Benchmark against baseline
+- [ ] Memory usage profiling
 
 ## Risk Assessment
 
 | Risk | Impact | Likelihood | Mitigation |
 |------|--------|------------|------------|
-| Rate limit bans | High | Medium | Max 3 retries, exponential backoff |
-| Algo API changes | Medium | Low | Monitor GitHub issues, nightly updates |
-| HEDGE mode bugs | Medium | High | Use ONE-WAY mode only |
-| Testnet differences | Low | Medium | Document testnet limitations |
-
----
+| [Risk 1] | High/Medium/Low | High/Medium/Low | [Mitigation strategy] |
+| [Risk 2] | High/Medium/Low | High/Medium/Low | [Mitigation strategy] |
 
 ## Dependencies
 
 ### External Dependencies
-- NautilusTrader Nightly (>= 2025-12-10)
-- Binance API credentials
+- NautilusTrader >= 1.220.0
+- [Other dependencies]
 
 ### Internal Dependencies
-- Spec 014 (TradingNode Configuration) - **COMPLETED**
-- Spec 016 (Order Reconciliation) - downstream consumer
-
----
-
-## Constitution Check
-
-| Principle | Status | Notes |
-|-----------|--------|-------|
-| Black Box Design | PASS | Factory provides clean interface |
-| KISS & YAGNI | PASS | Uses native BinanceExecClientConfig, no wrappers |
-| Native First | PASS | Uses NautilusTrader adapter directly |
-| Performance | PASS | No df.iterrows(), async operations |
-| TDD Discipline | PENDING | Tests to be written in implementation |
-| No Hardcoded Values | PASS | All config via parameters/env vars |
-
----
+- [List internal modules/features this depends on]
 
 ## Acceptance Criteria
 
 - [ ] All unit tests passing (coverage > 80%)
-- [ ] Testnet integration tests passing
-- [ ] Market, Limit, Stop orders work correctly
-- [ ] Error handling verified
-- [ ] Documentation updated (this plan + quickstart)
+- [ ] All integration tests passing
+- [ ] Documentation updated
 - [ ] Code review approved
-- [ ] alpha-debug verification complete
-
----
-
-## Generated Artifacts
-
-| Artifact | Path | Status |
-|----------|------|--------|
-| spec.md | `specs/015-binance-exec-client/spec.md` | EXISTS |
-| plan.md | `specs/015-binance-exec-client/plan.md` | CREATED |
-| research.md | `specs/015-binance-exec-client/research.md` | CREATED |
-| data-model.md | `specs/015-binance-exec-client/data-model.md` | CREATED |
-| contracts/ | `specs/015-binance-exec-client/contracts/` | CREATED |
-| quickstart.md | `specs/015-binance-exec-client/quickstart.md` | CREATED |
+- [ ] Performance benchmarks met
