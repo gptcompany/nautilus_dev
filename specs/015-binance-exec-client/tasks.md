@@ -57,12 +57,18 @@
 
 ### Implementation for FR-001
 
-- [ ] T008 [FR1] Add warn_rate_limits=True to build_binance_exec_client_config() in config/clients/binance.py
-- [ ] T009 [FR1] Add retry parameters (max_retries, retry_delay_initial_ms, retry_delay_max_ms) in config/clients/binance.py
-- [ ] T010 [FR1] Add futures_leverages parameter support in config/clients/binance.py
-- [ ] T011 [FR1] Add futures_margin_types parameter support in config/clients/binance.py
-- [ ] T012 [FR1] Update build_binance_data_client_config() with matching account_type fix in config/clients/binance.py
-- [ ] T013 [FR1] Update unit test for all config parameters in tests/test_binance_config.py
+- [X] T008 [FR1] Add warn_rate_limits=True to build_binance_exec_client_config() in config/clients/binance.py
+      *SKIPPED: warn_rate_limits not available in NautilusTrader nightly v1.222.0*
+- [X] T009 [FR1] Add retry parameters (max_retries, retry_delay_initial_ms, retry_delay_max_ms) in config/clients/binance.py
+      *IMPLEMENTED: Added with defaults 3, 500, 5000*
+- [X] T010 [FR1] Add futures_leverages parameter support in config/clients/binance.py
+      *IMPLEMENTED: Symbol to leverage mapping with BinanceSymbol keys*
+- [X] T011 [FR1] Add futures_margin_types parameter support in config/clients/binance.py
+      *IMPLEMENTED: Symbol to margin type (CROSS/ISOLATED) mapping*
+- [X] T012 [FR1] Update build_binance_data_client_config() with matching account_type fix in config/clients/binance.py
+      *VERIFIED: Already correct - added update_instruments_interval_mins param*
+- [X] T013 [FR1] Update unit test for all config parameters in tests/test_binance_config.py
+      *IMPLEMENTED: 13 tests in tests/tradingnode_config/test_config_clients.py - all passing*
 
 **Checkpoint**: FR-001 complete - client config fully parameterized with all options
 

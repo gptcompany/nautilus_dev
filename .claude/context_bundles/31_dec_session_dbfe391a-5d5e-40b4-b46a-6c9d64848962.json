@@ -269,7 +269,100 @@
       "timestamp": "2025-12-31T17:07:56.767544",
       "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -m pytest tests/tradingnode_config/test_config_clients.py::TestBinanceExecClientConfig -v 2>&1",
       "description": "Run TestBinanceExecClientConfig tests with verbose output"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-31T17:08:35.579666",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/015-binance-exec-client/tasks.md",
+      "old_string": "- [ ] T008 [FR1] Add warn_rate_limits=True to build_binance_exec_client_config() in config/clients/b..."
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-31T17:08:36.210821",
+      "todo_count": 9
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-31T17:08:48.985931",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -c \"\nfrom nautilus_trader.common.factories import OrderFactory\nimport inspect\n\n# Get method signatures\nfor method_name in ['market', 'limit', 'stop_market', 'stop_limit']:\n    method = getattr(OrderFactory, method_name)\n    sig = inspect.signature(method)\n    print(f'{method_name}:')\n    for name, param in sig.parameters.items():\n        if name != 'self':\n            annotation = param.annotation if param.annotation != inspect.Parameter.empty else 'Any'\n            default = f' = {param.default}' if param.default != inspect.Parameter.empty else ''\n            print(f'  {name}: {annotation}{default}')\n    print()\n\"",
+      "description": "Check OrderFactory method signatures"
+    },
+    {
+      "operation": "write",
+      "timestamp": "2025-12-31T17:09:53.031475",
+      "file_path": "/media/sam/1TB/nautilus_dev/config/order_helpers.py",
+      "content_length": 11711
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-31T17:10:11.526074",
+      "file_path": "/media/sam/1TB/nautilus_dev/config/__init__.py",
+      "old_string": "\"\"\"\nTradingNode Configuration Package.\n\nProduction-ready configuration system for NautilusTrader liv..."
+    },
+    {
+      "operation": "write",
+      "timestamp": "2025-12-31T17:10:54.870697",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/tradingnode_config/test_order_helpers.py",
+      "content_length": 10234
+    },
+    {
+      "operation": "task",
+      "timestamp": "2025-12-31T17:11:02.387520",
+      "subagent_type": "test-runner",
+      "prompt": "Run the tests in tests/tradingnode_config/test_order_helpers.py with verbose output using the Nautil..."
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-31T17:11:08.819992",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run pytest tests/tradingnode_config/test_order_helpers.py -v 2>&1",
+      "description": "Run order helpers tests with verbose output"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-31T17:11:18.081384",
+      "file_path": "/media/sam/1TB/nautilus_dev/config/factory.py"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-31T17:11:25.439434",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -c \"from nautilus_trader.adapters.binance.common.enums import BinanceAccountType; print([e.name for e in BinanceAccountType])\"",
+      "description": "Check BinanceAccountType enum values"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-31T17:11:33.003415",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -c \"import nautilus_trader; print(nautilus_trader.__version__)\"",
+      "description": "Check NautilusTrader version"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-31T17:11:39.595306",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -c \"from nautilus_trader.adapters.binance.common.enums import BinanceAccountType; print(BinanceAccountType.USDT_FUTURES)\"",
+      "description": "Verify USDT_FUTURES enum access directly"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-31T17:11:50.737770",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -c \"import sys; print(sys.executable)\" && python -c \"from nautilus_trader.adapters.binance.common.enums import BinanceAccountType; print(BinanceAccountType.USDT_FUTURES)\"",
+      "description": "Check Python executable and enum access"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-31T17:11:59.142623",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -m pytest tests/tradingnode_config/test_order_helpers.py -v 2>&1",
+      "description": "Run tests using python -m pytest"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-31T17:12:08.149031",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -c \"from nautilus_trader.common.component import TestClock; print(TestClock)\"",
+      "description": "Check correct TestClock import path"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-31T17:12:14.603799",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/tradingnode_config/test_order_helpers.py"
     }
   ],
-  "last_updated": "2025-12-31T17:07:56.767562"
+  "last_updated": "2025-12-31T17:12:14.603827"
 }
