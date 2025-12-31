@@ -598,7 +598,67 @@
       "timestamp": "2025-12-30T23:01:02.686689",
       "command": "git add -A && git status --short",
       "description": "Stage all changes"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-30T23:01:08.536763",
+      "command": "git status",
+      "description": "Full git status"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-30T23:01:14.258328",
+      "command": "git status --porcelain | head -30",
+      "description": "Check untracked files"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-30T23:01:19.278520",
+      "command": "git ls-files --others --exclude-standard | head -20",
+      "description": "List untracked files"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-30T23:01:24.723665",
+      "command": "git ls-files config/shutdown/ && git ls-files config/examples/trading_node_graceful.py && git ls-files scripts/test_graceful_shutdown.py",
+      "description": "Check if files are tracked"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-30T23:01:29.905418",
+      "command": "git diff --name-only HEAD && echo \"---\" && git diff --name-only --cached HEAD",
+      "description": "Check changed files vs HEAD"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-30T23:01:36.245903",
+      "command": "git log --oneline -5",
+      "description": "Check recent commits"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-30T23:01:41.130068",
+      "command": "git show --stat 4468066 | head -30",
+      "description": "Check latest commit content"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-30T23:01:51.514338",
+      "command": "git add specs/019-graceful-shutdown/tasks.md && git commit -m \"$(cat <<'EOF'\nComplete Spec 019 Graceful Shutdown - 100% (18/18 tasks)\n\nAlpha-debug fixes applied:\n- Add asyncio.Lock to prevent TOCTOU race condition\n- Add None check for _shutdown_started_at before elapsed calculation\n- Add try/except with fallback for unknown shutdown reasons\n- Add defensive `or []` for cache method returns\n- Add callback for fire-and-forget task exception handling\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n)\"",
+      "description": "Commit spec 019 completion"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-30T23:01:56.511007",
+      "command": "git push -u origin 019-graceful-shutdown 2>&1",
+      "description": "Push branch to origin"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-30T23:02:04.945358",
+      "command": "git stash && git checkout main && git merge 019-graceful-shutdown --no-edit && git push origin main && git checkout 019-graceful-shutdown && git stash pop 2>/dev/null || true",
+      "description": "Merge to main and push"
     }
   ],
-  "last_updated": "2025-12-30T23:01:02.686707"
+  "last_updated": "2025-12-30T23:02:04.945390"
 }
