@@ -415,7 +415,82 @@
       "timestamp": "2025-12-31T17:13:40.258012",
       "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -m pytest tests/tradingnode_config/test_order_helpers.py -v 2>&1",
       "description": "Run tests using python -m pytest"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-31T17:14:14.958572",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/015-binance-exec-client/tasks.md",
+      "old_string": "- [ ] T014 [P] [FR2] Create config/order_helpers.py with module docstring and imports\n- [ ] T015 [FR..."
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-31T17:14:15.224413",
+      "todo_count": 9
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-31T17:14:21.385604",
+      "file_path": "/media/sam/1TB/nautilus_dev/config/clients/binance.py"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-31T17:14:42.743669",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/015-binance-exec-client/research.md",
+      "old_string": "### TC-003: Position Mode\n\n**Decision**: ONE-WAY mode (NETTING) as default\n\n**Rationale**: HEDGE mod..."
+    },
+    {
+      "operation": "write",
+      "timestamp": "2025-12-31T17:15:34.038832",
+      "file_path": "/media/sam/1TB/nautilus_dev/config/binance_errors.py",
+      "content_length": 8398
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-31T17:15:49.150095",
+      "file_path": "/media/sam/1TB/nautilus_dev/config/__init__.py",
+      "old_string": "from config.order_helpers import (\n    create_external_claims,\n    create_limit_order,\n    create_ma..."
+    },
+    {
+      "operation": "write",
+      "timestamp": "2025-12-31T17:16:21.401196",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/tradingnode_config/test_binance_errors.py",
+      "content_length": 6536
+    },
+    {
+      "operation": "task",
+      "timestamp": "2025-12-31T17:16:29.266248",
+      "subagent_type": "test-runner",
+      "prompt": "Run the tests in tests/tradingnode_config/test_binance_errors.py with verbose output using the Nauti..."
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-31T17:16:35.315480",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run pytest tests/tradingnode_config/test_binance_errors.py -v 2>&1",
+      "description": "Run Binance error tests with verbose output"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-31T17:16:43.918697",
+      "file_path": "/media/sam/1TB/nautilus_dev/config/factory.py"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-31T17:16:52.107991",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -c \"from nautilus_trader.adapters.binance.common.enums import BinanceAccountType; print([e.name for e in BinanceAccountType])\"",
+      "description": "Check BinanceAccountType enum values"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-31T17:16:59.915160",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -c \"import nautilus_trader; print(nautilus_trader.__version__)\"",
+      "description": "Check NautilusTrader version in nightly env"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-31T17:17:07.419913",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -m pytest tests/tradingnode_config/test_binance_errors.py -v 2>&1",
+      "description": "Run tests with activated nightly environment"
     }
   ],
-  "last_updated": "2025-12-31T17:13:40.258035"
+  "last_updated": "2025-12-31T17:17:07.419934"
 }

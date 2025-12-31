@@ -48,6 +48,14 @@ from config.order_helpers import (
     create_stop_market_order,
     validate_order_params,
 )
+from config.binance_errors import (
+    BinanceErrorCategory,
+    calculate_backoff_delay,
+    get_error_category,
+    get_error_message,
+    is_retryable_error,
+    should_retry,
+)
 
 __all__ = [
     # Factory
@@ -69,4 +77,11 @@ __all__ = [
     "create_stop_limit_order",
     "create_external_claims",
     "validate_order_params",
+    # Error Handling (Spec 015 FR-004)
+    "BinanceErrorCategory",
+    "is_retryable_error",
+    "get_error_message",
+    "get_error_category",
+    "calculate_backoff_delay",
+    "should_retry",
 ]
