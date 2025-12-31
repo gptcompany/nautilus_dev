@@ -50,6 +50,28 @@
 - HEDGE mode: Has bug with LiveExecEngine reconciliation
 - ONE-WAY mode: Works correctly, recommended
 
+#### HEDGE Mode Limitation Details (Bug #3104)
+
+**Issue**: LiveExecEngine reconciliation fails to properly sync positions when using HEDGE mode (dual-side positions).
+
+**Symptoms**:
+- Positions may show incorrect quantities after restart
+- Long and short positions not tracked independently
+- Reconciliation loop may fail silently
+
+**Root Cause**: The Binance adapter's `positionIdx` handling doesn't properly map to NautilusTrader's position model when both long and short positions exist simultaneously.
+
+**Workaround**: Use ONE-WAY (NETTING) mode by setting:
+```python
+use_reduce_only=True  # Enforces single position direction per symbol
+```
+
+**Status**: OPEN as of 2025-12-31. Monitor GitHub issue #3104 for updates.
+
+**When HEDGE mode might be fixed**:
+- Watch for commits mentioning "positionIdx" or "hedge mode" in Binance adapter
+- Test thoroughly on testnet before using in production
+
 ### TC-004: Known Issues Resolution
 
 | Issue | Status | Resolution |

@@ -82,14 +82,15 @@
 
 ### Implementation for FR-002
 
-- [ ] T014 [P] [FR2] Create config/order_helpers.py with module docstring and imports
-- [ ] T015 [FR2] Implement create_market_order() helper in config/order_helpers.py
-- [ ] T016 [FR2] Implement create_limit_order() helper (with post_only param) in config/order_helpers.py
-- [ ] T017 [FR2] Implement create_stop_market_order() helper (Algo API) in config/order_helpers.py
-- [ ] T018 [FR2] Implement create_stop_limit_order() helper (Algo API) in config/order_helpers.py
-- [ ] T019 [FR2] Add order validation function validate_order_params() in config/order_helpers.py
-- [ ] T020 [FR2] Export helpers from config/__init__.py
-- [ ] T021 [P] [FR2] Write unit tests for all order helpers in tests/test_order_helpers.py
+- [X] T014 [P] [FR2] Create config/order_helpers.py with module docstring and imports
+- [X] T015 [FR2] Implement create_market_order() helper in config/order_helpers.py
+- [X] T016 [FR2] Implement create_limit_order() helper (with post_only param) in config/order_helpers.py
+- [X] T017 [FR2] Implement create_stop_market_order() helper (Algo API) in config/order_helpers.py
+- [X] T018 [FR2] Implement create_stop_limit_order() helper (Algo API) in config/order_helpers.py
+- [X] T019 [FR2] Add order validation function validate_order_params() in config/order_helpers.py
+- [X] T020 [FR2] Export helpers from config/__init__.py
+- [X] T021 [P] [FR2] Write unit tests for all order helpers in tests/test_order_helpers.py
+      *IMPLEMENTED: 25 tests passing in tests/tradingnode_config/test_order_helpers.py*
 
 **Checkpoint**: FR-002 complete - all 4 MVP order types supported
 
