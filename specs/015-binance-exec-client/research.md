@@ -14,10 +14,14 @@
 
 **Rationale**: Official API docs confirm parameter availability. Discord confirms best practices.
 
+**IMPORTANT (2025-12-31)**: Enum values changed in nightly from plural to singular:
+- `USDT_FUTURES` → `USDT_FUTURE`
+- `COIN_FUTURES` → `COIN_FUTURE`
+
 **Key Parameters**:
 | Parameter | Recommended | Notes |
 |-----------|-------------|-------|
-| `account_type` | USDT_FUTURES | For perpetual futures trading |
+| `account_type` | USDT_FUTURE | For perpetual futures trading (note: singular not plural) |
 | `use_position_ids` | True | Required for HEDGE mode |
 | `max_retries` | 3 | Prevent account bans from excessive retries |
 | `recv_window_ms` | 5000 | Default, works well |
