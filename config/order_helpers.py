@@ -89,6 +89,9 @@ def validate_order_params(
     if not isinstance(side, OrderSide):
         raise ValueError(f"side must be OrderSide, got {type(side)}")
 
+    if quantity is None:
+        raise ValueError("quantity must not be None")
+
     if quantity.as_double() <= 0:
         raise ValueError(f"quantity must be positive, got {quantity}")
 

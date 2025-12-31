@@ -116,10 +116,20 @@ BINANCE_ERROR_CODES: dict[int, tuple[str, BinanceErrorCategory, bool]] = {
     ),
     TIMEOUT: ("Request timeout", BinanceErrorCategory.NETWORK, True),
     SERVER_BUSY: ("Server is busy", BinanceErrorCategory.NETWORK, True),
+    UNKNOWN_ORDER_COMPOSITION: (
+        "Unknown order composition",
+        BinanceErrorCategory.ORDER,
+        False,
+    ),
     TOO_MANY_ORDERS: ("Too many orders", BinanceErrorCategory.RATE_LIMIT, True),
     SERVICE_SHUTTING_DOWN: (
         "Service shutting down",
         BinanceErrorCategory.NETWORK,
+        False,
+    ),
+    UNSUPPORTED_OPERATION: (
+        "Unsupported operation",
+        BinanceErrorCategory.VALIDATION,
         False,
     ),
     INVALID_TIMESTAMP: ("Invalid timestamp", BinanceErrorCategory.VALIDATION, True),
@@ -129,14 +139,94 @@ BINANCE_ERROR_CODES: dict[int, tuple[str, BinanceErrorCategory, bool]] = {
         False,
     ),
     # Request Errors
-    BAD_SYMBOL: ("Invalid symbol", BinanceErrorCategory.VALIDATION, False),
-    INVALID_PARAMETER: ("Invalid parameter", BinanceErrorCategory.VALIDATION, False),
+    ILLEGAL_CHARS: (
+        "Illegal characters in request",
+        BinanceErrorCategory.VALIDATION,
+        False,
+    ),
+    TOO_MANY_PARAMETERS: (
+        "Too many parameters",
+        BinanceErrorCategory.VALIDATION,
+        False,
+    ),
+    MANDATORY_PARAM_EMPTY: (
+        "Mandatory parameter is empty",
+        BinanceErrorCategory.VALIDATION,
+        False,
+    ),
+    UNKNOWN_PARAM: ("Unknown parameter sent", BinanceErrorCategory.VALIDATION, False),
+    UNREAD_PARAMETERS: (
+        "Unread parameters sent",
+        BinanceErrorCategory.VALIDATION,
+        False,
+    ),
+    PARAM_EMPTY: ("Parameter empty", BinanceErrorCategory.VALIDATION, False),
+    PARAM_NOT_REQUIRED: (
+        "Parameter not required",
+        BinanceErrorCategory.VALIDATION,
+        False,
+    ),
+    BAD_ASSET: ("Invalid asset", BinanceErrorCategory.VALIDATION, False),
+    BAD_ACCOUNT: ("Invalid account", BinanceErrorCategory.VALIDATION, False),
+    BAD_INSTRUMENT_TYPE: (
+        "Invalid instrument type",
+        BinanceErrorCategory.VALIDATION,
+        False,
+    ),
+    BAD_PRECISION: ("Invalid precision", BinanceErrorCategory.VALIDATION, False),
+    NO_DEPTH: ("No depth data available", BinanceErrorCategory.NETWORK, True),
+    WITHDRAW_NOT_NEGATIVE: (
+        "Withdrawal amount must be positive",
+        BinanceErrorCategory.VALIDATION,
+        False,
+    ),
+    TIF_NOT_REQUIRED: (
+        "Time in force not required for this order",
+        BinanceErrorCategory.VALIDATION,
+        False,
+    ),
+    INVALID_TIF: ("Invalid time in force", BinanceErrorCategory.VALIDATION, False),
     INVALID_ORDER_TYPE: ("Invalid order type", BinanceErrorCategory.VALIDATION, False),
     INVALID_SIDE: ("Invalid order side", BinanceErrorCategory.VALIDATION, False),
+    EMPTY_NEW_CL_ORD_ID: (
+        "Empty new client order ID",
+        BinanceErrorCategory.VALIDATION,
+        False,
+    ),
+    EMPTY_ORG_CL_ORD_ID: (
+        "Empty original client order ID",
+        BinanceErrorCategory.VALIDATION,
+        False,
+    ),
+    BAD_INTERVAL: ("Invalid interval", BinanceErrorCategory.VALIDATION, False),
+    BAD_SYMBOL: ("Invalid symbol", BinanceErrorCategory.VALIDATION, False),
+    INVALID_LISTEN_KEY: (
+        "Invalid listen key",
+        BinanceErrorCategory.AUTHENTICATION,
+        False,
+    ),
+    MORE_THAN_XX_HOURS: (
+        "Request spans too many hours",
+        BinanceErrorCategory.VALIDATION,
+        False,
+    ),
+    OPTIONAL_PARAMS_BAD_COMBO: (
+        "Invalid optional parameter combination",
+        BinanceErrorCategory.VALIDATION,
+        False,
+    ),
+    INVALID_PARAMETER: ("Invalid parameter", BinanceErrorCategory.VALIDATION, False),
     # Trading Errors
     NEW_ORDER_REJECTED: ("Order rejected", BinanceErrorCategory.ORDER, False),
     CANCEL_REJECTED: ("Cancel rejected", BinanceErrorCategory.ORDER, False),
     NO_SUCH_ORDER: ("Order not found", BinanceErrorCategory.ORDER, False),
+    BAD_API_KEY_FMT: (
+        "Invalid API key format",
+        BinanceErrorCategory.AUTHENTICATION,
+        False,
+    ),
+    REJECTED_MBX_KEY: ("API key rejected", BinanceErrorCategory.AUTHENTICATION, False),
+    NO_TRADING_WINDOW: ("No trading window", BinanceErrorCategory.ORDER, False),
     # Futures Errors
     REDUCE_ONLY_REJECT: (
         "Reduce-only order rejected",
@@ -145,6 +235,11 @@ BINANCE_ERROR_CODES: dict[int, tuple[str, BinanceErrorCategory, bool]] = {
     ),
     POSITION_SIDE_NOT_MATCH: (
         "Position side does not match",
+        BinanceErrorCategory.POSITION,
+        False,
+    ),
+    POSITION_SIDE_CHANGE_EXISTS_OPEN_ORDER: (
+        "Cannot change position side with open orders",
         BinanceErrorCategory.POSITION,
         False,
     ),
@@ -248,16 +343,21 @@ def calculate_backoff_delay(
     attempt : int
         Current retry attempt (1-indexed).
     initial_delay_ms : int, default 500
-        Initial delay in milliseconds.
+        Initial delay in milliseconds. Must be positive.
     max_delay_ms : int, default 5000
-        Maximum delay cap in milliseconds.
+        Maximum delay cap in milliseconds. Must be positive.
     multiplier : float, default 2.0
-        Exponential multiplier per attempt.
+        Exponential multiplier per attempt. Must be positive.
 
     Returns
     -------
     int
         Delay in milliseconds before next retry.
+
+    Raises
+    ------
+    ValueError
+        If initial_delay_ms, max_delay_ms, or multiplier is not positive.
 
     Example
     -------
@@ -268,6 +368,14 @@ def calculate_backoff_delay(
     >>> calculate_backoff_delay(5)  # Fifth retry (capped)
     5000
     """
+    # Validate parameters
+    if initial_delay_ms <= 0:
+        raise ValueError(f"initial_delay_ms must be positive, got {initial_delay_ms}")
+    if max_delay_ms <= 0:
+        raise ValueError(f"max_delay_ms must be positive, got {max_delay_ms}")
+    if multiplier <= 0:
+        raise ValueError(f"multiplier must be positive, got {multiplier}")
+
     if attempt <= 0:
         return initial_delay_ms
 
