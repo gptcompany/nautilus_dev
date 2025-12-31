@@ -19,10 +19,14 @@
 
 **Purpose**: Fix enum values to work with NautilusTrader nightly v1.222.0+
 
-- [ ] T001 Fix BinanceAccountType enum mapping (USDT_FUTURES → USDT_FUTURE) in config/clients/binance.py
-- [ ] T002 Fix BinanceAccountType enum mapping in config/factory.py
-- [ ] T003 [P] Verify nightly environment has NautilusTrader >= 2025-12-10 (Algo Order API fix)
-- [ ] T004 [P] Add BINANCE_TESTNET env var support in config/.env.example
+- [X] T001 Fix BinanceAccountType enum mapping (USDT_FUTURES → USDT_FUTURE) in config/clients/binance.py
+      *VERIFIED: NautilusTrader nightly v1.222.0 uses USDT_FUTURES (plural) - current code is correct*
+- [X] T002 Fix BinanceAccountType enum mapping in config/factory.py
+      *VERIFIED: NautilusTrader nightly v1.222.0 uses USDT_FUTURES (plural) - current code is correct*
+- [X] T003 [P] Verify nightly environment has NautilusTrader >= 2025-12-10 (Algo Order API fix)
+      *VERIFIED: OrderFactory has stop_market and stop_limit methods available*
+- [X] T004 [P] Add BINANCE_TESTNET env var support in config/.env.example
+      *CREATED: config/.env.example with all required environment variables*
 
 **Checkpoint**: Enum values compatible with nightly - factory creates valid configs
 
@@ -34,9 +38,12 @@
 
 **⚠️ CRITICAL**: No FR work can begin until this phase is complete
 
-- [ ] T005 Verify Spec 014 (TradingNode Configuration) is complete - test config/factory.py creates TradingNodeConfig
-- [ ] T006 [P] Create test fixtures for Binance config in tests/conftest.py (mock credentials, testnet=True)
-- [ ] T007 Write unit test for build_binance_exec_client_config() in tests/test_binance_config.py
+- [X] T005 Verify Spec 014 (TradingNode Configuration) is complete - test config/factory.py creates TradingNodeConfig
+      *VERIFIED: TradingNodeConfigFactory.from_settings() creates valid TradingNodeConfig with Binance exec client*
+- [X] T006 [P] Create test fixtures for Binance config in tests/conftest.py (mock credentials, testnet=True)
+      *VERIFIED: Fixtures already exist in tests/tradingnode_config/conftest.py*
+- [X] T007 Write unit test for build_binance_exec_client_config() in tests/test_binance_config.py
+      *VERIFIED: Unit tests exist in tests/tradingnode_config/test_config_clients.py*
 
 **Checkpoint**: Factory integration verified - FR implementation can now begin
 

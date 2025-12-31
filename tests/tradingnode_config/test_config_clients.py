@@ -111,7 +111,7 @@ class TestBinanceDataClientConfig:
 
 
 class TestBinanceExecClientConfig:
-    """Tests for Binance exec client config builder (T029)."""
+    """Tests for Binance exec client config builder (Spec 015 FR-001)."""
 
     def test_returns_exec_client_config(
         self, valid_binance_credentials: BinanceCredentials
@@ -121,12 +121,12 @@ class TestBinanceExecClientConfig:
         assert config is not None
 
     def test_uses_reduce_only(self, valid_binance_credentials: BinanceCredentials):
-        """Config should use reduce_only for safety."""
+        """Config should use reduce_only for NETTING mode safety (HEDGE bug #3104)."""
         config = build_binance_exec_client_config(valid_binance_credentials)
         assert config.use_reduce_only is True
 
     def test_uses_position_ids(self, valid_binance_credentials: BinanceCredentials):
-        """Config should use position_ids for hedging mode."""
+        """Config should use position_ids for position tracking."""
         config = build_binance_exec_client_config(valid_binance_credentials)
         assert config.use_position_ids is True
 
@@ -136,9 +136,85 @@ class TestBinanceExecClientConfig:
         assert config.recv_window_ms == 5000
 
     def test_max_retries(self, valid_binance_credentials: BinanceCredentials):
-        """Config should have 3 max retries."""
+        """Config should have 3 max retries by default."""
         config = build_binance_exec_client_config(valid_binance_credentials)
         assert config.max_retries == 3
+
+    def test_custom_max_retries(self, valid_binance_credentials: BinanceCredentials):
+        """Config should accept custom max_retries."""
+        config = build_binance_exec_client_config(
+            valid_binance_credentials, max_retries=5
+        )
+        assert config.max_retries == 5
+
+    def test_retry_delay_initial_ms(
+        self, valid_binance_credentials: BinanceCredentials
+    ):
+        """Config should have 500ms initial retry delay by default."""
+        config = build_binance_exec_client_config(valid_binance_credentials)
+        assert config.retry_delay_initial_ms == 500
+
+    def test_retry_delay_max_ms(self, valid_binance_credentials: BinanceCredentials):
+        """Config should have 5000ms max retry delay by default."""
+        config = build_binance_exec_client_config(valid_binance_credentials)
+        assert config.retry_delay_max_ms == 5000
+
+    def test_custom_retry_delays(self, valid_binance_credentials: BinanceCredentials):
+        """Config should accept custom retry delay parameters."""
+        config = build_binance_exec_client_config(
+            valid_binance_credentials,
+            retry_delay_initial_ms=1000,
+            retry_delay_max_ms=10000,
+        )
+        assert config.retry_delay_initial_ms == 1000
+        assert config.retry_delay_max_ms == 10000
+
+    def test_futures_leverages(self, valid_binance_credentials: BinanceCredentials):
+        """Config should support futures leverage mapping."""
+        config = build_binance_exec_client_config(
+            valid_binance_credentials,
+            futures_leverages={"BTCUSDT": 10, "ETHUSDT": 5},
+        )
+        assert config.futures_leverages is not None
+        assert config.futures_leverages["BTCUSDT"] == 10
+        assert config.futures_leverages["ETHUSDT"] == 5
+
+    def test_futures_margin_types(self, valid_binance_credentials: BinanceCredentials):
+        """Config should support futures margin type mapping."""
+        from nautilus_trader.adapters.binance.futures.enums import (
+            BinanceFuturesMarginType,
+        )
+
+        config = build_binance_exec_client_config(
+            valid_binance_credentials,
+            futures_margin_types={"BTCUSDT": "CROSS"},
+        )
+        assert config.futures_margin_types is not None
+        assert config.futures_margin_types["BTCUSDT"] == BinanceFuturesMarginType.CROSS
+
+    def test_futures_margin_types_isolated(
+        self, valid_binance_credentials: BinanceCredentials
+    ):
+        """Config should support ISOLATED margin type."""
+        from nautilus_trader.adapters.binance.futures.enums import (
+            BinanceFuturesMarginType,
+        )
+
+        config = build_binance_exec_client_config(
+            valid_binance_credentials,
+            futures_margin_types={"ETHUSDT": "ISOLATED"},
+        )
+        assert (
+            config.futures_margin_types["ETHUSDT"] == BinanceFuturesMarginType.ISOLATED
+        )
+
+    def test_none_futures_config_by_default(
+        self, valid_binance_credentials: BinanceCredentials
+    ):
+        """Futures config should be None by default."""
+        config = build_binance_exec_client_config(valid_binance_credentials)
+        assert config.futures_leverages is None
+        assert config.futures_margin_types is None
 
 
 class TestBybitDataClientConfig:

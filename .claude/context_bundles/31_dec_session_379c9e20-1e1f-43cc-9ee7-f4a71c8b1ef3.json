@@ -559,7 +559,190 @@
       "timestamp": "2025-12-31T15:59:26.722712",
       "command": "cat > /media/sam/1TB/nautilus_dev/docs/research/binance-exec-client-research.md << 'EOF'\n# NautilusTrader Binance Execution Client Research\n\n**Version**: Nightly (v1.222.0+)  \n**Last Updated**: 2025-12-31  \n**Source**: Context7 + Discord Community + Local Docs\n\n---\n\n## 1. BinanceExecClientConfig Parameters\n\n### Configuration Options (Nightly)\n\n| Option | Type | Default | Description |\n|--------|------|---------|-------------|\n| `venue` | `str` | `BINANCE` | Venue identifier |\n| `api_key` | `str` | `None` | API key (uses `BINANCE_API_KEY` env var if None) |\n| `api_secret` | `str` | `None` | API secret (uses `BINANCE_API_SECRET` env var if None) |\n| `key_type` | `BinanceKeyType` | `HMAC` | `HMAC`, `RSA`, or `ED25519` |\n| `account_type` | `BinanceAccountType` | `SPOT` | Account type (see section 2) |\n| `base_url_http` | `str` | `None` | Override HTTP REST base URL |\n| `base_url_ws` | `str` | `None` | Override WebSocket base URL |\n| `proxy_url` | `str` | `None` | Optional proxy URL |\n| `us` | `bool` | `False` | Use Binance US endpoints |\n| `testnet` | `bool` | `False` | Use testnet endpoints |\n| `use_gtd` | `bool` | `True` | Pass GTD to Binance (False = local expiry) |\n| `use_reduce_only` | `bool` | `True` | Pass reduce_only to Binance (False for Hedge mode) |\n| `use_position_ids` | `bool` | `True` | Enable Binance hedging position IDs |\n| `use_trade_lite` | `bool` | `False` | Use TRADE_LITE events with derived fees |\n| `treat_expired_as_canceled` | `bool` | `False` | Treat EXPIRED as CANCELED |\n| `recv_window_ms` | `int` | `5000` | Receive window for signed requests |\n| `max_retries` | `int` | `None` | Max retry attempts for order calls |\n| `retry_delay_initial_ms` | `int` | `None` | Initial retry delay |\n| `retry_delay_max_ms` | `int` | `None` | Maximum retry delay |\n| `futures_leverages` | `dict` | `None` | Symbol -> leverage mapping |\n| `futures_margin_types` | `dict` | `None` | Symbol -> margin type (isolated/cross) |\n| `listen_key_ping_max_failures` | `int` | `3` | Listen key ping failures before recovery |\n| `log_rejected_due_post_only_as_warning` | `bool` | `True` | Log post-only rejections as warnings |\n\n### Example Configuration\n\n```python\nfrom nautilus_trader.adapters.binance import BINANCE\nfrom nautilus_trader.adapters.binance import BinanceAccountType\nfrom nautilus_trader.adapters.binance import BinanceExecClientConfig\nfrom nautilus_trader.live.node import TradingNode\n\nconfig = TradingNodeConfig(\n    exec_clients={\n        BINANCE: BinanceExecClientConfig(\n            api_key=None,  # Uses BINANCE_API_KEY env var\n            api_secret=None,  # Uses BINANCE_API_SECRET env var\n            account_type=BinanceAccountType.USDT_FUTURES,\n            testnet=False,\n            use_reduce_only=True,  # Set False for Hedge mode\n            max_retries=3,\n            retry_delay_initial_ms=1000,\n            retry_delay_max_ms=5000,\n        ),\n    },\n)\n```\n\n---\n\n## 2. BinanceAccountType Enum Values\n\n| Enum Value | String | Description |\n|------------|--------|-------------|\n| `BinanceAccountType.SPOT` | `\"spot\"` | Spot trading |\n| `BinanceAccountType.MARGIN` | `\"margin\"` | Cross margin (shared) |\n| `BinanceAccountType.ISOLATED_MARGIN` | `\"isolated_margin\"` | Isolated margin (per position) |\n| `BinanceAccountType.USDT_FUTURES` | `\"usdt_future\"` | USDT-margined perpetuals/delivery |\n| `BinanceAccountType.COIN_FUTURES` | `\"coin_future\"` | Coin-margined futures |\n\n### Import\n\n```python\nfrom nautilus_trader.adapters.binance import BinanceAccountType\n\n# Usage\naccount_type = BinanceAccountType.USDT_FUTURES\n```\n\n### String Values in Config\n\nWhen using dictionary configs:\n```python\nexec_clients={\n    BINANCE: {\n        \"account_type\": \"usdt_future\",  # String form\n        # or\n        \"account_type\": BinanceAccountType.USDT_FUTURES,  # Enum form\n    },\n}\n```\n\n---\n\n## 3. Known Issues with Binance Adapter (from Discord)\n\n### 3.1 ADL (Auto-Deleveraging) Handling\n\n**Issue**: ADL fills with `x=TRADE` execution type were being dropped.\n\n**Status**: FIXED in commit `32896d3` (2025-11-22)\n\n**Details**:\n- Binance can send ADL fills with either `x=CALCULATED` or `x=TRADE` execution types\n- Previous versions only checked for `CALCULATED`\n- Fix adds `X=FILLED` status check so both ADL message variants are handled\n\n**Detection**: ADL orders use client ID `adl_autoclose`\n\n```python\n# ADL, Liquidation, and Settlement order detection:\n# - Liquidations: client_id starts with \"autoclose-\"\n# - ADL: client_id = \"adl_autoclose\"\n# - Settlements: client_id starts with \"settlement_autoclose-\"\n```\n\n### 3.2 STOP_MARKET Orders - Algo API Required\n\n**Issue**: STOP_MARKET orders fail with error:\n```\nreason='{'code': -4120, 'msg': 'Order type not supported for this endpoint. Please use the Algo Order API endpoints instead.'}'\n```\n\n**Status**: FIXED in commit `62ef6f6` (2025-12-10)\n\n**GitHub Issue**: [#3287](https://github.com/nautechsystems/nautilus_trader/issues/3287)\n\n**Solution**: Install nightly version with the fix:\n```bash\npip install nautilus_trader==1.221.0a20251210 --index-url=https://packages.nautechsystems.io/simple\n```\n\n### 3.3 Chinese Character Tokens (e.g., '币安人生')\n\n**Issue**: Rust panics on non-ASCII currency codes:\n```\nCondition failed: invalid string for 'code' contained a non-ASCII char, was '币安人生'\n```\n\n**Status**: FIXED in nightly (2025-10-26+)\n\n**GitHub Issue**: [#3053](https://github.com/nautechsystems/nautilus_trader/issues/3053)\n\n**Solution**:\n```bash\npip install nautilus_trader==1.221.0a20251026 --index-url=https://packages.nautechsystems.io/simple\n```\n\n**Temporary Workaround** (if can't upgrade):\nAdd filter in `binance.http.client` `send_request()` to skip non-ASCII symbols.\n\n### 3.4 OrderFilled Events Not Received (Binance US)\n\n**Issue**: Orders fill on Binance UI but `on_order_filled()` not triggered.\n\n**Status**: INVESTIGATING (GitHub #3006)\n\n**Likely Cause**: External order processing, missing instrument with silent return.\n\n### 3.5 Hedge Mode Position Reconciliation\n\n**Issue**: Two positions (LONG + SHORT) received but only one shows after reconciliation.\n\n**Status**: OPEN BUG (GitHub #3104)\n\n**Workaround**: Ensure `use_reduce_only=False` and position_id suffix (`-LONG`/`-SHORT`).\n\n### 3.6 FundingRateUpdate Not Implemented\n\n**Status**: Not implemented for Binance (only Rust-based adapters)\n\n**Workaround**: Implement custom subscription in Python base class.\n\n---\n\n## 4. Order Types Supported\n\n### Order Type Matrix\n\n| Order Type | Spot | Margin | USDT Futures | COIN Futures |\n|------------|------|--------|--------------|--------------|\n| `MARKET` | Yes | Yes | Yes | Yes |\n| `LIMIT` | Yes | Yes | Yes | Yes |\n| `STOP_MARKET` | No | Yes | Yes | Yes |\n| `STOP_LIMIT` | Yes | Yes | Yes | Yes |\n| `MARKET_IF_TOUCHED` | No | No | Yes | Yes |\n| `LIMIT_IF_TOUCHED` | Yes | Yes | Yes | Yes |\n| `TRAILING_STOP_MARKET` | No | No | Yes | Yes |\n\n### Order Submission Examples\n\n#### MARKET Order\n```python\nfrom nautilus_trader.model.orders import MarketOrder\n\norder = self.order_factory.market(\n    instrument_id=InstrumentId.from_str(\"BTCUSDT-PERP.BINANCE\"),\n    order_side=OrderSide.BUY,\n    quantity=Quantity.from_str(\"0.001\"),\n)\nself.submit_order(order)\n```\n\n#### LIMIT Order\n```python\nfrom nautilus_trader.model.orders import LimitOrder\n\norder = self.order_factory.limit(\n    instrument_id=InstrumentId.from_str(\"BTCUSDT-PERP.BINANCE\"),\n    order_side=OrderSide.BUY,\n    quantity=Quantity.from_str(\"0.001\"),\n    price=Price.from_str(\"50000.00\"),\n    time_in_force=TimeInForce.GTC,\n)\nself.submit_order(order)\n```\n\n#### STOP_MARKET Order (Futures only)\n```python\norder = self.order_factory.stop_market(\n    instrument_id=InstrumentId.from_str(\"BTCUSDT-PERP.BINANCE\"),\n    order_side=OrderSide.SELL,\n    quantity=Quantity.from_str(\"0.001\"),\n    trigger_price=Price.from_str(\"49000.00\"),\n    trigger_type=TriggerType.LAST_TRADE,  # or MARK_PRICE\n)\nself.submit_order(order)\n```\n\n#### STOP_LIMIT Order\n```python\norder = self.order_factory.stop_limit(\n    instrument_id=InstrumentId.from_str(\"BTCUSDT-PERP.BINANCE\"),\n    order_side=OrderSide.SELL,\n    quantity=Quantity.from_str(\"0.001\"),\n    price=Price.from_str(\"48900.00\"),  # Limit price\n    trigger_price=Price.from_str(\"49000.00\"),  # Stop price\n    time_in_force=TimeInForce.GTC,\n)\nself.submit_order(order)\n```\n\n#### TRAILING_STOP_MARKET Order (Futures only)\n```python\norder = self.order_factory.trailing_stop_market(\n    instrument_id=InstrumentId.from_str(\"BTCUSDT-PERP.BINANCE\"),\n    order_side=OrderSide.SELL,\n    quantity=Quantity.from_str(\"0.001\"),\n    activation_price=Price.from_str(\"55000.00\"),  # Optional: when to activate\n    trailing_offset=Decimal(\"100\"),  # Callback rate in basis points\n    trailing_offset_type=TrailingOffsetType.BASIS_POINTS,\n)\nself.submit_order(order)\n```\n\n**WARNING**: Do NOT use `trigger_price` for trailing stops - use `activation_price` instead.\n\n### Time in Force Options\n\n| TIF | Spot | Futures | Notes |\n|-----|------|---------|-------|\n| `GTC` | Yes | Yes | Good Till Canceled |\n| `GTD` | Yes* | Yes | *Converted to GTC for Spot with warning |\n| `FOK` | Yes | Yes | Fill or Kill |\n| `IOC` | Yes | Yes | Immediate or Cancel |\n\n### Execution Instructions\n\n| Instruction | Spot | Futures | Notes |\n|-------------|------|---------|-------|\n| `post_only` | Yes | Yes | LIMIT orders only (uses LIMIT_MAKER/GTX) |\n| `reduce_only` | No | Yes | Disabled in Hedge Mode |\n\n---\n\n## 5. Error Handling Patterns\n\n### 5.1 Rate Limit Handling\n\n**Binance Rate Limits**:\n| Endpoint | Limit (weight/min) |\n|----------|-------------------|\n| Global (Spot) | 6,000 |\n| Global (Futures) | 2,400 |\n| `/api/v3/order` | 3,000 |\n| `/fapi/v1/order` | 1,200 |\n| `/fapi/v1/klines` | 600 |\n\n**HTTP 429 Response**: Rate limit exceeded - back off immediately.\n\n**Best Practice**:\n```python\n# Configure retry behavior in exec client\nBinanceExecClientConfig(\n    max_retries=3,\n    retry_delay_initial_ms=1000,\n    retry_delay_max_ms=5000,\n)\n```\n\n### 5.2 Reconnection Handling\n\nThe adapter automatically handles:\n- WebSocket disconnections with automatic reconnect\n- Listen key expiration (ping every ~30 min, max 3 failures before recovery)\n- Order book snapshot rebuild on reconnect\n\n**Listen Key Configuration**:\n```python\nBinanceExecClientConfig(\n    listen_key_ping_max_failures=3,  # Triggers recovery after 3 consecutive failures\n)\n```\n\n### 5.3 Order State Consistency\n\n**Reconciliation on Startup**:\n```python\nfrom nautilus_trader.live.config import LiveExecEngineConfig\n\nLiveExecEngineConfig(\n    reconciliation=True,\n    reconciliation_startup_delay_secs=10.0,  # Minimum 10s recommended\n)\n```\n\n**Risk Event Handling** (Futures):\n- Liquidations: Orders with client_id starting `autoclose-`\n- ADL: Orders with client_id `adl_autoclose`\n- Settlements: Orders with client_id starting `settlement_autoclose-`\n\nAll risk events generate:\n1. Warning log with order details\n2. `OrderStatusReport` to seed cache\n3. `FillReport` with TAKER liquidity side\n\n### 5.4 Common Error Codes\n\n| Code | Meaning | Solution |\n|------|---------|----------|\n| `-1000` | Unknown error | Retry with exponential backoff |\n| `-1003` | Too many requests | Reduce request frequency |\n| `-1015` | Too many orders | Reduce order rate |\n| `-2010` | NEW_ORDER_REJECTED | Check order parameters |\n| `-2011` | CANCEL_REJECTED | Order already filled/canceled |\n| `-4120` | Order type not supported | Use Algo Order API (STOP_MARKET) |\n\n---\n\n## 6. Testnet Configuration\n\n### Environment Variables\n\n**Spot/Margin Testnet**:\n```bash\nexport BINANCE_TESTNET_API_KEY=\"your_testnet_api_key\"\nexport BINANCE_TESTNET_API_SECRET=\"your_testnet_api_secret\"\n```\n\n**Futures Testnet**:\n```bash\nexport BINANCE_FUTURES_TESTNET_API_KEY=\"your_futures_testnet_api_key\"\nexport BINANCE_FUTURES_TESTNET_API_SECRET=\"your_futures_testnet_api_secret\"\n```\n\n### Configuration\n\n```python\nfrom nautilus_trader.adapters.binance import BINANCE\nfrom nautilus_trader.adapters.binance import BinanceAccountType\nfrom nautilus_trader.adapters.binance import BinanceDataClientConfig\nfrom nautilus_trader.adapters.binance import BinanceExecClientConfig\n\nconfig = TradingNodeConfig(\n    data_clients={\n        BINANCE: BinanceDataClientConfig(\n            api_key=None,  # Uses BINANCE_TESTNET_API_KEY\n            api_secret=None,  # Uses BINANCE_TESTNET_API_SECRET\n            account_type=BinanceAccountType.SPOT,  # or USDT_FUTURES\n            testnet=True,  # CRITICAL: Enable testnet\n        ),\n    },\n    exec_clients={\n        BINANCE: BinanceExecClientConfig(\n            api_key=None,\n            api_secret=None,\n            account_type=BinanceAccountType.SPOT,\n            testnet=True,  # CRITICAL: Enable testnet\n        ),\n    },\n)\n```\n\n### Testnet URLs (Automatic)\n\nWhen `testnet=True`:\n- **Spot**: `testnet.binance.vision`\n- **Futures**: `testnet.binancefuture.com`\n\n### Testnet Limitations\n\n1. Limited liquidity\n2. May not support all order types\n3. ADL behavior more frequent (smaller insurance fund)\n4. Some instruments may be missing\n\n---\n\n## 7. Complete Live Trading Example\n\n```python\nfrom decimal import Decimal\n\nfrom nautilus_trader.adapters.binance import BINANCE\nfrom nautilus_trader.adapters.binance import BinanceAccountType\nfrom nautilus_trader.adapters.binance import BinanceDataClientConfig\nfrom nautilus_trader.adapters.binance import BinanceExecClientConfig\nfrom nautilus_trader.adapters.binance import BinanceLiveDataClientFactory\nfrom nautilus_trader.adapters.binance import BinanceLiveExecClientFactory\nfrom nautilus_trader.config import InstrumentProviderConfig\nfrom nautilus_trader.config import TradingNodeConfig\nfrom nautilus_trader.live.config import LiveExecEngineConfig\nfrom nautilus_trader.live.node import TradingNode\n\nconfig = TradingNodeConfig(\n    trader_id=\"TRADER-001\",\n    exec_engine=LiveExecEngineConfig(\n        reconciliation=True,\n        reconciliation_startup_delay_secs=10.0,\n    ),\n    data_clients={\n        BINANCE: BinanceDataClientConfig(\n            api_key=None,  # Uses env var\n            api_secret=None,  # Uses env var\n            account_type=BinanceAccountType.USDT_FUTURES,\n            testnet=False,\n            instrument_provider=InstrumentProviderConfig(load_all=True),\n        ),\n    },\n    exec_clients={\n        BINANCE: BinanceExecClientConfig(\n            api_key=None,\n            api_secret=None,\n            account_type=BinanceAccountType.USDT_FUTURES,\n            testnet=False,\n            use_reduce_only=True,\n            max_retries=3,\n            retry_delay_initial_ms=1000,\n            retry_delay_max_ms=5000,\n            futures_leverages={\"BTCUSDT\": 10, \"ETHUSDT\": 5},\n        ),\n    },\n)\n\nnode = TradingNode(config=config)\nnode.add_data_client_factory(BINANCE, BinanceLiveDataClientFactory)\nnode.add_exec_client_factory(BINANCE, BinanceLiveExecClientFactory)\nnode.build()\n```\n\n---\n\n## 8. Hedge Mode Configuration\n\nFor Binance Futures Hedge Mode (simultaneous LONG + SHORT positions):\n\n```python\n# 1. Enable Hedge Mode on Binance first (via UI or API)\n\n# 2. Configure execution client\nBinanceExecClientConfig(\n    account_type=BinanceAccountType.USDT_FUTURES,\n    use_reduce_only=False,  # CRITICAL: Must be False for Hedge mode\n    use_position_ids=True,  # Enable position ID tracking\n)\n\n# 3. Submit orders with position_id suffix\ndef buy_long(self):\n    order = self.order_factory.market(\n        instrument_id=self.instrument_id,\n        order_side=OrderSide.BUY,\n        quantity=Quantity.from_str(\"0.001\"),\n    )\n    position_id = PositionId(f\"{self.instrument_id}-LONG\")  # LONG suffix\n    self.submit_order(order, position_id)\n\ndef sell_short(self):\n    order = self.order_factory.market(\n        instrument_id=self.instrument_id,\n        order_side=OrderSide.SELL,\n        quantity=Quantity.from_str(\"0.001\"),\n    )\n    position_id = PositionId(f\"{self.instrument_id}-SHORT\")  # SHORT suffix\n    self.submit_order(order, position_id)\n```\n\n---\n\n## References\n\n- Official Docs: https://docs.nautilustrader.io/nightly/integrations/binance/\n- GitHub Issues: #3287 (STOP_MARKET), #3053 (Chinese chars), #3104 (Hedge reconciliation)\n- Discord: #binance channel (90-day archive in docs/discord/binance.md)\n- Binance API: https://binance-docs.github.io/apidocs/futures/en/\nEOF\necho \"Created: /media/sam/1TB/nautilus_dev/docs/research/binance-exec-client-research.md\"",
       "description": "Create binance exec client research document"
+    },
+    {
+      "operation": "grep",
+      "timestamp": "2025-12-31T15:59:52.752236",
+      "pattern": "BinanceExecClient|BinanceAccountType",
+      "path": "/media/sam/1TB/nautilus_dev/config",
+      "output_mode": "files_with_matches"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-31T15:59:58.876443",
+      "file_path": "/media/sam/1TB/nautilus_dev/config/clients/binance.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-31T15:59:58.891459",
+      "file_path": "/media/sam/1TB/nautilus_dev/config/factory.py"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-31T16:00:44.787179",
+      "command": "ls -la /media/sam/1TB/nautilus_dev/specs/015-binance-exec-client/",
+      "description": "Check directory contents"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-31T16:00:52.646220",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/015-binance-exec-client/research.md"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-31T16:00:52.649018",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/015-binance-exec-client/data-model.md"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-31T16:00:52.665932",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/015-binance-exec-client/tasks.md"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-31T16:01:06.012934",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/015-binance-exec-client/research.md",
+      "old_string": "### TC-001: BinanceExecClientConfig Parameters\n\n**Decision**: Use documented defaults with productio..."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-31T16:01:14.444758",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/015-binance-exec-client/data-model.md",
+      "old_string": "### BinanceAccountType (existing)\n```python\nclass BinanceAccountType(Enum):\n    SPOT = \"SPOT\"\n    US..."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-31T16:02:09.848369",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/015-binance-exec-client/plan.md",
+      "old_string": "# Implementation Plan: [FEATURE NAME]\n\n**Feature Branch**: `[###-feature-name]`\n**Created**: [DATE]\n..."
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-31T16:02:17.674474",
+      "command": ".specify/scripts/bash/update-agent-context.sh claude 2>&1 || echo \"Script not found or failed\"",
+      "description": "Update agent context"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2025-12-31T16:02:26.347387",
+      "todo_count": 4
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-31T16:02:32.275402",
+      "command": "ls -la /media/sam/1TB/nautilus_dev/specs/015-binance-exec-client/contracts/",
+      "description": "Check contracts directory"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-31T16:02:39.017090",
+      "command": "git add specs/015-binance-exec-client/ && git status --short",
+      "description": "Stage spec changes"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-31T16:02:49.559671",
+      "command": "git commit -m \"$(cat <<'EOF'\nComplete Spec 015 planning phase - Binance Exec Client\n\n- Updated plan.md with architecture, technical decisions, implementation strategy\n- Fixed research.md: Enum values USDT_FUTURES → USDT_FUTURE (nightly change)\n- Fixed data-model.md: Updated enum documentation\n- Technical decisions documented:\n  - Use USDT_FUTURE/COIN_FUTURE (singular) for nightly compatibility\n  - ONE-WAY position mode (HEDGE has known bug #3104)\n  - MVP scope: MARKET, LIMIT, STOP_MARKET, STOP_LIMIT\n\nReady for /speckit.tasks to generate implementation tasks.\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n)\"",
+      "description": "Commit planning phase"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-31T16:08:19.224858",
+      "command": ".specify/scripts/bash/check-prerequisites.sh --json",
+      "description": "Check prerequisites for task generation"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-31T16:08:27.375188",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/015-binance-exec-client/spec.md"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-31T16:08:27.380663",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/015-binance-exec-client/plan.md"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-31T16:08:27.385693",
+      "file_path": "/media/sam/1TB/nautilus_dev/.specify/templates/tasks-template.md"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-31T16:08:35.875367",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/015-binance-exec-client/data-model.md"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-31T16:08:35.882906",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/015-binance-exec-client/contracts/binance-exec-api.yaml"
+    },
+    {
+      "operation": "write",
+      "timestamp": "2025-12-31T16:09:43.081367",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/015-binance-exec-client/tasks.md",
+      "content_length": 11094
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-31T16:09:54.693671",
+      "command": "git add specs/015-binance-exec-client/tasks.md && git commit -m \"$(cat <<'EOF'\nRegenerate tasks.md for Spec 015 - Binance Exec Client\n\n47 tasks organized by functional requirement:\n- Phase 1 (Setup): 4 tasks - fix enum values USDT_FUTURES → USDT_FUTURE\n- Phase 2 (Foundational): 3 tasks - verify Spec 014 integration\n- Phase 3 (FR-001): 6 tasks - client configuration params\n- Phase 4 (FR-002): 8 tasks - order type helpers (MVP)\n- Phase 5 (FR-003): 4 tasks - position mode (NETTING)\n- Phase 6 (FR-004): 7 tasks - error handling with backoff\n- Phase 7 (FR-005): 3 tasks - external order claims\n- Phase 8 (Integration): 7 tasks - testnet validation\n- Phase 9 (Polish): 5 tasks - docs and cleanup\n\nMVP scope: FR-001 + FR-002 (T001-T021)\nParallel opportunities: 8 identified\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n)\"",
+      "description": "Commit tasks.md"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-31T16:45:22.796776",
+      "command": ".specify/scripts/bash/check-prerequisites.sh --json --require-tasks --include-tasks",
+      "description": "Check prerequisites for analysis"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-31T16:45:31.466874",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/015-binance-exec-client/spec.md"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-31T16:45:31.484082",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/015-binance-exec-client/tasks.md"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-31T16:45:31.497030",
+      "file_path": "/media/sam/1TB/nautilus_dev/.specify/memory/constitution.md"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-31T16:45:31.501774",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/015-binance-exec-client/plan.md"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-31T16:47:15.484807",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/015-binance-exec-client/spec.md",
+      "old_string": "#### FR-001: Client Configuration\n```python\nBinanceExecClientConfig(\n    account_type=BinanceAccount..."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-31T16:47:24.366708",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/015-binance-exec-client/spec.md",
+      "old_string": "### Client Setup\n\n```python\ndef create_binance_exec_client() -> dict:\n    \"\"\"Create Binance executio..."
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-31T16:47:32.373753",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/015-binance-exec-client/spec.md"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-31T16:47:41.780209",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/015-binance-exec-client/spec.md",
+      "old_string": "```python\ndef build_binance_exec_client_config(credentials: BinanceCredentials) -> BinanceExecClient..."
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-31T16:47:55.060403",
+      "command": "git add specs/015-binance-exec-client/spec.md && git commit -m \"$(cat <<'EOF'\nFix spec.md consistency issues (A1, A2 from analyze)\n\nA1 (HIGH): Updated enum value USDT_FUTURES → USDT_FUTURE (singular)\n  - FR-001 code example now matches nightly v1.222.0+\n  - Consistent with plan.md and research.md\n\nA2 (MEDIUM): Standardized function naming\n  - Changed create_binance_exec_client() → build_binance_exec_client_config()\n  - Matches existing code in config/clients/binance.py\n  - Updated signature to use BinanceCredentials parameter\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n)\"",
+      "description": "Commit spec.md fixes"
     }
   ],
-  "last_updated": "2025-12-31T15:59:26.722729"
+  "last_updated": "2025-12-31T16:47:55.060420"
 }
