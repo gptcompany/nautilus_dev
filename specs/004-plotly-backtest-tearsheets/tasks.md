@@ -89,7 +89,7 @@
 
 - [x] T024 [US2] Create equity curve validation helper in `strategies/common/tearsheet/validation.py`
 - [x] T025 [US2] Create drawdown validation helper in `strategies/common/tearsheet/validation.py`
-- [ ] T026 [US2] Add benchmark comparison support wrapper in `strategies/common/tearsheet/core.py`
+- [X] T026 [US2] Add benchmark comparison support wrapper in `strategies/common/tearsheet/core.py`
 - [ ] T027 [US2] Test with real 1-year BTCUSDT backtest data
 
 **Checkpoint**: User Story 2 complete - equity and drawdown charts fully validated
@@ -111,7 +111,7 @@
 ### Implementation for User Story 3
 
 - [x] T031 [US3] Create returns data validation helper in `strategies/common/tearsheet/validation.py`
-- [ ] T032 [US3] Add multi-year data handling check in edge_cases.py
+- [X] T032 [US3] Add multi-year data handling check in edge_cases.py
 - [ ] T033 [US3] Verify color coding for negative returns (red gradient)
 
 **Checkpoint**: User Story 3 complete - heatmaps display seasonal patterns correctly

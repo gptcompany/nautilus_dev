@@ -144,11 +144,11 @@
 
 **Purpose**: Final integration, edge cases, and cleanup
 
-- [ ] T047 [P] Write integration test with full evaluation cycle in tests/alpha_evolve/test_integration.py
-- [ ] T048 [P] Write integration test with ProgramStore in tests/alpha_evolve/test_integration.py
+- [X] T047 [P] Write integration test with full evaluation cycle in tests/alpha_evolve/test_integration.py
+- [X] T048 [P] Write integration test with ProgramStore in tests/alpha_evolve/test_integration.py
 - [x] T049 Add module docstring and type hints review in scripts/alpha_evolve/evaluator.py
 - [x] T050 Run ruff check and format on scripts/alpha_evolve/evaluator.py
-- [ ] T051 Run alpha-debug verification on evaluator implementation
+- [X] T051 Run alpha-debug verification on evaluator implementation
 
 ---
 
