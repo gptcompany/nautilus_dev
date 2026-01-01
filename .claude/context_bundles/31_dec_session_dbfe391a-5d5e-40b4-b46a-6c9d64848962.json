@@ -893,7 +893,169 @@
       "task_id": "a408cb5",
       "block": true,
       "timeout": 60000
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-31T17:53:55.060753",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run pytest tests/tradingnode_config/ -v --tb=short 2>&1 | tail -60",
+      "description": "Run all Spec 015 unit tests"
+    },
+    {
+      "operation": "grep",
+      "timestamp": "2025-12-31T17:54:52.269236",
+      "pattern": "USDT_FUTURES",
+      "path": "/media/sam/1TB/nautilus_dev/config",
+      "output_mode": "content"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-31T17:54:52.291571",
+      "file_path": "/media/sam/1TB/nautilus_dev/config/factory.py"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-31T17:55:05.698447",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -c \"from nautilus_trader.adapters.binance.common.enums import BinanceAccountType; print([e.name for e in BinanceAccountType])\"",
+      "description": "Check BinanceAccountType enum values"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-31T17:55:15.479968",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -c \"from config.factory import TradingNodeConfigFactory; print('Import OK')\"",
+      "description": "Test factory import"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-31T17:55:26.036871",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run pytest tests/tradingnode_config/ -v --tb=short 2>&1 | head -150",
+      "description": "Run config tests"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-31T17:55:37.844677",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -c \"import nautilus_trader; print(f'Activated env: {nautilus_trader.__version__}')\"",
+      "description": "Check activated env version"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-31T17:55:38.195456",
+      "command": "uv run python -c \"import nautilus_trader; print(f'uv env: {nautilus_trader.__version__}')\"",
+      "description": "Check uv env version"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-31T17:55:46.939149",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -m pytest tests/tradingnode_config/ -v --tb=short 2>&1 | head -150",
+      "description": "Run tests with activated env"
+    },
+    {
+      "operation": "grep",
+      "timestamp": "2025-12-31T17:55:59.447008",
+      "pattern": "build_cache_config",
+      "path": "/media/sam/1TB/nautilus_dev/config/cache",
+      "output_mode": "content"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-31T17:55:59.476971",
+      "file_path": "/media/sam/1TB/nautilus_dev/config/cache/__init__.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-31T17:56:07.636612",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/tradingnode_config/integration/test_redis_connection.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-31T17:56:07.645343",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/tradingnode_config/test_config_cache.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-31T17:56:18.265151",
+      "file_path": "/media/sam/1TB/nautilus_dev/config/cache/redis_config.py"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-31T17:56:40.841596",
+      "file_path": "/media/sam/1TB/nautilus_dev/config/cache/redis_config.py",
+      "old_string": "def wait_for_redis(\n    host: str | None = None,\n    port: int | None = None,\n    max_retries: int =..."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-31T17:56:54.597975",
+      "file_path": "/media/sam/1TB/nautilus_dev/config/cache/__init__.py",
+      "old_string": "from config.cache.redis_config import (\n    RedisConfigError,\n    RedisConnectionError,\n    check_re..."
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-31T17:57:00.538943",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -m pytest tests/tradingnode_config/ -v --tb=short 2>&1 | tail -80",
+      "description": "Run tests with fix"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-31T17:57:10.398282",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -m pytest tests/integration/test_binance_testnet.py -v --tb=short 2>&1",
+      "description": "Run Binance testnet tests"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-31T17:57:19.280605",
+      "command": "ruff check config/ tests/tradingnode_config/ tests/integration/ --fix && ruff format config/ tests/tradingnode_config/ tests/integration/",
+      "description": "Lint and format code"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-31T17:57:27.811838",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/tradingnode_config/conftest.py"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-31T17:57:36.754980",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/tradingnode_config/conftest.py",
+      "old_string": "import os\n\nimport pytest\n\nfrom config.models import ("
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-31T17:57:37.112214",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/tradingnode_config/test_binance_errors.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2025-12-31T17:57:37.152201",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/tradingnode_config/test_order_helpers.py"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-31T17:57:50.518243",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/tradingnode_config/test_binance_errors.py",
+      "old_string": "from config.binance_errors import ("
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-31T17:57:50.919082",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/tradingnode_config/test_order_helpers.py",
+      "old_string": "import pytest\nfrom nautilus_trader.common.component import TestClock\nfrom nautilus_trader.common.fac..."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2025-12-31T17:57:51.328528",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/integration/test_binance_testnet.py",
+      "old_string": "import pytest"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-31T17:58:00.543718",
+      "command": "ruff check config/ tests/tradingnode_config/ tests/integration/ && ruff format config/ tests/tradingnode_config/ tests/integration/ && echo \"✅ Ruff check and format passed\"",
+      "description": "Final lint check"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2025-12-31T17:58:11.343265",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -m pytest tests/tradingnode_config/ tests/integration/test_binance_testnet.py -v --tb=short 2>&1 | tail -30",
+      "description": "Final test run"
     }
   ],
-  "last_updated": "2025-12-31T17:53:29.752339"
+  "last_updated": "2025-12-31T17:58:11.343284"
 }

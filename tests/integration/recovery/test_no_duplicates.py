@@ -148,9 +148,7 @@ class TestNoDuplicateOrders:
     ):
         """Test that no duplicate stop-loss is created when one already exists."""
         # Setup: position with existing stop-loss order
-        mock_position = create_mock_position(
-            "BTCUSDT-PERP.BINANCE", Decimal("1.5")
-        )
+        mock_position = create_mock_position("BTCUSDT-PERP.BINANCE", Decimal("1.5"))
         existing_stop = create_mock_stop_order("BTCUSDT-PERP.BINANCE")
 
         mock_cache.instrument.return_value = mock_instrument
@@ -198,9 +196,7 @@ class TestNoDuplicateOrders:
     ):
         """Test that warning is logged when no stop-loss exists for position."""
         # Setup: position WITHOUT existing stop-loss
-        mock_position = create_mock_position(
-            "BTCUSDT-PERP.BINANCE", Decimal("1.5")
-        )
+        mock_position = create_mock_position("BTCUSDT-PERP.BINANCE", Decimal("1.5"))
 
         mock_cache.instrument.return_value = mock_instrument
         mock_cache.positions.return_value = [mock_position]
@@ -242,9 +238,7 @@ class TestNoDuplicateOrders:
     ):
         """Test that LIMIT orders are not counted as stop-loss orders."""
         # Setup: position with LIMIT order (not stop-loss)
-        mock_position = create_mock_position(
-            "BTCUSDT-PERP.BINANCE", Decimal("1.5")
-        )
+        mock_position = create_mock_position("BTCUSDT-PERP.BINANCE", Decimal("1.5"))
         limit_order = create_mock_limit_order("BTCUSDT-PERP.BINANCE")
 
         mock_cache.instrument.return_value = mock_instrument
@@ -333,9 +327,7 @@ class TestNoDuplicateOrders:
     ):
         """Test that calling on_start() twice doesn't create duplicates."""
         # Setup
-        mock_position = create_mock_position(
-            "BTCUSDT-PERP.BINANCE", Decimal("1.5")
-        )
+        mock_position = create_mock_position("BTCUSDT-PERP.BINANCE", Decimal("1.5"))
         existing_stop = create_mock_stop_order("BTCUSDT-PERP.BINANCE")
 
         mock_cache.instrument.return_value = mock_instrument
@@ -397,9 +389,7 @@ class TestNoDuplicateOrders:
             ),
         )
 
-        mock_position = create_mock_position(
-            "BTCUSDT-PERP.BINANCE", Decimal("1.5")
-        )
+        mock_position = create_mock_position("BTCUSDT-PERP.BINANCE", Decimal("1.5"))
         mock_cache.instrument.return_value = mock_instrument
         mock_cache.positions.return_value = [mock_position]
         mock_cache.orders_open.return_value = []

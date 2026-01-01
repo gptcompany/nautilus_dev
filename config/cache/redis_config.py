@@ -219,6 +219,51 @@ def check_redis_health(
         sock.close()
 
 
+def build_cache_config(
+    redis_config: object,
+    tick_capacity: int = 10_000,
+    bar_capacity: int = 10_000,
+) -> "CacheConfig":
+    """
+    Build CacheConfig from a RedisConfig object (T017).
+
+    Wrapper around create_redis_cache_config for object-based API.
+
+    Args:
+        redis_config: RedisConfig instance with host, port, password, timeout
+        tick_capacity: Max tick capacity in cache (default: 10,000)
+        bar_capacity: Max bar capacity in cache (default: 10,000)
+
+    Returns:
+        CacheConfig configured for Redis with msgpack encoding
+    """
+    from nautilus_trader.common.config import DatabaseConfig
+    from nautilus_trader.config import CacheConfig
+
+    host = getattr(redis_config, "host", "localhost")
+    port = getattr(redis_config, "port", 6379)
+    password = getattr(redis_config, "password", None)
+    timeout = getattr(redis_config, "timeout", 2)
+
+    validate_redis_config(host, port, "msgpack")
+
+    return CacheConfig(
+        database=DatabaseConfig(
+            type="redis",
+            host=host,
+            port=port,
+            password=password,
+            timeout=timeout,
+        ),
+        encoding="msgpack",
+        timestamps_as_iso8601=True,  # Readable timestamps for debugging
+        buffer_interval_ms=100,
+        flush_on_start=False,  # Preserve state on restart
+        tick_capacity=tick_capacity,
+        bar_capacity=bar_capacity,
+    )
+
+
 def wait_for_redis(
     host: str | None = None,
     port: int | None = None,
