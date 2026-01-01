@@ -1,0 +1,84 @@
+// This work is licensed under Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International
+// https://creativecommons.org/licenses/by-nc-sa/4.0/
+// © BigBeluga
+
+//@version=5
+indicator("Liquidation HeatMap [BigBeluga]", overlay = true, max_boxes_count = 500, max_bars_back = 500)
+
+
+// ＩＮＰＵＴＳ ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――
+color max_col     = input.color(color.yellow, "Max", inline = "L", group = "Liquidation Color")
+color min_col     = input.color(color.lime, "Min", inline = "L", group = "Liquidation Color")
+int   bars_amount = 500
+
+// ＭＥＴＨＯＤＳ ＡＮＤ ＦＵＮＣＴＩＯＮＳ――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――
+// Functions
+draw_scale(float min, float max)=>
+    int i = 0
+    if barstate.islast
+        var scale = table.new(position.middle_right, 1, 100)
+        while i <= 22
+            table.cell(scale, 0, i,
+                         text  = i == 0  ? str.tostring(max, format.volume)+"\n\nMAX"
+                               : i == 22 ? "MIN\n\n"+str.tostring(min, format.volume)
+                               : "",
+                         bgcolor = i == 0 ? color(na) : i == 22 ? color(na)
+                                   : color.from_gradient(22-i, 0, 22, color.new(min_col, 90), max_col),
+                         text_color = chart.fg_color,
+                         text_size  = size.small)
+            i += 1
+
+volume_data(int number)=>
+    var array<float> vol  = array.new<float>(number)
+    series float vol_data = ta.cum(volume) <= 1 ? (high-low)*100 : volume // if no volume data provided use candle size
+
+    vol.push(vol_data)
+
+    if vol.size() > number
+        vol.shift()
+    vol
+
+method detect_liquidity(array<float> vol)=>
+    var array<box> liquid_zones = array.new<box>(bars_amount)
+
+    int index = 2
+    series float ph        = ta.pivothigh(index, index)
+    series float pl        = ta.pivotlow(index, index)
+    float  atr_multi       = timeframe.multiplier >= 60 ? 0.2 : timeframe.isminutes ? 0.25 : timeframe.isdaily ? 0.2 : 0.4
+    series float atr       = (ta.atr(200) * atr_multi)[index]
+    series float vol_value = vol.last()[index]
+
+    color liquidity_col =
+                     vol_value <= (vol.avg())
+                     ? color.from_gradient(vol_value, 0, vol.avg(), na, color.new(min_col, 90))
+                     : color.from_gradient(vol_value, vol.avg(), vol.max(), color.new(min_col, 90), max_col)
+
+    if (last_bar_index - bar_index) < bars_amount
+        // >>
+        if not na(ph) or not na(ph[1]) or not na(ph[2])
+            liquid_zones.push(
+                 box.new(bar_index[index], high[index] + atr, bar_index, high[index], border_color = na, bgcolor = liquidity_col)
+                  )
+
+        if not na(pl) or not na(pl[1]) or not na(pl[2])
+            liquid_zones.push(
+                 box.new(bar_index[index], low[index], bar_index, low[index] - atr, border_color = na, bgcolor = liquidity_col)
+                  )
+
+        for box_id in liquid_zones
+            box_id.set_right(bar_index)
+
+            mid = (box_id.get_bottom() + box_id.get_top()) / 2
+
+            if (high > mid and low < mid)
+                box_id.set_right(bar_index)
+
+                liquid_zones.remove(liquid_zones.indexof(box_id))
+        // >>
+
+    draw_scale(0, vol.max())
+
+
+// ＰＬＯＴ ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――
+volume_data(bars_amount).detect_liquidity()
+//――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――
