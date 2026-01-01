@@ -93,9 +93,11 @@ DISCONNECTED -> CONNECTING -> CONNECTED -> [RECONNECTING] -> CONNECTED
 ```python
 class BinanceAccountType(Enum):
     SPOT = "SPOT"
-    USDT_FUTURES = "USDT_FUTURES"  # Perpetual USDT-margined
-    COIN_FUTURES = "COIN_FUTURES"  # Coin-margined
+    USDT_FUTURE = "usdt_future"  # Perpetual USDT-margined (note: singular)
+    COIN_FUTURE = "coin_future"  # Coin-margined (note: singular)
 ```
+
+**IMPORTANT**: Enum names changed from plural to singular in nightly (2025-12-31).
 
 ### Supported OrderType (existing)
 ```python

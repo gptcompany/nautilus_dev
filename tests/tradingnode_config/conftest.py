@@ -14,11 +14,11 @@ _project_root = Path(__file__).parent.parent.parent
 if str(_project_root) not in sys.path:
     sys.path.insert(0, str(_project_root))
 
-import os
+import os  # noqa: E402
 
-import pytest
+import pytest  # noqa: E402
 
-from config.models import (
+from config.models import (  # noqa: E402
     BinanceCredentials,
     BybitCredentials,
     ConfigEnvironment,
