@@ -10,16 +10,69 @@ Convert TradingView Pine Script strategies to NautilusTrader Python strategies.
 /pinescript   # Then paste code
 ```
 
+## Automatic Source Code Extraction
+
+The skill includes an automated extractor that fetches Pine Script source code from TradingView URLs.
+
+### How It Works
+
+1. **Playwright browser automation** opens the TradingView script page
+2. **Network interception** captures the `pine-facade.tradingview.com` API response
+3. **JSON parsing** extracts the source code and metadata
+
+### API Endpoint Discovered
+
+TradingView loads script source via:
+```
+https://pine-facade.tradingview.com/pine-facade/get/PUB%3B{script_id}/{version}?no_4xx=true
+```
+
+### Extractor Script
+
+```bash
+# Usage
+python scripts/pinescript_extractor.py <tradingview_url>
+
+# Example
+python scripts/pinescript_extractor.py https://www.tradingview.com/script/tMtleB1G-Liqudation-HeatMap-BigBeluga/
+
+# Output: JSON with source code and metadata
+{
+  "success": true,
+  "url": "https://...",
+  "name": "Liquidation HeatMap [BigBeluga]",
+  "source": "// Pine Script code...",
+  "metadata": {
+    "created": "2025-05-16T14:05:30.827152Z",
+    "pine_version": 5,
+    "kind": "study"
+  }
+}
+```
+
+### Requirements
+
+```bash
+pip install playwright
+playwright install chromium
+```
+
+### Limitations
+
+- **Open-source scripts only** - Protected/invite-only scripts cannot be extracted
+- **Requires Playwright** - Headless browser needed for dynamic content
+- **Rate limiting** - Don't abuse TradingView's servers
+
 ## Workflow
 
 ### Step 1: Input Acquisition
 
-**Option A: URL**
+**Option A: URL (Automatic Extraction)**
 ```
 /pinescript https://tradingview.com/script/ABC123
 ```
-- Fetch script from TradingView
-- Extract Pine Script code from page
+- Runs `scripts/pinescript_extractor.py` to fetch source code
+- Falls back to manual paste if extraction fails
 
 **Option B: Direct Paste**
 ```
