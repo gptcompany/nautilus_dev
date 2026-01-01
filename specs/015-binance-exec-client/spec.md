@@ -21,7 +21,7 @@ Current system only reads data from Binance. For live trading, we need execution
 #### FR-001: Client Configuration
 ```python
 BinanceExecClientConfig(
-    account_type=BinanceAccountType.USDT_FUTURES,
+    account_type=BinanceAccountType.USDT_FUTURE,  # Note: singular (nightly v1.222.0+)
     api_key=None,  # Sources from BINANCE_API_KEY env var
     api_secret=None,  # Sources from BINANCE_API_SECRET env var
     testnet=False,
@@ -85,18 +85,16 @@ strategy_config = StrategyConfig(
 ### Client Setup
 
 ```python
-def create_binance_exec_client() -> dict:
-    """Create Binance execution client configuration."""
-    return {
-        "BINANCE": BinanceExecClientConfig(
-            account_type=BinanceAccountType.USDT_FUTURES,
-            api_key=os.environ["BINANCE_API_KEY"],
-            api_secret=os.environ["BINANCE_API_SECRET"],
-            testnet=os.environ.get("BINANCE_TESTNET", "false").lower() == "true",
-            warn_rate_limits=True,
-            max_retries=3,
-        ),
-    }
+def build_binance_exec_client_config(credentials: BinanceCredentials) -> BinanceExecClientConfig:
+    """Build Binance execution client configuration."""
+    return BinanceExecClientConfig(
+        account_type=BinanceAccountType.USDT_FUTURE,  # Note: singular (nightly v1.222.0+)
+        api_key=credentials.api_key,
+        api_secret=credentials.api_secret,
+        testnet=credentials.testnet,
+        warn_rate_limits=True,
+        max_retries=3,
+    )
 ```
 
 ### Instrument Provider

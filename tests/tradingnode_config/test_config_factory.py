@@ -26,7 +26,9 @@ class TestTradingNodeConfigFactoryFromSettings:
         config = TradingNodeConfigFactory.from_settings(valid_trading_node_settings)
 
         # Verify core settings
-        assert str(config.trader_id) == valid_trading_node_settings.environment.trader_id
+        assert (
+            str(config.trader_id) == valid_trading_node_settings.environment.trader_id
+        )
 
     def test_includes_cache_config(
         self, valid_trading_node_settings: TradingNodeSettings
