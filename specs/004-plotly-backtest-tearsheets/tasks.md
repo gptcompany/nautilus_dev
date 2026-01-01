@@ -133,8 +133,8 @@
 ### Implementation for User Story 4
 
 - [x] T037 [US4] Create trade metrics validation helper in `strategies/common/tearsheet/validation.py`
-- [ ] T038 [US4] Add OHLC data availability check for bars_with_fills
-- [ ] T039 [US4] Implement graceful degradation when OHLC missing (skip bars_with_fills chart)
+- [x] T038 [US4] Add OHLC data availability check for bars_with_fills
+- [x] T039 [US4] Implement graceful degradation when OHLC missing (skip bars_with_fills chart)
 
 **Checkpoint**: User Story 4 complete - trade analysis charts validated
 
@@ -197,7 +197,7 @@
 - [x] T058 [P] Performance test for 1-year daily backtest (< 5 seconds) in `tests/test_tearsheets.py::test_performance_1year`
 - [x] T059 [P] Performance test for 10K+ data points in `tests/test_tearsheets.py::test_performance_large_dataset`
 - [x] T060 [P] HTML file size validation (< 2MB) in `tests/test_tearsheets.py::test_file_size_limit`
-- [ ] T061 [P] Documentation update in `docs/concepts/tearsheets.md`
+- [x] T061 [P] Documentation update in `docs/concepts/tearsheets.md`
 - [x] T062 [P] Add quickstart example to module __init__.py
 - [ ] T063 Code cleanup and type hint verification (mypy)
 - [x] T064 Run ruff format and ruff check for code style
