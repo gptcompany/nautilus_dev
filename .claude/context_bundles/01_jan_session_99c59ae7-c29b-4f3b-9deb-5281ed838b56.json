@@ -326,7 +326,67 @@
       "timestamp": "2026-01-01T12:59:34.969805",
       "command": "git add -A && git diff --cached --stat",
       "description": "Stage all changes"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-01T13:00:38.715933",
+      "command": "git push origin main",
+      "description": "Push main to remote"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-01T13:00:47.448511",
+      "command": "ls -la specs/",
+      "description": "List specs directory"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-01T13:00:48.144689",
+      "command": "for f in specs/*/tasks.md; do echo \"=== $f ===\"; grep -E \"^\\- \\[ \\]\" \"$f\" 2>/dev/null | wc -l | xargs echo \"Pending:\"; done",
+      "description": "Count pending tasks in all specs"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-01T13:00:56.998275",
+      "command": "for f in specs/*/tasks.md; do \n  pending=$(grep -c \"^\\- \\[ \\]\" \"$f\" 2>/dev/null || echo \"0\")\n  completed=$(grep -c \"^\\- \\[X\\]\" \"$f\" 2>/dev/null || echo \"0\")\n  total=$((pending + completed))\n  if [ \"$total\" -gt 0 ]; then\n    echo \"$(basename $(dirname $f)): $completed/$total done\"\n  fi\ndone",
+      "description": "Check completion status of all specs"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-01T13:01:01.622035",
+      "command": "grep -l \"^\\- \\[ \\]\" specs/*/tasks.md 2>/dev/null || echo \"No pending tasks found in any spec\"",
+      "description": "Find specs with pending tasks"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-01T13:01:08.772991",
+      "command": "for f in specs/004-plotly-backtest-tearsheets/tasks.md specs/007-alpha-evolve-evaluator/tasks.md specs/008-alpha-evolve-templates/tasks.md; do\n  echo \"=== $(basename $(dirname $f)) ===\"\n  grep -E \"^\\- \\[ \\]\" \"$f\" | head -5\n  echo \"\"\ndone",
+      "description": "Show pending tasks in each spec"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-01T13:01:17.827844",
+      "command": "echo \"=== 004-plotly ===\" && grep \"^\\- \\[ \\]\" specs/004-plotly-backtest-tearsheets/tasks.md | head -5",
+      "description": "Check 004-plotly tasks"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-01T13:01:17.834173",
+      "command": "echo \"=== 008-alpha-evolve-templates ===\" && grep \"^\\- \\[ \\]\" specs/008-alpha-evolve-templates/tasks.md | head -5",
+      "description": "Check 008 tasks"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-01T13:01:17.849289",
+      "command": "echo \"=== 007-alpha-evolve-evaluator ===\" && grep \"^\\- \\[ \\]\" specs/007-alpha-evolve-evaluator/tasks.md | head -5",
+      "description": "Check 007 tasks"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-01T13:01:26.131104",
+      "command": "echo \"004-plotly:\" && grep -c \"^\\- \\[ \\]\" specs/004-plotly-backtest-tearsheets/tasks.md && echo \"007-evaluator:\" && grep -c \"^\\- \\[ \\]\" specs/007-alpha-evolve-evaluator/tasks.md && echo \"008-templates:\" && grep -c \"^\\- \\[ \\]\" specs/008-alpha-evolve-templates/tasks.md",
+      "description": "Count pending in each"
     }
   ],
-  "last_updated": "2026-01-01T12:59:34.969825"
+  "last_updated": "2026-01-01T13:01:26.131134"
 }
