@@ -1,0 +1,37 @@
+//@version=5
+indicator("Trend Counter [BigBeluga Style]", overlay=false)
+
+// Inputs
+length = input.int(20, "Length", minval=2)
+smooth = input.int(5, "Smooth", minval=1)
+
+// Calculate midpoint: average of highest and lowest
+float mid = math.avg(ta.highest(length), ta.lowest(length))
+
+// Count consecutive bars above midline
+var float counter = 0.0
+for offset = 0 to length - 1
+    switch
+        hl2 > mid[offset] => counter += 1.0
+        => counter := 0.0
+
+// Apply EMA smoothing with cap at 400
+counter := math.round(ta.ema(counter > 400 ? 400 : counter, smooth))
+
+// Store for average calculation
+var array<float> count = array.new_float()
+count.push(counter)
+avg = math.round(count.avg())
+
+// Gradient colors based on trend strength
+color trendColor = counter > avg * 1.5 ? color.green :
+                   counter > avg ? color.lime :
+                   counter < avg * 0.5 ? color.red :
+                   counter < avg ? color.orange : color.gray
+
+// Plots
+plot(counter, "Counter", color=trendColor, linewidth=2)
+hline(avg, "Average", color=color.gray, linestyle=hline.style_dotted)
+
+// Background gradient
+bgcolor(counter > avg ? color.new(color.green, 90) : color.new(color.red, 90))
