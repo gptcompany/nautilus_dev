@@ -35,13 +35,15 @@ class PositionAccuracyStrategy(RecoverableStrategy):
 
     def on_position_recovered(self, position) -> None:
         """Capture detailed position data for accuracy verification."""
-        self.recovered_position_data.append({
-            "instrument_id": str(position.instrument_id.value),
-            "side": str(position.side.value),
-            "quantity": position.quantity,
-            "avg_px_open": position.avg_px_open,
-            "is_open": position.is_open,
-        })
+        self.recovered_position_data.append(
+            {
+                "instrument_id": str(position.instrument_id.value),
+                "side": str(position.side.value),
+                "quantity": position.quantity,
+                "avg_px_open": position.avg_px_open,
+                "is_open": position.is_open,
+            }
+        )
 
     def on_historical_data(self, bar) -> None:
         """Skip historical data processing."""
@@ -307,9 +309,7 @@ class TestPositionSizeAccuracy:
         ]
 
         positions = [
-            create_mock_position(
-                "BTCUSDT-PERP.BINANCE", side, qty, avg_px
-            )
+            create_mock_position("BTCUSDT-PERP.BINANCE", side, qty, avg_px)
             for side, qty, avg_px in position_data
         ]
 
@@ -338,7 +338,9 @@ class TestPositionSizeAccuracy:
         # NFR-002 Verification: All positions accurate
         assert len(strategy.recovered_position_data) == 3
 
-        for i, (expected_side, expected_qty, expected_avg_px) in enumerate(position_data):
+        for i, (expected_side, expected_qty, expected_avg_px) in enumerate(
+            position_data
+        ):
             recovered = strategy.recovered_position_data[i]
             assert recovered["side"] == expected_side
             assert recovered["quantity"] == expected_qty
@@ -546,7 +548,9 @@ class TestPositionSnapshotAccuracy:
 
     def test_position_snapshot_timestamp_ordering(self):
         """Test that ts_last_updated cannot be before ts_opened."""
-        with pytest.raises(ValueError, match="ts_last_updated cannot be before ts_opened"):
+        with pytest.raises(
+            ValueError, match="ts_last_updated cannot be before ts_opened"
+        ):
             PositionSnapshot(
                 instrument_id="BTCUSDT-PERP.BINANCE",
                 side="LONG",

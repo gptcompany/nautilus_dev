@@ -7,6 +7,7 @@ Provides production-ready CacheConfig for NautilusTrader TradingNode.
 from config.cache.redis_config import (
     RedisConfigError,
     RedisConnectionError,
+    build_cache_config,
     check_redis_health,
     create_debug_cache_config,
     create_redis_cache_config,
@@ -17,6 +18,7 @@ from config.cache.redis_config import (
 __all__ = [
     "RedisConfigError",
     "RedisConnectionError",
+    "build_cache_config",
     "check_redis_health",
     "create_debug_cache_config",
     "create_redis_cache_config",

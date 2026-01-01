@@ -29,7 +29,7 @@ _project_root = Path(__file__).parent.parent.parent
 if str(_project_root) not in sys.path:
     sys.path.insert(0, str(_project_root))
 
-import pytest
+import pytest  # noqa: E402
 
 # Skip all tests if testnet credentials not available
 TESTNET_API_KEY = os.environ.get("BINANCE_TESTNET_API_KEY")

@@ -15,7 +15,7 @@ if str(_project_root) not in sys.path:
     sys.path.insert(0, str(_project_root))
 
 
-from config.binance_errors import (
+from config.binance_errors import (  # noqa: E402
     ALGO_ORDER_REQUIRED,
     DISCONNECTED,
     INVALID_SIGNATURE,

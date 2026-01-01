@@ -14,14 +14,14 @@ _project_root = Path(__file__).parent.parent.parent
 if str(_project_root) not in sys.path:
     sys.path.insert(0, str(_project_root))
 
-import pytest
-from nautilus_trader.common.component import TestClock
-from nautilus_trader.common.factories import OrderFactory
-from nautilus_trader.model.enums import OrderSide, TimeInForce, TriggerType
-from nautilus_trader.model.identifiers import InstrumentId, StrategyId, TraderId
-from nautilus_trader.model.objects import Price, Quantity
+import pytest  # noqa: E402
+from nautilus_trader.common.component import TestClock  # noqa: E402
+from nautilus_trader.common.factories import OrderFactory  # noqa: E402
+from nautilus_trader.model.enums import OrderSide, TimeInForce, TriggerType  # noqa: E402
+from nautilus_trader.model.identifiers import InstrumentId, StrategyId, TraderId  # noqa: E402
+from nautilus_trader.model.objects import Price, Quantity  # noqa: E402
 
-from config.order_helpers import (
+from config.order_helpers import (  # noqa: E402
     create_external_claims,
     create_limit_order,
     create_market_order,

@@ -1,6 +1,6 @@
 # NautilusTrader Status Feed
 
-## Last Update: 12/31/2025, 12:00:55 AM UTC
+## Last Update: 1/1/2026, 12:01:04 AM UTC
 
 ### Current Versions
 - **Stable**: v1.221.0
@@ -12,17 +12,17 @@
 - **Feature Requests**: 15500
 
 ### Recent Open Issues (Top 5)
-- [#3361](https://github.com/nautechsystems/nautilus_trader/issues/3361) Converting an option from Databento to a Nautilus legacy results in a `pandas._libs.tslibs.np_datetime.OutOfBoundsDatetime` when printed [bug]
+- [#3362](https://github.com/nautechsystems/nautilus_trader/issues/3362) parquet_explorer.ipynb fails in JupyterLab Docker container - missing test data [bug]
 - [#3359](https://github.com/nautechsystems/nautilus_trader/issues/3359) Allow the instrument universe to be updated dynamically during backtesting [enhancement]
 - [#3307](https://github.com/nautechsystems/nautilus_trader/issues/3307) Add support for ticker name changes, stock splits, and corporate actions in general [enhancement]
 - [#3269](https://github.com/nautechsystems/nautilus_trader/issues/3269) [Deribit] Initial integration [enhancement, rust]
 - [#3180](https://github.com/nautechsystems/nautilus_trader/issues/3180) RFC: Comparison of Bybit Python vs Rust adapter performance [enhancement, RFC, rust, python, adapter]
 
 ### Active Bug Reports
-- [#3361](https://github.com/nautechsystems/nautilus_trader/issues/3361) Converting an option from Databento to a Nautilus legacy results in a `pandas._libs.tslibs.np_datetime.OutOfBoundsDatetime` when printed
+- [#3362](https://github.com/nautechsystems/nautilus_trader/issues/3362) parquet_explorer.ipynb fails in JupyterLab Docker container - missing test data
 - [#3104](https://github.com/nautechsystems/nautilus_trader/issues/3104) [Reconciliation] LiveExecEngine fails to reconcile long-lived Binance Futures positions for HEDGING
 - [#3042](https://github.com/nautechsystems/nautilus_trader/issues/3042) [Reconciliation] Fails for routing clients when instrument venue differs from client venue
-- [#3361](https://github.com/nautechsystems/nautilus_trader/issues/3361) Converting an option from Databento to a Nautilus legacy results in a `pandas._libs.tslibs.np_datetime.OutOfBoundsDatetime` when printed
+- [#3362](https://github.com/nautechsystems/nautilus_trader/issues/3362) parquet_explorer.ipynb fails in JupyterLab Docker container - missing test data
 - [#3104](https://github.com/nautechsystems/nautilus_trader/issues/3104) [Reconciliation] LiveExecEngine fails to reconcile long-lived Binance Futures positions for HEDGING
 
 ### Requested Features
