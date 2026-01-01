@@ -15,8 +15,7 @@ from dataclasses import dataclass
 from typing import Optional
 from collections import deque
 
-from nautilus_trader.indicators.base.indicator import Indicator
-from nautilus_trader.indicators.volatility.atr import AverageTrueRange
+from nautilus_trader.indicators import AverageTrueRange, Indicator
 from nautilus_trader.model.data import Bar
 
 
