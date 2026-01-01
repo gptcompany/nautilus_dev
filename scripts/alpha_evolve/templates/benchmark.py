@@ -152,11 +152,15 @@ def generate_bars(engine: BacktestEngine, num_bars: int) -> None:
 
     # Get bars from test data provider
     provider = TestDataProvider()
-    bars = (
-        provider.read_csv_bars("tests/test_data/binance/btcusdt-1min-2024.csv")
-        if num_bars > 10000
-        else None
-    )
+    bars = None
+    if num_bars > 10000:
+        try:
+            bars = provider.read_csv_bars(
+                "tests/test_data/binance/btcusdt-1min-2024.csv"
+            )
+        except (FileNotFoundError, OSError) as e:
+            print(f"  Warning: Could not read CSV bars: {e}")
+            print("  Falling back to synthetic bar generation...")
 
     if bars is None:
         # Generate synthetic bars if no CSV available
@@ -198,29 +202,31 @@ def run_benchmark_with_equity(num_bars: int) -> tuple[float, int]:
         Tuple of (execution_time_seconds, equity_points_recorded)
     """
     engine = create_engine()
-    generate_bars(engine, num_bars)
+    try:
+        generate_bars(engine, num_bars)
 
-    instrument = TestInstrumentProvider.btcusdt_binance()
-    bar_type = BarType.from_str(f"{instrument.id}-1-MINUTE-LAST-EXTERNAL")
+        instrument = TestInstrumentProvider.btcusdt_binance()
+        bar_type = BarType.from_str(f"{instrument.id}-1-MINUTE-LAST-EXTERNAL")
 
-    config = MomentumEvolveConfig(
-        instrument_id=instrument.id,
-        bar_type=bar_type,
-        trade_size=Decimal("0.1"),
-        fast_period=10,
-        slow_period=30,
-    )
-    strategy = MomentumEvolveStrategy(config)
-    engine.add_strategy(strategy)
+        config = MomentumEvolveConfig(
+            instrument_id=instrument.id,
+            bar_type=bar_type,
+            trade_size=Decimal("0.1"),
+            fast_period=10,
+            slow_period=30,
+        )
+        strategy = MomentumEvolveStrategy(config)
+        engine.add_strategy(strategy)
 
-    start = time.perf_counter()
-    engine.run()
-    elapsed = time.perf_counter() - start
+        start = time.perf_counter()
+        engine.run()
+        elapsed = time.perf_counter() - start
 
-    equity_points = len(strategy.get_equity_curve())
-    engine.dispose()
+        equity_points = len(strategy.get_equity_curve())
 
-    return elapsed, equity_points
+        return elapsed, equity_points
+    finally:
+        engine.dispose()
 
 
 def run_benchmark_no_equity(num_bars: int) -> float:
@@ -231,27 +237,29 @@ def run_benchmark_no_equity(num_bars: int) -> float:
         Execution time in seconds
     """
     engine = create_engine()
-    generate_bars(engine, num_bars)
+    try:
+        generate_bars(engine, num_bars)
 
-    instrument = TestInstrumentProvider.btcusdt_binance()
-    bar_type = BarType.from_str(f"{instrument.id}-1-MINUTE-LAST-EXTERNAL")
+        instrument = TestInstrumentProvider.btcusdt_binance()
+        bar_type = BarType.from_str(f"{instrument.id}-1-MINUTE-LAST-EXTERNAL")
 
-    config = VanillaMomentumConfig(
-        instrument_id=instrument.id,
-        bar_type=bar_type,
-        trade_size=Decimal("0.1"),
-        fast_period=10,
-        slow_period=30,
-    )
-    strategy = VanillaMomentumStrategy(config)
-    engine.add_strategy(strategy)
+        config = VanillaMomentumConfig(
+            instrument_id=instrument.id,
+            bar_type=bar_type,
+            trade_size=Decimal("0.1"),
+            fast_period=10,
+            slow_period=30,
+        )
+        strategy = VanillaMomentumStrategy(config)
+        engine.add_strategy(strategy)
 
-    start = time.perf_counter()
-    engine.run()
-    elapsed = time.perf_counter() - start
+        start = time.perf_counter()
+        engine.run()
+        elapsed = time.perf_counter() - start
 
-    engine.dispose()
-    return elapsed
+        return elapsed
+    finally:
+        engine.dispose()
 
 
 def run_benchmark(num_bars: int = 10000, num_runs: int = 3) -> dict:
@@ -259,12 +267,21 @@ def run_benchmark(num_bars: int = 10000, num_runs: int = 3) -> dict:
     Run complete benchmark comparing equity tracking overhead.
 
     Args:
-        num_bars: Number of bars to process per run
-        num_runs: Number of runs to average
+        num_bars: Number of bars to process per run (must be > 0)
+        num_runs: Number of runs to average (must be > 0)
 
     Returns:
         Dictionary with benchmark results
+
+    Raises:
+        ValueError: If num_bars or num_runs is not positive
     """
+    # Validate inputs
+    if num_bars <= 0:
+        raise ValueError(f"num_bars must be positive, got {num_bars}")
+    if num_runs <= 0:
+        raise ValueError(f"num_runs must be positive, got {num_runs}")
+
     print(f"\n{'=' * 60}")
     print("Alpha-Evolve Equity Tracking Benchmark")
     print(f"{'=' * 60}")
@@ -274,7 +291,11 @@ def run_benchmark(num_bars: int = 10000, num_runs: int = 3) -> dict:
 
     # Warmup run (discard)
     print("Warmup run...")
-    run_benchmark_no_equity(min(1000, num_bars))
+    try:
+        run_benchmark_no_equity(min(1000, num_bars))
+    except Exception as e:
+        print(f"Warning: Warmup run failed: {e}")
+        print("Continuing with benchmark...\n")
 
     # Run benchmarks
     times_with_equity = []
@@ -284,21 +305,46 @@ def run_benchmark(num_bars: int = 10000, num_runs: int = 3) -> dict:
     for i in range(num_runs):
         print(f"\nRun {i + 1}/{num_runs}:")
 
-        # Run without equity tracking
-        t_no_eq = run_benchmark_no_equity(num_bars)
-        times_no_equity.append(t_no_eq)
-        print(f"  No equity tracking: {t_no_eq:.4f}s")
+        try:
+            # Run without equity tracking
+            t_no_eq = run_benchmark_no_equity(num_bars)
+            times_no_equity.append(t_no_eq)
+            print(f"  No equity tracking: {t_no_eq:.4f}s")
 
-        # Run with equity tracking
-        t_eq, points = run_benchmark_with_equity(num_bars)
-        times_with_equity.append(t_eq)
-        equity_points = points
-        print(f"  With equity tracking: {t_eq:.4f}s ({points:,} points)")
+            # Run with equity tracking
+            t_eq, points = run_benchmark_with_equity(num_bars)
+            times_with_equity.append(t_eq)
+            equity_points = points
+            print(f"  With equity tracking: {t_eq:.4f}s ({points:,} points)")
+        except Exception as e:
+            print(f"  Error in run {i + 1}: {e}")
+            continue
+
+    # Validate that we have data
+    if not times_no_equity or not times_with_equity:
+        print("\nError: No successful benchmark runs completed")
+        return {
+            "num_bars": num_bars,
+            "num_runs": num_runs,
+            "avg_time_no_equity_s": 0,
+            "avg_time_with_equity_s": 0,
+            "overhead_percent": 0,
+            "equity_points": 0,
+            "pass": False,
+        }
 
     # Calculate statistics
     avg_no_eq = statistics.mean(times_no_equity)
     avg_with_eq = statistics.mean(times_with_equity)
-    overhead = ((avg_with_eq - avg_no_eq) / avg_no_eq) * 100
+
+    # Handle division by zero (theoretically possible if execution is instant)
+    if avg_no_eq <= 0:
+        print(
+            "\nError: Baseline timing is zero or negative, unable to calculate overhead"
+        )
+        overhead = 0.0
+    else:
+        overhead = ((avg_with_eq - avg_no_eq) / avg_no_eq) * 100
 
     results = {
         "num_bars": num_bars,
