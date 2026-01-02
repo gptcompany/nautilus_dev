@@ -56,22 +56,22 @@
 
 ### Tests for User Story 1
 
-- [ ] T014 [P] [US1] Create test file `tests/test_hmm_filter.py` with test fixtures
-- [ ] T015 [P] [US1] Write test_hmm_fit_with_sufficient_data in `tests/test_hmm_filter.py`
-- [ ] T016 [P] [US1] Write test_hmm_fit_fails_with_insufficient_data in `tests/test_hmm_filter.py`
-- [ ] T017 [P] [US1] Write test_hmm_predict_returns_regime_label in `tests/test_hmm_filter.py`
-- [ ] T018 [P] [US1] Write test_hmm_predict_latency_under_10ms in `tests/test_hmm_filter.py`
+- [X] T014 [P] [US1] Create test file `tests/test_hmm_filter.py` with test fixtures
+- [X] T015 [P] [US1] Write test_hmm_fit_with_sufficient_data in `tests/test_hmm_filter.py`
+- [X] T016 [P] [US1] Write test_hmm_fit_fails_with_insufficient_data in `tests/test_hmm_filter.py`
+- [X] T017 [P] [US1] Write test_hmm_predict_returns_regime_label in `tests/test_hmm_filter.py`
+- [X] T018 [P] [US1] Write test_hmm_predict_latency_under_10ms in `tests/test_hmm_filter.py`
 
 ### Implementation for User Story 1
 
-- [ ] T019 [E] [US1] Implement HMMRegimeFilter class in `strategies/common/regime_detection/hmm_filter.py`:
+- [X] T019 [E] [US1] Implement HMMRegimeFilter class in `strategies/common/regime_detection/hmm_filter.py`:
   - `__init__(n_states: int = 3, n_iter: int = 100)`
   - `fit(returns: np.ndarray, volatility: np.ndarray) -> None`
   - `predict(returns: float, volatility: float) -> RegimeState`
   - `get_state_probabilities() -> np.ndarray`
-- [ ] T020 [US1] Add convergence checking with multiple random initializations in `hmm_filter.py`
-- [ ] T021 [US1] Add regime label mapping logic (state index → RegimeState enum) in `hmm_filter.py`
-- [ ] T022 [US1] Export HMMRegimeFilter in `strategies/common/regime_detection/__init__.py`
+- [X] T020 [US1] Add convergence checking with multiple random initializations in `hmm_filter.py`
+- [X] T021 [US1] Add regime label mapping logic (state index → RegimeState enum) in `hmm_filter.py`
+- [X] T022 [US1] Export HMMRegimeFilter in `strategies/common/regime_detection/__init__.py`
 
 **Checkpoint**: HMM regime detection fully functional and tested
 
