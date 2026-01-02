@@ -5,7 +5,7 @@ Provides Pydantic models for Giller sub-linear sizing.
 
 from __future__ import annotations
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 
 class GillerConfig(BaseModel):
@@ -29,3 +29,11 @@ class GillerConfig(BaseModel):
     use_toxicity_penalty: bool = Field(default=True)
 
     model_config = {"frozen": True}
+
+    @model_validator(mode="after")
+    def validate_size_bounds(self) -> GillerConfig:
+        """Validate that min_size <= max_size."""
+        if self.min_size > self.max_size:
+            msg = f"min_size ({self.min_size}) must be <= max_size ({self.max_size})"
+            raise ValueError(msg)
+        return self

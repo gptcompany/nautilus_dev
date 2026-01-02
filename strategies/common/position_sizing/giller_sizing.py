@@ -6,6 +6,7 @@ using sub-linear scaling (signal^exponent) to avoid over-betting.
 
 from __future__ import annotations
 
+import math
 
 from strategies.common.position_sizing.config import GillerConfig
 
@@ -47,10 +48,19 @@ class GillerSizer:
 
         Returns:
             Position size with sign preserved, clamped to min/max limits.
+            Returns 0.0 for NaN/inf signals.
         """
+        # Handle NaN/inf signals
+        if not math.isfinite(signal):
+            return 0.0
+
         # Handle zero signal
         if signal == 0.0:
             return 0.0
+
+        # Clamp inputs to valid ranges
+        regime_weight = max(0.0, min(1.0, regime_weight))
+        toxicity = max(0.0, min(1.0, toxicity))
 
         # Extract sign and magnitude
         sign = 1.0 if signal > 0 else -1.0
