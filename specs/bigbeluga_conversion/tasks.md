@@ -1,9 +1,30 @@
 # BigBeluga Indicators - Conversion Tracking
 
 **Total Scripts**: 146 (BigBeluga profile)
-**Found & Classified**: 72 scripts
+**Found & Classified**: 79 scripts (combinazione di più fonti)
 **Focus**: LEADING indicators (Orderflow, Volume, Liquidity, FVG, Structure)
 **Excluded**: LAGGING indicators (RSI, MACD, oscillators, MAs)
+
+## Data Sources
+
+| Source | Scripts Found | Method |
+|--------|---------------|--------|
+| Explore Agent (Web Search) | 72 | Multi-query web search, URL extraction |
+| TradingView API Scraper | 24 | API endpoint with descriptions |
+| **Merged Total** | **79** | Deduplicated and classified |
+
+**Note**: I rimanenti ~67 script probabilmente sono premium/esclusivi o varianti non indicizzate.
+
+## TradingView API Discovery
+
+**Endpoint**: `https://www.tradingview.com/api/v1/scripts/?page=X&per_page=24&by={USERNAME}`
+
+Questo endpoint permette di:
+- Fetchare script di un utente con paginazione
+- Ottenere `scriptIdPart`, `scriptName`, `shortDescription`
+- Usare per automatizzare il discovery di nuovi indicatori
+
+**Note**: Il lazy loading della pagina profilo blocca a ~24 script visibili. Per tutti i 146 script, potrebbe essere necessario autenticarsi o usare endpoint diversi.
 
 ---
 
