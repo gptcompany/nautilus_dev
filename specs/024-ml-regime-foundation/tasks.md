@@ -167,7 +167,7 @@
 - [X] T047 [P] Add docstrings to all public classes/methods in `position_sizing/`
 - [X] T048 [P] Add type hints validation (run mypy) - SKIPPED: mypy not installed in nightly env
 - [X] T049 Run ruff format and ruff check on all new files
-- [ ] T050 Run alpha-debug verification on implementation (use alpha-debug agent)
+- [X] T050 Run alpha-debug verification on implementation (use alpha-debug agent) - Found & fixed 2 edge case bugs
 - [X] T051 Update `strategies/common/regime_detection/__init__.py` with __all__ exports
 
 ---
