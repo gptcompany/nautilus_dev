@@ -85,20 +85,20 @@
 
 ### Tests for User Story 2
 
-- [ ] T023 [P] [US2] Create test file `tests/test_gmm_filter.py` with test fixtures
-- [ ] T024 [P] [US2] Write test_gmm_fit_identifies_three_clusters in `tests/test_gmm_filter.py`
-- [ ] T025 [P] [US2] Write test_gmm_predict_returns_volatility_cluster in `tests/test_gmm_filter.py`
-- [ ] T026 [P] [US2] Write test_gmm_predict_probabilities in `tests/test_gmm_filter.py`
+- [X] T023 [P] [US2] Create test file `tests/test_gmm_filter.py` with test fixtures
+- [X] T024 [P] [US2] Write test_gmm_fit_identifies_three_clusters in `tests/test_gmm_filter.py`
+- [X] T025 [P] [US2] Write test_gmm_predict_returns_volatility_cluster in `tests/test_gmm_filter.py`
+- [X] T026 [P] [US2] Write test_gmm_predict_probabilities in `tests/test_gmm_filter.py`
 
 ### Implementation for User Story 2
 
-- [ ] T027 [E] [US2] Implement GMMVolatilityFilter class in `strategies/common/regime_detection/gmm_filter.py`:
+- [X] T027 [E] [US2] Implement GMMVolatilityFilter class in `strategies/common/regime_detection/gmm_filter.py`:
   - `__init__(n_clusters: int = 3)`
   - `fit(volatility: np.ndarray) -> None`
   - `predict(volatility: float) -> VolatilityCluster`
   - `get_cluster_probabilities(volatility: float) -> np.ndarray`
-- [ ] T028 [US2] Add cluster label mapping (cluster index → VolatilityCluster enum) in `gmm_filter.py`
-- [ ] T029 [US2] Export GMMVolatilityFilter in `strategies/common/regime_detection/__init__.py`
+- [X] T028 [US2] Add cluster label mapping (cluster index → VolatilityCluster enum) in `gmm_filter.py`
+- [X] T029 [US2] Export GMMVolatilityFilter in `strategies/common/regime_detection/__init__.py`
 
 **Checkpoint**: GMM volatility clustering fully functional and tested
 
@@ -112,20 +112,20 @@
 
 ### Tests for User Story 3
 
-- [ ] T030 [P] [US3] Create test file `tests/test_giller_sizing.py` with test fixtures
-- [ ] T031 [P] [US3] Write test_giller_sqrt_scaling in `tests/test_giller_sizing.py`
-- [ ] T032 [P] [US3] Write test_giller_with_regime_weight in `tests/test_giller_sizing.py`
-- [ ] T033 [P] [US3] Write test_giller_edge_cases_zero_negative in `tests/test_giller_sizing.py`
-- [ ] T034 [P] [US3] Write test_giller_respects_min_max_limits in `tests/test_giller_sizing.py`
+- [X] T030 [P] [US3] Create test file `tests/test_giller_sizing.py` with test fixtures
+- [X] T031 [P] [US3] Write test_giller_sqrt_scaling in `tests/test_giller_sizing.py`
+- [X] T032 [P] [US3] Write test_giller_with_regime_weight in `tests/test_giller_sizing.py`
+- [X] T033 [P] [US3] Write test_giller_edge_cases_zero_negative in `tests/test_giller_sizing.py`
+- [X] T034 [P] [US3] Write test_giller_respects_min_max_limits in `tests/test_giller_sizing.py`
 
 ### Implementation for User Story 3
 
-- [ ] T035 [US3] Implement GillerSizer class in `strategies/common/position_sizing/giller_sizing.py`:
+- [X] T035 [US3] Implement GillerSizer class in `strategies/common/position_sizing/giller_sizing.py`:
   - `__init__(config: GillerConfig)`
   - `calculate(signal: float, regime_weight: float = 1.0, toxicity: float = 0.0) -> float`
   - Sub-linear formula: `sign(signal) * |signal|^exponent * regime_weight * (1 - toxicity)`
-- [ ] T036 [US3] Add min/max size clamping in `giller_sizing.py`
-- [ ] T037 [US3] Export GillerSizer in `strategies/common/position_sizing/__init__.py`
+- [X] T036 [US3] Add min/max size clamping in `giller_sizing.py`
+- [X] T037 [US3] Export GillerSizer in `strategies/common/position_sizing/__init__.py`
 
 **Checkpoint**: Giller position sizing fully functional and tested
 
@@ -139,21 +139,21 @@
 
 ### Tests for Integration
 
-- [ ] T038 [P] Create test file `tests/test_regime_manager.py`
-- [ ] T039 [P] Write test_regime_manager_update_returns_combined_regime in `tests/test_regime_manager.py`
-- [ ] T040 [P] Write test_regime_manager_with_real_btcusdt_data in `tests/test_regime_manager.py`
+- [X] T038 [P] Create test file `tests/test_regime_manager.py`
+- [X] T039 [P] Write test_regime_manager_update_returns_combined_regime in `tests/test_regime_manager.py`
+- [X] T040 [P] Write test_regime_manager_with_real_btcusdt_data in `tests/test_regime_manager.py`
 
 ### Implementation for Integration
 
-- [ ] T041 Implement RegimeManager class in `strategies/common/regime_detection/regime_manager.py`:
+- [X] T041 Implement RegimeManager class in `strategies/common/regime_detection/regime_manager.py`:
   - `__init__(config: RegimeConfig)`
   - `fit(bars: list[Bar]) -> None`
   - `update(bar: Bar) -> RegimeResult`
   - `get_regime_weight() -> float`
-- [ ] T042 Create RegimeResult dataclass (regime, volatility, weight, confidence) in `regime_manager.py`
-- [ ] T043 Integrate HMMRegimeFilter and GMMVolatilityFilter in RegimeManager
-- [ ] T044 Implement regime transition logging (FR-008) in `regime_manager.py`
-- [ ] T045 Export RegimeManager, RegimeResult in `strategies/common/regime_detection/__init__.py`
+- [X] T042 Create RegimeResult dataclass (regime, volatility, weight, confidence) in `regime_manager.py`
+- [X] T043 Integrate HMMRegimeFilter and GMMVolatilityFilter in RegimeManager
+- [X] T044 Implement regime transition logging (FR-008) in `regime_manager.py`
+- [X] T045 Export RegimeManager, RegimeResult in `strategies/common/regime_detection/__init__.py`
 
 **Checkpoint**: Full regime detection pipeline functional
 
@@ -163,12 +163,12 @@
 
 **Purpose**: Final cleanup and documentation
 
-- [ ] T046 [P] Add docstrings to all public classes/methods in `regime_detection/`
-- [ ] T047 [P] Add docstrings to all public classes/methods in `position_sizing/`
-- [ ] T048 [P] Add type hints validation (run mypy)
-- [ ] T049 Run ruff format and ruff check on all new files
+- [X] T046 [P] Add docstrings to all public classes/methods in `regime_detection/`
+- [X] T047 [P] Add docstrings to all public classes/methods in `position_sizing/`
+- [X] T048 [P] Add type hints validation (run mypy) - SKIPPED: mypy not installed in nightly env
+- [X] T049 Run ruff format and ruff check on all new files
 - [ ] T050 Run alpha-debug verification on implementation (use alpha-debug agent)
-- [ ] T051 Update `strategies/common/regime_detection/__init__.py` with __all__ exports
+- [X] T051 Update `strategies/common/regime_detection/__init__.py` with __all__ exports
 
 ---
 

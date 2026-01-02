@@ -8,12 +8,20 @@ This module provides:
 """
 
 from strategies.common.regime_detection.config import RegimeConfig
+from strategies.common.regime_detection.gmm_filter import GMMVolatilityFilter
 from strategies.common.regime_detection.hmm_filter import HMMRegimeFilter
+from strategies.common.regime_detection.regime_manager import (
+    RegimeManager,
+    RegimeResult,
+)
 from strategies.common.regime_detection.types import RegimeState, VolatilityCluster
 
 __all__ = [
+    "GMMVolatilityFilter",
     "HMMRegimeFilter",
     "RegimeConfig",
+    "RegimeManager",
+    "RegimeResult",
     "RegimeState",
     "VolatilityCluster",
 ]

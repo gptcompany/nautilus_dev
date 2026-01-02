@@ -45,7 +45,6 @@ class RegimeState(IntEnum):
         """
         n_states = len(mean_returns)
         ret = mean_returns[state_idx]
-        vol = mean_volatility[state_idx]
 
         # Sort states by volatility to identify high/low vol regimes
         vol_rank = sorted(range(n_states), key=lambda i: mean_volatility[i])
