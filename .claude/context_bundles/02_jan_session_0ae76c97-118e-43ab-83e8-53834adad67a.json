@@ -349,7 +349,242 @@
       "operation": "todowrite",
       "timestamp": "2026-01-02T21:35:24.891993",
       "todo_count": 5
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-02T21:35:54.761769",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/regime_detection/hmm_filter.py"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-02T21:35:55.005351",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run pytest tests/test_hmm_filter.py -v --tb=short 2>&1 | head -80",
+      "description": "Run HMM filter tests"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-02T21:36:18.262816",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/test_hmm_filter.py"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-02T21:36:36.904346",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/test_hmm_filter.py",
+      "old_string": "class TestHMMRegimeMapping:\n    \"\"\"Tests for regime label mapping.\"\"\"\n\n    def test_regime_mapping_i..."
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-02T21:36:44.759389",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run pytest tests/test_hmm_filter.py -v --tb=short 2>&1 | tail -30",
+      "description": "Verify all HMM tests pass"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-02T21:37:14.459253",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/024-ml-regime-foundation/tasks.md",
+      "old_string": "- [ ] T014 [P] [US1] Create test file `tests/test_hmm_filter.py` with test fixtures\n- [ ] T015 [P] [..."
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-02T21:37:20.177263",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/regime_detection/__init__.py"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-02T21:37:28.064553",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/regime_detection/__init__.py",
+      "old_string": "\"\"\"Regime detection components for NautilusTrader strategies.\n\nThis module provides:\n- HMMRegimeFilt..."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-02T21:37:37.769186",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/024-ml-regime-foundation/tasks.md",
+      "old_string": "- [ ] T022 [US1] Export HMMRegimeFilter in `strategies/common/regime_detection/__init__.py`"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2026-01-02T21:37:38.036777",
+      "todo_count": 7
+    },
+    {
+      "operation": "write",
+      "timestamp": "2026-01-02T21:38:06.602149",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/test_gmm_filter.py",
+      "content_length": 6884
+    },
+    {
+      "operation": "task",
+      "timestamp": "2026-01-02T21:38:21.741157",
+      "subagent_type": "alpha-evolve",
+      "prompt": "Implement the GMMVolatilityFilter class for task T027 [E] [US2].\n\n**Context from spec 024-ml-regime-..."
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-02T21:38:29.797405",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/024-ml-regime-foundation/spec.md"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-02T21:38:29.810019",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/024-ml-regime-foundation/plan.md"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-02T21:38:29.818711",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/024-ml-regime-foundation/tasks.md"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-02T21:38:29.822265",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/regime_detection/types.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-02T21:38:29.830325",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/test_gmm_filter.py"
+    },
+    {
+      "operation": "glob",
+      "timestamp": "2026-01-02T21:38:37.715733",
+      "pattern": "**/gmm_filter.py",
+      "path": "/media/sam/1TB/nautilus_dev"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-02T21:38:37.760850",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/regime_detection/hmm_filter.py"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2026-01-02T21:38:46.118227",
+      "todo_count": 6
+    },
+    {
+      "operation": "write",
+      "timestamp": "2026-01-02T21:39:19.816404",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/regime_detection/gmm_filter.py",
+      "content_length": 4407
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2026-01-02T21:39:28.236875",
+      "todo_count": 6
+    },
+    {
+      "operation": "write",
+      "timestamp": "2026-01-02T21:39:56.774888",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/regime_detection/_gmm_approach_a.py",
+      "content_length": 4407
+    },
+    {
+      "operation": "write",
+      "timestamp": "2026-01-02T21:40:24.342485",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/regime_detection/_gmm_approach_b.py",
+      "content_length": 6269
+    },
+    {
+      "operation": "write",
+      "timestamp": "2026-01-02T21:40:51.908831",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/regime_detection/_gmm_approach_c.py",
+      "content_length": 4969
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2026-01-02T21:41:00.801880",
+      "todo_count": 6
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-02T21:41:33.090937",
+      "command": "cp strategies/common/regime_detection/_gmm_approach_a.py strategies/common/regime_detection/gmm_filter.py && source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run pytest tests/test_gmm_filter.py -v --tb=short 2>&1 | head -80",
+      "description": "Test Approach A: Minimal Direct Implementation"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-02T21:41:45.972556",
+      "command": "cp strategies/common/regime_detection/_gmm_approach_b.py strategies/common/regime_detection/gmm_filter.py && source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run pytest tests/test_gmm_filter.py -v --tb=short 2>&1 | head -80",
+      "description": "Test Approach B: Multi-Init with Normalization"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-02T21:42:04.441183",
+      "command": "cp strategies/common/regime_detection/_gmm_approach_c.py strategies/common/regime_detection/gmm_filter.py && source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run pytest tests/test_gmm_filter.py -v --tb=short 2>&1 | head -80",
+      "description": "Test Approach C: Sklearn Native Multi-Init"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-02T21:42:26.349991",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python3 -c \"\nimport numpy as np\nimport timeit\nimport sys\nsys.path.insert(0, '/media/sam/1TB/nautilus_dev')\n\n# Generate test data\nnp.random.seed(42)\nlow_vol = np.abs(np.random.normal(0.005, 0.001, 200))\nmed_vol = np.abs(np.random.normal(0.015, 0.003, 200))\nhigh_vol = np.abs(np.random.normal(0.035, 0.007, 200))\nvolatility = np.concatenate([low_vol, med_vol, high_vol])\n\nresults = {}\n\n# Approach A\nfrom strategies.common.regime_detection._gmm_approach_a import GMMVolatilityFilter as GMMA\ngmm_a = GMMA(n_clusters=3)\nfit_time_a = timeit.timeit(lambda: gmm_a.fit(volatility.copy()), number=5) / 5\ngmm_a.fit(volatility)\npred_time_a = timeit.timeit(lambda: gmm_a.predict(0.015), number=1000) / 1000\nresults['A'] = {'fit': fit_time_a * 1000, 'pred': pred_time_a * 1000000}\nprint(f'Approach A - Fit: {fit_time_a*1000:.2f}ms, Predict: {pred_time_a*1000000:.2f}us')\n\n# Approach B  \nfrom strategies.common.regime_detection._gmm_approach_b import GMMVolatilityFilter as GMMB\ngmm_b = GMMB(n_clusters=3, n_init=10)\nfit_time_b = timeit.timeit(lambda: gmm_b.fit(volatility.copy()), number=5) / 5\ngmm_b.fit(volatility)\npred_time_b = timeit.timeit(lambda: gmm_b.predict(0.015), number=1000) / 1000\nresults['B'] = {'fit': fit_time_b * 1000, 'pred': pred_time_b * 1000000}\nprint(f'Approach B - Fit: {fit_time_b*1000:.2f}ms, Predict: {pred_time_b*1000000:.2f}us')\n\n# Approach C\nfrom strategies.common.regime_detection._gmm_approach_c import GMMVolatilityFilter as GMMC\ngmm_c = GMMC(n_clusters=3, n_init=10)\nfit_time_c = timeit.timeit(lambda: gmm_c.fit(volatility.copy()), number=5) / 5\ngmm_c.fit(volatility)\npred_time_c = timeit.timeit(lambda: gmm_c.predict(0.015), number=1000) / 1000\nresults['C'] = {'fit': fit_time_c * 1000, 'pred': pred_time_c * 1000000}\nprint(f'Approach C - Fit: {fit_time_c*1000:.2f}ms, Predict: {pred_time_c*1000000:.2f}us')\n\"",
+      "description": "Benchmark all 3 approaches"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-02T21:42:44.895351",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run ruff check /media/sam/1TB/nautilus_dev/strategies/common/regime_detection/_gmm_approach_a.py --output-format=json 2>/dev/null | head -20 && echo \"---\" && wc -l /media/sam/1TB/nautilus_dev/strategies/common/regime_detection/_gmm_approach_a.py",
+      "description": "Check code quality for Approach A"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-02T21:42:47.258195",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run ruff check /media/sam/1TB/nautilus_dev/strategies/common/regime_detection/_gmm_approach_b.py --output-format=json 2>/dev/null | head -20 && echo \"---\" && wc -l /media/sam/1TB/nautilus_dev/strategies/common/regime_detection/_gmm_approach_b.py",
+      "description": "Check code quality for Approach B"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-02T21:42:49.167076",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run ruff check /media/sam/1TB/nautilus_dev/strategies/common/regime_detection/_gmm_approach_c.py --output-format=json 2>/dev/null | head -20 && echo \"---\" && wc -l /media/sam/1TB/nautilus_dev/strategies/common/regime_detection/_gmm_approach_c.py",
+      "description": "Check code quality for Approach C"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2026-01-02T21:42:55.924675",
+      "todo_count": 6
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-02T21:43:16.130181",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python3 -c \"\nimport numpy as np\nimport sys\nsys.path.insert(0, '/media/sam/1TB/nautilus_dev')\n\n# Test edge cases for robustness\nfrom strategies.common.regime_detection._gmm_approach_a import GMMVolatilityFilter as GMMA\n\n# Test 1: Very different scales of volatility\nnp.random.seed(42)\nextreme_low = np.abs(np.random.normal(0.0001, 0.00001, 200))\nextreme_high = np.abs(np.random.normal(0.5, 0.1, 200))\nmiddle = np.abs(np.random.normal(0.01, 0.002, 200))\nextreme_data = np.concatenate([extreme_low, middle, extreme_high])\n\ngmm = GMMA(n_clusters=3, min_samples=50)\ngmm.fit(extreme_data)\nprint('Extreme scale test - cluster means:', sorted(gmm.cluster_means))\n\n# Test if predictions work correctly\nlow_pred = gmm.predict(0.0001)\nhigh_pred = gmm.predict(0.5)\nprint(f'Low (0.0001) predicted: {low_pred}')\nprint(f'High (0.5) predicted: {high_pred}')\n\n# Check probabilities sum\nprobs = gmm.get_cluster_probabilities(0.01)\nprint(f'Probs sum: {sum(probs):.6f}')\n\"",
+      "description": "Test Approach A edge cases"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-02T21:43:32.341507",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python3 -c \"\nimport numpy as np\nimport sys\nsys.path.insert(0, '/media/sam/1TB/nautilus_dev')\n\n# Test edge cases for robustness\nfrom strategies.common.regime_detection._gmm_approach_c import GMMVolatilityFilter as GMMC\n\n# Test 1: Very different scales of volatility\nnp.random.seed(42)\nextreme_low = np.abs(np.random.normal(0.0001, 0.00001, 200))\nextreme_high = np.abs(np.random.normal(0.5, 0.1, 200))\nmiddle = np.abs(np.random.normal(0.01, 0.002, 200))\nextreme_data = np.concatenate([extreme_low, middle, extreme_high])\n\ngmm = GMMC(n_clusters=3, min_samples=50)\ngmm.fit(extreme_data)\nprint('Extreme scale test - cluster means:', sorted(gmm.cluster_means))\n\n# Test if predictions work correctly\nlow_pred = gmm.predict(0.0001)\nmid_pred = gmm.predict(0.01)\nhigh_pred = gmm.predict(0.5)\nprint(f'Low (0.0001) predicted: {low_pred}')\nprint(f'Mid (0.01) predicted: {mid_pred}')\nprint(f'High (0.5) predicted: {high_pred}')\n\"",
+      "description": "Test Approach C edge cases"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2026-01-02T21:43:46.122653",
+      "todo_count": 6
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-02T21:43:54.688135",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/regime_detection/gmm_filter.py"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-02T21:44:10.374875",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/regime_detection/gmm_filter.py",
+      "old_string": "\"\"\"GMM Volatility Clustering Filter - Approach C: Sklearn Native Multi-Init.\n\nStrategy: Use sklearn'..."
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-02T21:44:25.682749",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run pytest tests/test_gmm_filter.py -v --tb=short 2>&1",
+      "description": "Final validation of GMM filter tests"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-02T21:44:35.047364",
+      "command": "rm -f /media/sam/1TB/nautilus_dev/strategies/common/regime_detection/_gmm_approach_a.py /media/sam/1TB/nautilus_dev/strategies/common/regime_detection/_gmm_approach_b.py /media/sam/1TB/nautilus_dev/strategies/common/regime_detection/_gmm_approach_c.py && echo \"Cleaned up temporary approach files\"",
+      "description": "Clean up temporary approach files"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2026-01-02T21:44:41.809052",
+      "todo_count": 6
     }
   ],
-  "last_updated": "2026-01-02T21:35:24.892010"
+  "last_updated": "2026-01-02T21:44:41.809068"
 }
