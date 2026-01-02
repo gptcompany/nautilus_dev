@@ -11,8 +11,11 @@ from pathlib import Path
 import click
 from tqdm import tqdm
 
+from datetime import datetime
+
 from .catalog import CatalogWriter
 from .config import ConverterConfig
+from .converters.aggtrades import AggTradesConverter, get_aggtrades_date_range
 from .converters.funding import FundingRateConverter
 from .converters.klines import KlinesConverter
 from .converters.trades import TradesConverter
@@ -446,6 +449,138 @@ def status(ctx: click.Context, json_out: bool) -> None:
 
         if state.updated_at:
             click.echo(f"Last update: {state.updated_at}")
+
+
+@cli.command()
+@click.argument("symbol", type=str)
+@click.option("--start-date", type=str, default=None, help="Start date (YYYY-MM-DD)")
+@click.option("--end-date", type=str, default=None, help="End date (YYYY-MM-DD)")
+@click.option(
+    "--chunk-size", type=int, default=50_000, help="Rows per chunk (default 50k)"
+)
+@click.option("--dry-run", is_flag=True, help="Simulate without writing")
+@click.option("--verbose", "-v", is_flag=True, help="Verbose output")
+@click.pass_context
+def aggtrades(
+    ctx: click.Context,
+    symbol: str,
+    start_date: str | None,
+    end_date: str | None,
+    chunk_size: int,
+    dry_run: bool,
+    verbose: bool,
+) -> None:
+    """Convert Binance aggTrades CSV to NautilusTrader catalog.
+
+    Memory-optimized conversion for large datasets (100GB+).
+    Use --start-date and --end-date to convert subsets.
+
+    SYMBOL: Trading symbol (e.g., BTCUSDT, ETHUSDT)
+
+    Examples:
+        # Convert last 6 months
+        python -m strategies.binance2nautilus.cli aggtrades BTCUSDT --start-date 2025-07-01
+
+        # Convert specific range
+        python -m strategies.binance2nautilus.cli aggtrades BTCUSDT --start-date 2025-01-01 --end-date 2025-06-30
+    """
+    config: ConverterConfig = ctx.obj["config"]
+
+    # Validate symbol
+    if symbol not in list_supported_symbols():
+        click.echo(f"Error: Unsupported symbol: {symbol}", err=True)
+        click.echo(
+            f"Supported symbols: {', '.join(list_supported_symbols())}", err=True
+        )
+        sys.exit(2)
+
+    # Parse dates
+    start_dt = datetime.strptime(start_date, "%Y-%m-%d") if start_date else None
+    end_dt = datetime.strptime(end_date, "%Y-%m-%d") if end_date else None
+
+    # Show date range info
+    min_date, max_date = get_aggtrades_date_range(symbol, config.source_dir)
+    if min_date and max_date:
+        click.echo(f"Available data: {min_date.date()} to {max_date.date()}")
+    if start_dt or end_dt:
+        click.echo(
+            f"Converting: {start_dt.date() if start_dt else 'start'} to {end_dt.date() if end_dt else 'end'}"
+        )
+
+    # Load state
+    state = load_state(config.output_dir)
+
+    if verbose:
+        click.echo(f"Source: {config.source_dir}")
+        click.echo(f"Output: {config.output_dir}")
+        click.echo(f"Symbol: {symbol}")
+        click.echo(f"Chunk size: {chunk_size:,}")
+
+    # Initialize converter
+    converter = AggTradesConverter(
+        symbol=symbol,
+        config=config,
+        state=state,
+        start_date=start_dt,
+        end_date=end_dt,
+        chunk_size=chunk_size,
+    )
+
+    # Discover files
+    files = converter.get_pending_files()
+    if not files:
+        click.echo("No new files to process")
+        return
+
+    click.echo(f"Found {len(files)} files to process")
+
+    if dry_run:
+        for f in files[:10]:
+            click.echo(f"  Would process: {f.name}")
+        if len(files) > 10:
+            click.echo(f"  ... and {len(files) - 10} more")
+        return
+
+    # Initialize catalog and write instrument
+    catalog = CatalogWriter(config.output_dir)
+    instrument = get_instrument(symbol)
+    catalog.write_instrument(instrument)
+
+    # Process files - collect all ticks per file before writing to avoid interval overlap
+    total_ticks = 0
+    with tqdm(files, desc=f"Converting {symbol} aggTrades", unit="file") as pbar:
+        for file_path in pbar:
+            file_ticks_list = []
+            first_ts = None
+            last_ts = None
+
+            # Collect all ticks from this file (chunked reading, but accumulate before write)
+            for ticks in converter.process_file_chunked(file_path):
+                if ticks:
+                    file_ticks_list.extend(ticks)
+                    if first_ts is None:
+                        first_ts = ticks[0].ts_event
+                    last_ts = ticks[-1].ts_event
+
+            # Write all ticks from this file at once to avoid interval overlap
+            if file_ticks_list:
+                catalog.write_ticks(file_ticks_list)
+                converter.mark_processed(
+                    file_path=file_path,
+                    record_count=len(file_ticks_list),
+                    first_ts=first_ts,
+                    last_ts=last_ts,
+                )
+                total_ticks += len(file_ticks_list)
+                # Explicit cleanup
+                del file_ticks_list
+
+            pbar.set_postfix(ticks=f"{total_ticks:,}")
+
+    # Save state
+    save_state(state, config.output_dir)
+
+    click.echo(f"Converted {total_ticks:,} trade ticks from {len(files)} files")
 
 
 def main() -> None:
