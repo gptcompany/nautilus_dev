@@ -1,22 +1,22 @@
 # NautilusTrader Status Feed
 
-## Last Update: 1/1/2026, 12:01:04 AM UTC
+## Last Update: 1/2/2026, 12:00:19 AM UTC
 
 ### Current Versions
 - **Stable**: v1.221.0
 - **Nightly Commits**: 50 commits ahead
 
 ### Open Issues Summary
-- **Total Open Issues**: 16000
+- **Total Open Issues**: 16250
 - **Bugs**: 750
 - **Feature Requests**: 15500
 
 ### Recent Open Issues (Top 5)
+- [#3374](https://github.com/nautechsystems/nautilus_trader/issues/3374) RFC: Alpaca Markets Integration [RFC]
 - [#3362](https://github.com/nautechsystems/nautilus_trader/issues/3362) parquet_explorer.ipynb fails in JupyterLab Docker container - missing test data [bug]
 - [#3359](https://github.com/nautechsystems/nautilus_trader/issues/3359) Allow the instrument universe to be updated dynamically during backtesting [enhancement]
 - [#3307](https://github.com/nautechsystems/nautilus_trader/issues/3307) Add support for ticker name changes, stock splits, and corporate actions in general [enhancement]
 - [#3269](https://github.com/nautechsystems/nautilus_trader/issues/3269) [Deribit] Initial integration [enhancement, rust]
-- [#3180](https://github.com/nautechsystems/nautilus_trader/issues/3180) RFC: Comparison of Bybit Python vs Rust adapter performance [enhancement, RFC, rust, python, adapter]
 
 ### Active Bug Reports
 - [#3362](https://github.com/nautechsystems/nautilus_trader/issues/3362) parquet_explorer.ipynb fails in JupyterLab Docker container - missing test data

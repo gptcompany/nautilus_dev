@@ -4,33 +4,39 @@ Reference table for mapping academic paper indicator terminology to native Nauti
 
 ## Native Rust Indicators (ALWAYS Use These)
 
-| Paper Term | Alternative Names | NautilusTrader Class | Module | Parameters |
-|------------|-------------------|---------------------|--------|------------|
-| EMA | Exponential MA, EWMA | `ExponentialMovingAverage` | `nautilus_trader.indicators.average.ema` | `period: int` |
-| SMA | Simple MA, Moving Average | `SimpleMovingAverage` | `nautilus_trader.indicators.average.sma` | `period: int` |
-| WMA | Weighted MA | `WeightedMovingAverage` | `nautilus_trader.indicators.average.wma` | `period: int` |
-| HMA | Hull MA | `HullMovingAverage` | `nautilus_trader.indicators.average.hma` | `period: int` |
-| DEMA | Double EMA | `DoubleExponentialMovingAverage` | `nautilus_trader.indicators.average.dema` | `period: int` |
-| RSI | Relative Strength Index | `RelativeStrengthIndex` | `nautilus_trader.indicators.momentum.rsi` | `period: int` |
-| MACD | - | `MovingAverageConvergenceDivergence` | `nautilus_trader.indicators.momentum.macd` | `fast_period, slow_period, signal_period` |
-| ATR | Average True Range | `AverageTrueRange` | `nautilus_trader.indicators.volatility.atr` | `period: int` |
-| BB | Bollinger Bands | `BollingerBands` | `nautilus_trader.indicators.volatility.bb` | `period: int, k: float` |
-| Stochastic | %K, %D | `Stochastic` | `nautilus_trader.indicators.momentum.stoch` | `period_k, period_d` |
-| ADX | Average Directional Index | `AverageDirectionalIndex` | `nautilus_trader.indicators.momentum.adx` | `period: int` |
-| CCI | Commodity Channel Index | `CommodityChannelIndex` | `nautilus_trader.indicators.momentum.cci` | `period: int` |
-| ROC | Rate of Change | `RateOfChange` | `nautilus_trader.indicators.momentum.roc` | `period: int` |
-| OBV | On-Balance Volume | `OnBalanceVolume` | `nautilus_trader.indicators.volume.obv` | - |
-| VWAP | Volume Weighted Avg Price | `VolumeWeightedAveragePrice` | `nautilus_trader.indicators.average.vwap` | - |
-| Keltner | Keltner Channels | `KeltnerChannel` | `nautilus_trader.indicators.volatility.kc` | `period, k_multiplier` |
-| Donchian | Donchian Channels | `DonchianChannel` | `nautilus_trader.indicators.volatility.dc` | `period: int` |
-| Aroon | Aroon Indicator | `AroonIndicator` | `nautilus_trader.indicators.momentum.aroon` | `period: int` |
+**Import**: `from nautilus_trader.indicators import {ClassName}` (Nightly)
+
+| Paper Term | Alternative Names | NautilusTrader Class | Parameters |
+|------------|-------------------|---------------------|------------|
+| EMA | Exponential MA, EWMA | `ExponentialMovingAverage` | `period: int` |
+| SMA | Simple MA, Moving Average | `SimpleMovingAverage` | `period: int` |
+| WMA | Weighted MA | `WeightedMovingAverage` | `period: int` |
+| HMA | Hull MA | `HullMovingAverage` | `period: int` |
+| DEMA | Double EMA | `DoubleExponentialMovingAverage` | `period: int` |
+| RSI | Relative Strength Index | `RelativeStrengthIndex` | `period: int` |
+| MACD | - | `MovingAverageConvergenceDivergence` | `fast_period, slow_period, signal_period` |
+| ATR | Average True Range | `AverageTrueRange` | `period: int` |
+| BB | Bollinger Bands | `BollingerBands` | `period: int, k: float` |
+| Stochastic | %K, %D | `Stochastic` | `period_k, period_d` |
+| ADX | Average Directional Index | `AverageDirectionalIndex` | `period: int` |
+| CCI | Commodity Channel Index | `CommodityChannelIndex` | `period: int` |
+| ROC | Rate of Change | `RateOfChange` | `period: int` |
+| OBV | On-Balance Volume | `OnBalanceVolume` | - |
+| VWAP | Volume Weighted Avg Price | `VolumeWeightedAveragePrice` | - |
+| Keltner | Keltner Channels | `KeltnerChannel` | `period, k_multiplier` |
+| Donchian | Donchian Channels | `DonchianChannel` | `period: int` |
+| Aroon | Aroon Indicator | `AroonIndicator` | `period: int` |
 
 ## Usage Pattern (Native Rust)
 
 ```python
-from nautilus_trader.indicators.average.ema import ExponentialMovingAverage
-from nautilus_trader.indicators.momentum.rsi import RelativeStrengthIndex
-from nautilus_trader.indicators.volatility.atr import AverageTrueRange
+# NautilusTrader Nightly - all indicators in single module
+from nautilus_trader.indicators import (
+    ExponentialMovingAverage,
+    RelativeStrengthIndex,
+    AverageTrueRange,
+    Indicator,  # Base class for custom indicators
+)
 
 class MyStrategy(Strategy):
     def __init__(self, config):
