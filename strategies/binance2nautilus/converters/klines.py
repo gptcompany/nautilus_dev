@@ -97,8 +97,38 @@ class KlinesConverter(BaseConverter):
 
         Returns:
             DataFrame with raw klines data
+
+        Note:
+            Handles both headerless (old) and header (new) Binance CSV formats.
         """
-        return pd.read_csv(file_path)
+        # Standard Binance klines column names
+        column_names = [
+            "open_time",
+            "open",
+            "high",
+            "low",
+            "close",
+            "volume",
+            "close_time",
+            "quote_volume",
+            "count",
+            "taker_buy_volume",
+            "taker_buy_quote_volume",
+            "ignore",
+        ]
+
+        # Try reading with header first, check if first row is data or header
+        df = pd.read_csv(file_path, header=None, names=column_names)
+
+        # If first row looks like header (has 'open_time' string), skip it
+        if df.iloc[0]["open_time"] == "open_time":
+            df = df.iloc[1:].reset_index(drop=True)
+
+        # Convert numeric columns
+        for col in ["open_time", "open", "high", "low", "close", "volume"]:
+            df[col] = pd.to_numeric(df[col], errors="coerce")
+
+        return df
 
     def transform(self, df: pd.DataFrame) -> pd.DataFrame:
         """Transform raw klines CSV to wrangler format.
