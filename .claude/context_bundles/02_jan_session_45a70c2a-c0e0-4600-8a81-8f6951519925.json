@@ -588,7 +588,25 @@
       "timestamp": "2026-01-02T11:20:17.648488",
       "command": "ps aux | grep \"python -m strategies.binance2nautilus\" | grep -v grep",
       "description": "Check all running conversions"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-02T20:13:00.457739",
+      "command": "ps aux | grep \"python -m strategies.binance2nautilus\" | grep -v grep",
+      "description": "Check running conversions"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-02T20:13:00.459431",
+      "command": "tail -5 /tmp/klines_15m_conversion.log 2>/dev/null",
+      "description": "Check 15m klines progress"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-02T20:13:00.499496",
+      "command": "tail -5 /tmp/aggtrades_conversion2.log 2>/dev/null",
+      "description": "Check aggTrades progress"
     }
   ],
-  "last_updated": "2026-01-02T11:20:17.648510"
+  "last_updated": "2026-01-02T20:13:00.499514"
 }
