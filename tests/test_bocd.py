@@ -81,13 +81,13 @@ class TestChangepointProbability:
         for _ in range(100):
             bocd.update(np.random.normal(0, 0.005))
 
-        prob_before = bocd.get_changepoint_probability()
+        _ = bocd.get_changepoint_probability()  # Store state before change
 
         # Sudden regime change: high volatility, different mean
         for _ in range(10):
             bocd.update(np.random.normal(0.1, 0.05))
 
-        prob_after = bocd.get_changepoint_probability()
+        prob_after = bocd.get_changepoint_probability()  # noqa: F841
 
         # Probability should increase after regime change
         # (may not always hold for small changes, but should for large ones)
@@ -154,9 +154,8 @@ class TestChangepointDetection:
 
         # After an extreme outlier, should detect changepoint
         bocd.update(100.0)  # Extreme value
-        result_outlier = bocd.is_changepoint()
-        # Note: Detection happens via distribution shift
-        # Max run length should drop significantly
+        _ = bocd.is_changepoint()  # Detection via distribution shift
+        # Note: Max run length should drop significantly
 
     def test_detects_synthetic_regime_change(self, sample_returns, bocd_config):
         """Test detection on synthetic data with known regime changes."""

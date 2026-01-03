@@ -1143,7 +1143,76 @@
       "timestamp": "2026-01-03T11:58:52.416501",
       "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -m pytest tests/integration/test_meta_learning_pipeline.py -v",
       "description": "Run integration tests with python -m pytest"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-03T11:59:20.563808",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/026-meta-learning-pipeline/tasks.md",
+      "old_string": "## Phase 7: Integration & End-to-End Testing\n\n**Purpose**: Verify full pipeline works together\n\n- [ ..."
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2026-01-03T11:59:29.559600",
+      "todo_count": 8
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-03T11:59:36.547125",
+      "command": "ruff check strategies/common/labeling strategies/common/meta_learning strategies/common/position_sizing/integrated_sizing.py strategies/common/regime_detection/bocd*.py tests/test_meta_model.py tests/test_meta_walk_forward.py tests/test_bocd.py tests/test_integrated_sizing.py tests/integration/test_meta_learning_pipeline.py strategies/development/meta_learning_example.py --fix 2>&1 | head -100",
+      "description": "Run ruff check and fix on Spec 026 files"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-03T11:59:48.906778",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/test_bocd.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-03T11:59:48.912311",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/test_bocd.py"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-03T11:59:58.082317",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/test_bocd.py",
+      "old_string": "        prob_before = bocd.get_changepoint_probability()\n\n        # Sudden regime change: high volat..."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-03T11:59:58.687366",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/test_bocd.py",
+      "old_string": "        # After an extreme outlier, should detect changepoint\n        bocd.update(100.0)  # Extreme ..."
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-03T12:00:05.086372",
+      "command": "ruff check strategies/common/labeling strategies/common/meta_learning strategies/common/position_sizing/integrated_sizing.py strategies/common/regime_detection/bocd*.py tests/test_meta_model.py tests/test_meta_walk_forward.py tests/test_bocd.py tests/test_integrated_sizing.py tests/integration/test_meta_learning_pipeline.py strategies/development/meta_learning_example.py 2>&1",
+      "description": "Verify ruff check passes"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-03T12:00:12.885231",
+      "command": "ruff format strategies/common/labeling strategies/common/meta_learning strategies/common/position_sizing/integrated_sizing.py strategies/common/regime_detection/bocd*.py tests/test_meta_model.py tests/test_meta_walk_forward.py tests/test_bocd.py tests/test_integrated_sizing.py tests/integration/test_meta_learning_pipeline.py strategies/development/meta_learning_example.py 2>&1",
+      "description": "Run ruff format on Spec 026 files"
+    },
+    {
+      "operation": "task",
+      "timestamp": "2026-01-03T12:00:21.766468",
+      "subagent_type": "test-runner",
+      "prompt": "Run all Spec 026 tests with coverage:\n\n```bash\ncd /media/sam/1TB/nautilus_dev\nuv run pytest tests/te..."
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-03T12:00:27.949075",
+      "command": "uv run pytest tests/test_triple_barrier.py tests/test_meta_model.py tests/test_meta_walk_forward.py tests/test_bocd.py tests/test_integrated_sizing.py tests/integration/test_meta_learning_pipeline.py --cov=strategies/common/labeling --cov=strategies/common/meta_learning --cov=strategies/common/position_sizing/integrated_sizing --cov=strategies/common/regime_detection/bocd --cov-report=term-missing -v 2>&1 | tail -80",
+      "description": "Run Spec 026 tests with coverage"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-03T12:00:38.940494",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run pytest tests/test_triple_barrier.py tests/test_meta_model.py tests/test_meta_walk_forward.py tests/test_bocd.py tests/test_integrated_sizing.py tests/integration/test_meta_learning_pipeline.py --cov=strategies/common/labeling --cov=strategies/common/meta_learning --cov=strategies/common/position_sizing/integrated_sizing --cov=strategies/common/regime_detection/bocd --cov-report=term-missing -v 2>&1 | tail -120",
+      "description": "Run Spec 026 tests with NautilusTrader env"
     }
   ],
-  "last_updated": "2026-01-03T11:58:52.416526"
+  "last_updated": "2026-01-03T12:00:38.940510"
 }
