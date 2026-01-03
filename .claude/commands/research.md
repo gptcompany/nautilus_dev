@@ -32,6 +32,33 @@ Search query: "$ARGUMENTS algorithmic trading"
 
 Retrieve top 5-10 papers.
 
+### Step 2.5: Paper Download (MANDATORY)
+
+**CRITICAL**: Papers MUST be downloaded for future analysis, not just searched.
+
+For each paper found, attempt download using priority sources:
+
+1. **arXiv papers**: Use `mcp__paper-search-mcp__download_arxiv`
+2. **Semantic Scholar**: Use `mcp__paper-search-mcp__download_semantic`
+3. **bioRxiv/medRxiv**: Use respective download tools
+
+Save location: `/media/sam/1TB/nautilus_dev/docs/research/papers/`
+
+Create a download manifest:
+```markdown
+## Downloaded Papers
+
+| Paper ID | Title | Source | Status | Path |
+|----------|-------|--------|--------|------|
+| arxiv:2106.12345 | Title | arXiv | ✅ Downloaded | papers/2106.12345.pdf |
+| 10.2139/ssrn.XXX | Title | SSRN | ❌ Paywall | - |
+```
+
+**Fallback for paywalled papers**:
+- Document DOI/URL for manual download
+- Note: SSRN, JSTOR, Wiley often require institutional access
+- Consider open-access alternatives (preprints, author websites)
+
 ### Step 3: Paper Analysis
 
 For each paper found, extract:

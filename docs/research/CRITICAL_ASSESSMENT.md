@@ -20,21 +20,25 @@
 
 ---
 
-### 2. Papers Accademici - NON SCARICATI
+### 2. Papers Accademici - STATO AGGIORNATO (2026-01-03)
 
-**Papers citati ma NON scaricati**:
+**Papers scaricati**:
 
-| Paper | Citazioni | Status |
-|-------|-----------|--------|
-| Easley et al. (2011) - VPIN Flash Crash | 419 | NOT DOWNLOADED (SSRN 403 Forbidden) |
-| Kyle (1985) - Continuous Auctions | 10,000+ | NOT FOUND via search |
-| Glosten-Milgrom (1985) | 5,000+ | NOT SEARCHED |
-| Campbell et al. (2005) - Institutional Order Flow | ~500 | NOT DOWNLOADED |
+| Paper | Citazioni | Status | Path |
+|-------|-----------|--------|------|
+| Easley et al. (2011) - VPIN Flash Crash | 419 | ✅ DOWNLOADED | `papers/semantic_6bf500d5b533ce28c3a9ca8532e0701ddb482f9d.pdf` |
+| Aase & Øksendal (2019) - Kyle Model Extension | 1 | ✅ DOWNLOADED | `papers/1908.08777.pdf` |
+| Kyle (1985) - Continuous Auctions | 9,569 | ❌ JSTOR PAYWALL | DOI: 10.2307/1913210 |
+| Glosten-Milgrom (1985) | 5,000+ | ⏳ PENDING | - |
+| Campbell et al. (2005) - Institutional Order Flow | ~500 | ⏳ PENDING | - |
 
-**Azione richiesta**: Download manuale via:
-- SSRN (richiede login)
-- University library access
-- Sci-Hub (se legalmente permesso in giurisdizione)
+**Fonte alternativa per Kyle (1985)**:
+- Aase & Øksendal (2019) estende il modello Kyle, disponibile come PDF
+- Il paper originale di Kyle è disponibile su JSTOR (richiede accesso istituzionale)
+
+**Per accesso a papers paywalled**:
+- University library access (JSTOR, ScienceDirect)
+- ResearchGate (versioni author-submitted)
 
 ---
 
@@ -165,11 +169,12 @@ def validate_indicator(nautilus_indicator, pine_original, test_data):
 
 ## AZIONI IMMEDIATE RICHIESTE
 
-1. **[ ]** Download papers manualmente (SSRN login richiesto)
-2. **[ ]** Implementare script scraper per TradingView
-3. **[ ]** Categorizzare SMC come "Retail Methodology - No Academic Backing"
+1. **[x]** Download papers manualmente - VPIN (done), Kyle extension (done)
+2. **[~]** Implementare script scraper per TradingView - EXISTS: `scripts/pinescript_extractor.py`
+3. **[x]** Categorizzare SMC come "Retail Methodology - No Academic Backing" - DONE (this doc)
 4. **[ ]** Formalizzare Speed of Tape con definizione rigorosa
 5. **[ ]** Creare validation framework per ogni conversione
+6. **[~]** LuxAlgo ROI/SWOT analysis - Agent in progress (a14834d)
 
 ---
 
