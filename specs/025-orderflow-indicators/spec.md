@@ -48,12 +48,18 @@ As a trader, I want to model order arrival as a self-exciting Hawkes process so 
 - What if Hawkes process doesn't converge during fitting?
 - How to handle bid/ask data unavailable (use close vs open heuristic)?
 
+**Edge Case Requirements**:
+
+- **FR-009**: System MUST handle tick data gaps by carrying forward last known classification
+- **FR-010**: System MUST handle low volume periods with minimum bucket threshold
+- **FR-011**: System MUST handle Hawkes non-convergence with fixed-parameter fallback
+
 ## Requirements *(mandatory)*
 
 ### Functional Requirements
 
 - **FR-001**: System MUST calculate VPIN using volume buckets
-- **FR-002**: System MUST support configurable bucket size (default: 50 trades)
+- **FR-002**: System MUST support configurable volume bucket size (default: 1000.0) and bucket count (default: 50)
 - **FR-003**: System MUST classify trades as buy/sell (tick rule or bid/ask)
 - **FR-004**: System MUST fit Hawkes process parameters online
 - **FR-005**: System MUST calculate Order Flow Imbalance (OFI) from Hawkes
@@ -93,6 +99,7 @@ uv pip install tick  # Hawkes process library
 ```
 strategies/common/orderflow/
 ├── __init__.py
+├── config.py            # Configuration models
 ├── vpin.py              # VPIN toxicity indicator
 ├── hawkes_ofi.py        # Hawkes process OFI
 ├── trade_classifier.py  # Buy/sell classification

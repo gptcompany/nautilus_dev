@@ -1,29 +1,29 @@
 # NautilusTrader Status Feed
 
-## Last Update: 1/2/2026, 12:00:19 AM UTC
+## Last Update: 1/3/2026, 12:01:09 AM UTC
 
 ### Current Versions
-- **Stable**: v1.221.0
-- **Nightly Commits**: 50 commits ahead
+- **Stable**: v1.222.0
+- **Nightly Commits**: 8 commits ahead
 
 ### Open Issues Summary
-- **Total Open Issues**: 16250
-- **Bugs**: 750
+- **Total Open Issues**: 16500
+- **Bugs**: 1000
 - **Feature Requests**: 15500
 
 ### Recent Open Issues (Top 5)
+- [#3377](https://github.com/nautechsystems/nautilus_trader/issues/3377) MACD strategy in quickstart example only opens short positions [bug]
 - [#3374](https://github.com/nautechsystems/nautilus_trader/issues/3374) RFC: Alpaca Markets Integration [RFC]
 - [#3362](https://github.com/nautechsystems/nautilus_trader/issues/3362) parquet_explorer.ipynb fails in JupyterLab Docker container - missing test data [bug]
 - [#3359](https://github.com/nautechsystems/nautilus_trader/issues/3359) Allow the instrument universe to be updated dynamically during backtesting [enhancement]
 - [#3307](https://github.com/nautechsystems/nautilus_trader/issues/3307) Add support for ticker name changes, stock splits, and corporate actions in general [enhancement]
-- [#3269](https://github.com/nautechsystems/nautilus_trader/issues/3269) [Deribit] Initial integration [enhancement, rust]
 
 ### Active Bug Reports
+- [#3377](https://github.com/nautechsystems/nautilus_trader/issues/3377) MACD strategy in quickstart example only opens short positions
 - [#3362](https://github.com/nautechsystems/nautilus_trader/issues/3362) parquet_explorer.ipynb fails in JupyterLab Docker container - missing test data
 - [#3104](https://github.com/nautechsystems/nautilus_trader/issues/3104) [Reconciliation] LiveExecEngine fails to reconcile long-lived Binance Futures positions for HEDGING
 - [#3042](https://github.com/nautechsystems/nautilus_trader/issues/3042) [Reconciliation] Fails for routing clients when instrument venue differs from client venue
-- [#3362](https://github.com/nautechsystems/nautilus_trader/issues/3362) parquet_explorer.ipynb fails in JupyterLab Docker container - missing test data
-- [#3104](https://github.com/nautechsystems/nautilus_trader/issues/3104) [Reconciliation] LiveExecEngine fails to reconcile long-lived Binance Futures positions for HEDGING
+- [#3377](https://github.com/nautechsystems/nautilus_trader/issues/3377) MACD strategy in quickstart example only opens short positions
 
 ### Requested Features
 - [#3359](https://github.com/nautechsystems/nautilus_trader/issues/3359) Allow the instrument universe to be updated dynamically during backtesting
