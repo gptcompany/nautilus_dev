@@ -777,7 +777,144 @@
       "timestamp": "2026-01-03T11:50:58.235586",
       "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -c \"\nimport sys\nimport numpy as np\nsys.path.insert(0, '/media/sam/1TB/nautilus_dev')\nfrom strategies.common.regime_detection.config import BOCDConfig\nfrom strategies.common.regime_detection.bocd_approach_d import BOCD\n\nconfig = BOCDConfig(hazard_rate=0.05)\nbocd = BOCD(config)\n\nnp.random.seed(42)\nfor i in range(50):\n    bocd.update(np.random.normal(0, 0.01))\n\n# Get run length distribution BEFORE outlier\nrld_before = bocd.get_run_length_distribution()\nmax_rl_before = np.argmax(rld_before)\n\nprint('Before outlier:')\nprint(f'Max run length: {max_rl_before}')\nprint(f'Mass at max: {rld_before[max_rl_before]:.4f}')\nprint(f'Mass at r=0: {rld_before[0]:.4f}')\n\n# Process extreme outlier\nbocd.update(100.0)  # Really extreme\n\nrld_after = bocd.get_run_length_distribution()\nmax_rl_after = np.argmax(rld_after)\n\nprint('\\\\nAfter extreme outlier x=100:')\nprint(f'Max run length: {max_rl_after}')\nprint(f'Mass at max: {rld_after[max_rl_after]:.4f}')\nprint(f'Mass at r=0: {rld_after[0]:.4f}')  \nprint(f'Mass at r=1: {rld_after[1]:.4f}')\n\"",
       "description": "Check with extreme outlier"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-03T11:51:05.421013",
+      "command": "uv pip install hmmlearn",
+      "description": "Install hmmlearn dependency"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-03T11:51:05.729401",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/026-meta-learning-pipeline/tasks.md"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-03T11:51:42.487994",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/026-meta-learning-pipeline/tasks.md",
+      "old_string": "### Implementation for User Story 2\n\n- [ ] T018 [US2] Implement `MetaLabelGenerator` class in `strat..."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-03T11:51:43.479841",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/026-meta-learning-pipeline/tasks.md",
+      "old_string": "### Implementation for User Story 3\n\n- [ ] T024 [E] [US3] Implement `BOCD` class in `strategies/comm..."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-03T11:51:48.592566",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/026-meta-learning-pipeline/tasks.md",
+      "old_string": "### Implementation for User Story 4\n\n- [ ] T027 [US4] Implement `IntegratedSizer` class in `strategi..."
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2026-01-03T11:52:01.138787",
+      "todo_count": 8
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-03T11:52:06.264928",
+      "command": "mkdir -p /media/sam/1TB/nautilus_dev/tests/integration",
+      "description": "Create integration test directory"
+    },
+    {
+      "operation": "glob",
+      "timestamp": "2026-01-03T11:52:06.539036",
+      "pattern": "/media/sam/1TB/nautilus_dev/tests/integration/__init__.py"
+    },
+    {
+      "operation": "glob",
+      "timestamp": "2026-01-03T11:52:19.373689",
+      "pattern": "strategies/common/regime_detection/bocd.py",
+      "path": "/media/sam/1TB/nautilus_dev"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-03T11:52:23.109759",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/regime_detection/bocd.py"
+    },
+    {
+      "operation": "write",
+      "timestamp": "2026-01-03T11:53:11.727879",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/integration/test_meta_learning_pipeline.py",
+      "content_length": 11383
+    },
+    {
+      "operation": "write",
+      "timestamp": "2026-01-03T11:53:38.638738",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/regime_detection/bocd.py",
+      "content_length": 14127
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2026-01-03T11:53:48.270417",
+      "todo_count": 7
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-03T11:54:05.383143",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -c \"\nimport sys\nimport numpy as np\nsys.path.insert(0, '/media/sam/1TB/nautilus_dev')\nfrom strategies.common.regime_detection.bocd import BOCD\nfrom strategies.common.regime_detection.config import BOCDConfig\n\nconfig = BOCDConfig(hazard_rate=0.01, detection_threshold=0.5)\nbocd = BOCD(config)\n\n# Test basic functionality\nprint('Testing BOCD final implementation...')\n\n# Test 1: Basic update\nbocd.update(0.01)\nassert bocd.t == 1, f'Expected t=1, got {bocd.t}'\nprint('  [PASS] Basic update')\n\n# Test 2: Multiple updates\nbocd.reset()\nfor i in range(100):\n    bocd.update(np.random.normal(0, 0.01))\nassert bocd.t == 100\nrld = bocd.get_run_length_distribution()\nassert len(rld) == 101\nprint('  [PASS] Multiple updates')\n\n# Test 3: RLD sums to 1\nassert abs(np.sum(rld) - 1.0) < 1e-6, f'Sum is {np.sum(rld)}'\nprint('  [PASS] RLD sums to 1')\n\n# Test 4: RLD non-negative\nassert np.all(rld >= 0.0)\nprint('  [PASS] RLD non-negative')\n\n# Test 5: Reset clears state\nbocd.reset()\nassert bocd.t == 0\nrld = bocd.get_run_length_distribution()\nassert len(rld) == 1\nassert rld[0] == 1.0\nprint('  [PASS] Reset clears state')\n\n# Test 6: Detect regime change (distribution shift)\nnp.random.seed(42)\nbocd.reset()\nfor _ in range(50):\n    bocd.update(np.random.normal(0, 0.01))\nmax_rl_before = bocd.get_max_run_length()\nprint(f'  Max RL before outlier: {max_rl_before}')\n\nbocd.update(100.0)  # Extreme outlier\nmax_rl_after = bocd.get_max_run_length()\nprint(f'  Max RL after outlier: {max_rl_after}')\nassert max_rl_after < max_rl_before * 0.1, 'Should detect regime change'\nprint('  [PASS] Regime change detected via distribution shift')\n\n# Test 7: is_changepoint with threshold\nbocd.reset()\nfor _ in range(50):\n    bocd.update(np.random.normal(0, 0.01))\nprob = bocd.get_changepoint_probability()\nassert not bocd.is_changepoint(threshold=0.99)\nprint('  [PASS] is_changepoint with threshold')\n\n# Test 8: Outlier stability\nbocd.reset()\nfor _ in range(50):\n    bocd.update(np.random.normal(0, 0.01))\nbocd.update(10.0)\nprob = bocd.get_changepoint_probability()\nrld = bocd.get_run_length_distribution()\nassert 0 <= prob <= 1\nassert abs(np.sum(rld) - 1.0) < 1e-5\nprint('  [PASS] Outlier stability')\n\nprint('\\\\nAll basic tests PASS!')\n\"",
+      "description": "Test final BOCD implementation"
+    },
+    {
+      "operation": "write",
+      "timestamp": "2026-01-03T11:54:08.142426",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/development/meta_learning_example.py",
+      "content_length": 11425
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-03T11:54:12.347586",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/regime_detection/bocd.py"
+    },
+    {
+      "operation": "task",
+      "timestamp": "2026-01-03T11:54:14.925855",
+      "subagent_type": "test-runner",
+      "prompt": "Run the integration tests for Spec 026 Meta-Learning Pipeline:\n\n```bash\ncd /media/sam/1TB/nautilus_d..."
+    },
+    {
+      "operation": "glob",
+      "timestamp": "2026-01-03T11:54:18.809536",
+      "pattern": "specs/026-meta-learning-pipeline/contracts/*.py",
+      "path": "/media/sam/1TB/nautilus_dev"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-03T11:54:20.974653",
+      "command": "uv run pytest tests/integration/test_meta_learning_pipeline.py -v 2>&1",
+      "description": "Run meta-learning pipeline integration tests"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-03T11:54:29.117564",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/regime_detection/bocd.py",
+      "old_string": "from specs._026_meta_learning_pipeline.contracts.api import BaseBOCD, Changepoint"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-03T11:54:31.346979",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run pytest tests/integration/test_meta_learning_pipeline.py -v 2>&1",
+      "description": "Run meta-learning pipeline integration tests with nightly env"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-03T11:54:37.979442",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/regime_detection/bocd.py"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-03T11:54:39.092219",
+      "command": "/media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/python -m pytest tests/integration/test_meta_learning_pipeline.py -v 2>&1",
+      "description": "Run meta-learning pipeline tests with nightly Python"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-03T11:54:49.264475",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/regime_detection/bocd.py",
+      "old_string": "from __future__ import annotations\n\nfrom typing import TYPE_CHECKING\n\nimport numpy as np\nfrom scipy...."
     }
   ],
-  "last_updated": "2026-01-03T11:50:58.235601"
+  "last_updated": "2026-01-03T11:54:49.264492"
 }
