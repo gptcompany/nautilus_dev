@@ -9,7 +9,7 @@ This module provides:
 - BOCDConfig: Configuration for BOCD detector
 """
 
-from strategies.common.regime_detection.bocd import BOCD
+from strategies.common.regime_detection.bocd import BOCD, Changepoint
 from strategies.common.regime_detection.config import BOCDConfig, RegimeConfig
 from strategies.common.regime_detection.gmm_filter import GMMVolatilityFilter
 from strategies.common.regime_detection.hmm_filter import HMMRegimeFilter
@@ -22,6 +22,7 @@ from strategies.common.regime_detection.types import RegimeState, VolatilityClus
 __all__ = [
     "BOCD",
     "BOCDConfig",
+    "Changepoint",
     "GMMVolatilityFilter",
     "HMMRegimeFilter",
     "RegimeConfig",

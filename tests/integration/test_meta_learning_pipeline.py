@@ -73,7 +73,7 @@ class TestFullPipeline:
                 train_window=100,
                 test_window=20,
                 step_size=10,
-                embargo_window=2,
+                embargo_size=2,
             )
         )
 
@@ -158,7 +158,7 @@ class TestFullPipeline:
                 train_window=50,
                 test_window=10,
                 step_size=10,
-                embargo_window=3,
+                embargo_size=3,
             )
         )
 

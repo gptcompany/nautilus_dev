@@ -28,11 +28,11 @@ __all__ = [
 def __getattr__(name: str):
     """Lazy import to avoid circular dependencies."""
     if name == "TripleBarrierLabel":
-        from specs._026_meta_learning_pipeline.contracts.api import TripleBarrierLabel
+        from strategies.common.labeling.triple_barrier import TripleBarrierLabel
 
         return TripleBarrierLabel
     if name == "BarrierEvent":
-        from specs._026_meta_learning_pipeline.contracts.api import BarrierEvent
+        from strategies.common.labeling.triple_barrier import BarrierEvent
 
         return BarrierEvent
     if name == "TripleBarrierConfig":
