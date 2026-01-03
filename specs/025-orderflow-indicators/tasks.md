@@ -143,10 +143,10 @@
 
 - [x] T040 [P] Use test-runner agent to verify all tests pass with coverage > 80%
 - [x] T041 [P] Run alpha-debug verification on orderflow module
-- [ ] T042 Update quickstart.md with final API examples in specs/025-orderflow-indicators/quickstart.md
-- [ ] T043 Performance benchmark: Verify VPIN < 5ms, Hawkes < 1s
-- [ ] T044 Validate VPIN-volatility correlation >0.7 on historical flash crash data
-- [ ] T045 Validate OFI prediction accuracy >55% on test dataset
+- [x] T042 Update quickstart.md with final API examples in specs/025-orderflow-indicators/quickstart.md
+- [x] T043 Performance benchmark: Verify VPIN < 5ms, Hawkes < 1s (VPIN: 0.031ms, Hawkes: 1.31ms)
+- [ ] T044 Validate VPIN-volatility correlation >0.7 on historical flash crash data (DEFERRED: requires historical data)
+- [ ] T045 Validate OFI prediction accuracy >55% on test dataset (DEFERRED: requires historical data)
 
 ---
 
