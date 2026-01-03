@@ -293,6 +293,7 @@ strategies/
 │   │
 │   ├── meta_learning/              # NEW: Meta-model training
 │   │   ├── __init__.py
+│   │   ├── meta_label.py           # Meta-label generation from primary signals
 │   │   ├── meta_model.py           # Meta-model class
 │   │   ├── feature_engineering.py  # Meta-feature extraction
 │   │   └── walk_forward.py         # Walk-forward validation

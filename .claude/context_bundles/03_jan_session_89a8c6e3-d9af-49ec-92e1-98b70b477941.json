@@ -508,7 +508,253 @@
       "timestamp": "2026-01-03T10:46:09.993222",
       "url": "https://nautilustrader.io/docs/latest/api_reference/model/orders/",
       "prompt": "Extract information about order creation, tags parameter, custom labels, client_order_id, and order ..."
+    },
+    {
+      "operation": "skill",
+      "timestamp": "2026-01-03T10:47:19.507258",
+      "skill": "research",
+      "args": "triple barrier labeling meta-labeling AFML Lopez de Prado"
+    },
+    {
+      "operation": "mcp__semantic-router__classify_query",
+      "timestamp": "2026-01-03T10:47:23.357465",
+      "query": "triple barrier labeling meta-labeling AFML Lopez de Prado"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2026-01-03T10:47:30.106481",
+      "todo_count": 5
+    },
+    {
+      "operation": "mcp__paper-search-mcp__search_arxiv",
+      "timestamp": "2026-01-03T10:47:37.280998",
+      "query": "triple barrier labeling meta-labeling machine learning trading Lopez de Prado",
+      "max_results": 10
+    },
+    {
+      "operation": "mcp__paper-search-mcp__search_semantic",
+      "timestamp": "2026-01-03T10:47:38.513393",
+      "query": "triple barrier method meta-labeling algorithmic trading financial machine learning",
+      "max_results": 10
+    },
+    {
+      "operation": "mcp__paper-search-mcp__search_arxiv",
+      "timestamp": "2026-01-03T10:47:39.671327",
+      "query": "Bayesian online changepoint detection financial time series regime",
+      "max_results": 10
+    },
+    {
+      "operation": "mcp__paper-search-mcp__search_arxiv",
+      "timestamp": "2026-01-03T10:47:41.818331",
+      "query": "walk-forward validation backtesting trading strategy machine learning",
+      "max_results": 10
+    },
+    {
+      "operation": "mcp__paper-search-mcp__search_semantic",
+      "timestamp": "2026-01-03T10:47:52.584180",
+      "query": "Bayesian online changepoint detection regime switching financial markets",
+      "max_results": 10
+    },
+    {
+      "operation": "mcp__paper-search-mcp__search_semantic",
+      "timestamp": "2026-01-03T10:47:55.135653",
+      "query": "Kelly criterion position sizing machine learning trading bet sizing",
+      "max_results": 10
+    },
+    {
+      "operation": "mcp__paper-search-mcp__search_google_scholar",
+      "timestamp": "2026-01-03T10:47:57.176707",
+      "query": "meta-labeling financial machine learning AFML",
+      "max_results": 10
+    },
+    {
+      "operation": "taskoutput",
+      "timestamp": "2026-01-03T10:48:09.690138",
+      "task_id": "af08851",
+      "block": false,
+      "timeout": 30000
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2026-01-03T10:48:16.234595",
+      "todo_count": 5
+    },
+    {
+      "operation": "write",
+      "timestamp": "2026-01-03T10:50:46.062212",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/026-meta-learning-pipeline/research.md",
+      "content_length": 19832
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2026-01-03T10:52:03.035102",
+      "todo_count": 5
+    },
+    {
+      "operation": "glob",
+      "timestamp": "2026-01-03T10:52:08.999023",
+      "pattern": "specs/026-meta-learning-pipeline/**/*.md"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-03T10:52:09.007901",
+      "command": "ls -la /media/sam/1TB/nautilus_dev/scripts/sync_research.py 2>/dev/null || echo \"Script not found\"",
+      "description": "Check if sync_research.py exists"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-03T10:52:14.216892",
+      "command": "python scripts/sync_research.py --force 2>&1 | head -50",
+      "description": "Run sync_research.py to sync research"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2026-01-03T10:52:22.647956",
+      "todo_count": 6
+    },
+    {
+      "operation": "skill",
+      "timestamp": "2026-01-03T10:52:25.894093",
+      "skill": "speckit.tasks",
+      "args": "spec-026"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-03T10:52:31.049245",
+      "command": ".specify/scripts/bash/check-prerequisites.sh --json 2>/dev/null | tail -20",
+      "description": "Check prerequisites for spec-026"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-03T10:52:37.718953",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/026-meta-learning-pipeline/plan.md"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-03T10:52:37.725337",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/026-meta-learning-pipeline/spec.md"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-03T10:52:44.296576",
+      "file_path": "/media/sam/1TB/nautilus_dev/.specify/templates/tasks-template.md"
+    },
+    {
+      "operation": "write",
+      "timestamp": "2026-01-03T10:54:04.088972",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/026-meta-learning-pipeline/tasks.md",
+      "content_length": 12132
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2026-01-03T10:54:11.269935",
+      "todo_count": 6
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-03T10:59:43.131055",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/026-meta-learning-pipeline/tasks.md"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-03T11:01:32.651525",
+      "command": ".specify/scripts/bash/check-prerequisites.sh --json --require-tasks --include-tasks 2>/dev/null | tail -5",
+      "description": "Check prerequisites with tasks"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-03T11:01:39.518417",
+      "file_path": "/media/sam/1TB/nautilus_dev/.specify/memory/constitution.md"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-03T11:01:39.524024",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/026-meta-learning-pipeline/spec.md"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2026-01-03T11:02:33.383601",
+      "todo_count": 6
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-03T11:02:44.972293",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/026-meta-learning-pipeline/spec.md",
+      "old_string": "### Dependencies\n\n```bash\nuv pip install mlfinlab ruptures  # or custom BOCD\n```"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-03T11:02:45.376809",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/026-meta-learning-pipeline/spec.md",
+      "old_string": "- **SC-005**: Backtest with full pipeline shows Sharpe > 1.5"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2026-01-03T11:02:53.636525",
+      "todo_count": 6
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-03T11:03:18.713826",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/026-meta-learning-pipeline/tasks.md",
+      "old_string": "- [ ] T013 [E] [US1] Implement `TripleBarrierLabeler` class in `strategies/common/labeling/triple_ba..."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-03T11:03:19.034854",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/026-meta-learning-pipeline/tasks.md",
+      "old_string": "- [ ] T020 [E] [US2] Implement `MetaModel` class in `strategies/common/meta_learning/meta_model.py`\n..."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-03T11:03:19.350096",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/026-meta-learning-pipeline/tasks.md",
+      "old_string": "- [ ] T024 [E] [US3] Implement `BOCD` class in `strategies/common/regime_detection/bocd.py`\n  - `upd..."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-03T11:03:20.336302",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/026-meta-learning-pipeline/tasks.md",
+      "old_string": "- [ ] T010 Create API contracts in `specs/026-meta-learning-pipeline/contracts/api.py` - Protocol de..."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-03T11:03:30.997058",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/026-meta-learning-pipeline/plan.md",
+      "old_string": "│   ├── meta_learning/              # NEW: Meta-model training\n│   │   ├── __init__.py\n│   │   ├── m..."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-03T11:03:41.711753",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/026-meta-learning-pipeline/tasks.md",
+      "old_string": "- [ ] T027 [US4] Implement `IntegratedSizer` class in `strategies/common/position_sizing/integrated_..."
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2026-01-03T11:03:49.933671",
+      "todo_count": 7
+    },
+    {
+      "operation": "websearch",
+      "timestamp": "2026-01-03T11:07:37.370611",
+      "query": "mlfinlab open source fork alternative triple barrier labeling AFML 2024 2025"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-03T11:08:26.288020",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/026-meta-learning-pipeline/research.md"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-03T11:08:46.272529",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/026-meta-learning-pipeline/research.md",
+      "old_string": "## References\n\n### Meta-Labeling"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2026-01-03T11:08:57.398434",
+      "todo_count": 8
     }
   ],
-  "last_updated": "2026-01-03T10:46:09.993243"
+  "last_updated": "2026-01-03T11:08:57.398451"
 }
