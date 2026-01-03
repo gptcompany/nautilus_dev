@@ -1,0 +1,1724 @@
+{
+  "metadata": {
+    "analysis_date": "2026-01-03",
+    "source_documents": [
+      "hummingbot_analysis.md",
+      "hummingbot_strategy_roi_analysis.md",
+      "hummingbot_roi_swot_analysis.md"
+    ],
+    "total_strategies_analyzed": 28,
+    "analyst": "Claude Sonnet 4.5"
+  },
+  "strategies": [
+    {
+      "id": 1,
+      "name": "PositionExecutor (Triple Barrier)",
+      "category": "V2 Executor",
+      "file_path": "/hummingbot/strategy_v2/executors/position_executor/position_executor.py",
+      "lines_of_code": 804,
+      "roi_score": 9,
+      "roi_justification": "Essential risk management pattern reusable across ALL strategies. Production-tested on 1000s of trades. Simple, testable logic with clear state machine. Critical foundation component.",
+      "complexity": 2,
+      "complexity_description": "Low - Simple triple barrier logic with clear state transitions",
+      "estimated_hours": 4,
+      "estimated_hours_breakdown": {
+        "core_logic_extraction": 2,
+        "testing": 1.5,
+        "integration": 0.5
+      },
+      "dependencies": [
+        "NautilusTrader Strategy base class",
+        "Order and OrderFilled events",
+        "Clock/Timer for time limits"
+      ],
+      "swot": {
+        "strengths": [
+          "Production-tested risk management",
+          "Trailing stop implementation",
+          "Handles partial fills gracefully",
+          "Simple, testable logic",
+          "Proven on 1000s of trades"
+        ],
+        "weaknesses": [
+          "Tightly coupled to Hummingbot events",
+          "No NautilusTrader PositionId concept",
+          "Assumes single entry/exit",
+          "Polling-based exit checks"
+        ],
+        "opportunities": [
+          "Direct port to NautilusTrader Strategy",
+          "Reusable for ALL strategies",
+          "Test coverage exists (good reference)",
+          "Add ML-based barrier optimization",
+          "Support dynamic barrier adjustment"
+        ],
+        "threats": [
+          "NautilusTrader has native risk module",
+          "May duplicate existing functionality",
+          "Requires ExecutionClient integration",
+          "Time limit may conflict with strategy logic"
+        ]
+      },
+      "key_patterns": [
+        "Triple barrier exit conditions (TP/SL/Time)",
+        "State machine: PENDING_CREATE -> OPEN -> PARTIALLY_FILLED -> FILLED",
+        "PnL tracking from fills (not position queries)",
+        "Graceful degradation on order rejection"
+      ],
+      "conversion_notes": {
+        "mapping": {
+          "Hummingbot.PositionExecutor": "NautilusTrader.Strategy + RiskEngine",
+          "TrackedOrder": "Order + OrderEvents",
+          "TripleBarrier": "Custom Risk Module (new implementation)"
+        },
+        "lines_to_extract": 150,
+        "target_file": "/strategies/common/risk_modules/triple_barrier.py",
+        "implementation_approach": "Extract core logic only, replace event handling with NautilusTrader callbacks"
+      },
+      "priority": "CRITICAL",
+      "priority_justification": "Highest value/effort ratio (0.6). Reusable across ALL strategies. Production-tested risk management. IMPLEMENT FIRST."
+    },
+    {
+      "id": 2,
+      "name": "MarketMakingControllerBase",
+      "category": "V2 Controller",
+      "file_path": "/hummingbot/strategy_v2/controllers/market_making_controller_base.py",
+      "lines_of_code": 433,
+      "roi_score": 8,
+      "roi_justification": "Production-tested on 28+ exchanges. Clean separation of logic/execution. Multi-level spread support. Integrated risk management. Foundation for 10+ MM strategies.",
+      "complexity": 5,
+      "complexity_description": "Medium - Spread calculation, multi-level orders, executor orchestration",
+      "estimated_hours": 8,
+      "estimated_hours_breakdown": {
+        "spread_calculation_extraction": 2,
+        "level_generation_logic": 2,
+        "order_placement_mapping": 2,
+        "testing": 2
+      },
+      "dependencies": [
+        "PositionExecutor (Triple Barrier)",
+        "Price data (mid-price calculation)",
+        "Balance/capital management"
+      ],
+      "swot": {
+        "strengths": [
+          "Production-tested on 28+ exchanges",
+          "Clean separation of logic/execution",
+          "Multi-level support out of box",
+          "Integrated risk management",
+          "Clear configuration structure"
+        ],
+        "weaknesses": [
+          "Tightly coupled to Hummingbot event loop",
+          "Pydantic config (NautilusTrader uses msgspec)",
+          "No vectorized operations for spread calc",
+          "Polling-based (vs NautilusTrader event-driven)",
+          "Assumes PositionExecutor dependency"
+        ],
+        "opportunities": [
+          "Adapt to NautilusTrader Strategy class",
+          "Use native Rust indicators for mid-price",
+          "Leverage NautilusTrader's superior performance",
+          "Add ML-based dynamic spread adjustment",
+          "Template for NautilusTrader MM strategies"
+        ],
+        "threats": [
+          "Controller pattern requires ExecutorOrchestrator",
+          "Risk recreating ExecutorOrchestrator complexity",
+          "May overengineer simple market making",
+          "NautilusTrader Strategy class may be sufficient"
+        ]
+      },
+      "key_patterns": [
+        "Dynamic spread calculation based on mid-price",
+        "Multi-level order placement (1%, 2%, 3% from mid)",
+        "Integrated triple barrier per position",
+        "Automatic rebalancing on price movement",
+        "Level-based position sizing"
+      ],
+      "conversion_notes": {
+        "mapping": {
+          "ControllerConfigBase": "NautilusTrader StrategyConfig",
+          "ExecutorAction": "NautilusTrader Order submission",
+          "CreateExecutorAction": "submit_order() calls"
+        },
+        "lines_to_extract": 200,
+        "target_file": "/strategies/_templates/market_making_base.py",
+        "implementation_approach": "Extract spread calculation + level generation as pure functions, integrate with NautilusTrader Strategy"
+      },
+      "priority": "HIGH",
+      "priority_justification": "Production-ready pattern with proven risk management. Foundation for multiple MM strategies."
+    },
+    {
+      "id": 3,
+      "name": "GridExecutor",
+      "category": "V2 Executor",
+      "file_path": "/hummingbot/strategy_v2/executors/grid_executor/grid_executor.py",
+      "lines_of_code": 940,
+      "roi_score": 8,
+      "roi_justification": "High ROI potential in ranging markets. Capital-efficient activation bounds. Auto-rebalancing on level complete. Proven pattern used by traders.",
+      "complexity": 8,
+      "complexity_description": "High - 940 lines complex state machine, order recycling, inventory tracking",
+      "estimated_hours": 30,
+      "estimated_hours_breakdown": {
+        "grid_level_generation": 4,
+        "state_machine_logic": 10,
+        "order_recycling": 8,
+        "inventory_tracking": 4,
+        "testing": 4
+      },
+      "dependencies": [
+        "Min notional calculations",
+        "Price quantization",
+        "Balance tracking",
+        "Order state management"
+      ],
+      "swot": {
+        "strengths": [
+          "Handles min notional/quantization",
+          "Capital-efficient activation bounds",
+          "Auto-rebalancing on level complete",
+          "Effective in ranging markets",
+          "Inventory-aware rebalancing"
+        ],
+        "weaknesses": [
+          "940 lines (complex state machine)",
+          "Assumes single grid per executor",
+          "No support for grid overlap",
+          "Loses money in strong trends",
+          "Fixed grid (no dynamic adjustment)"
+        ],
+        "opportunities": [
+          "High ROI in ranging markets",
+          "Pattern reusable for DCA/ladder orders",
+          "Test coverage (reference implementation)",
+          "Add trend filter (EMA crossover)",
+          "Dynamic grid based on volatility (ATR)"
+        ],
+        "threats": [
+          "Requires significant rewrite for NT",
+          "May conflict with NT's OrderList",
+          "Grid strategies are commoditized",
+          "NautilusTrader can build natively in <200 lines",
+          "Complexity not justified by ROI"
+        ]
+      },
+      "key_patterns": [
+        "Grid level calculation (geometric vs arithmetic)",
+        "Order recycling (buy fills -> place sell at next level)",
+        "Inventory tracking (avoid accumulating too much base/quote)",
+        "State tracking per level: NOT_ACTIVE -> OPEN_ORDER_PLACED -> OPEN_ORDER_FILLED -> CLOSE_ORDER_PLACED -> COMPLETE",
+        "Activation bounds for capital efficiency"
+      ],
+      "conversion_notes": {
+        "mapping": {
+          "GridExecutor": "NautilusTrader GridStrategy",
+          "GridLevelStates": "Custom state tracking dict",
+          "grid_levels": "List of price levels + order state"
+        },
+        "lines_to_extract": 150,
+        "target_file": "/strategies/development/grid_strategy.py",
+        "implementation_approach": "Extract grid level calculation only, skip executor state machine. Build simple grid logic with NautilusTrader primitives."
+      },
+      "priority": "MEDIUM",
+      "priority_justification": "Proven pattern but complex. Can implement simpler version natively. Extract calculation logic only."
+    },
+    {
+      "id": 4,
+      "name": "DCAExecutor",
+      "category": "V2 Executor",
+      "file_path": "/hummingbot/strategy_v2/executors/dca_executor/dca_executor.py",
+      "lines_of_code": 544,
+      "roi_score": 7,
+      "roi_justification": "Good for trend following and long-term accumulation. Simple logic with proven time/price-based triggers. Useful baseline strategy.",
+      "complexity": 4,
+      "complexity_description": "Low-Medium - Time-based scheduling + price drop detection",
+      "estimated_hours": 8,
+      "estimated_hours_breakdown": {
+        "time_based_logic": 2,
+        "price_based_logic": 2,
+        "position_tracking": 2,
+        "testing": 2
+      },
+      "dependencies": [
+        "Timer/clock for intervals",
+        "Price monitoring",
+        "Position tracking"
+      ],
+      "swot": {
+        "strengths": [
+          "Simple, understandable logic",
+          "Maker/Taker mode flexibility",
+          "Good for trend following",
+          "Battle-tested DCA logic",
+          "Supports time + price triggers"
+        ],
+        "weaknesses": [
+          "Assumes sequential DCA levels",
+          "No advanced DCA strategies (TWAP)",
+          "Limited to single trading pair",
+          "No exit strategy (accumulate forever)",
+          "543 lines for simple logic"
+        ],
+        "opportunities": [
+          "Easy to implement in NT",
+          "Combine with PositionExecutor TP/SL",
+          "Test as baseline strategy",
+          "Add take-profit after accumulation",
+          "Dynamic sizing based on volatility"
+        ],
+        "threats": [
+          "NT can do this with simple Strategy",
+          "Not a unique competitive advantage",
+          "Better open-source DCA bots exist",
+          "Trivial to implement from scratch (<50 lines)",
+          "Hummingbot code overcomplicated"
+        ]
+      },
+      "key_patterns": [
+        "Time-based DCA (buy every N seconds)",
+        "Price-based DCA (buy on X% drops)",
+        "Maker/Taker mode (limit vs market orders)",
+        "Activation bounds for TAKER mode",
+        "Cumulative position tracking"
+      ],
+      "conversion_notes": {
+        "mapping": {
+          "DCAExecutor": "NautilusTrader DCAStrategy",
+          "DCAMode": "Order type (LIMIT/MARKET)",
+          "dca_levels": "List of target prices/amounts"
+        },
+        "lines_to_extract": 50,
+        "target_file": "/strategies/development/dca_strategy.py",
+        "implementation_approach": "Implement from scratch using NautilusTrader on_timer() callback. Skip Hummingbot boilerplate."
+      },
+      "priority": "LOW",
+      "priority_justification": "Trivial to implement natively. 10 lines of logic in 543 lines of boilerplate. Skip extraction."
+    },
+    {
+      "id": 5,
+      "name": "TWAP Executor",
+      "category": "V2 Executor",
+      "file_path": "/hummingbot/strategy_v2/executors/twap_executor/twap_executor.py",
+      "lines_of_code": 400,
+      "roi_score": 6,
+      "roi_justification": "Useful for minimizing market impact on large orders. Standard execution algorithm. Reduces slippage.",
+      "complexity": 3,
+      "complexity_description": "Low - Time-based order slicing",
+      "estimated_hours": 4,
+      "estimated_hours_breakdown": {
+        "order_slicing_logic": 2,
+        "interval_scheduling": 1,
+        "testing": 1
+      },
+      "dependencies": [
+        "Timer/scheduler",
+        "Order size calculation",
+        "Market data"
+      ],
+      "swot": {
+        "strengths": [
+          "Standard execution algorithm",
+          "Reduces slippage on large orders",
+          "Time-based predictable execution"
+        ],
+        "weaknesses": [
+          "Basic implementation only",
+          "No adaptive TWAP (volume-based)",
+          "Limited configuration options"
+        ],
+        "opportunities": [
+          "Combine with other executors",
+          "Useful for institutional-size orders",
+          "Add volume-weighted variant"
+        ],
+        "threats": [
+          "NautilusTrader likely has this",
+          "Low priority for retail traders",
+          "Simple algorithm, low ROI"
+        ]
+      },
+      "key_patterns": [
+        "Split large order into time-based slices",
+        "Execute slices at regular intervals",
+        "Track cumulative executed amount"
+      ],
+      "conversion_notes": {
+        "mapping": null,
+        "lines_to_extract": 0,
+        "target_file": null,
+        "implementation_approach": "SKIP - Check NautilusTrader for native TWAP support first"
+      },
+      "priority": "SKIP",
+      "priority_justification": "NautilusTrader likely has native TWAP. Basic algorithm. Check docs before implementing."
+    },
+    {
+      "id": 6,
+      "name": "XEMM Executor",
+      "category": "V2 Executor",
+      "file_path": "/hummingbot/strategy_v2/executors/xemm_executor/xemm_executor.py",
+      "lines_of_code": 650,
+      "roi_score": 7,
+      "roi_justification": "High ROI potential (arbitrage). Proven pattern used by HFTs. Profit from spread differences between exchanges.",
+      "complexity": 9,
+      "complexity_description": "High - Multi-exchange coordination, latency-sensitive, hedge management",
+      "estimated_hours": 60,
+      "estimated_hours_breakdown": {
+        "multi_venue_setup": 20,
+        "hedging_logic": 15,
+        "spread_monitoring": 10,
+        "risk_management": 10,
+        "testing": 5
+      },
+      "dependencies": [
+        "Multi-exchange connections",
+        "Fast execution infrastructure",
+        "Low-latency data feeds",
+        "Hedge position tracking"
+      ],
+      "swot": {
+        "strengths": [
+          "High ROI potential (arbitrage)",
+          "Proven pattern (used by HFTs)",
+          "Profit from cross-exchange spreads"
+        ],
+        "weaknesses": [
+          "Requires multi-exchange setup",
+          "Latency-sensitive",
+          "Complex coordination logic"
+        ],
+        "opportunities": [
+          "Port to NautilusTrader multi-venue",
+          "Combine with stat arb",
+          "High-frequency trading pattern"
+        ],
+        "threats": [
+          "Regulatory risk (wash trading)",
+          "Requires significant capital",
+          "Complex infrastructure needed"
+        ]
+      },
+      "key_patterns": [
+        "Quote on Exchange A while hedging on Exchange B",
+        "Monitor spread differences",
+        "Fast execution required",
+        "Hedge position management"
+      ],
+      "conversion_notes": {
+        "mapping": null,
+        "lines_to_extract": 0,
+        "target_file": null,
+        "implementation_approach": "DEFER - Requires multi-venue infrastructure. Complex. Future enhancement."
+      },
+      "priority": "DEFER",
+      "priority_justification": "Complex, requires multi-venue setup. High infrastructure requirements. Future enhancement only."
+    },
+    {
+      "id": 7,
+      "name": "DirectionalTradingControllerBase",
+      "category": "V2 Controller",
+      "file_path": "/hummingbot/strategy_v2/controllers/directional_trading_controller_base.py",
+      "lines_of_code": 420,
+      "roi_score": 7,
+      "roi_justification": "Clean signal -> execution separation. Multiple indicator support. Good reference for directional strategies.",
+      "complexity": 5,
+      "complexity_description": "Medium - Indicator integration, signal generation, position sizing",
+      "estimated_hours": 12,
+      "estimated_hours_breakdown": {
+        "signal_generation": 4,
+        "position_sizing": 3,
+        "indicator_integration": 3,
+        "testing": 2
+      },
+      "dependencies": [
+        "Indicator library (RSI, BB, MACD)",
+        "PositionExecutor",
+        "Signal strength calculation"
+      ],
+      "swot": {
+        "strengths": [
+          "Clean signal -> execution separation",
+          "Multiple indicator support",
+          "Position sizing based on signal strength",
+          "Risk management via PositionExecutor"
+        ],
+        "weaknesses": [
+          "Requires pandas_ta (heavy dependency)",
+          "Signal logic in separate class",
+          "Python indicators (100x slower)"
+        ],
+        "opportunities": [
+          "Port indicator patterns to NT",
+          "Use as reference for signal strategies",
+          "Template for combining indicators"
+        ],
+        "threats": [
+          "NT has native Rust indicators (faster)",
+          "Python indicators too slow",
+          "Dependency on pandas_ta"
+        ]
+      },
+      "key_patterns": [
+        "Signal generation from indicators (RSI, BB, MACD)",
+        "Position sizing based on signal strength",
+        "Risk management via PositionExecutor",
+        "Multi-indicator combination logic"
+      ],
+      "conversion_notes": {
+        "mapping": {
+          "DirectionalTradingControllerBase": "NautilusTrader Strategy",
+          "pandas_ta indicators": "NautilusTrader native Rust indicators",
+          "signal_strength": "Custom calculation with Rust indicators"
+        },
+        "lines_to_extract": 0,
+        "target_file": null,
+        "implementation_approach": "REFERENCE ONLY - Use NT's native Rust indicators instead of pandas_ta"
+      },
+      "priority": "REFERENCE",
+      "priority_justification": "Good patterns but use NT's native Rust indicators. Reference for signal combination logic only."
+    },
+    {
+      "id": 8,
+      "name": "PMM Simple Controller",
+      "category": "Controller",
+      "file_path": "/media/sam/1TB/hummingbot/controllers/market_making/pmm_simple.py",
+      "lines_of_code": 38,
+      "roi_score": 8,
+      "roi_justification": "ONLY 38 LINES - extremely clean. Shows power of base class pattern. Excellent reference for NT Strategy simplicity.",
+      "complexity": 2,
+      "complexity_description": "Low - Minimal boilerplate, delegates to base class",
+      "estimated_hours": 3,
+      "estimated_hours_breakdown": {
+        "config_adaptation": 1,
+        "base_class_integration": 1,
+        "testing": 1
+      },
+      "dependencies": [
+        "MarketMakingControllerBase",
+        "PositionExecutor",
+        "Triple barrier config"
+      ],
+      "swot": {
+        "strengths": [
+          "ONLY 38 LINES - extremely clean",
+          "Minimal boilerplate for MM",
+          "Shows base class pattern power",
+          "Production-ready implementation"
+        ],
+        "weaknesses": [
+          "Relies on base class (433 lines)",
+          "No unique logic",
+          "Fixed spreads only"
+        ],
+        "opportunities": [
+          "Excellent reference for NT Strategy",
+          "Shows power of base class pattern",
+          "Template for simple MM"
+        ],
+        "threats": [
+          "Too simple to be competitive",
+          "No differentiation"
+        ]
+      },
+      "key_patterns": [
+        "Pure Market Making with fixed spreads",
+        "Delegates to MarketMakingControllerBase",
+        "Triple barrier integration",
+        "Multi-level spread configuration"
+      ],
+      "conversion_notes": {
+        "mapping": {
+          "PMMSimpleController": "NautilusTrader MMStrategy",
+          "MarketMakingControllerBase": "Custom base class or direct Strategy"
+        },
+        "lines_to_extract": 38,
+        "target_file": "/strategies/_templates/pmm_simple.py",
+        "implementation_approach": "REFERENCE - Shows ideal strategy simplicity. Template for clean NT implementation."
+      },
+      "priority": "REFERENCE",
+      "priority_justification": "Perfect example of strategy simplicity. Use as template pattern, not direct port."
+    },
+    {
+      "id": 9,
+      "name": "Bollinger V1 Controller",
+      "category": "Controller",
+      "file_path": "/media/sam/1TB/hummingbot/controllers/directional_trading/bollinger_v1.py",
+      "lines_of_code": 88,
+      "roi_score": 6,
+      "roi_justification": "Simple, proven indicator. Clear signal logic. Good learning example but basic strategy with low edge.",
+      "complexity": 2,
+      "complexity_description": "Low - Single indicator, simple logic",
+      "estimated_hours": 4,
+      "estimated_hours_breakdown": {
+        "bollinger_integration": 1,
+        "signal_logic": 1,
+        "testing": 2
+      },
+      "dependencies": [
+        "BollingerBands indicator",
+        "BBP (Bollinger Band Percentage) calculation"
+      ],
+      "swot": {
+        "strengths": [
+          "Simple, proven indicator",
+          "Clear signal logic",
+          "88 lines total"
+        ],
+        "weaknesses": [
+          "Uses pandas_ta (slow)",
+          "No multi-timeframe",
+          "Basic strategy, low edge"
+        ],
+        "opportunities": [
+          "Port to NT with Rust BBands",
+          "Combine with other indicators",
+          "Learning example"
+        ],
+        "threats": [
+          "NT has native BollingerBands",
+          "Basic strategy widely known",
+          "Low competitive advantage"
+        ]
+      },
+      "key_patterns": [
+        "Bollinger Band Percentage (BBP) calculation",
+        "Long signal: BBP < 0.0 (price below lower band)",
+        "Short signal: BBP > 1.0 (price above upper band)",
+        "Mean reversion logic"
+      ],
+      "conversion_notes": {
+        "mapping": {
+          "pandas_ta.bbands": "nautilus_trader.indicators.bollinger_bands.BollingerBands",
+          "BBP": "Custom calculation with NT indicator"
+        },
+        "lines_to_extract": 30,
+        "target_file": "/strategies/development/bollinger_strategy.py",
+        "implementation_approach": "Use NT native BollingerBands indicator. Simple 1-day implementation."
+      },
+      "priority": "LOW",
+      "priority_justification": "Basic strategy, use as learning example. NT has native indicator. 1-day implementation."
+    },
+    {
+      "id": 10,
+      "name": "Fixed Grid Strategy",
+      "category": "Community Script",
+      "file_path": "/media/sam/1TB/hummingbot/scripts/community/fixed_grid.py",
+      "lines_of_code": 500,
+      "roi_score": 8,
+      "roi_justification": "AUTO-REBALANCING (unique feature). Non-linear grids for volatility. Inventory tracking per level. Proven community pattern.",
+      "complexity": 7,
+      "complexity_description": "Medium-High - Scale factors, inventory tracking, auto-rebalancing",
+      "estimated_hours": 24,
+      "estimated_hours_breakdown": {
+        "grid_generation": 6,
+        "scale_factors": 4,
+        "inventory_tracking": 8,
+        "rebalancing_logic": 4,
+        "testing": 2
+      },
+      "dependencies": [
+        "Grid level calculation",
+        "Inventory balance tracking",
+        "Rebalancing order logic"
+      ],
+      "swot": {
+        "strengths": [
+          "AUTO-REBALANCING (unique feature)",
+          "Scale factors for non-linear grids",
+          "Inventory tracking per level",
+          "Proven community pattern"
+        ],
+        "weaknesses": [
+          "500 lines (complex)",
+          "No dynamic grid adjustment",
+          "Assumes static price range"
+        ],
+        "opportunities": [
+          "Port rebalancing logic to NT",
+          "Non-linear grids for volatility",
+          "Test inventory management pattern"
+        ],
+        "threats": [
+          "GridExecutor already exists",
+          "Complex to maintain",
+          "May over-optimize"
+        ]
+      },
+      "key_patterns": [
+        "Grid generation with scale factors (non-linear)",
+        "Inventory tracking per level",
+        "Auto-rebalancing based on base/quote balances",
+        "Formula: minimum_spread = (ceiling - floor) / (1 + 2 * sum([pow(spread_scale_factor, n)]))"
+      ],
+      "conversion_notes": {
+        "mapping": {
+          "Fixed grid": "RebalancingGridStrategy",
+          "scale_factors": "Grid spacing calculation",
+          "inventory_tracking": "Balance monitoring per level"
+        },
+        "lines_to_extract": 100,
+        "target_file": "/strategies/development/rebalancing_grid.py",
+        "implementation_approach": "Extract rebalancing logic only. Simplify grid generation. Focus on inventory management."
+      },
+      "priority": "MEDIUM",
+      "priority_justification": "Unique rebalancing feature. Complex but valuable pattern. Extract rebalancing logic only (4-5 days)."
+    },
+    {
+      "id": 11,
+      "name": "Spot-Perp Arbitrage",
+      "category": "Community Script",
+      "file_path": "/media/sam/1TB/hummingbot/scripts/community/spot_perp_arb.py",
+      "lines_of_code": 643,
+      "roi_score": 9,
+      "roi_justification": "HIGH ROI (arbitrage). State machine handles edge cases. CSV logging for analysis. Proven profitable strategy.",
+      "complexity": 8,
+      "complexity_description": "High - Multi-venue, state machine, latency-sensitive",
+      "estimated_hours": 50,
+      "estimated_hours_breakdown": {
+        "multi_venue_setup": 15,
+        "state_machine": 12,
+        "profit_calculation": 8,
+        "execution_logic": 10,
+        "testing": 5
+      },
+      "dependencies": [
+        "2 exchange connections (spot + perpetual)",
+        "Fast execution",
+        "Funding rate data",
+        "Position tracking"
+      ],
+      "swot": {
+        "strengths": [
+          "HIGH ROI (arbitrage)",
+          "State machine handles edge cases",
+          "CSV logging for analysis",
+          "Proven profitable pattern"
+        ],
+        "weaknesses": [
+          "Requires 2 exchange connections",
+          "Latency-sensitive",
+          "Assumes funding rate is favorable"
+        ],
+        "opportunities": [
+          "Port to NT multi-venue",
+          "Extend to tri-arb (3 exchanges)",
+          "Add funding rate tracking",
+          "Very high ROI potential"
+        ],
+        "threats": [
+          "Requires significant capital",
+          "Regulatory risk (wash trading)",
+          "Opportunity window shrinking",
+          "High competition"
+        ]
+      },
+      "key_patterns": [
+        "State machine: Closed -> Opening -> Opened -> Closing",
+        "Profit calculation: (perp_bid - spot_ask) / spot_ask * 10000 (bps)",
+        "Execution: Buy spot + Short perp -> Wait for convergence -> Sell spot + Close perp",
+        "Edge case handling in state machine"
+      ],
+      "conversion_notes": {
+        "mapping": {
+          "SpotPerpArb": "Multi-venue NautilusTrader Strategy",
+          "StrategyState": "Enum for position lifecycle",
+          "profit_calculation": "Spread monitoring logic"
+        },
+        "lines_to_extract": 250,
+        "target_file": "/strategies/production/spot_perp_arb.py",
+        "implementation_approach": "Requires NautilusTrader multi-venue setup. State machine for position lifecycle. 7-10 days effort."
+      },
+      "priority": "HIGH",
+      "priority_justification": "VERY HIGH ROI (9/10). Proven profitable strategy. Requires multi-venue infrastructure. 7-10 days implementation."
+    },
+    {
+      "id": 12,
+      "name": "Triangular Arbitrage",
+      "category": "Community Script",
+      "file_path": "/media/sam/1TB/hummingbot/scripts/community/triangular_arbitrage.py",
+      "lines_of_code": 644,
+      "roi_score": 8,
+      "roi_justification": "Single exchange (lower risk). Kill switch on losses. Profit tracking per round. Proven arbitrage pattern.",
+      "complexity": 7,
+      "complexity_description": "High - 3-pair chain calculation, sequential execution",
+      "estimated_hours": 30,
+      "estimated_hours_breakdown": {
+        "chain_calculation": 8,
+        "profit_detection": 6,
+        "execution_logic": 10,
+        "kill_switch": 2,
+        "testing": 4
+      },
+      "dependencies": [
+        "3 liquid trading pairs",
+        "Fast execution",
+        "Fee calculation",
+        "Chain price calculation"
+      ],
+      "swot": {
+        "strengths": [
+          "Single exchange (lower risk)",
+          "Kill switch on excessive losses",
+          "Profit tracking per round",
+          "Proven arbitrage pattern"
+        ],
+        "weaknesses": [
+          "Requires 3 liquid pairs",
+          "Sequential execution (slow)",
+          "Doesn't account for fees in base version"
+        ],
+        "opportunities": [
+          "Add fee calculation",
+          "Parallel execution (all 3 orders)",
+          "Multi-exchange version",
+          "Proven pattern"
+        ],
+        "threats": [
+          "Opportunities rare on major exchanges",
+          "Requires fast execution",
+          "High competition from bots",
+          "Narrow profit margins"
+        ]
+      },
+      "key_patterns": [
+        "3-pair arbitrage: Direct (buy ADA-USDT > sell ADA-BTC > sell BTC-USDT)",
+        "Reverse: buy BTC-USDT > buy ADA-BTC > sell ADA-USDT",
+        "Chain price calculation",
+        "Profit calculation: (final_amount - initial_amount) / initial_amount * 100"
+      ],
+      "conversion_notes": {
+        "mapping": {
+          "TriangularArb": "Single-venue NautilusTrader Strategy",
+          "chain_calculation": "Price path logic",
+          "profit_detection": "Opportunity scanner"
+        },
+        "lines_to_extract": 200,
+        "target_file": "/strategies/development/triangular_arb.py",
+        "implementation_approach": "Single-venue strategy. Sequential execution first, optimize later. 5-6 days effort."
+      },
+      "priority": "MEDIUM",
+      "priority_justification": "Opportunities rare, high competition. Medium ROI. 5-6 days implementation. Lower priority than spot-perp."
+    },
+    {
+      "id": 13,
+      "name": "PMM with Shifted Mid & Dynamic Spreads",
+      "category": "Community Script",
+      "file_path": "/media/sam/1TB/hummingbot/scripts/community/pmm_with_shifted_mid_dynamic_spreads.py",
+      "lines_of_code": 235,
+      "roi_score": 7,
+      "roi_justification": "Adapts to volatility. Inventory management via mid shift. Proven MM pattern with dynamic adjustment.",
+      "complexity": 5,
+      "complexity_description": "Medium - Volatility calculation, inventory skew, spread adjustment",
+      "estimated_hours": 12,
+      "estimated_hours_breakdown": {
+        "volatility_calculation": 3,
+        "inventory_skew": 3,
+        "spread_adjustment": 3,
+        "testing": 3
+      },
+      "dependencies": [
+        "ATR or realized volatility",
+        "Balance tracking",
+        "Mid-price calculation"
+      ],
+      "swot": {
+        "strengths": [
+          "Adapts to volatility",
+          "Inventory management via mid shift",
+          "Dynamic spread adjustment",
+          "Proven MM pattern"
+        ],
+        "weaknesses": [
+          "Complex spread calculation",
+          "Requires tuning for each pair",
+          "No multi-timeframe analysis"
+        ],
+        "opportunities": [
+          "Port to NT as base MM strategy",
+          "Add more sophisticated skew models",
+          "Template for adaptive MM"
+        ],
+        "threats": [
+          "Many MM bots already do this",
+          "Requires significant capital",
+          "Complex parameter tuning"
+        ]
+      },
+      "key_patterns": [
+        "Dynamic spread = base_spread * (1 + volatility)",
+        "Mid price shift based on inventory imbalance",
+        "Inventory skew = (base_balance - target_base) / target_base",
+        "Shifted mid = mid_price + (mid_price * inventory_imbalance * shift_factor)"
+      ],
+      "conversion_notes": {
+        "mapping": {
+          "PMM Dynamic": "DynamicMMStrategy",
+          "volatility_calc": "NautilusTrader ATR indicator",
+          "inventory_skew": "Balance-based mid price adjustment"
+        },
+        "lines_to_extract": 100,
+        "target_file": "/strategies/production/dynamic_mm.py",
+        "implementation_approach": "Use NT ATR for volatility. Implement inventory skew logic. 2-3 days effort."
+      },
+      "priority": "MEDIUM",
+      "priority_justification": "Common pattern but useful. 2-3 days implementation. Good foundation for adaptive MM."
+    },
+    {
+      "id": 14,
+      "name": "PMM with Dynamic Spreads (Controller)",
+      "category": "Controller",
+      "file_path": "/hummingbot/controllers/market_making/pmm_with_dynamic_spreads.py",
+      "lines_of_code": 180,
+      "roi_score": 9,
+      "roi_justification": "Adaptive strategy with clear logic. Volatility-based spreads (ATR). Inventory adjustment. Production-ready pattern.",
+      "complexity": 5,
+      "complexity_description": "Medium - ATR integration, inventory logic, spread calculation",
+      "estimated_hours": 10,
+      "estimated_hours_breakdown": {
+        "atr_integration": 3,
+        "inventory_adjustment": 3,
+        "spread_calculation": 2,
+        "testing": 2
+      },
+      "dependencies": [
+        "ATR indicator",
+        "Inventory tracking",
+        "MarketMakingControllerBase"
+      ],
+      "swot": {
+        "strengths": [
+          "Adaptive strategy with clear logic",
+          "Volatility-based spreads (ATR)",
+          "Inventory adjustment built-in",
+          "Production-ready"
+        ],
+        "weaknesses": [
+          "Requires ExecutorOrchestrator",
+          "Pydantic config",
+          "Polling-based refresh"
+        ],
+        "opportunities": [
+          "Template for NT adaptive MM",
+          "Benchmark against fixed spreads",
+          "Extract spread calculation library"
+        ],
+        "threats": [
+          "Overengineering simple logic",
+          "Dependency on V2 executor pattern",
+          "Complex abstraction layers"
+        ]
+      },
+      "key_patterns": [
+        "Volatility adjustment: adjusted_spread = base_spread * (1 + volatility_multiplier)",
+        "Volatility multiplier: atr / mid_price (normalized ATR)",
+        "Inventory adjustment: if inventory_pct > 0.6: buy_spread *= 1.3, sell_spread *= 0.7",
+        "Combined volatility + inventory logic"
+      ],
+      "conversion_notes": {
+        "mapping": {
+          "PMM Dynamic Controller": "DynamicMMStrategy",
+          "ATR": "NautilusTrader ATR indicator",
+          "inventory_pct": "Balance monitoring"
+        },
+        "lines_to_extract": 100,
+        "target_file": "/strategies/production/pmm_dynamic.py",
+        "implementation_approach": "Use NT native ATR. Extract spread + inventory logic. 10 hours effort."
+      },
+      "priority": "HIGH",
+      "priority_justification": "Adaptive strategy with clear logic (9/10 ROI). Production-ready. 10 hours implementation."
+    },
+    {
+      "id": 15,
+      "name": "PMM with Order Refresh",
+      "category": "Controller",
+      "file_path": "/hummingbot/controllers/market_making/pmm_with_order_refresh.py",
+      "lines_of_code": 120,
+      "roi_score": 7,
+      "roi_justification": "Prevents stale orders in fast markets. Simple refresh logic. Good for competitive markets.",
+      "complexity": 3,
+      "complexity_description": "Low - Timer-based cancel/replace",
+      "estimated_hours": 4,
+      "estimated_hours_breakdown": {
+        "refresh_logic": 2,
+        "timer_integration": 1,
+        "testing": 1
+      },
+      "dependencies": [
+        "Timer/scheduler",
+        "Order cancellation",
+        "Order placement"
+      ],
+      "swot": {
+        "strengths": [
+          "Prevents stale orders",
+          "Simple refresh logic",
+          "Good for fast markets"
+        ],
+        "weaknesses": [
+          "Polling-based refresh",
+          "May cancel profitable orders",
+          "Fixed refresh interval"
+        ],
+        "opportunities": [
+          "Add adaptive refresh (volatility-based)",
+          "Skip refresh if order near fill",
+          "Template pattern"
+        ],
+        "threats": [
+          "May increase exchange fees",
+          "Could miss fills during refresh",
+          "Simple logic"
+        ]
+      },
+      "key_patterns": [
+        "Periodic cancel/replace (e.g., every 60 seconds)",
+        "Recalculate spreads based on latest mid-price",
+        "Place fresh orders after cancellation"
+      ],
+      "conversion_notes": {
+        "mapping": {
+          "Order refresh": "Timer callback in NT Strategy",
+          "cancel_all_orders": "NT cancel_all_orders()",
+          "place_grid_orders": "NT submit_order() calls"
+        },
+        "lines_to_extract": 30,
+        "target_file": null,
+        "implementation_approach": "Simple timer callback. Cancel + replace logic. 4 hours effort. Integrate into other MM strategies."
+      },
+      "priority": "MEDIUM",
+      "priority_justification": "Useful pattern for fast markets. Simple logic (4 hours). Integrate into other MM strategies."
+    },
+    {
+      "id": 16,
+      "name": "Trend Follower V1",
+      "category": "Controller",
+      "file_path": "/hummingbot/controllers/directional_trading/trend_follower_v1.py",
+      "lines_of_code": 200,
+      "roi_score": 8,
+      "roi_justification": "Trend strength scaling is clever. Position sizing based on signal. Clear entry/exit logic. Good directional pattern.",
+      "complexity": 5,
+      "complexity_description": "Medium - EMA calculation, trend strength, position sizing",
+      "estimated_hours": 12,
+      "estimated_hours_breakdown": {
+        "trend_detection": 3,
+        "strength_calculation": 3,
+        "position_sizing": 3,
+        "testing": 3
+      },
+      "dependencies": [
+        "EMA indicators (fast/slow)",
+        "PositionExecutor",
+        "Triple barrier config"
+      ],
+      "swot": {
+        "strengths": [
+          "Trend strength scaling is clever",
+          "Position sizing based on signal",
+          "Clear entry/exit logic",
+          "Triple barrier integration"
+        ],
+        "weaknesses": [
+          "Python indicators (slow)",
+          "Fixed EMA periods",
+          "No adaptive parameters",
+          "No walk-forward optimization"
+        ],
+        "opportunities": [
+          "Replace with NT Rust indicators",
+          "Add ML for parameter optimization",
+          "Backtest on Parquet catalog",
+          "Template for trend strategies"
+        ],
+        "threats": [
+          "Reinventing common patterns",
+          "Overfitting risk",
+          "Time spent on basic patterns",
+          "Better patterns exist"
+        ]
+      },
+      "key_patterns": [
+        "Trend detection: ema_fast > ema_slow = BULLISH",
+        "Trend strength: (ema_fast - ema_slow) / ema_slow",
+        "Position sizing: base_amount * (1 + trend_strength)",
+        "Dynamic sizing based on signal confidence"
+      ],
+      "conversion_notes": {
+        "mapping": {
+          "TrendFollower": "TrendStrategy",
+          "EMA": "NautilusTrader ExponentialMovingAverage (Rust)",
+          "trend_strength": "Custom calculation"
+        },
+        "lines_to_extract": 80,
+        "target_file": "/strategies/production/trend_follower.py",
+        "implementation_approach": "Use NT native EMA. Extract trend strength calculation. Position sizing logic. 12 hours effort."
+      },
+      "priority": "HIGH",
+      "priority_justification": "Trend strength scaling is valuable pattern (8/10 ROI). Use NT Rust indicators. 12 hours implementation."
+    },
+    {
+      "id": 17,
+      "name": "Mean Reversion V1",
+      "category": "Controller",
+      "file_path": "/hummingbot/controllers/directional_trading/mean_reversion_v1.py",
+      "lines_of_code": 150,
+      "roi_score": 6,
+      "roi_justification": "Classic pattern, well-implemented. RSI + BB combination reduces false signals. Good learning example.",
+      "complexity": 3,
+      "complexity_description": "Low - Simple indicator combination",
+      "estimated_hours": 6,
+      "estimated_hours_breakdown": {
+        "rsi_integration": 2,
+        "bb_integration": 2,
+        "entry_logic": 1,
+        "testing": 1
+      },
+      "dependencies": [
+        "RSI indicator",
+        "BollingerBands indicator",
+        "PositionExecutor"
+      ],
+      "swot": {
+        "strengths": [
+          "Classic pattern well-implemented",
+          "RSI + BB reduces false signals",
+          "Clear entry/exit logic",
+          "Triple barrier integration"
+        ],
+        "weaknesses": [
+          "Python indicators (slow)",
+          "Fixed indicator periods",
+          "No adaptive parameters",
+          "Basic pattern"
+        ],
+        "opportunities": [
+          "Replace with NT Rust indicators",
+          "Add ML for optimization",
+          "Template for mean reversion",
+          "Good learning example"
+        ],
+        "threats": [
+          "Reinventing common patterns",
+          "Overfitting risk",
+          "Low edge in efficient markets",
+          "Time spent on basics"
+        ]
+      },
+      "key_patterns": [
+        "Entry: RSI < 30 AND price < BB lower band (LONG)",
+        "Entry: RSI > 70 AND price > BB upper band (SHORT)",
+        "Exit via triple barrier (TP: 2%, SL: 1%, Time: 4h)",
+        "Multi-indicator confirmation"
+      ],
+      "conversion_notes": {
+        "mapping": {
+          "MeanReversion": "MeanReversionStrategy",
+          "RSI": "NautilusTrader RSI (Rust)",
+          "BollingerBands": "NautilusTrader BollingerBands (Rust)"
+        },
+        "lines_to_extract": 50,
+        "target_file": "/strategies/development/mean_reversion.py",
+        "implementation_approach": "Use NT native indicators. Simple entry logic. 6 hours effort. Learning example."
+      },
+      "priority": "MEDIUM",
+      "priority_justification": "Good template but basic pattern (6/10 ROI). Use NT Rust indicators. 6 hours implementation. Learning example."
+    },
+    {
+      "id": 18,
+      "name": "MACD + BB V1",
+      "category": "Community Script",
+      "file_path": "/hummingbot/scripts/community/macd_bb_v1.py",
+      "lines_of_code": 180,
+      "roi_score": 7,
+      "roi_justification": "Multi-indicator confirmation reduces false signals. Combines trend + mean reversion. Good pattern template.",
+      "complexity": 4,
+      "complexity_description": "Medium - Two indicator integration, signal combination",
+      "estimated_hours": 8,
+      "estimated_hours_breakdown": {
+        "macd_integration": 2,
+        "bb_integration": 2,
+        "signal_combination": 2,
+        "testing": 2
+      },
+      "dependencies": [
+        "MACD indicator",
+        "BollingerBands indicator",
+        "Signal combination logic"
+      ],
+      "swot": {
+        "strengths": [
+          "Multi-indicator confirmation",
+          "Reduces false signals",
+          "Combines trend + mean reversion",
+          "Clear signal logic"
+        ],
+        "weaknesses": [
+          "Python indicators (slow)",
+          "Fixed parameters",
+          "No optimization",
+          "May lag market"
+        ],
+        "opportunities": [
+          "Template for combining indicators",
+          "Use NT Rust indicators",
+          "Benchmark vs single indicator",
+          "Good learning pattern"
+        ],
+        "threats": [
+          "Reinventing common patterns",
+          "Overfitting risk",
+          "Time spent on basics",
+          "Lag from multiple filters"
+        ]
+      },
+      "key_patterns": [
+        "MACD for trend: macd.histogram > 0 = BULLISH",
+        "BB for entry timing: price <= BB lower band",
+        "Combined: Buy when MACD bullish AND price at lower BB",
+        "Multi-indicator filter"
+      ],
+      "conversion_notes": {
+        "mapping": {
+          "MACD_BB": "MultiIndicatorStrategy",
+          "MACD": "NautilusTrader MACD (Rust)",
+          "BollingerBands": "NautilusTrader BollingerBands (Rust)"
+        },
+        "lines_to_extract": 60,
+        "target_file": "/strategies/development/macd_bb.py",
+        "implementation_approach": "Use NT native indicators. Signal combination logic. 8 hours effort. Template for multi-indicator."
+      },
+      "priority": "MEDIUM",
+      "priority_justification": "Multi-indicator template (7/10 ROI). Use NT Rust indicators. 8 hours implementation. Good pattern example."
+    },
+    {
+      "id": 19,
+      "name": "Simple RSI Example",
+      "category": "Community Script",
+      "file_path": "/hummingbot/scripts/community/simple_rsi_example.py",
+      "lines_of_code": 80,
+      "roi_score": 5,
+      "roi_justification": "Beginner strategy, widely known. Simple logic. Good learning example but low edge.",
+      "complexity": 1,
+      "complexity_description": "Low - Single indicator, basic logic",
+      "estimated_hours": 2,
+      "estimated_hours_breakdown": {
+        "rsi_integration": 1,
+        "entry_logic": 0.5,
+        "testing": 0.5
+      },
+      "dependencies": [
+        "RSI indicator"
+      ],
+      "swot": {
+        "strengths": [
+          "Simple beginner strategy",
+          "Widely understood",
+          "Easy to test",
+          "80 lines only"
+        ],
+        "weaknesses": [
+          "Basic strategy",
+          "Low edge",
+          "Widely known",
+          "No filters"
+        ],
+        "opportunities": [
+          "Learning example",
+          "Baseline for comparison",
+          "Add filters for improvement",
+          "Quick implementation"
+        ],
+        "threats": [
+          "Too simple",
+          "Low competitive advantage",
+          "Better strategies exist",
+          "Time better spent elsewhere"
+        ]
+      },
+      "key_patterns": [
+        "RSI < 30 = Oversold = Buy signal",
+        "RSI > 70 = Overbought = Sell signal",
+        "Classic mean reversion"
+      ],
+      "conversion_notes": {
+        "mapping": {
+          "RSI Strategy": "Simple NT Strategy with RSI",
+          "RSI": "NautilusTrader RSI (Rust)"
+        },
+        "lines_to_extract": 20,
+        "target_file": null,
+        "implementation_approach": "SKIP - Too basic. Use as learning example only. NT has native RSI."
+      },
+      "priority": "LOW",
+      "priority_justification": "Beginner strategy (5/10 ROI). Too basic for production. Learning example only. 2 hours if needed."
+    },
+    {
+      "id": 20,
+      "name": "ExecutorOrchestrator",
+      "category": "Infrastructure",
+      "file_path": "/hummingbot/strategy_v2/executors/executor_orchestrator.py",
+      "lines_of_code": 633,
+      "roi_score": 7,
+      "roi_justification": "Handles complex multi-position scenarios. State persistence for recovery. Resource limits prevent overtrading. Proven in production.",
+      "complexity": 9,
+      "complexity_description": "High - Executor lifecycle, state persistence, coordination",
+      "estimated_hours": 48,
+      "estimated_hours_breakdown": {
+        "lifecycle_management": 12,
+        "state_persistence": 12,
+        "resource_limits": 8,
+        "coordination_logic": 10,
+        "testing": 6
+      },
+      "dependencies": [
+        "Executor base classes",
+        "File system for persistence",
+        "Controller actions"
+      ],
+      "swot": {
+        "strengths": [
+          "Handles complex multi-position scenarios",
+          "State persistence for recovery",
+          "Resource limits prevent overtrading",
+          "Proven in production"
+        ],
+        "weaknesses": [
+          "Adds abstraction layer over Strategy",
+          "633 lines for orchestration logic",
+          "Polling-based tick() instead of events",
+          "Tight coupling to Hummingbot architecture"
+        ],
+        "opportunities": [
+          "Adapt for NautilusTrader multi-strategy",
+          "Use as inspiration for risk limits",
+          "Extract state persistence patterns",
+          "Event-driven rewrite"
+        ],
+        "threats": [
+          "NautilusTrader has native Portfolio manager",
+          "May conflict with NautilusTrader's design",
+          "Adds complexity without clear ROI",
+          "Abstraction overhead"
+        ]
+      },
+      "key_patterns": [
+        "Executor lifecycle: spawn/stop based on Controller actions",
+        "State tracking: ACTIVE, COMPLETED, FAILED",
+        "Persistence: Save/load executor configs to disk",
+        "Resource limits: max_executors prevents overtrading"
+      ],
+      "conversion_notes": {
+        "mapping": null,
+        "lines_to_extract": 100,
+        "target_file": null,
+        "implementation_approach": "Extract state persistence logic only (~100 lines). Skip orchestration, use NautilusTrader Portfolio."
+      },
+      "priority": "MEDIUM",
+      "priority_justification": "Only if implementing multi-position strategies. Extract state persistence only. 12 hours for persistence logic."
+    },
+    {
+      "id": 21,
+      "name": "Microprice Calculator",
+      "category": "Utility",
+      "file_path": "/hummingbot/scripts/utility/microprice_calculator.py",
+      "lines_of_code": 60,
+      "roi_score": 6,
+      "roi_justification": "Useful for MM strategies. Better mid-price estimation. Simple calculation. Good utility.",
+      "complexity": 1,
+      "complexity_description": "Low - Simple weighted average",
+      "estimated_hours": 1,
+      "estimated_hours_breakdown": {
+        "implementation": 0.5,
+        "testing": 0.5
+      },
+      "dependencies": [
+        "Order book data (bid/ask volume)"
+      ],
+      "swot": {
+        "strengths": [
+          "Better mid-price estimation",
+          "Accounts for order book imbalance",
+          "Simple calculation",
+          "Useful for MM"
+        ],
+        "weaknesses": [
+          "Requires order book depth",
+          "May lag in fast markets",
+          "Simple formula"
+        ],
+        "opportunities": [
+          "Integrate into MM strategies",
+          "Use for better entry prices",
+          "Template for order book utilities",
+          "Quick win"
+        ],
+        "threats": [
+          "May not improve performance",
+          "Simple utility",
+          "Low priority"
+        ]
+      },
+      "key_patterns": [
+        "Microprice = (bid_volume * ask_price + ask_volume * bid_price) / (bid_volume + ask_volume)",
+        "Weighted mid based on order book imbalance",
+        "Better than simple (bid + ask) / 2"
+      ],
+      "conversion_notes": {
+        "mapping": {
+          "microprice": "Utility function in MM strategies"
+        },
+        "lines_to_extract": 10,
+        "target_file": "/strategies/common/utils/microprice.py",
+        "implementation_approach": "Copy formula. Simple utility function. 1 hour effort."
+      },
+      "priority": "MEDIUM",
+      "priority_justification": "Useful for MM strategies (6/10 ROI). Simple 1-hour implementation. Good utility addition."
+    },
+    {
+      "id": 22,
+      "name": "Telegram Alerts",
+      "category": "Utility",
+      "file_path": "/hummingbot/scripts/utility/telegram_alert.py",
+      "lines_of_code": 50,
+      "roi_score": 6,
+      "roi_justification": "Useful for live trading alerts. Simple integration. Good for monitoring. Quick implementation.",
+      "complexity": 1,
+      "complexity_description": "Trivial - HTTP POST request",
+      "estimated_hours": 1,
+      "estimated_hours_breakdown": {
+        "implementation": 0.5,
+        "integration": 0.5
+      },
+      "dependencies": [
+        "Telegram bot token",
+        "requests library"
+      ],
+      "swot": {
+        "strengths": [
+          "Simple integration",
+          "Useful for live trading",
+          "Instant notifications",
+          "Trivial implementation"
+        ],
+        "weaknesses": [
+          "Requires Telegram bot setup",
+          "Simple utility",
+          "Better solutions exist (Grafana)"
+        ],
+        "opportunities": [
+          "Alert pattern for live trading",
+          "Integrate with NT event callbacks",
+          "Quick win",
+          "15 lines of code"
+        ],
+        "threats": [
+          "NautilusTrader may have better monitoring",
+          "Grafana is better solution",
+          "Low priority"
+        ]
+      },
+      "key_patterns": [
+        "HTTP POST to Telegram API",
+        "Send alert on order fills, PnL changes",
+        "Integration with strategy events"
+      ],
+      "conversion_notes": {
+        "mapping": {
+          "telegram_alert": "Utility function in strategies"
+        },
+        "lines_to_extract": 15,
+        "target_file": "/strategies/common/utils/alerts.py",
+        "implementation_approach": "Copy 15 lines. Integrate with NT event callbacks. 1 hour effort."
+      },
+      "priority": "MEDIUM",
+      "priority_justification": "Useful for live trading (6/10 ROI). 1 hour implementation. Copy 15 lines."
+    },
+    {
+      "id": 23,
+      "name": "Simple PMM (Basic Script)",
+      "category": "Basic Script",
+      "file_path": "/hummingbot/scripts/basic/simple_pmm.py",
+      "lines_of_code": 120,
+      "roi_score": 4,
+      "roi_justification": "Educational example. Simple spread calculation. No production-grade risk management. Learning only.",
+      "complexity": 2,
+      "complexity_description": "Low - Basic market making",
+      "estimated_hours": 0,
+      "estimated_hours_breakdown": {},
+      "dependencies": [],
+      "swot": {
+        "strengths": [
+          "Simple educational example",
+          "Easy to understand",
+          "Low line count",
+          "Good starting point"
+        ],
+        "weaknesses": [
+          "No production-grade risk",
+          "Hardcoded parameters",
+          "No backtesting support",
+          "Educational only"
+        ],
+        "opportunities": [
+          "Convert to NT tutorials",
+          "Learning example",
+          "Pattern template"
+        ],
+        "threats": [
+          "Low quality code",
+          "Better examples in NT docs",
+          "Time wasted on toy examples"
+        ]
+      },
+      "key_patterns": [
+        "Basic spread calculation",
+        "Simple order placement",
+        "No risk management"
+      ],
+      "conversion_notes": {
+        "mapping": null,
+        "lines_to_extract": 0,
+        "target_file": null,
+        "implementation_approach": "SKIP - Educational only, not production-ready"
+      },
+      "priority": "SKIP",
+      "priority_justification": "Educational only (4/10 ROI). Not production-ready. Better examples in NT docs."
+    },
+    {
+      "id": 24,
+      "name": "Simple VWAP (Basic Script)",
+      "category": "Basic Script",
+      "file_path": "/hummingbot/scripts/basic/simple_vwap.py",
+      "lines_of_code": 95,
+      "roi_score": 4,
+      "roi_justification": "Educational example. Basic VWAP logic. Use native Rust VWAP instead.",
+      "complexity": 2,
+      "complexity_description": "Low - VWAP calculation",
+      "estimated_hours": 0,
+      "estimated_hours_breakdown": {},
+      "dependencies": [],
+      "swot": {
+        "strengths": [
+          "Educational example",
+          "Shows VWAP pattern"
+        ],
+        "weaknesses": [
+          "Basic implementation",
+          "Use NT native Rust VWAP"
+        ],
+        "opportunities": [
+          "Learning example"
+        ],
+        "threats": [
+          "Better in NT"
+        ]
+      },
+      "key_patterns": [
+        "VWAP calculation",
+        "Volume-weighted execution"
+      ],
+      "conversion_notes": {
+        "mapping": null,
+        "lines_to_extract": 0,
+        "target_file": null,
+        "implementation_approach": "SKIP - Use NautilusTrader native Rust VWAP"
+      },
+      "priority": "SKIP",
+      "priority_justification": "Use NT native Rust VWAP (4/10 ROI). Educational only."
+    },
+    {
+      "id": 25,
+      "name": "Buy Only (Basic Script)",
+      "category": "Basic Script",
+      "file_path": "/hummingbot/scripts/basic/buy_only.py",
+      "lines_of_code": 45,
+      "roi_score": 3,
+      "roi_justification": "Trivial logic. One-way accumulation. Educational only.",
+      "complexity": 1,
+      "complexity_description": "Low - Simple buy logic",
+      "estimated_hours": 0,
+      "estimated_hours_breakdown": {},
+      "dependencies": [],
+      "swot": {
+        "strengths": [
+          "Simple example"
+        ],
+        "weaknesses": [
+          "Trivial logic"
+        ],
+        "opportunities": [
+          "Learning only"
+        ],
+        "threats": [
+          "Waste of time"
+        ]
+      },
+      "key_patterns": [
+        "One-way accumulation"
+      ],
+      "conversion_notes": {
+        "mapping": null,
+        "lines_to_extract": 0,
+        "target_file": null,
+        "implementation_approach": "SKIP - Trivial logic"
+      },
+      "priority": "SKIP",
+      "priority_justification": "Trivial logic (3/10 ROI). Educational only. Skip."
+    },
+    {
+      "id": 26,
+      "name": "Momentum Example (Basic Script)",
+      "category": "Basic Script",
+      "file_path": "/hummingbot/scripts/basic/momentum_example.py",
+      "lines_of_code": 150,
+      "roi_score": 4,
+      "roi_justification": "EMA crossover example. Use NautilusTrader indicators instead. Educational only.",
+      "complexity": 2,
+      "complexity_description": "Low - EMA crossover",
+      "estimated_hours": 0,
+      "estimated_hours_breakdown": {},
+      "dependencies": [],
+      "swot": {
+        "strengths": [
+          "EMA crossover example"
+        ],
+        "weaknesses": [
+          "Python indicators (not Rust)"
+        ],
+        "opportunities": [
+          "Learning example"
+        ],
+        "threats": [
+          "Use NT Rust indicators"
+        ]
+      },
+      "key_patterns": [
+        "EMA crossover"
+      ],
+      "conversion_notes": {
+        "mapping": null,
+        "lines_to_extract": 0,
+        "target_file": null,
+        "implementation_approach": "SKIP - Use NautilusTrader native Rust EMA"
+      },
+      "priority": "SKIP",
+      "priority_justification": "Use NT native Rust EMA (4/10 ROI). Educational only. Skip."
+    },
+    {
+      "id": 27,
+      "name": "DCA Example (Utility Script)",
+      "category": "Utility Script",
+      "file_path": "/hummingbot/scripts/utility/dca_example.py",
+      "lines_of_code": 70,
+      "roi_score": 5,
+      "roi_justification": "Reference only. DCAExecutor is better. Simple example.",
+      "complexity": 1,
+      "complexity_description": "Low - Basic DCA",
+      "estimated_hours": 0,
+      "estimated_hours_breakdown": {},
+      "dependencies": [],
+      "swot": {
+        "strengths": [
+          "Simple DCA example"
+        ],
+        "weaknesses": [
+          "DCAExecutor is better"
+        ],
+        "opportunities": [
+          "Reference only"
+        ],
+        "threats": [
+          "Low value"
+        ]
+      },
+      "key_patterns": [
+        "Basic DCA logic"
+      ],
+      "conversion_notes": {
+        "mapping": null,
+        "lines_to_extract": 0,
+        "target_file": null,
+        "implementation_approach": "SKIP - DCAExecutor or native implementation better"
+      },
+      "priority": "SKIP",
+      "priority_justification": "DCAExecutor is better (5/10 ROI). Reference only. Skip."
+    },
+    {
+      "id": 28,
+      "name": "Candles Example (Utility Script)",
+      "category": "Utility Script",
+      "file_path": "/hummingbot/scripts/utility/candles_example.py",
+      "lines_of_code": 60,
+      "roi_score": 4,
+      "roi_justification": "Shows candle data access. NT has better support. Educational only.",
+      "complexity": 1,
+      "complexity_description": "Low - Data access example",
+      "estimated_hours": 0,
+      "estimated_hours_breakdown": {},
+      "dependencies": [],
+      "swot": {
+        "strengths": [
+          "Shows data access"
+        ],
+        "weaknesses": [
+          "NT has better support"
+        ],
+        "opportunities": [
+          "Learning only"
+        ],
+        "threats": [
+          "Low value"
+        ]
+      },
+      "key_patterns": [
+        "Candle data access"
+      ],
+      "conversion_notes": {
+        "mapping": null,
+        "lines_to_extract": 0,
+        "target_file": null,
+        "implementation_approach": "SKIP - NautilusTrader has better candle support"
+      },
+      "priority": "SKIP",
+      "priority_justification": "NT has better support (4/10 ROI). Educational only. Skip."
+    }
+  ],
+  "summary": {
+    "total_strategies": 28,
+    "by_priority": {
+      "CRITICAL": 1,
+      "HIGH": 3,
+      "MEDIUM": 9,
+      "LOW": 2,
+      "REFERENCE": 2,
+      "SKIP": 10,
+      "DEFER": 1
+    },
+    "by_category": {
+      "V2 Executor": 6,
+      "V2 Controller": 2,
+      "Controller": 6,
+      "Community Script": 6,
+      "Basic Script": 5,
+      "Utility Script": 2,
+      "Utility": 2,
+      "Infrastructure": 1
+    },
+    "avg_roi_score": 6.5,
+    "avg_complexity": 3.8,
+    "total_estimated_hours": 358,
+    "high_value_strategies": [
+      "PositionExecutor (Triple Barrier)",
+      "MarketMakingControllerBase",
+      "PMM with Dynamic Spreads (Controller)",
+      "Spot-Perp Arbitrage"
+    ],
+    "recommended_implementation_order": [
+      "PositionExecutor (Triple Barrier) - 4 hours - CRITICAL",
+      "MarketMakingControllerBase - 8 hours - HIGH",
+      "PMM with Dynamic Spreads (Controller) - 10 hours - HIGH",
+      "Trend Follower V1 - 12 hours - HIGH",
+      "PMM with Shifted Mid & Dynamic Spreads - 12 hours - MEDIUM",
+      "Spot-Perp Arbitrage - 50 hours - HIGH (requires multi-venue)"
+    ]
+  }
+}
