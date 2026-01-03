@@ -102,24 +102,24 @@
 
 ### Implementation for User Story 2
 
-- [ ] T018 [US2] Implement `MetaLabelGenerator` class in `strategies/common/meta_learning/meta_label.py`
+- [X] T018 [US2] Implement `MetaLabelGenerator` class in `strategies/common/meta_learning/meta_label.py`
   - Create meta-labels from primary signals + true labels
   - Compute: meta_label = 1 if primary_signal == true_label else 0
-- [ ] T019 [US2] Implement feature extraction in `strategies/common/meta_learning/feature_engineering.py`
+- [X] T019 [US2] Implement feature extraction in `strategies/common/meta_learning/feature_engineering.py`
   - Volume features (relative volume, volume momentum)
   - Volatility features (rolling std, ATR ratio)
   - Momentum features (returns, RSI-like)
   - Regime features (HMM state, if available)
-- [ ] T020 [E] [US2] Implement `MetaModel` class in `strategies/common/meta_learning/meta_model.py`
+- [X] T020 [E] [US2] Implement `MetaModel` class in `strategies/common/meta_learning/meta_model.py`
   - RandomForest wrapper with `fit()` and `predict_proba()`
   - Feature importance tracking
   - Calibration check (reliability diagram)
   - **Edge case**: Return 0.5 confidence when insufficient training data (<100 samples)
-- [ ] T021 [US2] Implement walk-forward validation in `strategies/common/meta_learning/walk_forward.py`
+- [X] T021 [US2] Implement walk-forward validation in `strategies/common/meta_learning/walk_forward.py`
   - `WalkForwardSplitter` class
   - Rolling 252/63/21/5 bar windows (train/test/step/embargo)
   - `walk_forward_train()` for proper training protocol
-- [ ] T022 [US2] Update `strategies/common/meta_learning/__init__.py` with public API exports
+- [X] T022 [US2] Update `strategies/common/meta_learning/__init__.py` with public API exports
 
 **Checkpoint**: Meta-model training functional, achieves AUC > 0.6
 
@@ -142,7 +142,7 @@
 
 ### Implementation for User Story 3
 
-- [ ] T024 [E] [US3] Implement `BOCD` class in `strategies/common/regime_detection/bocd.py`
+- [X] T024 [E] [US3] Implement `BOCD` class in `strategies/common/regime_detection/bocd.py`
   - `update(observation)` - process single observation
   - `get_changepoint_probability()` - P(run_length = 0)
   - `get_run_length_distribution()` - full posterior
@@ -151,7 +151,7 @@
   - Student-t conjugate prior (Adams & MacKay 2007)
   - **Edge case**: Handle non-stationary mean+variance via robust hazard rate
   - **FR-006**: When `is_changepoint()` returns True, caller should trigger regime refit
-- [ ] T025 [US3] Update `strategies/common/regime_detection/__init__.py` with BOCD exports
+- [X] T025 [US3] Update `strategies/common/regime_detection/__init__.py` with BOCD exports
 
 **Checkpoint**: BOCD functional, detects regime changes in streaming data
 
@@ -176,13 +176,13 @@
 
 ### Implementation for User Story 4
 
-- [ ] T027 [US4] Implement `IntegratedSizer` class in `strategies/common/position_sizing/integrated_sizing.py`
+- [X] T027 [US4] Implement `IntegratedSizer` class in `strategies/common/position_sizing/integrated_sizing.py`
   - `calculate(signal, meta_confidence, regime_weight, toxicity)` -> IntegratedSize
   - Formula: direction * |signal|^0.5 * meta_confidence * regime_weight * (1-toxicity) * kelly
   - Factor breakdown tracking via `IntegratedSize.factors` property
   - Default values for missing inputs
   - **FR-008**: Log factor contributions at DEBUG level for debugging
-- [ ] T028 [US4] Update `strategies/common/position_sizing/__init__.py` with IntegratedSizer exports
+- [X] T028 [US4] Update `strategies/common/position_sizing/__init__.py` with IntegratedSizer exports
 
 **Checkpoint**: Integrated sizing functional, combines all factors correctly
 
