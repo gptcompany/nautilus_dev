@@ -334,8 +334,7 @@ def create_classifier(
     if method not in classifiers:
         valid_methods = list(classifiers.keys())
         raise ValueError(
-            f"Invalid classification method: '{method}'. "
-            f"Valid methods: {valid_methods}"
+            f"Invalid classification method: '{method}'. Valid methods: {valid_methods}"
         )
 
     return classifiers[method]()
