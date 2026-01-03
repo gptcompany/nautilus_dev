@@ -2,6 +2,28 @@
 
 This directory contains documentation and synced data from the academic research pipeline.
 
+## Latest Research (2026-01-03)
+
+### Transcendent Trading Analysis
+
+**NEW**: Comprehensive analysis of non-conventional trading approaches (TDA, Wavelets, Fibonacci, Elliott Wave)
+
+| Document | Description | Size | Priority |
+|----------|-------------|------|----------|
+| **[RESEARCH_SUMMARY_2026.md](RESEARCH_SUMMARY_2026.md)** | Executive summary + roadmap | 11 KB | ⭐ Start Here |
+| **[TRANSCENDENT_ANALYSIS_2026.md](TRANSCENDENT_ANALYSIS_2026.md)** | Full analysis (40+ papers) | 29 KB | ⭐⭐ Deep Dive |
+| **[papers/DOWNLOAD_MANIFEST.md](papers/DOWNLOAD_MANIFEST.md)** | Paper downloads + access | 7 KB | Reference |
+
+**Key Findings**:
+- TDA: 2.5x Sharpe improvement (0.52 vs 0.21) - HIGH confidence
+- Wavelets: 92-94% accuracy - HIGH confidence
+- Elliott Wave: 2.2% in 15 days - MEDIUM confidence (validate)
+- Fibonacci: "Limited utility" per academic consensus - LOW confidence
+
+**Downloaded Papers** (3): `papers/LMS-AutoTSF_2024.pdf`, `papers/LSTM_Pattern_Recognition_2024.pdf`, `papers/TDA_Ball_Mapper_2022.pdf`
+
+---
+
 ## Contents
 
 ### Mapping Tables
@@ -12,6 +34,11 @@ This directory contains documentation and synced data from the academic research
 ### Synced Data
 
 - **strategies.json** - Strategy entities synced from `academic_research/memory.json`
+
+### Research Archives (2026)
+
+- **Transcendent Analysis** - TDA, wavelets, frequency domain, Fibonacci, Elliott Wave
+- **Downloaded Papers** - `papers/` directory (3 PDFs, 4.2 MB)
 
 ## Usage
 
