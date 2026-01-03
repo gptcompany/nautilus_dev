@@ -320,7 +320,38 @@
       "operation": "read",
       "timestamp": "2026-01-03T11:26:41.597316",
       "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/labeling/triple_barrier.py"
+    },
+    {
+      "operation": "task",
+      "timestamp": "2026-01-03T11:27:15.417818",
+      "subagent_type": "test-runner",
+      "prompt": "Run the triple barrier labeling tests to verify the implementation:\n\n```bash\ncd /media/sam/1TB/nauti..."
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-03T11:27:21.223201",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run pytest tests/test_triple_barrier.py -v --tb=short",
+      "description": "Run triple barrier labeling tests"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-03T11:27:33.667765",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -c \"import nautilus_trader; print(f'NautilusTrader version: {nautilus_trader.__version__}')\"",
+      "description": "Check NautilusTrader nightly version"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-03T11:27:34.852424",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run pytest tests/test_triple_barrier.py -v --tb=short",
+      "description": "Run triple barrier labeling tests"
+    },
+    {
+      "operation": "taskoutput",
+      "timestamp": "2026-01-03T11:27:39.236312",
+      "task_id": "ab3bf97",
+      "block": true,
+      "timeout": 30000
     }
   ],
-  "last_updated": "2026-01-03T11:26:41.597339"
+  "last_updated": "2026-01-03T11:27:39.236328"
 }
