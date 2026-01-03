@@ -1,0 +1,1269 @@
+{
+  "metadata": {
+    "generated_date": "2026-01-03",
+    "analysis_scope": "Complete extraction of all market making, Crabel, and mathematical target concepts",
+    "total_strategies_extracted": 47,
+    "sources": [
+      "cartea_mm_implementation.md",
+      "cartea_extraction_summary.md",
+      "crabel_nautilus_spec.md",
+      "Metodo_Crabel_Completo.md",
+      "Crabel_Tabelle_Statistiche.md",
+      "Target_OrderFlow_MarketProfile.md",
+      "Target_Prezzo_Metodi_Matematici.md"
+    ]
+  },
+
+  "strategies_ranked_by_roi": [
+    {
+      "rank": 1,
+      "name": "Inside Day + NR4 (ID/NR4) Combo",
+      "source": "Crabel - Day Trading with Short Term Price Patterns",
+      "category": "Pattern Recognition + ORB",
+      "roi_score": 10,
+      "complexity": 4,
+      "win_rate_empirical": "70-81%",
+      "key_formula": "Pattern: (High < Prior_High) AND (Low > Prior_Low) AND (Range < min(Range[-4:-1]))",
+      "entry_mechanism": "ORB (Opening Range Breakout): Buy_Stop = Open + Stretch, Sell_Stop = Open - Stretch",
+      "stretch_formula": "Stretch = mean([abs(Open[i] - nearest_extreme(High[i], Low[i])) for i in range(-10, 0)])",
+      "statistical_evidence": {
+        "bonds_buy": {"win_rate": 0.81, "win_loss_ratio": 2.34, "sample_size": 31},
+        "bonds_sell": {"win_rate": 0.69, "win_loss_ratio": 0.99, "sample_size": 29},
+        "soybeans_buy": {"win_rate": 0.71, "win_loss_ratio": 1.43, "sample_size": 73},
+        "soybeans_sell": {"win_rate": 0.78, "win_loss_ratio": 0.80, "sample_size": 27}
+      },
+      "data_requirements": ["daily_bars", "OHLC"],
+      "nautilus_mapping": {
+        "indicators": ["Custom NR4 detector", "Custom Inside Day detector"],
+        "order_types": ["STOP_MARKET"],
+        "strategy_base": "Strategy with on_bar handler"
+      },
+      "implementation_priority": "CRITICAL - Highest statistical edge",
+      "notes": "Most powerful Crabel pattern. Rare occurrence (1/15-20 days) but exceptional win rate. Combine contraction (NR4) with consolidation (Inside Day) for maximum effectiveness."
+    },
+    {
+      "rank": 2,
+      "name": "Avellaneda-Stoikov Market Making",
+      "source": "Cartea - Algorithmic and High-Frequency Trading (Chapter 10)",
+      "category": "Market Making",
+      "roi_score": 9,
+      "complexity": 9,
+      "win_rate_empirical": "N/A - Continuous strategy",
+      "key_formula": "Optimal Spread: δ* = (1/k) × log(1 + k/γ) + (γ × σ² × (T-t)) / 2",
+      "reservation_price": "r_t = S_t - q × γ × σ² × (T-t)",
+      "quote_prices": "P_bid = r_t - δ*, P_ask = r_t + δ*",
+      "parameters": {
+        "gamma": "Risk aversion coefficient (0.01-1.0)",
+        "k": "Order arrival elasticity (0.5-5.0)",
+        "sigma": "Volatility (annualized)",
+        "alpha": "Terminal inventory penalty (0.001-0.1)",
+        "T": "Session duration in seconds"
+      },
+      "mathematical_model": {
+        "arrival_rate": "λ(δ) = A × exp(-k × δ)",
+        "value_function": "H(t, x, S, q) = x + q × S + h(t, q)",
+        "objective": "Maximize E[x_T + q_T × (S_T - α × q_T²)]"
+      },
+      "data_requirements": ["L2_orderbook", "quote_ticks", "trade_ticks"],
+      "nautilus_mapping": {
+        "indicators": ["ExponentialMovingAverage (volatility)", "Custom reservation price calculator"],
+        "order_types": ["LIMIT with POST_ONLY"],
+        "strategy_base": "Strategy with on_order_book handler"
+      },
+      "implementation_priority": "HIGH - Proven academic framework",
+      "notes": "Nobel-quality mathematics. Requires parameter calibration (k, γ, σ). Best for liquid markets with tight spreads. Five-phase implementation: Basic MM → Inventory Risk → Adverse Selection → Short-Term Alpha → Full HJB solution."
+    },
+    {
+      "rank": 3,
+      "name": "NR7 (Narrow Range 7) + ORB",
+      "source": "Crabel",
+      "category": "Pattern Recognition + ORB",
+      "roi_score": 9,
+      "complexity": 2,
+      "win_rate_empirical": "62-74%",
+      "key_formula": "Pattern: Range[0] < min(Range[-7:-1])",
+      "entry_mechanism": "ORB with stretch",
+      "statistical_evidence": {
+        "bonds_buy": {"win_rate": 0.74, "sample_size": 81},
+        "bonds_sell": {"win_rate": 0.64, "sample_size": 88},
+        "sp_buy": {"win_rate": 0.67, "sample_size": 84},
+        "soybeans_sell": {"win_rate": 0.71, "sample_size": 103}
+      },
+      "data_requirements": ["daily_bars", "OHLC"],
+      "nautilus_mapping": {
+        "indicators": ["Custom NR7 detector"],
+        "order_types": ["STOP_MARKET"],
+        "strategy_base": "Strategy with on_bar handler"
+      },
+      "implementation_priority": "CRITICAL - Best win rate to implementation effort ratio",
+      "notes": "Easiest Crabel pattern to implement. Occurs ~1/15 days. Excellent balance of frequency and win rate. Pure contraction pattern - market rests then explodes."
+    },
+    {
+      "rank": 4,
+      "name": "2-Bar NR (Narrow Range) Pattern",
+      "source": "Crabel - Based on Wyckoff Last Point of Supply/Support",
+      "category": "Pattern Recognition + ORB",
+      "roi_score": 9,
+      "complexity": 5,
+      "win_rate_empirical": "60-79% (Day 0 exit: 75-79%)",
+      "key_formula": "Pattern: sum(Range[0:2]) < min([sum(Range[i:i+2]) for i in range(-20, -2)])",
+      "entry_mechanism": "ORB with Day 0 exit critical",
+      "statistical_evidence": {
+        "bonds_buy_day0": {"win_rate": 0.76, "sample_size": 34},
+        "bonds_sell_day0": {"win_rate": 0.75, "sample_size": 67},
+        "sp_buy_day0": {"win_rate": 0.75, "sample_size": 28},
+        "eurodollars_sell_day0": {"win_rate": 0.76, "sample_size": 21}
+      },
+      "critical_rule": "EXIT AT CLOSE OF DAY 0 - Win rate drops to 62-66% on Day 1-5",
+      "data_requirements": ["daily_bars", "OHLC", "20-day lookback"],
+      "nautilus_mapping": {
+        "indicators": ["Custom 2-Bar NR detector with 20-day rolling window"],
+        "order_types": ["STOP_MARKET", "MOC (Market-On-Close) for exit"],
+        "strategy_base": "Strategy with time-based exit logic"
+      },
+      "implementation_priority": "HIGH - Exceptional Day 0 performance",
+      "notes": "Multi-bar contraction. MUST exit at close of entry day. Wyckoff-inspired - detects accumulation/distribution zones. Longer lookback (20 days) makes it rarer but more powerful than NR4/NR7."
+    },
+    {
+      "rank": 5,
+      "name": "Bear Hook Day",
+      "source": "Crabel",
+      "category": "Pattern Recognition + Directional Bias",
+      "roi_score": 8,
+      "complexity": 4,
+      "win_rate_empirical": "65-81%",
+      "key_formula": "Pattern: (Open < Prior_Low) AND (Close > Prior_Close) AND (Range < Prior_Range)",
+      "directional_bias": "BEARISH - 13/16 tests profitable as SELL",
+      "entry_mechanism": "ORBP (ORB Preference) - Sell side only",
+      "statistical_evidence": {
+        "bonds_sell": {"win_rate": 0.70, "win_loss_ratio": 2.97, "sample_size": 30},
+        "cattle_sell": {"win_rate": 0.81, "win_loss_ratio": 1.25, "sample_size": 16}
+      },
+      "data_requirements": ["daily_bars", "OHLC"],
+      "nautilus_mapping": {
+        "indicators": ["Custom Hook Day detector"],
+        "order_types": ["STOP_MARKET (sell side)"],
+        "strategy_base": "Strategy with directional filter"
+      },
+      "implementation_priority": "MEDIUM-HIGH - Strong directional edge",
+      "notes": "Contrarian pattern. Open gaps down but closes up = false strength. Market tests below support, finds no sellers, but then weak close = distribution. Rare but highly reliable for short entries."
+    },
+    {
+      "rank": 6,
+      "name": "Inside Day + ORB",
+      "source": "Crabel",
+      "category": "Pattern Recognition + ORB",
+      "roi_score": 8,
+      "complexity": 2,
+      "win_rate_empirical": "60-76%",
+      "key_formula": "Pattern: (High < Prior_High) AND (Low > Prior_Low)",
+      "entry_mechanism": "ORB with stretch",
+      "statistical_evidence": {
+        "bonds_buy": {"win_rate": 0.76, "win_loss_ratio": 2.80, "sample_size": 51},
+        "soybeans_buy": {"win_rate": 0.70, "sample_size": 67},
+        "soybeans_sell": {"win_rate": 0.76, "sample_size": 55}
+      },
+      "frequency": "~1/5 days - More frequent than NR7",
+      "data_requirements": ["daily_bars", "OHLC"],
+      "nautilus_mapping": {
+        "indicators": ["Custom Inside Day detector"],
+        "order_types": ["STOP_MARKET"],
+        "strategy_base": "Strategy with on_bar handler"
+      },
+      "implementation_priority": "HIGH - Good frequency-to-win-rate ratio",
+      "notes": "Pure consolidation pattern. Market coils inside prior range = pending breakout. One-Time Frame markets respond best. Combines well with NR4 for ultimate edge (see ID/NR4)."
+    },
+    {
+      "rank": 7,
+      "name": "Doji + Narrow Range Combo",
+      "source": "Crabel",
+      "category": "Pattern Recognition + ORB",
+      "roi_score": 8,
+      "complexity": 3,
+      "win_rate_empirical": "61-76%",
+      "key_formula": "Pattern: (abs(Close - Open) <= Doji_Threshold) AND (Range < Range_Threshold)",
+      "doji_thresholds": {
+        "bonds": "5-8 ticks",
+        "sp500": "50 points",
+        "soybeans": "3-5 cents",
+        "crypto_btc": "0.3-0.5% of price"
+      },
+      "entry_mechanism": "ORB with SELL bias (67-76% vs 60-62% for BUY)",
+      "statistical_evidence": {
+        "soybeans_sell": {"win_rate": 0.76, "entry": "Open - 10¢", "sample_size": 147},
+        "bonds_sell": {"win_rate": 0.73, "entry": "Open - 16 ticks", "sample_size": 117}
+      },
+      "data_requirements": ["daily_bars", "OHLC"],
+      "nautilus_mapping": {
+        "indicators": ["Custom Doji detector", "Custom NR detector"],
+        "order_types": ["STOP_MARKET (sell bias)"],
+        "strategy_base": "Strategy with threshold calibration"
+      },
+      "implementation_priority": "MEDIUM - Market-specific thresholds required",
+      "notes": "Indecision (Doji) + contraction (NR) = coiled spring. Sell bias statistically stronger. Threshold calibration critical - must adapt to market volatility. Works best in agricultural commodities historically."
+    },
+    {
+      "rank": 8,
+      "name": "Market Making with Adverse Selection (Cartea 10.4)",
+      "source": "Cartea - Chapter 10.4",
+      "category": "Market Making",
+      "roi_score": 8,
+      "complexity": 10,
+      "win_rate_empirical": "N/A - Continuous strategy",
+      "key_formula": "Price Dynamics: dS_t = b × (dN_bid - dN_ask) + σ × dW_t",
+      "adverse_selection_coefficient": "b = Cov(ΔPrice, Order_Flow) / Var(Order_Flow)",
+      "optimal_spreads_with_STA": "δ_bid* = (1/k) + (γ × q) + (β × μ_t), δ_ask* = (1/k) - (γ × q) - (β × μ_t)",
+      "short_term_alpha_model": {
+        "alpha_dynamics": "dμ_t = -κ × μ_t × dt + η × dZ_t",
+        "kappa": "Mean reversion speed",
+        "eta": "Volatility of alpha shocks"
+      },
+      "trading_rule": "When μ_t > 0 (upward drift): tighten ask, widen bid. When μ_t < 0: tighten bid, widen ask",
+      "data_requirements": ["L2_orderbook", "trade_ticks", "tick_classification"],
+      "nautilus_mapping": {
+        "indicators": ["Order Flow Imbalance", "Short-term alpha estimator", "Price impact tracker"],
+        "order_types": ["LIMIT with dynamic spreads"],
+        "strategy_base": "Advanced MM strategy with alpha signals"
+      },
+      "implementation_priority": "ADVANCED - Requires sophisticated order flow analysis",
+      "notes": "Extension of basic A-S model. Incorporates informed trading detection. Each filled order moves mid-price against MM (permanent impact parameter 'b'). STA model allows MM to lean into temporary predictable movements."
+    },
+    {
+      "rank": 9,
+      "name": "NR4 (Narrow Range 4) + ORB",
+      "source": "Crabel",
+      "category": "Pattern Recognition + ORB",
+      "roi_score": 7,
+      "complexity": 2,
+      "win_rate_empirical": "60-68%",
+      "key_formula": "Pattern: Range[0] < min(Range[-4:-1])",
+      "entry_mechanism": "ORB with stretch",
+      "statistical_evidence": {
+        "bonds_buy": {"win_rate": 0.64, "sample_size": 148},
+        "bonds_sell": {"win_rate": 0.65, "sample_size": 162},
+        "soybeans_sell": {"win_rate": 0.68, "sample_size": 183}
+      },
+      "frequency": "~1/8 days",
+      "data_requirements": ["daily_bars", "OHLC"],
+      "nautilus_mapping": {
+        "indicators": ["Custom NR4 detector"],
+        "order_types": ["STOP_MARKET"],
+        "strategy_base": "Strategy with on_bar handler"
+      },
+      "implementation_priority": "MEDIUM - Baseline contraction pattern",
+      "notes": "Foundational Crabel pattern. Superseded by NR7 and ID/NR4 but still valuable. Occurs more frequently than NR7. Good for diversifying pattern portfolio."
+    },
+    {
+      "rank": 10,
+      "name": "Bull Hook Day",
+      "source": "Crabel",
+      "category": "Pattern Recognition + Directional Bias",
+      "roi_score": 7,
+      "complexity": 4,
+      "win_rate_empirical": "55-78%",
+      "key_formula": "Pattern: (Open > Prior_High) AND (Close < Prior_Close) AND (Range < Prior_Range)",
+      "directional_bias": "BULLISH - Less consistent than Bear Hook",
+      "entry_mechanism": "ORBP - Buy side only",
+      "statistical_evidence": {
+        "cattle_buy": {"win_rate": 0.78, "win_loss_ratio": 1.32, "sample_size": 37},
+        "bonds_buy": {"win_rate": 0.74, "win_loss_ratio": 0.81, "sample_size": 23},
+        "sp_buy": {"win_rate": 0.55, "win_loss_ratio": 3.11, "sample_size": 20}
+      },
+      "data_requirements": ["daily_bars", "OHLC"],
+      "nautilus_mapping": {
+        "indicators": ["Custom Hook Day detector"],
+        "order_types": ["STOP_MARKET (buy side)"],
+        "strategy_base": "Strategy with directional filter"
+      },
+      "implementation_priority": "MEDIUM - Variable performance across markets",
+      "notes": "Mirror of Bear Hook. Open gaps up but closes down = false weakness. Less reliable than Bear Hook overall but exceptional in cattle futures (78% win rate). S&P shows high W/L ratio but lower win rate."
+    },
+    {
+      "rank": 11,
+      "name": "VPIN (Volume-Synchronized Probability of Informed Trading)",
+      "source": "Order Flow / Market Microstructure - Easley, Lopez de Prado, O'Hara (2012)",
+      "category": "Order Flow Toxicity Detection",
+      "roi_score": 9,
+      "complexity": 10,
+      "win_rate_empirical": "Predictive indicator - No direct win rate",
+      "key_formula": "VPIN = (1/n) × Σ|V_buy(τ) - V_sell(τ)| / V_bucket",
+      "bulk_volume_classification": "buy_fraction = Φ(price_change / σ) where Φ = CDF of normal distribution",
+      "interpretation": {
+        "high_vpin": "VPIN > 0.5 → High probability of directional move",
+        "low_vpin": "VPIN < 0.3 → Market in equilibrium, range-bound"
+      },
+      "target_formula": "Target_Distance = f(VPIN, ATR). Higher VPIN = wider expected movement",
+      "historical_validation": "Predicted Flash Crash 2010 one hour before occurrence",
+      "data_requirements": ["tick_trades", "volume", "tick_classification"],
+      "nautilus_mapping": {
+        "indicators": ["Custom VPIN calculator with volume buckets"],
+        "order_types": ["MARKET or LIMIT based on VPIN signal"],
+        "strategy_base": "Advanced order flow strategy"
+      },
+      "implementation_priority": "ADVANCED - Requires tick-level data and statistical expertise",
+      "notes": "Most rigorous order flow metric. Measures toxic flow probability. Volume-synchronized (not time-based). Requires sophisticated BVC (Bulk Volume Classification) algorithm. Academic validation in peer-reviewed papers."
+    },
+    {
+      "rank": 12,
+      "name": "Kyle's Lambda (Price Impact Model)",
+      "source": "Market Microstructure - Albert Kyle (1985)",
+      "category": "Liquidity Measurement",
+      "roi_score": 8,
+      "complexity": 9,
+      "win_rate_empirical": "Predictive model - No direct win rate",
+      "key_formula": "ΔP = λ × Order_Imbalance",
+      "estimation": "λ = Cov(ΔP, OI) / Var(OI)",
+      "target_formula": "Expected_Move = λ × Expected_Order_Flow, Target = Entry + (λ × Predicted_Imbalance)",
+      "interpretation": {
+        "high_lambda": "Illiquid market - small orders move price significantly",
+        "low_lambda": "Liquid market - large volume needed to move price"
+      },
+      "data_requirements": ["tick_trades", "order_imbalance", "price_changes"],
+      "nautilus_mapping": {
+        "indicators": ["Custom Kyle's Lambda estimator via rolling regression"],
+        "order_types": ["LIMIT sized based on lambda"],
+        "strategy_base": "Execution optimization strategy"
+      },
+      "implementation_priority": "ADVANCED - Nobel-level market microstructure theory",
+      "notes": "Foundational liquidity metric. Inverse measure of market depth. Critical for optimal execution. Used by institutional traders for VWAP/TWAP strategies. Continuous Auctions and Insider Trading (Kyle 1985) is seminal paper."
+    },
+    {
+      "rank": 13,
+      "name": "Market Profile - Point of Control (POC)",
+      "source": "Market Profile / TPO - Steidlmayer & Dalton",
+      "category": "Volume Distribution Analysis",
+      "roi_score": 8,
+      "complexity": 6,
+      "win_rate_empirical": "80% POC revisit probability",
+      "key_formula": "POC = Price level with maximum TPO count (Time-Price Opportunity)",
+      "value_area": "VA = Range containing 70% of TPO activity",
+      "80_percent_rule": "IF Open outside prior VA AND re-enters within 2×30min bars THEN 80% probability of reaching opposite VA extreme",
+      "target_formulas": {
+        "long_entry_from_VAL": "Target = VAH (Value Area High)",
+        "short_entry_from_VAH": "Target = VAL (Value Area Low)",
+        "mean_reversion": "Target = POC (Point of Control)"
+      },
+      "poor_highs_lows": "Extremes with 1-2 TPO letters → Market returns to test = Target",
+      "single_prints": "Gaps in profile (rapid movement) → Market fills inefficiency = Target",
+      "data_requirements": ["30min_bars", "OHLC", "TPO_construction"],
+      "nautilus_mapping": {
+        "indicators": ["Custom Market Profile builder", "TPO counter", "Value Area calculator"],
+        "order_types": ["LIMIT at POC/VAL/VAH"],
+        "strategy_base": "Profile-based mean reversion strategy"
+      },
+      "implementation_priority": "HIGH - Institutional standard",
+      "notes": "Chicago Board of Trade methodology. POC = fair value perceived by market. VA = acceptance zone. Normal Day (wide IB) vs Trend Day (narrow IB, POC migration). Auction theory foundation."
+    },
+    {
+      "rank": 14,
+      "name": "Volume Profile - VPOC & HVN/LVN",
+      "source": "Volume Profile Analysis",
+      "category": "Volume Distribution Analysis",
+      "roi_score": 8,
+      "complexity": 5,
+      "win_rate_empirical": "85% Naked VPOC hit rate",
+      "key_formula": "VPOC = Price level with maximum volume",
+      "hvn_lvn": "HVN (High Volume Node) = Volume peaks → S/R. LVN (Low Volume Node) = Volume gaps → Rapid movement",
+      "target_formulas": {
+        "naked_vpoc": "VPOC from prior sessions not yet retested → Primary target",
+        "hvn_target": "Next HVN through LVN → Continuation target",
+        "value_area_exit": "Target = 0.5-1.0 × (VAH - VAL) beyond exit level"
+      },
+      "interpretation": {
+        "price_above_vpoc": "Bullish bias",
+        "price_below_vpoc": "Bearish bias",
+        "hvn_behavior": "Price attracts to HVN (consolidation)",
+        "lvn_behavior": "Price passes quickly through LVN (momentum)"
+      },
+      "data_requirements": ["bars_with_volume", "price_bins", "volume_distribution"],
+      "nautilus_mapping": {
+        "indicators": ["Custom Volume Profile builder", "VPOC calculator", "HVN/LVN detector"],
+        "order_types": ["LIMIT at HVN", "STOP at LVN breakout"],
+        "strategy_base": "Volume-based S/R strategy"
+      },
+      "implementation_priority": "HIGH - Superior to time-based profiles",
+      "notes": "Volume-based (not time-based) makes it more relevant than Market Profile for modern markets. VPOC = where actual transactions occurred. HVN = congestion = S/R. LVN = air pocket = fast moves. Stacked POCs (multiple sessions aligned) = strongest S/R."
+    },
+    {
+      "rank": 15,
+      "name": "VWAP with Standard Deviation Bands",
+      "source": "Institutional Execution Benchmarks",
+      "category": "Volume-Weighted Analysis",
+      "roi_score": 8,
+      "complexity": 4,
+      "win_rate_empirical": "68% mean reversion from ±1σ, 95% containment within ±2σ",
+      "key_formula": "VWAP = Σ(Price × Volume) / Σ(Volume)",
+      "standard_deviation": "σ = sqrt(Σ(Price² × Volume) / Σ(Volume) - VWAP²)",
+      "bands": {
+        "band_1sigma": "VWAP ± 1σ (68% containment)",
+        "band_2sigma": "VWAP ± 2σ (95% containment)",
+        "band_3sigma": "VWAP ± 3σ (99.7% containment)"
+      },
+      "target_formulas": {
+        "mean_reversion_from_2sigma": "Target = VWAP",
+        "trend_breakout_above_1sigma": "Target_1 = +2σ band, Target_2 = +3σ band",
+        "scalping": "Buy @ -1σ → Sell @ VWAP"
+      },
+      "anchored_vwap": "Anchor to specific events (earnings, major high/low, gap fill) for enhanced targets",
+      "data_requirements": ["bars_with_volume", "typical_price"],
+      "nautilus_mapping": {
+        "indicators": ["Native VWAP if available, else custom", "Custom StdDev bands"],
+        "order_types": ["LIMIT at bands"],
+        "strategy_base": "Mean reversion or breakout strategy"
+      },
+      "implementation_priority": "HIGH - Institutional benchmark, statistically robust",
+      "notes": "Used by institutions for execution benchmarks. VWAP = fair value weighted by actual transactions. Probabilistic targets (σ bands). Anchored VWAP at key events more powerful than rolling VWAP. Intraday reset typically."
+    },
+    {
+      "rank": 16,
+      "name": "Order Book Imbalance (OBI)",
+      "source": "Market Microstructure - Cont, Stoikov, Talreja (2010)",
+      "category": "Order Flow Analysis",
+      "roi_score": 7,
+      "complexity": 6,
+      "win_rate_empirical": "55-60% next-tick prediction accuracy",
+      "key_formula": "OBI = (Bid_Volume - Ask_Volume) / (Bid_Volume + Ask_Volume)",
+      "weighted_obi": "OBI_weighted = Σ(bid_size × decay^i) - Σ(ask_size × decay^i) / Total (decay typically 0.5-0.8)",
+      "interpretation": {
+        "obi_positive": "OBI > 0.3 → Upward bias next minute",
+        "obi_negative": "OBI < -0.3 → Downward bias next minute",
+        "obi_neutral": "OBI ≈ 0 → Equilibrium"
+      },
+      "target_formula": "IF |OBI| > threshold: Magnitude = |OBI| × ATR × Sensitivity, Target = Current_Price + sign(OBI) × Magnitude",
+      "data_requirements": ["L2_orderbook", "bid_ask_sizes", "real_time"],
+      "nautilus_mapping": {
+        "indicators": ["Custom OBI calculator with weighted levels"],
+        "order_types": ["MARKET or aggressive LIMIT"],
+        "strategy_base": "HFT or scalping strategy"
+      },
+      "implementation_priority": "MEDIUM-HIGH - Requires L2 data",
+      "notes": "Simple but effective. 55-60% accuracy seems low but statistically significant for HFT. Weighted version (closer levels matter more) superior. Compounded edge over thousands of trades. Academic validation."
+    },
+    {
+      "rank": 17,
+      "name": "Order Flow Delta & Cumulative Delta (CVD)",
+      "source": "Footprint Charts / Order Flow Analysis",
+      "category": "Order Flow Analysis",
+      "roi_score": 7,
+      "complexity": 5,
+      "win_rate_empirical": "Confirmation indicator - No standalone win rate",
+      "key_formula": "Delta = Ask_Volume - Bid_Volume",
+      "cumulative_delta": "CVD = Σ(Delta) over time",
+      "divergence_detection": "CVD_falling + Price_rising = Bearish divergence (reversal warning)",
+      "patterns": {
+        "absorption": "High volume at price level WITHOUT movement → Reversal signal",
+        "exhaustion": "Volume spike at extreme WITH price stall → Reversal signal",
+        "breakout_confirmation": "Delta aligned + Stacked imbalances + CVD rising = Valid breakout",
+        "delta_divergence": "Price makes new high, Delta does NOT = Reversal to POC/VPOC"
+      },
+      "imbalance_ratio": "Typical threshold: 3:1 or higher (Ask:Bid = 300:100 = 3:1 imbalance)",
+      "data_requirements": ["tick_trades", "bid_ask_classification", "volume"],
+      "nautilus_mapping": {
+        "indicators": ["Custom Delta calculator", "CVD tracker", "Imbalance detector"],
+        "order_types": ["Varies based on signal"],
+        "strategy_base": "Order flow confirmation strategy"
+      },
+      "implementation_priority": "MEDIUM - Requires bid/ask volume data",
+      "notes": "Footprint chart methodology. Delta shows aggressor side. CVD shows cumulative pressure. Divergences highly predictive. Absorption = institutional activity. Stacked imbalances = momentum confirmation. Best used as filter, not standalone."
+    },
+    {
+      "rank": 18,
+      "name": "Daily Bias (Crabel 5-Day Pattern)",
+      "source": "Crabel",
+      "category": "Directional Filter",
+      "roi_score": 7,
+      "complexity": 3,
+      "win_rate_empirical": "Enhances base pattern win rates by 5-10%",
+      "key_formula": "Analyze: Last 4 closes direction + Today's open direction + Range characteristics (NR/WS)",
+      "rule": "5/6 directional indicators must align for STRONG_BUY or STRONG_SELL bias",
+      "bias_levels": ["STRONG_BUY (5-6/6 up)", "BUY (4/6 up)", "NEUTRAL", "SELL (4/6 down)", "STRONG_SELL (5-6/6 down)"],
+      "integration_with_orb": "Use ORBP (ORB Preference) instead of standard ORB when bias is strong",
+      "trend_bias_matrix": {
+        "trend_up_bias_up": "Aggressive entry on open",
+        "trend_down_bias_down": "Aggressive entry on open",
+        "trend_up_bias_down": "Buy on break to support",
+        "trend_down_bias_up": "Sell on rally to resistance"
+      },
+      "data_requirements": ["daily_bars", "OHLC", "5-day history"],
+      "nautilus_mapping": {
+        "indicators": ["Custom 5-day pattern analyzer"],
+        "order_types": ["STOP_MARKET (one direction for ORBP)"],
+        "strategy_base": "Directional filter for other strategies"
+      },
+      "implementation_priority": "MEDIUM - Powerful filter but not standalone",
+      "notes": "Crabel's integration tool. Not a standalone strategy. Improves other patterns by filtering directionality. ORBP (one-sided entry) only when bias strong. Combines DIRECTION (closes) + MOMENTUM (range) + PRICE_ACTION (ORB)."
+    },
+    {
+      "rank": 19,
+      "name": "Fibonacci Extensions (Price Projection)",
+      "source": "Technical Analysis - Golden Ratio mathematics",
+      "category": "Mathematical Target Calculation",
+      "roi_score": 7,
+      "complexity": 1,
+      "win_rate_empirical": "65-70% target achievement in trending markets",
+      "key_formula": "Extension = C + (B - A) × Fib_Ratio",
+      "fibonacci_levels": {
+        "100%": "C + (B-A) × 1.000",
+        "127.2%": "C + (B-A) × 1.272",
+        "161.8%": "C + (B-A) × 1.618 (Golden Ratio)",
+        "200%": "C + (B-A) × 2.000",
+        "261.8%": "C + (B-A) × 2.618",
+        "423.6%": "C + (B-A) × 4.236"
+      },
+      "three_point_setup": "A = Swing Low, B = Swing High, C = Retracement End",
+      "data_requirements": ["swing_highs", "swing_lows", "retracement_identification"],
+      "nautilus_mapping": {
+        "indicators": ["Custom Fibonacci extension calculator"],
+        "order_types": ["LIMIT at Fib levels", "TAKE_PROFIT at extensions"],
+        "strategy_base": "Target calculation utility"
+      },
+      "implementation_priority": "MEDIUM - Simple, widely used, good for target setting",
+      "notes": "Universal mathematical relationships. Golden ratio (1.618) appears in nature, markets respect it. 127.2% and 161.8% most reliable. Combine with other methods for confluence. Works in all timeframes. No timing information."
+    },
+    {
+      "rank": 20,
+      "name": "ATR Projection (Volatility-Based Targets)",
+      "source": "Wilder - Average True Range",
+      "category": "Volatility-Based Target Calculation",
+      "roi_score": 7,
+      "complexity": 2,
+      "win_rate_empirical": "68% within 1×ATR, 95% within 2×ATR, 99.7% within 3×ATR",
+      "key_formula": "Target = Entry_Price ± (ATR × Multiplier)",
+      "multipliers": {
+        "conservative": "1.5-2.0 × ATR",
+        "normal": "2.0-3.0 × ATR",
+        "aggressive": "3.0-4.0 × ATR"
+      },
+      "probabilistic_interpretation": "1σ ≈ 1×ATR (68%), 2σ ≈ 2×ATR (95%), 3σ ≈ 3×ATR (99.7%)",
+      "adaptive_advantage": "Automatically adjusts to market volatility (unlike fixed targets)",
+      "data_requirements": ["OHLC", "ATR indicator"],
+      "nautilus_mapping": {
+        "indicators": ["AverageTrueRange (native Rust)"],
+        "order_types": ["TAKE_PROFIT at ATR multiples"],
+        "strategy_base": "Volatility-adaptive target strategy"
+      },
+      "implementation_priority": "HIGH - Simple, statistically sound, adaptive",
+      "notes": "Wilder's ATR = TRUE RANGE average. Adapts to volatility unlike P&F/Fibonacci. Probabilistic basis via normal distribution approximation. Use native Rust ATR in NautilusTrader. Combine with directional filters for best results."
+    },
+    {
+      "rank": 21,
+      "name": "Measured Move (AB=CD Pattern)",
+      "source": "Classical Technical Analysis",
+      "category": "Symmetrical Move Projection",
+      "roi_score": 7,
+      "complexity": 1,
+      "win_rate_empirical": "60-70% in clear trend environments",
+      "key_formula": "Target = C + (B - A)",
+      "variants": {
+        "move_100%": "C + (B - A) × 1.00 (Classic)",
+        "move_127%": "C + (B - A) × 1.272 (Extended)",
+        "move_162%": "C + (B - A) × 1.618 (Fibonacci-adjusted)"
+      },
+      "setup": "A = First impulse start, B = First impulse end, C = Retracement end",
+      "data_requirements": ["swing_identification", "retracement_detection"],
+      "nautilus_mapping": {
+        "indicators": ["Custom swing detector", "Measured move calculator"],
+        "order_types": ["TAKE_PROFIT at measured targets"],
+        "strategy_base": "Pattern-based target strategy"
+      },
+      "implementation_priority": "MEDIUM - Simple, visual, works in trends",
+      "notes": "Market symmetry principle. First leg predicts second leg. More intuitive than Fibonacci. Works in any timeframe. Similar to P&F logic (cause→effect) but simpler. Best in trending markets, poor in choppy conditions."
+    },
+    {
+      "rank": 22,
+      "name": "Point & Figure Horizontal Count",
+      "source": "Wyckoff - Cause and Effect",
+      "category": "Accumulation/Distribution Measurement",
+      "roi_score": 7,
+      "complexity": 5,
+      "win_rate_empirical": "65-75% when proper consolidation identified",
+      "key_formula": "Target = (Num_Columns × Box_Size × Reversal) + Range_Minimum (upside) OR Range_Maximum - (Num_Columns × Box_Size × Reversal) (downside)",
+      "wyckoff_principle": "Cause (horizontal consolidation) produces Effect (vertical movement) proportionally",
+      "parameters": {
+        "box_size": "Typically 1% of price or ATR/3",
+        "reversal": "Typically 3 boxes",
+        "num_columns": "Count changes of direction ≥ reversal amount"
+      },
+      "data_requirements": ["OHLC", "P&F construction or algorithmic count"],
+      "nautilus_mapping": {
+        "indicators": ["Custom P&F column counter"],
+        "order_types": ["TAKE_PROFIT at projected target"],
+        "strategy_base": "Accumulation/distribution detection strategy"
+      },
+      "implementation_priority": "MEDIUM - Classic method, labor-intensive",
+      "notes": "Wyckoff's Law of Cause and Effect. Energy accumulates horizontally, releases vertically. Can be calculated algorithmically without graphical P&F chart. Best for identifying breakout targets from consolidation. Time-tested but slower than modern methods."
+    },
+    {
+      "rank": 23,
+      "name": "Standard Deviation Projection (Regression Channels)",
+      "source": "Statistical Analysis",
+      "category": "Statistical Boundary Projection",
+      "roi_score": 6,
+      "complexity": 4,
+      "win_rate_empirical": "68% within ±1σ, 95% within ±2σ (statistical)",
+      "key_formula": "Upper_Band = Linear_Regression + (StdDev × N), Lower_Band = Linear_Regression - (StdDev × N)",
+      "probabilistic_targets": {
+        "1_sigma": "68.27% containment",
+        "2_sigma": "95.45% containment",
+        "3_sigma": "99.73% containment"
+      },
+      "ict_smc_variant": "Target_Level_N = Low + (High - Low) × (-N) for N = 1, 2, 2.5, 4 (manipulation legs)",
+      "data_requirements": ["price_series", "linear_regression", "standard_deviation"],
+      "nautilus_mapping": {
+        "indicators": ["Custom regression channel calculator"],
+        "order_types": ["LIMIT at StdDev levels"],
+        "strategy_base": "Mean reversion or breakout confirmation"
+      },
+      "implementation_priority": "MEDIUM - Statistically rigorous, requires calculation",
+      "notes": "Statistical basis stronger than P&F/Fibonacci. Normal distribution assumption. ICT/SMC uses for manipulation detection. Regression channels adapt to trend. StdDev widens in volatility, tightens in consolidation."
+    },
+    {
+      "rank": 24,
+      "name": "Average Daily Range (ADR) Projection",
+      "source": "Range-Based Statistics",
+      "category": "Volatility Projection",
+      "roi_score": 6,
+      "complexity": 1,
+      "win_rate_empirical": "50-60% (baseline volatility estimate)",
+      "key_formula": "ADR = mean([High[i] - Low[i] for i in range(-N, 0)]), Target_UP = Open + ADR, Target_DOWN = Open - ADR",
+      "percentile_variants": {
+        "conservative": "Open + Range_25th_Percentile",
+        "median": "Open + Range_50th_Percentile",
+        "aggressive": "Open + Range_75th_Percentile",
+        "extreme": "Open + Range_90th_Percentile"
+      },
+      "typical_lookback": "N = 10-20 days",
+      "data_requirements": ["OHLC", "range calculation"],
+      "nautilus_mapping": {
+        "indicators": ["Custom ADR calculator"],
+        "order_types": ["TAKE_PROFIT at ADR levels"],
+        "strategy_base": "Intraday target estimation"
+      },
+      "implementation_priority": "LOW-MEDIUM - Simple but crude",
+      "notes": "Simplest volatility measure. Less sophisticated than ATR (no gap adjustment). Percentile approach better than mean (handles outliers). Good for quick intraday targets. Combine with directional bias for edge."
+    },
+    {
+      "rank": 25,
+      "name": "Market Making At-The-Touch (Cartea 10.2.2)",
+      "source": "Cartea - Chapter 10.2.2",
+      "category": "Market Making",
+      "roi_score": 6,
+      "complexity": 7,
+      "win_rate_empirical": "N/A - Continuous strategy",
+      "key_formula": "Optimal_Quote_Size: Q_bid* = Q_0 - γ × q, Q_ask* = Q_0 + γ × q",
+      "constraint": "Must quote at best bid/ask (no spread control, only size control)",
+      "parameters": {
+        "Q_0": "Baseline quote size",
+        "gamma": "Inventory adjustment coefficient",
+        "q": "Current inventory position"
+      },
+      "interpretation": "Reduce size on side with unwanted inventory, increase on other side",
+      "data_requirements": ["L1_BBO", "inventory_tracking"],
+      "nautilus_mapping": {
+        "indicators": ["Position tracker"],
+        "order_types": ["LIMIT at BBO with dynamic size"],
+        "strategy_base": "Aggressive MM strategy for tight spreads"
+      },
+      "implementation_priority": "MEDIUM - Simpler than full A-S but less flexible",
+      "notes": "Constrained variant of A-S model. Exchange tick size dictates spread. Only control = quote SIZE. Less degrees of freedom than full A-S. Suitable for ultra-competitive markets (crypto, major FX pairs). Inventory risk managed via size, not spread."
+    },
+    {
+      "rank": 26,
+      "name": "Market Making Optimizing Volume (Cartea 10.2.3)",
+      "source": "Cartea - Chapter 10.2.3",
+      "category": "Market Making",
+      "roi_score": 6,
+      "complexity": 7,
+      "win_rate_empirical": "N/A - Continuous strategy",
+      "key_formula": "Modified_Spread: δ* = (1/k) - φ/(2×k) ± inventory_adjustment",
+      "objective": "Maximize trading volume while managing inventory risk",
+      "performance_criteria": "H = E[x_T + q_T × S_T - α × q_T² + φ × ∫(λ_bid + λ_ask) dt]",
+      "parameters": {
+        "phi": "Volume reward parameter (e.g., exchange rebates)",
+        "k": "Elasticity",
+        "gamma": "Risk aversion",
+        "alpha": "Terminal penalty"
+      },
+      "interpretation": "Volume incentives (rebates) → tighter spreads → more fills",
+      "data_requirements": ["L2_orderbook", "fill_tracking", "rebate_structure"],
+      "nautilus_mapping": {
+        "indicators": ["Volume tracker", "Rebate calculator"],
+        "order_types": ["LIMIT with aggressive pricing"],
+        "strategy_base": "Volume-maximizing MM strategy"
+      },
+      "implementation_priority": "MEDIUM - For markets with maker rebates",
+      "notes": "Relevant for exchanges with maker-taker fee structures. Optimize for volume when rebates > spread cost. Trade-off: tighter spreads (more volume) vs inventory risk. Best in high-rebate environments (some crypto exchanges)."
+    },
+    {
+      "rank": 27,
+      "name": "Utility Maximizing Market Maker (Cartea 10.3)",
+      "source": "Cartea - Chapter 10.3",
+      "category": "Market Making",
+      "roi_score": 6,
+      "complexity": 9,
+      "win_rate_empirical": "N/A - Continuous strategy",
+      "key_formula": "Optimal_Spread: δ* = (1/k) + (γ × σ² × (T-t)) / 2 ± inventory_term",
+      "utility_function": "U(x) = -exp(-γ × x) (Exponential utility)",
+      "performance_criteria": "H = E[-exp(-γ × (x_T + q_T × (S_T - α × q_T)))]",
+      "spread_behavior": {
+        "higher_risk_aversion": "Wider spreads",
+        "higher_volatility": "Wider spreads",
+        "time_to_maturity_decrease": "Spreads widen (less time to hedge)"
+      },
+      "data_requirements": ["L2_orderbook", "volatility_estimate", "time_to_session_end"],
+      "nautilus_mapping": {
+        "indicators": ["Volatility estimator", "Time tracker"],
+        "order_types": ["LIMIT with time-varying spreads"],
+        "strategy_base": "Risk-averse MM strategy"
+      },
+      "implementation_priority": "MEDIUM - More conservative than basic A-S",
+      "notes": "CARA (Constant Absolute Risk Aversion) utility. More risk-averse than basic A-S model. Spreads widen as session end approaches. Better for risk-averse market makers or volatile assets. Exponential utility penalizes losses more than basic quadratic."
+    },
+    {
+      "rank": 28,
+      "name": "Depth Skew (Bid/Ask Depth Ratio)",
+      "source": "Market Microstructure",
+      "category": "Order Book Analysis",
+      "roi_score": 6,
+      "complexity": 5,
+      "win_rate_empirical": "Confirmation indicator - No standalone win rate",
+      "key_formula": "Depth_Skew = Σ(Bid_Depth[i]) / Σ(Ask_Depth[i]) for i = 1 to N levels",
+      "weighted_formula": "Skew_weighted = Σ(bid_size / (1 + distance_from_mid)) / Σ(ask_size / (1 + distance_from_mid))",
+      "interpretation": {
+        "skew_gt_1.5": "Strong support, upward bias",
+        "skew_lt_0.67": "Strong resistance, downward bias",
+        "skew_approx_1.0": "Equilibrium"
+      },
+      "target_formula": "Target = Price level where Skew normalizes to 1.0",
+      "data_requirements": ["L2_orderbook", "multi_level_depth"],
+      "nautilus_mapping": {
+        "indicators": ["Custom depth skew calculator"],
+        "order_types": ["LIMIT in direction of skew"],
+        "strategy_base": "Order book imbalance strategy"
+      },
+      "implementation_priority": "MEDIUM - Requires L2 depth data",
+      "notes": "Measures bid vs ask liquidity imbalance. Weighted version (closer levels more important) superior. Predicts short-term direction. Combine with OBI for stronger signal. Can detect spoofing (fake walls)."
+    },
+    {
+      "rank": 29,
+      "name": "Absorption Rate (Institutional Activity Detection)",
+      "source": "Order Flow Analysis",
+      "category": "Liquidity Analysis",
+      "roi_score": 6,
+      "complexity": 6,
+      "win_rate_empirical": "Reversal detection indicator",
+      "key_formula": "Absorption_Rate = Volume_Consumed / Time_Elapsed at specific price level",
+      "interpretation": {
+        "high_absorption_stable_price": "Institutional accumulation/distribution → Reversal likely after completion",
+        "low_absorption_moving_price": "Genuine breakout → Extended target in direction"
+      },
+      "detection_method": "High volume at price level WITHOUT movement = absorption",
+      "data_requirements": ["tick_trades", "price_level_tracking", "volume_time_series"],
+      "nautilus_mapping": {
+        "indicators": ["Custom absorption rate tracker"],
+        "order_types": ["LIMIT at absorption zone for reversal"],
+        "strategy_base": "Institutional footprint detection"
+      },
+      "implementation_priority": "MEDIUM - Sophisticated analysis required",
+      "notes": "Detects when large players (institutions) are absorbing market orders with limit orders. High volume + no price movement = someone building/liquidating position. After absorption complete, expect reversal. Combine with other footprint patterns."
+    },
+    {
+      "rank": 30,
+      "name": "Price Impact Function (Square-Root Law)",
+      "source": "Market Microstructure - Empirical Market Impact Models",
+      "category": "Execution Modeling",
+      "roi_score": 5,
+      "complexity": 7,
+      "win_rate_empirical": "Execution cost minimization - not directional",
+      "key_formula": "ΔP = σ × √(Q/V) × sign(Q)",
+      "almgren_chriss_variant": "Temporary_Impact = η × (Q/τ), Permanent_Impact = γ × Q, Total_Impact = η × velocity + γ × total_size",
+      "target_formula": "Expected_Move = σ × √(Expected_Volume / ADV), Target = Entry ± Expected_Move",
+      "parameters": {
+        "sigma": "Daily volatility",
+        "Q": "Order size",
+        "V": "Average daily volume",
+        "eta": "Temporary impact coefficient",
+        "gamma": "Permanent impact coefficient"
+      },
+      "data_requirements": ["volume_profile", "volatility", "order_flow"],
+      "nautilus_mapping": {
+        "indicators": ["Custom price impact estimator"],
+        "order_types": ["LIMIT with impact-aware sizing"],
+        "strategy_base": "Optimal execution strategy (VWAP/TWAP)"
+      },
+      "implementation_priority": "LOW-MEDIUM - For large orders only",
+      "notes": "Square-root law empirically validated across markets. Almgren-Chriss model = optimal execution framework. Temporary impact decays, permanent impact persists. Critical for institutional execution. Retail traders can use for big position entries."
+    },
+    {
+      "rank": 31,
+      "name": "Liquidity Imbalance Ratio (LIR)",
+      "source": "Cont, Stoikov, Talreja (2010)",
+      "category": "Order Book Microstructure",
+      "roi_score": 5,
+      "complexity": 3,
+      "win_rate_empirical": "52-58% next-tick prediction",
+      "key_formula": "LIR = (Best_Bid_Size - Best_Ask_Size) / (Best_Bid_Size + Best_Ask_Size)",
+      "probabilities": {
+        "lir_positive": "P(uptick | LIR > 0) ≈ 0.52-0.58",
+        "lir_negative": "P(downtick | LIR < 0) ≈ 0.52-0.58"
+      },
+      "interpretation": "Small edge but statistically significant. Compounded over thousands of trades = measurable profit",
+      "data_requirements": ["L1_BBO_sizes"],
+      "nautilus_mapping": {
+        "indicators": ["Custom LIR calculator"],
+        "order_types": ["MARKET for scalping"],
+        "strategy_base": "HFT tick prediction"
+      },
+      "implementation_priority": "LOW - Only for HFT strategies",
+      "notes": "Simplest microstructure indicator. Only uses best bid/ask sizes. 52-58% accuracy seems low but profitable in HFT context (low latency, high frequency). Academic validation by Cont et al. Better as component in multi-factor model."
+    },
+    {
+      "rank": 32,
+      "name": "Early Entry (EE) - Type 1 & Type 2",
+      "source": "Crabel",
+      "category": "Intraday Momentum Confirmation",
+      "roi_score": 5,
+      "complexity": 6,
+      "win_rate_empirical": "Confirmation indicator - Enhances ORB win rate",
+      "type_1_early_entry": "First 5-min bar > avg range, open on extreme close on opposite, second bar shows equal thrust",
+      "type_2_early_entry": "First 5-min bar EXCESSIVELY large, drift in thrust direction, acceleration after accumulation",
+      "fundamental_rule": "NO 5-min bar against EE direction should have range > first bar. Violation = EE failure",
+      "data_requirements": ["5min_bars", "intraday_OHLC"],
+      "nautilus_mapping": {
+        "indicators": ["Custom 5-min bar analyzer", "Range comparator"],
+        "order_types": ["Entry confirmation for existing ORB"],
+        "strategy_base": "Intraday momentum filter"
+      },
+      "implementation_priority": "LOW-MEDIUM - Adds complexity to ORB",
+      "notes": "Intraday signal, not daily. Confirms ORB entry within first 5-10 minutes. Type 2 more reliable than Type 1. EE failure (counter-move with bigger range) = exit signal. Requires intraday data. Modern equivalent: opening auction analysis."
+    },
+    {
+      "rank": 33,
+      "name": "Upthrust & Spring (Wyckoff False Breakout)",
+      "source": "Crabel / Wyckoff",
+      "category": "False Breakout Detection",
+      "roi_score": 5,
+      "complexity": 4,
+      "win_rate_empirical": "61% (S&P Springs 1982-88)",
+      "upthrust": "Penetration above pivot high → Close below high = False bullish breakout → SELL",
+      "spring": "Penetration below pivot low → Close above low = False bearish breakout → BUY",
+      "statistical_evidence_spring": {
+        "sp_1982_88": {"win_rate": 0.61, "avg_win": 1190, "avg_loss": 832}
+      },
+      "target": "Opposite extreme of recent range",
+      "data_requirements": ["swing_highs", "swing_lows", "close_relative_to_pivot"],
+      "nautilus_mapping": {
+        "indicators": ["Custom pivot detector", "False breakout detector"],
+        "order_types": ["LIMIT at reversal"],
+        "strategy_base": "Reversal strategy"
+      },
+      "implementation_priority": "LOW-MEDIUM - Useful but not primary edge",
+      "notes": "Wyckoff concept applied by Crabel. Tests strength of support/resistance. Spring (buy) more reliable than Upthrust (sell) historically. Modern name: 'stop hunt' or 'liquidity grab'. Requires pivot identification logic."
+    },
+    {
+      "rank": 34,
+      "name": "3-Bar NR (Narrow Range)",
+      "source": "Crabel",
+      "category": "Extended Contraction Pattern",
+      "roi_score": 4,
+      "complexity": 6,
+      "win_rate_empirical": "Similar to 2-Bar NR (estimated 60-75%)",
+      "key_formula": "Pattern: sum(Range[0:3]) < min([sum(Range[i:i+3]) for i in range(-20, -3)])",
+      "concept": "3-day contraction longer than 2-day = potentially stronger signal",
+      "statistical_evidence": "Limited data in Crabel book - needs backtesting",
+      "data_requirements": ["daily_bars", "OHLC", "20-day lookback"],
+      "nautilus_mapping": {
+        "indicators": ["Custom 3-Bar NR detector"],
+        "order_types": ["STOP_MARKET"],
+        "strategy_base": "Extended contraction pattern strategy"
+      },
+      "implementation_priority": "LOW - Insufficient historical validation",
+      "notes": "Extension of 2-Bar NR concept. Crabel mentions it but provides limited statistics. Longer contraction potentially stronger coil but also rarer. Needs modern backtesting validation before deployment. May be over-optimized (curve-fit)."
+    },
+    {
+      "rank": 35,
+      "name": "Moves Away From Open (Statistical Tendency)",
+      "source": "Crabel",
+      "category": "Intraday Probability Analysis",
+      "roi_score": 4,
+      "complexity": 2,
+      "win_rate_empirical": "Statistical tendency, not tradable pattern",
+      "principle": "After defined move from open, market tends to close in direction of that move",
+      "statistical_evidence_bonds": {
+        "move_+16_ticks": {"pct_close_above_open": 0.88, "pct_close_above_50pct": 0.88, "pct_close_above_move": 0.60},
+        "move_+32_ticks": {"pct_close_above_open": 0.96, "pct_close_above_50pct": 0.92, "pct_close_above_move": 0.58}
+      },
+      "statistical_evidence_sp": {
+        "move_+160_pts": {"pct_close_above_open": 0.88, "pct_close_above_50pct": 0.79, "pct_close_above_move": 0.58},
+        "move_+300_pts": {"pct_close_above_open": 0.93, "pct_close_above_50pct": 0.86, "pct_close_above_move": 0.63}
+      },
+      "data_requirements": ["intraday_bars", "open_price", "intraday_high_low"],
+      "nautilus_mapping": {
+        "indicators": ["Custom move-from-open tracker"],
+        "order_types": ["Not standalone - position management tool"],
+        "strategy_base": "Exit timing optimization"
+      },
+      "implementation_priority": "LOW - Educational, not primary strategy",
+      "notes": "NOT a standalone entry strategy. Shows statistical tendency for continuation after strong move. Use for: 1) Position management (hold winner), 2) Avoid fading strong moves, 3) Set realistic intraday targets. Larger initial move = higher probability of closing in that direction."
+    },
+    {
+      "rank": 36,
+      "name": "Wide Spread 4/7 (WS4/WS7) - Expansion Day",
+      "source": "Crabel",
+      "category": "Expansion Detection (Anti-Pattern)",
+      "roi_score": 2,
+      "complexity": 2,
+      "win_rate_empirical": "52-54% (AVOID ORB after WS)",
+      "key_formula": "WS4: Range[0] > max(Range[-4:-1]), WS7: Range[0] > max(Range[-7:-1])",
+      "principle": "Expansion follows expansion with LOWER win rate than random",
+      "statistical_evidence": {
+        "orb_after_contraction": {"win_rate": 0.64, "gross_profit": "$710,000 on 7,313 trades"},
+        "orb_after_expansion": {"win_rate": 0.52, "gross_profit": "$102,000 on 7,524 trades"}
+      },
+      "trading_rule": "AVOID ORB breakout trades after WS days. Consider fade or range trading instead.",
+      "data_requirements": ["daily_bars", "OHLC"],
+      "nautilus_mapping": {
+        "indicators": ["Custom WS detector"],
+        "order_types": ["FILTER - blocks other strategies"],
+        "strategy_base": "Pattern filter (negative)"
+      },
+      "implementation_priority": "MEDIUM - Important filter to AVOID bad trades",
+      "notes": "Opposite of NR patterns. Large range = expansion = exhaustion. Contraction/Expansion principle in action. Do NOT chase breakouts after expansion days. Profitability 7x lower than after contraction. Use as filter to shut off ORB strategies."
+    },
+    {
+      "rank": 37,
+      "name": "Trend Day (10% Rule)",
+      "source": "Crabel",
+      "category": "Market Regime Identification",
+      "roi_score": 3,
+      "complexity": 3,
+      "win_rate_empirical": "Identification tool, not strategy",
+      "definition": "Range of first hour < 10% of daily range OR no dominant trading area OR open near extreme, close on opposite extreme",
+      "characteristics": "Narrow initial balance (IB), one-directional, minimal retracements",
+      "trading_implications": {
+        "orb": "Excellent for ORB continuation",
+        "mean_reversion": "AVOID - will get run over",
+        "stop_management": "Move to breakeven faster (5-10 min for S&P per Crabel)"
+      },
+      "data_requirements": ["intraday_bars", "first_hour_range", "daily_range"],
+      "nautilus_mapping": {
+        "indicators": ["Custom Trend Day detector"],
+        "order_types": ["Regime detection - adjusts other strategies"],
+        "strategy_base": "Market regime classifier"
+      },
+      "implementation_priority": "LOW - Useful context but not standalone",
+      "notes": "Descriptive, not predictive. Identifies trending days AFTER they start. Initial Balance (IB) concept from Market Profile. Narrow IB = trend potential. Modern equivalent: opening range volatility analysis. Use to adjust position sizing and stop management."
+    },
+    {
+      "rank": 38,
+      "name": "Doji (Standalone)",
+      "source": "Crabel",
+      "category": "Indecision Pattern",
+      "roi_score": 4,
+      "complexity": 1,
+      "win_rate_empirical": "60-73% when combined with ORB",
+      "key_formula": "abs(Close - Open) <= Doji_Threshold",
+      "thresholds": {
+        "bonds": "5-8 ticks",
+        "sp500": "50 points",
+        "soybeans": "3-5 cents",
+        "cattle": "25 points",
+        "crypto_btc": "0.3-0.5% of price",
+        "crypto_eth": "0.5% of price"
+      },
+      "statistical_evidence": {
+        "bonds_sell": {"win_rate": 0.73, "entry": "Open - 16 ticks", "sample_size": 117},
+        "sp_sell": {"win_rate": 0.67, "entry": "Open - 160 pts", "sample_size": 127}
+      },
+      "bias": "SELL bias stronger than BUY (67-76% vs 60-62%)",
+      "data_requirements": ["daily_bars", "OHLC"],
+      "nautilus_mapping": {
+        "indicators": ["Custom Doji detector with market-specific thresholds"],
+        "order_types": ["STOP_MARKET (sell bias)"],
+        "strategy_base": "Indecision breakout strategy"
+      },
+      "implementation_priority": "LOW-MEDIUM - Better when combined with NR",
+      "notes": "Japanese candlestick pattern. Open ≈ Close = indecision. Market coils for breakout. Best combined with NR (see Doji + NR). Standalone less powerful. Threshold must be calibrated to market volatility. Downside breakouts statistically stronger."
+    },
+    {
+      "rank": 39,
+      "name": "Initial Balance (IB) Extensions",
+      "source": "Market Profile / Crabel hybrid",
+      "category": "Range Extension Targets",
+      "roi_score": 5,
+      "complexity": 4,
+      "win_rate_empirical": "Varies by day type (Normal vs Trend)",
+      "key_formula": "IB = Range of first 2 hours (or first hour)",
+      "target_formulas": {
+        "first_extension": "IB_High + (IB_Range × 0.5) OR IB_Low - (IB_Range × 0.5)",
+        "second_extension": "IB_High + (IB_Range × 1.0) OR IB_Low - (IB_Range × 1.0)"
+      },
+      "day_type_targets": {
+        "normal_day": "Target = Extremes of IB (high probability reversal)",
+        "trend_day": "Target = 1.5-2.0× IB extension (breakout continuation)",
+        "double_distribution": "Target = New Value Area formation",
+        "neutral_day": "Target = POC (mean reversion)"
+      },
+      "data_requirements": ["intraday_bars", "first_hour_OHLC"],
+      "nautilus_mapping": {
+        "indicators": ["Custom IB calculator", "Day type classifier"],
+        "order_types": ["TAKE_PROFIT at IB extensions"],
+        "strategy_base": "Intraday target projection"
+      },
+      "implementation_priority": "LOW-MEDIUM - Requires intraday data and regime detection",
+      "notes": "Market Profile concept. First hour/two hours sets the tone. Normal Day: IB extremes hold. Trend Day: IB breaks early, extends 1.5-2×. Measured move concept applied to intraday. Combine with Crabel's ORB for entries, IB for targets."
+    },
+    {
+      "rank": 40,
+      "name": "Short-Term Pattern Open-to-Close (Crabel 5-Day)",
+      "source": "Crabel",
+      "category": "Pattern Recognition",
+      "roi_score": 4,
+      "complexity": 3,
+      "win_rate_empirical": "58-63% (specific patterns)",
+      "pattern_notation": "(+/-) for close direction, last sign = today's open direction",
+      "best_patterns_bonds": {
+        "---": {"entry": "BUY", "win_rate": 0.58},
+        "+++": {"entry": "SELL", "win_rate": 0.61},
+        "--+": {"entry": "SELL", "win_rate": 0.62},
+        "-++": {"entry": "SELL", "win_rate": 0.63},
+        "+-+": {"entry": "BUY", "win_rate": 0.60}
+      },
+      "concept": "Analyze last 3-4 closes + today's open direction for pattern",
+      "data_requirements": ["daily_bars", "close_direction", "open_direction"],
+      "nautilus_mapping": {
+        "indicators": ["Custom pattern sequence detector"],
+        "order_types": ["MARKET on open (not ORB)"],
+        "strategy_base": "Open-to-close direction prediction"
+      },
+      "implementation_priority": "LOW - Superseded by Daily Bias methodology",
+      "notes": "Early Crabel work. Statistical patterns in close sequences. Later evolved into Daily Bias (more sophisticated). Historical interest but not strongest edge. Daily Bias integrates these patterns + range + momentum. Use Daily Bias instead for modern implementation."
+    },
+    {
+      "rank": 41,
+      "name": "Stop Management - Move to Breakeven",
+      "source": "Crabel",
+      "category": "Position Management",
+      "roi_score": 6,
+      "complexity": 2,
+      "win_rate_empirical": "Risk management tool - preserves capital",
+      "general_rule": "Move stop to breakeven within 1 hour of entry",
+      "market_specific_timing": {
+        "sp500": "5-10 minutes (fast trending market)",
+        "bonds": "30-60 minutes",
+        "soybeans": "30-60 minutes",
+        "general": "Within 1 hour maximum"
+      },
+      "logic": "If market hasn't moved in your favor quickly, probably not a strong setup. Protect capital.",
+      "stop_placement": "Use opposite ORB stretch level initially, then move to entry price (breakeven)",
+      "data_requirements": ["entry_time", "current_time", "entry_price"],
+      "nautilus_mapping": {
+        "indicators": ["Time tracker", "P&L tracker"],
+        "order_types": ["STOP_LOSS with trailing logic"],
+        "strategy_base": "Position management module"
+      },
+      "implementation_priority": "HIGH - Critical risk management",
+      "notes": "Not a strategy but essential risk management. Crabel's observation: winning trades show profit quickly. Losers linger. Moving to breakeven after time threshold protects against slow bleed. Pattern-dependent: ID/NR4 (15 min), NR7 (30 min), NR4 (60 min)."
+    },
+    {
+      "rank": 42,
+      "name": "Poor Highs / Poor Lows (Market Profile)",
+      "source": "Market Profile",
+      "category": "Profile Inefficiency",
+      "roi_score": 5,
+      "complexity": 4,
+      "win_rate_empirical": "High probability revisit (70-80%)",
+      "definition": "Extremes with only 1-2 TPO letters = minimal time spent at price",
+      "interpretation": "Poor high/low = incomplete auction = market returns to test = target",
+      "trading_rule": "Target = Untested Poor High or Poor Low",
+      "data_requirements": ["market_profile_construction", "TPO_count"],
+      "nautilus_mapping": {
+        "indicators": ["Custom Market Profile builder", "Poor High/Low detector"],
+        "order_types": ["LIMIT at poor extremes"],
+        "strategy_base": "Profile inefficiency strategy"
+      },
+      "implementation_priority": "MEDIUM - Requires Market Profile construction",
+      "notes": "Market Profile concept. Low TPO count at extreme = brief visit = incomplete auction. Market gravitates back to test. Similar to Single Prints but specific to profile extremes. Use as target for swing trades. Combine with other Profile concepts (POC, VA)."
+    },
+    {
+      "rank": 43,
+      "name": "Single Prints (Market Profile)",
+      "source": "Market Profile",
+      "category": "Profile Inefficiency",
+      "roi_score": 5,
+      "complexity": 4,
+      "win_rate_empirical": "High probability fill (65-75%)",
+      "definition": "Gaps in profile = price levels with single TPO letter = rapid movement without time",
+      "interpretation": "Represents inefficiency that market tends to fill",
+      "trading_rule": "Target = Nearest Single Print area not yet filled",
+      "data_requirements": ["market_profile_construction", "profile_gap_detection"],
+      "nautilus_mapping": {
+        "indicators": ["Custom Market Profile builder", "Single Print detector"],
+        "order_types": ["LIMIT at single print zones"],
+        "strategy_base": "Profile inefficiency fill strategy"
+      },
+      "implementation_priority": "MEDIUM - Requires Market Profile construction",
+      "notes": "Single Prints = market moved too fast, didn't spend time. Creates vacuum. Similar to CME gaps (unfilled price levels). Market returns to 'complete the auction'. Not immediate - can take days/weeks. Use as swing trade targets, not scalping."
+    },
+    {
+      "rank": 44,
+      "name": "Composite Target Method (Multi-Method Confluence)",
+      "source": "Target_Prezzo_Metodi_Matematici.md",
+      "category": "Meta-Strategy / Target Validation",
+      "roi_score": 7,
+      "complexity": 5,
+      "win_rate_empirical": "Higher than any single method when confluence present",
+      "key_formula": "Target_Final = Weighted_Average(T1, T2, T3, T4)",
+      "component_methods": {
+        "T1": "ATR × 2 (weight 25%)",
+        "T2": "Measured Move 100% (weight 30%)",
+        "T3": "Fibonacci 161.8% (weight 25%)",
+        "T4": "2× StdDev projection (weight 20%)"
+      },
+      "confluence_validation": "Target is STRONG when: (1) ≥3 methods converge within 2%, (2) Coincides with historical S/R, (3) Reachable within normal volatility (≤3 ATR)",
+      "data_requirements": ["Multiple indicator inputs"],
+      "nautilus_mapping": {
+        "indicators": ["ATR", "Swing detector", "Fib calculator", "StdDev calculator"],
+        "order_types": ["TAKE_PROFIT at composite target"],
+        "strategy_base": "Multi-factor target calculator"
+      },
+      "implementation_priority": "MEDIUM-HIGH - Robust target methodology",
+      "notes": "Meta-approach combining multiple methods. Confluence = validation. More reliable than any single method. Similar to institutional 'confluence zones'. Weighted average allows tuning based on backtests. Risk/Reward ≥ 2:1 required for valid target."
+    },
+    {
+      "rank": 45,
+      "name": "Contraction/Expansion Principle (Crabel Core Concept)",
+      "source": "Crabel - Foundational Theory",
+      "category": "Market Regime Framework",
+      "roi_score": 9,
+      "complexity": 1,
+      "win_rate_empirical": "Not standalone - framework for all Crabel patterns",
+      "principle": "Markets alternate between Contraction (rest) and Expansion (movement). Contraction → Expansion, Expansion → Contraction (cyclical).",
+      "trading_implications": {
+        "after_contraction": "Trade ORB aggressively (64% avg win rate, $710K profit)",
+        "after_expansion": "AVOID ORB or fade (52% avg win rate, $102K profit)"
+      },
+      "contraction_patterns": ["NR4", "NR7", "Inside Day", "ID/NR4", "Doji", "2-Bar NR", "3-Bar NR"],
+      "expansion_patterns": ["WS4", "WS7", "Trend Day"],
+      "data_requirements": ["range_analysis"],
+      "nautilus_mapping": {
+        "indicators": ["Range comparison logic in all Crabel indicators"],
+        "order_types": ["N/A - conceptual framework"],
+        "strategy_base": "Master filter for pattern strategies"
+      },
+      "implementation_priority": "CRITICAL - Core understanding for all Crabel work",
+      "notes": "MOST IMPORTANT CRABEL CONCEPT. Not a strategy but the WHY behind all patterns. Contraction = market coils (energy accumulates). Expansion = market releases (energy discharges). Profitability 7× higher after contraction vs expansion. Apply to ALL breakout strategies, not just Crabel."
+    },
+    {
+      "rank": 46,
+      "name": "Anchored VWAP",
+      "source": "Institutional Trading / VWAP Extensions",
+      "category": "Event-Driven VWAP",
+      "roi_score": 6,
+      "complexity": 5,
+      "win_rate_empirical": "Varies by anchor point quality",
+      "concept": "VWAP calculated from specific event, not daily reset",
+      "anchor_points": ["Earnings release", "Major swing high/low", "Gap fill", "News event", "Market open (session start)"],
+      "target_formula": "Target = StdDev bands from Anchored VWAP (±1σ, ±2σ, ±3σ)",
+      "interpretation": "More relevant than rolling VWAP when price action centered around specific event",
+      "data_requirements": ["tick_data", "event_timestamps", "volume"],
+      "nautilus_mapping": {
+        "indicators": ["Custom Anchored VWAP calculator"],
+        "order_types": ["LIMIT at AVWAP bands"],
+        "strategy_base": "Event-driven mean reversion"
+      },
+      "implementation_priority": "MEDIUM - Requires event detection",
+      "notes": "More powerful than daily VWAP for event-driven trading. Anchor to significant market events. Price respects AVWAP from major swing points. Institutions anchor to session starts, earnings, major news. StdDev bands still apply. Manual anchor selection = discretionary, algorithmic = requires event detection."
+    },
+    {
+      "rank": 47,
+      "name": "80% Rule (Market Profile)",
+      "source": "Market Profile - Statistical Tendency",
+      "category": "Opening Type Strategy",
+      "roi_score": 6,
+      "complexity": 4,
+      "win_rate_empirical": "80% probability (by definition)",
+      "rule": "IF price opens outside prior day's Value Area AND re-enters VA within first 2× 30-min bars THEN 80% probability of reaching opposite VA extreme",
+      "target_formulas": {
+        "open_below_VAL_then_enters": "Target = VAH (Value Area High)",
+        "open_above_VAH_then_enters": "Target = VAL (Value Area Low)"
+      },
+      "key_conditions": ["Open outside VA", "Re-entry within first hour (2× 30min bars)", "Direction of re-entry determines target"],
+      "data_requirements": ["prior_day_value_area", "opening_price", "first_hour_bars"],
+      "nautilus_mapping": {
+        "indicators": ["Market Profile VA calculator", "Opening type classifier"],
+        "order_types": ["LIMIT at opposite VA extreme"],
+        "strategy_base": "Opening range strategy (Profile-based)"
+      },
+      "implementation_priority": "MEDIUM - Requires Market Profile data",
+      "notes": "One of the most reliable Market Profile rules. 80% is empirically observed, not theoretical. Early re-entry to VA = rejection of overnight sentiment. Market reverts to prior day's accepted value. Time window critical - must be within first hour. Similar to Crabel's ORB but Profile-based."
+    }
+  ],
+
+  "implementation_recommendations": {
+    "phase_1_critical_priority": [
+      "Inside Day + NR4 (ID/NR4)",
+      "NR7 + ORB",
+      "Contraction/Expansion Principle (framework)"
+    ],
+    "phase_2_high_priority": [
+      "2-Bar NR Pattern",
+      "Avellaneda-Stoikov Market Making",
+      "VWAP with StdDev Bands",
+      "Volume Profile (VPOC, HVN/LVN)"
+    ],
+    "phase_3_advanced": [
+      "VPIN (Order Flow Toxicity)",
+      "Kyle's Lambda",
+      "Market Making with Adverse Selection",
+      "Order Book Imbalance (OBI)"
+    ],
+    "supporting_tools": [
+      "Daily Bias Calculator",
+      "ATR Projection",
+      "Fibonacci Extensions",
+      "Composite Target Method",
+      "Stop Management (Breakeven)"
+    ]
+  },
+
+  "nautilus_trader_integration_notes": {
+    "native_rust_components": [
+      "ExponentialMovingAverage (for volatility)",
+      "AverageTrueRange (for ATR-based targets)",
+      "OrderBook analytics (mid_price, spread)"
+    ],
+    "custom_indicators_required": [
+      "NR4/NR7/Inside Day detectors",
+      "2-Bar NR / 3-Bar NR detectors",
+      "Hook Day detectors",
+      "Doji detector with market-specific thresholds",
+      "Stretch calculator (10-day average)",
+      "Daily Bias calculator (5-day pattern)",
+      "Market Profile builder (TPO, POC, VA)",
+      "Volume Profile builder (VPOC, HVN/LVN)",
+      "VWAP with StdDev bands",
+      "VPIN calculator",
+      "Kyle's Lambda estimator",
+      "OBI calculator",
+      "Delta/CVD tracker"
+    ],
+    "strategy_patterns": {
+      "crabel_orb": "Strategy with on_bar handler, pattern detection, STOP_MARKET orders",
+      "market_making": "Strategy with on_order_book handler, LIMIT POST_ONLY orders",
+      "order_flow": "Strategy with tick-level data, L2 orderbook, real-time analysis"
+    },
+    "data_requirements_summary": {
+      "tier_1_basic": ["daily_bars", "OHLC"],
+      "tier_2_optimal": ["L2_orderbook", "quote_ticks", "trade_ticks"],
+      "tier_3_advanced": ["tick_trades", "bid_ask_classification", "order_book_depth"]
+    },
+    "avoid_antipatterns": [
+      "NEVER use df.iterrows() - use vectorized operations or Rust wranglers",
+      "NEVER reimplement native Rust indicators",
+      "NEVER load entire datasets into memory - use streaming",
+      "ALWAYS use ParquetDataCatalog for large datasets",
+      "ALWAYS calibrate thresholds (Doji, Stretch) to specific markets"
+    ]
+  }
+}
