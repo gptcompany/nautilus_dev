@@ -110,7 +110,7 @@ As a trader, I want a unified pipeline that combines all factors (regime, VPIN, 
 - **SC-002**: Meta-model achieves AUC > 0.6 on out-of-sample data
 - **SC-003**: BOCD detects regime changes within 10 bars of actual change
 - **SC-004**: Integrated pipeline latency <20ms end-to-end
-- **SC-005**: Backtest with full pipeline shows Sharpe > 1.5
+- **SC-005**: Backtest with full pipeline shows Sharpe > 1.5 (target: BTCUSDT 1H, 2024-2025, default params)
 - **SC-006**: All components have >80% test coverage
 
 ## Technical Notes
@@ -118,7 +118,9 @@ As a trader, I want a unified pipeline that combines all factors (regime, VPIN, 
 ### Dependencies
 
 ```bash
-uv pip install mlfinlab ruptures  # or custom BOCD
+# No additional dependencies - uses custom implementations
+# (mlfinlab rejected due to licensing, ruptures rejected as offline-only)
+# Core deps already in nightly: numpy, scipy, scikit-learn, pydantic
 ```
 
 ### File Structure
