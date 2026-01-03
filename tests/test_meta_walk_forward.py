@@ -164,3 +164,95 @@ class TestPurgingAndEmbargo:
                 gap = min(purged_test) - max(purged_train)
                 # Gap should account for label span
                 assert gap >= max_holding
+
+
+@pytest.mark.meta_learning
+class TestWalkForwardTrain:
+    """Test suite for walk_forward_train utility function."""
+
+    def test_walk_forward_train_basic(self, walk_forward_config):
+        """Test basic walk-forward training loop."""
+        from sklearn.ensemble import RandomForestClassifier
+
+        from strategies.common.meta_learning.walk_forward import walk_forward_train
+
+        # Create synthetic data
+        n_samples = 400
+        n_features = 5
+        np.random.seed(42)
+        features = np.random.randn(n_samples, n_features)
+        meta_labels = np.random.randint(0, 2, n_samples)
+
+        # Create a simple model
+        model = RandomForestClassifier(n_estimators=10, random_state=42)
+
+        # Run walk-forward training
+        result = walk_forward_train(
+            model=model,
+            features=features,
+            meta_labels=meta_labels,
+            config=walk_forward_config,
+        )
+
+        # Check result structure
+        assert "predictions" in result
+        assert "actuals" in result
+        assert "indices" in result
+        assert "n_splits" in result
+
+        # Check that predictions were made
+        assert len(result["predictions"]) > 0
+        assert len(result["actuals"]) == len(result["predictions"])
+        assert len(result["indices"]) == len(result["predictions"])
+
+    def test_walk_forward_train_with_purging(self, walk_forward_config):
+        """Test walk-forward with purging for triple barrier labels."""
+        from sklearn.ensemble import RandomForestClassifier
+
+        from strategies.common.meta_learning.walk_forward import walk_forward_train
+
+        n_samples = 400
+        n_features = 5
+        np.random.seed(42)
+        features = np.random.randn(n_samples, n_features)
+        meta_labels = np.random.randint(0, 2, n_samples)
+
+        model = RandomForestClassifier(n_estimators=10, random_state=42)
+
+        # Run with purging
+        result = walk_forward_train(
+            model=model,
+            features=features,
+            meta_labels=meta_labels,
+            config=walk_forward_config,
+            max_holding_bars=10,
+        )
+
+        assert result["n_splits"] > 0
+        # With purging, may have fewer predictions per split
+        assert len(result["predictions"]) > 0
+
+    def test_walk_forward_train_predict_without_proba(self, walk_forward_config):
+        """Test walk-forward with model that has no predict_proba."""
+        from sklearn.svm import LinearSVC
+
+        from strategies.common.meta_learning.walk_forward import walk_forward_train
+
+        n_samples = 400
+        n_features = 5
+        np.random.seed(42)
+        features = np.random.randn(n_samples, n_features)
+        meta_labels = np.random.randint(0, 2, n_samples)
+
+        # LinearSVC has no predict_proba by default
+        model = LinearSVC(dual=True, random_state=42, max_iter=1000)
+
+        result = walk_forward_train(
+            model=model,
+            features=features,
+            meta_labels=meta_labels,
+            config=walk_forward_config,
+        )
+
+        # Should fall back to predict()
+        assert len(result["predictions"]) > 0

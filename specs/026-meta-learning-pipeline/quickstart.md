@@ -355,7 +355,7 @@ else:
 
 ## Next Steps
 
-1. Run tests: `uv run pytest tests/test_meta_learning.py -v`
+1. Run tests: `uv run pytest tests/test_triple_barrier.py tests/test_meta_model.py tests/test_meta_walk_forward.py tests/test_bocd.py tests/test_integrated_sizing.py -v`
 2. Backtest with historical data
 3. Tune hyperparameters (walk-forward validation)
 4. Monitor performance metrics (AUC, Sharpe, drawdown)
