@@ -126,7 +126,7 @@ class MetaLearningExampleStrategy(Strategy):
                 train_window=252,
                 test_window=63,
                 step_size=21,
-                embargo_window=5,
+                embargo_size=5,
             )
         )
 

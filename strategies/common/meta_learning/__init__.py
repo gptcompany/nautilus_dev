@@ -21,6 +21,7 @@ __all__ = [
     "WalkForwardSplitter",
     "WalkForwardConfig",
     "extract_meta_features",
+    "get_feature_names",
 ]
 
 
@@ -51,4 +52,10 @@ def __getattr__(name: str):
         )
 
         return extract_meta_features
+    if name == "get_feature_names":
+        from strategies.common.meta_learning.feature_engineering import (
+            get_feature_names,
+        )
+
+        return get_feature_names
     raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
