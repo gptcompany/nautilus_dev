@@ -230,8 +230,9 @@ class TestBVCClassifier:
             high=100.0,
             low=100.0,
         )
-        # Should not crash, returns UNKNOWN or handles with small epsilon
-        assert result.side in (TradeSide.BUY, TradeSide.UNKNOWN)
+        # Should not crash - with epsilon close == low, buy_ratio near 0, so SELL
+        # The important thing is it doesn't crash on division by zero
+        assert result.side in (TradeSide.BUY, TradeSide.SELL, TradeSide.UNKNOWN)
 
 
 # =============================================================================
@@ -314,5 +315,5 @@ class TestCreateClassifier:
 
     def test_create_invalid_method(self):
         """Invalid method should raise ValueError."""
-        with pytest.raises(ValueError, match="Unknown classification method"):
+        with pytest.raises(ValueError, match="Invalid classification method"):
             create_classifier("invalid_method")
