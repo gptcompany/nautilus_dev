@@ -711,7 +711,73 @@
       "timestamp": "2026-01-03T11:48:47.959133",
       "command": "uv run pytest tests/test_meta_model.py tests/test_meta_walk_forward.py tests/test_bocd.py tests/test_integrated_sizing.py -v 2>&1",
       "description": "Run Spec 026 Meta-Learning Pipeline tests"
+    },
+    {
+      "operation": "write",
+      "timestamp": "2026-01-03T11:49:41.238797",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/regime_detection/bocd_approach_d.py",
+      "content_length": 7717
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-03T11:49:45.262253",
+      "command": "uv pip install scikit-learn scipy",
+      "description": "Install sklearn and scipy"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-03T11:49:53.408843",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -c \"\nimport sys\nimport numpy as np\nsys.path.insert(0, '/media/sam/1TB/nautilus_dev')\nfrom strategies.common.regime_detection.config import BOCDConfig\nfrom strategies.common.regime_detection.bocd_approach_d import BOCD\n\nconfig = BOCDConfig(hazard_rate=0.05)\nbocd = BOCD(config)\n\nnp.random.seed(42)\nfor i in range(50):\n    bocd.update(np.random.normal(0, 0.01))\n\nprint('After 50 normal observations:')\nprint(f'CP prob: {bocd.get_changepoint_probability():.6f}')\nprint(f'RLD sum: {np.sum(bocd.get_run_length_distribution()):.6f}')\n\n# Now extreme observation\nprob = bocd.update(2.0)\nprint(f'\\\\nAfter x=2.0:')\nprint(f'CP prob: {prob:.6f}')\nprint(f'RLD sum: {np.sum(bocd.get_run_length_distribution()):.6f}')\n\"",
+      "description": "Test approach D"
+    },
+    {
+      "operation": "task",
+      "timestamp": "2026-01-03T11:49:59.364923",
+      "subagent_type": "test-runner",
+      "prompt": "Run the following tests after installing dependencies:\n\n```bash\ncd /media/sam/1TB/nautilus_dev\nuv ru..."
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-03T11:50:05.163732",
+      "command": "uv run pytest tests/test_meta_model.py tests/test_meta_walk_forward.py tests/test_bocd.py tests/test_integrated_sizing.py -v 2>&1",
+      "description": "Run specified test files with pytest"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-03T11:50:07.020615",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -c \"\nimport sys\nimport numpy as np\nsys.path.insert(0, '/media/sam/1TB/nautilus_dev')\nfrom strategies.common.regime_detection.config import BOCDConfig\nfrom strategies.common.regime_detection.bocd_approach_d import BOCD\n\nconfig = BOCDConfig(hazard_rate=0.05)\nbocd = BOCD(config)\n\nnp.random.seed(42)\nfor i in range(50):\n    bocd.update(np.random.normal(0, 0.01))\n\n# Manual calculation\nx = 2.0\nn = bocd._active_len\npred = bocd._student_t_pdf(x, n)\njoint = bocd._joint[:n].copy()\n\nprint('Before update with x=2.0:')\nprint(f'Joint[:5]: {joint[:5]}')\nprint(f'Pred[:5]: {pred[:5]}')\n\n# Growth probabilities\ngrowth = joint * pred * (1 - 0.05)\nprint(f'Growth[:5]: {growth[:5]}')\n\n# CP probability  \ncp = np.sum(joint * pred * 0.05)\nprint(f'CP sum: {cp:.6e}')\n\n# Total after update\nnew_joint_0 = cp\ngrowth_sum = np.sum(growth)\ntotal = new_joint_0 + growth_sum\nprint(f'Total: {total:.6e}')\nprint(f'Normalized CP: {new_joint_0 / total:.6f}')\n\"",
+      "description": "Debug approach D"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-03T11:50:25.531182",
+      "command": "uv pip install hmmlearn 2>&1",
+      "description": "Install missing hmmlearn dependency"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-03T11:50:27.255504",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -c \"\nimport sys\nimport numpy as np\nsys.path.insert(0, '/media/sam/1TB/nautilus_dev')\nfrom strategies.common.regime_detection.config import BOCDConfig\nfrom strategies.common.regime_detection.bocd_approach_d import BOCD\n\nconfig = BOCDConfig(hazard_rate=0.05)\nbocd = BOCD(config)\n\nnp.random.seed(42)\n# Build up normal regime\nfor i in range(50):\n    bocd.update(np.random.normal(0, 0.01))\n\nprint('Processing multiple outliers in sequence:')\nfor i in range(20):\n    x = np.random.normal(2.0, 0.01)  # From new regime\n    prob = bocd.update(x)\n    rld = bocd.get_run_length_distribution()\n    # Find most likely run length\n    max_rl = np.argmax(rld)\n    print(f'Step {i+1}: x={x:.3f}, CP prob={prob:.4f}, Max RL={max_rl}')\n\"",
+      "description": "Test multiple outliers"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-03T11:50:31.664803",
+      "command": "uv run pytest tests/test_meta_model.py tests/test_meta_walk_forward.py tests/test_bocd.py tests/test_integrated_sizing.py -v 2>&1",
+      "description": "Re-run tests after installing hmmlearn"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-03T11:50:42.761641",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -c \"\nimport sys\nimport numpy as np\nsys.path.insert(0, '/media/sam/1TB/nautilus_dev')\nfrom strategies.common.regime_detection.config import BOCDConfig\nfrom strategies.common.regime_detection.bocd_approach_d import BOCD\n\nconfig = BOCDConfig(hazard_rate=0.05)\nbocd = BOCD(config)\n\nnp.random.seed(42)\n# Build up normal regime - watch how joint evolves\nfor i in range(10):\n    x = np.random.normal(0, 0.01)\n    bocd.update(x)\n\nprint('After 10 normal observations:')\njoint = bocd._joint[:bocd._active_len]\nprint(f'Joint[:5]: {joint[:5]}')\nprint(f'Sum: {np.sum(joint):.6e}')\n\n# The key question: after many observations, does the mass concentrate\n# on high run lengths?\nprint(f'\\\\nMass at r=0: {joint[0]/np.sum(joint):.4f}')\nprint(f'Mass at r>5: {np.sum(joint[6:])/np.sum(joint):.4f}')\n\"",
+      "description": "Check joint evolution"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-03T11:50:58.235586",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -c \"\nimport sys\nimport numpy as np\nsys.path.insert(0, '/media/sam/1TB/nautilus_dev')\nfrom strategies.common.regime_detection.config import BOCDConfig\nfrom strategies.common.regime_detection.bocd_approach_d import BOCD\n\nconfig = BOCDConfig(hazard_rate=0.05)\nbocd = BOCD(config)\n\nnp.random.seed(42)\nfor i in range(50):\n    bocd.update(np.random.normal(0, 0.01))\n\n# Get run length distribution BEFORE outlier\nrld_before = bocd.get_run_length_distribution()\nmax_rl_before = np.argmax(rld_before)\n\nprint('Before outlier:')\nprint(f'Max run length: {max_rl_before}')\nprint(f'Mass at max: {rld_before[max_rl_before]:.4f}')\nprint(f'Mass at r=0: {rld_before[0]:.4f}')\n\n# Process extreme outlier\nbocd.update(100.0)  # Really extreme\n\nrld_after = bocd.get_run_length_distribution()\nmax_rl_after = np.argmax(rld_after)\n\nprint('\\\\nAfter extreme outlier x=100:')\nprint(f'Max run length: {max_rl_after}')\nprint(f'Mass at max: {rld_after[max_rl_after]:.4f}')\nprint(f'Mass at r=0: {rld_after[0]:.4f}')  \nprint(f'Mass at r=1: {rld_after[1]:.4f}')\n\"",
+      "description": "Check with extreme outlier"
     }
   ],
-  "last_updated": "2026-01-03T11:48:47.959156"
+  "last_updated": "2026-01-03T11:50:58.235601"
 }
