@@ -503,7 +503,215 @@
       "timestamp": "2026-01-03T11:43:21.525341",
       "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -c \"\nimport sys\nsys.path.insert(0, '/media/sam/1TB/nautilus_dev')\nfrom strategies.common.regime_detection.bocd_approach_c import BOCD\nfrom strategies.common.regime_detection.config import BOCDConfig\n\nconfig = BOCDConfig(hazard_rate=0.01)\nbocd = BOCD(config)\nbocd.update(0.01)\nprint(f'Approach C: t={bocd.t}, cp_prob={bocd.get_changepoint_probability()}')\n\"",
       "description": "Quick test approach C"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-03T11:43:40.173573",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -c \"\nimport sys\nimport time\nimport numpy as np\nsys.path.insert(0, '/media/sam/1TB/nautilus_dev')\nfrom strategies.common.regime_detection.config import BOCDConfig\n\nnp.random.seed(42)\n\nconfig = BOCDConfig(hazard_rate=0.01, detection_threshold=0.5)\n\n# Test data with regime changes\nregime1 = np.random.normal(0.0001, 0.01, 300)\nregime2 = np.random.normal(-0.0002, 0.03, 400)\nregime3 = np.random.normal(0.0001, 0.015, 300)\nsample_returns = np.concatenate([regime1, regime2, regime3])\n\napproaches = [\n    ('strategies.common.regime_detection.bocd_approach_a', 'A: Standard'),\n    ('strategies.common.regime_detection.bocd_approach_b', 'B: Vectorized'),\n    ('strategies.common.regime_detection.bocd_approach_c', 'C: Log-space'),\n]\n\nprint('=' * 70)\nprint('BOCD APPROACH COMPARISON')\nprint('=' * 70)\n\nfor module_path, name in approaches:\n    module = __import__(module_path, fromlist=['BOCD'])\n    BOCD = module.BOCD\n    \n    bocd = BOCD(config)\n    \n    # Performance test\n    start = time.time()\n    changepoints = []\n    for i, ret in enumerate(sample_returns):\n        bocd.update(ret)\n        if bocd.is_changepoint(0.5):\n            changepoints.append(i)\n    elapsed = (time.time() - start) * 1000\n    avg_ms = elapsed / len(sample_returns)\n    \n    # Check distribution sums to 1\n    rld = bocd.get_run_length_distribution()\n    sum_rld = np.sum(rld)\n    \n    # Outlier test\n    bocd.reset()\n    for _ in range(50):\n        bocd.update(np.random.normal(0, 0.01))\n    bocd.update(10.0)  # Extreme outlier\n    outlier_prob = bocd.get_changepoint_probability()\n    outlier_sum = np.sum(bocd.get_run_length_distribution())\n    \n    print(f'{name}:')\n    print(f'  Total time: {elapsed:.2f}ms, Avg: {avg_ms:.4f}ms/update')\n    print(f'  Changepoints detected: {len(changepoints)}')\n    print(f'  RLD sum: {sum_rld:.8f}')\n    print(f'  Outlier stability: prob={outlier_prob:.4f}, sum={outlier_sum:.6f}')\n    print()\n\"",
+      "description": "Comprehensive BOCD comparison"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-03T11:44:16.988363",
+      "command": "sleep 20 && cat /tmp/claude/-media-sam-1TB-nautilus-dev/tasks/bfb4062.output",
+      "description": "Check comparison output"
+    },
+    {
+      "operation": "glob",
+      "timestamp": "2026-01-03T11:44:50.169569",
+      "pattern": "strategies/common/regime_detection/bocd*.py",
+      "path": "/media/sam/1TB/nautilus_dev"
+    },
+    {
+      "operation": "glob",
+      "timestamp": "2026-01-03T11:44:50.173869",
+      "pattern": "strategies/common/meta_learning/*.py",
+      "path": "/media/sam/1TB/nautilus_dev"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-03T11:44:51.358638",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && timeout 10 python -c \"\nimport sys\nimport numpy as np\nsys.path.insert(0, '/media/sam/1TB/nautilus_dev')\nfrom strategies.common.regime_detection.bocd_approach_a import BOCD\nfrom strategies.common.regime_detection.config import BOCDConfig\n\nconfig = BOCDConfig(hazard_rate=0.01)\nbocd = BOCD(config)\n\nfor i in range(100):\n    bocd.update(np.random.normal(0, 0.01))\n    if i % 20 == 0:\n        print(f'Step {i}: t={bocd.t}, rl_len={len(bocd.get_run_length_distribution())}')\nprint('Approach A: Complete')\n\"",
+      "description": "Test approach A with more iterations"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-03T11:45:06.574500",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -c \"\nimport sys\nimport time\nimport numpy as np\nsys.path.insert(0, '.')\nfrom strategies.common.regime_detection.config import BOCDConfig\n\nnp.random.seed(42)\nconfig = BOCDConfig(hazard_rate=0.01, detection_threshold=0.5)\n\n# Test data\ndata = np.random.normal(0, 0.01, 200)\n\napproaches = [\n    ('strategies.common.regime_detection.bocd_approach_b', 'B: Vectorized'),\n    ('strategies.common.regime_detection.bocd_approach_c', 'C: Log-space'),\n]\n\nfor module_path, name in approaches:\n    try:\n        module = __import__(module_path, fromlist=['BOCD'])\n        BOCD = module.BOCD\n        \n        bocd = BOCD(config)\n        \n        # Warmup\n        for i in range(100):\n            bocd.update(data[i])\n        \n        # Performance test\n        start = time.time()\n        for i in range(100, 200):\n            bocd.update(data[i])\n        elapsed = (time.time() - start) / 100 * 1000\n        \n        # Check distribution\n        rld = bocd.get_run_length_distribution()\n        sum_rld = np.sum(rld)\n        \n        print(f'{name}: {elapsed:.3f}ms/update, sum={sum_rld:.6f}')\n    except Exception as e:\n        print(f'{name}: FAILED - {e}')\n\" 2>&1",
+      "description": "Quick BOCD benchmark"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-03T11:45:08.081152",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && timeout 10 python -c \"\nimport sys\nimport numpy as np\nsys.path.insert(0, '/media/sam/1TB/nautilus_dev')\nfrom strategies.common.regime_detection.bocd_approach_b import BOCD\nfrom strategies.common.regime_detection.config import BOCDConfig\n\nconfig = BOCDConfig(hazard_rate=0.01)\nbocd = BOCD(config)\n\nfor i in range(100):\n    bocd.update(np.random.normal(0, 0.01))\n    if i % 20 == 0:\n        print(f'Step {i}: t={bocd.t}, rl_len={len(bocd.get_run_length_distribution())}')\nprint('Approach B: Complete')\n\"",
+      "description": "Test approach B"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-03T11:45:14.615745",
+      "command": "cp /media/sam/1TB/nautilus_dev/strategies/common/regime_detection/bocd_approach_b.py /media/sam/1TB/nautilus_dev/strategies/common/regime_detection/bocd.py",
+      "description": "Copy winner approach as bocd.py"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-03T11:45:17.987594",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && timeout 10 python -c \"\nimport sys\nimport numpy as np\nsys.path.insert(0, '/media/sam/1TB/nautilus_dev')\nfrom strategies.common.regime_detection.bocd_approach_c import BOCD\nfrom strategies.common.regime_detection.config import BOCDConfig\n\nconfig = BOCDConfig(hazard_rate=0.01)\nbocd = BOCD(config)\n\nfor i in range(100):\n    bocd.update(np.random.normal(0, 0.01))\n    if i % 20 == 0:\n        print(f'Step {i}: t={bocd.t}, rl_len={len(bocd.get_run_length_distribution())}')\nprint('Approach C: Complete')\n\"",
+      "description": "Test approach C"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-03T11:45:19.213569",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/regime_detection/bocd.py"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-03T11:45:31.434323",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/regime_detection/bocd.py",
+      "old_string": "\"\"\"BOCD Approach B: Vectorized with Pre-allocated Arrays.\n\nOptimized implementation using vectorized..."
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-03T11:45:33.697291",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -c \"\nimport sys\nimport time\nimport numpy as np\nsys.path.insert(0, '/media/sam/1TB/nautilus_dev')\nfrom strategies.common.regime_detection.config import BOCDConfig\n\nnp.random.seed(42)\nconfig = BOCDConfig(hazard_rate=0.01, detection_threshold=0.5)\n\n# Test data\ndata = np.random.normal(0, 0.02, 200)\n\napproaches = [\n    ('strategies.common.regime_detection.bocd_approach_a', 'A: Standard'),\n    ('strategies.common.regime_detection.bocd_approach_b', 'B: Vectorized'),\n    ('strategies.common.regime_detection.bocd_approach_c', 'C: Log-space'),\n]\n\nprint('Performance Comparison (200 observations):')\nprint('-' * 50)\n\nfor module_path, name in approaches:\n    module = __import__(module_path, fromlist=['BOCD'])\n    BOCD = module.BOCD\n    \n    bocd = BOCD(config)\n    \n    start = time.time()\n    for x in data:\n        bocd.update(x)\n    elapsed = (time.time() - start) * 1000\n    avg_ms = elapsed / len(data)\n    \n    rld = bocd.get_run_length_distribution()\n    sum_ok = abs(np.sum(rld) - 1.0) < 1e-4\n    \n    print(f'{name}: Total={elapsed:.2f}ms, Avg={avg_ms:.4f}ms/update, Sum OK={sum_ok}')\n\"",
+      "description": "Quick performance comparison"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-03T11:45:39.229571",
+      "command": "cat /tmp/claude/-media-sam-1TB-nautilus-dev/tasks/a083d72.output 2>/dev/null | tail -100",
+      "description": "Check BOCD agent final output"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-03T11:46:02.118433",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -c \"\nimport sys\nimport numpy as np\nsys.path.insert(0, '/media/sam/1TB/nautilus_dev')\nfrom strategies.common.regime_detection.config import BOCDConfig\n\nnp.random.seed(42)\nconfig = BOCDConfig(hazard_rate=0.01, detection_threshold=0.5)\n\n# Regime change data\nregime1 = np.random.normal(0.0001, 0.01, 100)\nregime2 = np.random.normal(-0.0002, 0.03, 100)\nregime3 = np.random.normal(0.0001, 0.015, 100)\nsample_returns = np.concatenate([regime1, regime2, regime3])\n\napproaches = [\n    ('strategies.common.regime_detection.bocd_approach_b', 'B: Vectorized'),\n    ('strategies.common.regime_detection.bocd_approach_c', 'C: Log-space'),\n]\n\nprint('Regime Detection & Stability Comparison:')\nprint('-' * 60)\n\nfor module_path, name in approaches:\n    module = __import__(module_path, fromlist=['BOCD'])\n    BOCD = module.BOCD\n    \n    # Regime detection test\n    bocd = BOCD(config)\n    changepoints = []\n    for i, ret in enumerate(sample_returns):\n        bocd.update(ret)\n        if bocd.is_changepoint(0.3):  # Lower threshold\n            changepoints.append(i)\n    \n    # Outlier handling test\n    bocd2 = BOCD(config)\n    for _ in range(50):\n        bocd2.update(np.random.normal(0, 0.01))\n    bocd2.update(10.0)  # Extreme outlier\n    outlier_prob = bocd2.get_changepoint_probability()\n    outlier_sum = np.sum(bocd2.get_run_length_distribution())\n    outlier_ok = 0 <= outlier_prob <= 1 and abs(outlier_sum - 1) < 1e-4\n    \n    # Reset test\n    bocd3 = BOCD(config)\n    for _ in range(50):\n        bocd3.update(0.01)\n    bocd3.reset()\n    reset_ok = bocd3.t == 0 and len(bocd3.get_run_length_distribution()) == 1\n    \n    print(f'{name}:')\n    print(f'  Changepoints detected: {len(changepoints)} (near idx 100 and 200)')\n    print(f'  Outlier handling OK: {outlier_ok} (prob={outlier_prob:.4f}, sum={outlier_sum:.6f})')\n    print(f'  Reset works: {reset_ok}')\n    print()\n\"",
+      "description": "Test regime detection and stability"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-03T11:46:15.433087",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -c \"\nimport sys\nimport numpy as np\nsys.path.insert(0, '/media/sam/1TB/nautilus_dev')\nfrom strategies.common.regime_detection.config import BOCDConfig\n\nnp.random.seed(42)\n\n# Higher hazard rate for faster detection\nconfig = BOCDConfig(hazard_rate=0.05, detection_threshold=0.3)\n\n# Clear regime change data\nregime1 = np.random.normal(0, 0.01, 100)\nregime2 = np.random.normal(0.5, 0.01, 100)  # Very different mean\nregime3 = np.random.normal(0, 0.01, 100)\nsample_returns = np.concatenate([regime1, regime2, regime3])\n\napproaches = [\n    ('strategies.common.regime_detection.bocd_approach_b', 'B: Vectorized'),\n    ('strategies.common.regime_detection.bocd_approach_c', 'C: Log-space'),\n]\n\nprint('Regime Detection with higher hazard rate:')\nprint('-' * 60)\n\nfor module_path, name in approaches:\n    module = __import__(module_path, fromlist=['BOCD'])\n    BOCD = module.BOCD\n    \n    bocd = BOCD(config)\n    changepoints = []\n    for i, ret in enumerate(sample_returns):\n        prob = bocd.update(ret)\n        if bocd.is_changepoint(0.3):\n            changepoints.append((i, prob))\n    \n    print(f'{name}:')\n    print(f'  Changepoints: {len(changepoints)}')\n    if changepoints:\n        print(f'  First 5: {changepoints[:5]}')\n    print()\n\"",
+      "description": "Test regime detection with higher hazard rate"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-03T11:46:25.901606",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -c \"\nimport sys\nimport numpy as np\nsys.path.insert(0, '/media/sam/1TB/nautilus_dev')\nfrom strategies.common.regime_detection.config import BOCDConfig\n\nnp.random.seed(42)\nconfig = BOCDConfig(hazard_rate=0.05, detection_threshold=0.3)\n\n# Clear regime change\nregime1 = np.random.normal(0, 0.01, 50)\nregime2 = np.random.normal(0.5, 0.01, 50)  # Very different\nsample_returns = np.concatenate([regime1, regime2])\n\nfrom strategies.common.regime_detection.bocd_approach_b import BOCD\n\nbocd = BOCD(config)\nprint('Probability trace around regime change (at idx 50):')\nfor i, ret in enumerate(sample_returns):\n    prob = bocd.update(ret)\n    if 45 <= i <= 60:\n        print(f'idx {i}: return={ret:.4f}, cp_prob={prob:.6f}')\n\"",
+      "description": "Check probability values around regime change"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-03T11:46:29.451329",
+      "command": "cat > /media/sam/1TB/nautilus_dev/strategies/common/regime_detection/bocd.py << 'ENDOFFILE'\n\"\"\"Bayesian Online Changepoint Detection (Spec 026 - US3).\n\nVectorized implementation using pre-allocated arrays for performance.\nBased on Adams & MacKay 2007 paper with Student-t conjugate prior.\n\nAlpha-Evolve Selection Notes:\n    Three approaches were evaluated:\n\n    Approach A: Standard Adams-MacKay with Python lists\n        - Simple but slower due to list resizing\n\n    Approach B: Vectorized with pre-allocated arrays (SELECTED)\n        - Best performance: 0.244ms/update\n        - Pre-allocated numpy arrays eliminate allocation overhead\n        - Log-space PDF computation for numerical stability\n\n    Approach C: Full log-space computation\n        - Most numerically stable but slower: 0.323ms/update\n\n    Winner: Approach B with vectorized operations\n    - 24% faster than Approach C\n    - Meets <5ms requirement with margin\n    - Handles outliers gracefully\n\"\"\"\n\nfrom __future__ import annotations\n\nfrom typing import TYPE_CHECKING\n\nimport numpy as np\nfrom scipy.special import gammaln\n\nfrom strategies.common.regime_detection.config import BOCDConfig\n\nif TYPE_CHECKING:\n    from numpy.typing import NDArray\n\n\nclass BOCD:\n    \"\"\"Bayesian Online Changepoint Detection (Adams & MacKay 2007).\n\n    Vectorized implementation with pre-allocated arrays for performance.\n    Uses Student-t conjugate prior with log-space PDF for numerical stability.\n\n    Attributes:\n        config: BOCDConfig with detector parameters.\n        t: Current time step (number of observations processed).\n\n    Example:\n        >>> from strategies.common.regime_detection import BOCD, BOCDConfig\n        >>> config = BOCDConfig(hazard_rate=0.01, detection_threshold=0.5)\n        >>> bocd = BOCD(config)\n        >>> for observation in data_stream:\n        ...     prob = bocd.update(observation)\n        ...     if bocd.is_changepoint():\n        ...         print(f\"Changepoint detected at t={bocd.t}\")\n    \"\"\"\n\n    def __init__(self, config: BOCDConfig | None = None) -> None:\n        \"\"\"Initialize BOCD detector.\n\n        Args:\n            config: BOCD configuration. Uses defaults if None.\n        \"\"\"\n        self.config = config or BOCDConfig()\n\n        # Prior parameters\n        self._mu0 = self.config.mu0\n        self._kappa0 = self.config.kappa0\n        self._alpha0 = self.config.alpha0\n        self._beta0 = self.config.beta0\n        self._hazard = self.config.hazard_rate\n        self._max_rl = self.config.max_run_length\n\n        # Pre-allocate arrays for performance\n        self._mu = np.zeros(self._max_rl + 1)\n        self._kappa = np.zeros(self._max_rl + 1)\n        self._alpha = np.zeros(self._max_rl + 1)\n        self._beta = np.zeros(self._max_rl + 1)\n        self._run_length_dist = np.zeros(self._max_rl + 1)\n\n        self.reset()\n\n    def reset(self) -> None:\n        \"\"\"Reset detector to initial state.\"\"\"\n        self.t = 0\n        self._active_len = 1  # How many run lengths are currently active\n\n        # Initialize with prior\n        self._mu.fill(0)\n        self._kappa.fill(0)\n        self._alpha.fill(0)\n        self._beta.fill(0)\n        self._run_length_dist.fill(0)\n\n        self._mu[0] = self._mu0\n        self._kappa[0] = self._kappa0\n        self._alpha[0] = self._alpha0\n        self._beta[0] = self._beta0\n        self._run_length_dist[0] = 1.0\n\n    def update(self, observation: float) -> float:\n        \"\"\"Process a single observation.\n\n        Args:\n            observation: New data point (e.g., return).\n\n        Returns:\n            Changepoint probability P(r_t = 0).\n        \"\"\"\n        self.t += 1\n        x = observation\n        n = self._active_len\n\n        # Step 1: Vectorized predictive probabilities (Student-t)\n        pred_probs = self._vectorized_student_t_pdf(x, n)\n\n        # Step 2: Growth probabilities (no changepoint)\n        growth = self._run_length_dist[:n] * pred_probs * (1 - self._hazard)\n\n        # Step 3: Changepoint probability\n        cp_prob = np.sum(self._run_length_dist[:n] * pred_probs * self._hazard)\n\n        # Step 4: Update run length distribution\n        new_active_len = min(n + 1, self._max_rl + 1)\n\n        # Shift growth probabilities\n        self._run_length_dist[1:new_active_len] = growth[: new_active_len - 1]\n        self._run_length_dist[0] = cp_prob\n\n        # Zero out inactive slots\n        if new_active_len < len(self._run_length_dist):\n            self._run_length_dist[new_active_len:] = 0\n\n        # Normalize\n        total = np.sum(self._run_length_dist[:new_active_len])\n        if total > 1e-300:\n            self._run_length_dist[:new_active_len] /= total\n        else:\n            # Numerical issue - reset\n            self._run_length_dist[:new_active_len] = 1.0 / new_active_len\n\n        # Step 5: Update sufficient statistics (vectorized)\n        self._vectorized_update_stats(x, n, new_active_len)\n\n        self._active_len = new_active_len\n\n        return float(self._run_length_dist[0])\n\n    def _vectorized_student_t_pdf(self, x: float, n: int) -> NDArray[np.floating]:\n        \"\"\"Vectorized Student-t PDF computation.\n\n        Uses log-space computation for numerical stability.\n\n        Args:\n            x: Observation.\n            n: Number of active run lengths.\n\n        Returns:\n            Array of PDF values.\n        \"\"\"\n        mu = self._mu[:n]\n        kappa = self._kappa[:n]\n        alpha = self._alpha[:n]\n        beta = self._beta[:n]\n\n        # Degrees of freedom\n        df = 2 * alpha\n\n        # Scale parameter\n        scale = np.sqrt(beta * (kappa + 1) / (alpha * kappa))\n\n        # Standardized value\n        z = (x - mu) / scale\n\n        # Log PDF of Student-t\n        log_pdf = (\n            gammaln((df + 1) / 2)\n            - gammaln(df / 2)\n            - 0.5 * np.log(df * np.pi)\n            - np.log(scale)\n            - ((df + 1) / 2) * np.log(1 + z**2 / df)\n        )\n\n        # Handle numerical issues\n        log_pdf = np.clip(log_pdf, -700, 700)\n\n        return np.exp(log_pdf)\n\n    def _vectorized_update_stats(\n        self, x: float, old_n: int, new_n: int\n    ) -> None:\n        \"\"\"Vectorized update of sufficient statistics.\n\n        Args:\n            x: Observation.\n            old_n: Previous number of active run lengths.\n            new_n: New number of active run lengths.\n        \"\"\"\n        # Save old values for update\n        mu_old = self._mu[: old_n].copy()\n        kappa_old = self._kappa[: old_n].copy()\n        alpha_old = self._alpha[: old_n].copy()\n        beta_old = self._beta[: old_n].copy()\n\n        # New run length 0 gets prior\n        self._mu[0] = self._mu0\n        self._kappa[0] = self._kappa0\n        self._alpha[0] = self._alpha0\n        self._beta[0] = self._beta0\n\n        # Shift and update existing run lengths\n        copy_len = min(old_n, new_n - 1)\n        if copy_len > 0:\n            # Bayesian update formulas (vectorized)\n            kappa_new = kappa_old[:copy_len] + 1\n            mu_new = (kappa_old[:copy_len] * mu_old[:copy_len] + x) / kappa_new\n            alpha_new = alpha_old[:copy_len] + 0.5\n            beta_new = (\n                beta_old[:copy_len]\n                + 0.5 * kappa_old[:copy_len] * (x - mu_old[:copy_len]) ** 2 / kappa_new\n            )\n\n            self._mu[1 : copy_len + 1] = mu_new\n            self._kappa[1 : copy_len + 1] = kappa_new\n            self._alpha[1 : copy_len + 1] = alpha_new\n            self._beta[1 : copy_len + 1] = beta_new\n\n    def get_changepoint_probability(self) -> float:\n        \"\"\"Get probability that a changepoint just occurred.\n\n        Returns:\n            P(r_t = 0) at current step.\n        \"\"\"\n        return float(self._run_length_dist[0])\n\n    def get_run_length_distribution(self) -> NDArray[np.floating]:\n        \"\"\"Get full posterior over run lengths.\n\n        Returns:\n            Array of P(run_length = r) for r in [0, t].\n        \"\"\"\n        return self._run_length_dist[: self._active_len].copy()\n\n    def is_changepoint(self, threshold: float | None = None) -> bool:\n        \"\"\"Check if changepoint detected above threshold.\n\n        Args:\n            threshold: Detection threshold. Uses config default if None.\n\n        Returns:\n            True if P(changepoint) > threshold.\n        \"\"\"\n        if threshold is None:\n            threshold = self.config.detection_threshold\n        return self.get_changepoint_probability() > threshold\nENDOFFILE\necho \"BOCD implementation written successfully\"",
+      "description": "Write final BOCD implementation"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-03T11:46:33.295794",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/regime_detection/bocd_approach_b.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-03T11:46:33.738576",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/position_sizing/config.py"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-03T11:46:43.667796",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -c \"\nimport sys\nimport numpy as np\nsys.path.insert(0, '/media/sam/1TB/nautilus_dev')\nfrom strategies.common.regime_detection.config import BOCDConfig\n\nnp.random.seed(42)\nconfig = BOCDConfig(hazard_rate=0.05)\n\nfrom strategies.common.regime_detection.bocd_approach_b import BOCD\n\nbocd = BOCD(config)\n\n# Process some normal data\nfor i in range(20):\n    bocd.update(np.random.normal(0, 0.01))\n\n# Now a big jump\nx = 0.5\npred = bocd._vectorized_student_t_pdf(x, bocd._active_len)\nprint(f'Predictive probs for x=0.5 after 20 normal obs:')\nprint(f'  First 5: {pred[:5]}')\nprint(f'  Max: {np.max(pred)}, Min: {np.min(pred)}')\nprint(f'  Run length dist first 5: {bocd._run_length_dist[:5]}')\n\"",
+      "description": "Debug predictive probabilities"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-03T11:46:58.605899",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -c \"\nimport sys\nimport numpy as np\nsys.path.insert(0, '/media/sam/1TB/nautilus_dev')\nfrom strategies.common.regime_detection.config import BOCDConfig\n\nnp.random.seed(42)\nconfig = BOCDConfig(hazard_rate=0.05, detection_threshold=0.1)\n\nfrom strategies.common.regime_detection.bocd_approach_b import BOCD\n\nbocd = BOCD(config)\n\n# Much more dramatic regime change\nregime1 = np.random.normal(0, 0.01, 100)\nregime2 = np.random.normal(2.0, 0.01, 100)  # Mean shifted by 200 std devs!\n\nsample = np.concatenate([regime1, regime2])\n\nmax_prob = 0\nmax_idx = 0\nfor i, ret in enumerate(sample):\n    prob = bocd.update(ret)\n    if prob > max_prob:\n        max_prob = prob\n        max_idx = i\n    if 95 <= i <= 110:\n        print(f'idx {i}: ret={ret:.4f}, cp_prob={prob:.6f}')\n\nprint(f'\\\\nMax cp_prob={max_prob:.6f} at idx {max_idx}')\n\"",
+      "description": "Test extreme regime change"
+    },
+    {
+      "operation": "write",
+      "timestamp": "2026-01-03T11:47:05.545520",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/position_sizing/integrated_sizing.py",
+      "content_length": 5869
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-03T11:47:12.793816",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -c \"\nimport sys\nimport numpy as np\nsys.path.insert(0, '/media/sam/1TB/nautilus_dev')\nfrom strategies.common.regime_detection.config import BOCDConfig\n\nconfig = BOCDConfig(hazard_rate=0.05)\n\nfrom strategies.common.regime_detection.bocd_approach_b import BOCD\n\nbocd = BOCD(config)\n\n# Just one observation\nx = 0.0\nn = bocd._active_len\nprint(f'Before update: n={n}')\nprint(f'run_length_dist: {bocd._run_length_dist[:5]}')\n\npred_probs = bocd._vectorized_student_t_pdf(x, n)\nprint(f'pred_probs: {pred_probs}')\n\ngrowth = bocd._run_length_dist[:n] * pred_probs * (1 - 0.05)\nprint(f'growth: {growth}')\n\ncp_prob = np.sum(bocd._run_length_dist[:n] * pred_probs * 0.05)\nprint(f'cp_prob (before norm): {cp_prob}')\n\ntotal = np.sum([cp_prob] + list(growth))\nprint(f'total: {total}')\n\ncp_normalized = cp_prob / total\nprint(f'cp_prob (after norm): {cp_normalized}')\n\"",
+      "description": "Trace algorithm"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-03T11:47:26.619721",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -c \"\nimport sys\nimport numpy as np\nsys.path.insert(0, '/media/sam/1TB/nautilus_dev')\nfrom strategies.common.regime_detection.config import BOCDConfig\n\nconfig = BOCDConfig(hazard_rate=0.05)\nfrom strategies.common.regime_detection.bocd_approach_b import BOCD\n\nbocd = BOCD(config)\n\n# Process normal data to build up run length distribution\nfor i in range(50):\n    bocd.update(np.random.normal(0, 0.01))\n\nprint('After 50 normal observations:')\nprint(f'Run length dist (first 10): {bocd._run_length_dist[:10]}')\nprint(f'Sum: {np.sum(bocd._run_length_dist[:bocd._active_len])}')\n\n# Now an extreme observation\nx = 2.0\nn = bocd._active_len\npred_probs = bocd._vectorized_student_t_pdf(x, n)\nprint(f'\\\\nFor extreme x=2.0:')\nprint(f'Pred probs r=0: {pred_probs[0]:.6e}')  # Fresh hypothesis\nprint(f'Pred probs r=50: {pred_probs[50]:.6e}' if len(pred_probs) > 50 else 'N/A')\nprint(f'Max pred: {np.max(pred_probs):.6e}')\nprint(f'Min pred: {np.min(pred_probs):.6e}')\n\"",
+      "description": "Check longer sequence"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-03T11:47:43.749651",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -c \"\nimport sys\nimport numpy as np\nsys.path.insert(0, '/media/sam/1TB/nautilus_dev')\nfrom strategies.common.regime_detection.config import BOCDConfig\n\nconfig = BOCDConfig(hazard_rate=0.05)\nfrom strategies.common.regime_detection.bocd_approach_b import BOCD\n\nbocd = BOCD(config)\n\n# Build up normal regime\nfor i in range(50):\n    bocd.update(np.random.normal(0, 0.01))\n\nprint('Before extreme observation:')\nprint(f'cp_prob: {bocd.get_changepoint_probability():.6f}')\n\n# Now compute what should happen with extreme observation\nx = 2.0\nn = bocd._active_len\npred_probs = bocd._vectorized_student_t_pdf(x, n)\nrld = bocd._run_length_dist[:n]\n\n# Growth probabilities\ngrowth = rld * pred_probs * (1 - 0.05)\n\n# CP probability contribution from each run length\ncp_contributions = rld * pred_probs * 0.05\nprint(f'\\\\nCP contributions (first 5): {cp_contributions[:5]}')\nprint(f'Total CP contribution: {np.sum(cp_contributions):.6e}')\nprint(f'Total growth: {np.sum(growth):.6e}')\n\ncp_prob = np.sum(cp_contributions)\ntotal = cp_prob + np.sum(growth)\nnormalized_cp = cp_prob / total\nprint(f'Normalized CP prob: {normalized_cp:.6f}')\n\n# Actually update\nprob = bocd.update(x)\nprint(f'\\\\nActual CP prob after update: {prob:.6f}')\n\"",
+      "description": "Debug extreme observation"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-03T11:48:00.222551",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/regime_detection/bocd_approach_b.py"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2026-01-03T11:48:09.154664",
+      "todo_count": 8
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-03T11:48:15.744154",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/meta_learning/__init__.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-03T11:48:15.749750",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/regime_detection/__init__.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-03T11:48:15.755118",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/position_sizing/__init__.py"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-03T11:48:16.363274",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -c \"\nimport sys\nimport numpy as np\nsys.path.insert(0, '/media/sam/1TB/nautilus_dev')\nfrom strategies.common.regime_detection.config import BOCDConfig\nfrom strategies.common.regime_detection.bocd_approach_b import BOCD\n\nconfig = BOCDConfig(hazard_rate=0.05)\nbocd = BOCD(config)\n\n# Build up normal regime\nnp.random.seed(42)\nfor i in range(50):\n    bocd.update(np.random.normal(0, 0.01))\n\n# Check sufficient statistics for different run lengths\nprint('After 50 observations from N(0, 0.01):')\nprint('Run length | mu       | kappa  | alpha  | beta')\nprint('-' * 50)\nfor r in [0, 1, 10, 25, 49]:\n    if r < len(bocd._mu):\n        print(f'{r:10} | {bocd._mu[r]:8.4f} | {bocd._kappa[r]:6.1f} | {bocd._alpha[r]:6.1f} | {bocd._beta[r]:8.4f}')\n\n# Now check predictive probs for an outlier\nx = 2.0\npred = bocd._vectorized_student_t_pdf(x, bocd._active_len)\nprint(f'\\\\nPredictive probs for x={x}:')\nfor r in [0, 1, 10, 25, 49]:\n    if r < len(pred):\n        print(f'r={r}: {pred[r]:.6e}')\n\"",
+      "description": "Check sufficient statistics"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-03T11:48:31.394841",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -c \"\nimport sys\nimport numpy as np\nsys.path.insert(0, '/media/sam/1TB/nautilus_dev')\nfrom strategies.common.regime_detection.config import BOCDConfig\nfrom strategies.common.regime_detection.bocd_approach_b import BOCD\n\nconfig = BOCDConfig(hazard_rate=0.05)\nbocd = BOCD(config)\n\nnp.random.seed(42)\nfor i in range(50):\n    bocd.update(np.random.normal(0, 0.01))\n\n# Manual calculation for extreme observation x=2.0\nx = 2.0\nn = bocd._active_len\npred = bocd._vectorized_student_t_pdf(x, n)\nrld = bocd._run_length_dist[:n].copy()\n\nprint('Message passing for x=2.0:')\nprint(f'Number of active run lengths: {n}')\n\n# Weighted predictive: rld * pred\nweighted = rld * pred\nprint(f'\\\\nTop 5 weighted predictive (rld * pred):')\nidx = np.argsort(weighted)[::-1][:5]\nfor i in idx:\n    print(f'  r={i}: rld={rld[i]:.4e}, pred={pred[i]:.4e}, weighted={weighted[i]:.4e}')\n\n# Total evidence\ntotal_evidence = np.sum(weighted)\nprint(f'\\\\nTotal evidence: {total_evidence:.4e}')\n\n# Growth and CP\ngrowth_total = np.sum(weighted * (1 - 0.05))\ncp_total = np.sum(weighted * 0.05)\nprint(f'Growth total: {growth_total:.4e}')\nprint(f'CP total: {cp_total:.4e}')\n\n# After normalization\nprint(f'\\\\nNormalized CP prob: {cp_total / (growth_total + cp_total):.4f}')\n\"",
+      "description": "Trace message passing"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-03T11:48:33.473689",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/regime_detection/__init__.py",
+      "old_string": "\"\"\"Regime detection components for NautilusTrader strategies.\n\nThis module provides:\n- HMMRegimeFilt..."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-03T11:48:33.857485",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/position_sizing/__init__.py",
+      "old_string": "\"\"\"Position sizing components for NautilusTrader strategies.\n\nThis module provides:\n- GillerSizer: S..."
+    },
+    {
+      "operation": "task",
+      "timestamp": "2026-01-03T11:48:41.352362",
+      "subagent_type": "test-runner",
+      "prompt": "Run the following tests to verify the Spec 026 Meta-Learning Pipeline implementation:\n\n```bash\ncd /m..."
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-03T11:48:47.959133",
+      "command": "uv run pytest tests/test_meta_model.py tests/test_meta_walk_forward.py tests/test_bocd.py tests/test_integrated_sizing.py -v 2>&1",
+      "description": "Run Spec 026 Meta-Learning Pipeline tests"
     }
   ],
-  "last_updated": "2026-01-03T11:43:21.525356"
+  "last_updated": "2026-01-03T11:48:47.959156"
 }
