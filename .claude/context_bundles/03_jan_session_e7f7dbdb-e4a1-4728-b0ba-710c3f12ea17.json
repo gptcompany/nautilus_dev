@@ -177,7 +177,19 @@
       "timestamp": "2026-01-03T01:13:35.935268",
       "command": "git log --oneline 024-ml-regime-foundation -20",
       "description": "Show full history of spec-024 branch"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-03T01:14:07.086237",
+      "command": "git log --oneline -5 && git status --short",
+      "description": "Quick status check"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-03T01:14:13.285188",
+      "command": "git add .claude/ && git commit -m \"chore: Update Claude context\" && git push origin 025-orderflow-indicators 2>&1",
+      "description": "Commit and push spec-025"
     }
   ],
-  "last_updated": "2026-01-03T01:13:35.935284"
+  "last_updated": "2026-01-03T01:14:13.285207"
 }
