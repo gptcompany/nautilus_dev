@@ -341,6 +341,167 @@ def mock_clock():
     return clock
 
 
+# =============================================================================
+# Meta-Learning Fixtures (Spec 026)
+# =============================================================================
+
+
+@pytest.fixture
+def sample_price_series():
+    """Generate a synthetic price series for testing.
+
+    Returns 500 bars of simulated price data with trend and noise.
+    """
+    import numpy as np
+
+    np.random.seed(42)
+    n = 500
+    # Random walk with drift
+    returns = np.random.normal(0.0002, 0.02, n)
+    prices = 100 * np.exp(np.cumsum(returns))
+    return prices.astype(np.float64)
+
+
+@pytest.fixture
+def sample_atr_values(sample_price_series):
+    """Generate synthetic ATR values based on price series."""
+    import numpy as np
+
+    # Approximate ATR as 2% of price
+    atr = sample_price_series * 0.02
+    # Add some noise
+    atr = atr * (1 + np.random.normal(0, 0.1, len(atr)))
+    return np.abs(atr).astype(np.float64)
+
+
+@pytest.fixture
+def sample_signals():
+    """Generate synthetic trading signals for testing."""
+    import numpy as np
+
+    np.random.seed(42)
+    n = 500
+    # Random signals: +1 (long), -1 (short), 0 (no signal)
+    signals = np.random.choice([-1, 0, 1], size=n, p=[0.2, 0.6, 0.2])
+    return signals.astype(np.int64)
+
+
+@pytest.fixture
+def sample_labels():
+    """Generate synthetic triple barrier labels for testing."""
+    import numpy as np
+
+    np.random.seed(42)
+    n = 500
+    # Labels: +1 (take profit), -1 (stop loss), 0 (timeout)
+    labels = np.random.choice([-1, 0, 1], size=n, p=[0.3, 0.2, 0.5])
+    return labels.astype(np.int64)
+
+
+@pytest.fixture
+def sample_meta_features():
+    """Generate synthetic features for meta-model testing.
+
+    Returns (n_samples, n_features) array with 6 features:
+    - volatility, volume_ratio, momentum, regime_state, signal_strength, drawdown
+    """
+    import numpy as np
+
+    np.random.seed(42)
+    n = 500
+    features = np.column_stack(
+        [
+            np.random.uniform(0.01, 0.05, n),  # volatility
+            np.random.uniform(0.5, 2.0, n),  # volume_ratio
+            np.random.uniform(-0.1, 0.1, n),  # momentum
+            np.random.randint(0, 3, n),  # regime_state
+            np.random.uniform(0, 1, n),  # signal_strength
+            np.random.uniform(-0.2, 0, n),  # drawdown
+        ]
+    )
+    return features.astype(np.float64)
+
+
+@pytest.fixture
+def sample_returns():
+    """Generate synthetic returns series for BOCD testing.
+
+    Returns 1000 observations with two regime changes.
+    """
+    import numpy as np
+
+    np.random.seed(42)
+    # Regime 1: Low volatility (0-300)
+    regime1 = np.random.normal(0.0001, 0.01, 300)
+    # Regime 2: High volatility (300-700)
+    regime2 = np.random.normal(-0.0002, 0.03, 400)
+    # Regime 3: Medium volatility (700-1000)
+    regime3 = np.random.normal(0.0001, 0.015, 300)
+    return np.concatenate([regime1, regime2, regime3]).astype(np.float64)
+
+
+@pytest.fixture
+def triple_barrier_config():
+    """Create default TripleBarrierConfig for testing."""
+    from strategies.common.labeling.config import TripleBarrierConfig
+
+    return TripleBarrierConfig(
+        pt_multiplier=2.0,
+        sl_multiplier=1.0,
+        max_holding_bars=10,
+        atr_period=14,
+    )
+
+
+@pytest.fixture
+def meta_model_config():
+    """Create default MetaModelConfig for testing."""
+    from strategies.common.meta_learning.config import MetaModelConfig
+
+    return MetaModelConfig(
+        n_estimators=50,  # Reduced for faster tests
+        max_depth=3,
+        random_state=42,
+    )
+
+
+@pytest.fixture
+def walk_forward_config():
+    """Create default WalkForwardConfig for testing."""
+    from strategies.common.meta_learning.config import WalkForwardConfig
+
+    return WalkForwardConfig(
+        train_window=100,  # Reduced for testing
+        test_window=25,
+        step_size=10,
+        embargo_size=2,
+    )
+
+
+@pytest.fixture
+def bocd_config():
+    """Create default BOCDConfig for testing."""
+    from strategies.common.regime_detection.config import BOCDConfig
+
+    return BOCDConfig(
+        hazard_rate=0.01,  # Higher for testing (expect changes more often)
+        detection_threshold=0.5,  # Lower for testing
+    )
+
+
+@pytest.fixture
+def integrated_sizing_config():
+    """Create default IntegratedSizingConfig for testing."""
+    from strategies.common.position_sizing.config import IntegratedSizingConfig
+
+    return IntegratedSizingConfig(
+        giller_exponent=0.5,
+        fractional_kelly=0.5,
+        min_size=0.01,
+        max_size=1.0,
+    )
+
+
 def pytest_configure(config):
     """Configure custom pytest markers."""
     config.addinivalue_line(
@@ -353,4 +514,7 @@ def pytest_configure(config):
     )
     config.addinivalue_line(
         "markers", "recovery: mark test as recovery module test (Spec 017)"
+    )
+    config.addinivalue_line(
+        "markers", "meta_learning: mark test as meta-learning pipeline test (Spec 026)"
     )
