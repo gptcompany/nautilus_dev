@@ -55,7 +55,7 @@
 
 **Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T012 [US1] Write unit tests for triple barrier labeling in `tests/test_triple_barrier.py`
+- [X] T012 [US1] Write unit tests for triple barrier labeling in `tests/test_triple_barrier.py`
   - Test +1 label when TP hit first
   - Test -1 label when SL hit first
   - Test 0 label on timeout
@@ -64,17 +64,17 @@
 
 ### Implementation for User Story 1
 
-- [ ] T013 [E] [US1] Implement `TripleBarrierLabeler` class in `strategies/common/labeling/triple_barrier.py`
+- [X] T013 [E] [US1] Implement `TripleBarrierLabeler` class in `strategies/common/labeling/triple_barrier.py`
   - `apply()` method for vectorized labeling
   - `get_barrier_events()` for detailed event tracking
   - ATR-based barrier calculation
   - Support for long and short signals
   - **Edge case**: Handle "no barrier hit" (return 0 with final return sign)
-- [ ] T014 [US1] Create barrier calculation helpers in `strategies/common/labeling/label_utils.py`
+- [X] T014 [US1] Create barrier calculation helpers in `strategies/common/labeling/label_utils.py`
   - `get_vertical_barriers()` - timeout indices
   - `get_horizontal_barriers()` - TP/SL price levels
   - `check_barrier_hit()` - vectorized barrier checking
-- [ ] T015 [US1] Update `strategies/common/labeling/__init__.py` with public API exports
+- [X] T015 [US1] Update `strategies/common/labeling/__init__.py` with public API exports
 
 **Checkpoint**: Triple barrier labeling functional, can process historical data independently
 
@@ -90,12 +90,12 @@
 
 ### Tests for User Story 2
 
-- [ ] T016 [US2] Write unit tests for meta-label generation in `tests/test_meta_model.py`
+- [X] T016 [US2] Write unit tests for meta-label generation in `tests/test_meta_model.py`
   - Test meta-label creation (correct/incorrect classification)
   - Test feature extraction
   - Test model training/prediction API
   - Test AUC > 0.6 requirement
-- [ ] T017 [P] [US2] Write unit tests for walk-forward validation in `tests/test_walk_forward.py`
+- [X] T017 [P] [US2] Write unit tests for walk-forward validation in `tests/test_walk_forward.py`
   - Test rolling window splits
   - Test embargo/purging
   - Test no look-ahead bias
@@ -133,7 +133,7 @@
 
 ### Tests for User Story 3
 
-- [ ] T023 [US3] Write unit tests for BOCD in `tests/test_bocd.py`
+- [X] T023 [US3] Write unit tests for BOCD in `tests/test_bocd.py`
   - Test update mechanics (single observation)
   - Test changepoint probability calculation
   - Test run length distribution
@@ -167,7 +167,7 @@
 
 ### Tests for User Story 4
 
-- [ ] T026 [US4] Write unit tests for integrated sizing in `tests/test_integrated_sizing.py`
+- [X] T026 [US4] Write unit tests for integrated sizing in `tests/test_integrated_sizing.py`
   - Test multiplicative combination formula
   - Test edge cases (high toxicity, low confidence)
   - Test default values for missing factors
