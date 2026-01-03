@@ -308,3 +308,42 @@ class TestEdgeCases:
 
         # Negative return, but barriers not hit
         assert labels_down[0] in [0, -1]
+
+
+@pytest.mark.meta_learning
+class TestModuleImports:
+    """Test that module __init__.py exports work correctly."""
+
+    def test_import_from_labeling_module(self):
+        """Test imports from strategies.common.labeling."""
+        from strategies.common.labeling import (
+            TripleBarrierConfig,
+            TripleBarrierLabeler,
+            get_horizontal_barriers,
+            get_vertical_barriers,
+        )
+
+        # Verify we got the right classes
+        assert TripleBarrierLabeler is not None
+        assert TripleBarrierConfig is not None
+        assert get_vertical_barriers is not None
+        assert get_horizontal_barriers is not None
+
+    def test_import_from_meta_learning_module(self):
+        """Test imports from strategies.common.meta_learning."""
+        from strategies.common.meta_learning import (
+            MetaLabelGenerator,
+            MetaModel,
+            MetaModelConfig,
+            WalkForwardConfig,
+            WalkForwardSplitter,
+            extract_meta_features,
+        )
+
+        # Verify we got the right classes
+        assert MetaModel is not None
+        assert MetaModelConfig is not None
+        assert MetaLabelGenerator is not None
+        assert WalkForwardSplitter is not None
+        assert WalkForwardConfig is not None
+        assert extract_meta_features is not None
