@@ -1,0 +1,25 @@
+{
+  "session_id": "72806092-48fd-4698-af8d-7afe1279d145",
+  "created_at": "2026-01-03T01:49:43.668059",
+  "operations": [
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-03T01:49:43.668072",
+      "command": "git merge 025-orderflow-indicators --no-edit 2>&1",
+      "description": "Merge feature branch to main"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-03T01:49:48.392467",
+      "command": "git stash push -m \"temp: more context files\" . && git merge 025-orderflow-indicators --no-edit 2>&1",
+      "description": "Stash remaining files and merge"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-03T01:49:53.967487",
+      "command": "rm -f \".claude/context_bundles/03_jan_session_72806092-48fd-4698-af8d-7afe1279d145.json\" && git merge 025-orderflow-indicators --no-edit 2>&1",
+      "description": "Remove untracked file and merge"
+    }
+  ],
+  "last_updated": "2026-01-03T01:49:53.967504"
+}
