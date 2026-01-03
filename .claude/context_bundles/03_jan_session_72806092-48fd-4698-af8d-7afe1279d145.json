@@ -614,7 +614,47 @@
       "timestamp": "2026-01-03T01:20:50.843541",
       "command": "ls -la /media/sam/1TB/nautilus_dev/strategies/common/orderflow/",
       "description": "List orderflow directory contents"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-03T01:20:52.724279",
+      "command": "ls -la /media/sam/1TB/nautilus_dev/strategies/common/orderflow/",
+      "description": "List existing orderflow module files"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-03T01:20:52.795959",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/025-orderflow-indicators/data-model.md"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-03T01:20:54.510636",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/orderflow/__init__.py"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-03T01:20:58.280218",
+      "command": "ls -la /media/sam/1TB/nautilus_dev/tests/test_*.py",
+      "description": "List test files"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-03T01:20:58.431529",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/orderflow/__init__.py"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-03T01:20:59.218943",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python << 'PYEOF'\n# Final verification against API contract\nimport os\nimport shutil\n\ninit_path = '/media/sam/1TB/nautilus_dev/strategies/common/orderflow/__init__.py'\ninit_backup = '/media/sam/1TB/nautilus_dev/strategies/common/orderflow/__init__.py.bak'\n\nshutil.move(init_path, init_backup)\n\ntry:\n    with open(init_path, 'w') as f:\n        f.write('# Temporary empty init\\n')\n    \n    import sys\n    sys.path.insert(0, '/media/sam/1TB/nautilus_dev')\n    \n    from strategies.common.orderflow.trade_classifier import (\n        TradeSide,\n        TradeClassification,\n        TickRuleClassifier,\n        BVCClassifier,\n        CloseVsOpenClassifier,\n        create_classifier,\n    )\n    \n    # Verify API contract compliance\n    print(\"=== API Contract Compliance Check ===\")\n    print()\n    \n    # 1. TradeSide enum values match contract\n    assert TradeSide.BUY.value == 1, \"TradeSide.BUY must be 1\"\n    assert TradeSide.SELL.value == -1, \"TradeSide.SELL must be -1\"\n    assert TradeSide.UNKNOWN.value == 0, \"TradeSide.UNKNOWN must be 0\"\n    print(\"[OK] TradeSide enum matches contract (BUY=1, SELL=-1, UNKNOWN=0)\")\n    \n    # 2. TradeClassification dataclass matches contract\n    tc = TradeClassification(\n        side=TradeSide.BUY,\n        volume=100.0,\n        price=50000.0,\n        timestamp_ns=1234567890,\n        method=\"tick_rule\",\n        confidence=0.95\n    )\n    assert hasattr(tc, 'side'), \"Missing 'side' attribute\"\n    assert hasattr(tc, 'volume'), \"Missing 'volume' attribute\"\n    assert hasattr(tc, 'price'), \"Missing 'price' attribute\"\n    assert hasattr(tc, 'timestamp_ns'), \"Missing 'timestamp_ns' attribute\"\n    assert hasattr(tc, 'method'), \"Missing 'method' attribute\"\n    assert hasattr(tc, 'confidence'), \"Missing 'confidence' attribute\"\n    print(\"[OK] TradeClassification has all contract fields\")\n    \n    # 3. TradeClassification is frozen (immutable)\n    try:\n        tc.side = TradeSide.SELL\n        raise AssertionError(\"TradeClassification should be frozen\")\n    except AttributeError:\n        pass\n    print(\"[OK] TradeClassification is frozen=True\")\n    \n    # 4. All classifiers implement classify() with contract signature\n    for classifier_cls, name in [\n        (TickRuleClassifier, \"TickRuleClassifier\"),\n        (BVCClassifier, \"BVCClassifier\"),\n        (CloseVsOpenClassifier, \"CloseVsOpenClassifier\")\n    ]:\n        classifier = classifier_cls()\n        result = classifier.classify(\n            price=100.0,\n            volume=10.0,\n            timestamp_ns=12345,\n            prev_price=99.0,\n            open_price=98.0,\n            high=101.0,\n            low=97.0\n        )\n        assert isinstance(result, TradeClassification), f\"{name} must return TradeClassification\"\n        assert hasattr(classifier, 'method_name'), f\"{name} must have method_name\"\n        print(f\"[OK] {name} implements classify() correctly\")\n    \n    # 5. Factory function works\n    for method in [\"tick_rule\", \"bvc\", \"close_vs_open\"]:\n        classifier = create_classifier(method)\n        assert hasattr(classifier, 'classify'), f\"Factory-created {method} missing classify()\"\n        print(f\"[OK] create_classifier('{method}') works\")\n    \n    # 6. Factory raises ValueError for invalid method\n    try:\n        create_classifier(\"invalid_method\")\n        raise AssertionError(\"Should raise ValueError for invalid method\")\n    except ValueError:\n        pass\n    print(\"[OK] create_classifier raises ValueError for invalid method\")\n    \n    print()\n    print(\"=== All API Contract Checks Passed ===\")\n    \nfinally:\n    if os.path.exists(init_backup):\n        shutil.move(init_backup, init_path)\nPYEOF",
+      "description": "Verify API contract compliance"
+    },
+    {
+      "operation": "taskoutput",
+      "timestamp": "2026-01-03T01:20:59.816687",
+      "task_id": "ae6cb49",
+      "block": true,
+      "timeout": 60000
     }
   ],
-  "last_updated": "2026-01-03T01:20:50.843559"
+  "last_updated": "2026-01-03T01:20:59.816704"
 }
