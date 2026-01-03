@@ -212,11 +212,11 @@
 
 **Purpose**: Documentation, cleanup, and final validation
 
-- [ ] T032 [P] Verify all type hints and docstrings complete
-- [ ] T033 [P] Run ruff format and lint on all new files
-- [ ] T034 [P] Verify test coverage > 80% for all new modules
-- [ ] T035 Update `specs/026-meta-learning-pipeline/quickstart.md` with final API examples
-- [ ] T036 Run alpha-debug verification on all [E] marked implementations
+- [X] T032 [P] Verify all type hints and docstrings complete
+- [X] T033 [P] Run ruff format and lint on all new files
+- [X] T034 [P] Verify test coverage > 80% for all new modules
+- [X] T035 Update `specs/026-meta-learning-pipeline/quickstart.md` with final API examples
+- [X] T036 Run alpha-debug verification on all [E] marked implementations
 
 ---
 
