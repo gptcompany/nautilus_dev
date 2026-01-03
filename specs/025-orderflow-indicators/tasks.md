@@ -18,9 +18,9 @@
 
 **Purpose**: Create orderflow module structure and install dependencies
 
-- [ ] T001 Create orderflow module directory at strategies/common/orderflow/
-- [ ] T002 Install tick library for Hawkes processes: `uv pip install tick`
-- [ ] T003 [P] Create module __init__.py with public exports at strategies/common/orderflow/__init__.py
+- [x] T001 Create orderflow module directory at strategies/common/orderflow/
+- [x] T002 Install tick library for Hawkes processes: `uv pip install tick` (skipped - Python 3.12 incompatible, using pure Python fallback)
+- [x] T003 [P] Create module __init__.py with public exports at strategies/common/orderflow/__init__.py
 
 ---
 
@@ -32,21 +32,21 @@
 
 ### Configuration Models
 
-- [ ] T004 Create VPINConfig Pydantic model in strategies/common/orderflow/config.py
-- [ ] T005 Create HawkesConfig Pydantic model in strategies/common/orderflow/config.py
-- [ ] T006 Create OrderflowConfig Pydantic model in strategies/common/orderflow/config.py
+- [x] T004 Create VPINConfig Pydantic model in strategies/common/orderflow/config.py
+- [x] T005 Create HawkesConfig Pydantic model in strategies/common/orderflow/config.py
+- [x] T006 Create OrderflowConfig Pydantic model in strategies/common/orderflow/config.py
 
 ### Trade Classification (Shared by US1 and US2)
 
-- [ ] T007 Create TradeClassification dataclass in strategies/common/orderflow/trade_classifier.py
-- [ ] T008 Implement TickRuleClassifier in strategies/common/orderflow/trade_classifier.py
-- [ ] T009 [P] Implement BVCClassifier (Bulk Volume Classification) in strategies/common/orderflow/trade_classifier.py
-- [ ] T010 [P] Implement CloseVsOpenClassifier for bar data in strategies/common/orderflow/trade_classifier.py
-- [ ] T011 Create create_classifier() factory function in strategies/common/orderflow/trade_classifier.py
+- [x] T007 Create TradeClassification dataclass in strategies/common/orderflow/trade_classifier.py
+- [x] T008 Implement TickRuleClassifier in strategies/common/orderflow/trade_classifier.py
+- [x] T009 [P] Implement BVCClassifier (Bulk Volume Classification) in strategies/common/orderflow/trade_classifier.py
+- [x] T010 [P] Implement CloseVsOpenClassifier for bar data in strategies/common/orderflow/trade_classifier.py
+- [x] T011 Create create_classifier() factory function in strategies/common/orderflow/trade_classifier.py
 
 ### Tests for Foundational Components
 
-- [ ] T012 Write unit tests for trade classifiers in tests/test_trade_classifier.py
+- [x] T012 Write unit tests for trade classifiers in tests/test_trade_classifier.py
 
 **Checkpoint**: Foundation ready - user story implementation can now begin
 
