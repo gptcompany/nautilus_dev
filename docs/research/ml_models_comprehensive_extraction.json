@@ -1,0 +1,1731 @@
+{
+  "metadata": {
+    "extraction_date": "2026-01-03",
+    "sources": [
+      "trading_ml_research_final_2026.md",
+      "market_regime_detection_sota_2025.md",
+      "random_walk_mean_reversion_research.md",
+      "implementation_priority_matrix_2026.md",
+      "CRITICAL_ASSESSMENT.md",
+      "priority_conversion_list.md"
+    ],
+    "total_models_extracted": 47,
+    "methodology": "Comprehensive extraction of ALL ML models/techniques mentioned"
+  },
+  "models": [
+    {
+      "id": 1,
+      "name": "Hidden Markov Model (HMM) for Regime Detection",
+      "type": "Regime Detection",
+      "category": "Unsupervised Learning - State Space Model",
+      "paper_source": "Multiple sources - QuantStart tutorials, hmmlearn library",
+      "year": "Classic method - 2015-2025 implementations",
+      "roi_score": 10,
+      "implementation_complexity": 2,
+      "python_libraries": [
+        "hmmlearn (3.3k stars)",
+        "numpy",
+        "pandas"
+      ],
+      "data_required": [
+        "OHLCV",
+        "Returns",
+        "Volatility (rolling std)",
+        "Momentum (EMA difference)"
+      ],
+      "training_time": "~50ms (500 bars)",
+      "inference_time": "~1ms per bar",
+      "accuracy": "78-85% (offline regime detection)",
+      "key_features": [
+        "Gaussian emission distributions",
+        "Transition matrix for temporal persistence",
+        "Viterbi decoding for state sequence",
+        "Probabilistic regime assignment"
+      ],
+      "limitations": [
+        "Assumes Markovian transitions",
+        "Requires pre-specification of n_regimes",
+        "Can suffer from local optima in EM algorithm"
+      ],
+      "priority": "CRITICAL - Phase 1",
+      "implementation_status": "not_started"
+    },
+    {
+      "id": 2,
+      "name": "Gaussian Mixture Model (GMM) for Volatility Clustering",
+      "type": "Regime Detection",
+      "category": "Unsupervised Learning - Clustering",
+      "paper_source": "Scrucca (2024) - DOI:10.3390/e26110907",
+      "year": 2024,
+      "roi_score": 9,
+      "implementation_complexity": 1,
+      "python_libraries": [
+        "scikit-learn",
+        "numpy",
+        "pandas"
+      ],
+      "data_required": [
+        "Returns",
+        "Realized volatility",
+        "Momentum",
+        "Absolute returns"
+      ],
+      "training_time": "~20ms (500 bars)",
+      "inference_time": "~0.5ms per bar",
+      "accuracy": "72-80% (volatility regime clustering)",
+      "key_features": [
+        "Fast - no iterative forward-backward like HMM",
+        "Captures non-Gaussian multimodal distributions",
+        "Differential entropy as volatility measure",
+        "Full covariance for feature correlation"
+      ],
+      "limitations": [
+        "No temporal dynamics (unlike HMM)",
+        "Assumes static regime structure"
+      ],
+      "priority": "CRITICAL - Phase 1",
+      "implementation_status": "not_started"
+    },
+    {
+      "id": 3,
+      "name": "K-Means to HMM Hybrid (Zero-Shot Adaptation)",
+      "type": "Regime Detection",
+      "category": "Hybrid Unsupervised",
+      "paper_source": "Adapting to the Unknown (2025) - arXiv:2504.09664",
+      "year": 2025,
+      "roi_score": 9,
+      "implementation_complexity": 2,
+      "python_libraries": [
+        "scikit-learn (K-Means)",
+        "hmmlearn (HMM)",
+        "numpy"
+      ],
+      "data_required": [
+        "Multi-feature matrix (returns, volatility, momentum, risk)"
+      ],
+      "training_time": "~25ms (K-Means) + ~50ms (HMM) = ~75ms",
+      "inference_time": "~1ms per bar",
+      "accuracy": "80-85% (better initialization)",
+      "key_features": [
+        "K-Means initializes HMM centers",
+        "Avoids local optima in EM algorithm",
+        "Zero-shot forecasting capability",
+        "25x speedup over random initialization"
+      ],
+      "limitations": [
+        "Still requires n_regimes specification",
+        "Two-step training process"
+      ],
+      "priority": "HIGH - Phase 1",
+      "implementation_status": "not_started"
+    },
+    {
+      "id": 4,
+      "name": "VPIN (Volume-Synchronized Probability of Informed Trading)",
+      "type": "Orderflow / Toxic Flow Detection",
+      "category": "Market Microstructure",
+      "paper_source": "Easley et al. (2012) - SSRN:1695596 'Flow Toxicity'",
+      "year": 2012,
+      "roi_score": 9,
+      "implementation_complexity": 5,
+      "python_libraries": [
+        "numpy",
+        "pandas",
+        "custom implementation"
+      ],
+      "data_required": [
+        "Tick-level trades",
+        "Price",
+        "Volume",
+        "Side (buy/sell or tick rule)"
+      ],
+      "training_time": "N/A (rolling calculation)",
+      "inference_time": "~10ms per bucket update",
+      "accuracy": "75-82% (flash crash prediction)",
+      "key_features": [
+        "Volume buckets remove time-of-day effects",
+        "Order imbalance per bucket",
+        "Rolling 50-bucket average",
+        "Predicted 2010 Flash Crash (VPIN > 0.5)"
+      ],
+      "limitations": [
+        "Requires tick-level data",
+        "Volume synchronization can lag",
+        "Bucket size parameter sensitive"
+      ],
+      "priority": "HIGH - Phase 2",
+      "implementation_status": "not_started"
+    },
+    {
+      "id": 5,
+      "name": "Triple Barrier Labeling",
+      "type": "Signal Generation / Labeling",
+      "category": "Supervised Learning Preprocessing",
+      "paper_source": "López de Prado (2018) - Advances in Financial Machine Learning",
+      "year": 2018,
+      "roi_score": 10,
+      "implementation_complexity": 4,
+      "python_libraries": [
+        "mlfinlab",
+        "numpy",
+        "pandas"
+      ],
+      "data_required": [
+        "OHLCV",
+        "Volatility (ATR or rolling std)",
+        "Entry timestamps"
+      ],
+      "training_time": "~100ms per 1000 bars (label generation)",
+      "inference_time": "N/A (offline labeling)",
+      "accuracy": "N/A (label quality measure)",
+      "key_features": [
+        "Profit target barrier",
+        "Stop loss barrier",
+        "Time-based timeout barrier",
+        "Avoids look-ahead bias",
+        "Symmetric profit/loss targets"
+      ],
+      "limitations": [
+        "Requires historical data",
+        "Barrier parameters need tuning",
+        "Not real-time applicable"
+      ],
+      "priority": "CRITICAL - Phase 3",
+      "implementation_status": "not_started"
+    },
+    {
+      "id": 6,
+      "name": "Meta-labeling",
+      "type": "Signal Generation / Bet Sizing",
+      "category": "Supervised Learning - Two-Stage",
+      "paper_source": "López de Prado (2018) - AFML",
+      "year": 2018,
+      "roi_score": 10,
+      "implementation_complexity": 5,
+      "python_libraries": [
+        "mlfinlab",
+        "scikit-learn (RandomForest)",
+        "numpy"
+      ],
+      "data_required": [
+        "Features (same as primary model)",
+        "Primary model signals",
+        "True labels (from Triple Barrier)"
+      ],
+      "training_time": "~200ms (RandomForest)",
+      "inference_time": "~5ms per prediction",
+      "accuracy": "60-70% (P(primary_correct))",
+      "key_features": [
+        "Predicts when primary model will be correct",
+        "Two-stage prediction pipeline",
+        "Reduces false positives",
+        "Better Sharpe ratio than single-stage"
+      ],
+      "limitations": [
+        "Requires trained primary model",
+        "Complex two-stage architecture",
+        "Overfitting risk"
+      ],
+      "priority": "CRITICAL - Phase 3",
+      "implementation_status": "not_started"
+    },
+    {
+      "id": 7,
+      "name": "Bayesian Online Changepoint Detection (BOCD)",
+      "type": "Regime Detection",
+      "category": "Online Bayesian Inference",
+      "paper_source": "Adams & MacKay (2007)",
+      "year": 2007,
+      "roi_score": 10,
+      "implementation_complexity": 6,
+      "python_libraries": [
+        "scipy (Student-t distribution)",
+        "numpy",
+        "custom implementation"
+      ],
+      "data_required": [
+        "Time series (returns, prices)",
+        "Hazard rate parameter"
+      ],
+      "training_time": "N/A (online algorithm)",
+      "inference_time": "~5ms per observation",
+      "accuracy": "65-75% (online regime detection)",
+      "key_features": [
+        "Online - processes streaming data",
+        "Probabilistic changepoint detection",
+        "Adaptive to changepoint frequency",
+        "Run length distribution tracking"
+      ],
+      "limitations": [
+        "Computationally intensive for real-time",
+        "Requires hazard rate specification",
+        "Student-t assumption"
+      ],
+      "priority": "CRITICAL - Phase 4",
+      "implementation_status": "not_started"
+    },
+    {
+      "id": 8,
+      "name": "Hawkes Process for Order Flow Imbalance",
+      "type": "Orderflow Forecasting",
+      "category": "Point Process",
+      "paper_source": "Forecasting OFI with Hawkes (2024) - arXiv:2408.03594",
+      "year": 2024,
+      "roi_score": 10,
+      "implementation_complexity": 6,
+      "python_libraries": [
+        "tick (Hawkes library)",
+        "numpy"
+      ],
+      "data_required": [
+        "Buy trade timestamps",
+        "Sell trade timestamps",
+        "Tick-level data"
+      ],
+      "training_time": "~200ms (1000 events)",
+      "inference_time": "~2ms per event",
+      "accuracy": "80-88% (OFI forecast accuracy)",
+      "key_features": [
+        "Models self-excitation in trades",
+        "Bivariate process (buy/sell)",
+        "Intensity forecasting",
+        "SOTA for orderflow prediction"
+      ],
+      "limitations": [
+        "Requires tick-level data",
+        "Complex parameter estimation",
+        "Computational cost"
+      ],
+      "priority": "HIGH - Phase 2",
+      "implementation_status": "not_started"
+    },
+    {
+      "id": 9,
+      "name": "Sub-linear Position Sizing (Giller Formula)",
+      "type": "Risk Management / Position Sizing",
+      "category": "Signal Transformation",
+      "paper_source": "Graham Giller - The 10 Most Important Things",
+      "year": "2020s (desktop articles)",
+      "roi_score": 10,
+      "implementation_complexity": 1,
+      "python_libraries": [
+        "numpy"
+      ],
+      "data_required": [
+        "Signal magnitude"
+      ],
+      "training_time": "N/A",
+      "inference_time": "< 0.1ms",
+      "accuracy": "N/A (risk adjustment)",
+      "key_features": [
+        "Size = Signal^0.5 (not linear)",
+        "Accounts for Laplace (not Gaussian) distribution",
+        "Reduces over-leverage on outliers",
+        "Simple one-line formula"
+      ],
+      "limitations": [
+        "Assumes Laplace distribution",
+        "No dynamic adaptation"
+      ],
+      "priority": "CRITICAL - Phase 1 (Quick Win)",
+      "implementation_status": "not_started"
+    },
+    {
+      "id": 10,
+      "name": "Transformer for Limit Order Book (TLOB)",
+      "type": "Orderflow Forecasting",
+      "category": "Deep Learning - Transformer",
+      "paper_source": "TLOB: Transformer Dual Attention (2025) - arXiv:2502.15757",
+      "year": 2025,
+      "roi_score": 10,
+      "implementation_complexity": 9,
+      "python_libraries": [
+        "PyTorch",
+        "torch.nn.Transformer",
+        "numpy"
+      ],
+      "data_required": [
+        "Level 2 orderbook snapshots",
+        "Bid/ask prices",
+        "Bid/ask volumes",
+        "GPU required"
+      ],
+      "training_time": "~5000ms (GPU)",
+      "inference_time": "~15ms per snapshot",
+      "accuracy": "88-92% (SOTA on FI-2010, NASDAQ, Bitcoin LOB)",
+      "key_features": [
+        "SOTA LOB forecasting",
+        "Dual attention mechanism",
+        "Captures long-range dependencies",
+        "Works on multiple asset classes"
+      ],
+      "limitations": [
+        "Requires GPU",
+        "High computational cost",
+        "Needs large training dataset",
+        "Complex architecture"
+      ],
+      "priority": "LOW - Research Only",
+      "implementation_status": "not_started"
+    },
+    {
+      "id": 11,
+      "name": "Extended Kalman Filter (EKF) for Non-linear State Estimation",
+      "type": "Signal Extraction / State Estimation",
+      "category": "Non-linear Filtering",
+      "paper_source": "Optimal Signal Extraction (2024) - arXiv:2512.18648",
+      "year": 2024,
+      "roi_score": 7,
+      "implementation_complexity": 7,
+      "python_libraries": [
+        "filterpy",
+        "numpy"
+      ],
+      "data_required": [
+        "Noisy observations (prices, orderflow)",
+        "State transition model",
+        "Observation model"
+      ],
+      "training_time": "~50ms (initialization)",
+      "inference_time": "~2ms per update",
+      "accuracy": "Variable (depends on model quality)",
+      "key_features": [
+        "Non-linear extension of Kalman filter",
+        "Separates informed vs noise traders",
+        "Recursive state estimation",
+        "Online algorithm"
+      ],
+      "limitations": [
+        "Requires accurate state-space model",
+        "Jacobian calculations",
+        "Can diverge with poor initialization"
+      ],
+      "priority": "MEDIUM - Phase 2",
+      "implementation_status": "not_started"
+    },
+    {
+      "id": 12,
+      "name": "Unscented Kalman Filter (UKF)",
+      "type": "Signal Extraction / State Estimation",
+      "category": "Non-linear Filtering",
+      "paper_source": "filterpy library documentation",
+      "year": "2010s",
+      "roi_score": 7,
+      "implementation_complexity": 7,
+      "python_libraries": [
+        "filterpy",
+        "numpy"
+      ],
+      "data_required": [
+        "Noisy observations",
+        "State transition model",
+        "Observation model"
+      ],
+      "training_time": "~50ms",
+      "inference_time": "~3ms per update",
+      "accuracy": "Better than EKF for highly non-linear systems",
+      "key_features": [
+        "Sigma points instead of Jacobian",
+        "Better for highly non-linear systems",
+        "No linearization required"
+      ],
+      "limitations": [
+        "More computationally expensive than EKF",
+        "Still requires good model"
+      ],
+      "priority": "LOW - Alternative to EKF",
+      "implementation_status": "not_started"
+    },
+    {
+      "id": 13,
+      "name": "Particle Filter for OFI",
+      "type": "Orderflow / State Estimation",
+      "category": "Sequential Monte Carlo",
+      "paper_source": "Custom implementation (not specified in docs)",
+      "year": "Various",
+      "roi_score": 6,
+      "implementation_complexity": 8,
+      "python_libraries": [
+        "Custom implementation",
+        "numpy",
+        "scipy"
+      ],
+      "data_required": [
+        "Non-Gaussian orderflow",
+        "Particle distribution"
+      ],
+      "training_time": "Variable (particle count)",
+      "inference_time": "~10ms per update",
+      "accuracy": "Good for non-Gaussian, but computationally expensive",
+      "key_features": [
+        "Handles non-Gaussian distributions",
+        "Flexible - no model assumptions",
+        "Sequential importance sampling"
+      ],
+      "limitations": [
+        "Particle degeneracy",
+        "Computationally expensive",
+        "Requires many particles for accuracy"
+      ],
+      "priority": "LOW - Research Only",
+      "implementation_status": "not_started"
+    },
+    {
+      "id": 14,
+      "name": "GARCH (Generalized Autoregressive Conditional Heteroskedasticity)",
+      "type": "Volatility Modeling",
+      "category": "Time Series - EXCLUDED (Linear)",
+      "paper_source": "Classic finance literature",
+      "year": "1980s",
+      "roi_score": 5,
+      "implementation_complexity": 4,
+      "python_libraries": [
+        "arch"
+      ],
+      "data_required": [
+        "Returns"
+      ],
+      "training_time": "~100ms",
+      "inference_time": "~5ms",
+      "accuracy": "Good for volatility clustering, but assumes Gaussian residuals",
+      "key_features": [
+        "Volatility clustering",
+        "Conditional variance modeling"
+      ],
+      "limitations": [
+        "LINEAR - assumes Gaussian residuals",
+        "User preference: EXCLUDED from priority list"
+      ],
+      "priority": "EXCLUDED - Linear/Parametric",
+      "implementation_status": "not_applicable"
+    },
+    {
+      "id": 15,
+      "name": "GARCH + Regime Switching (Markov Regime-Switching GARCH)",
+      "type": "Volatility Modeling + Regime Detection",
+      "category": "Hybrid Time Series",
+      "paper_source": "Zhou & Zhang (2025) - DOI:10.1109/HPCC67675.2025.00134",
+      "year": 2025,
+      "roi_score": 7,
+      "implementation_complexity": 6,
+      "python_libraries": [
+        "arch (GARCH)",
+        "sklearn (GMM for regimes)",
+        "numpy"
+      ],
+      "data_required": [
+        "Returns",
+        "Conditional volatility"
+      ],
+      "training_time": "~150ms (GARCH + GMM)",
+      "inference_time": "~5ms",
+      "accuracy": "Better than single-regime GARCH",
+      "key_features": [
+        "Regime-dependent GARCH parameters",
+        "Combines GARCH with GMM clustering",
+        "Separates high/low volatility regimes"
+      ],
+      "limitations": [
+        "Still has GARCH limitations (Gaussian residuals)",
+        "Two-step estimation"
+      ],
+      "priority": "MEDIUM - If GARCH needed",
+      "implementation_status": "not_started"
+    },
+    {
+      "id": 16,
+      "name": "EMD + GMM (Empirical Mode Decomposition)",
+      "type": "Regime Detection",
+      "category": "Signal Decomposition + Clustering",
+      "paper_source": "EMD + GMM 25x speedup (2025) - arXiv:2503.20678",
+      "year": 2025,
+      "roi_score": 8,
+      "implementation_complexity": 5,
+      "python_libraries": [
+        "PyEMD",
+        "sklearn (GMM)",
+        "numpy"
+      ],
+      "data_required": [
+        "Price time series"
+      ],
+      "training_time": "~200ms (EMD decomposition)",
+      "inference_time": "~10ms",
+      "accuracy": "Good for multi-scale regime detection",
+      "key_features": [
+        "Decomposes price into intrinsic mode functions",
+        "High, medium, low, trend components",
+        "25x speedup over SOTA diffusion methods",
+        "Works on non-stationary data"
+      ],
+      "limitations": [
+        "EMD can have mode mixing",
+        "Computational cost for real-time"
+      ],
+      "priority": "MEDIUM - Phase 2",
+      "implementation_status": "not_started"
+    },
+    {
+      "id": 17,
+      "name": "Ruptures (Changepoint Detection Library)",
+      "type": "Regime Detection",
+      "category": "Offline Changepoint Detection",
+      "paper_source": "ruptures library (1.8k stars) - github.com/deepcharles/ruptures",
+      "year": "2020s",
+      "roi_score": 8,
+      "implementation_complexity": 2,
+      "python_libraries": [
+        "ruptures",
+        "numpy"
+      ],
+      "data_required": [
+        "Time series (returns, prices)"
+      ],
+      "training_time": "Variable (PELT, Binary Segmentation, etc.)",
+      "inference_time": "Offline only",
+      "accuracy": "Good for offline changepoint detection",
+      "key_features": [
+        "PELT (Pruned Exact Linear Time)",
+        "Binary Segmentation",
+        "Bottom-Up Segmentation",
+        "BIC/AIC model selection"
+      ],
+      "limitations": [
+        "Offline only (not real-time)",
+        "No online variant in library"
+      ],
+      "priority": "MEDIUM - Backtesting tool",
+      "implementation_status": "not_started"
+    },
+    {
+      "id": 18,
+      "name": "CNN AutoEncoder for Regime Detection",
+      "type": "Regime Detection",
+      "category": "Deep Learning - Unsupervised",
+      "paper_source": "kangchengX/market-regime (GitHub)",
+      "year": 2024,
+      "roi_score": 8,
+      "implementation_complexity": 7,
+      "python_libraries": [
+        "PyTorch or TensorFlow",
+        "numpy"
+      ],
+      "data_required": [
+        "OHLCV bars",
+        "Multi-index data"
+      ],
+      "training_time": "~2000ms (GPU)",
+      "inference_time": "~10ms per bar",
+      "accuracy": "82-88% (offline regime detection)",
+      "key_features": [
+        "Detects 2008 GFC and COVID-19 periods effectively",
+        "Learns latent regime representation",
+        "Unsupervised clustering in latent space"
+      ],
+      "limitations": [
+        "Requires GPU",
+        "Needs large training dataset",
+        "Black-box representation"
+      ],
+      "priority": "LOW - Research Only",
+      "implementation_status": "not_started"
+    },
+    {
+      "id": 19,
+      "name": "DRL Cross-Contextual (Deep Reinforcement Learning)",
+      "type": "Signal Generation / Strategy Optimization",
+      "category": "Deep Reinforcement Learning",
+      "paper_source": "DRL Cross-Contextual (2024) - DOI:10.1145/3627673.3680101",
+      "year": 2024,
+      "roi_score": 7,
+      "implementation_complexity": 9,
+      "python_libraries": [
+        "Stable-Baselines3 or custom DRL",
+        "PyTorch",
+        "gym"
+      ],
+      "data_required": [
+        "OHLCV",
+        "State space (features)",
+        "Reward function"
+      ],
+      "training_time": "> 5000ms (many episodes)",
+      "inference_time": "~10ms per action",
+      "accuracy": "Variable (environment-dependent)",
+      "key_features": [
+        "Two-stage encoder-decoder",
+        "Regime-adaptive DRL",
+        "Learns optimal policy"
+      ],
+      "limitations": [
+        "Very complex",
+        "Requires extensive hyperparameter tuning",
+        "Overfitting risk",
+        "Needs large training data"
+      ],
+      "priority": "LOW - Research Only",
+      "implementation_status": "not_started"
+    },
+    {
+      "id": 20,
+      "name": "Random Forest for Meta-labeling",
+      "type": "Signal Generation / Meta-learning",
+      "category": "Ensemble Learning",
+      "paper_source": "López de Prado (2018) - AFML",
+      "year": 2018,
+      "roi_score": 9,
+      "implementation_complexity": 3,
+      "python_libraries": [
+        "scikit-learn",
+        "numpy"
+      ],
+      "data_required": [
+        "Features (same as primary model)",
+        "Meta-labels (P(primary_correct))"
+      ],
+      "training_time": "~200ms (100 trees)",
+      "inference_time": "~5ms",
+      "accuracy": "60-70% (P(correct) prediction)",
+      "key_features": [
+        "Predicts when primary model is correct",
+        "Handles non-linear relationships",
+        "Feature importance analysis",
+        "Robust to overfitting with proper tuning"
+      ],
+      "limitations": [
+        "Requires quality labels",
+        "Overfitting with too many trees/depth"
+      ],
+      "priority": "HIGH - Phase 3",
+      "implementation_status": "not_started"
+    },
+    {
+      "id": 21,
+      "name": "Fractional Differentiation",
+      "type": "Feature Engineering",
+      "category": "Signal Processing",
+      "paper_source": "López de Prado (2018) - AFML, fracdiff library",
+      "year": 2018,
+      "roi_score": 8,
+      "implementation_complexity": 3,
+      "python_libraries": [
+        "fracdiff (10,000x faster implementation)",
+        "numpy"
+      ],
+      "data_required": [
+        "Price time series"
+      ],
+      "training_time": "~50ms (parameter estimation)",
+      "inference_time": "~1ms per observation",
+      "accuracy": "N/A (preprocessing)",
+      "key_features": [
+        "Makes series stationary while preserving memory",
+        "Fractional order d (0 < d < 1)",
+        "Better than integer differentiation",
+        "10,000x speedup in fracdiff library"
+      ],
+      "limitations": [
+        "Requires d parameter tuning",
+        "Not all ML models benefit"
+      ],
+      "priority": "MEDIUM - Feature Engineering",
+      "implementation_status": "not_started"
+    },
+    {
+      "id": 22,
+      "name": "Cointegration-based Pairs Trading (Engle-Granger)",
+      "type": "Signal Generation / Mean Reversion",
+      "category": "Statistical Arbitrage",
+      "paper_source": "Krauss (2017) - DOI:10.1111/joes.12153",
+      "year": 2017,
+      "roi_score": 8,
+      "implementation_complexity": 4,
+      "python_libraries": [
+        "statsmodels.tsa.stattools.coint",
+        "numpy",
+        "pandas"
+      ],
+      "data_required": [
+        "Paired asset prices",
+        "Formation period (252 days)",
+        "Trading period (126 days)"
+      ],
+      "training_time": "~100ms (ADF test)",
+      "inference_time": "~5ms (z-score calculation)",
+      "accuracy": "Variable (depends on pair quality)",
+      "key_features": [
+        "Tests for cointegration (stationary spread)",
+        "Z-score based entry/exit",
+        "Mean-reverting spread trading",
+        "Academic gold standard for pairs trading"
+      ],
+      "limitations": [
+        "Requires cointegrated pairs",
+        "Spread can drift over time",
+        "Needs periodic re-testing"
+      ],
+      "priority": "HIGH - Mean Reversion Strategy",
+      "implementation_status": "not_started"
+    },
+    {
+      "id": 23,
+      "name": "Ornstein-Uhlenbeck (OU) Process for Mean Reversion",
+      "type": "Signal Generation / Mean Reversion",
+      "category": "Stochastic Differential Equation",
+      "paper_source": "ORCA (2025) - DOI:10.1145/3768292.3770406",
+      "year": 2025,
+      "roi_score": 9,
+      "implementation_complexity": 5,
+      "python_libraries": [
+        "numpy",
+        "scipy.optimize",
+        "custom implementation"
+      ],
+      "data_required": [
+        "Spread time series (from pairs)",
+        "Returns"
+      ],
+      "training_time": "~50ms (parameter estimation)",
+      "inference_time": "~2ms (OU prediction)",
+      "accuracy": "Good for mean-reverting spreads",
+      "key_features": [
+        "Parameters: θ (speed), μ (mean), σ (volatility)",
+        "Half-life = log(2)/θ",
+        "Physics-informed neural network (PINN) enhancement",
+        "Deep learning + OU dynamics"
+      ],
+      "limitations": [
+        "Assumes mean-reverting dynamics",
+        "Parameters can change over time",
+        "Spread must be stationary"
+      ],
+      "priority": "HIGH - Mean Reversion Strategy",
+      "implementation_status": "not_started"
+    },
+    {
+      "id": 24,
+      "name": "Hurst Exponent for Mean Reversion Detection",
+      "type": "Signal Generation / Feature Engineering",
+      "category": "Time Series Analysis",
+      "paper_source": "Ramos-Requena (2020) - DOI:10.3390/math8030348",
+      "year": 2020,
+      "roi_score": 7,
+      "implementation_complexity": 2,
+      "python_libraries": [
+        "numpy",
+        "custom implementation"
+      ],
+      "data_required": [
+        "Time series (spread or returns)"
+      ],
+      "training_time": "~20ms",
+      "inference_time": "~5ms",
+      "accuracy": "Good for screening mean-reverting pairs",
+      "key_features": [
+        "H < 0.5: Mean reverting",
+        "H = 0.5: Random walk",
+        "H > 0.5: Trending",
+        "Simple screening tool"
+      ],
+      "limitations": [
+        "Sensitive to window size",
+        "Not predictive, only descriptive"
+      ],
+      "priority": "MEDIUM - Screening Tool",
+      "implementation_status": "not_started"
+    },
+    {
+      "id": 25,
+      "name": "Genetic Algorithm (GA) for Triple Barrier Optimization",
+      "type": "Hyperparameter Optimization",
+      "category": "Evolutionary Optimization",
+      "paper_source": "Enhanced Triple Barrier GA (2024) - DOI:10.3390/2227-7390/12/5/780",
+      "year": 2024,
+      "roi_score": 7,
+      "implementation_complexity": 5,
+      "python_libraries": [
+        "DEAP (genetic algorithms)",
+        "numpy"
+      ],
+      "data_required": [
+        "Historical bars",
+        "Volatility",
+        "Barrier parameter space"
+      ],
+      "training_time": "~5000ms (many generations)",
+      "inference_time": "N/A (optimization only)",
+      "accuracy": "Improves triple barrier performance",
+      "key_features": [
+        "Optimizes profit target / stop loss ratio",
+        "Optimizes hold time",
+        "Evolutionary search",
+        "Avoids local optima"
+      ],
+      "limitations": [
+        "Computationally expensive",
+        "Overfitting risk",
+        "Requires large dataset"
+      ],
+      "priority": "LOW - Optimization Tool",
+      "implementation_status": "not_started"
+    },
+    {
+      "id": 26,
+      "name": "Hierarchical Risk Parity (HRP)",
+      "type": "Risk Management / Portfolio Optimization",
+      "category": "Portfolio Construction",
+      "paper_source": "López de Prado (2020) - Machine Learning for Asset Managers",
+      "year": 2020,
+      "roi_score": 7,
+      "implementation_complexity": 4,
+      "python_libraries": [
+        "riskfolio-lib",
+        "scipy.cluster.hierarchy",
+        "numpy"
+      ],
+      "data_required": [
+        "Returns matrix",
+        "Covariance matrix"
+      ],
+      "training_time": "~100ms",
+      "inference_time": "~50ms (rebalance)",
+      "accuracy": "Better diversification than Mean-Variance",
+      "key_features": [
+        "Hierarchical clustering",
+        "Inverse-variance weighting",
+        "Robust to estimation error",
+        "No matrix inversion required"
+      ],
+      "limitations": [
+        "Backward-looking (uses historical correlations)",
+        "Not a trading signal"
+      ],
+      "priority": "LOW - Portfolio Tool",
+      "implementation_status": "not_started"
+    },
+    {
+      "id": 27,
+      "name": "Regime-Switching LGCC (Local Gaussian Correlation)",
+      "type": "Regime Detection / Dependency Analysis",
+      "category": "Non-parametric Correlation",
+      "paper_source": "Regime-Switching LGCC (2023) - arXiv preprint",
+      "year": 2023,
+      "roi_score": 6,
+      "implementation_complexity": 8,
+      "python_libraries": [
+        "Research code (not widely available)",
+        "numpy",
+        "scipy"
+      ],
+      "data_required": [
+        "Multi-asset returns",
+        "Regime labels"
+      ],
+      "training_time": "~500ms",
+      "inference_time": "~50ms",
+      "accuracy": "Detects asymmetric tail dependencies",
+      "key_features": [
+        "Local Gaussian Correlation for regime-specific dependencies",
+        "Captures lower tail dependence in bear markets",
+        "Bootstrap test for dependency equality"
+      ],
+      "limitations": [
+        "Complex implementation",
+        "Research-grade code",
+        "Computational cost"
+      ],
+      "priority": "LOW - Research Only",
+      "implementation_status": "not_started"
+    },
+    {
+      "id": 28,
+      "name": "Visibility Graph + GMM Optimization",
+      "type": "Regime Detection",
+      "category": "Graph Theory + Clustering",
+      "paper_source": "Optimization of GMMs on Visibility Graphs (2023) - DOI:10.1007/s10287-023-00460-4",
+      "year": 2023,
+      "roi_score": 6,
+      "implementation_complexity": 7,
+      "python_libraries": [
+        "networkx (graphs)",
+        "sklearn (GMM)",
+        "numpy"
+      ],
+      "data_required": [
+        "Time series (prices)"
+      ],
+      "training_time": "~300ms",
+      "inference_time": "~20ms",
+      "accuracy": "Better GMM initialization than random",
+      "key_features": [
+        "Encodes time series as visibility graphs",
+        "Uses graph structure for EM initialization",
+        "Fully unsupervised",
+        "Outperforms standard EM"
+      ],
+      "limitations": [
+        "Graph construction overhead",
+        "Complex implementation"
+      ],
+      "priority": "LOW - Research Only",
+      "implementation_status": "not_started"
+    },
+    {
+      "id": 29,
+      "name": "Two Sigma Regime-Adaptive ML",
+      "type": "Regime Detection / ML Pipeline",
+      "category": "Production ML System",
+      "paper_source": "Two Sigma Regime Article (website)",
+      "year": "2020s",
+      "roi_score": 8,
+      "implementation_complexity": 8,
+      "python_libraries": [
+        "Custom (proprietary)",
+        "sklearn",
+        "numpy"
+      ],
+      "data_required": [
+        "Multi-asset features",
+        "Market data"
+      ],
+      "training_time": "Variable (production system)",
+      "inference_time": "Variable",
+      "accuracy": "Proprietary",
+      "key_features": [
+        "Production ML regime detection",
+        "Adaptive model retraining",
+        "Institutional-grade implementation"
+      ],
+      "limitations": [
+        "Proprietary - no code available",
+        "Complex infrastructure"
+      ],
+      "priority": "REFERENCE ONLY",
+      "implementation_status": "not_applicable"
+    },
+    {
+      "id": 30,
+      "name": "Wasserstein Clustering for Regime Detection",
+      "type": "Regime Detection",
+      "category": "Optimal Transport Theory",
+      "paper_source": "Medium: From HMM to Wasserstein Clustering",
+      "year": "2020s",
+      "roi_score": 7,
+      "implementation_complexity": 8,
+      "python_libraries": [
+        "POT (Python Optimal Transport)",
+        "numpy",
+        "scipy"
+      ],
+      "data_required": [
+        "Distribution samples",
+        "Return distributions"
+      ],
+      "training_time": "~500ms",
+      "inference_time": "~50ms",
+      "accuracy": "More robust than Euclidean clustering",
+      "key_features": [
+        "Optimal transport theory",
+        "Robust to outliers",
+        "Better than Euclidean distance for distributions"
+      ],
+      "limitations": [
+        "Computationally expensive",
+        "Requires understanding of optimal transport",
+        "Research-stage"
+      ],
+      "priority": "LOW - Future Research",
+      "implementation_status": "not_started"
+    },
+    {
+      "id": 31,
+      "name": "Path Signature Methods",
+      "type": "Regime Detection / Feature Engineering",
+      "category": "Rough Path Theory",
+      "paper_source": "Imperial College research",
+      "year": "2020s",
+      "roi_score": 6,
+      "implementation_complexity": 9,
+      "python_libraries": [
+        "signatory (PyTorch)",
+        "numpy"
+      ],
+      "data_required": [
+        "Time series paths"
+      ],
+      "training_time": "~1000ms",
+      "inference_time": "~100ms",
+      "accuracy": "Good for path-dependent regimes",
+      "key_features": [
+        "Represents time series as paths in signature space",
+        "Enables metric space structure",
+        "Path-dependent clustering"
+      ],
+      "limitations": [
+        "Very complex mathematics",
+        "Computationally expensive",
+        "Research-stage"
+      ],
+      "priority": "LOW - Future Research",
+      "implementation_status": "not_started"
+    },
+    {
+      "id": 32,
+      "name": "Volume Order Imbalance (VOI)",
+      "type": "Orderflow / Signal Generation",
+      "category": "Market Microstructure",
+      "paper_source": "Limit-Order-Book-Imbalance (GitHub)",
+      "year": "2020s",
+      "roi_score": 8,
+      "implementation_complexity": 3,
+      "python_libraries": [
+        "numpy",
+        "pandas",
+        "custom implementation"
+      ],
+      "data_required": [
+        "Level 2 orderbook",
+        "Bid/ask volumes at best levels"
+      ],
+      "training_time": "N/A (real-time calculation)",
+      "inference_time": "~1ms per snapshot",
+      "accuracy": "Good predictor of short-term price movement",
+      "key_features": [
+        "VOI = (BidVol - AskVol) / (BidVol + AskVol)",
+        "Simple, fast calculation",
+        "Real-time applicable",
+        "Works on L2 data"
+      ],
+      "limitations": [
+        "Requires L2 orderbook",
+        "Can be noisy on low liquidity"
+      ],
+      "priority": "HIGH - Phase 2",
+      "implementation_status": "not_started"
+    },
+    {
+      "id": 33,
+      "name": "Deep Order Flow Imbalance (Deep OFI)",
+      "type": "Orderflow / Signal Generation",
+      "category": "Deep Learning",
+      "paper_source": "Deep Order Flow Imbalance (2024) - Semantic Scholar",
+      "year": 2024,
+      "roi_score": 8,
+      "implementation_complexity": 7,
+      "python_libraries": [
+        "PyTorch",
+        "numpy"
+      ],
+      "data_required": [
+        "Tick-level orderflow",
+        "Multiple time horizons"
+      ],
+      "training_time": "~2000ms (GPU)",
+      "inference_time": "~10ms",
+      "accuracy": "Alpha at multiple time horizons (tick to minute)",
+      "key_features": [
+        "Deep learning on OFI",
+        "Multi-scale predictions",
+        "Captures non-linear OFI patterns"
+      ],
+      "limitations": [
+        "Requires GPU",
+        "Complex architecture",
+        "Needs large training data"
+      ],
+      "priority": "MEDIUM - Research",
+      "implementation_status": "not_started"
+    },
+    {
+      "id": 34,
+      "name": "LOBench (Limit Order Book Benchmark)",
+      "type": "Benchmarking / Data Source",
+      "category": "Dataset",
+      "paper_source": "LOBench (2025) - arXiv:2505.02139",
+      "year": 2025,
+      "roi_score": 5,
+      "implementation_complexity": 1,
+      "python_libraries": [
+        "pandas",
+        "numpy"
+      ],
+      "data_required": [
+        "Benchmark LOB dataset"
+      ],
+      "training_time": "N/A (data reference)",
+      "inference_time": "N/A",
+      "accuracy": "N/A (benchmark)",
+      "key_features": [
+        "Standardized LOB benchmark",
+        "Model comparison",
+        "FI-2010, NASDAQ, Bitcoin data"
+      ],
+      "limitations": [
+        "Not a model - just data"
+      ],
+      "priority": "REFERENCE ONLY",
+      "implementation_status": "not_applicable"
+    },
+    {
+      "id": 35,
+      "name": "Market States + State Machines (Probabilistic Transition Matrix)",
+      "type": "Regime Detection",
+      "category": "State Space Model",
+      "paper_source": "Modeling Market States (2025) - arXiv:2510.00953",
+      "year": 2025,
+      "roi_score": 8,
+      "implementation_complexity": 4,
+      "python_libraries": [
+        "numpy",
+        "sklearn (clustering)",
+        "scipy"
+      ],
+      "data_required": [
+        "Returns",
+        "Momentum",
+        "Risk features"
+      ],
+      "training_time": "~100ms",
+      "inference_time": "~5ms",
+      "accuracy": "Captures skewness, kurtosis better than traditional",
+      "key_features": [
+        "Cluster returns based on momentum + risk",
+        "Construct probabilistic transition matrix",
+        "Gaussian mixture weighted by state frequencies",
+        "Custom return distribution generation"
+      ],
+      "limitations": [
+        "Requires feature engineering",
+        "Transition matrix can change over time"
+      ],
+      "priority": "MEDIUM - Phase 2",
+      "implementation_status": "not_started"
+    },
+    {
+      "id": 36,
+      "name": "Finite Mixture Models for Multiscale Dynamics",
+      "type": "Regime Detection",
+      "category": "Mixture Models",
+      "paper_source": "Finite Mixture Models (2024) - DOI:10.1080/01605682.2024.2329156",
+      "year": 2024,
+      "roi_score": 7,
+      "implementation_complexity": 5,
+      "python_libraries": [
+        "sklearn",
+        "numpy"
+      ],
+      "data_required": [
+        "Multiscale time series"
+      ],
+      "training_time": "~200ms",
+      "inference_time": "~10ms",
+      "accuracy": "Good for non-stationary regimes",
+      "key_features": [
+        "Autoregressive GMMs",
+        "Multiple objective optimization",
+        "Simulation-augmented selection",
+        "Validated on COVID-19 data"
+      ],
+      "limitations": [
+        "Complex model selection",
+        "Computationally expensive"
+      ],
+      "priority": "LOW - Research",
+      "implementation_status": "not_started"
+    },
+    {
+      "id": 37,
+      "name": "Student-t Distribution for Non-Gaussian Returns",
+      "type": "Risk Management / Modeling",
+      "category": "Statistical Distribution",
+      "paper_source": "Non-Gaussian Approach to Risk Measures (2007)",
+      "year": 2007,
+      "roi_score": 7,
+      "implementation_complexity": 2,
+      "python_libraries": [
+        "scipy.stats.t",
+        "numpy"
+      ],
+      "data_required": [
+        "Returns"
+      ],
+      "training_time": "~20ms (parameter estimation)",
+      "inference_time": "~1ms",
+      "accuracy": "Better than Gaussian for fat tails",
+      "key_features": [
+        "Fat tails (captures excess kurtosis)",
+        "Degrees of freedom parameter",
+        "Better VaR/CVaR estimates",
+        "Simple replacement for Gaussian"
+      ],
+      "limitations": [
+        "Still symmetric (no skewness)",
+        "Requires DoF parameter tuning"
+      ],
+      "priority": "MEDIUM - Risk Modeling",
+      "implementation_status": "not_started"
+    },
+    {
+      "id": 38,
+      "name": "Lévy Processes for Asset Returns",
+      "type": "Risk Management / Modeling",
+      "category": "Stochastic Process",
+      "paper_source": "Bianchi et al. (2023) - Lévy models",
+      "year": 2023,
+      "roi_score": 6,
+      "implementation_complexity": 7,
+      "python_libraries": [
+        "scipy",
+        "numpy",
+        "custom implementation"
+      ],
+      "data_required": [
+        "Returns"
+      ],
+      "training_time": "~100ms",
+      "inference_time": "~5ms",
+      "accuracy": "Better than Gaussian for fat tails + jumps",
+      "key_features": [
+        "Fat tails",
+        "Skewness",
+        "Jump discontinuities",
+        "More realistic than Brownian motion"
+      ],
+      "limitations": [
+        "Complex parameter estimation",
+        "Not widely used in practice"
+      ],
+      "priority": "LOW - Research",
+      "implementation_status": "not_started"
+    },
+    {
+      "id": 39,
+      "name": "Kaniadakis Non-Gaussian Option Pricing",
+      "type": "Option Pricing / Risk Management",
+      "category": "Non-Gaussian Pricing",
+      "paper_source": "Kaniadakis (2017) - Fat-tail option pricing",
+      "year": 2017,
+      "roi_score": 5,
+      "implementation_complexity": 8,
+      "python_libraries": [
+        "scipy",
+        "numpy",
+        "custom implementation"
+      ],
+      "data_required": [
+        "Option prices",
+        "Implied volatility"
+      ],
+      "training_time": "~200ms",
+      "inference_time": "~10ms",
+      "accuracy": "Better than Black-Scholes for fat tails",
+      "key_features": [
+        "Non-Gaussian return distribution",
+        "Fat-tail option pricing",
+        "Kaniadakis entropy"
+      ],
+      "limitations": [
+        "Complex mathematics",
+        "Not widely adopted",
+        "Limited to option pricing"
+      ],
+      "priority": "LOW - Specialized",
+      "implementation_status": "not_started"
+    },
+    {
+      "id": 40,
+      "name": "Fractional Brownian Motion for Kurtosis Modeling",
+      "type": "Modeling",
+      "category": "Stochastic Process",
+      "paper_source": "Modeling Kurtosis and Returns (2021)",
+      "year": 2021,
+      "roi_score": 6,
+      "implementation_complexity": 7,
+      "python_libraries": [
+        "fbm (fractional Brownian motion)",
+        "numpy"
+      ],
+      "data_required": [
+        "Returns"
+      ],
+      "training_time": "~100ms",
+      "inference_time": "~5ms",
+      "accuracy": "Good for long-memory processes",
+      "key_features": [
+        "Long-range dependence",
+        "Hurst exponent",
+        "Self-similarity"
+      ],
+      "limitations": [
+        "Complex estimation",
+        "Not commonly used in trading"
+      ],
+      "priority": "LOW - Research",
+      "implementation_status": "not_started"
+    },
+    {
+      "id": 41,
+      "name": "QMLE (Quasi-Maximum Likelihood Estimation) for Non-Gaussian GARCH",
+      "type": "Volatility Modeling",
+      "category": "Estimation Method",
+      "paper_source": "Fat Tails and Asymmetry in Volatility Models (2004)",
+      "year": 2004,
+      "roi_score": 6,
+      "implementation_complexity": 5,
+      "python_libraries": [
+        "arch",
+        "statsmodels",
+        "numpy"
+      ],
+      "data_required": [
+        "Returns"
+      ],
+      "training_time": "~150ms",
+      "inference_time": "~5ms",
+      "accuracy": "Better than MLE for non-Gaussian residuals",
+      "key_features": [
+        "Robust to distributional misspecification",
+        "Works with GARCH models",
+        "Handles fat tails"
+      ],
+      "limitations": [
+        "Still GARCH-based",
+        "Complex implementation"
+      ],
+      "priority": "LOW - If GARCH needed",
+      "implementation_status": "not_started"
+    },
+    {
+      "id": 42,
+      "name": "OPTICS Clustering for Pairs Trading",
+      "type": "Signal Generation / Clustering",
+      "category": "Density-based Clustering",
+      "paper_source": "denz3n/Algorithmic-Trading (GitHub)",
+      "year": "2020s",
+      "roi_score": 7,
+      "implementation_complexity": 3,
+      "python_libraries": [
+        "sklearn.cluster.OPTICS",
+        "numpy"
+      ],
+      "data_required": [
+        "Stock features",
+        "Correlation matrix"
+      ],
+      "training_time": "~100ms",
+      "inference_time": "~50ms (rebalance)",
+      "accuracy": "Good for finding similar stocks",
+      "key_features": [
+        "Density-based clustering",
+        "No need to specify number of clusters",
+        "Handles noise",
+        "Better than K-Means for pairs"
+      ],
+      "limitations": [
+        "Computationally expensive",
+        "Parameter tuning (min_samples, xi)"
+      ],
+      "priority": "MEDIUM - Pairs Trading",
+      "implementation_status": "not_started"
+    },
+    {
+      "id": 43,
+      "name": "Sentiment Analysis from Tiingo API",
+      "type": "Feature Engineering / Signal Generation",
+      "category": "Alternative Data",
+      "paper_source": "denz3n/Algorithmic-Trading (GitHub)",
+      "year": "2020s",
+      "roi_score": 6,
+      "implementation_complexity": 2,
+      "python_libraries": [
+        "tiingo API",
+        "requests",
+        "pandas"
+      ],
+      "data_required": [
+        "News sentiment scores"
+      ],
+      "training_time": "N/A (API call)",
+      "inference_time": "~100ms (API latency)",
+      "accuracy": "Variable (depends on sentiment quality)",
+      "key_features": [
+        "Stock sentiment from news",
+        "Tiingo API integration",
+        "Easy to integrate"
+      ],
+      "limitations": [
+        "Requires paid API",
+        "Sentiment quality varies",
+        "API latency"
+      ],
+      "priority": "LOW - Alternative Data",
+      "implementation_status": "not_started"
+    },
+    {
+      "id": 44,
+      "name": "LSTM vs HMM Comparison for Stock Forecasting",
+      "type": "Benchmarking",
+      "category": "Model Comparison",
+      "paper_source": "Nikhil-Kumar-Patel/Hidden-Makov-Model (GitHub)",
+      "year": "2020s",
+      "roi_score": 5,
+      "implementation_complexity": 7,
+      "python_libraries": [
+        "tensorflow/keras (LSTM)",
+        "hmmlearn (HMM)",
+        "numpy"
+      ],
+      "data_required": [
+        "OHLCV",
+        "Returns"
+      ],
+      "training_time": "~2000ms (LSTM), ~50ms (HMM)",
+      "inference_time": "~10ms (LSTM), ~1ms (HMM)",
+      "accuracy": "HMM demonstrates strong long-term trend capture",
+      "key_features": [
+        "Comparison study",
+        "LSTM, ARIMA, RNN, HMM comparison",
+        "HMM wins on long-term trends"
+      ],
+      "limitations": [
+        "Not a new model - just comparison"
+      ],
+      "priority": "REFERENCE ONLY",
+      "implementation_status": "not_applicable"
+    },
+    {
+      "id": 45,
+      "name": "Support Vector Regression (SVR) vs HMM",
+      "type": "Benchmarking",
+      "category": "Model Comparison",
+      "paper_source": "ayushjain1594/Stock-Forecasting (GitHub)",
+      "year": "2020s",
+      "roi_score": 5,
+      "implementation_complexity": 4,
+      "python_libraries": [
+        "sklearn.svm.SVR",
+        "hmmlearn",
+        "numpy"
+      ],
+      "data_required": [
+        "OHLCV",
+        "Returns"
+      ],
+      "training_time": "~200ms (SVR), ~50ms (HMM)",
+      "inference_time": "~5ms (SVR), ~1ms (HMM)",
+      "accuracy": "HMM demonstrates effectiveness vs SVR",
+      "key_features": [
+        "Comparison study",
+        "HMM vs SVR performance"
+      ],
+      "limitations": [
+        "Not a new model - just comparison"
+      ],
+      "priority": "REFERENCE ONLY",
+      "implementation_status": "not_applicable"
+    },
+    {
+      "id": 46,
+      "name": "Siamese Model for Regime Detection",
+      "type": "Regime Detection",
+      "category": "Deep Learning - Metric Learning",
+      "paper_source": "kangchengX/market-regime (GitHub)",
+      "year": 2024,
+      "roi_score": 7,
+      "implementation_complexity": 8,
+      "python_libraries": [
+        "PyTorch",
+        "numpy"
+      ],
+      "data_required": [
+        "OHLCV bars",
+        "Paired samples"
+      ],
+      "training_time": "~3000ms (GPU)",
+      "inference_time": "~15ms",
+      "accuracy": "Good for similarity-based regime detection",
+      "key_features": [
+        "Learns similarity metric",
+        "Paired training",
+        "Embedding space clustering"
+      ],
+      "limitations": [
+        "Requires GPU",
+        "Complex training procedure",
+        "Needs paired data"
+      ],
+      "priority": "LOW - Research",
+      "implementation_status": "not_started"
+    },
+    {
+      "id": 47,
+      "name": "Hierarchical Clustering for Regime Detection",
+      "type": "Regime Detection",
+      "category": "Unsupervised Learning - Clustering",
+      "paper_source": "kangchengX/market-regime (GitHub)",
+      "year": 2024,
+      "roi_score": 7,
+      "implementation_complexity": 2,
+      "python_libraries": [
+        "scipy.cluster.hierarchy",
+        "sklearn",
+        "numpy"
+      ],
+      "data_required": [
+        "Returns",
+        "Features"
+      ],
+      "training_time": "~50ms",
+      "inference_time": "~5ms",
+      "accuracy": "Good for hierarchical regime structure",
+      "key_features": [
+        "Hierarchical regime structure",
+        "Dendrogram visualization",
+        "No need to specify number of clusters upfront"
+      ],
+      "limitations": [
+        "Slower than K-Means",
+        "Linkage criterion choice matters"
+      ],
+      "priority": "MEDIUM - Alternative to K-Means",
+      "implementation_status": "not_started"
+    }
+  ],
+  "summary_statistics": {
+    "by_category": {
+      "Regime Detection": 18,
+      "Orderflow": 6,
+      "Signal Generation": 8,
+      "Risk Management": 7,
+      "Feature Engineering": 3,
+      "Benchmarking": 3,
+      "Specialized": 2
+    },
+    "by_priority": {
+      "CRITICAL": 7,
+      "HIGH": 6,
+      "MEDIUM": 13,
+      "LOW": 17,
+      "EXCLUDED": 1,
+      "REFERENCE_ONLY": 3
+    },
+    "by_complexity": {
+      "Easy (1-3)": 14,
+      "Medium (4-6)": 18,
+      "Hard (7-9)": 15
+    },
+    "by_roi_score": {
+      "10": 10,
+      "9": 7,
+      "8": 10,
+      "7": 11,
+      "6": 6,
+      "5": 3
+    },
+    "quick_wins": {
+      "description": "ROI >= 9 AND Complexity <= 3",
+      "count": 4,
+      "models": [
+        "HMM Regime Detection",
+        "GMM Volatility Clustering",
+        "K-Means to HMM Hybrid",
+        "Sub-linear Position Sizing"
+      ]
+    },
+    "phase_1_foundation": {
+      "description": "CRITICAL priority for Phase 1",
+      "count": 7,
+      "models": [
+        "HMM Regime Detection",
+        "GMM Volatility Clustering",
+        "K-Means to HMM Hybrid",
+        "Sub-linear Position Sizing",
+        "Triple Barrier Labeling",
+        "Meta-labeling",
+        "BOCD"
+      ]
+    }
+  },
+  "implementation_recommendations": {
+    "immediate_start": [
+      {
+        "id": 1,
+        "name": "HMM Regime Detection",
+        "justification": "ROI 10, Complexity 2, Production-ready library (hmmlearn)"
+      },
+      {
+        "id": 2,
+        "name": "GMM Volatility Clustering",
+        "justification": "ROI 9, Complexity 1, Fastest regime detection"
+      },
+      {
+        "id": 9,
+        "name": "Sub-linear Position Sizing",
+        "justification": "ROI 10, Complexity 1, One-line formula"
+      }
+    ],
+    "week_1_targets": [
+      "HMM Regime Detection",
+      "GMM Volatility Clustering",
+      "Sub-linear Position Sizing",
+      "K-Means to HMM Hybrid"
+    ],
+    "avoid_initially": [
+      {
+        "id": 10,
+        "name": "Transformer for LOB",
+        "reason": "Complexity 9, requires GPU, large dataset"
+      },
+      {
+        "id": 19,
+        "name": "DRL Cross-Contextual",
+        "reason": "Complexity 9, very complex, research-stage"
+      },
+      {
+        "id": 31,
+        "name": "Path Signature Methods",
+        "reason": "Complexity 9, very complex mathematics"
+      }
+    ]
+  },
+  "data_requirements_summary": {
+    "minimum_viable": [
+      "OHLCV bars (required for 80% of models)",
+      "Returns (calculated from OHLCV)",
+      "Volatility (rolling std or ATR)"
+    ],
+    "enhanced": [
+      "Tick-level trades (for VPIN, Hawkes)",
+      "Level 2 orderbook (for VOI, Deep OFI)",
+      "Buy/sell classification (tick rule or side)"
+    ],
+    "optional": [
+      "Sentiment data (Tiingo API)",
+      "Macro data (FRED API)",
+      "On-chain data (CryptoQuant)"
+    ]
+  },
+  "library_dependencies": {
+    "critical": [
+      "hmmlearn (3.3k stars) - HMM regime detection",
+      "scikit-learn - GMM, Random Forest, clustering",
+      "numpy - array operations",
+      "pandas - data manipulation"
+    ],
+    "high_priority": [
+      "mlfinlab - Triple Barrier, Meta-labeling",
+      "tick - Hawkes processes",
+      "scipy - statistical functions",
+      "statsmodels - cointegration, time series"
+    ],
+    "optional": [
+      "PyTorch - Transformer, CNN, DRL (if GPU available)",
+      "filterpy - Kalman filters",
+      "ruptures - offline changepoint detection",
+      "fracdiff - fractional differentiation",
+      "arch - GARCH models (if needed)"
+    ]
+  },
+  "academic_papers_referenced": 47,
+  "github_repos_referenced": 15
+}

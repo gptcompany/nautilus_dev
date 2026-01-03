@@ -27,6 +27,15 @@ After ANY Write/Edit to `monitoring/grafana/dashboards/*.json`:
 4. Re-import dashboard if fixes were applied
 This is MANDATORY - never skip visual validation for Grafana changes.
 
+### 7. NEVER read large documents directly - ALWAYS delegate to agents.
+When analyzing multiple documents or large files (research, logs, specs):
+1. **NEVER** read documents directly in main context - wastes tokens
+2. **ALWAYS** spawn Task agents to analyze documents in parallel
+3. **ALWAYS** use /research skill for academic paper searches
+4. **ALWAYS** use backtest-analyzer for log analysis
+5. Agents have their own context windows - use them!
+This is MANDATORY - main context is for orchestration, not document reading.
+
 ## Philosophy
 
 ### Error Handling for Trading Systems
