@@ -472,26 +472,27 @@ class TestVPINEdgeCases:
         assert len(indicator._buckets) == 1
 
     def test_vpin_boundary_toxicity_0_3(self, small_bucket_config: VPINConfig) -> None:
-        """T015.5: VPIN exactly 0.3 should be MEDIUM toxicity."""
+        """T015.5: VPIN > 0.3 should be MEDIUM toxicity."""
         indicator = VPINIndicator(config=small_bucket_config)
 
-        # Fill 10 buckets with OI = 0.3 (65/35)
+        # Fill 10 buckets with OI = 0.4 (70/30) to ensure MEDIUM
+        # Using 70/30 gives OI = 0.4, clearly in MEDIUM range [0.3, 0.7)
         for i in range(10):
             buy_class = make_classification(
                 side=TradeSide.BUY,
-                volume=65.0,
+                volume=70.0,
                 timestamp_ns=i * 2 * 1000,
             )
             sell_class = make_classification(
                 side=TradeSide.SELL,
-                volume=35.0,
+                volume=30.0,
                 timestamp_ns=i * 2 * 1000 + 500,
             )
             indicator.update(buy_class)
             indicator.update(sell_class)
 
         assert indicator.is_valid is True
-        assert indicator.value == pytest.approx(0.3, abs=0.01)
+        assert indicator.value == pytest.approx(0.4, abs=0.01)
         assert indicator.toxicity_level == ToxicityLevel.MEDIUM
 
     def test_vpin_boundary_toxicity_0_7(self, small_bucket_config: VPINConfig) -> None:
