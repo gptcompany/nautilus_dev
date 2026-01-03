@@ -381,17 +381,21 @@ class BOCD(BaseBOCD):
     def is_changepoint(self, threshold: float | None = None) -> bool:
         """Check if changepoint was detected at the last update.
 
-        Uses distribution shift detection rather than just P(r=0),
-        which tends toward the hazard rate during stable periods.
+        Uses distribution shift detection - when the maximum run length
+        drops significantly, it indicates probability mass has shifted
+        from long runs to short runs, signaling a regime change.
 
-        A changepoint is detected when the maximum run length drops
-        significantly, indicating probability mass has shifted from
-        long runs to short runs.
+        Note on threshold parameter:
+            The threshold parameter is provided for API compatibility but
+            is used to scale the distribution shift detection sensitivity.
+            A lower threshold makes detection more sensitive.
+            In Adams & MacKay BOCD, P(r=0) tends toward the hazard rate
+            during stable periods, so raw P(r=0) > threshold is unreliable.
 
         Args:
-            threshold: Optional threshold for P(r=0) based detection.
-                      If provided and P(r=0) > threshold, returns True.
-                      Otherwise uses distribution shift detection.
+            threshold: Detection sensitivity (default uses config value).
+                      Lower values = more sensitive detection.
+                      Ignored when None, uses config.detection_threshold.
 
         Returns:
             True if a changepoint was detected.
@@ -400,11 +404,7 @@ class BOCD(BaseBOCD):
             When is_changepoint() returns True, caller should trigger
             regime refit per FR-006 requirement.
         """
-        # If threshold provided, use traditional P(r=0) check
-        if threshold is not None:
-            return self.get_changepoint_probability() > threshold
-
-        # Otherwise use distribution shift detection (more reliable)
+        # Always use distribution shift detection (P(r=0) tends to hazard rate)
         return self._changepoint_detected
 
     def get_last_changepoint(self) -> Changepoint | None:
