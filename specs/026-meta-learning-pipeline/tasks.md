@@ -192,15 +192,15 @@
 
 **Purpose**: Verify full pipeline works together
 
-- [ ] T029 Write integration test in `tests/integration/test_meta_learning_pipeline.py`
+- [X] T029 Write integration test in `tests/integration/test_meta_learning_pipeline.py`
   - Full pipeline: bars -> labeling -> meta-model -> sizing
   - Verify no look-ahead bias
   - Test with BacktestNode
-- [ ] T030 Create example strategy in `strategies/development/meta_learning_example.py`
+- [X] T030 Create example strategy in `strategies/development/meta_learning_example.py`
   - Uses all components (Triple Barrier, Meta-Model, BOCD, IntegratedSizer)
   - Demonstrates warmup pattern
   - Shows logging of factor contributions
-- [ ] T031 Verify performance requirements:
+- [X] T031 Verify performance requirements:
   - Triple barrier: <60s for 1M bars
   - Meta-model inference: <5ms
   - BOCD update: <5ms
