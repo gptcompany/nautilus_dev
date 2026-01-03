@@ -60,19 +60,19 @@
 
 ### Tests for User Story 1
 
-- [ ] T013 [US1] Write unit tests for VPINBucket dataclass in tests/test_vpin.py
-- [ ] T014 [US1] Write unit tests for VPINIndicator in tests/test_vpin.py
-- [ ] T015 [US1] Write edge case tests (zero volume, NaN, empty buckets) in tests/test_vpin.py
+- [x] T013 [US1] Write unit tests for VPINBucket dataclass in tests/test_vpin.py
+- [x] T014 [US1] Write unit tests for VPINIndicator in tests/test_vpin.py
+- [x] T015 [US1] Write edge case tests (zero volume, NaN, empty buckets) in tests/test_vpin.py
 
 ### Implementation for User Story 1
 
-- [ ] T016 [US1] Create ToxicityLevel enum in strategies/common/orderflow/vpin.py
-- [ ] T017 [US1] Create VPINBucket dataclass in strategies/common/orderflow/vpin.py
-- [ ] T018 [US1] Implement VPINIndicator class with volume bucketing logic in strategies/common/orderflow/vpin.py
-- [ ] T019 [US1] Implement handle_bar() method for streaming updates in strategies/common/orderflow/vpin.py
-- [ ] T020 [US1] Implement rolling VPIN calculation (value property) in strategies/common/orderflow/vpin.py
-- [ ] T021 [US1] Implement toxicity_level property in strategies/common/orderflow/vpin.py
-- [ ] T022 [US1] Add reset() method for indicator state in strategies/common/orderflow/vpin.py
+- [x] T016 [US1] Create ToxicityLevel enum in strategies/common/orderflow/vpin.py
+- [x] T017 [US1] Create VPINBucket dataclass in strategies/common/orderflow/vpin.py
+- [x] T018 [US1] Implement VPINIndicator class with volume bucketing logic in strategies/common/orderflow/vpin.py
+- [x] T019 [US1] Implement handle_bar() method for streaming updates in strategies/common/orderflow/vpin.py
+- [x] T020 [US1] Implement rolling VPIN calculation (value property) in strategies/common/orderflow/vpin.py
+- [x] T021 [US1] Implement toxicity_level property in strategies/common/orderflow/vpin.py
+- [x] T022 [US1] Add reset() method for indicator state in strategies/common/orderflow/vpin.py
 
 **Checkpoint**: User Story 1 complete - VPIN indicator is fully functional and independently testable
 
@@ -92,20 +92,20 @@
 
 ### Tests for User Story 2
 
-- [ ] T023 [US2] Write unit tests for HawkesState dataclass in tests/test_hawkes_ofi.py
-- [ ] T024 [US2] Write unit tests for HawkesOFI indicator in tests/test_hawkes_ofi.py
-- [ ] T025 [US2] Write edge case tests (convergence failure, sparse events) in tests/test_hawkes_ofi.py
+- [x] T023 [US2] Write unit tests for HawkesState dataclass in tests/test_hawkes_ofi.py
+- [x] T024 [US2] Write unit tests for HawkesOFI indicator in tests/test_hawkes_ofi.py
+- [x] T025 [US2] Write edge case tests (convergence failure, sparse events) in tests/test_hawkes_ofi.py
 
 ### Implementation for User Story 2
 
-- [ ] T026 [P] [US2] Create HawkesState dataclass in strategies/common/orderflow/hawkes_ofi.py
-- [ ] T027 [E] [US2] Implement HawkesOFI class with tick library integration in strategies/common/orderflow/hawkes_ofi.py
-- [ ] T028 [US2] Implement rolling window event buffer in strategies/common/orderflow/hawkes_ofi.py
-- [ ] T029 [US2] Implement refit() method for periodic model update in strategies/common/orderflow/hawkes_ofi.py
-- [ ] T030 [US2] Implement intensity calculation (buy_intensity, sell_intensity properties) in strategies/common/orderflow/hawkes_ofi.py
-- [ ] T031 [US2] Implement ofi property (Order Flow Imbalance) in strategies/common/orderflow/hawkes_ofi.py
-- [ ] T032 [US2] Implement pure Python fallback if tick unavailable in strategies/common/orderflow/hawkes_ofi.py
-- [ ] T033 [US2] Add reset() method for indicator state in strategies/common/orderflow/hawkes_ofi.py
+- [x] T026 [P] [US2] Create HawkesState dataclass in strategies/common/orderflow/hawkes_ofi.py
+- [x] T027 [E] [US2] Implement HawkesOFI class with tick library integration in strategies/common/orderflow/hawkes_ofi.py
+- [x] T028 [US2] Implement rolling window event buffer in strategies/common/orderflow/hawkes_ofi.py
+- [x] T029 [US2] Implement refit() method for periodic model update in strategies/common/orderflow/hawkes_ofi.py
+- [x] T030 [US2] Implement intensity calculation (buy_intensity, sell_intensity properties) in strategies/common/orderflow/hawkes_ofi.py
+- [x] T031 [US2] Implement ofi property (Order Flow Imbalance) in strategies/common/orderflow/hawkes_ofi.py
+- [x] T032 [US2] Implement pure Python fallback if tick unavailable in strategies/common/orderflow/hawkes_ofi.py
+- [x] T033 [US2] Add reset() method for indicator state in strategies/common/orderflow/hawkes_ofi.py
 
 **Checkpoint**: User Story 2 complete - Hawkes OFI is fully functional and independently testable
 
@@ -123,15 +123,15 @@
 
 ### Tests for Integration
 
-- [ ] T034 Write integration test for OrderflowManager in tests/test_orderflow_manager.py
-- [ ] T035 Write integration test with GillerSizer (toxicity parameter) in tests/test_orderflow_manager.py
+- [x] T034 Write integration test for OrderflowManager in tests/test_orderflow_manager.py
+- [x] T035 Write integration test with GillerSizer (toxicity parameter) in tests/test_orderflow_manager.py
 
 ### Implementation
 
-- [ ] T036 Implement OrderflowManager class in strategies/common/orderflow/orderflow_manager.py
-- [ ] T037 Implement handle_bar() to update both VPIN and Hawkes in strategies/common/orderflow/orderflow_manager.py
-- [ ] T038 Implement toxicity and ofi properties for unified access in strategies/common/orderflow/orderflow_manager.py
-- [ ] T039 Update __init__.py to export all public classes in strategies/common/orderflow/__init__.py
+- [x] T036 Implement OrderflowManager class in strategies/common/orderflow/orderflow_manager.py
+- [x] T037 Implement handle_bar() to update both VPIN and Hawkes in strategies/common/orderflow/orderflow_manager.py
+- [x] T038 Implement toxicity and ofi properties for unified access in strategies/common/orderflow/orderflow_manager.py
+- [x] T039 Update __init__.py to export all public classes in strategies/common/orderflow/__init__.py
 
 **Checkpoint**: Integration complete - OrderflowManager provides unified interface
 
@@ -141,8 +141,8 @@
 
 **Purpose**: Improvements that affect multiple user stories
 
-- [ ] T040 [P] Use test-runner agent to verify all tests pass with coverage > 80%
-- [ ] T041 [P] Run alpha-debug verification on orderflow module
+- [x] T040 [P] Use test-runner agent to verify all tests pass with coverage > 80%
+- [x] T041 [P] Run alpha-debug verification on orderflow module
 - [ ] T042 Update quickstart.md with final API examples in specs/025-orderflow-indicators/quickstart.md
 - [ ] T043 Performance benchmark: Verify VPIN < 5ms, Hawkes < 1s
 - [ ] T044 Validate VPIN-volatility correlation >0.7 on historical flash crash data
