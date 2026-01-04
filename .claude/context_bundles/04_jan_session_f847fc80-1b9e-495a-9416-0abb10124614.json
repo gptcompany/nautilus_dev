@@ -289,7 +289,257 @@
       "timestamp": "2026-01-04T12:31:42.507527",
       "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python3 << 'EOF'\n\"\"\"Test that the Sharpe ratio bug is fixed.\"\"\"\nfrom strategies.common.adaptive_control.meta_portfolio import MetaPortfolio\nfrom strategies.common.adaptive_control.luck_skill import LuckQuantifier, TrackRecordAnalyzer\nfrom strategies.common.adaptive_control.particle_portfolio import ThompsonSelector\n\n# Test 1: MetaPortfolio._calculate_sharpe with zero variance\nportfolio = MetaPortfolio()\n# pnls with zero variance (all same value)\nsharpe = portfolio._calculate_sharpe([0.1, 0.1, 0.1, 0.1, 0.1])\nassert sharpe == 0.0, f\"Expected 0.0, got {sharpe}\"\nprint(f\"[PASS] MetaPortfolio: Zero variance returns 0.0, not {sharpe}\")\n\n# Test 2: LuckQuantifier._calculate_sharpe with zero variance\nluck = LuckQuantifier()\nsharpe = luck._calculate_sharpe([0.01, 0.01, 0.01])\nassert sharpe == 0.0, f\"Expected 0.0, got {sharpe}\"\nprint(f\"[PASS] LuckQuantifier: Zero variance returns 0.0, not {sharpe}\")\n\n# Test 3: TrackRecordAnalyzer._calculate_sharpe with zero variance\nanalyzer = TrackRecordAnalyzer()\nfor _ in range(10):\n    analyzer.add_return(0.05)  # All same returns\nsharpe = analyzer._calculate_sharpe()\nassert sharpe == 0.0, f\"Expected 0.0, got {sharpe}\"\nprint(f\"[PASS] TrackRecordAnalyzer: Zero variance returns 0.0, not {sharpe}\")\n\n# Test 4: Thompson update_continuous decay order\n# Compare with update() behavior\nselector1 = ThompsonSelector([\"A\", \"B\"], decay=0.9)\nselector2 = ThompsonSelector([\"A\", \"B\"], decay=0.9)\n\n# Method 1: Use update() (correct behavior)\nselector1.update(\"A\", success=True)  # Decay first, then add 1\n\n# Method 2: Use update_continuous with equivalent value\n# return_value * 10 = 1.0 -> successes += 1.0 (same as update())\nselector2.update_continuous(\"A\", 0.1)\n\n# After fix, both should have same final successes for strategy A\n# (within floating point tolerance)\ns1 = selector1.stats[\"A\"].successes\ns2 = selector2.stats[\"A\"].successes\nprint(f\"[INFO] After update(): A.successes = {s1:.6f}\")\nprint(f\"[INFO] After update_continuous(): A.successes = {s2:.6f}\")\n# Both should be: initial(1.0) * decay(0.9) + 1.0 = 1.9\nassert abs(s1 - s2) < 0.01, f\"Decay order mismatch: update()={s1}, update_continuous()={s2}\"\nprint(f\"[PASS] Thompson: Decay order is consistent between update() and update_continuous()\")\n\nprint(\"\\n[SUCCESS] All bug fixes verified!\")\nEOF",
       "description": "Functional test of bug fixes"
+    },
+    {
+      "operation": "skill",
+      "timestamp": "2026-01-04T12:31:57.832502",
+      "skill": "research",
+      "args": "meta-meta trading systems adaptive control: hierarchical control systems for algorithmic trading, mu..."
+    },
+    {
+      "operation": "task",
+      "timestamp": "2026-01-04T12:31:58.299274",
+      "subagent_type": "nautilus-docs-specialist",
+      "prompt": "Search for NautilusTrader nightly architecture patterns and schemas for implementing adaptive tradin..."
+    },
+    {
+      "operation": "task",
+      "timestamp": "2026-01-04T12:31:58.318335",
+      "subagent_type": "general-purpose",
+      "prompt": "Research the relationship between Kelly Criterion, Giller Power-Law Sizing, and SOPS in the context ..."
+    },
+    {
+      "operation": "mcp__paper-search-mcp__search_arxiv",
+      "timestamp": "2026-01-04T12:32:06.456930",
+      "query": "Kelly criterion robust uncertainty",
+      "max_results": 15
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-04T12:32:07.467945",
+      "command": "grep -r -l \"multi-strategy\\|portfolio\\|adaptive\\|ensemble\\|meta-strategy\" /media/sam/1TB/nautilus_dev/docs/discord/ 2>/dev/null | head -20",
+      "description": "Search Discord docs for multi-strategy patterns"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-04T12:32:07.471836",
+      "command": "grep -r -l \"warmup\\|initialization\\|on_start\\|lifecycle\" /media/sam/1TB/nautilus_dev/docs/discord/ 2>/dev/null | head -20",
+      "description": "Search Discord for strategy lifecycle patterns"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-04T12:32:07.511848",
+      "command": "grep -r -l \"state\\|persist\\|recovery\\|cache\" /media/sam/1TB/nautilus_dev/docs/discord/ 2>/dev/null | head -20",
+      "description": "Search Discord for state management patterns"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-04T12:32:07.590537",
+      "file_path": "/media/sam/1TB/nautilus_dev/docs/nautilus/nautilus-trader-changelog.json"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-04T12:32:15.428811",
+      "file_path": "/media/sam/1TB/nautilus_dev/docs/discord/questions.md"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-04T12:32:15.440401",
+      "file_path": "/media/sam/1TB/nautilus_dev/docs/discord/help.md"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-04T12:32:15.466128",
+      "file_path": "/media/sam/1TB/nautilus_dev/docs/discord/general.md"
+    },
+    {
+      "operation": "mcp__paper-search-mcp__search_arxiv",
+      "timestamp": "2026-01-04T12:32:20.649738",
+      "query": "power law position sizing",
+      "max_results": 10
+    },
+    {
+      "operation": "mcp__paper-search-mcp__search_arxiv",
+      "timestamp": "2026-01-04T12:32:26.656817",
+      "query": "non-parametric bet sizing",
+      "max_results": 10
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-04T12:32:26.818398",
+      "command": "grep -n -i \"multi.strategy\\|portfolio\\|ensemble\\|meta.strategy\\|coordinator\\|orchestr\" /media/sam/1TB/nautilus_dev/docs/discord/questions.md 2>/dev/null | head -50",
+      "description": "Search for multi-strategy patterns in questions"
+    },
+    {
+      "operation": "mcp__paper-search-mcp__search_arxiv",
+      "timestamp": "2026-01-04T12:32:31.526978",
+      "query": "fractional Kelly alternative",
+      "max_results": 10
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-04T12:32:38.094282",
+      "command": "grep -n -i \"actor\\|on_start\\|on_stop\\|on_resume\\|lifecycle\\|initialize\\|warmup\\|request_bars\" /media/sam/1TB/nautilus_dev/docs/discord/questions.md 2>/dev/null | head -80",
+      "description": "Search for Actor/Strategy lifecycle patterns"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-04T12:32:38.120599",
+      "command": "grep -n -i \"position.sizing\\|risk.manager\\|ExecAlgorithm\\|sizing\" /media/sam/1TB/nautilus_dev/docs/discord/questions.md 2>/dev/null | head -30",
+      "description": "Search for position sizing patterns"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-04T12:32:38.190055",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/adaptive_control"
+    },
+    {
+      "operation": "mcp__paper-search-mcp__search_semantic",
+      "timestamp": "2026-01-04T12:32:38.885802",
+      "query": "hierarchical position sizing trading",
+      "max_results": 10
+    },
+    {
+      "operation": "mcp__paper-search-mcp__search_semantic",
+      "timestamp": "2026-01-04T12:32:43.183902",
+      "query": "adaptive Kelly criterion financial markets",
+      "max_results": 10
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-04T12:32:46.191759",
+      "command": "ls -la /media/sam/1TB/nautilus_dev/strategies/common/adaptive_control/ 2>/dev/null || echo \"Directory does not exist\"",
+      "description": "List adaptive_control directory"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-04T12:32:46.226316",
+      "command": "grep -n -i \"ExecAlgorithm\\|exec_algorithm\\|sizing\\|risk\" /media/sam/1TB/nautilus_dev/docs/discord/help.md 2>/dev/null | head -50",
+      "description": "Search for ExecAlgorithm patterns"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-04T12:32:53.290696",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/adaptive_control/__init__.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-04T12:32:53.305782",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/adaptive_control/meta_controller.py"
+    },
+    {
+      "operation": "mcp__paper-search-mcp__search_semantic",
+      "timestamp": "2026-01-04T12:33:01.416070",
+      "query": "Kelly criterion estimation error parameter uncertainty",
+      "max_results": 15
+    },
+    {
+      "operation": "webfetch",
+      "timestamp": "2026-01-04T12:33:05.414512",
+      "url": "https://nautilustrader.io/docs/nightly/concepts/strategies",
+      "prompt": "Extract all information about:\n1. Strategy lifecycle (on_start, on_stop, on_resume, etc.)\n2. Positio..."
+    },
+    {
+      "operation": "webfetch",
+      "timestamp": "2026-01-04T12:33:05.427939",
+      "url": "https://nautilustrader.io/docs/nightly/concepts/actors",
+      "prompt": "Extract information about:\n1. Actor lifecycle and initialization\n2. How Actors differ from Strategie..."
+    },
+    {
+      "operation": "webfetch",
+      "timestamp": "2026-01-04T12:33:05.458774",
+      "url": "https://nautilustrader.io/docs/nightly/concepts/exec_algorithms",
+      "prompt": "Extract all information about ExecAlgorithm including:\n1. Purpose and use cases\n2. How to implement ..."
+    },
+    {
+      "operation": "mcp__paper-search-mcp__search_semantic",
+      "timestamp": "2026-01-04T12:33:09.925066",
+      "query": "fractional Kelly sizing robust bet sizing",
+      "max_results": 10
+    },
+    {
+      "operation": "mcp__paper-search-mcp__search_arxiv",
+      "timestamp": "2026-01-04T12:33:11.995018",
+      "query": "Kelly criterion portfolio optimization",
+      "max_results": 10
+    },
+    {
+      "operation": "mcp__paper-search-mcp__search_semantic",
+      "timestamp": "2026-01-04T12:33:13.348536",
+      "query": "signal-based position sizing algorithmic trading",
+      "max_results": 10
+    },
+    {
+      "operation": "webfetch",
+      "timestamp": "2026-01-04T12:33:21.773556",
+      "url": "https://nautilustrader.io/docs/nightly/concepts/execution",
+      "prompt": "Extract information about execution algorithms, order management, and hooks for modifying order subm..."
+    },
+    {
+      "operation": "webfetch",
+      "timestamp": "2026-01-04T12:33:21.788830",
+      "url": "https://nautilustrader.io/docs/nightly/concepts/cache",
+      "prompt": "Extract information about state persistence, Redis cache, custom state storage, recovery patterns"
+    },
+    {
+      "operation": "webfetch",
+      "timestamp": "2026-01-04T12:33:21.798472",
+      "url": "https://nautilustrader.io/docs/nightly/concepts/architecture",
+      "prompt": "Extract the architecture diagram, component interactions, and any schema information"
+    },
+    {
+      "operation": "grep",
+      "timestamp": "2026-01-04T12:33:30.476566",
+      "pattern": "Kelly|kelly",
+      "path": "/media/sam/1TB/nautilus_dev",
+      "output_mode": "files_with_matches"
+    },
+    {
+      "operation": "grep",
+      "timestamp": "2026-01-04T12:33:30.490739",
+      "pattern": "Giller|power.law.sizing|power-law",
+      "path": "/media/sam/1TB/nautilus_dev",
+      "output_mode": "files_with_matches"
+    },
+    {
+      "operation": "grep",
+      "timestamp": "2026-01-04T12:33:30.497984",
+      "pattern": "SOPS|sigmoid.*position",
+      "path": "/media/sam/1TB/nautilus_dev",
+      "output_mode": "files_with_matches"
+    },
+    {
+      "operation": "glob",
+      "timestamp": "2026-01-04T12:33:30.521810",
+      "pattern": "**/adaptive_control/*.md",
+      "path": "/media/sam/1TB/nautilus_dev"
+    },
+    {
+      "operation": "webfetch",
+      "timestamp": "2026-01-04T12:33:36.884132",
+      "url": "https://nautilustrader.io/docs/nightly/concepts/controllers",
+      "prompt": "Extract all information about Controllers including lifecycle management, adding/removing strategies..."
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-04T12:33:36.930566",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/adaptive_control/sops_sizing.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-04T12:33:37.317631",
+      "file_path": "/media/sam/1TB/nautilus_dev/docs/027-adaptive-control-framework.md"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-04T12:33:37.321393",
+      "file_path": "/media/sam/1TB/nautilus_dev/docs/research/adaptive-control-academic-review.md"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-04T12:33:37.333894",
+      "file_path": "/media/sam/1TB/nautilus_dev/CLAUDE.md"
     }
   ],
-  "last_updated": "2026-01-04T12:31:42.507549"
+  "last_updated": "2026-01-04T12:33:37.333918"
 }
