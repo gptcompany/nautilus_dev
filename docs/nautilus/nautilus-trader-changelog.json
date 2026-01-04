@@ -1,13 +1,39 @@
 {
-  "timestamp": "2026-01-03T00:01:09.148Z",
+  "timestamp": "2026-01-04T00:00:32.422Z",
   "stable_version": "v1.222.0",
-  "nightly_commits": 8,
+  "nightly_commits": 22,
   "breaking_changes": [],
   "open_issues": {
-    "total": 16500,
-    "bugs": 1000,
-    "features": 15500,
+    "total": 67,
+    "bugs": 5,
+    "features": 62,
     "issues_list": [
+      {
+        "number": 3384,
+        "title": "TestClock not monotonic: Repeated TimeEvents do not obey monotonicity",
+        "state": "open",
+        "labels": [
+          "bug"
+        ],
+        "created_at": "2026-01-03T23:50:39Z",
+        "updated_at": "2026-01-03T23:51:29Z",
+        "author": "draphi",
+        "url": "https://github.com/nautechsystems/nautilus_trader/issues/3384",
+        "comments": 0
+      },
+      {
+        "number": 3380,
+        "title": "OrderUpdated event causes panic during initial reconciliation",
+        "state": "open",
+        "labels": [
+          "bug"
+        ],
+        "created_at": "2026-01-03T00:59:37Z",
+        "updated_at": "2026-01-03T03:47:13Z",
+        "author": "santivazq",
+        "url": "https://github.com/nautechsystems/nautilus_trader/issues/3380",
+        "comments": 0
+      },
       {
         "number": 3377,
         "title": "MACD strategy in quickstart example only opens short positions",
@@ -16,7 +42,7 @@
           "bug"
         ],
         "created_at": "2026-01-02T05:49:39Z",
-        "updated_at": "2026-01-02T09:23:59Z",
+        "updated_at": "2026-01-03T08:44:14Z",
         "author": "SisyphusCoin",
         "url": "https://github.com/nautechsystems/nautilus_trader/issues/3377",
         "comments": 1
@@ -32,19 +58,6 @@
         "updated_at": "2026-01-01T15:41:32Z",
         "author": "agcrum",
         "url": "https://github.com/nautechsystems/nautilus_trader/issues/3374",
-        "comments": 0
-      },
-      {
-        "number": 3362,
-        "title": "parquet_explorer.ipynb fails in JupyterLab Docker container - missing test data",
-        "state": "open",
-        "labels": [
-          "bug"
-        ],
-        "created_at": "2025-12-31T04:01:32Z",
-        "updated_at": "2025-12-31T04:01:32Z",
-        "author": "Dylan-Meyers",
-        "url": "https://github.com/nautechsystems/nautilus_trader/issues/3362",
         "comments": 0
       },
       {
@@ -130,23 +143,35 @@
         "author": "cjdsellers",
         "url": "https://github.com/nautechsystems/nautilus_trader/issues/3152",
         "comments": 1
-      },
-      {
-        "number": 3151,
-        "title": "[dYdX] v4 upgrade and Rust port",
-        "state": "open",
-        "labels": [
-          "enhancement",
-          "rust"
-        ],
-        "created_at": "2025-11-04T07:19:06Z",
-        "updated_at": "2025-12-14T22:54:47Z",
-        "author": "cjdsellers",
-        "url": "https://github.com/nautechsystems/nautilus_trader/issues/3151",
-        "comments": 0
       }
     ],
     "bug_list": [
+      {
+        "number": 3384,
+        "title": "TestClock not monotonic: Repeated TimeEvents do not obey monotonicity",
+        "state": "open",
+        "labels": [
+          "bug"
+        ],
+        "created_at": "2026-01-03T23:50:39Z",
+        "updated_at": "2026-01-03T23:51:29Z",
+        "author": "draphi",
+        "url": "https://github.com/nautechsystems/nautilus_trader/issues/3384",
+        "comments": 0
+      },
+      {
+        "number": 3380,
+        "title": "OrderUpdated event causes panic during initial reconciliation",
+        "state": "open",
+        "labels": [
+          "bug"
+        ],
+        "created_at": "2026-01-03T00:59:37Z",
+        "updated_at": "2026-01-03T03:47:13Z",
+        "author": "santivazq",
+        "url": "https://github.com/nautechsystems/nautilus_trader/issues/3380",
+        "comments": 0
+      },
       {
         "number": 3377,
         "title": "MACD strategy in quickstart example only opens short positions",
@@ -155,23 +180,10 @@
           "bug"
         ],
         "created_at": "2026-01-02T05:49:39Z",
-        "updated_at": "2026-01-02T09:23:59Z",
+        "updated_at": "2026-01-03T08:44:14Z",
         "author": "SisyphusCoin",
         "url": "https://github.com/nautechsystems/nautilus_trader/issues/3377",
         "comments": 1
-      },
-      {
-        "number": 3362,
-        "title": "parquet_explorer.ipynb fails in JupyterLab Docker container - missing test data",
-        "state": "open",
-        "labels": [
-          "bug"
-        ],
-        "created_at": "2025-12-31T04:01:32Z",
-        "updated_at": "2025-12-31T04:01:32Z",
-        "author": "Dylan-Meyers",
-        "url": "https://github.com/nautechsystems/nautilus_trader/issues/3362",
-        "comments": 0
       },
       {
         "number": 3104,
@@ -198,19 +210,6 @@
         "updated_at": "2025-10-14T07:42:30Z",
         "author": "cjdsellers",
         "url": "https://github.com/nautechsystems/nautilus_trader/issues/3042",
-        "comments": 1
-      },
-      {
-        "number": 3377,
-        "title": "MACD strategy in quickstart example only opens short positions",
-        "state": "open",
-        "labels": [
-          "bug"
-        ],
-        "created_at": "2026-01-02T05:49:39Z",
-        "updated_at": "2026-01-02T09:23:59Z",
-        "author": "SisyphusCoin",
-        "url": "https://github.com/nautechsystems/nautilus_trader/issues/3377",
         "comments": 1
       }
     ],
