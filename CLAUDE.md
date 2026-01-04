@@ -16,6 +16,49 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ---
 
+## 🔴 FUNDAMENTAL PHILOSOPHY: NO FIXED PARAMETERS
+
+> **"La gabbia la creiamo noi, non il sistema"**
+> (The cage is created by us, not the system)
+
+This is the **foundational principle** of our trading system:
+
+### The Five Pillars (I Cinque Pilastri):
+1. **Probabilistico** - Not predictions, but probability distributions
+2. **Non Lineare** - Power laws, not linear scaling (Giller, Mandelbrot)
+3. **Non Parametrico** - Adaptive to data, not fixed parameters
+4. **Scalare** - Works at any frequency, any asset, any market condition
+5. **Leggi Naturali** - Fibonacci, fractals, wave physics, flow dynamics
+
+### What This Means in Practice:
+
+```python
+# ❌ WRONG: Fixed parameters trap you
+EMA_PERIOD = 20  # Why 20? Why not 19 or 21?
+RSI_THRESHOLD = 70  # Arbitrary
+
+# ✅ RIGHT: Parameters adapt to data
+alpha = 2.0 / (N + 1)  # Alpha from data characteristics
+threshold = mean + 2 * std  # Dynamic, data-driven
+```
+
+### Implementation Rules:
+- **Default values are STARTING POINTS**, not gospel
+- **Ratios over absolutes** - invariant to scale
+- **Recursive/online algorithms** - O(1), adapt continuously
+- **Power-law scaling** (Giller: signal^0.5) - like natural systems
+- **Ensemble/consensus** - multiple views, not single truth
+
+### Anti-Patterns to Avoid:
+- Hardcoded thresholds without justification
+- Fixed lookback windows (use adaptive)
+- Over-optimized parameters (overfitting)
+- Linear scaling (use sub-linear/power-law)
+
+**Reference**: `strategies/common/adaptive_control/` - the synthesis
+
+---
+
 ## ⚠️ CRITICAL: Long-Running Processes (nohup/setsid)
 
 **ALWAYS use `setsid` for long-running processes to ensure they survive session termination!**
