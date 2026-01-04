@@ -405,7 +405,60 @@
       "timestamp": "2026-01-04T12:13:26.842744",
       "command": "find /media/sam/1TB/nautilus_dev/strategies -name \"*.py\" -exec grep -l -i \"position.siz\\|risk\\|kelly\\|atr.*mult\\|adaptive\" {} \\; 2>/dev/null | head -20",
       "description": "Find strategies with position sizing"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-04T12:13:28.266952",
+      "command": "ls -la /media/sam/1TB/nautilus_dev/strategies/common/ 2>/dev/null",
+      "description": "List common utilities in strategies"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-04T12:13:28.340402",
+      "command": "grep -r \"portfolio\\.\\|cache\\.\\|self\\.portfolio\\|self\\.cache\" /media/sam/1TB/nautilus_dev/strategies/ --include=\"*.py\" -l 2>/dev/null | head -10",
+      "description": "Find strategies using portfolio/cache"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-04T12:13:38.448332",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/position_sizing/__init__.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-04T12:13:38.454260",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/position_sizing/config.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-04T12:13:38.464389",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/position_sizing/giller_sizing.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-04T12:14:07.686207",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/position_sizing/integrated_sizing.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-04T12:14:07.697975",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/examples/risk_managed_strategy.py"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-04T12:14:13.592827",
+      "command": "ls -la /media/sam/1TB/nautilus_dev/strategies/common/adaptive_control/",
+      "description": "List adaptive control files"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-04T12:14:13.641581",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/adaptive_control/sops_sizing.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-04T12:14:19.238968",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/recovery/recoverable_strategy.py"
     }
   ],
-  "last_updated": "2026-01-04T12:13:26.842770"
+  "last_updated": "2026-01-04T12:14:19.238989"
 }
