@@ -100,6 +100,16 @@ from .luck_skill import (
     TrackRecordAnalyzer,
     SkillAssessment,
 )
+from .sops_sizing import (
+    SOPS,
+    TapeSpeed,
+    GillerScaler,
+    SOPSGillerSizer,
+    AdaptiveKEstimator,
+    SOPSState,
+    TapeSpeedState,
+    create_sops_sizer,
+)
 
 __all__ = [
     # Core detectors (FFT-based, accurate but slower)
@@ -176,4 +186,17 @@ __all__ = [
     "BacktestResult",
     "SystemConfig",
     "create_meta_portfolio_from_backtest",
+    # Luck vs Skill (Lopez de Prado)
+    "LuckQuantifier",
+    "TrackRecordAnalyzer",
+    "SkillAssessment",
+    # SOPS Sizing (Sigmoidal + Giller + TapeSpeed)
+    "SOPS",
+    "TapeSpeed",
+    "GillerScaler",
+    "SOPSGillerSizer",
+    "AdaptiveKEstimator",
+    "SOPSState",
+    "TapeSpeedState",
+    "create_sops_sizer",
 ]
