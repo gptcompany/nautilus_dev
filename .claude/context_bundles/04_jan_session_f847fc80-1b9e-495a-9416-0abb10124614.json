@@ -622,7 +622,43 @@
       "operation": "todowrite",
       "timestamp": "2026-01-04T12:35:50.589717",
       "todo_count": 6
+    },
+    {
+      "operation": "task",
+      "timestamp": "2026-01-04T12:37:13.787337",
+      "subagent_type": "test-runner",
+      "prompt": "Run the adaptive control tests to verify the bug fixes work correctly:\n\n```bash\nuv run pytest tests/..."
+    },
+    {
+      "operation": "write",
+      "timestamp": "2026-01-04T12:37:14.204146",
+      "file_path": "/media/sam/1TB/nautilus_dev/docs/research/meta-meta-systems-research.md",
+      "content_length": 12566
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2026-01-04T12:37:23.747577",
+      "todo_count": 6
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-04T12:37:24.891907",
+      "command": "uv run pytest tests/strategies/common/test_adaptive_control.py -v",
+      "description": "Run adaptive control tests"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-04T12:37:28.613554",
+      "command": "uv run python -c \"\nfrom strategies.common.adaptive_control.meta_portfolio import MetaPortfolio\nfrom strategies.common.adaptive_control.particle_portfolio import ThompsonSelector\n\n# Test 1: Sharpe with constant returns (was exploding to 10^12)\nmp = MetaPortfolio()\nmp.register_system('test')\nfor _ in range(5):\n    mp.update_pnl({'test': 100.0})\nstatus = mp.get_status()\nsharpe = status['system_details']['test']['recent_sharpe']\nprint(f'Sharpe with constant returns: {sharpe}')\nassert sharpe == 0.0, f'BUG NOT FIXED: Sharpe should be 0.0, got {sharpe}'\n\n# Test 2: Thompson decay order (was decaying new counts)\nts = ThompsonSelector(strategies=['a'], decay=0.5)\nts.update_continuous('a', 0.1)\n# Expected: 1.0*0.5 + 1.0 = 1.5 (decay first, then add)\n# Bug: (1.0 + 1.0)*0.5 = 1.0 (add first, then decay all)\nprint(f'Thompson after update_continuous: successes={ts.stats[\\\"a\\\"].successes}')\n# With fix, should be 1.5, not 1.0\n\nprint('\\nAll edge case tests passed!')\n\"",
+      "description": "Run edge case tests for bug fixes"
+    },
+    {
+      "operation": "taskoutput",
+      "timestamp": "2026-01-04T12:37:30.041986",
+      "task_id": "abbb73f",
+      "block": true,
+      "timeout": 60000
     }
   ],
-  "last_updated": "2026-01-04T12:35:50.589735"
+  "last_updated": "2026-01-04T12:37:30.042009"
 }
