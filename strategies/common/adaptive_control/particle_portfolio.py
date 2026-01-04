@@ -347,17 +347,20 @@ class ThompsonSelector:
             strategy: Strategy name
             return_value: Strategy return (can be negative)
         """
+        if strategy not in self.stats:
+            return
+
+        # Apply decay FIRST (consistent with update() method)
+        for s in self.strategies:
+            self.stats[s].successes *= self.decay
+            self.stats[s].failures *= self.decay
+
         # Convert continuous to pseudo-counts
         # Positive return = partial success
         if return_value >= 0:
             self.stats[strategy].successes += min(1.0, return_value * 10)
         else:
             self.stats[strategy].failures += min(1.0, abs(return_value) * 10)
-
-        # Apply decay
-        for s in self.strategies:
-            self.stats[s].successes *= self.decay
-            self.stats[s].failures *= self.decay
 
     def get_probabilities(self) -> Dict[str, float]:
         """Get current success probability estimates."""

@@ -163,7 +163,133 @@
       "timestamp": "2026-01-04T12:21:07.843533",
       "file_path": "/media/sam/1TB/nautilus_dev/docs/027-architecture-validation-report.md",
       "old_string": "## 5. Test Issues to Fix\n\n### 5.1 API Signature Mismatch\n\n**File**: `tests/strategies/common/test_ad..."
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-04T12:21:34.590033",
+      "file_path": "/tmp/claude/-media-sam-1TB-nautilus-dev/tasks/acc6430.output"
+    },
+    {
+      "operation": "task",
+      "timestamp": "2026-01-04T12:29:20.824171",
+      "subagent_type": "nautilus-coder",
+      "prompt": "Fix the two HIGH/MEDIUM priority bugs in the adaptive control framework:\n\n## BUG 1: Sharpe Ratio Exp..."
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-04T12:29:27.909413",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/adaptive_control/meta_portfolio.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-04T12:29:27.916949",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/adaptive_control/luck_skill.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-04T12:29:27.926559",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/adaptive_control/particle_portfolio.py"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-04T12:29:39.987986",
+      "command": "grep -n \"std = math.sqrt(variance) if variance > 0 else 1e-10\" strategies/common/adaptive_control/*.py",
+      "description": "Find all Sharpe ratio bug occurrences"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-04T12:29:48.025967",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/adaptive_control/luck_skill.py"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-04T12:29:57.833388",
+      "command": "cat -n strategies/common/adaptive_control/meta_portfolio.py | sed -n '493,503p'",
+      "description": "Show exact lines for meta_portfolio fix"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-04T12:29:59.040344",
+      "command": "cat -n strategies/common/adaptive_control/luck_skill.py | sed -n '288,299p'",
+      "description": "Show exact lines for luck_skill fix 1"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-04T12:30:01.161374",
+      "command": "cat -n strategies/common/adaptive_control/luck_skill.py | sed -n '341,351p'",
+      "description": "Show exact lines for luck_skill fix 2"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-04T12:30:01.676281",
+      "command": "cat -n strategies/common/adaptive_control/particle_portfolio.py | sed -n '342,361p'",
+      "description": "Show exact lines for Thompson decay fix"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-04T12:30:11.702795",
+      "command": "sed -i '493,502s/.*/    def _calculate_sharpe(self, pnls: List[float], risk_free: float = 0.0) -> float:\\n        \"\"\"Calculate Sharpe ratio from PnL series.\"\"\"\\n        if len(pnls) < 2:\\n            return 0.0\\n\\n        mean = sum(pnls) \\/ len(pnls)\\n        variance = sum((p - mean) ** 2 for p in pnls) \\/ len(pnls)\\n\\n        # Return 0 if variance is 0 (undefined Sharpe - neutral value)\\n        if variance == 0:\\n            return 0.0\\n\\n        std = math.sqrt(variance)\\n        return (mean - risk_free) \\/ std/' strategies/common/adaptive_control/meta_portfolio.py",
+      "description": "Fix meta_portfolio Sharpe calculation"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-04T12:30:18.063375",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/adaptive_control/meta_portfolio.py"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-04T12:30:23.964925",
+      "command": "git checkout -- strategies/common/adaptive_control/meta_portfolio.py strategies/common/adaptive_control/luck_skill.py strategies/common/adaptive_control/particle_portfolio.py",
+      "description": "Restore files from git"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-04T12:30:35.113741",
+      "command": "python3 << 'EOF'\nimport re\n\n# Fix meta_portfolio.py\nwith open('strategies/common/adaptive_control/meta_portfolio.py', 'r') as f:\n    content = f.read()\n\n# Old pattern\nold_sharpe = '''    def _calculate_sharpe(self, pnls: List[float], risk_free: float = 0.0) -> float:\n        \"\"\"Calculate Sharpe ratio from PnL series.\"\"\"\n        if len(pnls) < 2:\n            return 0.0\n\n        mean = sum(pnls) / len(pnls)\n        variance = sum((p - mean) ** 2 for p in pnls) / len(pnls)\n        std = math.sqrt(variance) if variance > 0 else 1e-10\n\n        return (mean - risk_free) / std'''\n\nnew_sharpe = '''    def _calculate_sharpe(self, pnls: List[float], risk_free: float = 0.0) -> float:\n        \"\"\"Calculate Sharpe ratio from PnL series.\"\"\"\n        if len(pnls) < 2:\n            return 0.0\n\n        mean = sum(pnls) / len(pnls)\n        variance = sum((p - mean) ** 2 for p in pnls) / len(pnls)\n\n        # Return 0 if variance is 0 (undefined Sharpe - neutral value)\n        if variance == 0:\n            return 0.0\n\n        std = math.sqrt(variance)\n        return (mean - risk_free) / std'''\n\nif old_sharpe in content:\n    content = content.replace(old_sharpe, new_sharpe)\n    with open('strategies/common/adaptive_control/meta_portfolio.py', 'w') as f:\n        f.write(content)\n    print(\"Fixed meta_portfolio.py\")\nelse:\n    print(\"Pattern not found in meta_portfolio.py\")\nEOF",
+      "description": "Fix meta_portfolio.py Sharpe calculation"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-04T12:30:49.575743",
+      "command": "python3 << 'EOF'\n# Fix luck_skill.py - Two _calculate_sharpe methods\nwith open('strategies/common/adaptive_control/luck_skill.py', 'r') as f:\n    content = f.read()\n\n# Fix 1: LuckQuantifier._calculate_sharpe (lines 288-298)\nold_sharpe1 = '''    def _calculate_sharpe(self, returns: List[float]) -> float:\n        \"\"\"Calculate Sharpe ratio from returns.\"\"\"\n        if len(returns) < 2:\n            return 0.0\n\n        mean = sum(returns) / len(returns)\n        variance = sum((r - mean) ** 2 for r in returns) / len(returns)\n        std = math.sqrt(variance) if variance > 0 else 1e-10\n\n        # Annualize (assuming daily returns)\n        return (mean / std) * math.sqrt(252)'''\n\nnew_sharpe1 = '''    def _calculate_sharpe(self, returns: List[float]) -> float:\n        \"\"\"Calculate Sharpe ratio from returns.\"\"\"\n        if len(returns) < 2:\n            return 0.0\n\n        mean = sum(returns) / len(returns)\n        variance = sum((r - mean) ** 2 for r in returns) / len(returns)\n\n        # Return 0 if variance is 0 (undefined Sharpe - neutral value)\n        if variance == 0:\n            return 0.0\n\n        std = math.sqrt(variance)\n        # Annualize (assuming daily returns)\n        return (mean / std) * math.sqrt(252)'''\n\nif old_sharpe1 in content:\n    content = content.replace(old_sharpe1, new_sharpe1)\n    print(\"Fixed LuckQuantifier._calculate_sharpe\")\nelse:\n    print(\"LuckQuantifier pattern not found\")\n\n# Fix 2: TrackRecordAnalyzer._calculate_sharpe (lines 341-350)\nold_sharpe2 = '''    def _calculate_sharpe(self) -> float:\n        \"\"\"Calculate current Sharpe ratio.\"\"\"\n        if len(self._returns) < 2:\n            return 0.0\n\n        mean = sum(self._returns) / len(self._returns)\n        variance = sum((r - mean) ** 2 for r in self._returns) / len(self._returns)\n        std = math.sqrt(variance) if variance > 0 else 1e-10\n\n        return (mean / std) * math.sqrt(252)'''\n\nnew_sharpe2 = '''    def _calculate_sharpe(self) -> float:\n        \"\"\"Calculate current Sharpe ratio.\"\"\"\n        if len(self._returns) < 2:\n            return 0.0\n\n        mean = sum(self._returns) / len(self._returns)\n        variance = sum((r - mean) ** 2 for r in self._returns) / len(self._returns)\n\n        # Return 0 if variance is 0 (undefined Sharpe - neutral value)\n        if variance == 0:\n            return 0.0\n\n        std = math.sqrt(variance)\n        return (mean / std) * math.sqrt(252)'''\n\nif old_sharpe2 in content:\n    content = content.replace(old_sharpe2, new_sharpe2)\n    print(\"Fixed TrackRecordAnalyzer._calculate_sharpe\")\nelse:\n    print(\"TrackRecordAnalyzer pattern not found\")\n\nwith open('strategies/common/adaptive_control/luck_skill.py', 'w') as f:\n    f.write(content)\nprint(\"Saved luck_skill.py\")\nEOF",
+      "description": "Fix luck_skill.py Sharpe calculations"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-04T12:31:05.711751",
+      "command": "python3 << 'EOF'\n# Fix particle_portfolio.py - Thompson decay order bug\nwith open('strategies/common/adaptive_control/particle_portfolio.py', 'r') as f:\n    content = f.read()\n\n# Old pattern (decay applied AFTER adding new count)\nold_update_continuous = '''    def update_continuous(self, strategy: str, return_value: float) -> None:\n        \"\"\"\n        Update with continuous return (not just success/failure).\n\n        Args:\n            strategy: Strategy name\n            return_value: Strategy return (can be negative)\n        \"\"\"\n        # Convert continuous to pseudo-counts\n        # Positive return = partial success\n        if return_value >= 0:\n            self.stats[strategy].successes += min(1.0, return_value * 10)\n        else:\n            self.stats[strategy].failures += min(1.0, abs(return_value) * 10)\n\n        # Apply decay\n        for s in self.strategies:\n            self.stats[s].successes *= self.decay\n            self.stats[s].failures *= self.decay'''\n\n# New pattern (decay applied FIRST, matching update() behavior)\nnew_update_continuous = '''    def update_continuous(self, strategy: str, return_value: float) -> None:\n        \"\"\"\n        Update with continuous return (not just success/failure).\n\n        Args:\n            strategy: Strategy name\n            return_value: Strategy return (can be negative)\n        \"\"\"\n        if strategy not in self.stats:\n            return\n\n        # Apply decay FIRST (consistent with update() method)\n        for s in self.strategies:\n            self.stats[s].successes *= self.decay\n            self.stats[s].failures *= self.decay\n\n        # Convert continuous to pseudo-counts\n        # Positive return = partial success\n        if return_value >= 0:\n            self.stats[strategy].successes += min(1.0, return_value * 10)\n        else:\n            self.stats[strategy].failures += min(1.0, abs(return_value) * 10)'''\n\nif old_update_continuous in content:\n    content = content.replace(old_update_continuous, new_update_continuous)\n    with open('strategies/common/adaptive_control/particle_portfolio.py', 'w') as f:\n        f.write(content)\n    print(\"Fixed particle_portfolio.py - update_continuous decay order\")\nelse:\n    print(\"Pattern not found in particle_portfolio.py\")\nEOF",
+      "description": "Fix Thompson decay order in particle_portfolio.py"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-04T12:31:12.293081",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run python -c \"from strategies.common.adaptive_control import *; print('Import OK')\"",
+      "description": "Verify imports work after fixes"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-04T12:31:22.152061",
+      "command": "grep -A 15 \"def _calculate_sharpe\" strategies/common/adaptive_control/meta_portfolio.py | head -20",
+      "description": "Verify meta_portfolio fix"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-04T12:31:22.156262",
+      "command": "grep -A 15 \"def _calculate_sharpe\" strategies/common/adaptive_control/luck_skill.py | head -40",
+      "description": "Verify luck_skill fixes"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-04T12:31:22.188855",
+      "command": "grep -A 20 \"def update_continuous\" strategies/common/adaptive_control/particle_portfolio.py",
+      "description": "Verify particle_portfolio fix"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-04T12:31:42.507527",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python3 << 'EOF'\n\"\"\"Test that the Sharpe ratio bug is fixed.\"\"\"\nfrom strategies.common.adaptive_control.meta_portfolio import MetaPortfolio\nfrom strategies.common.adaptive_control.luck_skill import LuckQuantifier, TrackRecordAnalyzer\nfrom strategies.common.adaptive_control.particle_portfolio import ThompsonSelector\n\n# Test 1: MetaPortfolio._calculate_sharpe with zero variance\nportfolio = MetaPortfolio()\n# pnls with zero variance (all same value)\nsharpe = portfolio._calculate_sharpe([0.1, 0.1, 0.1, 0.1, 0.1])\nassert sharpe == 0.0, f\"Expected 0.0, got {sharpe}\"\nprint(f\"[PASS] MetaPortfolio: Zero variance returns 0.0, not {sharpe}\")\n\n# Test 2: LuckQuantifier._calculate_sharpe with zero variance\nluck = LuckQuantifier()\nsharpe = luck._calculate_sharpe([0.01, 0.01, 0.01])\nassert sharpe == 0.0, f\"Expected 0.0, got {sharpe}\"\nprint(f\"[PASS] LuckQuantifier: Zero variance returns 0.0, not {sharpe}\")\n\n# Test 3: TrackRecordAnalyzer._calculate_sharpe with zero variance\nanalyzer = TrackRecordAnalyzer()\nfor _ in range(10):\n    analyzer.add_return(0.05)  # All same returns\nsharpe = analyzer._calculate_sharpe()\nassert sharpe == 0.0, f\"Expected 0.0, got {sharpe}\"\nprint(f\"[PASS] TrackRecordAnalyzer: Zero variance returns 0.0, not {sharpe}\")\n\n# Test 4: Thompson update_continuous decay order\n# Compare with update() behavior\nselector1 = ThompsonSelector([\"A\", \"B\"], decay=0.9)\nselector2 = ThompsonSelector([\"A\", \"B\"], decay=0.9)\n\n# Method 1: Use update() (correct behavior)\nselector1.update(\"A\", success=True)  # Decay first, then add 1\n\n# Method 2: Use update_continuous with equivalent value\n# return_value * 10 = 1.0 -> successes += 1.0 (same as update())\nselector2.update_continuous(\"A\", 0.1)\n\n# After fix, both should have same final successes for strategy A\n# (within floating point tolerance)\ns1 = selector1.stats[\"A\"].successes\ns2 = selector2.stats[\"A\"].successes\nprint(f\"[INFO] After update(): A.successes = {s1:.6f}\")\nprint(f\"[INFO] After update_continuous(): A.successes = {s2:.6f}\")\n# Both should be: initial(1.0) * decay(0.9) + 1.0 = 1.9\nassert abs(s1 - s2) < 0.01, f\"Decay order mismatch: update()={s1}, update_continuous()={s2}\"\nprint(f\"[PASS] Thompson: Decay order is consistent between update() and update_continuous()\")\n\nprint(\"\\n[SUCCESS] All bug fixes verified!\")\nEOF",
+      "description": "Functional test of bug fixes"
     }
   ],
-  "last_updated": "2026-01-04T12:21:07.843552"
+  "last_updated": "2026-01-04T12:31:42.507549"
 }
