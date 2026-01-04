@@ -618,7 +618,90 @@
       "operation": "read",
       "timestamp": "2026-01-04T01:14:57.232051",
       "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/adaptive_control/meta_controller.py"
+    },
+    {
+      "operation": "write",
+      "timestamp": "2026-01-04T01:15:41.073640",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/adaptive_control/particle_portfolio.py",
+      "content_length": 15557
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-04T01:15:52.085299",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/adaptive_control/__init__.py",
+      "old_string": "from .information_theory import (\n    EntropyEstimator,\n    MutualInformationEstimator,\n    WienerFi..."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-04T01:15:59.122985",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/adaptive_control/__init__.py",
+      "old_string": "    # Information Theory (entropy, SNR, risk)\n    \"EntropyEstimator\",\n    \"MutualInformationEstimato..."
+    },
+    {
+      "operation": "taskoutput",
+      "timestamp": "2026-01-04T01:16:05.704241",
+      "task_id": "aad0359",
+      "block": false,
+      "timeout": 30000
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-04T01:16:36.645318",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/strategies/common/test_adaptive_control.py",
+      "old_string": "    def test_iir_regime_detector_trending(self):\n        \"\"\"IIR regime should detect trending market..."
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-04T01:16:42.422172",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/adaptive_control/meta_controller.py"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-04T01:16:58.441683",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/strategies/common/test_adaptive_control.py",
+      "old_string": "    def test_meta_controller_updates_state(self):\n        \"\"\"MetaController should update state on n..."
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-04T01:17:04.467355",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -m pytest tests/strategies/common/test_adaptive_control.py -v --tb=short 2>&1 | tail -50",
+      "description": "Run adaptive_control tests"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2026-01-04T01:17:19.793797",
+      "todo_count": 9
+    },
+    {
+      "operation": "write",
+      "timestamp": "2026-01-04T01:21:22.230675",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/adaptive_control/meta_portfolio.py",
+      "content_length": 18369
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-04T01:21:32.562399",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/adaptive_control/__init__.py",
+      "old_string": "from .particle_portfolio import (\n    ParticlePortfolio,\n    ThompsonSelector,\n    BayesianEnsemble,..."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-04T01:21:39.775867",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/adaptive_control/__init__.py",
+      "old_string": "    # Particle-based Portfolio Selection\n    \"ParticlePortfolio\",\n    \"ThompsonSelector\",\n    \"Bayes..."
+    },
+    {
+      "operation": "write",
+      "timestamp": "2026-01-04T01:33:00.140971",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/adaptive_control/luck_skill.py",
+      "content_length": 12752
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-04T01:33:18.283804",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/adaptive_control/__init__.py",
+      "old_string": "from .meta_portfolio import (\n    MetaPortfolio,\n    BacktestMatrix,\n    BacktestResult,\n    SystemC..."
     }
   ],
-  "last_updated": "2026-01-04T01:14:57.232066"
+  "last_updated": "2026-01-04T01:33:18.283820"
 }

@@ -81,6 +81,25 @@ from .information_theory import (
     InformationState,
     OptimalSamplingAnalyzer,
 )
+from .particle_portfolio import (
+    ParticlePortfolio,
+    ThompsonSelector,
+    BayesianEnsemble,
+    Particle,
+    PortfolioState,
+)
+from .meta_portfolio import (
+    MetaPortfolio,
+    BacktestMatrix,
+    BacktestResult,
+    SystemConfig,
+    create_meta_portfolio_from_backtest,
+)
+from .luck_skill import (
+    LuckQuantifier,
+    TrackRecordAnalyzer,
+    SkillAssessment,
+)
 
 __all__ = [
     # Core detectors (FFT-based, accurate but slower)
@@ -145,4 +164,16 @@ __all__ = [
     "InformationBasedRiskManager",
     "InformationState",
     "OptimalSamplingAnalyzer",
+    # Particle-based Portfolio Selection
+    "ParticlePortfolio",
+    "ThompsonSelector",
+    "BayesianEnsemble",
+    "Particle",
+    "PortfolioState",
+    # Meta-Portfolio (backtest matrix + production ensemble)
+    "MetaPortfolio",
+    "BacktestMatrix",
+    "BacktestResult",
+    "SystemConfig",
+    "create_meta_portfolio_from_backtest",
 ]
