@@ -391,7 +391,199 @@
       "operation": "read",
       "timestamp": "2026-01-04T12:53:53.773440",
       "file_path": "/media/sam/1TB/nautilus_dev/specs/027-validation/risk_analysis.md"
+    },
+    {
+      "operation": "write",
+      "timestamp": "2026-01-04T12:55:15.695472",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/027-validation/gap_analysis.md",
+      "content_length": 8507
+    },
+    {
+      "operation": "write",
+      "timestamp": "2026-01-04T12:56:11.323589",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/027-validation/executive_summary.md",
+      "content_length": 2966
+    },
+    {
+      "operation": "write",
+      "timestamp": "2026-01-04T12:56:11.656264",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/027-validation/action_items.md",
+      "content_length": 3538
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-04T12:58:44.588891",
+      "command": "ls -la /media/sam/1TB/nautilus_dev/specs/027-validation/",
+      "description": "List validation files"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-04T12:59:30.068833",
+      "command": "mv /media/sam/1TB/nautilus_dev/specs/027-validation /media/sam/1TB/nautilus_dev/specs/028-validation && ls -la /media/sam/1TB/nautilus_dev/specs/028-validation/",
+      "description": "Rename validation directory to 028"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-04T13:03:04.295288",
+      "command": "ls -la /media/sam/1TB/meta-labeling/",
+      "description": "List meta-labeling directory"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-04T13:03:04.352774",
+      "command": "find /media/sam/1TB/meta-labeling -type f \\( -name \"*.pptx\" -o -name \"*.ppt\" -o -name \"*.pdf\" -o -name \"*.md\" -o -name \"*.py\" \\) 2>/dev/null | head -30",
+      "description": "Find docs and code in meta-labeling"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-04T13:03:17.953420",
+      "file_path": "/media/sam/1TB/meta-labeling/README.md"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-04T13:03:17.959393",
+      "file_path": "/media/sam/1TB/meta-labeling/calibration_and_position_sizing/calibration_with_kelly.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-04T13:03:17.967857",
+      "file_path": "/media/sam/1TB/meta-labeling/theory_and_framework/bet_sizing.py"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-04T13:09:29.857237",
+      "command": "ls -la /media/sam/1TB/meta-labeling/*.jpg /media/sam/1TB/meta-labeling/*.jpeg /media/sam/1TB/meta-labeling/*.png 2>/dev/null | head -20",
+      "description": "List exported images"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-04T13:09:38.794123",
+      "file_path": "/media/sam/1TB/meta-labeling/Meta-labeling Architectures Diagrams1.jpg"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-04T13:09:38.805704",
+      "file_path": "/media/sam/1TB/meta-labeling/Meta-labeling Architectures Diagrams2.jpg"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-04T13:09:38.817896",
+      "file_path": "/media/sam/1TB/meta-labeling/Meta-labeling Architectures Diagrams3.jpg"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-04T13:09:38.827905",
+      "file_path": "/media/sam/1TB/meta-labeling/Meta-labeling Architectures Diagrams4.jpg"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-04T13:09:57.018690",
+      "file_path": "/media/sam/1TB/meta-labeling/Meta-labeling Architectures Diagrams5.jpg"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-04T13:09:57.023930",
+      "file_path": "/media/sam/1TB/meta-labeling/Meta-labeling Architectures Diagrams6.jpg"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-04T13:09:57.031672",
+      "file_path": "/media/sam/1TB/meta-labeling/Meta-labeling Architectures Diagrams7.jpg"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-04T13:09:57.038271",
+      "file_path": "/media/sam/1TB/meta-labeling/Meta-labeling Architectures Diagrams8.jpg"
+    },
+    {
+      "operation": "write",
+      "timestamp": "2026-01-04T13:17:59.315470",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/028-validation/research_plan_swot.md",
+      "content_length": 10417
+    },
+    {
+      "operation": "write",
+      "timestamp": "2026-01-04T13:18:47.661035",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/028-validation/session_prompt_swot.md",
+      "content_length": 7962
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-04T13:19:16.338805",
+      "command": "ls -la /media/sam/1TB/nautilus_dev/specs/ | grep -E \"027|028\"",
+      "description": "Check spec directories"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-04T13:19:16.396830",
+      "command": "ls -la /media/sam/1TB/meta-labeling/",
+      "description": "List meta-labeling contents"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-04T13:19:16.419895",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/028-validation/research_plan_swot.md"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-04T13:19:22.893886",
+      "command": "ls -la /media/sam/1TB/nautilus_dev/specs/027-adaptive-control-framework/",
+      "description": "List spec-027 contents"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-04T13:19:22.921275",
+      "command": "ls -la /media/sam/1TB/nautilus_dev/specs/028-validation/",
+      "description": "List spec-028 contents"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-04T13:19:56.530502",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/028-validation/research_plan_swot.md",
+      "old_string": "## 1. REFERENCE CATALOG (Quello che abbiamo)\n\n### 1.1 Documenti Interni Prodotti\n\n| Documento | Path..."
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-04T13:21:28.884257",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/028-validation/session_prompt_swot.md"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-04T13:21:47.809986",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/028-validation/session_prompt_swot.md",
+      "old_string": "## DOCUMENTI DA LEGGERE PRIMA\n\n```\nOBBLIGATORI:\n- specs/028-validation/research_plan_swot.md     # P..."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-04T13:22:05.973512",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/028-validation/session_prompt_swot.md",
+      "old_string": "### TASK C: Alternative Architectures\n**Agent**: WebSearch + paper-search\n\n```\nQUERIES:\n1. \"risk par..."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-04T13:22:32.857692",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/028-validation/session_prompt_swot.md",
+      "old_string": "## REGOLE DI ESECUZIONE\n\n### Delegation Strategy\n\n```python\nPARALLEL_TASKS = {\n    \"TASK_A\": {\n     ..."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-04T13:22:47.748088",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/028-validation/session_prompt_swot.md",
+      "old_string": "### Output Structure\n\n```\nspecs/028-validation/\n├── research_plan_swot.md          # Questo piano (g..."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-04T13:23:12.681725",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/028-validation/session_prompt_swot.md",
+      "old_string": "## SUCCESS CRITERIA\n\n```python\nSESSION_SUCCESS = (\n    len(counter_evidence_papers) >= 5 AND\n    len..."
+    },
+    {
+      "operation": "grep",
+      "timestamp": "2026-01-04T13:23:19.966630",
+      "pattern": "KISS|YAGNI|Keep It Simple",
+      "path": "/media/sam/1TB/nautilus_dev/CLAUDE.md",
+      "output_mode": "content"
     }
   ],
-  "last_updated": "2026-01-04T12:53:53.773466"
+  "last_updated": "2026-01-04T13:23:19.966650"
 }
