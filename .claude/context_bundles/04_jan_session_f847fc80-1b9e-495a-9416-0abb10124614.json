@@ -6,7 +6,164 @@
       "operation": "todowrite",
       "timestamp": "2026-01-04T12:16:16.937241",
       "todo_count": 5
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-04T12:16:37.043764",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/adaptive_control/particle_portfolio.py"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-04T12:16:37.315698",
+      "command": "uv run pyright strategies/common/adaptive_control/ --outputjson 2>/dev/null | head -100",
+      "description": "Run pyright type checking on adaptive control"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-04T12:16:38.620515",
+      "command": "uv run ruff check strategies/common/adaptive_control/ 2>&1 | head -50",
+      "description": "Run ruff linting on adaptive control"
+    },
+    {
+      "operation": "glob",
+      "timestamp": "2026-01-04T12:16:56.526434",
+      "pattern": "**/test*adaptive*control*.py"
+    },
+    {
+      "operation": "glob",
+      "timestamp": "2026-01-04T12:16:56.540593",
+      "pattern": "**/test*sops*.py"
+    },
+    {
+      "operation": "glob",
+      "timestamp": "2026-01-04T12:16:56.547115",
+      "pattern": "**/test*luck*.py"
+    },
+    {
+      "operation": "glob",
+      "timestamp": "2026-01-04T12:16:56.555421",
+      "pattern": "**/test*particle*.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-04T12:17:07.721436",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/strategies/common/test_adaptive_control.py"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-04T12:17:07.995824",
+      "command": "uv run pytest tests/strategies/common/test_adaptive_control.py -v 2>&1 | tail -80",
+      "description": "Run existing adaptive control tests"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2026-01-04T12:17:11.606930",
+      "todo_count": 5
+    },
+    {
+      "operation": "write",
+      "timestamp": "2026-01-04T12:17:11.849676",
+      "file_path": "/media/sam/1TB/nautilus_dev/docs/027-architecture-validation-report.md",
+      "content_length": 9189
+    },
+    {
+      "operation": "taskoutput",
+      "timestamp": "2026-01-04T12:17:19.450935",
+      "task_id": "a7f34b3",
+      "block": true,
+      "timeout": 60000
+    },
+    {
+      "operation": "taskoutput",
+      "timestamp": "2026-01-04T12:17:19.478450",
+      "task_id": "acc6430",
+      "block": true,
+      "timeout": 60000
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2026-01-04T12:17:19.948737",
+      "todo_count": 5
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-04T12:17:41.981342",
+      "command": "uv run python3 -c \"\nimport math\n\n# Test 1: Division by zero in AdaptiveKEstimator when vol_baseline is 0\nprint('=== TEST 1: AdaptiveKEstimator division by zero ===')\nfrom strategies.common.adaptive_control.sops_sizing import AdaptiveKEstimator\n\nk_est = AdaptiveKEstimator()\n# All zero returns\nfor _ in range(20):\n    k_est.update(0.0)\nprint(f'k with all zeros: {k_est.k}')\n\n# Test 2: NaN propagation with inf input\nprint('\\\\n=== TEST 2: NaN propagation in SOPS ===')\nfrom strategies.common.adaptive_control.sops_sizing import SOPS\nsops = SOPS()\ntry:\n    result = sops.size(float('inf'))\n    print(f'SOPS with inf signal: {result}')\nexcept Exception as e:\n    print(f'Error: {e}')\n\n# Test 3: Negative signal in GillerScaler with power < 1\nprint('\\\\n=== TEST 3: GillerScaler with negative values ===')\nfrom strategies.common.adaptive_control.sops_sizing import GillerScaler\ngiller = GillerScaler(power=0.5)\nprint(f'Giller scale(-1): {giller.scale(-1)}')\nprint(f'Giller scale(-0.5): {giller.scale(-0.5)}')\n\n# Test 4: Empty strategies list in ThompsonSelector\nprint('\\\\n=== TEST 4: Empty strategies in ThompsonSelector ===')\nfrom strategies.common.adaptive_control.particle_portfolio import ThompsonSelector\ntry:\n    ts = ThompsonSelector(strategies=[])\n    result = ts.select()\n    print(f'Select from empty: {result}')\nexcept Exception as e:\n    print(f'Error (expected): {type(e).__name__}: {e}')\n\n# Test 5: LuckQuantifier with edge cases\nprint('\\\\n=== TEST 5: LuckQuantifier edge cases ===')\nfrom strategies.common.adaptive_control.luck_skill import LuckQuantifier\nluck = LuckQuantifier()\n\n# Zero sharpe\nassessment = luck.assess(sharpe=0.0, n_trials=1, track_record_months=12)\nprint(f'Sharpe=0: prob_luck={assessment.probability_of_luck}')\n\n# Negative sharpe\nassessment = luck.assess(sharpe=-1.0, n_trials=1, track_record_months=12)\nprint(f'Sharpe=-1: prob_luck={assessment.probability_of_luck}')\n\n# Very short track record (close to 0)\nassessment = luck.assess(sharpe=2.0, n_trials=1, track_record_months=0)\nprint(f'0 months: prob_luck={assessment.probability_of_luck}')\n\n# Test 6: MetaPortfolio with negative pnl\nprint('\\\\n=== TEST 6: MetaPortfolio Sharpe with constant returns ===')\nfrom strategies.common.adaptive_control.meta_portfolio import MetaPortfolio\nmp = MetaPortfolio()\nmp.register_system('test')\n# All same PnL (zero variance)\npnls = [100.0] * 5\nfor p in pnls:\n    mp.update_pnl({'test': p})\nstatus = mp.get_status()\nprint(f'Sharpe with constant PnL: {status[\\\"system_details\\\"][\\\"test\\\"][\\\"recent_sharpe\\\"]}')\n\n# Test 7: ParticlePortfolio resample with edge case\nprint('\\\\n=== TEST 7: Particle Portfolio single strategy ===')\nfrom strategies.common.adaptive_control.particle_portfolio import ParticlePortfolio\npp = ParticlePortfolio(strategies=['only_one'], n_particles=10)\nfor i in range(5):\n    state = pp.update({'only_one': 0.01})\nprint(f'Single strategy weight: {state.strategy_weights}')\n\nprint('\\\\n=== ALL EDGE CASE TESTS COMPLETED ===')\n\"\n",
+      "description": "Run edge case tests for numerical stability"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-04T12:18:04.772889",
+      "command": "uv run python3 -c \"\nimport math\n\n# Test more edge cases\nprint('=== ADDITIONAL EDGE CASE TESTS ===')\n\n# Test 8: TapeSpeed with negative timestamp difference\nprint('\\\\n=== TEST 8: TapeSpeed timestamp edge cases ===')\nfrom strategies.common.adaptive_control.sops_sizing import TapeSpeed\nts = TapeSpeed()\nts.update(100.0)  # First timestamp\nts.update(99.0)   # Earlier timestamp (going backwards!)\nprint(f'TapeSpeed with backwards time: lambda={ts.lambda_rate}')\n\n# Test 9: TapeSpeed with zero dt\nprint('\\\\n=== TEST 9: TapeSpeed zero dt ===')\nts2 = TapeSpeed()\nts2.update(100.0)\nts2.update(100.0)  # Same timestamp\nprint(f'TapeSpeed with same timestamp: lambda={ts2.lambda_rate}')\n\n# Test 10: minimum_track_record with very high sharpe\nprint('\\\\n=== TEST 10: minimum_track_record extreme sharpe ===')\nfrom strategies.common.adaptive_control.luck_skill import LuckQuantifier\nluck = LuckQuantifier()\n# Very high sharpe\nmin_track = luck.minimum_track_record(sharpe=10.0, kurtosis=10.0)\nprint(f'Min track record for Sharpe=10, kurtosis=10: {min_track}')\n\n# Test 11: Particle filter with large negative returns\nprint('\\\\n=== TEST 11: Particle log_weight overflow ===')\nfrom strategies.common.adaptive_control.particle_portfolio import ParticlePortfolio\npp = ParticlePortfolio(strategies=['a', 'b'], n_particles=10)\n# Very negative returns - can cause log_weight to go to -inf\nfor i in range(50):\n    state = pp.update({'a': -1.0, 'b': -0.5})  # Large negative returns\nprint(f'After extreme negative returns:')\nprint(f'  ESS: {state.effective_particles}')\nprint(f'  Weights: {state.strategy_weights}')\n\n# Test 12: MetaPortfolio aggregate with all zero signals\nprint('\\\\n=== TEST 12: MetaPortfolio aggregate edge cases ===')\nfrom strategies.common.adaptive_control.meta_portfolio import MetaPortfolio\nmp = MetaPortfolio()\nmp.register_system('a')\nmp.register_system('b')\n# All zero signals\nsignal, size = mp.aggregate({'a': 0.0, 'b': 0.0})\nprint(f'All zero signals: signal={signal}, size={size}')\n\n# Unknown system in aggregate\nsignal, size = mp.aggregate({'unknown': 1.0})\nprint(f'Unknown system: signal={signal}, size={size}')\n\n# Test 13: TrackRecordAnalyzer with extreme returns\nprint('\\\\n=== TEST 13: TrackRecordAnalyzer kurtosis ===')\nfrom strategies.common.adaptive_control.luck_skill import TrackRecordAnalyzer\ntra = TrackRecordAnalyzer()\n# Add constant returns\nfor _ in range(30):\n    tra.add_return(0.01)  # All same\nassessment = tra.get_assessment()\nprint(f'Constant returns: kurtosis -> likely division by zero issue')\nprint(f'  Sharpe: {tra._calculate_sharpe()}')\n\n# Test 14: Mutable default arguments check\nprint('\\\\n=== TEST 14: Mutable default arguments ===')\nfrom strategies.common.adaptive_control.particle_portfolio import Particle\np1 = Particle(weights={'a': 0.5, 'b': 0.5})\np2 = Particle(weights={'a': 0.3, 'b': 0.7})\nprint(f'p1 weights: {p1.weights}')\nprint(f'p2 weights: {p2.weights}')\nprint('No mutable default argument issue here.')\n\nprint('\\\\n=== ALL ADDITIONAL TESTS COMPLETED ===')\n\"\n",
+      "description": "Run additional edge case tests"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-04T12:18:19.991681",
+      "command": "uv run python3 -c \"\n# Test variance calculation issues in detail\nprint('=== VARIANCE EDGE CASE ANALYSIS ===')\n\n# Direct inspection of _calculate_sharpe in meta_portfolio.py\n# variance = sum((p - mean) ** 2 for p in pnls) / len(pnls)\n# This is population variance, not sample variance\n\n# When all values are identical:\npnls = [100.0] * 5\nmean = sum(pnls) / len(pnls)  # 100.0\nvariance = sum((p - mean) ** 2 for p in pnls) / len(pnls)  # 0.0\nprint(f'Variance of constant values: {variance}')\n\nimport math\n# std = math.sqrt(variance) if variance > 0 else 1e-10\nstd = math.sqrt(variance) if variance > 0 else 1e-10\nprint(f'Std with fallback: {std}')\n\n# sharpe = (mean - risk_free) / std\nsharpe = (mean - 0.0) / std\nprint(f'Sharpe: {sharpe}')\n\n# The bug: std is 1e-10 which is TINY, making Sharpe HUGE\n# This is the bug in meta_portfolio.py line 500\n\nprint('\\\\n=== BUG CONFIRMED ===')\nprint('When variance is 0 (constant values), std defaults to 1e-10')\nprint('This causes Sharpe to explode to ~10^12')\n\n# Same issue in luck_skill.py\nprint('\\\\n=== Same issue in luck_skill.py ===')\n# Line 294-298 has same pattern\n# Line 347-348 has same pattern\n\n# What should happen: return 0.0 or NaN when variance is 0\nprint('Proper fix: return 0.0 when len(pnls) < 2 or variance == 0')\n\"\n",
+      "description": "Analyze variance calculation bug in detail"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2026-01-04T12:18:29.221690",
+      "todo_count": 5
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2026-01-04T12:18:31.565604",
+      "todo_count": 5
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-04T12:18:31.859328",
+      "file_path": "/tmp/claude/-media-sam-1TB-nautilus-dev/tasks/acc6430.output"
+    },
+    {
+      "operation": "taskoutput",
+      "timestamp": "2026-01-04T12:18:39.784913",
+      "task_id": "acc6430",
+      "block": true,
+      "timeout": 120000
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-04T12:18:47.010856",
+      "command": "uv run python3 -c \"\nprint('=== API MISMATCH ANALYSIS ===')\n\n# Test 1: Check if ThompsonSelector and BayesianEnsemble have consistent APIs\nprint('\\\\n=== TEST 1: ThompsonSelector API consistency ===')\nfrom strategies.common.adaptive_control.particle_portfolio import ThompsonSelector, BayesianEnsemble\n\nts = ThompsonSelector(strategies=['a', 'b', 'c'])\n# Test get_probabilities\nprobs = ts.get_probabilities()\nprint(f'get_probabilities returns: {probs}')\n\n# Test update method compatibility\nts.update('a', success=True)\nts.update_continuous('b', return_value=0.05)\n\n# Test 2: MetaPortfolio + BayesianEnsemble integration\nprint('\\\\n=== TEST 2: MetaPortfolio + BayesianEnsemble ===')\nfrom strategies.common.adaptive_control.meta_portfolio import MetaPortfolio\n\nmp = MetaPortfolio()\nmp.register_system('strat_a')\nmp.register_system('strat_b')\n\n# Check _ensemble is created\nprint(f'Ensemble created: {mp._ensemble is not None}')\nprint(f'Thompson created: {mp._thompson is not None}')\n\n# Test update_pnl\nresult = mp.update_pnl({'strat_a': 0.01, 'strat_b': -0.005})\nprint(f'Weights after update: {result}')\n\n# Test 3: Check if BayesianEnsemble.update matches ThompsonSelector expectations\nprint('\\\\n=== TEST 3: BayesianEnsemble.update signature ===')\nbe = BayesianEnsemble(strategies=['x', 'y'], n_particles=10)\n# BayesianEnsemble.update expects Dict[str, float]\nstate = be.update({'x': 0.01, 'y': 0.02})\nprint(f'Update returns PortfolioState: {type(state).__name__}')\n\n# Test 4: MetaPortfolio._update_weights_from_probs expectations\nprint('\\\\n=== TEST 4: _update_weights_from_probs compatibility ===')\n# This expects Dict[str, float] from thompson.get_probabilities()\n# Let's verify the return type\nprobs = ts.get_probabilities()\nprint(f'get_probabilities type: {type(probs)}')\nprint(f'All values are floats: {all(isinstance(v, float) for v in probs.values())}')\n\nprint('\\\\n=== API ANALYSIS COMPLETE ===')\n\"\n",
+      "description": "Analyze API compatibility between modules"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-04T12:19:17.974815",
+      "command": "uv run python3 -c \"\nprint('=== LOGIC ERROR ANALYSIS ===')\n\n# Test 1: Giller scaling sign preservation\nprint('\\\\n=== TEST 1: Giller sign preservation ===')\nfrom strategies.common.adaptive_control.sops_sizing import GillerScaler\n\ngs = GillerScaler(power=0.5)\n\n# Test various inputs\ntests = [(-4.0, -2.0), (-1.0, -1.0), (-0.25, -0.5), (0.0, 0.0), (0.25, 0.5), (1.0, 1.0), (4.0, 2.0)]\nfor inp, expected in tests:\n    result = gs.scale(inp)\n    status = 'OK' if abs(result - expected) < 0.001 else 'FAIL'\n    print(f'scale({inp:6.2f}) = {result:6.3f} (expected {expected:6.3f}) [{status}]')\n\n# Test 2: Thompson update_continuous decay order issue\nprint('\\\\n=== TEST 2: Thompson update_continuous decay order ===')\nfrom strategies.common.adaptive_control.particle_portfolio import ThompsonSelector\n\nts = ThompsonSelector(strategies=['a', 'b'], decay=0.99)\n# Initial state\nprint(f'Initial successes: a={ts.stats[\\\"a\\\"].successes}, b={ts.stats[\\\"b\\\"].successes}')\n\n# Update 'a' with positive return\nts.update_continuous('a', 0.1)\nprint(f'After update_continuous a+0.1:')\nprint(f'  a.successes={ts.stats[\\\"a\\\"].successes:.4f}, a.failures={ts.stats[\\\"a\\\"].failures:.4f}')\nprint(f'  b.successes={ts.stats[\\\"b\\\"].successes:.4f}, b.failures={ts.stats[\\\"b\\\"].failures:.4f}')\n\n# BUG: In update_continuous, decay is applied AFTER update to the specific strategy\n# But this means the just-added count is also decayed!\n# Compare with update() which applies decay BEFORE update\n\n# Test 3: Particle normalization with all-negative weights\nprint('\\\\n=== TEST 3: Particle normalization edge case ===')\nfrom strategies.common.adaptive_control.particle_portfolio import Particle\n\np = Particle(weights={'a': -1.0, 'b': -2.0})  # All negative (shouldn't happen but...)\np.normalize_weights()\nprint(f'Normalized negative weights: {p.weights}')\n# Uses sum(abs(w)) so it will normalize to [-0.33, -0.67]\n\n# Test 4: SOPS + Giller pipeline sanity\nprint('\\\\n=== TEST 4: Full SOPS pipeline test ===')\nfrom strategies.common.adaptive_control.sops_sizing import SOPSGillerSizer\n\nsizer = SOPSGillerSizer(max_position=1.0, enable_tape_weight=False)\n# Warmup\nfor i in range(20):\n    sizer.update(return_value=0.01 * (i % 5 - 2))  # Varying returns\n\n# Test various signals\nfor signal in [-2.0, -1.0, -0.5, 0.0, 0.5, 1.0, 2.0]:\n    size = sizer.size(signal)\n    state = sizer.get_state(signal)\n    print(f'signal={signal:5.1f} -> sops={state.sops_position:6.3f} -> giller={state.giller_position:6.3f} -> final={size:6.3f}')\n\nprint('\\\\n=== LOGIC ANALYSIS COMPLETE ===')\n\"\n",
+      "description": "Analyze logic errors in algorithms"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-04T12:19:33.461061",
+      "command": "uv run python3 -c \"\nprint('=== DECAY ORDER BUG VERIFICATION ===')\nfrom strategies.common.adaptive_control.particle_portfolio import ThompsonSelector\n\n# Compare update() vs update_continuous() behavior\nprint('\\\\n--- update() behavior (correct) ---')\nts1 = ThompsonSelector(strategies=['a'], decay=0.5)  # Strong decay for visibility\nprint(f'Initial: successes={ts1.stats[\\\"a\\\"].successes}, failures={ts1.stats[\\\"a\\\"].failures}')\nts1.update('a', success=True)\nprint(f'After update(True): successes={ts1.stats[\\\"a\\\"].successes}, failures={ts1.stats[\\\"a\\\"].failures}')\n# Expected: 1.0*0.5 + 1 = 1.5 successes, 1.0*0.5 = 0.5 failures\n\nprint('\\\\n--- update_continuous() behavior (BUGGY) ---')\nts2 = ThompsonSelector(strategies=['a'], decay=0.5)\nprint(f'Initial: successes={ts2.stats[\\\"a\\\"].successes}, failures={ts2.stats[\\\"a\\\"].failures}')\nts2.update_continuous('a', return_value=0.1)  # 0.1 * 10 = 1.0 success added\nprint(f'After update_continuous(0.1): successes={ts2.stats[\\\"a\\\"].successes}, failures={ts2.stats[\\\"a\\\"].failures}')\n# BUG: (1.0 + 1.0) * 0.5 = 1.0 successes (the new 1.0 is also decayed!)\n#      Expected: 1.0*0.5 + 1.0 = 1.5 successes\n\nprint('\\\\n--- BUG EXPLANATION ---')\nprint('In update(), decay is applied FIRST, then +1 is added.')\nprint('In update_continuous(), +count is added FIRST, then decay is applied to ALL.')\nprint('This means new observations are immediately discounted in update_continuous().')\nprint('\\\\nThis is inconsistent behavior between the two methods.')\n\"\n",
+      "description": "Verify decay order bug in Thompson selector"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2026-01-04T12:19:44.968558",
+      "todo_count": 5
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2026-01-04T12:20:38.763400",
+      "todo_count": 5
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2026-01-04T12:21:07.548283",
+      "todo_count": 5
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-04T12:21:07.843533",
+      "file_path": "/media/sam/1TB/nautilus_dev/docs/027-architecture-validation-report.md",
+      "old_string": "## 5. Test Issues to Fix\n\n### 5.1 API Signature Mismatch\n\n**File**: `tests/strategies/common/test_ad..."
     }
   ],
-  "last_updated": "2026-01-04T12:16:16.937251"
+  "last_updated": "2026-01-04T12:21:07.843552"
 }
