@@ -497,8 +497,12 @@ class MetaPortfolio:
 
         mean = sum(pnls) / len(pnls)
         variance = sum((p - mean) ** 2 for p in pnls) / len(pnls)
-        std = math.sqrt(variance) if variance > 0 else 1e-10
 
+        # Return 0 if variance is 0 (undefined Sharpe - neutral value)
+        if variance == 0:
+            return 0.0
+
+        std = math.sqrt(variance)
         return (mean - risk_free) / std
 
     def save_state(self, path: Path) -> None:

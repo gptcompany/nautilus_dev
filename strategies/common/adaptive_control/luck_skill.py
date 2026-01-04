@@ -292,8 +292,12 @@ class LuckQuantifier:
 
         mean = sum(returns) / len(returns)
         variance = sum((r - mean) ** 2 for r in returns) / len(returns)
-        std = math.sqrt(variance) if variance > 0 else 1e-10
 
+        # Return 0 if variance is 0 (undefined Sharpe - neutral value)
+        if variance == 0:
+            return 0.0
+
+        std = math.sqrt(variance)
         # Annualize (assuming daily returns)
         return (mean / std) * math.sqrt(252)
 
@@ -345,8 +349,12 @@ class TrackRecordAnalyzer:
 
         mean = sum(self._returns) / len(self._returns)
         variance = sum((r - mean) ** 2 for r in self._returns) / len(self._returns)
-        std = math.sqrt(variance) if variance > 0 else 1e-10
 
+        # Return 0 if variance is 0 (undefined Sharpe - neutral value)
+        if variance == 0:
+            return 0.0
+
+        std = math.sqrt(variance)
         return (mean / std) * math.sqrt(252)
 
     def _calculate_skewness(self) -> float:
