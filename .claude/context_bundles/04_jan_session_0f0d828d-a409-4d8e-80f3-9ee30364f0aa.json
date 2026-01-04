@@ -94,7 +94,531 @@
       "timestamp": "2026-01-04T00:23:29.520862",
       "query": "biosignals trading decisions cryptocurrency",
       "max_results": 10
+    },
+    {
+      "operation": "skill",
+      "timestamp": "2026-01-04T00:32:06.265896",
+      "skill": "research",
+      "args": "scaling laws power law biology economics language universal patterns West Kleiber"
+    },
+    {
+      "operation": "mcp__paper-search-mcp__search_arxiv",
+      "timestamp": "2026-01-04T00:32:19.607129",
+      "query": "scaling laws power law biology economics universal patterns fractal",
+      "max_results": 10
+    },
+    {
+      "operation": "mcp__paper-search-mcp__search_semantic",
+      "timestamp": "2026-01-04T00:32:20.741754",
+      "query": "Geoffrey West scaling laws biology cities economics universal power law Kleiber",
+      "max_results": 10
+    },
+    {
+      "operation": "mcp__paper-search-mcp__search_semantic",
+      "timestamp": "2026-01-04T00:32:22.119357",
+      "query": "Zipf law language economics market scaling universality",
+      "max_results": 10
+    },
+    {
+      "operation": "glob",
+      "timestamp": "2026-01-04T00:43:37.225635",
+      "pattern": "specs/spec-0*.md",
+      "path": "/media/sam/1TB/nautilus_dev"
+    },
+    {
+      "operation": "glob",
+      "timestamp": "2026-01-04T00:43:44.195955",
+      "pattern": "**/specs/**/*.md",
+      "path": "/media/sam/1TB/nautilus_dev"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-04T00:43:52.388414",
+      "command": "ls -d /media/sam/1TB/nautilus_dev/specs/*/ | sort -V | tail -5",
+      "description": "Find latest spec numbers"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-04T00:44:02.860548",
+      "command": "mkdir -p /media/sam/1TB/nautilus_dev/specs/027-natural-laws-framework",
+      "description": "Create spec directory"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2026-01-04T00:44:11.095008",
+      "todo_count": 5
+    },
+    {
+      "operation": "write",
+      "timestamp": "2026-01-04T00:45:06.666131",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/027-natural-laws-framework/spec.md",
+      "content_length": 9984
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2026-01-04T00:45:16.104729",
+      "todo_count": 5
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-04T00:45:22.802694",
+      "command": "mkdir -p /media/sam/1TB/nautilus_dev/strategies/common/natural_laws",
+      "description": "Create natural laws module directory"
+    },
+    {
+      "operation": "write",
+      "timestamp": "2026-01-04T00:45:32.339026",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/natural_laws/__init__.py",
+      "content_length": 710
+    },
+    {
+      "operation": "write",
+      "timestamp": "2026-01-04T00:46:32.841854",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/natural_laws/system_hrv.py",
+      "content_length": 10908
+    },
+    {
+      "operation": "grep",
+      "timestamp": "2026-01-04T00:46:39.005205",
+      "pattern": "position.?siz|Kelly|risk.?percent|sizing",
+      "path": "/media/sam/1TB/nautilus_dev/specs"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-04T00:46:43.941003",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/011-stop-loss-position-limits/spec.md"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-04T00:47:14.387893",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/027-natural-laws-framework/spec.md",
+      "old_string": "# Spec 027: Natural Laws Trading Framework\n\n**Status**: Draft\n**Priority**: High\n**Complexity**: Med..."
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-04T00:47:19.281151",
+      "command": "mv /media/sam/1TB/nautilus_dev/specs/027-natural-laws-framework /media/sam/1TB/nautilus_dev/specs/027-adaptive-control-framework",
+      "description": "Rename spec to reflect control systems approach"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2026-01-04T00:47:26.572050",
+      "todo_count": 5
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-04T00:47:31.926780",
+      "command": "mv /media/sam/1TB/nautilus_dev/strategies/common/natural_laws /media/sam/1TB/nautilus_dev/strategies/common/adaptive_control",
+      "description": "Rename module to adaptive_control"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-04T00:47:47.474211",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/adaptive_control/__init__.py"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-04T00:48:02.802183",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/adaptive_control/__init__.py",
+      "old_string": "# Natural Laws Trading Framework\n# Applying universal scaling laws to algorithmic trading\n#\n# Based ..."
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-04T00:48:08.435377",
+      "command": "rm -f /media/sam/1TB/nautilus_dev/strategies/common/adaptive_control/system_hrv.py",
+      "description": "Remove old file"
+    },
+    {
+      "operation": "write",
+      "timestamp": "2026-01-04T00:50:28.157512",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/adaptive_control/system_health.py",
+      "content_length": 6861
+    },
+    {
+      "operation": "write",
+      "timestamp": "2026-01-04T00:50:29.306874",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/adaptive_control/kelly_sizer.py",
+      "content_length": 7329
+    },
+    {
+      "operation": "write",
+      "timestamp": "2026-01-04T00:50:29.902396",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/adaptive_control/spectral_regime.py",
+      "content_length": 7042
+    },
+    {
+      "operation": "write",
+      "timestamp": "2026-01-04T00:50:31.406374",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/adaptive_control/pid_drawdown.py",
+      "content_length": 6239
+    },
+    {
+      "operation": "grep",
+      "timestamp": "2026-01-04T00:50:57.725614",
+      "pattern": "giller|Giller|GILLER",
+      "path": "/media/sam/1TB/nautilus_dev"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-04T00:51:02.009640",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/position_sizing/giller_sizing.py"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-04T00:51:18.768646",
+      "command": "rm /media/sam/1TB/nautilus_dev/strategies/common/adaptive_control/kelly_sizer.py",
+      "description": "Remove Kelly - Giller is better"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-04T00:51:26.774131",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/position_sizing/integrated_sizing.py"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2026-01-04T00:51:44.741380",
+      "todo_count": 4
+    },
+    {
+      "operation": "grep",
+      "timestamp": "2026-01-04T00:51:50.588473",
+      "pattern": "meta_confidence|MetaModel|primary_model_correct",
+      "path": "/media/sam/1TB/nautilus_dev/strategies/common"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-04T00:51:55.580505",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/meta_learning/meta_model.py"
+    },
+    {
+      "operation": "grep",
+      "timestamp": "2026-01-04T00:52:10.514861",
+      "pattern": "regime_weight|RegimeDetector|regime_classifier",
+      "path": "/media/sam/1TB/nautilus_dev/strategies/common"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-04T00:52:15.521167",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/regime_detection/regime_manager.py"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-04T00:52:40.715283",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/adaptive_control/__init__.py",
+      "old_string": "# Adaptive Control Trading Framework\n# Practical DSP + Control Theory for algorithmic trading\n#\n# NO..."
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2026-01-04T00:52:52.482556",
+      "todo_count": 4
+    },
+    {
+      "operation": "write",
+      "timestamp": "2026-01-04T00:53:35.455189",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/adaptive_control/regime_integration.py",
+      "content_length": 8213
+    },
+    {
+      "operation": "write",
+      "timestamp": "2026-01-04T00:55:09.565511",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/adaptive_control/meta_controller.py",
+      "content_length": 14085
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-04T00:55:17.911004",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/006-alpha-evolve-core/spec.md"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-04T00:55:30.048689",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/009-alpha-evolve-controller/spec.md"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-04T00:56:10.193011",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/adaptive_control/__init__.py",
+      "old_string": "# Adaptive Control Trading Framework\n# DSP + Control Theory for algorithmic trading\n#\n# Philosophy: ..."
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2026-01-04T00:56:23.441600",
+      "todo_count": 5
+    },
+    {
+      "operation": "write",
+      "timestamp": "2026-01-04T00:57:27.096776",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/adaptive_control/dsp_filters.py",
+      "content_length": 11189
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-04T00:57:44.384075",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/adaptive_control/__init__.py",
+      "old_string": "from .spectral_regime import SpectralRegimeDetector, MarketRegime\nfrom .system_health import SystemH..."
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2026-01-04T00:57:53.415112",
+      "todo_count": 5
+    },
+    {
+      "operation": "mcp__paper-search-mcp__search_arxiv",
+      "timestamp": "2026-01-04T00:58:44.535132",
+      "query": "fractal market hypothesis self-similarity trading Mandelbrot",
+      "max_results": 5
+    },
+    {
+      "operation": "mcp__paper-search-mcp__search_arxiv",
+      "timestamp": "2026-01-04T00:58:45.497075",
+      "query": "biological rhythms circadian trading financial markets cycles",
+      "max_results": 5
+    },
+    {
+      "operation": "mcp__paper-search-mcp__search_semantic",
+      "timestamp": "2026-01-04T00:58:46.445996",
+      "query": "Gann trading angles square of nine mathematical analysis",
+      "max_results": 5
+    },
+    {
+      "operation": "mcp__paper-search-mcp__search_google_scholar",
+      "timestamp": "2026-01-04T00:58:53.570124",
+      "query": "Mandelbrot fractal market hypothesis self-similarity financial",
+      "max_results": 5
+    },
+    {
+      "operation": "mcp__paper-search-mcp__search_arxiv",
+      "timestamp": "2026-01-04T00:58:56.224795",
+      "query": "golden ratio phi Fibonacci financial markets price patterns",
+      "max_results": 5
+    },
+    {
+      "operation": "write",
+      "timestamp": "2026-01-04T01:00:41.771536",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/adaptive_control/universal_laws.py",
+      "content_length": 17604
+    },
+    {
+      "operation": "write",
+      "timestamp": "2026-01-04T01:02:31.903350",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/adaptive_control/vibration_analysis.py",
+      "content_length": 12410
+    },
+    {
+      "operation": "write",
+      "timestamp": "2026-01-04T01:03:54.022497",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/adaptive_control/flow_physics.py",
+      "content_length": 13133
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2026-01-04T01:05:41.160240",
+      "todo_count": 5
+    },
+    {
+      "operation": "write",
+      "timestamp": "2026-01-04T01:07:06.692133",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/adaptive_control/alpha_evolve_bridge.py",
+      "content_length": 14585
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-04T01:07:11.095134",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/adaptive_control/__init__.py"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-04T01:07:22.809437",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/adaptive_control/__init__.py",
+      "old_string": "from .dsp_filters import (\n    IIRLowPass,\n    IIRHighPass,\n    RecursiveVariance,\n    KalmanFilter1..."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-04T01:07:33.205547",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/adaptive_control/__init__.py",
+      "old_string": "    # DSP Filters (O(1) per sample - FAST)\n    \"IIRLowPass\",\n    \"IIRHighPass\",\n    \"RecursiveVarian..."
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-04T01:07:46.445981",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/adaptive_control/regime_integration.py"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-04T01:07:57.416900",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/adaptive_control/regime_integration.py",
+      "old_string": "from .spectral_regime import MarketRegime, SpectralRegimeDetector\n\nif TYPE_CHECKING:"
+    },
+    {
+      "operation": "write",
+      "timestamp": "2026-01-04T01:08:56.137862",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/adaptive_control/multi_dimensional_regime.py",
+      "content_length": 11515
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-04T01:09:07.964439",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/position_sizing/giller_sizing.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-04T01:09:19.154493",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/adaptive_control/__init__.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-04T01:09:27.460190",
+      "file_path": "/media/sam/1TB/nautilus_dev/CLAUDE.md"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-04T01:09:47.164748",
+      "file_path": "/media/sam/1TB/nautilus_dev/CLAUDE.md",
+      "old_string": "**Development Philosophy**: KISS (Keep It Simple) + YAGNI (You Ain't Gonna Need It)\n\n---"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-04T01:09:57.708890",
+      "file_path": "/media/sam/1TB/nautilus_dev/CLAUDE.md",
+      "old_string": "### The Three Pillars:\n1. **Probabilità** (Probability) - Not predictions, but distributions\n2. **No..."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-04T01:10:05.391264",
+      "file_path": "/media/sam/1TB/nautilus_dev/CLAUDE.md",
+      "old_string": "### The Three Pillars (I Tre Pilastri):\n1. **Probabilistico** - Not predictions, but probability dis..."
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2026-01-04T01:10:14.477791",
+      "todo_count": 7
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-04T01:10:21.506021",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/adaptive_control/__init__.py",
+      "old_string": "from .flow_physics import (\n    MarketFlowAnalyzer,\n    FlowState,\n    WaveEquationAnalyzer,\n    Inf..."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-04T01:10:30.420052",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/adaptive_control/__init__.py",
+      "old_string": "    # Flow Physics (markets as fluid systems)\n    \"MarketFlowAnalyzer\",\n    \"FlowState\",\n    \"WaveEq..."
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-04T01:10:36.769609",
+      "command": "python -c \"from strategies.common.adaptive_control import *; print('All imports successful'); print('Exported:', len(__all__), 'items')\"",
+      "description": "Verify adaptive_control imports"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-04T01:10:44.712718",
+      "command": "python -c \"\nfrom strategies.common.adaptive_control import (\n    MetaController, \n    MultiDimensionalRegimeDetector,\n    AdaptiveSurvivalSystem,\n    IIRLowPass,\n    MarketFlowAnalyzer,\n    VibrationAnalyzer,\n)\nprint('Core imports: OK')\nprint('MetaController:', MetaController)\nprint('MultiDimensionalRegimeDetector:', MultiDimensionalRegimeDetector)\nprint('AdaptiveSurvivalSystem:', AdaptiveSurvivalSystem)\n\"",
+      "description": "Verify core imports work"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2026-01-04T01:10:55.514534",
+      "todo_count": 7
+    },
+    {
+      "operation": "glob",
+      "timestamp": "2026-01-04T01:10:59.432748",
+      "pattern": "tests/**/test_adaptive*.py"
+    },
+    {
+      "operation": "write",
+      "timestamp": "2026-01-04T01:12:06.746206",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/strategies/common/test_adaptive_control.py",
+      "content_length": 11607
+    },
+    {
+      "operation": "write",
+      "timestamp": "2026-01-04T01:13:37.877958",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/adaptive_control/information_theory.py",
+      "content_length": 13831
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-04T01:13:48.410479",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/adaptive_control/__init__.py",
+      "old_string": "from .multi_dimensional_regime import (\n    MultiDimensionalRegimeDetector,\n    MultiDimensionalResu..."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-04T01:13:55.831217",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/adaptive_control/__init__.py",
+      "old_string": "    # Multi-Dimensional Regime (consensus from multiple views)\n    \"MultiDimensionalRegimeDetector\",..."
+    },
+    {
+      "operation": "task",
+      "timestamp": "2026-01-04T01:14:03.866940",
+      "subagent_type": "test-runner",
+      "prompt": "Run the tests in `/media/sam/1TB/nautilus_dev/tests/strategies/common/test_adaptive_control.py` with..."
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-04T01:14:13.689828",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run pytest /media/sam/1TB/nautilus_dev/tests/strategies/common/test_adaptive_control.py -v 2>&1",
+      "description": "Run tests with verbose output"
+    },
+    {
+      "operation": "glob",
+      "timestamp": "2026-01-04T01:14:23.699367",
+      "pattern": "**/strategies/common/adaptive*.py",
+      "path": "/media/sam/1TB/nautilus_dev"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-04T01:14:23.738445",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/strategies/common/test_adaptive_control.py"
+    },
+    {
+      "operation": "glob",
+      "timestamp": "2026-01-04T01:14:30.445781",
+      "pattern": "**/adaptive_control.py",
+      "path": "/media/sam/1TB/nautilus_dev"
+    },
+    {
+      "operation": "glob",
+      "timestamp": "2026-01-04T01:14:36.136278",
+      "pattern": "**/adaptive*.py",
+      "path": "/media/sam/1TB/nautilus_dev"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-04T01:14:40.269112",
+      "command": "find /media/sam/1TB/nautilus_dev/strategies -name \"*.py\" -type f 2>/dev/null | head -20",
+      "description": "Find Python files in strategies directory"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-04T01:14:46.813545",
+      "command": "ls -la /media/sam/1TB/nautilus_dev/strategies/common/ 2>/dev/null",
+      "description": "List contents of strategies/common directory"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-04T01:14:50.653965",
+      "command": "ls -la /media/sam/1TB/nautilus_dev/strategies/common/adaptive_control/ 2>/dev/null",
+      "description": "List contents of adaptive_control directory"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-04T01:14:57.211774",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/adaptive_control/__init__.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-04T01:14:57.219953",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/adaptive_control/dsp_filters.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-04T01:14:57.232051",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/adaptive_control/meta_controller.py"
     }
   ],
-  "last_updated": "2026-01-04T00:23:29.520877"
+  "last_updated": "2026-01-04T01:14:57.232066"
 }
