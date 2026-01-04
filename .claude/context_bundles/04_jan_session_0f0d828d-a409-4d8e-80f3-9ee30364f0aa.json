@@ -757,7 +757,36 @@
       "timestamp": "2026-01-04T11:49:16.774562",
       "command": "ruff check strategies/common/adaptive_control/sops_sizing.py 2>/dev/null || python3 -m py_compile strategies/common/adaptive_control/sops_sizing.py && echo \"Syntax OK\"",
       "description": "Lint check sops_sizing.py"
+    },
+    {
+      "operation": "write",
+      "timestamp": "2026-01-04T11:50:23.528646",
+      "file_path": "/media/sam/1TB/nautilus_dev/docs/027-adaptive-control-framework.md",
+      "content_length": 7169
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-04T11:50:31.140170",
+      "command": "python -c \"from strategies.common.adaptive_control import SOPSGillerSizer, TapeSpeed, LuckQuantifier; print('All imports OK')\" 2>&1",
+      "description": "Verify final imports"
+    },
+    {
+      "operation": "write",
+      "timestamp": "2026-01-04T12:03:53.580967",
+      "file_path": "/media/sam/1TB/nautilus_dev/.claude/agents/adaptive-control-architect.md",
+      "content_length": 3997
+    },
+    {
+      "operation": "write",
+      "timestamp": "2026-01-04T12:04:25.532939",
+      "file_path": "/media/sam/1TB/nautilus_dev/.claude/agents/adaptive-control-architect.md",
+      "content_length": 3826
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-04T12:04:33.091118",
+      "file_path": "/media/sam/1TB/nautilus_dev/.claude/settings.local.json"
     }
   ],
-  "last_updated": "2026-01-04T11:49:16.774594"
+  "last_updated": "2026-01-04T12:04:33.091137"
 }
