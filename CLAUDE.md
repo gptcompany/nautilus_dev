@@ -12,7 +12,55 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Native Rust indicators (never reimplement)
 - Parquet/DuckDB for data (streaming, not in-memory)
 
-**Development Philosophy**: KISS (Keep It Simple) + YAGNI (You Ain't Gonna Need It)
+**Development Philosophy**: KISS (Keep It Simple) + YAGNI (You Ain't Gonna Need It) + **PMW (Prove Me Wrong)**
+
+---
+
+## 🟡 VALIDATION PHILOSOPHY: PROVE ME WRONG (PMW)
+
+> **"Cerca attivamente disconferme, non conferme"**
+
+Prima di considerare qualsiasi sistema/strategia valido:
+
+### Mentalità Anti-Confirmation Bias
+- **Cerca paper che CONTRADDICONO** le tue scelte, non solo quelli che confermano
+- **Cerca failure stories** di sistemi simili in produzione
+- **Cerca alternative più SEMPLICI** che potrebbero funzionare meglio
+
+### SWOT Cross-Validation Protocol
+```
+PRIMA DI VALIDARE UN SISTEMA:
+
+1. COUNTER-EVIDENCE SEARCH
+   - Academic critiques (arXiv, SSRN)
+   - Practitioner failures (forum, post-mortem)
+   - Alternative architectures
+
+2. STRUCTURED SWOT
+   - Strengths: cosa funziona davvero?
+   - Weaknesses: dove siamo deboli?
+   - Opportunities: cosa potremmo migliorare?
+   - Threats: cosa potrebbe farci fallire?
+
+3. HONEST VERDICT
+   - GO: procedi con confidence
+   - WAIT: fix issues prima
+   - STOP: ripensa l'approccio
+```
+
+### Queries di Disconferma (Esempi)
+```
+# Invece di cercare "Thompson Sampling works"
+Cerca: "Thompson Sampling non-stationary failure"
+
+# Invece di cercare "regime detection success"
+Cerca: "regime detection out of sample poor performance"
+
+# Invece di cercare "power law sizing optimal"
+Cerca: "position sizing overfitting backtest"
+```
+
+**Reference**: `specs/028-validation/session_prompt_swot.md` - template completo
 
 ---
 
