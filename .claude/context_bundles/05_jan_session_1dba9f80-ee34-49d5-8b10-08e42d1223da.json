@@ -1,0 +1,25 @@
+{
+  "session_id": "1dba9f80-ee34-49d5-8b10-08e42d1223da",
+  "created_at": "2026-01-05T18:01:11.400081",
+  "operations": [
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-05T18:01:11.400101",
+      "command": "echo \"=== market_regime_detection_sota_2025 ===\" && grep -iE '(2023|2024|2025)' docs/research/market_regime_detection_sota_2025.md | head -10",
+      "description": "Check recent citations in market_regime_detection"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-05T18:01:11.427817",
+      "command": "echo \"=== research_vs_repos_analysis ===\" && grep -iE '(2024|2025|2026)' specs/028-validation/research_vs_repos_analysis.md | head -15",
+      "description": "Check recent citations in research_vs_repos"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-05T18:01:21.277367",
+      "command": "echo \"Document Year Citation Analysis:\" && echo \"\" && for year_range in \"pre-2020\" \"2020-2023\" \"2024-2026\"; do echo \"=== $year_range ===\" && case $year_range in \"pre-2020\") pattern=\"(198[0-9]|199[0-9]|200[0-9]|201[0-9])\" ;; \"2020-2023\") pattern=\"(2020|2021|2022|2023)\" ;; \"2024-2026\") pattern=\"(2024|2025|2026)\" ;; esac && for doc in \"MEGA_SYNTHESIS_2026.md\" \"meta-meta-systems-research.md\" \"trading_ml_research_final_2026.md\" \"market_regime_detection_sota_2025.md\" \"luxalgo_roi_swot_ranking.md\"; do count=$(grep -oE \"$pattern\" \"docs/research/$doc\" 2>/dev/null | wc -l) && echo \"$doc: $count mentions\" done && echo \"\" done",
+      "description": "Count year citations by era"
+    }
+  ],
+  "last_updated": "2026-01-05T18:01:21.277385"
+}
