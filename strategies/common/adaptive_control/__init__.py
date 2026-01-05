@@ -46,13 +46,9 @@ from .alpha_evolve_bridge import (
     EvolutionTrigger,
     EvolutionConfig,
 )
-from .universal_laws import (
-    LogarithmicSpiral,
-    FibonacciAnalyzer,
-    FractalDimensionEstimator,
-    NaturalCycleDetector,
-    UniversalLawsAnalyzer,
-)
+
+# NOTE: universal_laws removed (2026-01-05) - PMW validation found no academic evidence
+# for Fibonacci/wave physics in trading. See CLAUDE.md for details.
 from .vibration_analysis import (
     VibrationAnalyzer,
     VibrationMode,
@@ -144,12 +140,7 @@ __all__ = [
     "EvolutionRequest",
     "EvolutionTrigger",
     "EvolutionConfig",
-    # Universal Laws (Gann, Fibonacci, Fractals)
-    "LogarithmicSpiral",
-    "FibonacciAnalyzer",
-    "FractalDimensionEstimator",
-    "NaturalCycleDetector",
-    "UniversalLawsAnalyzer",
+    # NOTE: Universal Laws removed (2026-01-05) - PMW validation
     # Vibration Analysis (cycles, harmonics)
     "VibrationAnalyzer",
     "VibrationMode",
