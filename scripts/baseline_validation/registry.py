@@ -119,16 +119,17 @@ class ContenderRegistry:
 
     @classmethod
     def from_config(cls, config: dict) -> "ContenderRegistry":
-        """Create registry from configuration dict.
+        """Create registry from configuration dict or Pydantic models.
 
         Args:
             config: Dict with contender configurations.
-                Expected format:
+                Expected format (plain dict):
                 {
                     "adaptive": {"enabled": True, "config": {...}},
                     "fixed": {"enabled": True, "config": {...}},
                     "buyhold": {"enabled": True, "config": {...}},
                 }
+                Or dict of ContenderConfig Pydantic models.
 
         Returns:
             Configured ContenderRegistry.
@@ -136,10 +137,18 @@ class ContenderRegistry:
         registry = cls()
 
         for contender_type, contender_config in config.items():
-            if not contender_config.get("enabled", True):
-                continue
+            # Handle both Pydantic ContenderConfig and plain dicts
+            if hasattr(contender_config, "enabled"):
+                # Pydantic model
+                if not contender_config.enabled:
+                    continue
+                sizer_config = contender_config.config
+            else:
+                # Plain dict
+                if not contender_config.get("enabled", True):
+                    continue
+                sizer_config = contender_config.get("config", {})
 
-            sizer_config = contender_config.get("config", {})
             sizer = create_sizer(contender_type, sizer_config)
             registry.register(contender_type, sizer)
 

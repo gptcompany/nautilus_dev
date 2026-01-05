@@ -342,7 +342,30 @@
       "operation": "read",
       "timestamp": "2026-01-05T22:35:04.714250",
       "file_path": "/media/sam/1TB/nautilus_dev/scripts/baseline_validation/comparison_validator.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-05T22:35:34.573065",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/baseline_validation/registry.py"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-05T22:35:42.780976",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/baseline_validation/registry.py",
+      "old_string": "    @classmethod\n    def from_config(cls, config: dict) -> \"ContenderRegistry\":\n        \"\"\"Create re..."
+    },
+    {
+      "operation": "task",
+      "timestamp": "2026-01-05T22:35:49.137137",
+      "subagent_type": "test-runner",
+      "prompt": "Run the Phase 4 tests again after the fix:\n\n```bash\ncd /media/sam/1TB/nautilus_dev\nsource /media/sam..."
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-05T22:35:53.386671",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run pytest tests/test_baseline_validation/test_comparison_validator.py tests/test_baseline_validation/test_walk_forward_integration.py -v --tb=short 2>&1 | head -80",
+      "description": "Run Phase 4 baseline validation tests"
     }
   ],
-  "last_updated": "2026-01-05T22:35:04.714280"
+  "last_updated": "2026-01-05T22:35:53.386694"
 }
