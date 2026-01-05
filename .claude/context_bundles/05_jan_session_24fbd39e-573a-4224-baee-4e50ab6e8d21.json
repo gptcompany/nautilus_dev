@@ -332,7 +332,258 @@
       "timestamp": "2026-01-05T17:35:47.780359",
       "file_path": "/media/sam/1TB/nautilus_dev/docs/research/adaptive-systems-failure-analysis-2020-2025.md",
       "content_length": 32249
+    },
+    {
+      "operation": "mcp__paper-search-mcp__search_arxiv",
+      "timestamp": "2026-01-05T17:36:55.095212",
+      "query": "adaptive position sizing cryptocurrency reinforcement learning 2024 2025",
+      "max_results": 15
+    },
+    {
+      "operation": "mcp__paper-search-mcp__search_semantic",
+      "timestamp": "2026-01-05T17:36:56.344631",
+      "query": "Thompson Sampling portfolio allocation non-stationary",
+      "year": "2023-",
+      "max_results": 10
+    },
+    {
+      "operation": "mcp__paper-search-mcp__search_semantic",
+      "timestamp": "2026-01-05T17:36:57.429491",
+      "query": "regime detection financial markets out of sample performance",
+      "year": "2023-",
+      "max_results": 10
+    },
+    {
+      "operation": "websearch",
+      "timestamp": "2026-01-05T17:37:00.852310",
+      "query": "Renaissance Technologies Medallion Fund adaptive strategy regime switching 2024"
+    },
+    {
+      "operation": "websearch",
+      "timestamp": "2026-01-05T17:37:00.905503",
+      "query": "\"power law\" position sizing trading empirical results site:papers.ssrn.com OR site:arxiv.org"
+    },
+    {
+      "operation": "task",
+      "timestamp": "2026-01-05T17:38:37.820759",
+      "subagent_type": "general-purpose",
+      "prompt": "READ AND ANALYZE EXISTING RESEARCH DOCUMENTS\n\nRead these files and provide a structured summary of t..."
+    },
+    {
+      "operation": "task",
+      "timestamp": "2026-01-05T17:38:37.828267",
+      "subagent_type": "general-purpose",
+      "prompt": "CREATE COMPREHENSIVE RESEARCH UPDATE DOCUMENT\n\nBased on the NEW research findings below, create an u..."
+    },
+    {
+      "operation": "task",
+      "timestamp": "2026-01-05T17:38:37.836805",
+      "subagent_type": "general-purpose",
+      "prompt": "ANALYZE NAUTILUS_DEV IMPLEMENTATIONS VS NEW RESEARCH\n\nSearch the nautilus_dev codebase and compare i..."
+    },
+    {
+      "operation": "task",
+      "timestamp": "2026-01-05T17:38:37.844703",
+      "subagent_type": "general-purpose",
+      "prompt": "CREATE FINAL PROBABILITY MATRIX\n\nBased on all research conducted, create a final probability assessm..."
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-05T17:38:42.180544",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/028-validation/research_vs_repos_analysis.md"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-05T17:38:42.188209",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/028-validation/extreme_edge_discovery_prompt.md"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-05T17:38:42.201176",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/028-validation/extreme_edge_discovery_report.md"
+    },
+    {
+      "operation": "glob",
+      "timestamp": "2026-01-05T17:38:42.836476",
+      "pattern": "docs/research/**/*.md"
+    },
+    {
+      "operation": "glob",
+      "timestamp": "2026-01-05T17:38:42.844970",
+      "pattern": "specs/**/research.md"
+    },
+    {
+      "operation": "glob",
+      "timestamp": "2026-01-05T17:38:42.851949",
+      "pattern": "strategies/common/**/research.md"
+    },
+    {
+      "operation": "glob",
+      "timestamp": "2026-01-05T17:38:44.354231",
+      "pattern": "**/adaptive_control/**/*.py",
+      "path": "/media/sam/1TB/nautilus_dev/strategies/common"
+    },
+    {
+      "operation": "glob",
+      "timestamp": "2026-01-05T17:38:44.361894",
+      "pattern": "**/position_sizing/**/*.py",
+      "path": "/media/sam/1TB/nautilus_dev/strategies/common"
+    },
+    {
+      "operation": "glob",
+      "timestamp": "2026-01-05T17:38:44.371558",
+      "pattern": "**/regime_detection/**/*.py",
+      "path": "/media/sam/1TB/nautilus_dev/strategies/common"
+    },
+    {
+      "operation": "glob",
+      "timestamp": "2026-01-05T17:38:44.379944",
+      "pattern": "**/*fibonacci*.py",
+      "path": "/media/sam/1TB/nautilus_dev/strategies"
+    },
+    {
+      "operation": "glob",
+      "timestamp": "2026-01-05T17:38:44.390874",
+      "pattern": "**/*wave*.py",
+      "path": "/media/sam/1TB/nautilus_dev/strategies"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-05T17:38:47.789044",
+      "file_path": "/media/sam/1TB/nautilus_dev/docs/research/MEGA_SYNTHESIS_2026.md"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-05T17:38:47.795364",
+      "file_path": "/media/sam/1TB/nautilus_dev/docs/research/adaptive-systems-failure-analysis-2020-2025.md"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-05T17:38:47.802654",
+      "file_path": "/media/sam/1TB/nautilus_dev/docs/research/kelly-vs-giller-analysis.md"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-05T17:38:50.533219",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/position_sizing/giller_sizing.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-05T17:38:50.541327",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/position_sizing/integrated_sizing.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-05T17:38:50.552228",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/regime_detection/hmm_filter.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-05T17:38:50.561288",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/regime_detection/gmm_filter.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-05T17:38:50.567677",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/adaptive_control/universal_laws.py"
+    },
+    {
+      "operation": "glob",
+      "timestamp": "2026-01-05T17:38:54.592405",
+      "pattern": "strategies/common/adaptive_control/**/*.md"
+    },
+    {
+      "operation": "glob",
+      "timestamp": "2026-01-05T17:38:54.600586",
+      "pattern": "specs/027*/**/*"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-05T17:38:54.635488",
+      "file_path": "/media/sam/1TB/nautilus_dev/docs/research/market_regime_detection_sota_2025.md"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-05T17:38:57.608470",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/adaptive_control/spectral_regime.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-05T17:38:57.614370",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/adaptive_control/flow_physics.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-05T17:38:57.621322",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/adaptive_control/vibration_analysis.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-05T17:38:57.630806",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/regime_detection/bocd.py"
+    },
+    {
+      "operation": "glob",
+      "timestamp": "2026-01-05T17:39:00.553422",
+      "pattern": "strategies/common/adaptive_control/*.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-05T17:39:00.593156",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/027-adaptive-control-framework/spec.md"
+    },
+    {
+      "operation": "grep",
+      "timestamp": "2026-01-05T17:39:05.467429",
+      "pattern": "Thompson|thompson",
+      "path": "/media/sam/1TB/nautilus_dev/strategies/common",
+      "output_mode": "files_with_matches"
+    },
+    {
+      "operation": "grep",
+      "timestamp": "2026-01-05T17:39:05.473874",
+      "pattern": "Kelly|kelly",
+      "path": "/media/sam/1TB/nautilus_dev/strategies/common",
+      "output_mode": "files_with_matches"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-05T17:39:05.513034",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/adaptive_control/luck_skill.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-05T17:39:05.518029",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/adaptive_control/meta_controller.py"
+    },
+    {
+      "operation": "grep",
+      "timestamp": "2026-01-05T17:39:12.252590",
+      "pattern": "Two Sigma|Giller|Kelly|HMM|regime",
+      "path": "/media/sam/1TB/nautilus_dev/docs",
+      "output_mode": "files_with_matches"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-05T17:39:12.264633",
+      "command": "find /media/sam/1TB/nautilus_dev/docs -name \"*.md\" -o -name \"*.json\" | grep -E \"(research|swot|validation)\" | head -20",
+      "description": "Find research and validation documents"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-05T17:39:18.763356",
+      "file_path": "/media/sam/1TB/nautilus_dev/docs/research/adaptive-systems-failure-analysis-2020-2025.md"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-05T17:39:18.771036",
+      "file_path": "/media/sam/1TB/nautilus_dev/docs/research/kelly-vs-giller-analysis.md"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-05T17:39:18.778954",
+      "file_path": "/media/sam/1TB/nautilus_dev/docs/research/market_regime_detection_sota_2025.md"
     }
   ],
-  "last_updated": "2026-01-05T17:35:47.780376"
+  "last_updated": "2026-01-05T17:39:18.778967"
 }
