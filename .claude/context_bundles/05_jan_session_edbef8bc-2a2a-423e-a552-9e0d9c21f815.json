@@ -875,7 +875,61 @@
       "operation": "todowrite",
       "timestamp": "2026-01-05T22:55:51.286056",
       "todo_count": 4
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-05T22:56:33.321063",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/baseline_validation/verdict.py",
+      "old_string": "def determine_verdict(\n    adaptive_sharpe: float,\n    fixed_sharpe: float,\n    adaptive_max_dd: flo..."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-05T22:56:41.817336",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/baseline_validation/comparison_metrics.py",
+      "old_string": "def _t_distribution_p_value(t: float, df: int) -> float:\n    \"\"\"Approximate p-value from t-distribut..."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-05T22:56:49.624817",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/baseline_validation/cli.py",
+      "old_string": "def _load_config(config_path: str) -> BaselineValidationConfig:\n    \"\"\"Load configuration from YAML ..."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-05T22:56:57.612032",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/baseline_validation/report.py",
+      "old_string": "        # Get p-value from comparison if available\n        p_value = 0.05  # Default\n        if vali..."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-05T22:57:11.811475",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/baseline_validation/verdict.py",
+      "old_string": "def calculate_confidence(\n    window_sharpes: list[float],\n    p_value: float,\n    min_windows: int ..."
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-05T22:57:18.108808",
+      "command": "/media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/python -m pytest tests/test_baseline_validation/ --tb=short -q 2>&1",
+      "description": "Run tests after bug fixes"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-05T22:57:33.357420",
+      "command": "git add scripts/baseline_validation/verdict.py \\\n    scripts/baseline_validation/comparison_metrics.py \\\n    scripts/baseline_validation/cli.py \\\n    scripts/baseline_validation/report.py && \\\ngit commit -m \"$(cat <<'EOF'\nfix(spec-029): Fix 5 bugs found by alpha-debug\n\nBug fixes:\n- B1: Empty YAML file no longer crashes _load_config (cli.py)\n- B2: Use exact match instead of substring for contender names (report.py)\n- B3: Clamp p_value to valid [0,1] range in confidence calc (verdict.py)\n- B4: Handle NaN Sharpe ratios - return WAIT instead of GO (verdict.py)\n- B5: Guard against division by zero when df=0 (comparison_metrics.py)\n\nAll 139 tests passing.\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n)\"",
+      "description": "Commit bug fixes"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-05T22:57:38.392159",
+      "command": "git push origin main 2>&1",
+      "description": "Push to origin"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-05T22:58:04.865772",
+      "command": "git log --oneline -3",
+      "description": "Verify commits pushed"
     }
   ],
-  "last_updated": "2026-01-05T22:55:51.286080"
+  "last_updated": "2026-01-05T22:58:04.865788"
 }
