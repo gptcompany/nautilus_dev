@@ -457,6 +457,18 @@ grep -r "breaking\|deprecated" docs/nautilus/ --include="*.md"
 - **Functions <= 50 lines** - Extract helpers if larger
 - **Write Complete Code Once** - 5 clear lines today > 1 line + future edits
 
+### Spec vs Direct Fix Rule
+
+```
+< 4h + existing code → FIX DIRECTLY (no spec needed)
+> 4h + new module    → /speckit.specify FIRST
+```
+
+**Examples**:
+- Bug fix in existing file → direct fix
+- New 8h audit trail module → create spec first
+- Run existing walk-forward tests → direct execution
+
 ### Important Reminders
 
 #### NEVER
