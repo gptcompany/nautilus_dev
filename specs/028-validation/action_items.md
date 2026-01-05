@@ -4,7 +4,7 @@
 
 | Item | Owner | Effort | File | Line |
 |------|-------|--------|------|------|
-| [ ] Fix `update_strategy_performance()` → `record_strategy_pnl()` | Dev | 30m | alpha_evolve_bridge.py | 384 |
+| [x] Fix `update_strategy_performance()` → `record_strategy_pnl()` | Dev | 30m | alpha_evolve_bridge.py | 384 |
 | [ ] Fix `update()` signature mismatch | Dev | 30m | alpha_evolve_bridge.py | 411 |
 | [ ] Add NaN input guards to MetaController.update() | Dev | 15m | meta_controller.py | 240+ |
 | [ ] Add NaN guards to SystemHealthMonitor.update() | Dev | 15m | system_health.py | 100+ |
