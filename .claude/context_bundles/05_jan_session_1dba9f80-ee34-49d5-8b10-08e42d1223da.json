@@ -37,7 +37,31 @@
       "timestamp": "2026-01-05T18:01:33.174968",
       "command": "echo \"research_vs_repos pre-2020:\" && grep -oE '\\b(198[0-9]|199[0-9]|200[0-9]|201[0-9])\\b' specs/028-validation/research_vs_repos_analysis.md | wc -l && echo \"research_vs_repos 2020-2023:\" && grep -oE '\\b(2020|2021|2022|2023)\\b' specs/028-validation/research_vs_repos_analysis.md | wc -l && echo \"research_vs_repos 2024-2026:\" && grep -oE '\\b(2024|2025|2026)\\b' specs/028-validation/research_vs_repos_analysis.md | wc -l",
       "description": "Count citations by era for research_vs_repos"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-05T18:01:40.173601",
+      "command": "echo \"meta-meta pre-2020:\" && grep -oE '\\b(198[0-9]|199[0-9]|200[0-9]|201[0-9])\\b' docs/research/meta-meta-systems-research.md | wc -l && echo \"meta-meta 2020-2023:\" && grep -oE '\\b(2020|2021|2022|2023)\\b' docs/research/meta-meta-systems-research.md | wc -l && echo \"meta-meta 2024-2026:\" && grep -oE '\\b(2024|2025|2026)\\b' docs/research/meta-meta-systems-research.md | wc -l",
+      "description": "Count citations by era for meta-meta"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-05T18:01:40.673598",
+      "command": "wc -l docs/research/*.md specs/028-validation/research_vs_repos_analysis.md",
+      "description": "Get line counts for all documents"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-05T18:01:48.628042",
+      "command": "echo \"=== Cross-References Analysis ===\" && echo \"\" && echo \"MEGA_SYNTHESIS sources:\" && grep -i \"sources:\" docs/research/MEGA_SYNTHESIS_2026.md | head -3 && echo \"\" && echo \"trading_ml cites MEGA_SYNTHESIS:\" && grep -i \"mega\" docs/research/trading_ml_research_final_2026.md | head -3 && echo \"\" && echo \"research_vs_repos cites others:\" && grep -iE \"(mega|transcendent|master)\" specs/028-validation/research_vs_repos_analysis.md | head -5",
+      "description": "Check document dependencies"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-05T18:01:53.079527",
+      "command": "head -20 docs/research/MEGA_SYNTHESIS_2026.md | grep -i \"source\"",
+      "description": "Check MEGA_SYNTHESIS sources explicitly"
     }
   ],
-  "last_updated": "2026-01-05T18:01:33.174985"
+  "last_updated": "2026-01-05T18:01:53.079544"
 }
