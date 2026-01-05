@@ -263,7 +263,86 @@
       "timestamp": "2026-01-05T22:32:12.162345",
       "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run pytest tests/test_baseline_validation/test_baseline_strategy.py -v --tb=short 2>&1 | head -80",
       "description": "Run baseline strategy tests with verbose output"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2026-01-05T22:32:28.382421",
+      "todo_count": 7
+    },
+    {
+      "operation": "write",
+      "timestamp": "2026-01-05T22:33:06.820057",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/test_baseline_validation/test_comparison_validator.py",
+      "content_length": 6909
+    },
+    {
+      "operation": "write",
+      "timestamp": "2026-01-05T22:33:07.749715",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/test_baseline_validation/test_walk_forward_integration.py",
+      "content_length": 6001
+    },
+    {
+      "operation": "write",
+      "timestamp": "2026-01-05T22:33:49.008078",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/baseline_validation/comparison_validator.py",
+      "content_length": 10978
+    },
+    {
+      "operation": "task",
+      "timestamp": "2026-01-05T22:33:56.316420",
+      "subagent_type": "test-runner",
+      "prompt": "Run the comparison validator and walk-forward integration tests:\n\n```bash\ncd /media/sam/1TB/nautilus..."
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-05T22:34:00.132588",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run pytest tests/test_baseline_validation/test_comparison_validator.py tests/test_baseline_validation/test_walk_forward_integration.py -v --tb=short 2>&1 | head -100",
+      "description": "Run comparison validator and walk-forward integration tests"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-05T22:34:13.625209",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -c \"import nautilus_trader; print(nautilus_trader.__version__)\" 2>&1",
+      "description": "Verify nautilus_trader is installed in the environment"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-05T22:34:19.328395",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -m pytest tests/test_baseline_validation/test_comparison_validator.py tests/test_baseline_validation/test_walk_forward_integration.py -v --tb=short 2>&1 | head -120",
+      "description": "Run tests with python -m pytest instead of uv run"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-05T22:34:35.310631",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -m pytest tests/test_baseline_validation/test_comparison_validator.py tests/test_baseline_validation/test_walk_forward_integration.py -v --tb=short 2>&1 | tail -80",
+      "description": "Get remaining test failures"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-05T22:34:46.376500",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/baseline_validation/registry.py"
+    },
+    {
+      "operation": "glob",
+      "timestamp": "2026-01-05T22:34:51.238521",
+      "pattern": "**/baseline_validation/*.py",
+      "path": "/media/sam/1TB/nautilus_dev"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-05T22:34:55.371679",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/baseline_validation/config_models.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-05T22:35:00.376070",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/baseline_validation/registry.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-05T22:35:04.714250",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/baseline_validation/comparison_validator.py"
     }
   ],
-  "last_updated": "2026-01-05T22:32:12.162364"
+  "last_updated": "2026-01-05T22:35:04.714280"
 }
