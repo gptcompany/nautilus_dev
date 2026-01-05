@@ -19,7 +19,25 @@
       "timestamp": "2026-01-05T18:01:21.277367",
       "command": "echo \"Document Year Citation Analysis:\" && echo \"\" && for year_range in \"pre-2020\" \"2020-2023\" \"2024-2026\"; do echo \"=== $year_range ===\" && case $year_range in \"pre-2020\") pattern=\"(198[0-9]|199[0-9]|200[0-9]|201[0-9])\" ;; \"2020-2023\") pattern=\"(2020|2021|2022|2023)\" ;; \"2024-2026\") pattern=\"(2024|2025|2026)\" ;; esac && for doc in \"MEGA_SYNTHESIS_2026.md\" \"meta-meta-systems-research.md\" \"trading_ml_research_final_2026.md\" \"market_regime_detection_sota_2025.md\" \"luxalgo_roi_swot_ranking.md\"; do count=$(grep -oE \"$pattern\" \"docs/research/$doc\" 2>/dev/null | wc -l) && echo \"$doc: $count mentions\" done && echo \"\" done",
       "description": "Count year citations by era"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-05T18:01:33.141228",
+      "command": "echo \"trading_ml pre-2020:\" && grep -oE '\\b(198[0-9]|199[0-9]|200[0-9]|201[0-9])\\b' docs/research/trading_ml_research_final_2026.md | wc -l && echo \"trading_ml 2020-2023:\" && grep -oE '\\b(2020|2021|2022|2023)\\b' docs/research/trading_ml_research_final_2026.md | wc -l && echo \"trading_ml 2024-2026:\" && grep -oE '\\b(2024|2025|2026)\\b' docs/research/trading_ml_research_final_2026.md | wc -l",
+      "description": "Count citations by era for trading_ml"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-05T18:01:33.152977",
+      "command": "echo \"market_regime pre-2020:\" && grep -oE '\\b(198[0-9]|199[0-9]|200[0-9]|201[0-9])\\b' docs/research/market_regime_detection_sota_2025.md | wc -l && echo \"market_regime 2020-2023:\" && grep -oE '\\b(2020|2021|2022|2023)\\b' docs/research/market_regime_detection_sota_2025.md | wc -l && echo \"market_regime 2024-2026:\" && grep -oE '\\b(2024|2025|2026)\\b' docs/research/market_regime_detection_sota_2025.md | wc -l",
+      "description": "Count citations by era for market_regime"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-05T18:01:33.174968",
+      "command": "echo \"research_vs_repos pre-2020:\" && grep -oE '\\b(198[0-9]|199[0-9]|200[0-9]|201[0-9])\\b' specs/028-validation/research_vs_repos_analysis.md | wc -l && echo \"research_vs_repos 2020-2023:\" && grep -oE '\\b(2020|2021|2022|2023)\\b' specs/028-validation/research_vs_repos_analysis.md | wc -l && echo \"research_vs_repos 2024-2026:\" && grep -oE '\\b(2024|2025|2026)\\b' specs/028-validation/research_vs_repos_analysis.md | wc -l",
+      "description": "Count citations by era for research_vs_repos"
     }
   ],
-  "last_updated": "2026-01-05T18:01:21.277385"
+  "last_updated": "2026-01-05T18:01:33.174985"
 }
