@@ -679,6 +679,225 @@ Fixed Fractional:
 
 ---
 
+## 6. EMD, KALMAN, PARTICLE FILTERS & VOLUME CYCLE DETECTION
+
+**Data Update**: 2026-01-05 (Round 3)
+
+### 6.1 EMD: Quale Versione per P3?
+
+| Variante | Probabilistico | Non-Lineare | Non-Parametrico | Adattivo | P3 Score |
+|----------|---------------|-------------|-----------------|----------|----------|
+| **EMD classico** | ❌ | ✅ | ⚠️ | ❌ | 2/5 |
+| **EEMD** (Ensemble) | ✅ (noise trials) | ✅ | ⚠️ | ❌ | 3/5 |
+| **CEEMDAN** | ✅ | ✅ | ✅ (adaptive noise) | ✅ | **4/5** |
+| **2LE-CEEMDAN** | ✅ | ✅ | ✅ | ✅ | **5/5** |
+| **VMD** (Variational) | ✅ | ✅ | ⚠️ (K modes preset) | ✅ | 3.5/5 |
+
+**Paper chiave**: "2LE-CEEMDAN" (Aksehir 2024) - Riduzione RMSE fino a 96.8% su S&P 500
+
+**Raccomandazione**: **CEEMDAN** o **2LE-CEEMDAN** per rispettare i 5 pilastri
+
+### 6.2 Implementazioni Esistenti in nautilus_dev
+
+| Componente | File | Status | P3 Score |
+|------------|------|--------|----------|
+| **Kalman Filter 1D** | `dsp_filters.py:165-235` | ✅ Implementato | 3/5 |
+| **Particle Filter** | `particle_portfolio.py:63-236` | ✅ Implementato | 5/5 |
+| **Thompson Sampling** | `particle_portfolio.py:257-368` | ✅ Implementato | 5/5 |
+| **Bayesian Ensemble** | `particle_portfolio.py:370-485` | ✅ Implementato | 5/5 |
+| **Spectral (FFT)** | `spectral_regime.py` | ✅ Implementato | 4/5 |
+| **EMD/CEEMDAN** | - | ❌ NON implementato | - |
+
+### 6.3 Volume Cycles: EMD vs Alternative
+
+#### Il Problema Fondamentale
+
+```
+Volume(t) = Σ Partecipazione_i(t) × Intensità_i(t)
+dove i = {HFT, retail, swing, institutional, whale}
+```
+
+**EMD estrae FREQUENZE, non INTENTO dei player**
+
+#### Mapping Teorico EMD → Player
+
+| Player | Scala Temporale | IMF EMD |
+|--------|-----------------|---------|
+| HFT/MM | ms - sec | IMF1-2 (noise) |
+| Retail/Scalper | min - ore | IMF3-4 |
+| Swing Trader | giorni | IMF5-6 |
+| Istituzionale | settimane | IMF7-8 |
+| Whale/Accumulation | mesi | Residuo |
+
+#### ⚠️ LIMITAZIONE CRITICA
+
+```
+Scenario: Whale accumula in 3 giorni con ordini piccoli
+EMD vede: Alta frequenza → IMF3-4 (retail-like)
+Realtà: È un whale che maschera attività
+EMD FALLISCE: guarda FREQUENZA, non INTENTO
+```
+
+### 6.4 Alternative Migliori per Player Detection
+
+| Metodo | Cosa Misura | P3 Score | Implementato? |
+|--------|-------------|----------|---------------|
+| **VPIN** | Prob. informed trading | 4/5 | ❌ |
+| **Kyle's Lambda** | Price impact per volume | 3.5/5 | ❌ |
+| **Order Flow Imbalance** | Buy vs Sell pressure | 4/5 | ❌ |
+| **Volume Clock** | Time-normalized activity | 5/5 | ❌ |
+
+#### VPIN (Volume-Synchronized Probability of Informed Trading)
+
+```python
+VPIN = |Buy_Volume - Sell_Volume| / Total_Volume
+
+# Alto VPIN → informed traders attivi (whale, institutional)
+# Basso VPIN → noise traders dominano (retail, HFT)
+```
+
+#### Kyle's Lambda
+
+```python
+λ = Δprice / Δvolume  # Rolling regression
+
+# Alta λ + alto volume = whale activity
+# Bassa λ + alto volume = HFT/MM providing liquidity
+```
+
+#### Order Flow Imbalance (OFI)
+
+```python
+OFI = Σ (bid_change × volume_at_bid) - Σ (ask_change × volume_at_ask)
+
+# OFI persistente → accumulation/distribution
+# OFI oscillante → market making
+```
+
+### 6.5 Pipeline Raccomandata per Volume/Participation Cycles
+
+```
+Raw Volume
+    ↓
+Volume Clock (adattivo al mercato)
+    ↓
+VPIN calculation (informed vs uninformed)
+    ↓
+CEEMDAN decomposition (cicli multi-scala)
+    ↓
+Particle Filter (regime di partecipazione)
+```
+
+**Rationale**:
+- Volume Clock → Normalizza per attività (non tempo)
+- VPIN → Separa informed/noise PRIMA della decomposizione
+- CEEMDAN su VPIN → Cicli di informed trading (non volume grezzo)
+- Particle Filter → Tracking regime in real-time
+
+### 6.6 Meta-System Architecture (Documento Esistente)
+
+**File trovato**: `/media/sam/1TB/nautilus_dev/docs/research/meta-meta-systems-research.md`
+
+#### Architettura 3-Livelli
+
+```
+LEVEL 3: Meta-Meta Controller (MANCANTE)
+├── Risk budget allocation
+├── Evolution triggers
+├── Circuit breakers
+└── Performance evaluation
+
+LEVEL 2: Meta Controller (IMPLEMENTATO)
+├── SystemHealthMonitor (Polyvagal states)
+├── SpectralRegimeDetector
+├── ThompsonSelector
+├── ParticlePortfolio
+└── SOPSGillerSizer
+
+LEVEL 1: Base Strategies (IMPLEMENTATO)
+├── Signal generation
+├── Order execution
+└── Slippage management
+```
+
+**Key Finding**: 3-level architecture → +20-40% performance vs 2-level
+
+**Gap**: Level 3 Strategic Controller da implementare (vedi `gap_analysis.md`)
+
+### 6.7 Azioni Future
+
+#### EMD/Volume Pipeline
+
+- [ ] Implementare CEEMDAN (PyEMD library)
+- [ ] Implementare VPIN calculator
+- [ ] Implementare Volume Clock bars
+- [ ] Test CEEMDAN su VPIN vs CEEMDAN su raw volume
+- [ ] Integrare con Particle Filter per regime tracking
+
+#### Meta-System
+
+- [ ] Implementare Level 3 Strategic Controller
+- [ ] Aggiungere circuit breakers
+- [ ] Aggiungere risk budget allocation cross-strategy
+
+### 6.8 Paper Accademici Rilevanti
+
+**EMD/CEEMDAN**:
+- Aksehir (2024): "2LE-CEEMDAN" - RMSE -96.8%
+- Zhu & Zhong (2024): "CEEMDAN-LSTM-BN" - Stock volatility
+- Hassan et al. (2025): "CEEMD-PCA-CNN-BiLSTM" - S&P 500
+
+**Volume/Order Flow**:
+- Easley et al. (2012): "Flow Toxicity and Liquidity in a High-Frequency World" (VPIN original)
+- Kyle (1985): "Continuous Auctions and Insider Trading" (Lambda)
+- Cont et al. (2014): "The Price Impact of Order Book Events" (OFI)
+
+**Particle Filters**:
+- Doucet et al. (2001): "Sequential Monte Carlo Methods"
+- Arulampalam et al. (2002): "Tutorial on Particle Filters"
+
+---
+
+## 7. CONCLUSIONE CONSOLIDATA
+
+### Cosa è VALIDATO (Deploy Ready)
+
+| Componente | Evidence | Action |
+|------------|----------|--------|
+| Thompson Sampling | Academic + Two Sigma | ✅ KEEP |
+| Particle Filter | Academic + Practitioner | ✅ KEEP |
+| HMM Regime | Renaissance, Two Sigma | ✅ KEEP |
+| Giller Sizing | Baker 2013, Meyer 2023 | ✅ KEEP |
+| Kalman Filter | Standard control theory | ✅ KEEP |
+
+### Cosa RIMUOVERE
+
+| Componente | Problem | Action |
+|------------|---------|--------|
+| `universal_laws.py` | Fibonacci = pseudoscience | 🔴 DELETE |
+| `vibration_analysis.py` (partial) | Harmonic ratios | 🔴 EXTRACT FFT only |
+
+### Cosa IMPLEMENTARE
+
+| Componente | Priority | Effort |
+|------------|----------|--------|
+| VPIN Calculator | HIGH | 4h |
+| Volume Clock | HIGH | 2h |
+| CEEMDAN | MEDIUM | 8h |
+| Level 3 Controller | HIGH | 16h |
+
+### P3 Pillars Final Status
+
+| Pillar | Status | Evidence |
+|--------|--------|----------|
+| **P1: Probabilistico** | ✅ VALIDATED | Thompson, Particle, Bayesian |
+| **P2: Non Lineare** | ✅ VALIDATED | Giller ^0.5, SOPS tanh |
+| **P3: Non Parametrico** | ✅ VALIDATED | Adaptive k, λ, α |
+| **P4: Scalare** | ⚠️ PARTIAL | Scale-specific tuning needed |
+| **P5: Leggi Naturali** | ❌ REFUTED | Fibonacci da rimuovere |
+
+---
+
 *Documento generato con metodologia PMW (Prove Me Wrong)*
 *Cerca disconferme, non conferme*
-*Round 2: Practitioner evidence + 2024-2026 papers integrated*
+*Round 3: EMD, Kalman, Particle, Volume Cycles, Meta-System integrated*

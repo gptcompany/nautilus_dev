@@ -369,7 +369,61 @@
       "operation": "read",
       "timestamp": "2026-01-05T17:49:00.920771",
       "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/adaptive_control/flow_physics.py"
+    },
+    {
+      "operation": "mcp__paper-search-mcp__search_arxiv",
+      "timestamp": "2026-01-05T17:49:34.159919",
+      "query": "empirical mode decomposition financial markets trading adaptive 2024",
+      "max_results": 10
+    },
+    {
+      "operation": "mcp__paper-search-mcp__search_semantic",
+      "timestamp": "2026-01-05T17:49:35.366818",
+      "query": "ensemble empirical mode decomposition stock prediction non-stationary",
+      "year": "2023-",
+      "max_results": 10
+    },
+    {
+      "operation": "mcp__paper-search-mcp__search_semantic",
+      "timestamp": "2026-01-05T17:49:36.628363",
+      "query": "particle filter portfolio optimization adaptive trading",
+      "year": "2023-",
+      "max_results": 10
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-05T17:54:04.913877",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/028-validation/research_vs_repos_analysis.md",
+      "old_string": "---\n\n*Documento generato con metodologia PMW (Prove Me Wrong)*\n*Cerca disconferme, non conferme*\n*Ro..."
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-05T17:56:01.610621",
+      "command": "find /media/sam/1TB/nautilus_dev/docs/research -name \"*.md\" -type f -exec wc -l {} \\; | sort -rn | head -20",
+      "description": "Find largest research docs"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-05T17:56:04.350360",
+      "command": "find /media/sam/1TB/nautilus_dev/specs -name \"*.md\" -type f -exec wc -l {} \\; | sort -rn | head -20",
+      "description": "Find largest spec docs"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-05T17:56:06.346656",
+      "command": "find /media/sam/1TB/nautilus_dev/docs -name \"*meta*\" -o -name \"*architect*\" -o -name \"*system*\" 2>/dev/null | head -20",
+      "description": "Find meta/architecture docs"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-05T17:56:18.938029",
+      "file_path": "/media/sam/1TB/nautilus_dev/docs/research/MEGA_SYNTHESIS_2026.md"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-05T17:56:18.956357",
+      "file_path": "/media/sam/1TB/nautilus_dev/docs/research/meta-meta-systems-research.md"
     }
   ],
-  "last_updated": "2026-01-05T17:49:00.920786"
+  "last_updated": "2026-01-05T17:56:18.956379"
 }
