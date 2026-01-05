@@ -381,7 +381,7 @@ class AdaptiveSurvivalSystem:
         pnl: float,
     ) -> None:
         """Update performance for a strategy."""
-        self.meta.update_strategy_performance(strategy_name, pnl)
+        self.meta.record_strategy_pnl(strategy_name, pnl)
 
     def process(
         self,
