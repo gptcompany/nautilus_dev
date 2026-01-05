@@ -251,7 +251,19 @@
       "timestamp": "2026-01-05T22:31:42.737543",
       "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run pytest tests/test_baseline_validation/test_sizers.py tests/test_baseline_validation/test_registry.py -v --tb=short 2>&1 | head -100",
       "description": "Run baseline_validation module tests"
+    },
+    {
+      "operation": "task",
+      "timestamp": "2026-01-05T22:32:08.449670",
+      "subagent_type": "test-runner",
+      "prompt": "Run the baseline_strategy tests:\n\n```bash\ncd /media/sam/1TB/nautilus_dev\nsource /media/sam/2TB-NVMe/..."
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-05T22:32:12.162345",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run pytest tests/test_baseline_validation/test_baseline_strategy.py -v --tb=short 2>&1 | head -80",
+      "description": "Run baseline strategy tests with verbose output"
     }
   ],
-  "last_updated": "2026-01-05T22:31:42.737565"
+  "last_updated": "2026-01-05T22:32:12.162364"
 }
