@@ -109,7 +109,7 @@ class AppendOnlyWriter:
             Path to current log file.
         """
         if self._rotate_daily:
-            date_str = datetime.utcnow().strftime("%Y%m%d")
+            date_str = datetime.now(UTC).strftime("%Y%m%d")
             return self._base_path / f"audit_{date_str}.jsonl"
         return self._base_path / "audit.jsonl"
 
@@ -119,7 +119,7 @@ class AppendOnlyWriter:
         Returns:
             File descriptor for writing.
         """
-        today = datetime.utcnow().strftime("%Y%m%d")
+        today = datetime.now(UTC).strftime("%Y%m%d")
 
         # Check if we need to rotate
         if self._fd is None or (self._rotate_daily and self._current_date != today):
