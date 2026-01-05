@@ -320,15 +320,190 @@ STOP_LOSS_PCT = 5  # Non adattivo
 
 ---
 
+---
+
+## 4. NAUTILUS_DEV: Implementazioni Trovate (8,555+ righe)
+
+### 4.1 Position Sizing Stack
+
+| File | Righe | Cosa Fa |
+|------|-------|---------|
+| `strategies/common/position_sizing/giller_sizing.py` | 83 | Power-law: `size = sign(signal) * |signal|^0.5` |
+| `strategies/common/position_sizing/integrated_sizing.py` | 187 | Pipeline completo: Giller + Kelly + Regime + Toxicity |
+| `strategies/common/adaptive_control/sops_sizing.py` | 624 | SOPS (tanh) + TapeSpeed (Poisson lambda) |
+
+**Contro-evidenza applicata**:
+
+| Componente | Hardcoded | Rischio |
+|------------|-----------|---------|
+| Giller exponent=0.5 | SI (default) | Zero validazione cross-domain |
+| SOPS k_base=1.0 | SI | Arbitrario |
+| TapeSpeed alpha=0.1 | SI | Non validato |
+| fractional_kelly=0.5 | SI | Practitioner consensus (OK) |
+
+**AZIONE**: Test Giller vs Fixed 2% vs Half-Kelly su 10 anni
+
+---
+
+### 4.2 Thompson Sampling
+
+| File | Righe | Cosa Fa |
+|------|-------|---------|
+| `strategies/common/adaptive_control/particle_portfolio.py:257-368` | 112 | ThompsonSelector con Beta priors |
+| `strategies/common/adaptive_control/particle_portfolio.py:63-237` | 175 | ParticleFilter per weights |
+| `strategies/common/adaptive_control/particle_portfolio.py:370-466` | 97 | BayesianEnsemble (hybrid) |
+
+**Hardcoded trovati**:
+- `decay = 0.99` (forgetting factor)
+- `scaling = 10` (continuous returns)
+- `Beta(1,1)` prior (uninformativo - OK)
+
+**Contro-evidenza applicata**:
+- TS assume stazionarieta → mercati non-stazionari
+- decay=0.99 potrebbe essere troppo lento per regime shifts
+- NESSUN drift detection (ADWIN) implementato
+
+**AZIONE**:
+- [ ] Aggiungere ADWIN drift detection
+- [ ] Test decay=0.99 vs 0.95 vs 0.9
+
+---
+
+### 4.3 Regime Detection Stack
+
+| File | Righe | Metodo |
+|------|-------|--------|
+| `regime_detection/hmm_filter.py` | 208 | HMM 3-stati |
+| `regime_detection/gmm_filter.py` | 169 | GMM volatility clustering |
+| `adaptive_control/spectral_regime.py` | 215 | 1/f noise (PSD slope) |
+| `adaptive_control/dsp_filters.py` | 400+ | IIR O(1) filters |
+| `adaptive_control/multi_dimensional_regime.py` | 300+ | Consensus multi-detector |
+
+**Hardcoded CRITICI**:
+```python
+# spectral_regime.py
+alpha < 0.5: MEAN_REVERTING
+0.5 <= alpha < 1.5: NORMAL
+alpha >= 1.5: TRENDING
+
+# regime_manager.py
+regime_weights = {
+    TRENDING_UP: 1.0,
+    TRENDING_DOWN: 1.0,
+    RANGING: 0.5,      # HARDCODED
+    VOLATILE: 0.3,     # HARDCODED
+}
+```
+
+**Contro-evidenza applicata**:
+- HMM fallisce OOS (Guidolin 2011)
+- Spectral e LAGGING indicator
+- Soglie 0.5/1.5 sono ARBITRARIE
+- NESSUNA hysteresis implementata
+
+**AZIONE**:
+- [ ] Aggiungere hysteresis (soglie diverse entry/exit)
+- [ ] Test: HMM vs Spectral vs Semplice volatility threshold
+- [ ] Validare regime weights OOS
+
+---
+
+### 4.4 Adaptive Control
+
+| File | Righe | Cosa Fa |
+|------|-------|---------|
+| `adaptive_control/pid_drawdown.py` | 150+ | PID per risk control |
+| `adaptive_control/meta_controller.py` | 200+ | State machine VENTRAL/SYMPATHETIC/DORSAL |
+| `adaptive_control/universal_laws.py` | 400+ | Fibonacci, Gann, Fractals |
+| `adaptive_control/information_theory.py` | 500+ | Entropy-based sizing |
+| `adaptive_control/flow_physics.py` | 400+ | Wave equation, diffusion |
+
+**Hardcoded CRITICI in PID**:
+```python
+Kp = 2.0   # HARDCODED
+Ki = 0.1   # HARDCODED
+Kd = 0.5   # HARDCODED
+target_drawdown = 0.02  # HARDCODED
+```
+
+**Contro-evidenza applicata**:
+- PID gains non hanno validazione in trading
+- Universal Laws (Fibonacci, Gann) = confirmation bias
+- Flow Physics = metafora senza validazione
+- Information Theory applicata a trading = overfitting risk
+
+**AZIONE**:
+- [ ] Test PID gains su range di valori
+- [ ] Confrontare universal_laws vs random baseline
+- [ ] Rimuovere moduli senza validazione OOS
+
+---
+
+### 4.5 Moduli a RISCHIO ALTO
+
+| Modulo | File | Problema |
+|--------|------|----------|
+| `universal_laws.py` | Fibonacci/Gann | Zero evidenza scientifica |
+| `vibration_analysis.py` | Harmonic ratios | Zero validazione |
+| `flow_physics.py` | Wave equations | Metafora non provata |
+| `luck_skill.py` | Skill assessment | Teoricamente sound ma non testato |
+
+**RACCOMANDAZIONE**: Questi moduli dovrebbero essere DISABILITATI fino a validazione OOS.
+
+---
+
+### 4.6 Parametri Totali Contati
+
+| Categoria | Count | Tipo |
+|-----------|-------|------|
+| Position sizing | 15+ | Configurabili |
+| Thompson/Particle | 8+ | Configurabili |
+| Regime detection | 20+ | Mix hardcoded/config |
+| PID control | 5 | HARDCODED |
+| Universal laws | 10+ | HARDCODED (Fibonacci ratios) |
+| **TOTALE** | **~60** | vs 3 per Fixed Fractional |
+
+**Ogni parametro e un'opportunita di overfitting.**
+
+---
+
 ## CONCLUSIONE
 
-### Probabilita Combinate
+### Probabilita Combinate (Aggiornate con nautilus_dev)
 
 | Repository | P(Success) | Azione |
 |------------|------------|--------|
 | Spec-027 | 1-3% | WAIT/STOP |
 | LiquidationHeatmap | ~50% | VALIDATE |
 | UTXOracle | ~55% | VALIDATE |
+| **nautilus_dev/adaptive_control** | ~5% | CRITICAL REVIEW |
+
+### Moduli per Livello di Rischio
+
+| Rischio | Moduli | Azione |
+|---------|--------|--------|
+| **CRITICO** | universal_laws, flow_physics, vibration_analysis | DISABLE |
+| **ALTO** | HMM regime, spectral regime, PID control | TEST vs BASELINE |
+| **MEDIO** | Thompson Sampling, Giller sizing | ADD DRIFT DETECTION |
+| **BASSO** | Particle Filter, fractional Kelly | OK (validati in letteratura) |
+
+### ~60 Parametri vs 3 per Fixed Fractional
+
+```
+Sistema Attuale:
+- 15+ position sizing params
+- 8+ Thompson/Particle params
+- 20+ regime detection params
+- 5 PID hardcoded
+- 10+ universal laws
+= ~60 parametri = ~60 opportunita di overfitting
+
+Fixed Fractional:
+- risk_per_trade = 2%
+- max_positions = 10
+- stop_loss = 5%
+= 3 parametri = controllo semplice
+```
 
 ### Messaggio Chiave
 
