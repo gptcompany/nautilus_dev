@@ -64,44 +64,63 @@ Cerca: "position sizing overfitting backtest"
 
 ---
 
-## 🔴 FUNDAMENTAL PHILOSOPHY: NO FIXED PARAMETERS
+## 🔴 FUNDAMENTAL PHILOSOPHY: ADAPTIVE SIGNALS, FIXED SAFETY
 
 > **"La gabbia la creiamo noi, non il sistema"**
 > (The cage is created by us, not the system)
+>
+> **EXCEPT**: Safety parameters are NOT a cage - they are protection against ruin.
 
 This is the **foundational principle** of our trading system:
 
-### The Five Pillars (I Cinque Pilastri):
+### The Four Pillars (I Quattro Pilastri):
 1. **Probabilistico** - Not predictions, but probability distributions
 2. **Non Lineare** - Power laws, not linear scaling (Giller, Mandelbrot)
 3. **Non Parametrico** - Adaptive to data, not fixed parameters
 4. **Scalare** - Works at any frequency, any asset, any market condition
-5. **Leggi Naturali** - Fibonacci, fractals, wave physics, flow dynamics
 
-### What This Means in Practice:
+> **P5 "Leggi Naturali" REMOVED** (2026-01-05): PMW validation found ZERO academic
+> evidence for Fibonacci/wave physics in trading. Fractals (Mandelbrot) remain valid
+> under P2. See `specs/028-validation/research_vs_repos_analysis.md` for details.
+
+### Signal Parameters (ADAPTIVE):
 
 ```python
-# ❌ WRONG: Fixed parameters trap you
+# ❌ WRONG: Fixed signal parameters trap you
 EMA_PERIOD = 20  # Why 20? Why not 19 or 21?
 RSI_THRESHOLD = 70  # Arbitrary
 
-# ✅ RIGHT: Parameters adapt to data
+# ✅ RIGHT: Signal parameters adapt to data
 alpha = 2.0 / (N + 1)  # Alpha from data characteristics
 threshold = mean + 2 * std  # Dynamic, data-driven
 ```
 
+### Safety Parameters (FIXED - NON-NEGOTIABLE):
+
+```python
+# ✅ CORRECT: Safety parameters are FIXED to prevent ruin
+# Reference: Knight Capital lost $440M in 45 min without these
+MAX_LEVERAGE = 3              # NEVER adaptive
+MAX_POSITION_PCT = 10         # NEVER adaptive (% of portfolio)
+STOP_LOSS_PCT = 5             # NEVER adaptive
+DAILY_LOSS_LIMIT_PCT = 2      # NEVER adaptive
+KILL_SWITCH_DRAWDOWN = 15     # NEVER adaptive (% triggers halt)
+```
+
 ### Implementation Rules:
-- **Default values are STARTING POINTS**, not gospel
+- **Signal defaults are STARTING POINTS**, not gospel
+- **Safety limits are HARD CONSTRAINTS**, non-negotiable
 - **Ratios over absolutes** - invariant to scale
 - **Recursive/online algorithms** - O(1), adapt continuously
 - **Power-law scaling** (Giller: signal^0.5) - like natural systems
 - **Ensemble/consensus** - multiple views, not single truth
 
 ### Anti-Patterns to Avoid:
-- Hardcoded thresholds without justification
-- Fixed lookback windows (use adaptive)
+- Hardcoded signal thresholds without justification
+- Fixed lookback windows for signals (use adaptive)
 - Over-optimized parameters (overfitting)
 - Linear scaling (use sub-linear/power-law)
+- **Adaptive safety limits** (NEVER - leads to ruin)
 
 **Reference**: `strategies/common/adaptive_control/` - the synthesis
 
