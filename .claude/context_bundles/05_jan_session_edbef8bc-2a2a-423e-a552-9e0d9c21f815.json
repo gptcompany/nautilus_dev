@@ -365,7 +365,517 @@
       "timestamp": "2026-01-05T22:35:53.386671",
       "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run pytest tests/test_baseline_validation/test_comparison_validator.py tests/test_baseline_validation/test_walk_forward_integration.py -v --tb=short 2>&1 | head -80",
       "description": "Run Phase 4 baseline validation tests"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-05T22:36:16.272084",
+      "command": "/media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/pytest /media/sam/1TB/nautilus_dev/tests/test_baseline_validation/test_comparison_validator.py /media/sam/1TB/nautilus_dev/tests/test_baseline_validation/test_walk_forward_integration.py -v --tb=short 2>&1 | head -100",
+      "description": "Run Phase 4 tests with nightly pytest"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-05T22:36:21.971226",
+      "command": "ls /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/ 2>&1 | head -20",
+      "description": "Check nightly env bin"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-05T22:36:27.688810",
+      "command": "/media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/python -m pytest tests/test_baseline_validation/test_comparison_validator.py tests/test_baseline_validation/test_walk_forward_integration.py -v --tb=short 2>&1 | head -100",
+      "description": "Run Phase 4 tests with nightly python"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-05T22:36:37.325560",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/test_baseline_validation/test_comparison_validator.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-05T22:37:36.903876",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/test_baseline_validation/test_comparison_validator.py"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-05T22:37:42.947691",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/test_baseline_validation/test_comparison_validator.py",
+      "old_string": "        for name, contender_result in result.contender_results.items():\n            assert hasattr(c..."
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-05T22:37:48.187931",
+      "command": "/media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/python -m pytest tests/test_baseline_validation/test_comparison_validator.py tests/test_baseline_validation/test_walk_forward_integration.py -v 2>&1 | head -60",
+      "description": "Run Phase 4 tests"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-05T22:37:57.950504",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/029-baseline-validation/tasks.md"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-05T22:38:01.677692",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/029-baseline-validation/tasks.md"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-05T22:38:10.057400",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/029-baseline-validation/tasks.md",
+      "old_string": "### Tests for User Story 2\n\n- [ ] T021 [P] [US2] Unit test for comparison validator in `tests/test_b..."
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2026-01-05T22:38:15.086189",
+      "todo_count": 7
+    },
+    {
+      "operation": "write",
+      "timestamp": "2026-01-05T22:38:40.050032",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/test_baseline_validation/test_verdict.py",
+      "content_length": 7149
+    },
+    {
+      "operation": "write",
+      "timestamp": "2026-01-05T22:39:01.348731",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/test_baseline_validation/test_report_models.py",
+      "content_length": 5620
+    },
+    {
+      "operation": "write",
+      "timestamp": "2026-01-05T22:39:27.341794",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/test_baseline_validation/test_report.py",
+      "content_length": 9381
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-05T22:39:34.326347",
+      "command": "/media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/python -m pytest tests/test_baseline_validation/test_verdict.py tests/test_baseline_validation/test_report_models.py tests/test_baseline_validation/test_report.py -v 2>&1 | head -80",
+      "description": "Run Phase 5 tests (RED phase)"
+    },
+    {
+      "operation": "write",
+      "timestamp": "2026-01-05T22:39:57.908401",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/baseline_validation/report_models.py",
+      "content_length": 4049
+    },
+    {
+      "operation": "write",
+      "timestamp": "2026-01-05T22:40:33.442383",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/baseline_validation/verdict.py",
+      "content_length": 4947
+    },
+    {
+      "operation": "write",
+      "timestamp": "2026-01-05T22:41:02.672528",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/baseline_validation/report.py",
+      "content_length": 7643
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-05T22:41:09.000134",
+      "command": "/media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/python -m pytest tests/test_baseline_validation/test_verdict.py tests/test_baseline_validation/test_report_models.py tests/test_baseline_validation/test_report.py -v 2>&1 | head -100",
+      "description": "Run Phase 5 tests (GREEN phase)"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-05T22:41:17.196579",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/baseline_validation/comparison_metrics.py"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-05T22:41:25.586058",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/baseline_validation/report.py",
+      "old_string": "        # Get p-value from comparison if available\n        p_value = 0.05  # Default\n        if vali..."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-05T22:41:34.353935",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/test_baseline_validation/test_verdict.py",
+      "old_string": "    def test_low_confidence_with_few_windows(self) -> None:\n        \"\"\"Test low confidence with few ..."
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-05T22:41:40.596541",
+      "command": "/media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/python -m pytest tests/test_baseline_validation/test_verdict.py tests/test_baseline_validation/test_report_models.py tests/test_baseline_validation/test_report.py -v 2>&1 | tail -30",
+      "description": "Run Phase 5 tests after fixes"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-05T22:41:48.145048",
+      "command": "/media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/python -m pytest tests/test_baseline_validation/ -v 2>&1 | tail -50",
+      "description": "Run all baseline validation tests"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-05T22:42:00.022650",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/029-baseline-validation/tasks.md"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-05T22:42:08.979594",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/029-baseline-validation/tasks.md",
+      "old_string": "### Tests for User Story 3\n\n- [ ] T029 [P] [US3] Unit test for verdict logic in `tests/test_baseline..."
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2026-01-05T22:42:15.877067",
+      "todo_count": 7
+    },
+    {
+      "operation": "write",
+      "timestamp": "2026-01-05T22:42:34.319287",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/test_baseline_validation/test_cli.py",
+      "content_length": 5543
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-05T22:42:39.070388",
+      "command": "/media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/python -m pytest tests/test_baseline_validation/test_cli.py -v 2>&1 | head -30",
+      "description": "Run CLI tests (RED phase)"
+    },
+    {
+      "operation": "write",
+      "timestamp": "2026-01-05T22:43:13.937079",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/baseline_validation/cli.py",
+      "content_length": 7850
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-05T22:43:19.026879",
+      "command": "/media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/python -m pytest tests/test_baseline_validation/test_cli.py -v 2>&1 | head -50",
+      "description": "Run CLI tests (GREEN phase)"
+    },
+    {
+      "operation": "write",
+      "timestamp": "2026-01-05T22:43:49.221925",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/test_baseline_validation/test_integration.py",
+      "content_length": 8423
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-05T22:43:55.181100",
+      "command": "/media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/python -m pytest tests/test_baseline_validation/test_integration.py -v 2>&1",
+      "description": "Run integration tests"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-05T22:44:09.901586",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/test_baseline_validation/test_integration.py",
+      "old_string": "    def test_single_window_validation(self) -> None:\n        \"\"\"Test validation with minimal windows..."
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-05T22:44:14.505421",
+      "command": "/media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/python -m pytest tests/test_baseline_validation/test_integration.py -v 2>&1 | tail -20",
+      "description": "Run integration tests after fix"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-05T22:44:22.475960",
+      "command": "/media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/python -m pytest tests/test_baseline_validation/ -v --tb=no 2>&1 | tail -50",
+      "description": "Run all baseline validation tests"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-05T22:44:37.596677",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/029-baseline-validation/tasks.md",
+      "old_string": "## Phase 6: CLI & Integration\n\n**Purpose**: CLI interface and end-to-end integration\n\n- [ ] T041 Cre..."
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2026-01-05T22:44:43.081700",
+      "todo_count": 7
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-05T22:44:47.121319",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/baseline_validation/__init__.py"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-05T22:45:03.762868",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/baseline_validation/__init__.py",
+      "old_string": "\"\"\"Baseline Validation Framework for NautilusTrader.\n\nThis module provides rigorous validation compa..."
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-05T22:45:11.277388",
+      "command": "/media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/python -c \"\nfrom scripts.baseline_validation import (\n    ComparisonValidator,\n    BaselineValidationConfig,\n    create_report_from_validation_run,\n    Verdict,\n)\n\nconfig = BaselineValidationConfig.default()\nvalidator = ComparisonValidator(config)\nresult = validator.run_mock(seed=42)\nreport = create_report_from_validation_run(result)\nprint(f'Verdict: {report.verdict.value}')\nprint(f'Confidence: {report.confidence:.0%}')\nprint(f'Best: {result.best_contender}')\nprint('Import test passed!')\n\" 2>&1",
+      "description": "Verify package imports work"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-05T22:45:21.737644",
+      "command": "/media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/python -m pytest tests/test_baseline_validation/ --tb=no -q 2>&1",
+      "description": "Final test run"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-05T22:45:39.682219",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/029-baseline-validation/tasks.md",
+      "old_string": "## Phase 7: Polish & Documentation\n\n**Purpose**: Documentation, validation, and performance verifica..."
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2026-01-05T22:45:46.224521",
+      "todo_count": 7
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-05T22:48:57.352547",
+      "command": "git status",
+      "description": "Check git status"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-05T22:48:57.376361",
+      "command": "git diff --stat HEAD",
+      "description": "Check changes to commit"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-05T22:48:57.396367",
+      "command": "git log --oneline -5",
+      "description": "Check recent commits"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-05T22:49:19.574578",
+      "command": "git add scripts/baseline_validation/__init__.py \\\n    scripts/baseline_validation/cli.py \\\n    scripts/baseline_validation/report.py \\\n    scripts/baseline_validation/report_models.py \\\n    scripts/baseline_validation/verdict.py \\\n    tests/test_baseline_validation/test_cli.py \\\n    tests/test_baseline_validation/test_integration.py \\\n    tests/test_baseline_validation/test_report.py \\\n    tests/test_baseline_validation/test_report_models.py \\\n    tests/test_baseline_validation/test_verdict.py \\\n    tests/test_baseline_validation/test_comparison_validator.py \\\n    specs/029-baseline-validation/tasks.md",
+      "description": "Stage spec-029 files"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-05T22:49:25.629266",
+      "command": "git diff --cached --stat",
+      "description": "Check staged changes"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-05T22:49:36.187669",
+      "command": "git commit -m \"$(cat <<'EOF'\nfeat(spec-029): Complete baseline validation framework implementation\n\nImplements PMW (Prove Me Wrong) validation framework for comparing\nadaptive position sizing against simple baselines.\n\nPhase 5-7 completion:\n- verdict.py: GO/WAIT/STOP decision logic with Sharpe edge threshold\n- report_models.py: Pydantic models for ValidationReport, ContenderSummary\n- report.py: Markdown/JSON report generation with comparison tables\n- cli.py: Click-based CLI with run/report/compare commands\n- Full integration tests (139 tests passing)\n\nKey features:\n- Walk-forward validation with embargo periods (Lopez de Prado PKCV)\n- Statistical comparison (t-test, confidence calculation)\n- Configurable via YAML or Pydantic models\n- Reproducible results with seed support\n\nReference: DeMiguel (2009) - \"1/N beats 14 optimization models OOS\"\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n)\"",
+      "description": "Commit spec-029 implementation"
+    },
+    {
+      "operation": "task",
+      "timestamp": "2026-01-05T22:49:44.648680",
+      "subagent_type": "alpha-debug",
+      "prompt": "Run alpha-debug on the baseline validation framework implementation (scripts/baseline_validation/).\n..."
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2026-01-05T22:49:50.287102",
+      "todo_count": 4
+    },
+    {
+      "operation": "glob",
+      "timestamp": "2026-01-05T22:49:55.804813",
+      "pattern": "scripts/baseline_validation/**/*.py",
+      "path": "/media/sam/1TB/nautilus_dev"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-05T22:49:55.812334",
+      "command": "git diff HEAD~3 --stat -- /media/sam/1TB/nautilus_dev/scripts/baseline_validation/ 2>/dev/null | head -30",
+      "description": "Check recent changes to baseline validation"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-05T22:50:06.310678",
+      "command": "wc -l /media/sam/1TB/nautilus_dev/scripts/baseline_validation/*.py 2>/dev/null | tail -1",
+      "description": "Count total lines in baseline validation"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-05T22:50:11.125321",
+      "command": "ls -la /media/sam/1TB/nautilus_dev/scripts/baseline_validation/ 2>/dev/null",
+      "description": "List baseline validation directory"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-05T22:50:18.137868",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/baseline_validation/verdict.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-05T22:50:18.142709",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/baseline_validation/report.py"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2026-01-05T22:50:25.009598",
+      "todo_count": 4
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-05T22:50:31.714239",
+      "command": "uv run pyright scripts/baseline_validation/verdict.py scripts/baseline_validation/report.py scripts/baseline_validation/report_models.py scripts/baseline_validation/cli.py scripts/baseline_validation/comparison_validator.py scripts/baseline_validation/comparison_metrics.py 2>&1 | head -80",
+      "description": "Run pyright type checking on baseline validation"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-05T22:50:33.193863",
+      "command": "uv run ruff check scripts/baseline_validation/ 2>&1 | head -60",
+      "description": "Run ruff linting on baseline validation"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-05T22:50:46.134373",
+      "command": "uv run python -c \"\nfrom scripts.baseline_validation.verdict import determine_verdict\nfrom scripts.baseline_validation.report_models import Verdict\n\n# Test 1: Basic logic - Fixed wins\nresult = determine_verdict(\n    adaptive_sharpe=0.5, \n    fixed_sharpe=0.8, \n    adaptive_max_dd=0.1, \n    fixed_max_dd=0.1\n)\nprint(f'Test 1 - Fixed wins: {result} (expected: STOP)')\n\n# Test 2: Edge too small\nresult = determine_verdict(\n    adaptive_sharpe=0.9, \n    fixed_sharpe=0.8,  # Edge = 0.1, less than 0.2 threshold\n    adaptive_max_dd=0.1, \n    fixed_max_dd=0.1\n)\nprint(f'Test 2 - Small edge: {result} (expected: WAIT)')\n\n# Test 3: Good edge, acceptable drawdown\nresult = determine_verdict(\n    adaptive_sharpe=1.0, \n    fixed_sharpe=0.7,  # Edge = 0.3\n    adaptive_max_dd=0.15, \n    fixed_max_dd=0.1   # Ratio = 1.5, exactly at tolerance\n)\nprint(f'Test 3 - Good edge, borderline DD: {result} (expected: GO)')\n\n# Test 4: Good edge but excessive drawdown\nresult = determine_verdict(\n    adaptive_sharpe=1.0, \n    fixed_sharpe=0.7,  # Edge = 0.3\n    adaptive_max_dd=0.2, \n    fixed_max_dd=0.1   # Ratio = 2.0, exceeds 1.5 tolerance\n)\nprint(f'Test 4 - Good edge, bad DD: {result} (expected: WAIT)')\n\n# Test 5: Edge case - equal sharpes\nresult = determine_verdict(\n    adaptive_sharpe=0.8, \n    fixed_sharpe=0.8, \n    adaptive_max_dd=0.1, \n    fixed_max_dd=0.1\n)\nprint(f'Test 5 - Equal sharpes: {result} (expected: WAIT)')\n\n# Test 6: Edge case - fixed_max_dd = 0\nresult = determine_verdict(\n    adaptive_sharpe=1.0, \n    fixed_sharpe=0.7, \n    adaptive_max_dd=0.1, \n    fixed_max_dd=0.0  # Division by zero risk!\n)\nprint(f'Test 6 - Zero fixed DD: {result} (expected: GO, but check for div/0)')\n\" 2>&1",
+      "description": "Test verdict logic edge cases"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-05T22:51:05.751403",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -c \"\nimport sys\nsys.path.insert(0, '/media/sam/1TB/nautilus_dev')\n\nfrom scripts.baseline_validation.verdict import determine_verdict\nfrom scripts.baseline_validation.report_models import Verdict\n\n# Test 1: Basic logic - Fixed wins\nresult = determine_verdict(\n    adaptive_sharpe=0.5, \n    fixed_sharpe=0.8, \n    adaptive_max_dd=0.1, \n    fixed_max_dd=0.1\n)\nprint(f'Test 1 - Fixed wins: {result} (expected: STOP)')\n\n# Test 2: Edge too small\nresult = determine_verdict(\n    adaptive_sharpe=0.9, \n    fixed_sharpe=0.8,  # Edge = 0.1, less than 0.2 threshold\n    adaptive_max_dd=0.1, \n    fixed_max_dd=0.1\n)\nprint(f'Test 2 - Small edge: {result} (expected: WAIT)')\n\n# Test 3: Good edge, acceptable drawdown\nresult = determine_verdict(\n    adaptive_sharpe=1.0, \n    fixed_sharpe=0.7,  # Edge = 0.3\n    adaptive_max_dd=0.15, \n    fixed_max_dd=0.1   # Ratio = 1.5, exactly at tolerance\n)\nprint(f'Test 3 - Good edge, borderline DD: {result} (expected: GO)')\n\n# Test 4: Good edge but excessive drawdown\nresult = determine_verdict(\n    adaptive_sharpe=1.0, \n    fixed_sharpe=0.7,  # Edge = 0.3\n    adaptive_max_dd=0.2, \n    fixed_max_dd=0.1   # Ratio = 2.0, exceeds 1.5 tolerance\n)\nprint(f'Test 4 - Good edge, bad DD: {result} (expected: WAIT)')\n\n# Test 5: Edge case - equal sharpes\nresult = determine_verdict(\n    adaptive_sharpe=0.8, \n    fixed_sharpe=0.8, \n    adaptive_max_dd=0.1, \n    fixed_max_dd=0.1\n)\nprint(f'Test 5 - Equal sharpes: {result} (expected: WAIT)')\n\n# Test 6: Edge case - fixed_max_dd = 0\nresult = determine_verdict(\n    adaptive_sharpe=1.0, \n    fixed_sharpe=0.7, \n    adaptive_max_dd=0.1, \n    fixed_max_dd=0.0  # Division by zero risk!\n)\nprint(f'Test 6 - Zero fixed DD: {result} (expected: GO, but check for div/0)')\n\n# Test 7: Edge case - Both DDs are 0\nresult = determine_verdict(\n    adaptive_sharpe=1.0, \n    fixed_sharpe=0.7, \n    adaptive_max_dd=0.0, \n    fixed_max_dd=0.0  \n)\nprint(f'Test 7 - Both DDs zero: {result} (expected: GO)')\n\n# Test 8: Negative Sharpes\nresult = determine_verdict(\n    adaptive_sharpe=-0.5, \n    fixed_sharpe=-0.8,  # Both negative, adaptive still better\n    adaptive_max_dd=0.2, \n    fixed_max_dd=0.1\n)\nprint(f'Test 8 - Negative sharpes: {result} (expected: WAIT, edge < 0.2)')\n\" 2>&1",
+      "description": "Test verdict logic with nautilus env"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-05T22:51:18.426598",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -c \"\nimport sys\nsys.path.insert(0, '/media/sam/1TB/nautilus_dev')\n\nfrom scripts.baseline_validation.verdict import calculate_confidence\n\n# Test confidence calculation edge cases\n\n# Test 1: Empty window_sharpes\ntry:\n    result = calculate_confidence([], 0.05)\n    print(f'Test 1 - Empty list: {result} (expected: 0.1)')\nexcept Exception as e:\n    print(f'Test 1 - Empty list CRASHED: {e}')\n\n# Test 2: Single element\nresult = calculate_confidence([1.0], 0.05)\nprint(f'Test 2 - Single element: {result}')\n\n# Test 3: Two elements\nresult = calculate_confidence([1.0, 0.8], 0.05)\nprint(f'Test 3 - Two elements: {result}')\n\n# Test 4: p_value = 0 edge case\nresult = calculate_confidence([1.0, 0.9, 1.1], 0.0)\nprint(f'Test 4 - p_value=0: {result}')\n\n# Test 5: p_value = 1 edge case\nresult = calculate_confidence([1.0, 0.9, 1.1], 1.0)\nprint(f'Test 5 - p_value=1: {result}')\n\n# Test 6: p_value > 1 (invalid but might happen)\ntry:\n    result = calculate_confidence([1.0, 0.9, 1.1], 1.5)\n    print(f'Test 6 - p_value=1.5: {result} (should handle gracefully)')\nexcept Exception as e:\n    print(f'Test 6 - p_value=1.5 CRASHED: {e}')\n\n# Test 7: Negative p_value (invalid)\ntry:\n    result = calculate_confidence([1.0, 0.9, 1.1], -0.1)\n    print(f'Test 7 - p_value=-0.1: {result} (should handle gracefully)')\nexcept Exception as e:\n    print(f'Test 7 - p_value=-0.1 CRASHED: {e}')\n\n# Test 8: All same sharpes (zero variance)\nresult = calculate_confidence([1.0, 1.0, 1.0, 1.0], 0.05)\nprint(f'Test 8 - Zero variance: {result}')\n\n# Test 9: mean = 0 edge case (CV division by zero)\nresult = calculate_confidence([0.5, -0.5], 0.05)\nprint(f'Test 9 - Mean=0: {result}')\n\n# Test 10: All zeros\nresult = calculate_confidence([0.0, 0.0, 0.0], 0.05)\nprint(f'Test 10 - All zeros: {result}')\n\" 2>&1",
+      "description": "Test calculate_confidence edge cases"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-05T22:51:34.307319",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -c \"\nimport sys\nsys.path.insert(0, '/media/sam/1TB/nautilus_dev')\n\nfrom scripts.baseline_validation.comparison_metrics import (\n    calculate_win_loss_ratio, \n    calculate_t_statistic,\n    calculate_sharpe_difference,\n    calculate_contender_metrics,\n)\n\n# Test comparison_metrics edge cases\n\nprint('=== calculate_win_loss_ratio ===')\n\n# Test 1: Length mismatch\ntry:\n    result = calculate_win_loss_ratio([0.1, 0.2], [0.1])\n    print(f'Test 1 - Length mismatch: {result}')\nexcept ValueError as e:\n    print(f'Test 1 - Length mismatch raises: {e}')\n\n# Test 2: Empty lists\ntry:\n    result = calculate_win_loss_ratio([], [])\n    print(f'Test 2 - Empty lists: {result}')\nexcept Exception as e:\n    print(f'Test 2 - Empty lists CRASHED: {e}')\n\n# Test 3: All ties\nresult = calculate_win_loss_ratio([0.1, 0.2, 0.3], [0.1, 0.2, 0.3])\nprint(f'Test 3 - All ties: {result} (expected: 1.0)')\n\n# Test 4: B never wins\nresult = calculate_win_loss_ratio([0.3, 0.4, 0.5], [0.1, 0.2, 0.3])\nprint(f'Test 4 - B never wins: {result} (expected: inf)')\n\n# Test 5: A never wins\nresult = calculate_win_loss_ratio([0.1, 0.2, 0.3], [0.3, 0.4, 0.5])\nprint(f'Test 5 - A never wins: {result} (expected: 0)')\n\nprint()\nprint('=== calculate_t_statistic ===')\n\n# Test 6: n < 2\nt, p = calculate_t_statistic([0.1], [0.05])\nprint(f'Test 6 - n=1: t={t}, p={p}')\n\n# Test 7: All identical differences\nt, p = calculate_t_statistic([0.1, 0.2, 0.3], [0.05, 0.15, 0.25])\nprint(f'Test 7 - Identical diff=0.05: t={t}, p={p}')\n\nprint()\nprint('=== calculate_sharpe_difference ===')\n\n# Test 8: sharpe_b = 0\nabs_diff, pct_diff = calculate_sharpe_difference(0.5, 0.0)\nprint(f'Test 8 - sharpe_b=0: abs={abs_diff}, pct={pct_diff}')\n\n# Test 9: sharpe_a = 0, sharpe_b = 0\nabs_diff, pct_diff = calculate_sharpe_difference(0.0, 0.0)\nprint(f'Test 9 - Both zero: abs={abs_diff}, pct={pct_diff}')\n\n# Test 10: Very small sharpe_b\nabs_diff, pct_diff = calculate_sharpe_difference(0.5, 1e-15)\nprint(f'Test 10 - Very small sharpe_b: abs={abs_diff}, pct={pct_diff}')\n\nprint()\nprint('=== calculate_contender_metrics ===')\n\n# Test 11: Empty inputs\nmetrics = calculate_contender_metrics('test', [], [], [], [])\nprint(f'Test 11 - Empty: avg_sharpe={metrics.avg_sharpe}, win_rate={metrics.win_rate}')\n\n# Test 12: Single element\nmetrics = calculate_contender_metrics('test', [1.0], [0.05], [0.1], [50])\nprint(f'Test 12 - Single: avg_sharpe={metrics.avg_sharpe}, std_sharpe={metrics.std_sharpe}')\n\" 2>&1",
+      "description": "Test comparison_metrics edge cases"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-05T22:51:49.406618",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -c \"\nimport sys\nsys.path.insert(0, '/media/sam/1TB/nautilus_dev')\n\nfrom scripts.baseline_validation.report_models import ContenderSummary, ValidationReport, Verdict\nfrom datetime import datetime\n\n# Test report_models validation edge cases\n\nprint('=== ContenderSummary ===')\n\n# Test 1: Valid summary\ntry:\n    summary = ContenderSummary(\n        name='test',\n        avg_sharpe=1.0,\n        std_sharpe=0.2,\n        max_drawdown=0.1,\n        win_rate=0.5,\n        total_trades=100\n    )\n    print(f'Test 1 - Valid: OK')\nexcept Exception as e:\n    print(f'Test 1 - Valid FAILED: {e}')\n\n# Test 2: Negative std_sharpe\ntry:\n    summary = ContenderSummary(\n        name='test',\n        avg_sharpe=1.0,\n        std_sharpe=-0.2,  # Invalid\n        max_drawdown=0.1,\n        win_rate=0.5,\n        total_trades=100\n    )\n    print(f'Test 2 - Negative std: FAILED TO VALIDATE')\nexcept Exception as e:\n    print(f'Test 2 - Negative std: Correctly rejected: {type(e).__name__}')\n\n# Test 3: win_rate > 1\ntry:\n    summary = ContenderSummary(\n        name='test',\n        avg_sharpe=1.0,\n        std_sharpe=0.2,\n        max_drawdown=0.1,\n        win_rate=1.5,  # Invalid\n        total_trades=100\n    )\n    print(f'Test 3 - win_rate > 1: FAILED TO VALIDATE')\nexcept Exception as e:\n    print(f'Test 3 - win_rate > 1: Correctly rejected: {type(e).__name__}')\n\n# Test 4: max_drawdown > 1\ntry:\n    summary = ContenderSummary(\n        name='test',\n        avg_sharpe=1.0,\n        std_sharpe=0.2,\n        max_drawdown=1.5,  # Invalid\n        win_rate=0.5,\n        total_trades=100\n    )\n    print(f'Test 4 - max_dd > 1: FAILED TO VALIDATE')\nexcept Exception as e:\n    print(f'Test 4 - max_dd > 1: Correctly rejected: {type(e).__name__}')\n\n# Test 5: Negative win_rate\ntry:\n    summary = ContenderSummary(\n        name='test',\n        avg_sharpe=1.0,\n        std_sharpe=0.2,\n        max_drawdown=0.1,\n        win_rate=-0.1,  # Invalid\n        total_trades=100\n    )\n    print(f'Test 5 - Negative win_rate: FAILED TO VALIDATE')\nexcept Exception as e:\n    print(f'Test 5 - Negative win_rate: Correctly rejected: {type(e).__name__}')\n\nprint()\nprint('=== ValidationReport ===')\n\n# Test 6: window_count = 0\ntry:\n    report = ValidationReport(\n        run_id='test',\n        timestamp=datetime.now(),\n        verdict=Verdict.GO,\n        confidence=0.8,\n        recommendation='test',\n        contender_summaries={},\n        window_count=0,  # Invalid per ge=1\n        data_start=datetime(2015, 1, 1),\n        data_end=datetime(2025, 1, 1)\n    )\n    print(f'Test 6 - window_count=0: FAILED TO VALIDATE')\nexcept Exception as e:\n    print(f'Test 6 - window_count=0: Correctly rejected: {type(e).__name__}')\n\n# Test 7: confidence > 1\ntry:\n    report = ValidationReport(\n        run_id='test',\n        timestamp=datetime.now(),\n        verdict=Verdict.GO,\n        confidence=1.5,  # Invalid\n        recommendation='test',\n        contender_summaries={},\n        window_count=5,\n        data_start=datetime(2015, 1, 1),\n        data_end=datetime(2025, 1, 1)\n    )\n    print(f'Test 7 - confidence > 1: FAILED TO VALIDATE')\nexcept Exception as e:\n    print(f'Test 7 - confidence > 1: Correctly rejected: {type(e).__name__}')\n\" 2>&1",
+      "description": "Test report_models validation"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-05T22:52:03.846914",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -c \"\nimport sys\nsys.path.insert(0, '/media/sam/1TB/nautilus_dev')\n\nfrom scripts.baseline_validation.cli import _load_config, _format_text_output\nfrom scripts.baseline_validation.report_models import ValidationReport, Verdict, ContenderSummary\nfrom datetime import datetime\nimport tempfile\nimport os\n\nprint('=== CLI _load_config ===')\n\n# Test 1: Non-existent file (should raise)\ntry:\n    config = _load_config('/nonexistent/path.yaml')\n    print('Test 1 - Non-existent: SHOULD HAVE RAISED')\nexcept FileNotFoundError:\n    print('Test 1 - Non-existent: Correctly raised FileNotFoundError')\nexcept Exception as e:\n    print(f'Test 1 - Non-existent: Raised {type(e).__name__}: {e}')\n\n# Test 2: Empty YAML file\nwith tempfile.NamedTemporaryFile(mode='w', suffix='.yaml', delete=False) as f:\n    f.write('')\n    f.flush()\n    try:\n        config = _load_config(f.name)\n        print(f'Test 2 - Empty YAML: Got default config, seed={config.seed}')\n    except Exception as e:\n        print(f'Test 2 - Empty YAML: CRASHED with {type(e).__name__}: {e}')\n    finally:\n        os.unlink(f.name)\n\n# Test 3: Invalid YAML\nwith tempfile.NamedTemporaryFile(mode='w', suffix='.yaml', delete=False) as f:\n    f.write('{{invalid yaml')\n    f.flush()\n    try:\n        config = _load_config(f.name)\n        print('Test 3 - Invalid YAML: SHOULD HAVE RAISED')\n    except Exception as e:\n        print(f'Test 3 - Invalid YAML: Correctly raised {type(e).__name__}')\n    finally:\n        os.unlink(f.name)\n\n# Test 4: Valid YAML with partial config\nwith tempfile.NamedTemporaryFile(mode='w', suffix='.yaml', delete=False) as f:\n    f.write('seed: 123\\\\nvalidation:\\\\n  train_months: 24')\n    f.flush()\n    try:\n        config = _load_config(f.name)\n        print(f'Test 4 - Partial config: seed={config.seed}, train_months={config.validation.train_months}')\n    except Exception as e:\n        print(f'Test 4 - Partial config: CRASHED with {type(e).__name__}: {e}')\n    finally:\n        os.unlink(f.name)\n\nprint()\nprint('=== CLI _format_text_output ===')\n\n# Test 5: Empty contender_summaries\ntry:\n    report = ValidationReport(\n        run_id='test',\n        timestamp=datetime.now(),\n        verdict=Verdict.GO,\n        confidence=0.8,\n        recommendation='test recommendation',\n        contender_summaries={},\n        window_count=5,\n        data_start=datetime(2015, 1, 1),\n        data_end=datetime(2025, 1, 1)\n    )\n    output = _format_text_output(report)\n    print(f'Test 5 - Empty summaries: OK, {len(output)} chars')\nexcept Exception as e:\n    print(f'Test 5 - Empty summaries: CRASHED with {type(e).__name__}: {e}')\n\" 2>&1",
+      "description": "Test CLI edge cases"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-05T22:52:16.217884",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -c \"\nimport sys\nsys.path.insert(0, '/media/sam/1TB/nautilus_dev')\n\nfrom scripts.baseline_validation.report import create_report_from_validation_run, format_comparison_table\nfrom scripts.baseline_validation.report_models import ContenderSummary\n\nprint('=== format_comparison_table ===')\n\n# Test 1: Empty summaries dict\ntry:\n    result = format_comparison_table({})\n    print(f'Test 1 - Empty: OK, output length={len(result)}')\nexcept Exception as e:\n    print(f'Test 1 - Empty: CRASHED with {type(e).__name__}: {e}')\n\n# Test 2: Single contender\nsummaries = {\n    'adaptive': ContenderSummary(\n        name='adaptive',\n        avg_sharpe=1.0,\n        std_sharpe=0.2,\n        max_drawdown=0.1,\n        win_rate=0.6,\n        total_trades=100\n    )\n}\ntry:\n    result = format_comparison_table(summaries)\n    print(f'Test 2 - Single contender: OK')\nexcept Exception as e:\n    print(f'Test 2 - Single contender: CRASHED with {type(e).__name__}: {e}')\n\nprint()\nprint('=== report pairwise comparison lookup ===')\n\n# Check the pairwise comparison lookup logic in create_report_from_validation_run\n# The issue is at line 81: 'if \\\"adaptive\\\" in pw.contender_a and \\\"fixed\\\" in pw.contender_b'\n# This uses substring matching, not exact matching!\n\nprint('Substring matching issue:')\ntest_cases = [\n    ('adaptive', 'fixed'),        # Should match\n    ('adaptive_v2', 'fixed'),     # Would also match (unintended!)\n    ('my_adaptive', 'fixed'),     # Would also match (unintended!)\n    ('adaptive', 'fixed_2pct'),   # Would also match (unintended!)\n]\nfor a, b in test_cases:\n    matches = 'adaptive' in a and 'fixed' in b\n    print(f'  contender_a={a!r}, contender_b={b!r}: matches={matches}')\n\" 2>&1",
+      "description": "Test report format and lookup logic"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-05T22:52:29.210858",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -c \"\nimport sys\nsys.path.insert(0, '/media/sam/1TB/nautilus_dev')\n\nfrom scripts.baseline_validation.comparison_validator import ComparisonValidator, create_comparison_validator\nfrom datetime import datetime\n\nprint('=== ComparisonValidator.generate_windows ===')\n\n# Test 1: Very short data range (might generate 0 windows)\nvalidator = create_comparison_validator(\n    data_start=datetime(2024, 1, 1),\n    data_end=datetime(2024, 3, 1),   # Only 2 months, but train=12, test=1\n    train_months=12,\n    test_months=1\n)\nwindows = validator.generate_windows()\nprint(f'Test 1 - Short data range: {len(windows)} windows (train=12m, test=1m, data=2m)')\n\n# Test 2: Normal range\nvalidator = create_comparison_validator(\n    data_start=datetime(2015, 1, 1),\n    data_end=datetime(2025, 1, 1),\n    train_months=12,\n    test_months=1\n)\nwindows = validator.generate_windows()\nprint(f'Test 2 - 10 years: {len(windows)} windows')\n\n# Test 3: Exactly enough data for one window\nvalidator = create_comparison_validator(\n    data_start=datetime(2024, 1, 1),\n    data_end=datetime(2025, 2, 1),   # 13 months (train=12 + test=1)\n    train_months=12,\n    test_months=1\n)\nwindows = validator.generate_windows()\nprint(f'Test 3 - Exactly one window: {len(windows)} windows')\n\nprint()\nprint('=== ContenderResult properties with empty lists ===')\nfrom scripts.baseline_validation.comparison_validator import ContenderResult\n\n# Test 4: Empty ContenderResult\nresult = ContenderResult(\n    name='test',\n    window_sharpes=[],\n    window_returns=[],\n    window_drawdowns=[],\n    window_trade_counts=[]\n)\nprint(f'Test 4 - Empty result:')\nprint(f'  avg_sharpe={result.avg_sharpe}')\nprint(f'  std_sharpe={result.std_sharpe}')\nprint(f'  avg_return={result.avg_return}')\nprint(f'  max_drawdown={result.max_drawdown}')\nprint(f'  total_trades={result.total_trades}')\nprint(f'  win_rate={result.win_rate}')\n\" 2>&1",
+      "description": "Test comparison_validator edge cases"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-05T22:52:40.175825",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -c \"\nimport sys\nsys.path.insert(0, '/media/sam/1TB/nautilus_dev')\n\nfrom scripts.baseline_validation.comparison_validator import ComparisonValidator, ContenderResult\nfrom scripts.baseline_validation.config_models import BaselineValidationConfig\n\nprint('=== ContenderResult properties with empty lists ===')\n\n# Test 1: Empty ContenderResult\nresult = ContenderResult(\n    name='test',\n    window_sharpes=[],\n    window_returns=[],\n    window_drawdowns=[],\n    window_trade_counts=[]\n)\nprint(f'Test 1 - Empty result:')\nprint(f'  avg_sharpe={result.avg_sharpe}')\nprint(f'  std_sharpe={result.std_sharpe}')\nprint(f'  avg_return={result.avg_return}')\nprint(f'  max_drawdown={result.max_drawdown}')\nprint(f'  total_trades={result.total_trades}')\nprint(f'  win_rate={result.win_rate}')\n\nprint()\nprint('=== ComparisonValidator with default config ===')\n\n# Test 2: Default config\nconfig = BaselineValidationConfig.default()\nvalidator = ComparisonValidator(config)\nwindows = validator.generate_windows()\nprint(f'Test 2 - Default config: {len(windows)} windows')\n\n# Test 3: Run mock and check report generation\nresult = validator.run_mock(seed=42)\nprint(f'Test 3 - Mock run:')\nprint(f'  contenders: {list(result.contender_results.keys())}')\nprint(f'  best_contender: {result.best_contender}')\nprint(f'  best_sharpe: {result.best_sharpe:.3f}')\n\n# Check if comparison has pairwise results\nif result.comparison:\n    print(f'  pairwise_comparisons: {len(result.comparison.pairwise_comparisons)}')\n    for pw in result.comparison.pairwise_comparisons:\n        print(f'    {pw.contender_a} vs {pw.contender_b}: p={pw.p_value:.4f}, a_beats_b={pw.a_beats_b}')\n\" 2>&1",
+      "description": "Test ContenderResult and ComparisonValidator"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2026-01-05T22:52:56.555406",
+      "todo_count": 4
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-05T22:53:11.363706",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -c \"\nimport sys\nsys.path.insert(0, '/media/sam/1TB/nautilus_dev')\n\nfrom scripts.baseline_validation.report import create_report_from_validation_run\nfrom scripts.baseline_validation.comparison_validator import ComparisonValidator, ValidationRun, ContenderResult\nfrom scripts.baseline_validation.config_models import BaselineValidationConfig\nfrom datetime import datetime\n\nprint('=== create_report_from_validation_run edge cases ===')\n\n# Test 1: Missing 'adaptive' contender\nconfig = BaselineValidationConfig.default()\nvalidator = ComparisonValidator(config)\n\n# Create a mock ValidationRun with only 'fixed' contender\nmock_run = ValidationRun(\n    config_hash='test123',\n    run_timestamp=datetime.now(),\n    windows=validator.generate_windows()[:5],  # Just 5 windows\n    contender_results={\n        'fixed': ContenderResult(\n            name='fixed',\n            window_sharpes=[0.8, 0.9, 0.85, 0.82, 0.88],\n            window_returns=[0.03, 0.04, 0.035, 0.032, 0.038],\n            window_drawdowns=[0.1, 0.12, 0.11, 0.1, 0.11],\n            window_trade_counts=[50, 55, 52, 48, 53]\n        ),\n        'buyhold': ContenderResult(\n            name='buyhold',\n            window_sharpes=[0.6, 0.5, 0.55, 0.52, 0.58],\n            window_returns=[0.02, 0.01, 0.015, 0.012, 0.018],\n            window_drawdowns=[0.15, 0.18, 0.16, 0.14, 0.17],\n            window_trade_counts=[1, 1, 1, 1, 1]\n        )\n    },\n    comparison=None\n)\n\ntry:\n    report = create_report_from_validation_run(mock_run)\n    print(f'Test 1 - Missing adaptive:')\n    print(f'  verdict: {report.verdict}')\n    print(f'  confidence: {report.confidence}')\n    print(f'  recommendation: {report.recommendation}')\nexcept Exception as e:\n    print(f'Test 1 - Missing adaptive: CRASHED with {type(e).__name__}: {e}')\n\nprint()\n\n# Test 2: Missing 'fixed' contender\nmock_run2 = ValidationRun(\n    config_hash='test123',\n    run_timestamp=datetime.now(),\n    windows=validator.generate_windows()[:5],\n    contender_results={\n        'adaptive': ContenderResult(\n            name='adaptive',\n            window_sharpes=[1.0, 1.1, 0.95, 1.02, 1.08],\n            window_returns=[0.05, 0.055, 0.048, 0.052, 0.058],\n            window_drawdowns=[0.12, 0.14, 0.13, 0.11, 0.12],\n            window_trade_counts=[60, 65, 62, 58, 63]\n        )\n    },\n    comparison=None\n)\n\ntry:\n    report = create_report_from_validation_run(mock_run2)\n    print(f'Test 2 - Missing fixed:')\n    print(f'  verdict: {report.verdict}')\n    print(f'  confidence: {report.confidence}')\n    print(f'  recommendation: {report.recommendation}')\nexcept Exception as e:\n    print(f'Test 2 - Missing fixed: CRASHED with {type(e).__name__}: {e}')\n\nprint()\n\n# Test 3: Empty contender_results\nmock_run3 = ValidationRun(\n    config_hash='test123',\n    run_timestamp=datetime.now(),\n    windows=validator.generate_windows()[:5],\n    contender_results={},\n    comparison=None\n)\n\ntry:\n    report = create_report_from_validation_run(mock_run3)\n    print(f'Test 3 - Empty contenders:')\n    print(f'  verdict: {report.verdict}')\n    print(f'  confidence: {report.confidence}')\nexcept Exception as e:\n    print(f'Test 3 - Empty contenders: CRASHED with {type(e).__name__}: {e}')\n\" 2>&1",
+      "description": "Test report creation with missing contenders"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-05T22:53:19.922107",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -c \"\nimport sys\nsys.path.insert(0, '/media/sam/1TB/nautilus_dev')\n\nfrom scripts.baseline_validation.report import create_report_from_validation_run\nfrom scripts.baseline_validation.comparison_validator import ComparisonValidator, ValidationRun, ContenderResult\nfrom scripts.baseline_validation.config_models import BaselineValidationConfig\nfrom datetime import datetime\n\nprint('=== create_report_from_validation_run with empty windows ===')\n\nconfig = BaselineValidationConfig.default()\nvalidator = ComparisonValidator(config)\n\n# Test: Empty windows list\nmock_run = ValidationRun(\n    config_hash='test123',\n    run_timestamp=datetime.now(),\n    windows=[],  # Empty!\n    contender_results={\n        'adaptive': ContenderResult(\n            name='adaptive',\n            window_sharpes=[],\n            window_returns=[],\n            window_drawdowns=[],\n            window_trade_counts=[]\n        ),\n        'fixed': ContenderResult(\n            name='fixed',\n            window_sharpes=[],\n            window_returns=[],\n            window_drawdowns=[],\n            window_trade_counts=[]\n        )\n    },\n    comparison=None\n)\n\ntry:\n    report = create_report_from_validation_run(mock_run)\n    print(f'Test - Empty windows:')\n    print(f'  window_count: {report.window_count}')\n    print(f'  data_start: {report.data_start}')\n    print(f'  data_end: {report.data_end}')\nexcept Exception as e:\n    print(f'Test - Empty windows: CRASHED with {type(e).__name__}: {e}')\n\" 2>&1",
+      "description": "Test report creation with empty windows"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-05T22:53:34.184623",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -c \"\nimport sys\nsys.path.insert(0, '/media/sam/1TB/nautilus_dev')\n\nfrom scripts.baseline_validation.verdict import determine_verdict, generate_recommendation\nfrom scripts.baseline_validation.report_models import Verdict\n\nprint('=== verdict edge cases with extreme values ===')\n\n# Test 1: Extremely high Sharpe values\nresult = determine_verdict(\n    adaptive_sharpe=100.0,  # Unrealistic\n    fixed_sharpe=99.5,\n    adaptive_max_dd=0.01,\n    fixed_max_dd=0.01\n)\nprint(f'Test 1 - Very high sharpes (100 vs 99.5): {result}')\n\n# Test 2: Very negative Sharpes\nresult = determine_verdict(\n    adaptive_sharpe=-10.0,\n    fixed_sharpe=-15.0,  # Fixed worse\n    adaptive_max_dd=0.5,\n    fixed_max_dd=0.3\n)\nprint(f'Test 2 - Negative sharpes (-10 vs -15): {result}')\n# Edge = -10 - (-15) = 5.0, which is > 0.2\n# DD ratio = 0.5/0.3 = 1.67 > 1.5\n# Should be WAIT due to DD\n\n# Test 3: NaN handling (if floats ever become NaN)\nimport math\ntry:\n    result = determine_verdict(\n        adaptive_sharpe=float('nan'),\n        fixed_sharpe=0.8,\n        adaptive_max_dd=0.1,\n        fixed_max_dd=0.1\n    )\n    print(f'Test 3 - NaN adaptive sharpe: {result}')\nexcept Exception as e:\n    print(f'Test 3 - NaN: CRASHED with {type(e).__name__}: {e}')\n\n# Test 4: Infinity handling\ntry:\n    result = determine_verdict(\n        adaptive_sharpe=float('inf'),\n        fixed_sharpe=0.8,\n        adaptive_max_dd=0.1,\n        fixed_max_dd=0.1\n    )\n    print(f'Test 4 - Inf adaptive sharpe: {result}')\nexcept Exception as e:\n    print(f'Test 4 - Inf: CRASHED with {type(e).__name__}: {e}')\n\nprint()\nprint('=== generate_recommendation edge cases ===')\n\n# Test 5: WAIT with negative edge\nrec = generate_recommendation(\n    verdict=Verdict.WAIT,\n    adaptive_sharpe=-0.5,\n    fixed_sharpe=-0.3,\n    sharpe_edge=-0.2  # Negative edge\n)\nprint(f'Test 5 - WAIT with negative edge:')\nprint(f'  {rec[:100]}...')\n\" 2>&1",
+      "description": "Test verdict with extreme values"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-05T22:53:48.523156",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -c \"\nimport sys\nsys.path.insert(0, '/media/sam/1TB/nautilus_dev')\n\nfrom scripts.baseline_validation.verdict import determine_verdict\nfrom scripts.baseline_validation.report_models import Verdict\nimport math\n\n# Deep dive into NaN bug\nprint('=== NaN Bug Analysis ===')\n\n# Check comparison behavior with NaN\nnan = float('nan')\nprint(f'nan > 0.8: {nan > 0.8}')  # False\nprint(f'nan < 0.8: {nan < 0.8}')  # False\nprint(f'0.8 > nan: {0.8 > nan}')  # False\nprint(f'nan - 0.8: {nan - 0.8}')  # nan\nprint(f'(nan - 0.8) < 0.2: {(nan - 0.8) < 0.2}')  # False\n\n# So with NaN adaptive_sharpe:\n# Line 47: fixed_sharpe > adaptive_sharpe = 0.8 > nan = False -> doesn't return STOP\n# Line 51: sharpe_edge < threshold = nan < 0.2 = False -> doesn't return WAIT\n# Line 56: fixed_max_dd > 0 = True\n# Line 57: dd_ratio = 0.1 / 0.1 = 1.0\n# Line 58: 1.0 > 1.5 = False -> doesn't return WAIT\n# Falls through to return GO!\n\nprint()\nprint('Logic with NaN:')\nadaptive_sharpe = float('nan')\nfixed_sharpe = 0.8\nsharpe_edge = adaptive_sharpe - fixed_sharpe\nprint(f'  sharpe_edge = {sharpe_edge}')\nprint(f'  fixed > adaptive: {fixed_sharpe > adaptive_sharpe}')\nprint(f'  edge < 0.2: {sharpe_edge < 0.2}')\nprint('  Result: Falls through to GO because NaN comparisons are False!')\n\nprint()\nprint('=== Infinity Bug Analysis ===')\ninf = float('inf')\nprint(f'inf > 0.8: {inf > 0.8}')  # True\nprint(f'inf - 0.8: {inf - 0.8}')  # inf\nprint(f'(inf - 0.8) < 0.2: {(inf - 0.8) < 0.2}')  # False\n\n# So with Inf adaptive_sharpe:\n# Line 47: fixed_sharpe > adaptive_sharpe = 0.8 > inf = False\n# Line 51: sharpe_edge < threshold = inf < 0.2 = False\n# Falls through to GO - but at least this MIGHT be intentional (infinite sharpe is good)\n\" 2>&1",
+      "description": "Analyze NaN bug in verdict"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-05T22:53:59.025531",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -c \"\nimport sys\nsys.path.insert(0, '/media/sam/1TB/nautilus_dev')\n\nfrom scripts.baseline_validation.comparison_metrics import _t_distribution_p_value, _norm_cdf\n\nprint('=== t-distribution p-value edge cases ===')\n\n# Test 1: Very large t-statistic\np = _t_distribution_p_value(100.0, 30)\nprint(f'Test 1 - t=100, df=30: p={p}')\n\n# Test 2: Zero t-statistic\np = _t_distribution_p_value(0.0, 30)\nprint(f'Test 2 - t=0, df=30: p={p}')\n\n# Test 3: Negative t-statistic\np = _t_distribution_p_value(-2.5, 30)\nprint(f'Test 3 - t=-2.5, df=30: p={p}')\n\n# Test 4: Very small df\np = _t_distribution_p_value(2.5, 2)\nprint(f'Test 4 - t=2.5, df=2: p={p}')\n\n# Test 5: df = 1\np = _t_distribution_p_value(2.5, 1)\nprint(f'Test 5 - t=2.5, df=1: p={p}')\n\n# Test 6: df = 0 (edge case - should this be handled?)\ntry:\n    p = _t_distribution_p_value(2.5, 0)\n    print(f'Test 6 - df=0: p={p}')\nexcept Exception as e:\n    print(f'Test 6 - df=0: CRASHED with {type(e).__name__}: {e}')\n\n# Test 7: NaN t-statistic\nimport math\np = _t_distribution_p_value(float('nan'), 30)\nprint(f'Test 7 - t=nan: p={p}')\n\n# Test 8: Inf t-statistic\np = _t_distribution_p_value(float('inf'), 30)\nprint(f'Test 8 - t=inf: p={p}')\n\" 2>&1",
+      "description": "Test t-distribution p-value edge cases"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-05T22:54:11.219471",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -c \"\nimport sys\nsys.path.insert(0, '/media/sam/1TB/nautilus_dev')\n\nfrom scripts.baseline_validation.report import create_report_from_validation_run, generate_markdown_report, export_to_json\nfrom scripts.baseline_validation.comparison_validator import ComparisonValidator\nfrom scripts.baseline_validation.config_models import BaselineValidationConfig\nimport json\n\nprint('=== Full integration test ===')\n\n# Run a complete mock validation and generate all output formats\nconfig = BaselineValidationConfig.default()\nvalidator = ComparisonValidator(config)\nresult = validator.run_mock(seed=42)\n\n# Create report\nreport = create_report_from_validation_run(result)\n\nprint(f'Report created:')\nprint(f'  run_id: {report.run_id}')\nprint(f'  verdict: {report.verdict}')\nprint(f'  confidence: {report.confidence:.2%}')\nprint(f'  window_count: {report.window_count}')\nprint(f'  contenders: {list(report.contender_summaries.keys())}')\n\nprint()\n\n# Test markdown generation\nmd = generate_markdown_report(report)\nprint(f'Markdown report: {len(md)} chars')\nprint(f'  Contains verdict: {\\\"## Verdict\\\" in md}')\nprint(f'  Contains table: {\\\"|\\\" in md}')\n\nprint()\n\n# Test JSON export\njson_str = export_to_json(report)\nprint(f'JSON export: {len(json_str)} chars')\n\n# Verify JSON is valid\ntry:\n    parsed = json.loads(json_str)\n    print(f'  JSON valid: True')\n    print(f'  Keys: {list(parsed.keys())}')\nexcept json.JSONDecodeError as e:\n    print(f'  JSON valid: False - {e}')\n\n# Test round-trip\nfrom scripts.baseline_validation.report_models import ValidationReport\ntry:\n    restored = ValidationReport.model_validate(parsed)\n    print(f'  Round-trip: Success')\n    print(f'  Restored verdict: {restored.verdict}')\nexcept Exception as e:\n    print(f'  Round-trip: FAILED - {e}')\n\" 2>&1",
+      "description": "Full integration test"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-05T22:54:19.066097",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -c \"\nimport sys\nsys.path.insert(0, '/media/sam/1TB/nautilus_dev')\n\n# Check if CLI works (without actually invoking it - just import test)\nprint('=== CLI import test ===')\n\ntry:\n    from scripts.baseline_validation.cli import cli, run, report, compare\n    print('CLI imports: OK')\nexcept Exception as e:\n    print(f'CLI import: FAILED - {e}')\n\n# Check the click decorators work\nprint()\nprint('=== CLI command inspection ===')\nprint(f'run command params: {[p.name for p in run.params]}')\nprint(f'report command params: {[p.name for p in report.params]}')\nprint(f'compare command params: {[p.name for p in compare.params]}')\n\" 2>&1",
+      "description": "Test CLI imports"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2026-01-05T22:54:35.366644",
+      "todo_count": 4
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-05T22:54:47.865429",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -c \"\nimport sys\nsys.path.insert(0, '/media/sam/1TB/nautilus_dev')\n\nfrom scripts.baseline_validation.comparison_metrics import compare_contenders, compare_all_contenders\n\nprint('=== compare_contenders with mismatched lengths ===')\n\n# Test: Different length sequences for sharpes vs returns\ntry:\n    result = compare_contenders(\n        name_a='A',\n        name_b='B',\n        sharpes_a=[1.0, 0.9],  # 2 elements\n        sharpes_b=[0.8, 0.7],  # 2 elements\n        returns_a=[0.05, 0.04, 0.03],  # 3 elements - MISMATCH!\n        returns_b=[0.03, 0.02, 0.01],  # 3 elements\n        drawdowns_a=[0.1, 0.12],  # 2 elements\n        drawdowns_b=[0.11, 0.13],  # 2 elements\n    )\n    print(f'Test - Mismatched lengths: Got result (sharpes 2, returns 3)')\n    print(f'  sharpe_diff: {result.sharpe_difference}')\n    print(f'  t_stat: {result.t_statistic}')\nexcept Exception as e:\n    print(f'Test - Mismatched lengths: CRASHED with {type(e).__name__}: {e}')\n\nprint()\nprint('=== compare_all_contenders with missing keys ===')\n\n# Test: Missing 'sharpes' key\ntry:\n    result = compare_all_contenders({\n        'A': {\n            # Missing 'sharpes'!\n            'returns': [0.05],\n            'drawdowns': [0.1],\n            'trade_counts': [50]\n        },\n        'B': {\n            'sharpes': [0.8],\n            'returns': [0.03],\n            'drawdowns': [0.11],\n            'trade_counts': [45]\n        }\n    })\n    print(f'Test - Missing sharpes key:')\n    print(f'  A avg_sharpe: {result.contender_metrics[\\\"A\\\"].avg_sharpe}')\nexcept Exception as e:\n    print(f'Test - Missing key: CRASHED with {type(e).__name__}: {e}')\n\" 2>&1",
+      "description": "Test comparison with mismatched data"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-05T22:55:00.021393",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -c \"\nimport sys\nsys.path.insert(0, '/media/sam/1TB/nautilus_dev')\n\nfrom scripts.baseline_validation.config_models import BaselineValidationConfig, ValidationConfig, SuccessCriteriaConfig\nfrom datetime import datetime\n\nprint('=== Config edge cases ===')\n\n# Test 1: data_end before data_start\ntry:\n    config = ValidationConfig(\n        data_start=datetime(2025, 1, 1),\n        data_end=datetime(2015, 1, 1),  # Before start!\n        train_months=12,\n        test_months=1\n    )\n    print(f'Test 1 - End before start: SHOULD HAVE VALIDATED (data_end={config.data_end})')\nexcept Exception as e:\n    print(f'Test 1 - End before start: Correctly rejected: {type(e).__name__}')\n\nprint()\nprint('=== SuccessCriteriaConfig ===')\n\n# Test 2: Negative thresholds\ntry:\n    criteria = SuccessCriteriaConfig(\n        sharpe_edge=-0.5,  # Negative edge threshold?\n        max_drawdown_ratio=1.5,\n        min_windows=5,\n        significance_level=0.05\n    )\n    print(f'Test 2 - Negative sharpe_edge: {criteria.sharpe_edge} (allowed?)')\nexcept Exception as e:\n    print(f'Test 2 - Negative sharpe_edge: Rejected: {type(e).__name__}')\n\n# Test 3: significance_level > 1\ntry:\n    criteria = SuccessCriteriaConfig(\n        sharpe_edge=0.2,\n        max_drawdown_ratio=1.5,\n        min_windows=5,\n        significance_level=1.5  # Invalid\n    )\n    print(f'Test 3 - sig_level > 1: {criteria.significance_level} (allowed?)')\nexcept Exception as e:\n    print(f'Test 3 - sig_level > 1: Correctly rejected: {type(e).__name__}')\n\" 2>&1",
+      "description": "Test config validation edge cases"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-05T22:55:05.090743",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/baseline_validation/config_models.py"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-05T22:55:11.261831",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -c \"\nimport sys\nsys.path.insert(0, '/media/sam/1TB/nautilus_dev')\n\nfrom scripts.baseline_validation.config_models import SuccessCriteriaConfig\n\n# Test 3 again - significance_level doesn't exist!\nprint('=== SuccessCriteriaConfig fields ===')\ncriteria = SuccessCriteriaConfig()\nprint(f'Fields: {list(criteria.model_fields.keys())}')\n\n# So significance_level isn't in SuccessCriteriaConfig - look for it elsewhere\n\" 2>&1",
+      "description": "Check SuccessCriteriaConfig fields"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-05T22:55:20.463806",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -c \"\nimport sys\nsys.path.insert(0, '/media/sam/1TB/nautilus_dev')\n\n# Final verification: Test the CLI with --help to ensure it works\nfrom click.testing import CliRunner\nfrom scripts.baseline_validation.cli import cli\n\nrunner = CliRunner()\n\nprint('=== CLI --help ===')\nresult = runner.invoke(cli, ['--help'])\nprint(f'Exit code: {result.exit_code}')\n\nprint()\nprint('=== run --help ===')\nresult = runner.invoke(cli, ['run', '--help'])\nprint(f'Exit code: {result.exit_code}')\n\nprint()\nprint('=== run --mock ===')\nresult = runner.invoke(cli, ['run', '--mock', '--seed', '42'])\nprint(f'Exit code: {result.exit_code}')\nif result.exit_code != 0:\n    print(f'Error: {result.output}')\nelse:\n    print('Success! Output length:', len(result.output))\n    # Check verdict is in output\n    print('Contains Verdict:', 'Verdict:' in result.output)\n\" 2>&1",
+      "description": "Test CLI execution"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-05T22:55:28.970619",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -c \"\nimport sys\nsys.path.insert(0, '/media/sam/1TB/nautilus_dev')\n\n# Check if there are any existing tests we can run\nimport subprocess\nresult = subprocess.run(\n    ['find', '/media/sam/1TB/nautilus_dev/tests', '-name', '*baseline*', '-o', '-name', '*validation*'],\n    capture_output=True,\n    text=True\n)\nprint('Test files found:')\nprint(result.stdout if result.stdout else 'None')\n\" 2>&1",
+      "description": "Find existing tests"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-05T22:55:35.629379",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -m pytest tests/test_baseline_validation/ -v --tb=short 2>&1 | tail -50",
+      "description": "Run existing baseline validation tests"
+    },
+    {
+      "operation": "grep",
+      "timestamp": "2026-01-05T22:55:45.844565",
+      "pattern": "nan|NaN|empty.*yaml|df=0",
+      "path": "/media/sam/1TB/nautilus_dev/tests/test_baseline_validation",
+      "output_mode": "content"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2026-01-05T22:55:51.286056",
+      "todo_count": 4
     }
   ],
-  "last_updated": "2026-01-05T22:35:53.386694"
+  "last_updated": "2026-01-05T22:55:51.286080"
 }
