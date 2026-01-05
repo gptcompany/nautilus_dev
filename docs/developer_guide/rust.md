@@ -168,8 +168,7 @@ The `check_anyhow_usage.sh` pre-commit hook enforces these anyhow conventions au
 ### Logging
 
 - Fully qualify logging macros so the backend is explicit:
-  - Use `log::…` (`log::info!`, `log::warn!`, etc.) inside synchronous core crates.
-  - Use `tracing::…` (`tracing::debug!`, `tracing::info!`, etc.) for async runtimes, adapters, and peripheral components.
+  - Use `log::…` (`log::debug!`, `log::info!`, `log::warn!`, etc.) for all Rust components.
 - Start messages with a capitalised word, prefer complete sentences, and omit terminal periods (e.g. `"Processing batch"`, not `"Processing batch."`).
 
 :::info Automated enforcement
