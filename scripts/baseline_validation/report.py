@@ -76,9 +76,13 @@ def create_report_from_validation_run(
         # Get p-value from comparison if available
         p_value = 0.05  # Default
         if validation_run.comparison:
-            # Use pairwise comparison p-value
+            # B2 fix: Use exact match instead of substring matching
             for pw in validation_run.comparison.pairwise_comparisons:
-                if "adaptive" in pw.contender_a and "fixed" in pw.contender_b:
+                if pw.contender_a == "adaptive" and pw.contender_b == "fixed":
+                    p_value = pw.p_value
+                    break
+                # Also check reverse order
+                if pw.contender_a == "fixed" and pw.contender_b == "adaptive":
                     p_value = pw.p_value
                     break
 

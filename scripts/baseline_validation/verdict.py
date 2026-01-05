@@ -41,6 +41,12 @@ def determine_verdict(
     Returns:
         Verdict enum (GO, WAIT, or STOP).
     """
+    import math
+
+    # B4 fix: Handle NaN values - cannot make decision with invalid data
+    if math.isnan(adaptive_sharpe) or math.isnan(fixed_sharpe):
+        return Verdict.WAIT
+
     sharpe_edge = adaptive_sharpe - fixed_sharpe
 
     # Fixed wins - STOP
@@ -85,6 +91,9 @@ def calculate_confidence(
 
     if n_windows < 2:
         return 0.1  # Very low confidence with insufficient data
+
+    # B3 fix: Clamp p_value to valid range [0, 1]
+    p_value = max(0.0, min(1.0, p_value))
 
     # Window count contribution (0.0 to 0.4)
     window_factor = min(n_windows / 20, 1.0) * 0.4
