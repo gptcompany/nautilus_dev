@@ -32,6 +32,45 @@
 
 ---
 
+## MVP Rationale: Why Simple First
+
+> **YAGNI (You Ain't Gonna Need It)** + **PMW (Prove Me Wrong)**
+
+This audit trail is intentionally **minimal** because:
+
+### 1. Depends on Spec 029 Validation Results
+
+| Spec 029 Result | Audit Trail Needs |
+|-----------------|-------------------|
+| **Adaptive wins** | Full audit of ~60 adaptive params |
+| **Fixed 2% wins** | Simpler audit (only 3 params + trades) |
+| **Inconclusive** | Keep MVP, extend test period |
+
+Building NT-native Parquet integration **before** knowing if the adaptive system survives validation would be premature optimization.
+
+### 2. JSON Lines + DuckDB is Sufficient for MVP
+
+| Requirement | MVP Solution | Future (if needed) |
+|-------------|--------------|-------------------|
+| <1ms writes | JSON Lines (O_APPEND) | Same |
+| Forensic queries | DuckDB on Parquet | Same or NT-native |
+| NT event capture | MessageBus subscription | Same |
+| Schema | Pydantic custom | Arrow registration |
+
+### 3. Upgrade Path Preserved
+
+If Spec 029 validates adaptive system AND we need tighter NT integration:
+
+```python
+# Future: Register Arrow schema for ParquetDataCatalog compatibility
+from nautilus_trader.serialization.arrow import register_arrow_schema
+register_arrow_schema(AuditEvent, schema=AUDIT_ARROW_SCHEMA)
+```
+
+**For now**: JSON Lines + DuckDB is the **simplest thing that works**.
+
+---
+
 ## Architecture Overview
 
 ### System Context
@@ -548,6 +587,107 @@ class AuditQuery:
         
         result = self._conn.execute(query).fetchall()
         return {row[0]: row[1] for row in result}
+```
+
+---
+
+## NautilusTrader Event Integration
+
+### MessageBus Subscription Pattern
+
+To capture NautilusTrader native order/position events, use the MessageBus subscription pattern:
+
+```python
+# strategies/common/audit/observer.py
+from nautilus_trader.common.actor import Actor
+from nautilus_trader.model.events import (
+    OrderFilled,
+    OrderRejected,
+    PositionOpened,
+    PositionClosed,
+)
+
+class AuditObserver(Actor):
+    """
+    Observes NautilusTrader events for audit logging.
+
+    Subscribes to MessageBus topics to capture order/position lifecycle events.
+    This is the recommended pattern for integration with NT event system.
+    """
+
+    def __init__(self, config, audit_emitter: "AuditEventEmitter"):
+        super().__init__(config)
+        self._audit = audit_emitter
+
+    def on_start(self):
+        """Subscribe to NT event topics on startup."""
+        # Order events (all strategies)
+        self._msgbus.subscribe(topic="events.order.*", handler=self._on_order_event)
+        # Position events (all strategies)
+        self._msgbus.subscribe(topic="events.position.*", handler=self._on_position_event)
+
+    def _on_order_event(self, event) -> None:
+        """Handle order lifecycle events."""
+        if isinstance(event, OrderFilled):
+            self._audit.emit(TradeEvent(
+                event_type=AuditEventType.TRADE_ORDER_FILLED,
+                source="nautilus_trader",
+                order_id=str(event.client_order_id),
+                instrument_id=str(event.instrument_id),
+                side=str(event.order_side),
+                size=str(event.last_qty),
+                price=str(event.last_px),
+                slippage_bps=0.0,  # Calculate from expected vs actual
+                realized_pnl="0",  # From position tracker
+                strategy_source=str(event.strategy_id),
+            ))
+        elif isinstance(event, OrderRejected):
+            self._audit.emit(AuditEvent(
+                event_type=AuditEventType.TRADE_ORDER_REJECTED,
+                source="nautilus_trader",
+                payload={"order_id": str(event.client_order_id), "reason": event.reason},
+            ))
+
+    def _on_position_event(self, event) -> None:
+        """Handle position lifecycle events."""
+        if isinstance(event, PositionOpened):
+            self._audit.emit(AuditEvent(
+                event_type=AuditEventType.TRADE_POSITION_OPENED,
+                source="nautilus_trader",
+                payload={
+                    "instrument_id": str(event.instrument_id),
+                    "side": str(event.entry),
+                    "quantity": str(event.quantity),
+                },
+            ))
+        elif isinstance(event, PositionClosed):
+            self._audit.emit(AuditEvent(
+                event_type=AuditEventType.TRADE_POSITION_CLOSED,
+                source="nautilus_trader",
+                payload={
+                    "instrument_id": str(event.instrument_id),
+                    "realized_pnl": str(event.realized_pnl),
+                },
+            ))
+```
+
+### Parquet Compatibility Note
+
+NautilusTrader uses `ParquetDataCatalog` for market data with Arrow schemas. For audit trail:
+
+- **Hot path (JSON Lines)**: Custom format, NOT using NT's Parquet infrastructure
+- **Cold path (Parquet)**: Custom schema, compatible with DuckDB queries
+
+This separation is intentional because:
+1. Audit events have different schema than market data (orders, bars, ticks)
+2. JSON Lines provides <1ms latency for hot path
+3. DuckDB provides fast SQL queries on custom Parquet without NT dependencies
+
+If future integration with NT's catalog is desired, implement custom Arrow schemas using:
+```python
+# Future enhancement: NT-compatible Parquet
+from nautilus_trader.serialization.arrow import register_arrow_schema
+# Register custom AuditEvent schema for ParquetDataCatalog compatibility
 ```
 
 ---

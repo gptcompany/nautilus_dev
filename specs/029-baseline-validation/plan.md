@@ -17,6 +17,37 @@ Based on DeMiguel et al. (2009), simple 1/N strategies beat 14 optimization mode
 
 ---
 
+## PMW Philosophy: Why This Validation is Critical
+
+> **"Cerca attivamente disconferme, non conferme"** (PMW - Prove Me Wrong)
+
+This spec exists because **we do not assume the adaptive system works**. Academic research suggests:
+
+- **DeMiguel 2009**: 1/N beats 14 optimization models OOS
+- **70% of ML strategies fail within 6 months** (industry data)
+- **~60 parameters = ~60 opportunities for overfitting**
+
+### Expected Outcomes (Honest Assessment)
+
+| Outcome | Probability | Action |
+|---------|-------------|--------|
+| Adaptive wins (Sharpe +0.2, DSR >0.5) | **30%** | Deploy with monitoring |
+| Fixed 2% wins | **50%** | Simplify system, abandon Spec-027 complexity |
+| Inconclusive | **20%** | Extend test period or refine approach |
+
+### What Happens If Fixed 2% Wins?
+
+If validation shows Fixed 2% outperforms the adaptive stack:
+
+1. **Archive** `strategies/common/adaptive_control/` (don't delete - learning)
+2. **Simplify** to Fixed Fractional sizing (3 params)
+3. **Redirect effort** to alpha generation, not position sizing complexity
+4. **Document** lessons learned in PMW validation report
+
+This is **not failure** - it's the scientific method applied to trading systems.
+
+---
+
 ## Research Summary
 
 ### Key Academic Sources
@@ -98,38 +129,60 @@ Based on DeMiguel et al. (2009), simple 1/N strategies beat 14 optimization mode
 - Reuses existing code (GillerSizer, SOPS classes)
 - Easier to add new contenders
 
-**Implementation**:
+**Implementation** (aligned with NautilusTrader `PositionSizer` base class):
 ```python
-class ContenderSizer(Protocol):
-    """Protocol for position sizing contenders."""
-    
-    def calculate_size(
+from decimal import Decimal
+from nautilus_trader.model.objects import Price, Money, Quantity
+from nautilus_trader.risk.sizing import PositionSizer, FixedRiskSizer
+
+class AdaptiveSizer(PositionSizer):
+    """Contender A: SOPS + Giller + Thompson adaptive sizing."""
+
+    def __init__(self, instrument, sops_sizer, giller_exponent: float = 0.5):
+        super().__init__(instrument)
+        self._sops = sops_sizer
+        self._giller_exp = giller_exponent
+
+    def calculate(
         self,
-        signal: float,
-        equity: float,
-        volatility: float,
-    ) -> float:
-        """Calculate position size given signal and context."""
-        ...
+        entry: Price,
+        stop_loss: Price,
+        equity: Money,
+        risk: Decimal,
+        commission_rate: Decimal = Decimal(0),
+        exchange_rate: Decimal = Decimal(1),
+        hard_limit: Decimal | None = None,
+        unit_batch_size: Decimal = Decimal(1),
+        units: int = 1,
+    ) -> Quantity:
+        """Calculate position size using adaptive SOPS+Giller logic."""
+        signal = self._sops.get_signal()
+        adjusted_risk = risk * Decimal(str(abs(signal) ** self._giller_exp))
+        # Use native FixedRiskSizer calculation with adjusted risk
+        base_sizer = FixedRiskSizer(self.instrument)
+        return base_sizer.calculate(entry, stop_loss, equity, adjusted_risk)
 
-class FixedFractionalSizer:
-    """Contender B: Fixed 2% risk per trade."""
-    
-    def __init__(self, risk_pct: float = 0.02):
-        self.risk_pct = risk_pct
-    
-    def calculate_size(self, signal: float, equity: float, volatility: float) -> float:
-        if signal == 0:
-            return 0.0
-        sign = 1.0 if signal > 0 else -1.0
-        return sign * equity * self.risk_pct / volatility
+class FixedFractionalSizer(PositionSizer):
+    """Contender B: Fixed 2% risk per trade (uses native FixedRiskSizer)."""
 
-class BuyAndHoldSizer:
+    def __init__(self, instrument, risk_pct: float = 0.02):
+        super().__init__(instrument)
+        self._base_sizer = FixedRiskSizer(instrument)
+        self._risk_pct = Decimal(str(risk_pct))
+
+    def calculate(self, entry: Price, stop_loss: Price, equity: Money, **kwargs) -> Quantity:
+        return self._base_sizer.calculate(entry, stop_loss, equity, self._risk_pct, **kwargs)
+
+class BuyAndHoldSizer(PositionSizer):
     """Contender C: Full allocation, no rebalancing."""
-    
-    def calculate_size(self, signal: float, equity: float, volatility: float) -> float:
-        return equity  # Full allocation on entry, hold
+
+    def calculate(self, entry: Price, stop_loss: Price, equity: Money, **kwargs) -> Quantity:
+        # Full equity allocation
+        size = equity.as_decimal() / entry.as_decimal()
+        return self.instrument.make_qty(size)
 ```
+
+**Note**: All sizers now extend `nautilus_trader.risk.sizing.PositionSizer` for API compatibility.
 
 ---
 
