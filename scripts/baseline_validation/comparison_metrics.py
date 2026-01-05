@@ -263,6 +263,10 @@ def _t_distribution_p_value(t: float, df: int) -> float:
     Returns:
         Two-tailed p-value.
     """
+    # B5 fix: Guard against invalid degrees of freedom
+    if df <= 0:
+        return 1.0
+
     # For large df, use normal approximation
     # For small df, use rough approximation
 

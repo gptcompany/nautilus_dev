@@ -214,6 +214,10 @@ def _load_config(config_path: str) -> BaselineValidationConfig:
     # Start with defaults and override
     config = BaselineValidationConfig.default()
 
+    # B1 fix: Handle empty YAML file (returns None)
+    if not data:
+        return config
+
     # Update validation settings
     if "validation" in data:
         for key, value in data["validation"].items():
