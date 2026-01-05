@@ -20,25 +20,115 @@ Components:
     - cli: Command-line interface
 
 Usage:
-    >>> from scripts.baseline_validation import ComparisonValidator
+    >>> from scripts.baseline_validation import ComparisonValidator, BaselineValidationConfig
+    >>> config = BaselineValidationConfig.default()
     >>> validator = ComparisonValidator(config)
-    >>> result = validator.validate()
-    >>> print(result.verdict)  # GO, WAIT, or STOP
+    >>> result = validator.run_mock()  # or validator.run() for real backtest
+    >>> from scripts.baseline_validation import create_report_from_validation_run
+    >>> report = create_report_from_validation_run(result)
+    >>> print(report.verdict)  # GO, WAIT, or STOP
 """
 
 __version__ = "0.1.0"
 __author__ = "NautilusTrader Team"
 
-# Lazy imports to avoid circular dependencies
+# Core sizers
+from scripts.baseline_validation.sizers import (
+    ContenderSizer,
+    FixedFractionalSizer,
+    BuyAndHoldSizer,
+    AdaptiveSizer,
+    create_sizer,
+)
+
+# Registry
+from scripts.baseline_validation.registry import (
+    ContenderRegistry,
+    get_default_contenders,
+)
+
+# Configuration
+from scripts.baseline_validation.config_models import (
+    BaselineValidationConfig,
+    ValidationConfig,
+    SuccessCriteriaConfig,
+    ContenderConfig,
+)
+
+# Validation
+from scripts.baseline_validation.comparison_validator import (
+    ComparisonValidator,
+    ContenderResult,
+    ValidationRun,
+)
+
+# Metrics
+from scripts.baseline_validation.comparison_metrics import (
+    MultiContenderComparison,
+    ComparisonResult,
+    ContenderMetrics,
+)
+
+# Verdict
+from scripts.baseline_validation.verdict import (
+    determine_verdict,
+    calculate_confidence,
+    generate_recommendation,
+)
+from scripts.baseline_validation.report_models import Verdict
+
+# Reports
+from scripts.baseline_validation.report import (
+    create_report_from_validation_run,
+    generate_markdown_report,
+    format_comparison_table,
+    export_to_json,
+)
+from scripts.baseline_validation.report_models import (
+    ValidationReport,
+    ContenderSummary,
+    VerdictDetails,
+)
+
+# Strategy
+from scripts.baseline_validation.baseline_strategy import BaselineStrategy
+
 __all__ = [
+    # Core sizers
     "ContenderSizer",
     "FixedFractionalSizer",
     "BuyAndHoldSizer",
     "AdaptiveSizer",
+    "create_sizer",
+    # Registry
     "ContenderRegistry",
-    "BaselineStrategy",
+    "get_default_contenders",
+    # Configuration
+    "BaselineValidationConfig",
+    "ValidationConfig",
+    "SuccessCriteriaConfig",
+    "ContenderConfig",
+    # Validation
     "ComparisonValidator",
-    "ComparisonMetrics",
+    "ContenderResult",
+    "ValidationRun",
+    # Metrics
+    "MultiContenderComparison",
+    "ComparisonResult",
+    "ContenderMetrics",
+    # Verdict
     "Verdict",
-    "ReportGenerator",
+    "determine_verdict",
+    "calculate_confidence",
+    "generate_recommendation",
+    # Reports
+    "ValidationReport",
+    "ContenderSummary",
+    "VerdictDetails",
+    "create_report_from_validation_run",
+    "generate_markdown_report",
+    "format_comparison_table",
+    "export_to_json",
+    # Strategy
+    "BaselineStrategy",
 ]

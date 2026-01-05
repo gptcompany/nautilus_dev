@@ -103,7 +103,8 @@ class TestComparisonValidatorExecution:
         for name, contender_result in result.contender_results.items():
             assert hasattr(contender_result, "avg_sharpe")
             assert hasattr(contender_result, "max_drawdown")
-            assert hasattr(contender_result, "window_results")
+            assert hasattr(contender_result, "window_sharpes")
+            assert hasattr(contender_result, "window_returns")
 
 
 class TestContenderResultAggregation:
