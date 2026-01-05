@@ -20,10 +20,10 @@
 
 **Purpose**: Project initialization and package structure
 
-- [ ] T001 Create package structure `scripts/baseline_validation/__init__.py` with module docstring
-- [ ] T002 [P] Create test package structure `tests/test_baseline_validation/__init__.py`
-- [ ] T003 [P] Create test fixtures in `tests/test_baseline_validation/conftest.py`
-- [ ] T004 [P] Create default configuration YAML in `scripts/baseline_validation/config/default.yaml`
+- [X] T001 Create package structure `scripts/baseline_validation/__init__.py` with module docstring
+- [X] T002 [P] Create test package structure `tests/test_baseline_validation/__init__.py`
+- [X] T003 [P] Create test fixtures in `tests/test_baseline_validation/conftest.py`
+- [X] T004 [P] Create default configuration YAML in `scripts/baseline_validation/config/default.yaml`
 
 ---
 
@@ -33,12 +33,14 @@
 
 **CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T005 Create ContenderSizer protocol and base class in `scripts/baseline_validation/sizers.py`
-- [ ] T006 [P] Implement FixedFractionalSizer (Fixed 2%) in `scripts/baseline_validation/sizers.py` (after T005)
-- [ ] T007 [P] Implement BuyAndHoldSizer in `scripts/baseline_validation/sizers.py` (after T005)
-- [ ] T008 Implement AdaptiveSizer wrapper (SOPS+Giller+Thompson) in `scripts/baseline_validation/sizers.py` (after T005)
-- [ ] T009 Create Contender registry pattern in `scripts/baseline_validation/registry.py`
-- [ ] T010 [P] Create Pydantic configuration models in `scripts/baseline_validation/config_models.py`
+- [X] T005 Create ContenderSizer protocol and base class in `scripts/baseline_validation/sizers.py`
+- [X] T006 Implement FixedFractionalSizer (Fixed 2%) in `scripts/baseline_validation/sizers.py` (after T005)
+- [X] T007 Implement BuyAndHoldSizer in `scripts/baseline_validation/sizers.py` (after T006)
+- [X] T008 Implement AdaptiveSizer wrapper (SOPS+Giller+Thompson) in `scripts/baseline_validation/sizers.py` (after T007)
+- [X] T009 Create Contender registry pattern in `scripts/baseline_validation/registry.py`
+- [X] T010 [P] Create Pydantic configuration models in `scripts/baseline_validation/config_models.py`
+- [X] T010a Add transaction costs config (FR-009: 0.1% default) in `scripts/baseline_validation/config/default.yaml`
+- [X] T010b Implement edge case handlers (zero trades, NaN/Inf, extreme volatility) in `scripts/baseline_validation/edge_cases.py`
 
 **Checkpoint**: Foundation ready - sizers and registry available for user stories
 
@@ -57,19 +59,19 @@
 
 ### Tests for User Story 1
 
-- [ ] T011 [P] [US1] Unit test for sizer calculations in `tests/test_baseline_validation/test_sizers.py`
-- [ ] T012 [P] [US1] Unit test for registry discovery in `tests/test_baseline_validation/test_registry.py`
-- [ ] T013 [P] [US1] Unit test for baseline strategy wrapper in `tests/test_baseline_validation/test_baseline_strategy.py`
+- [X] T011 [P] [US1] Unit test for sizer calculations in `tests/test_baseline_validation/test_sizers.py`
+- [X] T012 [P] [US1] Unit test for registry discovery in `tests/test_baseline_validation/test_registry.py`
+- [X] T013 [P] [US1] Unit test for baseline strategy wrapper in `tests/test_baseline_validation/test_baseline_strategy.py`
 
 ### Implementation for User Story 1
 
-- [ ] T014 [US1] Create generic BaselineStrategy wrapper in `scripts/baseline_validation/baseline_strategy.py`
-- [ ] T015 [US1] Implement signal generation (EMA crossover) in `scripts/baseline_validation/baseline_strategy.py`
-- [ ] T016 [US1] Wire BaselineStrategy to use pluggable ContenderSizer in `scripts/baseline_validation/baseline_strategy.py`
-- [ ] T017 [US1] Create comparison metrics module in `scripts/baseline_validation/comparison_metrics.py`
-- [ ] T018 [US1] Implement relative Sharpe difference calculation in `scripts/baseline_validation/comparison_metrics.py`
-- [ ] T019 [US1] Implement win/loss ratio between contenders in `scripts/baseline_validation/comparison_metrics.py`
-- [ ] T020 [US1] Implement statistical significance (t-test) in `scripts/baseline_validation/comparison_metrics.py`
+- [X] T014 [US1] Create generic BaselineStrategy wrapper in `scripts/baseline_validation/baseline_strategy.py`
+- [X] T015 [US1] Implement signal generation (EMA crossover using `update_raw()` for Rust compatibility) in `scripts/baseline_validation/baseline_strategy.py`
+- [X] T016 [US1] Wire BaselineStrategy to use pluggable ContenderSizer in `scripts/baseline_validation/baseline_strategy.py`
+- [X] T017 [US1] Create comparison metrics module in `scripts/baseline_validation/comparison_metrics.py` (depends on T014-T016 for strategy results)
+- [X] T018 [US1] Implement relative Sharpe difference calculation in `scripts/baseline_validation/comparison_metrics.py`
+- [X] T019 [US1] Implement win/loss ratio between contenders in `scripts/baseline_validation/comparison_metrics.py`
+- [X] T020 [US1] Implement statistical significance (t-test) in `scripts/baseline_validation/comparison_metrics.py`
 
 **Checkpoint**: User Story 1 complete - can run baseline comparison and get metrics for all contenders
 
@@ -152,12 +154,14 @@
 
 ## Phase 7: Polish & Documentation
 
-**Purpose**: Documentation and final validation
+**Purpose**: Documentation, validation, and performance verification
 
 - [ ] T047 [P] Create usage guide in `docs/029-baseline-validation-guide.md`
 - [ ] T048 [P] Create runbook (interpretation, troubleshooting) in `docs/029-baseline-validation-runbook.md`
 - [ ] T049 Run initial validation on available BTC data and document results
 - [ ] T050 Run alpha-debug verification on all modules
+- [ ] T051 Performance benchmark: verify SC-001 (6h runtime for 10yr BTC) in `tests/test_baseline_validation/test_performance.py`
+- [ ] T052 Reproducibility test: verify SC-007 (same data+config = same results) in `tests/test_baseline_validation/test_reproducibility.py`
 
 ---
 
@@ -192,8 +196,8 @@
 - T002, T003, T004 can all run in parallel (different files)
 
 **Phase 2**:
-- T006, T007 can run in parallel after T005 completes (different classes, same file but independent)
-- T009, T010 can run in parallel (different files)
+- T005 → T006 → T007 → T008 must be sequential (same file: sizers.py)
+- T009, T010, T010a, T010b can run in parallel (different files)
 
 **User Story 1**:
 - T011, T012, T013 tests can all run in parallel (different test files)
@@ -258,3 +262,11 @@ Task: "Unit test for baseline strategy wrapper in tests/test_baseline_validation
 - Uses existing walk-forward infrastructure from `scripts/alpha_evolve/walk_forward/`
 - Uses existing adaptive control from `strategies/common/adaptive_control/`
 - PMW Philosophy: This validation exists to PROVE the adaptive system works (or doesn't)
+
+### API Compatibility Notes (verified via nautilus-docs-specialist)
+
+- **EMA Import**: Use `from nautilus_trader.indicators import ExponentialMovingAverage`
+- **Rust Indicator Compatibility**: Use `ema.update_raw(bar.close.as_double())` instead of `ema.handle_bar(bar)` for Rust/Cython compatibility
+- **PositionSizer**: Extend `nautilus_trader.risk.sizing.PositionSizer` with `calculate()` method
+- **BacktestEngine**: Use for programmatic walk-forward windows (not BacktestNode)
+- **ParquetDataCatalog**: Verify BTC instrument precision matches historical data

@@ -427,7 +427,79 @@
       "timestamp": "2026-01-05T22:14:19.187770",
       "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python3 -c \"\nfrom nautilus_trader.indicators import ExponentialMovingAverage\nfrom nautilus_trader.model.data import Bar, BarType, BarSpecification\nfrom nautilus_trader.model.objects import Price, Quantity\nfrom nautilus_trader.model.enums import AggregationSource, BarAggregation, PriceType\nfrom nautilus_trader.model.identifiers import InstrumentId\nfrom nautilus_trader.core.datetime import secs_to_nanos\nimport time\n\n# Create an EMA\nema = ExponentialMovingAverage(20, PriceType.LAST)\nprint('EMA created:', ema)\n\n# Create a bar specification\ninstrument_id = InstrumentId.from_str('BTCUSDT.BINANCE')\nbar_spec = BarSpecification(1, BarAggregation.MINUTE, PriceType.LAST)\nbar_type = BarType(instrument_id, bar_spec, AggregationSource.EXTERNAL)\n\n# Create test bars\nfor i in range(25):\n    ts = secs_to_nanos(int(time.time()) + i * 60)\n    bar = Bar(\n        bar_type=bar_type,\n        open=Price.from_str(f'{100.00 + i*0.1:.2f}'),\n        high=Price.from_str(f'{101.00 + i*0.1:.2f}'),\n        low=Price.from_str(f'{99.00 + i*0.1:.2f}'),\n        close=Price.from_str(f'{100.50 + i*0.1:.2f}'),\n        volume=Quantity.from_str('1000'),\n        ts_event=ts,\n        ts_init=ts,\n    )\n    ema.handle_bar(bar)\n    if i == 24:\n        print(f'After 25 bars - value: {ema.value:.4f}, initialized: {ema.initialized}')\n\" 2>&1",
       "description": "Test EMA with proper imports"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-05T22:15:12.973525",
+      "file_path": "/tmp/claude/-media-sam-1TB-nautilus-dev/tasks/aff2708.output"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-05T22:15:18.032747",
+      "file_path": "/tmp/claude/-media-sam-1TB-nautilus-dev/tasks/aff2708.output"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-05T22:15:22.755374",
+      "file_path": "/tmp/claude/-media-sam-1TB-nautilus-dev/tasks/aff2708.output"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2026-01-05T22:15:31.498013",
+      "todo_count": 4
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-05T22:15:42.518567",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/029-baseline-validation/tasks.md",
+      "old_string": "- [ ] T005 Create ContenderSizer protocol and base class in `scripts/baseline_validation/sizers.py`\n..."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-05T22:15:48.935766",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/029-baseline-validation/tasks.md",
+      "old_string": "- [ ] T014 [US1] Create generic BaselineStrategy wrapper in `scripts/baseline_validation/baseline_st..."
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2026-01-05T22:15:55.596635",
+      "todo_count": 4
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-05T22:16:02.869212",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/029-baseline-validation/tasks.md",
+      "old_string": "- [ ] T009 Create Contender registry pattern in `scripts/baseline_validation/registry.py`\n- [ ] T010..."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-05T22:16:11.866966",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/029-baseline-validation/tasks.md",
+      "old_string": "## Phase 7: Polish & Documentation\n\n**Purpose**: Documentation and final validation\n\n- [ ] T047 [P] ..."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-05T22:16:19.277479",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/029-baseline-validation/tasks.md",
+      "old_string": "- [ ] T017 [US1] Create comparison metrics module in `scripts/baseline_validation/comparison_metrics..."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-05T22:16:27.397942",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/029-baseline-validation/tasks.md",
+      "old_string": "### Parallel Opportunities\n\n**Phase 1**:\n- T002, T003, T004 can all run in parallel (different files..."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-05T22:16:40.720133",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/029-baseline-validation/tasks.md",
+      "old_string": "## Notes\n\n- [P] tasks = different files, no dependencies\n- [E] not used in this spec - no complex al..."
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2026-01-05T22:16:48.221840",
+      "todo_count": 4
     }
   ],
-  "last_updated": "2026-01-05T22:14:19.187788"
+  "last_updated": "2026-01-05T22:16:48.221860"
 }

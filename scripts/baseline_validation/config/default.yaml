@@ -1,0 +1,81 @@
+# Baseline Validation Configuration
+# Based on PMW (Prove Me Wrong) philosophy
+# Reference: DeMiguel 2009, Lopez de Prado 2018
+
+validation:
+  # Date range for validation (10 years BTC data)
+  data_start: "2015-01-01"
+  data_end: "2025-01-01"
+
+  # Walk-forward window configuration
+  train_months: 12        # Training period per window
+  test_months: 1          # Test period per window
+  step_months: 1          # Rolling step size
+
+  # Embargo periods (Lopez de Prado PKCV)
+  embargo_before_days: 5  # Pre-test purge
+  embargo_after_days: 3   # Post-test purge
+
+  # Validation criteria
+  min_windows: 12         # Minimum windows for statistical validity
+
+  # Transaction costs (FR-009: consistent across all contenders)
+  transaction_cost_pct: 0.001  # 0.1% per trade
+
+contenders:
+  # Contender A: Full adaptive stack
+  adaptive:
+    name: "SOPS+Giller+Thompson"
+    enabled: true
+    config:
+      sops_k_base: 1.0
+      giller_exponent: 0.5
+      thompson_decay: 0.99
+      vol_alpha: 0.1
+      enable_tape_weight: true
+
+  # Contender B: Fixed 2% (baseline)
+  fixed:
+    name: "Fixed 2%"
+    enabled: true
+    config:
+      risk_pct: 0.02        # 2% risk per trade
+      max_positions: 10     # Maximum concurrent positions
+      stop_loss_pct: 0.05   # 5% stop loss
+
+  # Contender C: Buy & Hold (benchmark)
+  buyhold:
+    name: "Buy & Hold"
+    enabled: true
+    config:
+      allocation_pct: 1.0   # Full allocation
+
+# Success criteria based on research_vs_repos_analysis.md
+success_criteria:
+  # Adaptive must beat Fixed by this Sharpe margin
+  sharpe_edge: 0.2
+
+  # Deflated Sharpe > 0.5 (skill > luck)
+  min_dsr: 0.5
+
+  # PBO < 0.5 (not overfit)
+  max_pbo: 0.5
+
+  # Maximum acceptable drawdown
+  max_drawdown: 0.30
+
+# Output configuration
+output:
+  report_dir: "reports/baseline_validation"
+  formats:
+    - "markdown"
+    - "json"
+
+  # Equity curve generation
+  generate_charts: true
+
+  # Detailed metrics per window
+  verbose: false
+
+# Reproducibility
+seed: 42
