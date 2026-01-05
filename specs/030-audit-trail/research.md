@@ -14,27 +14,30 @@ This research analyzed state-of-the-art audit trail systems for algorithmic trad
 - Post-mortem forensics and analysis
 - Industry standards and regulatory requirements
 
-**Key Finding**: The trading industry is converging on cryptographically-verifiable, append-only audit trails as the standard. The VeritasChain Protocol (VCP) v1.1 represents the emerging industry standard with three-layer integrity (Event, Collection, External).
+**Key Finding**: The trading industry is converging on cryptographically-verifiable, append-only audit trails. The VeritasChain Protocol (VCP) v1.1 presents an interesting three-layer integrity model (Event, Collection, External) worth considering.
 
 ---
 
 ## Industry Context: Why This Matters
 
-### Recent Trading Disasters (2025)
+### Notable Trading Disasters
 
-Three major algorithmic trading incidents in 2025 shared a common root cause: **audit logs that could be modified by the systems they were supposed to audit**.
+Several algorithmic trading incidents shared a common root cause: **inadequate audit trails**.
 
-| Incident | Impact | Root Cause |
-|----------|--------|------------|
-| Two Sigma Fraud | $165M | Parameter manipulation undetected for 2 years |
-| Knight Capital | $440M in 45 min | No audit trail for debugging |
-| Jane Street/SEBI | Months to investigate | Logs not correlated across markets |
+| Incident | Year | Impact | Root Cause |
+|----------|------|--------|------------|
+| Knight Capital | 2012 | $440M in 45 min | No audit trail for debugging, test code in production |
+| Flash Crash | 2010 | $1T temporary loss | Insufficient cross-market event correlation |
+| Various quant failures | Ongoing | Undisclosed | Parameter manipulation, model drift undetected |
 
-### Regulatory Pressure
+**Lesson**: Immutable, queryable audit trails are essential for post-mortem analysis and regulatory compliance.
 
-- **MiFID III**: Requires microsecond-precise audit trails
-- **EU AI Act (Article 12)**: Mandates automatic logging for high-risk AI systems by August 2026
+### Regulatory Context
+
+- **MiFID II (2018)**: Requires detailed audit trails for algorithmic trading, including order-to-trade ratios and timestamps
+- **EU AI Act (Article 12)**: Mandates automatic logging for high-risk AI systems (effective 2026)
 - **CAT (Consolidated Audit Trail)**: US requirement for cross-market event correlation
+- **SEC Rule 17a-4**: Requires immutable records retention for broker-dealers
 
 ---
 
