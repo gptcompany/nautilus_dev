@@ -20,8 +20,8 @@
 
 **Purpose**: Create audit trail module structure and base dependencies
 
-- [ ] T001 Create audit module directory structure in `strategies/common/audit/`
-- [ ] T002 Create `strategies/common/audit/__init__.py` with public exports
+- [X] T001 Create audit module directory structure in `strategies/common/audit/`
+- [X] T002 Create `strategies/common/audit/__init__.py` with public exports
 - [ ] T003 [P] Add duckdb dependency to project requirements (optional, for queries)
 
 ---
@@ -32,14 +32,14 @@
 
 **CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T004 Create `AuditConfig` dataclass in `strategies/common/audit/config.py` with settings for: base_path, sync_writes, rotate_daily, retention_days
-- [ ] T005 Create `AuditEventType` enum in `strategies/common/audit/events.py` with hierarchical event types (param.*, trade.*, sys.*)
-- [ ] T006 Create `AuditEvent` base Pydantic model in `strategies/common/audit/events.py` with: ts_event (ns), event_type, source, trader_id, sequence, checksum property
-- [ ] T007 Create `AppendOnlyWriter` class in `strategies/common/audit/writer.py` with O_APPEND flag, thread-safe writes, daily rotation
-- [ ] T008 Create `AuditEventEmitter` class in `strategies/common/audit/emitter.py` with emit(), sequence tracking, writer integration
-- [ ] T009 [P] Create unit test for `AppendOnlyWriter` O_APPEND behavior in `tests/unit/audit/test_writer.py`
-- [ ] T010 [P] Create unit test for `AuditEvent` checksum computation in `tests/unit/audit/test_events.py`
-- [ ] T010b [P] Create unit test for crash recovery (partial write handling) in `tests/unit/audit/test_writer.py`
+- [X] T004 Create `AuditConfig` dataclass in `strategies/common/audit/config.py` with settings for: base_path, sync_writes, rotate_daily, retention_days
+- [X] T005 Create `AuditEventType` enum in `strategies/common/audit/events.py` with hierarchical event types (param.*, trade.*, sys.*)
+- [X] T006 Create `AuditEvent` base Pydantic model in `strategies/common/audit/events.py` with: ts_event (ns), event_type, source, trader_id, sequence, checksum property
+- [X] T007 Create `AppendOnlyWriter` class in `strategies/common/audit/writer.py` with O_APPEND flag, thread-safe writes, daily rotation
+- [X] T008 Create `AuditEventEmitter` class in `strategies/common/audit/emitter.py` with emit(), sequence tracking, writer integration
+- [X] T009 [P] Create unit test for `AppendOnlyWriter` O_APPEND behavior in `tests/unit/audit/test_writer.py`
+- [X] T010 [P] Create unit test for `AuditEvent` checksum computation in `tests/unit/audit/test_events.py`
+- [X] T010b [P] Create unit test for crash recovery (partial write handling) in `tests/unit/audit/test_writer.py`
 
 **Checkpoint**: Foundation ready - can emit audit events to append-only JSON Lines files
 
@@ -58,13 +58,13 @@
 
 ### Implementation for User Story 1
 
-- [ ] T011 [US1] Create `ParameterChangeEvent` Pydantic model in `strategies/common/audit/events.py` with: param_name, old_value, new_value, trigger_reason
-- [ ] T012 [US1] Add `emit_param_change()` convenience method to `AuditEventEmitter` in `strategies/common/audit/emitter.py`
-- [ ] T013 [US1] Create unit test for `ParameterChangeEvent` serialization in `tests/unit/audit/test_events.py`
-- [ ] T014 [US1] Create unit test for `emit_param_change()` end-to-end in `tests/unit/audit/test_emitter.py`
+- [X] T011 [US1] Create `ParameterChangeEvent` Pydantic model in `strategies/common/audit/events.py` with: param_name, old_value, new_value, trigger_reason
+- [X] T012 [US1] Add `emit_param_change()` convenience method to `AuditEventEmitter` in `strategies/common/audit/emitter.py`
+- [X] T013 [US1] Create unit test for `ParameterChangeEvent` serialization in `tests/unit/audit/test_events.py`
+- [X] T014 [US1] Create unit test for `emit_param_change()` end-to-end in `tests/unit/audit/test_emitter.py`
 - [ ] T015 [US1] Integrate audit emitter into `MetaController` for state transitions in `strategies/common/adaptive_control/meta_controller.py`
 - [ ] T016 [US1] Integrate audit emitter into `SOPSGillerSizer` for k parameter changes in `strategies/common/adaptive_control/sops_sizing.py`
-- [ ] T017 [US1] Create integration test verifying parameter logging from MetaController in `tests/integration/test_audit_integration.py`
+- [X] T017 [US1] Create integration test verifying parameter logging from MetaController in `tests/integration/test_audit_integration.py`
 
 **Checkpoint**: Parameter changes are logged immutably - MVP for security auditing
 
