@@ -33,12 +33,13 @@
 **CRITICAL**: No user story work can begin until this phase is complete
 
 - [ ] T004 Create `AuditConfig` dataclass in `strategies/common/audit/config.py` with settings for: base_path, sync_writes, rotate_daily, retention_days
-- [ ] T005 [P] Create `AuditEventType` enum in `strategies/common/audit/events.py` with hierarchical event types (param.*, trade.*, sys.*)
+- [ ] T005 Create `AuditEventType` enum in `strategies/common/audit/events.py` with hierarchical event types (param.*, trade.*, sys.*)
 - [ ] T006 Create `AuditEvent` base Pydantic model in `strategies/common/audit/events.py` with: ts_event (ns), event_type, source, trader_id, sequence, checksum property
 - [ ] T007 Create `AppendOnlyWriter` class in `strategies/common/audit/writer.py` with O_APPEND flag, thread-safe writes, daily rotation
 - [ ] T008 Create `AuditEventEmitter` class in `strategies/common/audit/emitter.py` with emit(), sequence tracking, writer integration
 - [ ] T009 [P] Create unit test for `AppendOnlyWriter` O_APPEND behavior in `tests/unit/audit/test_writer.py`
 - [ ] T010 [P] Create unit test for `AuditEvent` checksum computation in `tests/unit/audit/test_events.py`
+- [ ] T010b [P] Create unit test for crash recovery (partial write handling) in `tests/unit/audit/test_writer.py`
 
 **Checkpoint**: Foundation ready - can emit audit events to append-only JSON Lines files
 
@@ -196,12 +197,14 @@ All user stories can be implemented in parallel after Foundational phase:
 ## Parallel Example: Foundational Phase
 
 ```bash
-# Launch parallel tasks in Phase 2:
-T005: Create AuditEventType enum in strategies/common/audit/events.py
+# Sequential tasks in Phase 2 (same files):
+T004→T005→T006 (config.py, events.py)
+T007→T008 (writer.py, emitter.py)
+
+# Parallel tasks (different files, after dependencies ready):
 T009: Create unit test for AppendOnlyWriter in tests/unit/audit/test_writer.py
 T010: Create unit test for AuditEvent checksum in tests/unit/audit/test_events.py
-
-# Note: T004→T006→T007→T008 must be sequential (same files/dependencies)
+T010b: Create crash recovery test in tests/unit/audit/test_writer.py
 ```
 
 ## Parallel Example: User Stories
@@ -262,3 +265,4 @@ Setup → Foundational → US1 (MVP)
 - Integration tests can run in parallel as they target different components
 - DuckDB is optional dependency - US4 can be deferred if not needed immediately
 - Sync writes enabled only for TradeEvent (audit compliance) - others use async
+- **ALWAYS use test-runner agent** for executing tests (per constitution)
