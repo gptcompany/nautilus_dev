@@ -315,7 +315,31 @@
       "timestamp": "2026-01-06T17:06:41.544551",
       "command": "/media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/python -m pytest tests/integration/test_csrc_walk_forward.py -v 2>&1",
       "description": "Run tests using nightly env python directly"
+    },
+    {
+      "operation": "task",
+      "timestamp": "2026-01-06T17:07:09.548459",
+      "subagent_type": "test-runner",
+      "prompt": "Run these tests using pytest verbose mode:\n- tests/test_adaptive_decay.py\n- tests/test_thompson_sele..."
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T17:07:14.143016",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run pytest tests/test_adaptive_decay.py tests/test_thompson_selector_adaptive.py tests/integration/test_csrc_walk_forward.py -v 2>&1",
+      "description": "Run pytest on three test files in verbose mode"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T17:07:20.939807",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -c \"import nautilus_trader; print(f'NautilusTrader version: {nautilus_trader.__version__}')\" && pytest tests/test_adaptive_decay.py tests/test_thompson_selector_adaptive.py tests/integration/test_csrc_walk_forward.py -v 2>&1",
+      "description": "Run pytest with nightly environment activated"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T17:07:30.090733",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/python -m pytest tests/test_adaptive_decay.py tests/test_thompson_selector_adaptive.py tests/integration/test_csrc_walk_forward.py -v 2>&1",
+      "description": "Run pytest using python -m with nightly environment"
     }
   ],
-  "last_updated": "2026-01-06T17:06:41.544573"
+  "last_updated": "2026-01-06T17:07:30.090748"
 }
