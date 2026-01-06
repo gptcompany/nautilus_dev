@@ -560,7 +560,15 @@ class SOPSGillerSizer:
 
         Returns:
             Final position size in [-max_position, max_position]
+
+        Note:
+            Returns 0.0 for NaN or Inf signals to prevent dangerous positions.
         """
+        # Guard against NaN/Inf signals - these could cause unexpected behavior
+        # due to Python's NaN comparison semantics (min/max return first arg)
+        if not math.isfinite(signal):
+            return 0.0
+
         # Step 1: SOPS with adaptive k
         sops_position = self._sops.size(signal)
 

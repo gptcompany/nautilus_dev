@@ -13,6 +13,7 @@ Key features:
 from __future__ import annotations
 
 import logging
+import threading
 from typing import TYPE_CHECKING, Any, Callable
 
 from strategies.common.audit.config import AuditConfig
@@ -27,7 +28,6 @@ from strategies.common.audit.events import (
 from strategies.common.audit.writer import AppendOnlyWriter
 
 if TYPE_CHECKING:
-
     from pydantic import BaseModel
 
 
@@ -40,6 +40,11 @@ class AuditEventEmitter:
 
     Provides methods to emit audit events for logging, monitoring, and compliance.
     Integrates with AppendOnlyWriter for immutable storage.
+
+    Supports high-rate event emission via optional batching/throttling:
+    - Buffer events and flush periodically or when buffer is full
+    - Thread-safe operation with background flush thread
+    - Graceful shutdown ensures all events are written
 
     Attributes:
         trader_id: Trader identifier for all emitted events.
@@ -57,6 +62,19 @@ class AuditEventEmitter:
         ...     source="meta_controller",
         ... )
         >>> emitter.close()
+
+    Example (batching):
+        >>> emitter = AuditEventEmitter(
+        ...     trader_id="TRADER-001",
+        ...     config=config,
+        ...     enable_batching=True,
+        ...     batch_size=100,
+        ...     flush_interval_ms=1000,
+        ... )
+        >>> # Events are buffered and flushed periodically
+        >>> for i in range(1000):
+        ...     emitter.emit_param_change(...)
+        >>> emitter.close()  # Flushes remaining events
     """
 
     def __init__(
@@ -66,6 +84,9 @@ class AuditEventEmitter:
         writer: AppendOnlyWriter | None = None,
         logger: logging.Logger | None = None,
         on_event: Callable[[BaseModel], None] | None = None,
+        enable_batching: bool = False,
+        batch_size: int = 100,
+        flush_interval_ms: int = 1000,
     ) -> None:
         """Initialize the AuditEventEmitter.
 
@@ -75,6 +96,9 @@ class AuditEventEmitter:
             writer: Optional custom writer. If None, creates from config.
             logger: Optional custom logger. If None, uses module logger.
             on_event: Optional callback invoked for each emitted event.
+            enable_batching: Enable batching mode for high-rate event emission.
+            batch_size: Flush when buffer reaches this size (default: 100).
+            flush_interval_ms: Flush every N milliseconds (default: 1000).
         """
         self._trader_id = trader_id
         self._config = config or AuditConfig()
@@ -94,7 +118,24 @@ class AuditEventEmitter:
             )
             self._owns_writer = True
 
-        _log.debug("AuditEventEmitter initialized: trader_id=%s", trader_id)
+        # Batching configuration
+        self._enable_batching = enable_batching
+        self._batch_size = batch_size
+        self._flush_interval_ms = flush_interval_ms
+        self._buffer: list[AuditEvent] = []
+        self._buffer_lock = threading.Lock()
+        self._flush_timer: threading.Timer | None = None
+        self._shutdown_event = threading.Event()
+
+        # Start periodic flush if batching enabled
+        if self._enable_batching:
+            self._schedule_flush()
+
+        _log.debug(
+            "AuditEventEmitter initialized: trader_id=%s batching=%s",
+            trader_id,
+            enable_batching,
+        )
 
     @property
     def trader_id(self) -> str:
@@ -111,10 +152,71 @@ class AuditEventEmitter:
         """Underlying AppendOnlyWriter."""
         return self._writer
 
+    def _schedule_flush(self) -> None:
+        """Schedule periodic flush timer.
+
+        Internal method to start background thread for periodic batch flushing.
+        """
+        if self._shutdown_event.is_set():
+            return
+
+        self._flush_timer = threading.Timer(
+            self._flush_interval_ms / 1000.0,
+            self._periodic_flush,
+        )
+        self._flush_timer.daemon = True
+        self._flush_timer.start()
+
+    def _periodic_flush(self) -> None:
+        """Periodic flush callback (runs in background thread)."""
+        if not self._shutdown_event.is_set():
+            self._flush_batch()
+            self._schedule_flush()  # Re-schedule for next interval
+
+    def _flush_batch_unsafe(self) -> None:
+        """Flush buffered events to writer (caller must hold lock).
+
+        Internal method that assumes caller already holds self._buffer_lock.
+        """
+        if not self._buffer:
+            return
+
+        # Write all buffered events
+        for event in self._buffer:
+            self._writer.write(event)
+
+            # Log for observability (debug level to avoid spam)
+            self._log.debug(
+                "Audit: %s seq=%d (batched)",
+                event.event_type.value,
+                event.sequence,
+            )
+
+            # Invoke callback if registered
+            if self._on_event is not None:
+                self._on_event(event)
+
+        # Clear buffer
+        batch_count = len(self._buffer)
+        self._buffer.clear()
+
+        self._log.debug("Flushed batch of %d events", batch_count)
+
+    def _flush_batch(self) -> None:
+        """Flush buffered events to writer.
+
+        Thread-safe method to write all buffered events and clear buffer.
+        """
+        with self._buffer_lock:
+            self._flush_batch_unsafe()
+
     def emit(self, event: AuditEvent) -> AuditEvent:
         """Emit an audit event.
 
         Sets trader_id and sequence, writes to log, invokes callback.
+
+        In batching mode, events are buffered and flushed periodically
+        or when buffer reaches batch_size.
 
         Args:
             event: Audit event to emit.
@@ -122,24 +224,37 @@ class AuditEventEmitter:
         Returns:
             The emitted event (with trader_id and sequence set).
         """
-        # Set trader_id and sequence
-        event.trader_id = self._trader_id
-        event.sequence = self._sequence
-        self._sequence += 1
+        # Set trader_id and sequence (always sequential, even in batching mode)
+        with self._buffer_lock:
+            event.trader_id = self._trader_id
+            event.sequence = self._sequence
+            self._sequence += 1
 
-        # Write to append-only log
-        self._writer.write(event)
+            if self._enable_batching:
+                # Add to buffer
+                self._buffer.append(event)
 
-        # Log for observability (debug level to avoid spam)
-        self._log.debug(
-            "Audit: %s seq=%d",
-            event.event_type.value,
-            event.sequence,
-        )
+                # Flush if buffer is full (use unsafe version since we hold lock)
+                if len(self._buffer) >= self._batch_size:
+                    self._flush_batch_unsafe()
+            else:
+                # Immediate write (non-batching mode)
+                pass  # Release lock before writing
 
-        # Invoke callback if registered
-        if self._on_event is not None:
-            self._on_event(event)
+        # Non-batching mode: write immediately
+        if not self._enable_batching:
+            self._writer.write(event)
+
+            # Log for observability (debug level to avoid spam)
+            self._log.debug(
+                "Audit: %s seq=%d",
+                event.event_type.value,
+                event.sequence,
+            )
+
+            # Invoke callback if registered
+            if self._on_event is not None:
+                self._on_event(event)
 
         return event
 
@@ -280,17 +395,39 @@ class AuditEventEmitter:
         return self.emit(event)
 
     def flush(self) -> None:
-        """Flush pending writes to disk."""
+        """Flush pending writes to disk.
+
+        In batching mode, flushes buffered events first.
+        """
+        if self._enable_batching:
+            self._flush_batch()
         self._writer.flush()
 
     def close(self) -> None:
         """Close the emitter and writer.
 
+        Ensures graceful shutdown:
+        - Stops periodic flush timer
+        - Flushes remaining buffered events
+        - Closes writer (if owned)
+
         Should be called when shutting down the audit system.
-        Only closes writer if emitter owns it.
         """
+        # Signal shutdown to stop periodic flush
+        self._shutdown_event.set()
+
+        # Cancel flush timer if running
+        if self._flush_timer is not None:
+            self._flush_timer.cancel()
+
+        # Flush remaining buffered events
+        if self._enable_batching:
+            self._flush_batch()
+
+        # Close writer if owned
         if self._owns_writer:
             self._writer.close()
+
         _log.debug("AuditEventEmitter closed")
 
     def __enter__(self) -> "AuditEventEmitter":

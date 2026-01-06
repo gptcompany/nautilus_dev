@@ -240,24 +240,33 @@ class AppendOnlyWriter:
                 _log.error("Failed to write audit event: %s", e)
                 return False
 
-    def write_raw(self, line: str) -> None:
+    def write_raw(self, line: str) -> bool:
         """Write raw string to append-only log.
 
         Used for recovery from partial writes.
 
         Args:
             line: Raw string to write (should end with newline).
+
+        Returns:
+            True if write succeeded, False on error.
         """
         if not line.endswith("\n"):
             line = line + "\n"
         data = line.encode("utf-8")
 
         with self._lock:
-            fd = self._ensure_file()
-            os.write(fd, data)
+            try:
+                fd = self._ensure_file()
+                os.write(fd, data)
 
-            if self._sync_writes:
-                os.fsync(fd)
+                if self._sync_writes:
+                    os.fsync(fd)
+
+                return True
+            except OSError as e:
+                _log.error("Failed to write raw audit data: %s", e)
+                return False
 
     def flush(self) -> None:
         """Flush pending writes to disk.

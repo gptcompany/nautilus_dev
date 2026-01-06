@@ -33,9 +33,10 @@ class TestAuditQuery:
             partition = cold_path / "2026/01/06"
             partition.mkdir(parents=True)
 
+            # 2026-01-06 00:00:00 UTC = 1767657600 seconds = 1767657600000000000 ns
             events = [
                 {
-                    "ts_event": 1736121600000000000,
+                    "ts_event": 1767657600000000000,  # 2026-01-06 00:00:00 UTC
                     "event_type": "param.state_change",
                     "source": "meta_controller",
                     "trader_id": "TRADER-001",
@@ -46,7 +47,7 @@ class TestAuditQuery:
                     "checksum": "abc123",
                 },
                 {
-                    "ts_event": 1736121660000000000,  # +60s
+                    "ts_event": 1767657660000000000,  # +60s
                     "event_type": "param.k_change",
                     "source": "sops_sizer",
                     "trader_id": "TRADER-001",
@@ -57,7 +58,7 @@ class TestAuditQuery:
                     "checksum": "def456",
                 },
                 {
-                    "ts_event": 1736121720000000000,  # +120s
+                    "ts_event": 1767657720000000000,  # +120s
                     "event_type": "trade.fill",
                     "source": "nautilus_trader",
                     "trader_id": "TRADER-001",
