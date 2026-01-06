@@ -112,6 +112,10 @@ from .sops_sizing import (
     TapeSpeedState,
     create_sops_sizer,
 )
+from .adaptive_decay import (
+    VolatilityContext,
+    AdaptiveDecayCalculator,
+)
 
 __all__ = [
     # Core detectors (FFT-based, accurate but slower)
@@ -201,4 +205,7 @@ __all__ = [
     "SOPSState",
     "TapeSpeedState",
     "create_sops_sizer",
+    # Adaptive Decay (Spec 032)
+    "VolatilityContext",
+    "AdaptiveDecayCalculator",
 ]

@@ -21,8 +21,8 @@
 
 **Purpose**: Create new module structure for adaptive decay
 
-- [ ] T001 Create adaptive_decay.py module file in strategies/common/adaptive_control/adaptive_decay.py
-- [ ] T002 Update __init__.py exports in strategies/common/adaptive_control/__init__.py
+- [X] T001 Create adaptive_decay.py module file in strategies/common/adaptive_control/adaptive_decay.py
+- [X] T002 Update __init__.py exports in strategies/common/adaptive_control/__init__.py
 
 ---
 
@@ -32,8 +32,8 @@
 
 **CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T003 Create VolatilityContext dataclass in strategies/common/adaptive_control/adaptive_decay.py
-- [ ] T004 Create AdaptiveDecayCalculator class skeleton in strategies/common/adaptive_control/adaptive_decay.py
+- [X] T003 Create VolatilityContext dataclass in strategies/common/adaptive_control/adaptive_decay.py
+- [X] T004 Create AdaptiveDecayCalculator class skeleton in strategies/common/adaptive_control/adaptive_decay.py
 
 **Checkpoint**: Foundation ready - user story implementation can now begin
 
