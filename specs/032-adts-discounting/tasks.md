@@ -59,7 +59,7 @@
 - [ ] T010 [US1] Implement normalized_volatility property in VolatilityContext in strategies/common/adaptive_control/adaptive_decay.py
 - [ ] T011 [US1] Implement calculate() method in AdaptiveDecayCalculator in strategies/common/adaptive_control/adaptive_decay.py
 - [ ] T012 [US1] Implement calculate_from_ratio() convenience method in strategies/common/adaptive_control/adaptive_decay.py
-- [ ] T013 [US1] Run tests and verify all US1 tests pass
+- [ ] T013 [US1] Run tests via test-runner agent: verify T005-T009b pass, coverage >= 80% for adaptive_decay.py
 
 **Checkpoint**: AdaptiveDecayCalculator fully functional - can calculate adaptive decay from variance_ratio
 
@@ -131,6 +131,7 @@
 - [ ] T041 Run alpha-debug verification on particle_portfolio.py modifications
 - [ ] T042 Verify SC-001: Measure adaptation speed (30% faster in volatile regimes)
 - [ ] T043 Verify SC-002: Full [0.95, 0.99] range coverage in 3 transitions
+- [ ] T044 [P] Verify O(1) decay calculation overhead (< 1ms per call)
 
 ---
 
@@ -142,7 +143,7 @@
 - **Foundational (Phase 2)**: Depends on Phase 1 - BLOCKS all user stories
 - **User Story 1 (Phase 3)**: Depends on Phase 2
 - **User Story 2 (Phase 4)**: Depends on Phase 2 (and integrates US1 output)
-- **User Story 3 (Phase 5)**: Depends on Phase 2 and Phase 4 (needs ThompsonSelector changes)
+- **User Story 3 (Phase 5)**: Depends on Phase 4 (needs ThompsonSelector changes from US2)
 - **Polish (Phase 6)**: Depends on all user stories complete
 
 ### User Story Dependencies

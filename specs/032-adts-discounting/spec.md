@@ -70,7 +70,7 @@ As a system monitor, I need to observe how decay rates change over time and corr
 - What happens when variance_ratio is extremely high (>10)? System should cap normalized_volatility at 1.0 to prevent decay from going below 0.95
 - What happens when variance_ratio is zero or near-zero? System should handle gracefully (no division involved in formula) and default to low volatility regime (decay = 0.99, since variance_ratio < 0.7 maps to normalized_volatility = 0.0)
 - What happens when IIRRegimeDetector is not provided? System should fall back to fixed decay rate (0.99) for backward compatibility
-- What happens during warmup period when variance estimates are unstable? System should use default decay rate until regime detector has sufficient samples
+- What happens during warmup period when variance estimates are unstable? System should use default decay rate (0.99) until regime detector returns a valid variance_ratio (i.e., when `IIRRegimeDetector.variance_ratio` is not None and detector has processed >= 50 samples)
 
 ## Requirements *(mandatory)*
 
