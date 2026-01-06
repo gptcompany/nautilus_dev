@@ -13,7 +13,25 @@
       "timestamp": "2026-01-06T11:46:39.789307",
       "command": "rm -rf specs/032-feature-adts-adaptive && mkdir -p specs/032-adts-discounting/checklists",
       "description": "Fix directory name"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T11:46:47.426557",
+      "command": "git log --all --oneline -- \"specs/032-adts-discounting/spec.md\" | head -3",
+      "description": "Find commit with correct 032"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T11:46:52.967144",
+      "command": "git show 6ae2c3b:specs/032-adts-discounting/spec.md > specs/032-adts-discounting/spec.md && echo \"032-adts-discounting OK\"",
+      "description": "Recover correct 032"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T11:46:53.322873",
+      "command": "rm -rf specs/032-feature-adts-adaptive && ls -la specs/032*/",
+      "description": "Remove wrong folder and verify"
     }
   ],
-  "last_updated": "2026-01-06T11:46:39.789328"
+  "last_updated": "2026-01-06T11:46:53.322890"
 }
