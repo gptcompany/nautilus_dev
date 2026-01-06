@@ -1,0 +1,26 @@
+{
+  "execution": {
+    "workflow_id": "nautilus-monitor",
+    "workflow_name": "NautilusTrader Version Monitor",
+    "timestamp": "2026-01-06T00:00:31.252Z",
+    "status": "warning"
+  },
+  "nautilus_state": {
+    "stable_version": "v1.222.0",
+    "nightly_commits_ahead": 41,
+    "check_date": "2026-01-06"
+  },
+  "breaking_changes": [
+    {
+      "sha": "314ef30",
+      "title": "Align Rust data commands with Python and fix book flow",
+      "date": "2026-01-04T07:25:14Z",
+      "url": "https://github.com/nautechsystems/nautilus_trader/commit/314ef3021c24d62dbd9e6403af011e30061b023b",
+      "message": "Align Rust data commands with Python and fix book flow\n\n- Add correlation_id field to all Subscribe/Unsubscribe command structs\n- Fix BookUpdater to handle direct OrderBookDeltas/Depth10 from msgbus\n- Forward BookSnapshots subscriptions to client as BookDeltas with link\n- Track direct deltas subscriptions separately from snapshot-forwarded\n- Properly unsubscribe deltas when all snapshot intervals are removed"
+    }
+  ],
+  "compatibility_assessment": {
+    "status": "review_required",
+    "breaking_count": 1
+  }
+}
