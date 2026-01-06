@@ -21,9 +21,9 @@
 
 **Purpose**: Create base structure for correlation tracking module
 
-- [ ] T001 Create `strategies/common/adaptive_control/correlation_tracker.py` with module docstring and imports
-- [ ] T002 [P] Create `tests/unit/test_correlation_tracker.py` with test class skeleton
-- [ ] T003 [P] Create `tests/integration/test_csrc_walk_forward.py` with test class skeleton
+- [X] T001 Create `strategies/common/adaptive_control/correlation_tracker.py` with module docstring and imports
+- [X] T002 [P] Create `tests/unit/test_correlation_tracker.py` with test class skeleton
+- [X] T003 [P] Create `tests/integration/test_csrc_walk_forward.py` with test class skeleton
 
 ---
 
@@ -33,12 +33,12 @@
 
 **Critical**: No user story work can begin until this phase is complete
 
-- [ ] T004 [E] Implement `OnlineStats` dataclass for single-strategy statistics (mean, var, n) in `strategies/common/adaptive_control/correlation_tracker.py`
-- [ ] T005 Implement `OnlineCorrelationMatrix.__init__()` with parameters (strategies, decay=0.99, shrinkage=0.1, min_samples=30) in `strategies/common/adaptive_control/correlation_tracker.py`
-- [ ] T006 [E] Implement Welford's online update algorithm for `_update_stats()` method in `strategies/common/adaptive_control/correlation_tracker.py`
-- [ ] T007 [E] Implement Ledoit-Wolf shrinkage function `_apply_shrinkage()` in `strategies/common/adaptive_control/correlation_tracker.py`
-- [ ] T008 Implement `OnlineCorrelationMatrix.update(returns: Dict[str, float])` using EMA for covariance updates in `strategies/common/adaptive_control/correlation_tracker.py`
-- [ ] T009 Implement `get_correlation_matrix() -> np.ndarray` returning shrunk N×N matrix in `strategies/common/adaptive_control/correlation_tracker.py`
+- [X] T004 [E] Implement `OnlineStats` dataclass for single-strategy statistics (mean, var, n) in `strategies/common/adaptive_control/correlation_tracker.py`
+- [X] T005 Implement `OnlineCorrelationMatrix.__init__()` with parameters (strategies, decay=0.99, shrinkage=0.1, min_samples=30) in `strategies/common/adaptive_control/correlation_tracker.py`
+- [X] T006 [E] Implement Welford's online update algorithm for `_update_stats()` method in `strategies/common/adaptive_control/correlation_tracker.py`
+- [X] T007 [E] Implement Ledoit-Wolf shrinkage function `_apply_shrinkage()` in `strategies/common/adaptive_control/correlation_tracker.py`
+- [X] T008 Implement `OnlineCorrelationMatrix.update(returns: Dict[str, float])` using EMA for covariance updates in `strategies/common/adaptive_control/correlation_tracker.py`
+- [X] T009 Implement `get_correlation_matrix() -> np.ndarray` returning shrunk N×N matrix in `strategies/common/adaptive_control/correlation_tracker.py`
 - [ ] T010 Write unit tests for `OnlineCorrelationMatrix` initialization in `tests/unit/test_correlation_tracker.py`
 - [ ] T011 Write unit tests for correlation convergence (synthetic data, known correlation 0.9, verify within 5% after 150 samples) in `tests/unit/test_correlation_tracker.py`
 
