@@ -513,7 +513,78 @@
       "timestamp": "2026-01-06T17:11:09.926499",
       "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run pytest tests/test_adaptive_decay.py tests/test_thompson_selector_adaptive.py -v 2>&1",
       "description": "Run pytest on adaptive decay and thompson selector tests"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-06T17:11:28.719094",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/032-adts-discounting/tasks.md",
+      "old_string": "- [ ] T040 Run alpha-debug verification on adaptive_decay.py\n- [ ] T041 Run alpha-debug verification..."
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2026-01-06T17:11:34.211952",
+      "todo_count": 4
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T17:11:40.638535",
+      "command": "grep -E \"^\\- \\[\" /media/sam/1TB/nautilus_dev/specs/032-adts-discounting/tasks.md | wc -l && echo \"---\" && grep -E \"^\\- \\[X\\]\" /media/sam/1TB/nautilus_dev/specs/032-adts-discounting/tasks.md | wc -l && echo \"---\" && grep -E \"^\\- \\[ \\]\" /media/sam/1TB/nautilus_dev/specs/032-adts-discounting/tasks.md",
+      "description": "Count completed vs pending tasks"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T17:11:46.010079",
+      "command": "grep -n \"^\\- \\[ \\]\" /media/sam/1TB/nautilus_dev/specs/032-adts-discounting/tasks.md",
+      "description": "Find incomplete task"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T17:11:51.852323",
+      "command": "grep -c '\\- \\[X\\]' /media/sam/1TB/nautilus_dev/specs/032-adts-discounting/tasks.md && grep -c '\\- \\[ \\]' /media/sam/1TB/nautilus_dev/specs/032-adts-discounting/tasks.md || echo \"0 incomplete\"",
+      "description": "Count tasks"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T17:11:59.091596",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && ruff check strategies/common/adaptive_control/adaptive_decay.py strategies/common/adaptive_control/particle_portfolio.py strategies/common/audit/events.py 2>&1",
+      "description": "Run ruff linting on modified files"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-06T17:12:08.057220",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/adaptive_control/particle_portfolio.py",
+      "old_string": "if TYPE_CHECKING:\n    from strategies.common.adaptive_control.correlation_tracker import (\n        C..."
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T17:12:12.723612",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && ruff check strategies/common/adaptive_control/adaptive_decay.py strategies/common/adaptive_control/particle_portfolio.py strategies/common/audit/events.py 2>&1",
+      "description": "Run ruff linting again"
+    },
+    {
+      "operation": "task",
+      "timestamp": "2026-01-06T17:12:18.878879",
+      "subagent_type": "test-runner",
+      "prompt": "Run these tests using pytest verbose mode to verify final implementation:\n- tests/test_adaptive_deca..."
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T17:12:23.691043",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run pytest tests/test_adaptive_decay.py tests/test_thompson_selector_adaptive.py tests/integration/test_csrc_walk_forward.py -v 2>&1",
+      "description": "Run pytest on three test files in verbose mode"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T17:12:30.065091",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -m pytest tests/test_adaptive_decay.py tests/test_thompson_selector_adaptive.py -v 2>&1",
+      "description": "Run pytest on unit test files"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T17:12:39.176456",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -m pytest tests/integration/test_csrc_walk_forward.py -v 2>&1",
+      "description": "Run integration test for CSRC walk forward"
     }
   ],
-  "last_updated": "2026-01-06T17:11:09.926520"
+  "last_updated": "2026-01-06T17:12:39.176472"
 }

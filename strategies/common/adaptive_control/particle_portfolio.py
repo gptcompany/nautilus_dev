@@ -41,7 +41,10 @@ from typing import TYPE_CHECKING, Dict, List, Optional, Tuple
 if TYPE_CHECKING:
     from strategies.common.adaptive_control.correlation_tracker import (
         CorrelationMetrics,
+        OnlineCorrelationMatrix,
     )
+    from strategies.common.adaptive_control.dsp_filters import IIRRegimeDetector
+    from strategies.common.audit.emitter import AuditEventEmitter
 
 
 @dataclass
