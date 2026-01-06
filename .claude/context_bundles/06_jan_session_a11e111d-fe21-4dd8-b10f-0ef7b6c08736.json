@@ -412,7 +412,528 @@
       "timestamp": "2026-01-06T12:51:00.843232",
       "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && PYTHONPATH=/media/sam/1TB/nautilus_dev:$PYTHONPATH python -m pytest tests/unit/test_correlation_tracker.py tests/integration/test_csrc_walk_forward.py -v --tb=short 2>&1 | head -200",
       "description": "Run CSRC tests with PYTHONPATH set"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-06T12:51:55.053602",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/integration/test_csrc_walk_forward.py",
+      "old_string": "    def test_lambda_sensitivity(self):\n        \"\"\"T029: Test higher lambda = more diversification.\n\n..."
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T12:52:04.097423",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run pytest tests/unit/test_correlation_tracker.py tests/integration/test_csrc_walk_forward.py -v --tb=short 2>&1 | tail -30",
+      "description": "Run CSRC tests to verify all pass"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T12:52:11.556207",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -m pytest tests/unit/test_correlation_tracker.py -v --tb=short 2>&1 | tail -40",
+      "description": "Run unit tests for correlation tracker"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T12:52:27.207261",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -m pytest tests/integration/test_csrc_walk_forward.py -v --tb=short --ignore-glob=\"*conftest*\" 2>&1 | tail -40",
+      "description": "Run integration tests for CSRC"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-06T12:53:06.385236",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/integration/test_csrc_walk_forward.py"
+    },
+    {
+      "operation": "task",
+      "timestamp": "2026-01-06T15:18:42.651224",
+      "subagent_type": "alpha-debug",
+      "prompt": "Perform iterative bug hunting on the CSRC (Correlation-aware Allocation) implementation.\n\n## Recentl..."
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2026-01-06T15:18:50.616614",
+      "todo_count": 8
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T15:19:01.614701",
+      "command": "git diff HEAD~3 --stat 2>/dev/null | tail -20",
+      "description": "Get diff stats for recent changes"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T15:19:01.643728",
+      "command": "git diff HEAD~3 --name-only 2>/dev/null | grep -E '\\.(py|md)$' | head -30",
+      "description": "List modified Python and Markdown files"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-06T15:19:01.729059",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/adaptive_control/correlation_tracker.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-06T15:19:01.740006",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/adaptive_control/particle_portfolio.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-06T15:19:10.628069",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/unit/test_correlation_tracker.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-06T15:19:10.635950",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/integration/test_csrc_walk_forward.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-06T15:19:10.647676",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/audit/events.py"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2026-01-06T15:19:18.127810",
+      "todo_count": 8
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T15:19:28.826414",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run pyright strategies/common/adaptive_control/correlation_tracker.py strategies/common/adaptive_control/particle_portfolio.py --outputjson 2>/dev/null | head -100",
+      "description": "Run pyright type checking on CSRC modules"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T15:19:35.566533",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run ruff check strategies/common/adaptive_control/correlation_tracker.py strategies/common/adaptive_control/particle_portfolio.py --output-format=text 2>/dev/null | head -50",
+      "description": "Run ruff linting on CSRC modules"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T15:19:37.775088",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run pytest tests/unit/test_correlation_tracker.py -v --tb=short 2>&1 | tail -60",
+      "description": "Run unit tests for correlation tracker"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T15:19:52.966991",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run pytest tests/integration/test_csrc_walk_forward.py -v --tb=short 2>&1 | tail -80",
+      "description": "Run integration tests for CSRC"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T15:19:58.689494",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -c \"from tests.integration.test_csrc_walk_forward import *; import pytest; pytest.main(['-v', '--tb=short', 'tests/integration/test_csrc_walk_forward.py'])\" 2>&1 | tail -80",
+      "description": "Run CSRC integration tests with nautilus environment"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2026-01-06T15:20:25.842383",
+      "todo_count": 8
+    },
+    {
+      "operation": "grep",
+      "timestamp": "2026-01-06T15:20:42.613112",
+      "pattern": "corr_matrix = self\\._correlation_tracker\\.get_correlation_matrix",
+      "path": "/media/sam/1TB/nautilus_dev/strategies/common/adaptive_control/particle_portfolio.py",
+      "output_mode": "content"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T15:20:43.418050",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python3 -c \"\nimport numpy as np\nfrom strategies.common.adaptive_control.correlation_tracker import (\n    OnlineCorrelationMatrix,\n    calculate_covariance_penalty,\n)\n\n# Test edge case: what happens if corr_matrix None passed to penalty?\n# This would only happen if the type guard fails\ntry:\n    # This should not happen in normal flow, but test it\n    result = calculate_covariance_penalty(\n        weights={'A': 0.5, 'B': 0.5},\n        corr_matrix=None,  # Invalid input\n        strategy_indices={'A': 0, 'B': 1}\n    )\n    print(f'ERROR: No exception raised, got {result}')\nexcept TypeError as e:\n    print(f'TypeError (expected): {e}')\nexcept Exception as e:\n    print(f'Other exception: {type(e).__name__}: {e}')\n\n# Test edge case: empty weights dict\ntry:\n    corr = np.eye(2)\n    result = calculate_covariance_penalty(\n        weights={},  # Empty weights\n        corr_matrix=corr,\n        strategy_indices={'A': 0, 'B': 1}\n    )\n    print(f'Empty weights result: {result}')\nexcept Exception as e:\n    print(f'Empty weights exception: {type(e).__name__}: {e}')\n\n# Test edge case: weights with strategy not in indices\ntry:\n    corr = np.eye(2)\n    result = calculate_covariance_penalty(\n        weights={'A': 0.5, 'X': 0.5},  # X not in indices\n        corr_matrix=corr,\n        strategy_indices={'A': 0, 'B': 1}\n    )\n    print(f'Unknown strategy result: {result}')\nexcept Exception as e:\n    print(f'Unknown strategy exception: {type(e).__name__}: {e}')\n\n# Test edge case: total_weight = 0\ntry:\n    corr = np.eye(2)\n    result = calculate_covariance_penalty(\n        weights={'A': 0.0, 'B': 0.0},  # All zeros\n        corr_matrix=corr,\n        strategy_indices={'A': 0, 'B': 1}\n    )\n    print(f'Zero weights result: {result}')\nexcept Exception as e:\n    print(f'Zero weights exception: {type(e).__name__}: {e}')\n\"\n",
+      "description": "Test edge cases for calculate_covariance_penalty"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T15:21:04.106590",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python3 -c \"\nimport numpy as np\nfrom strategies.common.adaptive_control.correlation_tracker import (\n    OnlineCorrelationMatrix,\n    calculate_covariance_penalty,\n)\n\n# Deep test: Verify the actual flow in ParticlePortfolio\n# When _correlation_tracker is None, corr_matrix is None but lambda_penalty check passes\n\n# Scenario: What if _lambda_penalty > 0 but _correlation_tracker is None?\n# This is a configuration error - let's verify behavior\n\n# In particle_portfolio.py line 197:\n# if self._correlation_tracker is not None and self._lambda_penalty > 0:\n# This is SAFE because we check _correlation_tracker is not None first\n\nprint('Test 1: Normal flow analysis')\nprint('- _correlation_tracker=None AND _lambda_penalty>0: penalty skipped (SAFE)')\nprint('- _correlation_tracker!=None AND _lambda_penalty=0: penalty skipped (SAFE)')\nprint('- _correlation_tracker!=None AND _lambda_penalty>0: penalty calculated')\n\n# Test edge case: Very large correlation values (outside [-1, 1])\nprint()\nprint('Test 2: Invalid correlation matrix (values outside [-1, 1])')\ncorr = np.array([[1.0, 2.0], [2.0, 1.0]])  # Invalid correlation > 1\ntry:\n    result = calculate_covariance_penalty(\n        weights={'A': 0.5, 'B': 0.5},\n        corr_matrix=corr,\n        strategy_indices={'A': 0, 'B': 1}\n    )\n    print(f'Invalid corr result: {result}')\n    print('NOTE: No validation of correlation matrix - trusts input')\nexcept Exception as e:\n    print(f'Exception: {type(e).__name__}: {e}')\n\n# Test: Negative weights (should not happen but test)\nprint()\nprint('Test 3: Negative weights (edge case)')\ncorr = np.array([[1.0, 0.5], [0.5, 1.0]])\nresult = calculate_covariance_penalty(\n    weights={'A': -0.5, 'B': 1.5},  # Negative weight\n    corr_matrix=corr,\n    strategy_indices={'A': 0, 'B': 1}\n)\nprint(f'Negative weights result: {result}')\n# After normalization: -0.5/1.0=-0.5, 1.5/1.0=1.5 (NOT normalized to sum 1!)\n# The normalization only happens if total_weight > 0 AND abs(total_weight - 1.0) > 1e-6\n\n# Test: Weights sum to -1\nprint()\nprint('Test 4: Weights sum to negative')\nresult = calculate_covariance_penalty(\n    weights={'A': -0.5, 'B': -0.5},\n    corr_matrix=corr,\n    strategy_indices={'A': 0, 'B': 1}\n)\nprint(f'Negative sum weights: {result}')\n\"\n",
+      "description": "Deep test edge cases in correlation penalty"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-06T15:21:11.587293",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/adaptive_control/correlation_tracker.py"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T15:21:27.589747",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python3 -c \"\nimport numpy as np\n\n# BUG: When total_weight <= 0, weights are NOT normalized\n# This allows negative weights or zero weights to pass through\n\n# Case 1: total_weight = 0 (all zeros)\nweight_array = np.array([0.0, 0.0])\ntotal_weight = np.sum(weight_array)\nprint(f'Case 1: total_weight={total_weight}')\nprint(f'  Condition: total_weight > 0 = {total_weight > 0}')\nprint(f'  Weights not normalized, remain zeros')\nprint(f'  w @ C @ w = 0, diagonal = 0, penalty = 0 (SAFE)')\nprint()\n\n# Case 2: total_weight = 1.0 (negative + positive)\nweight_array = np.array([-0.5, 1.5])  # sum = 1.0\ntotal_weight = np.sum(weight_array)\nprint(f'Case 2: total_weight={total_weight}')\nprint(f'  Condition: total_weight > 0 AND abs(1.0 - 1.0) > 1e-6 = {total_weight > 0 and abs(total_weight - 1.0) > 1e-6}')\nprint(f'  Weights NOT normalized because sum = 1.0')\nprint(f'  Negative weight -0.5 passes through unchanged!')\nprint()\n\n# Case 3: total_weight < 0 (both negative)\nweight_array = np.array([-0.5, -0.5])  # sum = -1.0\ntotal_weight = np.sum(weight_array)\nprint(f'Case 3: total_weight={total_weight}')\nprint(f'  Condition: total_weight > 0 = {total_weight > 0}')\nprint(f'  Weights NOT normalized (total_weight not > 0)')\nprint(f'  Negative weights pass through unchanged!')\n\n# Is this a REAL bug? Let's check ParticlePortfolio.particles\n# In Particle.normalize_weights():\n#   total = sum(abs(w) for w in self.weights.values())\n#   weights normalized by absolute sum\n# So Particle weights are ALWAYS non-negative after normalize_weights()\nprint()\nprint('=== Checking Particle.normalize_weights() ===')\nfrom strategies.common.adaptive_control.particle_portfolio import Particle\n\np = Particle(weights={'A': -0.5, 'B': 1.5})\nprint(f'Before normalize: {p.weights}')\np.normalize_weights()\nprint(f'After normalize: {p.weights}')\n\n# Hmm, normalize_weights uses abs() in total but divides raw weights\n# This would make negative weights smaller but still negative!\n\"\n",
+      "description": "Investigate negative weight edge case"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-06T15:21:37.515377",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/adaptive_control/particle_portfolio.py"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T15:21:54.742643",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python3 -c \"\n# Investigate: Can Particle weights ever become negative?\n\n# 1. Initial creation (line 154):\n#    weights = {s: random.random() for s in strategies}\n#    random.random() returns [0, 1), so ALWAYS positive\n\n# 2. After mutation (line 357-358):\n#    noise = random.gauss(0, self.mutation_std)\n#    particle.weights[s] = max(0, particle.weights[s] + noise)\n#    The max(0, ...) ensures weights stay non-negative!\n\n# 3. After resampling (line 338-339):\n#    Copies existing particle weights, which should already be non-negative\n\n# Conclusion: In normal operation, particle weights should NEVER be negative\n\n# BUT: The normalize_weights() method has a subtle bug:\n# - Uses abs() in total calculation\n# - Divides raw weights by total\n# If weights were negative, they'd stay negative but get smaller\n\n# Since weights can't become negative, this isn't a real bug in practice\n# BUT it's a potential latent bug if someone modifies particle weights externally\n\nprint('=== Particle Weight Flow Analysis ===')\nprint('1. Initial creation: random.random() -> [0, 1) (SAFE)')\nprint('2. After mutation: max(0, ...) ensures >= 0 (SAFE)')\nprint('3. After resampling: copies existing (should be >= 0)')\nprint()\nprint('Conclusion: Weights cannot become negative in normal flow')\nprint('normalize_weights() abs() usage is defensive but inconsistent')\nprint()\nprint('=== Testing the actual flow ===')\n\nimport random\nrandom.seed(42)\n\nfrom strategies.common.adaptive_control.particle_portfolio import ParticlePortfolio\n\nstrategies = ['A', 'B', 'C']\nportfolio = ParticlePortfolio(strategies, n_particles=10)\n\n# Check all initial weights are positive\nall_positive = True\nfor p in portfolio.particles:\n    for s, w in p.weights.items():\n        if w < 0:\n            print(f'NEGATIVE: {s}={w}')\n            all_positive = False\n\nprint(f'All initial weights positive: {all_positive}')\n\n# Run some updates with extreme returns\nreturns = {'A': -10.0, 'B': 10.0, 'C': 0.0}\nstate = portfolio.update(returns)\n\n# Check weights after update\nall_positive = True\nfor p in portfolio.particles:\n    for s, w in p.weights.items():\n        if w < 0:\n            print(f'NEGATIVE after update: {s}={w}')\n            all_positive = False\n\nprint(f'All weights positive after update: {all_positive}')\n\"\n",
+      "description": "Verify particle weights stay non-negative"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T15:22:12.870013",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python3 -c \"\nimport numpy as np\nfrom strategies.common.adaptive_control.correlation_tracker import OnlineCorrelationMatrix\n\n# Test: EMA behavior on first sample\n# Line 257: self._ema_cov = np.outer(deviations, deviations)\n# On first sample, deviations = ret_array - ema_means = ret_array - ret_array = [0, 0, ...]\n# So _ema_cov starts as all zeros!\n\ntracker = OnlineCorrelationMatrix(strategies=['A', 'B'], min_samples=1)\ntracker.update({'A': 0.1, 'B': 0.2})\n\nprint('After 1 sample:')\nprint(f'  _ema_means: {tracker._ema_means}')\nprint(f'  _ema_cov:\\\\n{tracker._ema_cov}')\nprint(f'  _n_samples: {tracker._n_samples}')\n\n# Get correlation matrix with min_samples=1\ncorr = tracker.get_correlation_matrix()\nprint(f'  corr_matrix:\\\\n{corr}')\n\n# With zero covariance, variances are 0, and we divide by epsilon\n# Let's trace through get_correlation_matrix()\nvariances = np.diag(tracker._ema_cov)\nprint(f'  variances: {variances}')\n\n# Line 370: std_devs = np.sqrt(np.maximum(variances, tracker.epsilon))\n# With epsilon=1e-6, std_devs = sqrt(1e-6) = 0.001\nstd_devs = np.sqrt(np.maximum(variances, tracker.epsilon))\nprint(f'  std_devs: {std_devs}')\n\n# Line 373-375: sample_corr = _ema_cov / std_outer\nstd_outer = np.outer(std_devs, std_devs)\nsample_corr = tracker._ema_cov / std_outer\nprint(f'  sample_corr:\\\\n{sample_corr}')\n# All zeros / (0.001 * 0.001) = 0 / 1e-6 = 0\n\n# After shrinkage and diagonal fix, should be identity\nprint()\nprint('=> First sample correlation is all zeros (except diagonal)')\nprint('   This is correct behavior - no correlation info yet')\n\"\n",
+      "description": "Test EMA behavior on first sample"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T15:22:28.545722",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python3 -c \"\nimport numpy as np\nfrom strategies.common.adaptive_control.correlation_tracker import OnlineCorrelationMatrix\n\n# Test: Verify OnlineStats (Welford) is NOT used for covariance calculation\n# The code maintains _stats list but only uses it for individual variance tracking\n# The EMA-based _ema_cov is used for correlation matrix\n\n# This creates potential inconsistency: _stats.var uses population formula\n# while _ema_cov uses EMA which has different statistical properties\n\ntracker = OnlineCorrelationMatrix(strategies=['A', 'B'], min_samples=2, decay=0.99)\n\n# Feed 100 samples of known variance\nnp.random.seed(42)\nfor i in range(100):\n    tracker.update({'A': np.random.randn(), 'B': np.random.randn()})\n\nprint('Welford stats vs EMA stats:')\nprint(f'  Welford A: mean={tracker._stats[0].mean:.4f}, var={tracker._stats[0].var:.4f}')\nprint(f'  Welford B: mean={tracker._stats[1].mean:.4f}, var={tracker._stats[1].var:.4f}')\nprint(f'  EMA means: {tracker._ema_means}')\nprint(f'  EMA variances (diag): {np.diag(tracker._ema_cov)}')\n\n# The difference is expected due to EMA vs arithmetic mean\n# But Welford stats are NEVER USED for correlation calculation!\n# This is dead code / unused computation\n\nprint()\nprint('=> _stats (Welford) is computed but NEVER USED for correlation')\nprint('   Only _ema_means and _ema_cov are used in get_correlation_matrix()')\nprint('   This is NOT a bug, but unnecessary computation (~10% overhead)')\n\"\n",
+      "description": "Check for dead code in Welford stats"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2026-01-06T15:22:45.983920",
+      "todo_count": 8
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T15:23:01.077731",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python3 -c \"\n# Deep test of ParticlePortfolio CSRC integration\n\nimport numpy as np\nfrom strategies.common.adaptive_control.correlation_tracker import OnlineCorrelationMatrix\nfrom strategies.common.adaptive_control.particle_portfolio import ParticlePortfolio\n\n# Test 1: Strategy indices mismatch\n# ParticlePortfolio maintains its own _strategy_indices (line 147-149)\n# These should match OnlineCorrelationMatrix.strategy_indices\n\nstrategies = ['A', 'B', 'C']\ntracker = OnlineCorrelationMatrix(strategies=strategies)\nportfolio = ParticlePortfolio(\n    strategies=strategies,\n    correlation_tracker=tracker,\n    lambda_penalty=1.0,\n)\n\nprint('Test 1: Strategy indices consistency')\nprint(f'  ParticlePortfolio._strategy_indices: {portfolio._strategy_indices}')\nprint(f'  OnlineCorrelationMatrix.strategy_indices: {tracker.strategy_indices}')\nmatch = portfolio._strategy_indices == tracker.strategy_indices\nprint(f'  Match: {match}')\n\n# Test 2: What if strategies in different order?\nstrategies_different = ['C', 'A', 'B']  # Different order\ntracker2 = OnlineCorrelationMatrix(strategies=strategies_different)\nportfolio2 = ParticlePortfolio(\n    strategies=['A', 'B', 'C'],  # Original order\n    correlation_tracker=tracker2,\n    lambda_penalty=1.0,\n)\n\nprint()\nprint('Test 2: Different order strategies')\nprint(f'  ParticlePortfolio._strategy_indices: {portfolio2._strategy_indices}')\nprint(f'  OnlineCorrelationMatrix.strategy_indices: {tracker2.strategy_indices}')\n\n# When calculating penalty, we use portfolio._strategy_indices\n# But corr_matrix came from tracker which has different indices!\n# This is a POTENTIAL BUG if user passes mismatched tracker\n\n# Let's trace the actual penalty calculation\nnp.random.seed(42)\nfor _ in range(50):\n    returns = {'A': np.random.randn() * 0.01, 'B': np.random.randn() * 0.01, 'C': np.random.randn() * 0.01}\n    state = portfolio2.update(returns)\n\n# The corr_matrix[i,j] refers to tracker's indices, not portfolio's\n# This could cause correlation values to be mismatched!\nprint()\nprint('=> POTENTIAL BUG: If tracker and portfolio have different strategy order,')\nprint('   the correlation matrix indices will be misaligned!')\n\"\n",
+      "description": "Test strategy indices consistency"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T15:23:18.559354",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python3 -c \"\n# Demonstrate the index mismatch bug\n\nimport numpy as np\nfrom strategies.common.adaptive_control.correlation_tracker import (\n    OnlineCorrelationMatrix,\n    calculate_covariance_penalty,\n)\nfrom strategies.common.adaptive_control.particle_portfolio import ParticlePortfolio\n\n# Create tracker with order C, A, B\ntracker = OnlineCorrelationMatrix(strategies=['C', 'A', 'B'])\n\n# Feed data: A and B are highly correlated, C is independent\nnp.random.seed(42)\nfor _ in range(100):\n    base = np.random.randn() * 0.01\n    tracker.update({\n        'A': base,\n        'B': base + np.random.randn() * 0.001,  # High correlation with A\n        'C': np.random.randn() * 0.01,  # Independent\n    })\n\ncorr = tracker.get_correlation_matrix()\nprint('Correlation matrix (tracker order: C=0, A=1, B=2):')\nprint(f'  C-A (indices 0,1): {corr[0,1]:.3f}')\nprint(f'  C-B (indices 0,2): {corr[0,2]:.3f}')\nprint(f'  A-B (indices 1,2): {corr[1,2]:.3f}')\n\n# Portfolio uses order A=0, B=1, C=2\nportfolio_indices = {'A': 0, 'B': 1, 'C': 2}\n\nprint()\nprint('ParticlePortfolio expects A=0, B=1, C=2')\nprint(f'  Looking for A-B at [0,1]: {corr[0,1]:.3f} <- WRONG! This is C-A!')\nprint(f'  Looking for A-C at [0,2]: {corr[0,2]:.3f} <- WRONG! This is C-B!')\nprint(f'  Looking for B-C at [1,2]: {corr[1,2]:.3f} <- WRONG! This is A-B!')\n\n# Calculate penalty with wrong indices\nweights = {'A': 0.5, 'B': 0.5, 'C': 0.0}  # All weight in A, B\n\n# Correct penalty (using tracker's indices)\ncorrect_penalty = calculate_covariance_penalty(weights, corr, tracker.strategy_indices)\n\n# Wrong penalty (using portfolio's indices)\nwrong_penalty = calculate_covariance_penalty(weights, corr, portfolio_indices)\n\nprint()\nprint(f'Correct penalty (tracker indices): {correct_penalty:.4f}')\nprint(f'Wrong penalty (portfolio indices): {wrong_penalty:.4f}')\nprint(f'Difference: {abs(correct_penalty - wrong_penalty):.4f}')\nprint()\nprint('=> BUG CONFIRMED: Index mismatch causes incorrect penalty calculation!')\n\"\n",
+      "description": "Demonstrate the index mismatch bug"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-06T15:23:29.244436",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/adaptive_control/particle_portfolio.py"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-06T15:23:36.427631",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/adaptive_control/particle_portfolio.py",
+      "old_string": "                penalty = calculate_covariance_penalty(\n                    weights=particle.weights..."
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T15:23:52.210612",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python3 -c \"\n# Verify the fix for strategy index mismatch\n\nimport numpy as np\nfrom strategies.common.adaptive_control.correlation_tracker import OnlineCorrelationMatrix\nfrom strategies.common.adaptive_control.particle_portfolio import ParticlePortfolio\n\n# Create tracker with order C, A, B\ntracker = OnlineCorrelationMatrix(strategies=['C', 'A', 'B'])\n\n# Create portfolio with order A, B, C but using tracker\nportfolio = ParticlePortfolio(\n    strategies=['A', 'B', 'C'],\n    n_particles=50,\n    correlation_tracker=tracker,\n    lambda_penalty=1.0,\n)\n\n# Feed data: A and B are highly correlated, C is independent\nnp.random.seed(42)\nfor _ in range(100):\n    base = np.random.randn() * 0.01\n    returns = {\n        'A': base,\n        'B': base + np.random.randn() * 0.001,  # High correlation with A\n        'C': np.random.randn() * 0.01,  # Independent\n    }\n    state = portfolio.update(returns)\n\n# With the fix, penalty should now be calculated correctly\n# using tracker's strategy_indices instead of portfolio's\n\nprint('After fix, penalty uses tracker.strategy_indices')\nprint(f'Tracker indices: {tracker.strategy_indices}')\nprint(f'Final correlation_metrics: {state.correlation_metrics}')\nprint()\nprint('Test PASSED: No crash, penalty calculated with correct indices')\n\"\n",
+      "description": "Verify index mismatch fix"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T15:24:01.776765",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run pytest tests/unit/test_correlation_tracker.py -v --tb=short 2>&1 | tail -40",
+      "description": "Run unit tests after fix"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T15:24:05.510993",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -c \"from tests.integration.test_csrc_walk_forward import *; import pytest; pytest.main(['-v', '--tb=short', 'tests/integration/test_csrc_walk_forward.py'])\" 2>&1 | tail -30",
+      "description": "Run integration tests after fix"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-06T15:24:20.544934",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/integration/test_csrc_walk_forward.py"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T15:24:36.597552",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python3 -c \"\n# Analyze why test_lambda_zero_matches_baseline is failing\n\nimport numpy as np\nfrom strategies.common.adaptive_control.correlation_tracker import OnlineCorrelationMatrix\nfrom strategies.common.adaptive_control.particle_portfolio import ParticlePortfolio\n\ndef generate_correlated_returns(n_samples, correlation, seed=42):\n    np.random.seed(seed)\n    x = np.random.randn(n_samples) * 0.01\n    z = np.random.randn(n_samples) * 0.01\n    y = correlation * x + np.sqrt(1 - correlation**2) * z\n    return x, y\n\nn_samples = 100\nstrategies = ['A', 'B']\n\n# With tracker but lambda=0\ntracker = OnlineCorrelationMatrix(strategies=strategies, min_samples=10)\nportfolio_lambda0 = ParticlePortfolio(\n    strategies=strategies,\n    n_particles=50,\n    correlation_tracker=tracker,\n    lambda_penalty=0.0,  # No penalty - should skip penalty calculation\n)\n\n# Without tracker at all\nportfolio_no_tracker = ParticlePortfolio(\n    strategies=strategies,\n    n_particles=50,\n    lambda_penalty=0.0,\n)\n\nx, y = generate_correlated_returns(n_samples, correlation=0.8)\n\n# Run with same seed\nnp.random.seed(999)\nstate_lambda0 = None\nfor i in range(n_samples):\n    state_lambda0 = portfolio_lambda0.update({'A': x[i], 'B': y[i]})\n\nnp.random.seed(999)\nstate_no_tracker = None\nfor i in range(n_samples):\n    state_no_tracker = portfolio_no_tracker.update({'A': x[i], 'B': y[i]})\n\nprint('Final weights comparison:')\nfor s in strategies:\n    w0 = state_lambda0.strategy_weights.get(s, 0)\n    w_no = state_no_tracker.strategy_weights.get(s, 0)\n    print(f'  {s}: lambda0={w0:.4f}, no_tracker={w_no:.4f}, diff={abs(w0-w_no):.4f}')\n\n# The issue is that even with lambda=0, having a tracker causes\n# correlation_tracker.update() to be called, which consumes random numbers\n# from np.random in a different order than without tracker!\n\n# Let's verify: Does tracker.update() use random numbers?\nprint()\nprint('Tracker consumes no random numbers directly,')\nprint('but the test initializes particles with random.random() (Python stdlib)')\nprint('and mutation uses random.gauss() (Python stdlib)')\nprint('np.random.seed only affects numpy random, not stdlib random!')\n\"\n",
+      "description": "Analyze test failure"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T15:24:50.690824",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -c \"\nimport random\nrandom.seed(42)  # Reset Python stdlib random too\nimport numpy as np\nnp.random.seed(42)\n\nfrom tests.integration.test_csrc_walk_forward import TestLambdaSensitivity\n\ntest = TestLambdaSensitivity()\ntest.test_lambda_zero_matches_baseline()\nprint('Test passed!')\n\"\n",
+      "description": "Run the exact failing test"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T15:24:56.972644",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -c \"import pytest; pytest.main(['-v', '--tb=short', 'tests/integration/test_csrc_walk_forward.py'])\" 2>&1 | tail -30",
+      "description": "Re-run integration tests"
+    },
+    {
+      "operation": "grep",
+      "timestamp": "2026-01-06T15:25:17.596705",
+      "pattern": "self\\._strategy_indices",
+      "path": "/media/sam/1TB/nautilus_dev/strategies/common/adaptive_control/particle_portfolio.py",
+      "output_mode": "content"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T15:25:26.469223",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run pytest tests/unit/test_correlation_tracker.py tests/integration/test_csrc_walk_forward.py -v --tb=short 2>&1 | grep -E \"(PASSED|FAILED|ERROR|test_)\"",
+      "description": "Run all CSRC tests"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T15:25:33.966025",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run pytest tests/unit/test_correlation_tracker.py -v --tb=short 2>&1 | tail -10",
+      "description": "Run unit tests summary"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2026-01-06T15:25:48.290538",
+      "todo_count": 8
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T15:26:03.673015",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python3 -c \"\nimport numpy as np\nfrom strategies.common.adaptive_control.correlation_tracker import OnlineCorrelationMatrix\nfrom strategies.common.adaptive_control.particle_portfolio import ParticlePortfolio\n\n# Test numerical stability edge cases\n\nprint('=== Numerical Stability Tests ===')\n\n# 1. Extreme returns (very large)\nprint()\nprint('Test 1: Extreme large returns')\ntracker = OnlineCorrelationMatrix(strategies=['A', 'B'], min_samples=5)\nportfolio = ParticlePortfolio(\n    strategies=['A', 'B'],\n    n_particles=20,\n    correlation_tracker=tracker,\n    lambda_penalty=1.0,\n)\ntry:\n    for _ in range(10):\n        state = portfolio.update({'A': 1e10, 'B': 1e10})\n    print(f'  Large returns: weights={state.strategy_weights}')\n    print('  OK: No crash')\nexcept Exception as e:\n    print(f'  ERROR: {e}')\n\n# 2. Extreme returns (very small)\nprint()\nprint('Test 2: Extreme small returns')\ntracker = OnlineCorrelationMatrix(strategies=['A', 'B'], min_samples=5)\nportfolio = ParticlePortfolio(\n    strategies=['A', 'B'],\n    n_particles=20,\n    correlation_tracker=tracker,\n    lambda_penalty=1.0,\n)\ntry:\n    for _ in range(10):\n        state = portfolio.update({'A': 1e-20, 'B': 1e-20})\n    print(f'  Tiny returns: weights={state.strategy_weights}')\n    print('  OK: No crash')\nexcept Exception as e:\n    print(f'  ERROR: {e}')\n\n# 3. NaN in returns\nprint()\nprint('Test 3: NaN in returns')\ntracker = OnlineCorrelationMatrix(strategies=['A', 'B'], min_samples=5)\nportfolio = ParticlePortfolio(\n    strategies=['A', 'B'],\n    n_particles=20,\n    correlation_tracker=tracker,\n    lambda_penalty=1.0,\n)\ntry:\n    state = portfolio.update({'A': float('nan'), 'B': 0.01})\n    print(f'  NaN returns: weights={state.strategy_weights}')\n    if any(np.isnan(v) for v in state.strategy_weights.values()):\n        print('  WARNING: NaN in weights!')\n    else:\n        print('  OK: No NaN propagation')\nexcept Exception as e:\n    print(f'  ERROR: {e}')\n\n# 4. Inf in returns\nprint()\nprint('Test 4: Inf in returns')\ntracker = OnlineCorrelationMatrix(strategies=['A', 'B'], min_samples=5)\nportfolio = ParticlePortfolio(\n    strategies=['A', 'B'],\n    n_particles=20,\n    correlation_tracker=tracker,\n    lambda_penalty=1.0,\n)\ntry:\n    state = portfolio.update({'A': float('inf'), 'B': 0.01})\n    print(f'  Inf returns: weights={state.strategy_weights}')\n    if any(np.isinf(v) for v in state.strategy_weights.values()):\n        print('  WARNING: Inf in weights!')\n    else:\n        print('  OK: No Inf propagation')\nexcept Exception as e:\n    print(f'  ERROR: {e}')\n\"\n",
+      "description": "Test numerical stability edge cases"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T15:28:09.834878",
+      "command": "cat /tmp/claude/-media-sam-1TB-nautilus-dev/tasks/b15358b.output",
+      "description": "Get output from numerical stability test"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T15:28:13.639989",
+      "command": "sleep 3 && cat /tmp/claude/-media-sam-1TB-nautilus-dev/tasks/b15358b.output",
+      "description": "Wait and get output"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T15:28:30.156776",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python3 << 'EOF'\nimport numpy as np\nfrom strategies.common.adaptive_control.correlation_tracker import OnlineCorrelationMatrix\nfrom strategies.common.adaptive_control.particle_portfolio import ParticlePortfolio\n\nprint('=== Numerical Stability Tests ===')\n\n# 1. Extreme returns (very large)\nprint()\nprint('Test 1: Extreme large returns')\ntracker = OnlineCorrelationMatrix(strategies=['A', 'B'], min_samples=5)\nportfolio = ParticlePortfolio(\n    strategies=['A', 'B'],\n    n_particles=20,\n    correlation_tracker=tracker,\n    lambda_penalty=1.0,\n)\ntry:\n    for _ in range(10):\n        state = portfolio.update({'A': 1e10, 'B': 1e10})\n    print(f'  Large returns: weights={state.strategy_weights}')\n    print('  OK: No crash')\nexcept Exception as e:\n    print(f'  ERROR: {e}')\n\n# 2. Extreme returns (very small)\nprint()\nprint('Test 2: Extreme small returns')\ntracker = OnlineCorrelationMatrix(strategies=['A', 'B'], min_samples=5)\nportfolio = ParticlePortfolio(\n    strategies=['A', 'B'],\n    n_particles=20,\n    correlation_tracker=tracker,\n    lambda_penalty=1.0,\n)\ntry:\n    for _ in range(10):\n        state = portfolio.update({'A': 1e-20, 'B': 1e-20})\n    print(f'  Tiny returns: weights={state.strategy_weights}')\n    print('  OK: No crash')\nexcept Exception as e:\n    print(f'  ERROR: {e}')\n\n# 3. NaN in returns\nprint()\nprint('Test 3: NaN in returns')\ntracker = OnlineCorrelationMatrix(strategies=['A', 'B'], min_samples=5)\nportfolio = ParticlePortfolio(\n    strategies=['A', 'B'],\n    n_particles=20,\n    correlation_tracker=tracker,\n    lambda_penalty=1.0,\n)\ntry:\n    state = portfolio.update({'A': float('nan'), 'B': 0.01})\n    print(f'  NaN returns: weights={state.strategy_weights}')\n    has_nan = any(np.isnan(v) for v in state.strategy_weights.values())\n    if has_nan:\n        print('  WARNING: NaN in weights!')\n    else:\n        print('  OK: No NaN propagation')\nexcept Exception as e:\n    print(f'  ERROR: {e}')\n\n# 4. Inf in returns\nprint()\nprint('Test 4: Inf in returns')\ntracker = OnlineCorrelationMatrix(strategies=['A', 'B'], min_samples=5)\nportfolio = ParticlePortfolio(\n    strategies=['A', 'B'],\n    n_particles=20,\n    correlation_tracker=tracker,\n    lambda_penalty=1.0,\n)\ntry:\n    state = portfolio.update({'A': float('inf'), 'B': 0.01})\n    print(f'  Inf returns: weights={state.strategy_weights}')\n    has_inf = any(np.isinf(v) for v in state.strategy_weights.values())\n    if has_inf:\n        print('  WARNING: Inf in weights!')\n    else:\n        print('  OK: No Inf propagation')\nexcept Exception as e:\n    print(f'  ERROR: {e}')\nEOF\n",
+      "description": "Test numerical stability edge cases"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T15:30:35.283127",
+      "command": "sleep 5 && cat /tmp/claude/-media-sam-1TB-nautilus-dev/tasks/be2e733.output 2>/dev/null || echo \"No output yet\"",
+      "description": "Wait for output"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T15:30:43.500747",
+      "command": "cat /tmp/claude/-media-sam-1TB-nautilus-dev/tasks/be2e733.output",
+      "description": "Get test output"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T15:30:56.049013",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python3 -c \"\nimport numpy as np\nfrom strategies.common.adaptive_control.correlation_tracker import OnlineCorrelationMatrix\n\nprint('=== Numerical Stability Tests for OnlineCorrelationMatrix ===')\n\n# Test 1: NaN handling\nprint()\nprint('Test 1: NaN in returns')\ntracker = OnlineCorrelationMatrix(strategies=['A', 'B'], min_samples=5)\ntry:\n    for i in range(5):\n        tracker.update({'A': 0.01, 'B': 0.02})\n    tracker.update({'A': float('nan'), 'B': 0.01})\n    corr = tracker.get_correlation_matrix()\n    has_nan = np.any(np.isnan(corr))\n    print(f'  After NaN update, corr has NaN: {has_nan}')\n    if has_nan:\n        print('  BUG: NaN propagated to correlation matrix')\nexcept Exception as e:\n    print(f'  Exception: {e}')\n\n# Test 2: Inf handling\nprint()\nprint('Test 2: Inf in returns')\ntracker = OnlineCorrelationMatrix(strategies=['A', 'B'], min_samples=5)\ntry:\n    for i in range(5):\n        tracker.update({'A': 0.01, 'B': 0.02})\n    tracker.update({'A': float('inf'), 'B': 0.01})\n    corr = tracker.get_correlation_matrix()\n    has_inf = np.any(np.isinf(corr))\n    print(f'  After Inf update, corr has Inf: {has_inf}')\n    if has_inf:\n        print('  BUG: Inf propagated to correlation matrix')\nexcept Exception as e:\n    print(f'  Exception: {e}')\n\n# Test 3: Very large values\nprint()\nprint('Test 3: Very large values')\ntracker = OnlineCorrelationMatrix(strategies=['A', 'B'], min_samples=5)\ntry:\n    for i in range(10):\n        tracker.update({'A': 1e15, 'B': 1e15})\n    corr = tracker.get_correlation_matrix()\n    print(f'  Large values corr: {corr}')\n    has_nan_inf = np.any(np.isnan(corr)) or np.any(np.isinf(corr))\n    print(f'  Has NaN/Inf: {has_nan_inf}')\nexcept Exception as e:\n    print(f'  Exception: {e}')\n\"\n",
+      "description": "Test OnlineCorrelationMatrix numerical stability"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T15:31:25.075124",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python3 -c \"\nimport numpy as np\nfrom strategies.common.adaptive_control.correlation_tracker import OnlineCorrelationMatrix\n\n# Track the NaN propagation\nprint('=== Tracing NaN Propagation ===')\n\ntracker = OnlineCorrelationMatrix(strategies=['A', 'B'], min_samples=2)\n\n# Add valid data first\nfor i in range(5):\n    tracker.update({'A': 0.01, 'B': 0.02})\n\nprint(f'Before NaN:')\nprint(f'  _ema_means: {tracker._ema_means}')\nprint(f'  _ema_cov diagonal: {np.diag(tracker._ema_cov)}')\n\n# Add NaN\ntracker.update({'A': float('nan'), 'B': 0.01})\n\nprint(f'After NaN:')\nprint(f'  _ema_means: {tracker._ema_means}')\nprint(f'  _ema_cov: {tracker._ema_cov}')\n\n# The NaN propagates through EMA update:\n# ret_array[0] = nan\n# _ema_means = decay * old_means + (1-decay) * [nan, 0.01]\n#            = [nan, something]\n# deviations = [nan, ...] - [nan, ...]\n# _ema_cov = ... + np.outer([nan, ...], [nan, ...]) = all NaN\n\nprint()\nprint('=> NaN in returns propagates to _ema_means and _ema_cov')\nprint('   This is a data validation gap, not necessarily a bug')\nprint('   The caller should validate inputs before calling update()')\n\"\n",
+      "description": "Trace NaN propagation"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T15:31:39.114709",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python3 -c \"\nimport numpy as np\nfrom strategies.common.adaptive_control.correlation_tracker import OnlineCorrelationMatrix\nfrom strategies.common.adaptive_control.particle_portfolio import ParticlePortfolio\n\n# Test ParticlePortfolio with NaN returns - does it crash?\nprint('=== ParticlePortfolio NaN Handling ===')\n\ntracker = OnlineCorrelationMatrix(strategies=['A', 'B'], min_samples=5)\nportfolio = ParticlePortfolio(\n    strategies=['A', 'B'],\n    n_particles=20,\n    correlation_tracker=tracker,\n    lambda_penalty=1.0,\n)\n\n# Normal updates first\nnp.random.seed(42)\nfor _ in range(10):\n    state = portfolio.update({'A': np.random.randn() * 0.01, 'B': np.random.randn() * 0.01})\n\nprint(f'Before NaN: weights={state.strategy_weights}')\n\n# Now send NaN\ntry:\n    state = portfolio.update({'A': float('nan'), 'B': 0.01})\n    print(f'After NaN: weights={state.strategy_weights}')\n    \n    # Check if weights are valid\n    has_nan = any(np.isnan(v) for v in state.strategy_weights.values())\n    has_inf = any(np.isinf(v) for v in state.strategy_weights.values())\n    weights_sum = sum(state.strategy_weights.values())\n    \n    print(f'  Has NaN: {has_nan}')\n    print(f'  Has Inf: {has_inf}')\n    print(f'  Sum: {weights_sum:.4f}')\n    \n    if has_nan:\n        print('  MEDIUM BUG: NaN propagated to portfolio weights')\nexcept Exception as e:\n    print(f'  Exception: {type(e).__name__}: {e}')\n\"\n",
+      "description": "Test ParticlePortfolio NaN handling"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T15:32:15.008076",
+      "command": "sleep 8 && cat /tmp/claude/-media-sam-1TB-nautilus-dev/tasks/bd24af4.output 2>/dev/null || echo \"Timeout - checking process\"",
+      "description": "Get NaN test output"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T15:32:27.925585",
+      "command": "cat /tmp/claude/-media-sam-1TB-nautilus-dev/tasks/bd24af4.output",
+      "description": "Cat output file"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T15:32:31.699748",
+      "command": "ls -la /tmp/claude/-media-sam-1TB-nautilus-dev/tasks/bd24af4.output 2>/dev/null || echo \"File does not exist\"",
+      "description": "Check if file exists"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T15:32:41.585907",
+      "command": "timeout 10 /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/python3 -c \"\nimport numpy as np\nfrom strategies.common.adaptive_control.correlation_tracker import OnlineCorrelationMatrix\nfrom strategies.common.adaptive_control.particle_portfolio import ParticlePortfolio\n\ntracker = OnlineCorrelationMatrix(strategies=['A', 'B'], min_samples=5)\nportfolio = ParticlePortfolio(\n    strategies=['A', 'B'],\n    n_particles=20,\n    correlation_tracker=tracker,\n    lambda_penalty=1.0,\n)\n\nnp.random.seed(42)\nfor _ in range(10):\n    state = portfolio.update({'A': np.random.randn() * 0.01, 'B': np.random.randn() * 0.01})\n\nprint(f'Before NaN: weights={state.strategy_weights}')\n\nstate = portfolio.update({'A': float('nan'), 'B': 0.01})\nprint(f'After NaN: weights={state.strategy_weights}')\n\" 2>&1 || echo \"Command timed out or failed\"",
+      "description": "Run NaN test with timeout"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T15:33:06.719349",
+      "command": "timeout 5 /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/python3 -c \"\nimport numpy as np\nimport math\nprint('Step 1: imports')\n\n# Test if nan causes math.exp to hang\nval = float('nan')\nprint(f'Step 2: val={val}')\n\n# In particle_portfolio, log_weight accumulates fitness\n# fitness = portfolio_return = sum of (nan * weight) = nan\n# log_weight += nan -> nan\n# Then: weights = [math.exp(p.log_weight) for p in particles]\n# math.exp(nan) = nan, which is not a problem\n\n# BUT: max(p.log_weight for p in particles) where all are nan\n# max() with all nan might hang or behave unexpectedly\nprint('Step 3: testing max with nan')\ntry:\n    result = max([float('nan'), float('nan'), float('nan')])\n    print(f'  max of nans = {result}')\nexcept Exception as e:\n    print(f'  Exception: {e}')\n\n# That's not the issue. Let me test sum with nan\nprint('Step 4: testing sum with nan')\ntotal_weight = sum([float('nan'), 0.5, 0.3])\nprint(f'  sum with nan = {total_weight}')\nif total_weight > 0:\n    print('  total_weight > 0: True')\nelse:\n    print('  total_weight > 0: False')\n\n# nan > 0 is False, so we skip normalization\n# Then ESS calculation: 1.0 / sum(w * w)\n# With nan weights, this could be 0 or nan\n\" 2>&1 || echo \"Timed out\"",
+      "description": "Debug NaN handling"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T15:33:17.632423",
+      "command": "timeout 5 /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/python3 -c \"\n# Isolate the issue step by step\nimport numpy as np\nfrom strategies.common.adaptive_control.correlation_tracker import OnlineCorrelationMatrix\nprint('Step 1: OnlineCorrelationMatrix imported')\n\ntracker = OnlineCorrelationMatrix(strategies=['A', 'B'], min_samples=5)\nprint('Step 2: tracker created')\n\nfor i in range(10):\n    tracker.update({'A': 0.01, 'B': 0.02})\nprint('Step 3: 10 normal updates done')\n\ntracker.update({'A': float('nan'), 'B': 0.01})\nprint('Step 4: NaN update done')\n\ncorr = tracker.get_correlation_matrix()\nprint(f'Step 5: corr = {corr}')\n\" 2>&1 || echo \"Timed out at correlation tracker\"",
+      "description": "Test OnlineCorrelationMatrix with NaN"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T15:33:27.130855",
+      "command": "timeout 10 /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/python3 -c \"\nimport numpy as np\nfrom strategies.common.adaptive_control.particle_portfolio import ParticlePortfolio\nprint('Step 1: ParticlePortfolio imported')\n\nportfolio = ParticlePortfolio(strategies=['A', 'B'], n_particles=5)\nprint('Step 2: portfolio created (no tracker)')\n\nfor i in range(5):\n    state = portfolio.update({'A': 0.01, 'B': 0.02})\nprint(f'Step 3: 5 normal updates done, weights={state.strategy_weights}')\n\nstate = portfolio.update({'A': float('nan'), 'B': 0.01})\nprint(f'Step 4: NaN update done, weights={state.strategy_weights}')\n\" 2>&1 || echo \"Timed out at ParticlePortfolio\"",
+      "description": "Test ParticlePortfolio without tracker"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T15:33:59.310954",
+      "command": "timeout 10 /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/python3 -c \"\nimport random\nimport math\nprint('Testing ParticlePortfolio update step by step')\n\n# Simulate what happens when NaN is in returns\nparticles_log_weights = [0.0, 0.0, 0.0, 0.0, 0.0]\n\n# After NaN update, fitness = nan, log_weight += nan = nan\nfor i in range(len(particles_log_weights)):\n    particles_log_weights[i] = float('nan')\n\nprint(f'Step 1: log_weights = {particles_log_weights}')\n\n# max_log_weight = max(nan, nan, nan, ...) = nan\nmax_log_weight = max(particles_log_weights)\nprint(f'Step 2: max_log_weight = {max_log_weight}')\n\n# Subtract max: nan - nan = nan\nfor i in range(len(particles_log_weights)):\n    particles_log_weights[i] -= max_log_weight\nprint(f'Step 3: after subtract max = {particles_log_weights}')\n\n# math.exp(nan) = nan\nweights = [math.exp(lw) for lw in particles_log_weights]\nprint(f'Step 4: weights after exp = {weights}')\n\n# sum of nan = nan\ntotal_weight = sum(weights)\nprint(f'Step 5: total_weight = {total_weight}')\n\n# nan > 0 is False, so we skip normalization\nif total_weight > 0:\n    print('Step 6: normalizing...')\n    weights = [w / total_weight for w in weights]\nelse:\n    print('Step 6: SKIP normalization (total_weight not > 0)')\n\n# ESS = 1.0 / sum(w*w) \ness_denom = sum(w * w for w in weights)\nprint(f'Step 7: ess_denom = {ess_denom}')\n# nan > 0 is False, so sum(weights) > 0 is False\nif sum(weights) > 0:\n    ess = 1.0 / ess_denom\nelse:\n    ess = 0\nprint(f'Step 8: ess = {ess}')\n\n# Resampling check\nn_particles = 5\nresampling_threshold = 0.5\ness_ratio = ess / n_particles\nprint(f'Step 9: ess_ratio = {ess_ratio}')\nif ess_ratio < resampling_threshold:\n    print('Step 10: RESAMPLING triggered')\n    # This is where the hang might be!\n    # _resample uses weights for systematic resampling\n    # positions = [(random.random() + i) / n for i in range(n)]\n    # cumsum is built from weights (all nan)\n    \n    cumsum = []\n    total = 0.0\n    for w in weights:\n        total += w\n        cumsum.append(total)\n    print(f'  cumsum = {cumsum}')\n    \n    positions = [(random.random() + i) / n_particles for i in range(n_particles)]\n    print(f'  positions = {positions}')\n    \n    # The loop: while i < n: if positions[i] < cumsum[j]: ...\n    # But cumsum[j] is nan, so positions[i] < nan is always False!\n    # The loop keeps incrementing j until j >= len(cumsum)\n    # Then j is clamped to len(cumsum) - 1\n    # But positions[i] < cumsum[j] (nan) is still False!\n    # So j keeps getting clamped but the condition is never True\n    # This causes an INFINITE LOOP!\nelse:\n    print('Step 10: no resampling')\n\" 2>&1",
+      "description": "Trace NaN hang in resampling"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-06T15:34:06.352353",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/adaptive_control/particle_portfolio.py"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-06T15:34:22.077044",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/adaptive_control/particle_portfolio.py",
+      "old_string": "    def _resample(self, weights: List[float]) -> None:\n        \"\"\"Resample particles using systemati..."
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T15:34:30.980632",
+      "command": "timeout 10 /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/python3 -c \"\nimport numpy as np\nfrom strategies.common.adaptive_control.particle_portfolio import ParticlePortfolio\n\nprint('=== Testing NaN Handling After Fix ===')\n\nportfolio = ParticlePortfolio(strategies=['A', 'B'], n_particles=5)\n\nfor i in range(5):\n    state = portfolio.update({'A': 0.01, 'B': 0.02})\nprint(f'Before NaN: weights={state.strategy_weights}')\n\nstate = portfolio.update({'A': float('nan'), 'B': 0.01})\nprint(f'After NaN: weights={state.strategy_weights}')\n\n# Continue with normal updates\nfor i in range(5):\n    state = portfolio.update({'A': 0.01, 'B': 0.02})\nprint(f'After recovery: weights={state.strategy_weights}')\n\nprint('SUCCESS: No hang, system recovered')\n\" 2>&1 || echo \"FAILED: Timed out\"",
+      "description": "Verify NaN fix"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T15:34:39.877370",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run pytest tests/unit/test_correlation_tracker.py -v --tb=short 2>&1 | tail -10",
+      "description": "Run unit tests after fix"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T15:34:43.299134",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -c \"import pytest; pytest.main(['-v', '--tb=short', 'tests/integration/test_csrc_walk_forward.py'])\" 2>&1 | tail -15",
+      "description": "Run integration tests after fix"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-06T15:35:00.197530",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/integration/test_csrc_walk_forward.py"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-06T15:35:21.978315",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/integration/test_csrc_walk_forward.py",
+      "old_string": "    def test_lambda_zero_matches_baseline(self):\n        \"\"\"T028: Test lambda=0.0 gives same behavio..."
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T15:35:32.105019",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -c \"import pytest; pytest.main(['-v', '--tb=short', 'tests/integration/test_csrc_walk_forward.py'])\" 2>&1 | tail -15",
+      "description": "Run integration tests after test fix"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-06T15:35:48.297436",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/integration/test_csrc_walk_forward.py"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-06T15:36:08.504345",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/integration/test_csrc_walk_forward.py",
+      "old_string": "    def test_all_strategies_correlated(self):\n        \"\"\"T038: Test allocation to highest Sharpe whe..."
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T15:36:13.545475",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -c \"import pytest; pytest.main(['-v', '--tb=short', 'tests/integration/test_csrc_walk_forward.py'])\" 2>&1 | tail -15",
+      "description": "Run integration tests after test fixes"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T15:36:31.302710",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run pytest tests/unit/test_correlation_tracker.py -v --tb=short 2>&1 | tail -10",
+      "description": "Run all unit tests"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2026-01-06T15:36:46.946410",
+      "todo_count": 8
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T15:37:43.881935",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python3 -c \"\n# Look for other potential edge cases in the integration\n\nimport numpy as np\nfrom strategies.common.adaptive_control.correlation_tracker import OnlineCorrelationMatrix\nfrom strategies.common.adaptive_control.particle_portfolio import ParticlePortfolio\n\nprint('=== Integration Edge Case Tests ===')\n\n# Test 1: Empty returns dict\nprint()\nprint('Test 1: Empty returns dict')\ntracker = OnlineCorrelationMatrix(strategies=['A', 'B'], min_samples=5)\nportfolio = ParticlePortfolio(\n    strategies=['A', 'B'],\n    n_particles=10,\n    correlation_tracker=tracker,\n    lambda_penalty=1.0,\n)\ntry:\n    state = portfolio.update({})  # Empty returns\n    print(f'  Empty returns: weights={state.strategy_weights}')\n    print('  OK: Handled gracefully (missing strategies default to 0)')\nexcept Exception as e:\n    print(f'  ERROR: {e}')\n\n# Test 2: Extra strategies in returns (not in portfolio)\nprint()\nprint('Test 2: Extra strategies in returns')\ntry:\n    state = portfolio.update({'A': 0.01, 'B': 0.02, 'C': 0.03})  # C not in portfolio\n    print(f'  Extra strategy: weights={state.strategy_weights}')\n    print('  OK: Extra strategies ignored')\nexcept Exception as e:\n    print(f'  ERROR: {e}')\n\n# Test 3: Correlation tracker with more strategies than portfolio\nprint()\nprint('Test 3: Mismatched strategy counts')\ntracker_big = OnlineCorrelationMatrix(strategies=['A', 'B', 'C', 'D'], min_samples=5)\nportfolio_small = ParticlePortfolio(\n    strategies=['A', 'B'],\n    n_particles=10,\n    correlation_tracker=tracker_big,\n    lambda_penalty=1.0,\n)\ntry:\n    # Update with portfolio's strategies only\n    for _ in range(10):\n        state = portfolio_small.update({'A': np.random.randn() * 0.01, 'B': np.random.randn() * 0.01})\n    print(f'  Big tracker, small portfolio: weights={state.strategy_weights}')\n    print('  OK: Works (portfolio only cares about its strategies)')\nexcept Exception as e:\n    print(f'  ERROR: {e}')\n\n# Test 4: Very high lambda\nprint()\nprint('Test 4: Extreme lambda penalty')\ntracker = OnlineCorrelationMatrix(strategies=['A', 'B'], min_samples=5)\nportfolio = ParticlePortfolio(\n    strategies=['A', 'B'],\n    n_particles=10,\n    correlation_tracker=tracker,\n    lambda_penalty=1000.0,  # Very high\n)\ntry:\n    for _ in range(20):\n        state = portfolio.update({'A': np.random.randn() * 0.01, 'B': np.random.randn() * 0.01})\n    print(f'  High lambda: weights={state.strategy_weights}')\n    print('  OK: No crash, weights valid')\nexcept Exception as e:\n    print(f'  ERROR: {e}')\n\" 2>&1",
+      "description": "Test integration edge cases"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T15:37:59.774048",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python3 -c \"\nimport numpy as np\nfrom strategies.common.adaptive_control.correlation_tracker import OnlineCorrelationMatrix\nfrom strategies.common.adaptive_control.particle_portfolio import BayesianEnsemble\n\nprint('=== BayesianEnsemble Integration Tests ===')\n\n# Test 1: Setting tracker after creation\nprint()\nprint('Test 1: Set tracker after creation')\nensemble = BayesianEnsemble(strategies=['A', 'B', 'C'], n_particles=20)\ntracker = OnlineCorrelationMatrix(strategies=['A', 'B', 'C'], min_samples=10)\n\n# Set tracker on internal portfolio\nensemble.particle_portfolio.correlation_tracker = tracker\nensemble.particle_portfolio.lambda_penalty = 1.0\n\ntry:\n    np.random.seed(42)\n    for _ in range(50):\n        returns = {'A': np.random.randn() * 0.01, 'B': np.random.randn() * 0.01, 'C': np.random.randn() * 0.01}\n        state = ensemble.update(returns)\n    \n    print(f'  Final weights: {state.strategy_weights}')\n    print(f'  Correlation metrics: {state.correlation_metrics}')\n    print('  OK: Post-creation tracker works')\nexcept Exception as e:\n    print(f'  ERROR: {e}')\n\n# Test 2: Check get_allocation uses CSRC weights\nprint()\nprint('Test 2: get_allocation with CSRC')\nweights, selected = ensemble.get_allocation()\nprint(f'  Allocation weights: {weights}')\nprint(f'  Selected strategies: {selected}')\nprint(f'  Sum of weights: {sum(weights.values()):.4f}')\n\" 2>&1",
+      "description": "Test BayesianEnsemble integration"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T15:38:09.902319",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run pyright strategies/common/adaptive_control/particle_portfolio.py --outputjson 2>/dev/null | python3 -c \"\nimport json, sys\ndata = json.load(sys.stdin)\nerrors = data.get('generalDiagnostics', [])\nif not errors:\n    print('No pyright errors!')\nelse:\n    print(f'Pyright found {len(errors)} issues:')\n    for e in errors:\n        print(f'  Line {e[\\\"range\\\"][\\\"start\\\"][\\\"line\\\"]+1}: {e[\\\"message\\\"][:80]}')\n\"",
+      "description": "Check pyright errors"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2026-01-06T15:38:31.395204",
+      "todo_count": 8
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T15:38:51.504225",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python3 -c \"\nimport sys\nimport time\nimport numpy as np\nfrom strategies.common.adaptive_control.correlation_tracker import OnlineCorrelationMatrix\nfrom strategies.common.adaptive_control.particle_portfolio import ParticlePortfolio\n\nprint('=== Memory and Performance Tests ===')\n\n# Test 1: Memory usage over many updates\nprint()\nprint('Test 1: Memory stability over 10,000 updates')\ntracker = OnlineCorrelationMatrix(strategies=['A', 'B', 'C', 'D', 'E'], min_samples=30)\n\n# Get initial memory\ninitial_size = (\n    sys.getsizeof(tracker._ema_cov) +\n    sys.getsizeof(tracker._ema_means) +\n    sum(sys.getsizeof(s) for s in tracker._stats)\n)\n\nnp.random.seed(42)\nfor i in range(10000):\n    returns = {s: np.random.randn() * 0.01 for s in tracker.strategies}\n    tracker.update(returns)\n\n# Get final memory\nfinal_size = (\n    sys.getsizeof(tracker._ema_cov) +\n    sys.getsizeof(tracker._ema_means) +\n    sum(sys.getsizeof(s) for s in tracker._stats)\n)\n\nprint(f'  Initial size: {initial_size} bytes')\nprint(f'  Final size: {final_size} bytes')\nprint(f'  Memory growth: {final_size - initial_size} bytes')\nif final_size == initial_size:\n    print('  OK: No memory leak (EMA has O(N^2) fixed memory)')\nelse:\n    print('  WARNING: Memory grew')\n\n# Test 2: Performance benchmark\nprint()\nprint('Test 2: Update performance (10 strategies, 1000 iterations)')\nstrategies = [f'strat_{i}' for i in range(10)]\ntracker = OnlineCorrelationMatrix(strategies=strategies, min_samples=30)\nportfolio = ParticlePortfolio(\n    strategies=strategies,\n    n_particles=100,\n    correlation_tracker=tracker,\n    lambda_penalty=1.0,\n)\n\n# Warm up\nnp.random.seed(42)\nfor _ in range(100):\n    returns = {s: np.random.randn() * 0.01 for s in strategies}\n    portfolio.update(returns)\n\n# Benchmark\nn_iterations = 1000\nstart = time.perf_counter()\nfor _ in range(n_iterations):\n    returns = {s: np.random.randn() * 0.01 for s in strategies}\n    portfolio.update(returns)\nelapsed = time.perf_counter() - start\n\navg_ms = (elapsed / n_iterations) * 1000\nprint(f'  Total time: {elapsed:.3f}s')\nprint(f'  Average per update: {avg_ms:.3f}ms')\nif avg_ms < 1.0:\n    print('  OK: Under 1ms target (FR-006)')\nelse:\n    print(f'  WARNING: Above 1ms target')\n\n# Test 3: Particle memory\nprint()\nprint('Test 3: Particle memory with 100 particles, 10 strategies')\nportfolio2 = ParticlePortfolio(\n    strategies=strategies,\n    n_particles=100,\n)\nparticle_memory = sum(\n    sys.getsizeof(p.weights) + \n    sum(sys.getsizeof(k) + sys.getsizeof(v) for k, v in p.weights.items())\n    for p in portfolio2.particles\n)\nprint(f'  Particle weights memory: ~{particle_memory} bytes ({particle_memory/1024:.1f} KB)')\n\" 2>&1",
+      "description": "Memory and performance tests"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T15:39:21.581882",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python3 -c \"\nimport time\nimport numpy as np\nfrom strategies.common.adaptive_control.correlation_tracker import OnlineCorrelationMatrix, calculate_covariance_penalty\nfrom strategies.common.adaptive_control.particle_portfolio import ParticlePortfolio\n\nprint('=== Performance Breakdown ===')\n\nstrategies = [f'strat_{i}' for i in range(10)]\nn_iterations = 100\n\n# Test 1: Correlation tracker alone\nprint()\nprint('Test 1: OnlineCorrelationMatrix.update()')\ntracker = OnlineCorrelationMatrix(strategies=strategies, min_samples=30)\nnp.random.seed(42)\nfor _ in range(100):\n    tracker.update({s: np.random.randn() * 0.01 for s in strategies})\n\nstart = time.perf_counter()\nfor _ in range(n_iterations):\n    returns = {s: np.random.randn() * 0.01 for s in strategies}\n    tracker.update(returns)\nelapsed = time.perf_counter() - start\nprint(f'  Avg: {(elapsed / n_iterations) * 1000:.3f}ms per update')\n\n# Test 2: Get correlation matrix\nprint()\nprint('Test 2: get_correlation_matrix()')\nstart = time.perf_counter()\nfor _ in range(n_iterations):\n    corr = tracker.get_correlation_matrix()\nelapsed = time.perf_counter() - start\nprint(f'  Avg: {(elapsed / n_iterations) * 1000:.3f}ms per call')\n\n# Test 3: Penalty calculation\nprint()\nprint('Test 3: calculate_covariance_penalty() x100 particles')\nweights = {s: 1/10 for s in strategies}\ncorr = tracker.get_correlation_matrix()\nindices = tracker.strategy_indices\nstart = time.perf_counter()\nfor _ in range(n_iterations * 100):  # 100 particles\n    calculate_covariance_penalty(weights, corr, indices)\nelapsed = time.perf_counter() - start\nprint(f'  Total for 100 particles: {(elapsed / n_iterations) * 1000:.3f}ms')\nprint(f'  Per particle: {(elapsed / (n_iterations * 100)) * 1000:.4f}ms')\n\n# Test 4: Full ParticlePortfolio.update()\nprint()\nprint('Test 4: ParticlePortfolio.update() (100 particles, with CSRC)')\ntracker2 = OnlineCorrelationMatrix(strategies=strategies, min_samples=30)\nportfolio = ParticlePortfolio(\n    strategies=strategies,\n    n_particles=100,\n    correlation_tracker=tracker2,\n    lambda_penalty=1.0,\n)\n# Warm up\nfor _ in range(100):\n    portfolio.update({s: np.random.randn() * 0.01 for s in strategies})\n\nstart = time.perf_counter()\nfor _ in range(n_iterations):\n    returns = {s: np.random.randn() * 0.01 for s in strategies}\n    portfolio.update(returns)\nelapsed = time.perf_counter() - start\nprint(f'  Avg: {(elapsed / n_iterations) * 1000:.3f}ms per update')\n\n# Test 5: Without CSRC for comparison\nprint()\nprint('Test 5: ParticlePortfolio.update() (100 particles, NO CSRC)')\nportfolio_no_csrc = ParticlePortfolio(\n    strategies=strategies,\n    n_particles=100,\n    lambda_penalty=0.0,\n)\n# Warm up\nfor _ in range(100):\n    portfolio_no_csrc.update({s: np.random.randn() * 0.01 for s in strategies})\n\nstart = time.perf_counter()\nfor _ in range(n_iterations):\n    returns = {s: np.random.randn() * 0.01 for s in strategies}\n    portfolio_no_csrc.update(returns)\nelapsed = time.perf_counter() - start\nprint(f'  Avg: {(elapsed / n_iterations) * 1000:.3f}ms per update')\n\" 2>&1",
+      "description": "Performance breakdown"
+    },
+    {
+      "operation": "grep",
+      "timestamp": "2026-01-06T15:39:35.860410",
+      "pattern": "FR-006|1ms|performance",
+      "path": "/media/sam/1TB/nautilus_dev/specs/031-csrc-correlation",
+      "output_mode": "content"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T15:39:50.669945",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python3 -c \"\nimport time\nimport numpy as np\nfrom strategies.common.adaptive_control.correlation_tracker import OnlineCorrelationMatrix\n\nprint('=== FR-006 Compliance: < 1ms for correlation update ===')\n\n# Test with 10 strategies\nprint()\nprint('10 strategies:')\nstrategies = [f'strat_{i}' for i in range(10)]\ntracker = OnlineCorrelationMatrix(strategies=strategies, min_samples=30)\n\nnp.random.seed(42)\nfor _ in range(100):\n    tracker.update({s: np.random.randn() * 0.01 for s in strategies})\n\nn_iterations = 1000\nstart = time.perf_counter()\nfor _ in range(n_iterations):\n    returns = {s: np.random.randn() * 0.01 for s in strategies}\n    tracker.update(returns)\nelapsed = time.perf_counter() - start\navg_ms = (elapsed / n_iterations) * 1000\nprint(f'  Avg update: {avg_ms:.4f}ms')\nprint(f'  FR-006 compliant: {avg_ms < 1.0}')\n\n# Test with 20 strategies\nprint()\nprint('20 strategies:')\nstrategies = [f'strat_{i}' for i in range(20)]\ntracker = OnlineCorrelationMatrix(strategies=strategies, min_samples=30)\n\nnp.random.seed(42)\nfor _ in range(100):\n    tracker.update({s: np.random.randn() * 0.01 for s in strategies})\n\nstart = time.perf_counter()\nfor _ in range(n_iterations):\n    returns = {s: np.random.randn() * 0.01 for s in strategies}\n    tracker.update(returns)\nelapsed = time.perf_counter() - start\navg_ms = (elapsed / n_iterations) * 1000\nprint(f'  Avg update: {avg_ms:.4f}ms')\nprint(f'  FR-006 compliant: {avg_ms < 1.0}')\n\" 2>&1",
+      "description": "Verify FR-006 compliance"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2026-01-06T15:40:08.295815",
+      "todo_count": 8
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T15:40:17.367080",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run pytest tests/unit/test_correlation_tracker.py tests/integration/test_csrc_walk_forward.py -v --tb=short 2>&1 | tail -20",
+      "description": "Final test run"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T15:40:23.973655",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run pytest tests/unit/test_correlation_tracker.py -v --tb=short 2>&1 | tail -10",
+      "description": "Run unit tests"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T15:40:27.393645",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -c \"import pytest; pytest.main(['-v', '--tb=short', 'tests/integration/test_csrc_walk_forward.py'])\" 2>&1 | tail -15",
+      "description": "Run integration tests"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T15:40:43.196475",
+      "command": "git diff --stat strategies/common/adaptive_control/particle_portfolio.py tests/integration/test_csrc_walk_forward.py",
+      "description": "Show diff stats for modified files"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2026-01-06T15:40:50.475960",
+      "todo_count": 8
     }
   ],
-  "last_updated": "2026-01-06T12:51:00.843252"
+  "last_updated": "2026-01-06T15:40:50.475977"
 }

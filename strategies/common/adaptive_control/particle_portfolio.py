@@ -202,7 +202,7 @@ class ParticlePortfolio:
                 penalty = calculate_covariance_penalty(
                     weights=particle.weights,
                     corr_matrix=corr_matrix,
-                    strategy_indices=self._strategy_indices,
+                    strategy_indices=self._correlation_tracker.strategy_indices,
                 )
                 particle.fitness -= self._lambda_penalty * penalty
 
@@ -318,8 +318,34 @@ class ParticlePortfolio:
         return state
 
     def _resample(self, weights: List[float]) -> None:
-        """Resample particles using systematic resampling."""
+        """Resample particles using systematic resampling.
+
+        Handles edge cases:
+        - NaN/Inf weights: Falls back to uniform resampling
+        - Zero total weight: Falls back to uniform resampling
+        """
+        import math
+
         n = self.n_particles
+
+        # Validate weights - check for NaN, Inf, or zero total
+        valid_weights = all(math.isfinite(w) for w in weights)
+        total_weight = sum(weights) if valid_weights else 0.0
+
+        if not valid_weights or total_weight <= 0:
+            # Fallback: uniform resampling (copy each particle once)
+            # This prevents infinite loop on NaN/Inf/zero weights
+            new_particles = []
+            for particle in self.particles:
+                new_p = Particle(
+                    weights=particle.weights.copy(),
+                    log_weight=0.0,
+                    fitness=particle.fitness,
+                )
+                new_particles.append(new_p)
+            self.particles = new_particles
+            return
+
         positions = [(random.random() + i) / n for i in range(n)]
 
         cumsum = []
