@@ -141,3 +141,164 @@ As a strategy template, I need helper methods for common order patterns so that 
 - Risk management rules (stop-loss, position sizing)
 - Portfolio-level allocation
 - Strategy parameter optimization (handled by evolution)
+
+---
+
+## Future Enhancements (Black Book Concepts)
+
+> **Source**: "The Black Book of Financial Hacking" - J.C. Lotter
+> **Philosophy**: Add complexity ONLY if OOS shows problems.
+
+### FE-001: Multiple Evolvable Blocks
+
+**Current**: Single EVOLVE-BLOCK for all decision logic
+
+**Enhancement**: Multiple named blocks for entry, exit, sizing
+
+```python
+class MultiBlockEvolveStrategy(Strategy):
+    def _on_bar_evolved(self, bar):
+        # === EVOLVE-BLOCK: entry_logic ===
+        # LLM can mutate entry signals independently
+        if self.ema_fast.value > self.ema_slow.value:
+            entry_signal = True
+        # === END EVOLVE-BLOCK ===
+
+        # === EVOLVE-BLOCK: exit_logic ===
+        # LLM can mutate exit logic independently
+        if self.position and self.ema_fast.value < self.ema_slow.value:
+            self._close_position()
+        # === END EVOLVE-BLOCK ===
+
+        # === EVOLVE-BLOCK: position_sizing ===
+        # LLM can mutate sizing independently
+        size = self.calculate_kelly_size(entry_signal)
+        # === END EVOLVE-BLOCK ===
+```
+
+**Trigger**: When single-block evolution struggles to optimize entry/exit/sizing together (conflicting objectives)
+
+**Trade-off**: Requires coordinated mutation of multiple blocks, more complex patching
+
+**Reference**: Black Book - "Evolve components independently when joint optimization fails"
+
+### FE-002: State Machine Templates
+
+**Current**: Simple signal-based logic
+
+**Enhancement**: Explicit state machine for complex strategies
+
+```python
+class StateMachineTemplate(BaseEvolveStrategy):
+    """
+    State machine template for regime-aware strategies.
+
+    States: ACCUMULATION, TRENDING, DISTRIBUTION, SIDEWAYS
+    """
+    def __init__(self):
+        self.state = "SIDEWAYS"
+
+    def _on_bar_evolved(self, bar):
+        # === EVOLVE-BLOCK: state_detection ===
+        # LLM mutates regime detection logic
+        volatility = self.calculate_volatility()
+        if volatility > threshold_high:
+            self.state = "TRENDING"
+        elif volatility < threshold_low:
+            self.state = "SIDEWAYS"
+        # === END EVOLVE-BLOCK ===
+
+        # === EVOLVE-BLOCK: state_action ===
+        # LLM mutates action per state
+        if self.state == "TRENDING":
+            self._trend_following_logic()
+        elif self.state == "SIDEWAYS":
+            self._mean_reversion_logic()
+        # === END EVOLVE-BLOCK ===
+```
+
+**Trigger**: When single-strategy evolution produces inconsistent behavior across market regimes
+
+**Trade-off**: More complex template, but better for adaptive strategies
+
+**Reference**: Black Book - "Use state machines for regime-dependent logic"
+
+### FE-003: Feature Engineering Helpers
+
+**Current**: Only native Rust indicators (EMA, RSI, etc.)
+
+**Enhancement**: Pre-built feature combinations for LLM to use
+
+```python
+class FeatureLibrary:
+    """
+    Pre-computed features for LLM to reference in EVOLVE-BLOCK.
+    """
+    @property
+    def momentum_features(self):
+        return {
+            'ema_cross': self.ema_fast.value > self.ema_slow.value,
+            'rsi_oversold': self.rsi.value < 30,
+            'rsi_overbought': self.rsi.value > 70,
+            'price_above_ema': self.bar.close > self.ema.value,
+        }
+
+    @property
+    def volatility_features(self):
+        return {
+            'atr_expanding': self.atr.value > self.atr_slow.value,
+            'bollinger_squeeze': self.bb_upper - self.bb_lower < threshold,
+        }
+
+    # LLM can reference in EVOLVE-BLOCK:
+    # if self.features.momentum_features['ema_cross']:
+```
+
+**Trigger**: When LLM mutations frequently produce invalid indicator combinations or slow custom calculations
+
+**Trade-off**: Larger template, but faster LLM mutation (no need to implement features from scratch)
+
+**Reference**: Black Book - "Pre-compute features to reduce mutation complexity"
+
+### FE-004: Risk-Aware Position Sizing
+
+**Current**: Fixed position size or simple helpers
+
+**Enhancement**: Built-in Kelly criterion and risk parity sizing
+
+```python
+class RiskAwareTemplate(BaseEvolveStrategy):
+    def calculate_kelly_size(self, win_rate, avg_win, avg_loss):
+        """
+        Kelly criterion for optimal position sizing.
+
+        f = (p * b - q) / b
+        where p = win rate, q = 1-p, b = avg_win/avg_loss
+        """
+        if avg_loss == 0:
+            return 0
+        b = avg_win / avg_loss
+        kelly_fraction = (win_rate * b - (1 - win_rate)) / b
+        # Use half-Kelly for safety
+        return max(0, kelly_fraction / 2)
+
+    def calculate_risk_parity_size(self, volatility):
+        """
+        Size inversely proportional to volatility.
+        """
+        target_vol = 0.02  # 2% portfolio volatility
+        return target_vol / volatility if volatility > 0 else 0
+```
+
+**Trigger**: When evolved strategies blow up in live trading due to over-sizing
+
+**Trade-off**: More complex position sizing logic, but prevents ruin
+
+**Reference**: Black Book - "Never evolve position sizing - use proven formulas"
+
+---
+
+**Decision Log** (2026-01-06):
+- Single EVOLVE-BLOCK chosen for MVP simplicity
+- Simple momentum template for seed strategy
+- Black Book enhancements documented for complex strategy needs
