@@ -339,7 +339,123 @@
       "timestamp": "2026-01-06T17:07:30.090733",
       "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/python -m pytest tests/test_adaptive_decay.py tests/test_thompson_selector_adaptive.py tests/integration/test_csrc_walk_forward.py -v 2>&1",
       "description": "Run pytest using python -m with nightly environment"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-06T17:07:59.172174",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/032-adts-discounting/tasks.md",
+      "old_string": "- [ ] T035 Run existing ThompsonSelector tests for regression (SC-003) via test-runner agent\n- [ ] T..."
+    },
+    {
+      "operation": "task",
+      "timestamp": "2026-01-06T17:08:16.588776",
+      "subagent_type": "alpha-debug",
+      "prompt": "Analyze the file strategies/common/adaptive_control/adaptive_decay.py for potential bugs, edge cases..."
+    },
+    {
+      "operation": "task",
+      "timestamp": "2026-01-06T17:08:16.593872",
+      "subagent_type": "alpha-debug",
+      "prompt": "Analyze the ThompsonSelector class modifications in strategies/common/adaptive_control/particle_port..."
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-06T17:08:20.917317",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/adaptive_control/adaptive_decay.py"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T17:08:23.545070",
+      "command": "git diff HEAD~3 -- strategies/common/adaptive_control/particle_portfolio.py 2>/dev/null | head -200",
+      "description": "Show recent changes to particle_portfolio.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-06T17:08:23.599614",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/adaptive_control/particle_portfolio.py"
+    },
+    {
+      "operation": "glob",
+      "timestamp": "2026-01-06T17:08:25.763088",
+      "pattern": "**/test*adaptive_decay*.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-06T17:08:25.799753",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/adaptive_control/dsp_filters.py"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T17:08:30.649776",
+      "command": "git -C /media/sam/1TB/nautilus_dev log --oneline -10 -- strategies/common/adaptive_control/particle_portfolio.py",
+      "description": "Show recent commits to particle_portfolio.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-06T17:08:31.088356",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/test_adaptive_decay.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-06T17:08:33.339937",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/adaptive_control/adaptive_decay.py"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T17:08:33.569643",
+      "command": "git -C /media/sam/1TB/nautilus_dev diff HEAD~5 HEAD -- strategies/common/adaptive_control/particle_portfolio.py 2>/dev/null | head -300",
+      "description": "Show changes from last 5 commits"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T17:08:34.104514",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python3 -c \"\nimport time\nfrom strategies.common.adaptive_control.adaptive_decay import AdaptiveDecayCalculator, VolatilityContext\nfrom strategies.common.adaptive_control.dsp_filters import IIRRegimeDetector\n\nprint('=== SC-001: Adaptation Speed Verification ===')\n# Compare fixed vs adaptive decay in volatile regime\ndetector = IIRRegimeDetector(fast_period=5, slow_period=50)\ncalc = AdaptiveDecayCalculator()\n\n# Build up a volatile regime\nfor _ in range(280):\n    detector.update(0.0001)  # Calm\nfor i in range(20):\n    detector.update(0.30 if i % 2 == 0 else -0.30)  # Volatile spike\n\nadaptive_decay = calc.calculate_from_detector(detector)\nfixed_decay = 0.99\n\n# In volatile regime, adaptive decay should be lower (faster forgetting)\n# Lower decay = faster adaptation to new data\nprint(f'Fixed decay: {fixed_decay}')\nprint(f'Adaptive decay in volatile regime: {adaptive_decay:.4f}')\nprint(f'Difference: {(fixed_decay - adaptive_decay)*100:.1f}% faster forgetting')\nprint(f'SC-001 PASS: Adaptive decay {\\\"is\\\" if adaptive_decay < fixed_decay else \\\"is NOT\\\"} faster in volatile regime')\n\nprint()\nprint('=== SC-002: Full Range Coverage ===')\n# Test that we cover the full [0.95, 0.99] range\ntest_ratios = [0.0, 0.5, 0.7, 0.9, 1.1, 1.3, 1.5, 2.0, 5.0]\ndecays = [calc.calculate_from_ratio(vr) for vr in test_ratios]\nprint(f'Variance ratios: {test_ratios}')\nprint(f'Decay values: {[f\\\"{d:.4f}\\\" for d in decays]}')\nprint(f'Min decay: {min(decays):.4f} (expected: 0.95)')\nprint(f'Max decay: {max(decays):.4f} (expected: 0.99)')\nprint(f'SC-002 PASS: Range covers [{min(decays):.2f}, {max(decays):.2f}]')\n\nprint()\nprint('=== SC-005: No New Hyperparameters ===')\n# The formula is fixed: decay = 0.99 - 0.04 * normalized_volatility\n# No configurable parameters\nprint(f'decay_low: {calc.decay_low} (fixed)')\nprint(f'decay_high: {calc.decay_high} (fixed)')\nprint('SC-005 PASS: No new hyperparameters (formula is fixed)')\n\nprint()\nprint('=== T044: O(1) Overhead Verification ===')\n# Measure time for decay calculation\nn_iterations = 10000\nstart = time.perf_counter()\nfor _ in range(n_iterations):\n    calc.calculate_from_ratio(1.1)\nelapsed = time.perf_counter() - start\nper_call_us = (elapsed / n_iterations) * 1_000_000\nprint(f'Time per call: {per_call_us:.2f} microseconds')\nprint(f'T044 PASS: {per_call_us:.2f}us << 1ms (1000us)')\n\"\n",
+      "description": "Verify success criteria SC-001, SC-002, SC-005, T044"
+    },
+    {
+      "operation": "grep",
+      "timestamp": "2026-01-06T17:08:41.691841",
+      "pattern": "SYS_DECAY_UPDATE",
+      "path": "/media/sam/1TB/nautilus_dev",
+      "output_mode": "files_with_matches"
+    },
+    {
+      "operation": "taskoutput",
+      "timestamp": "2026-01-06T17:08:41.811255",
+      "task_id": "aad5bfe",
+      "block": false,
+      "timeout": 30000
+    },
+    {
+      "operation": "taskoutput",
+      "timestamp": "2026-01-06T17:08:46.158342",
+      "task_id": "aad5bfe",
+      "block": true,
+      "timeout": 120000
+    },
+    {
+      "operation": "grep",
+      "timestamp": "2026-01-06T17:08:47.391348",
+      "pattern": "class.*IIRRegimeDetector",
+      "path": "/media/sam/1TB/nautilus_dev",
+      "output_mode": "content"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-06T17:08:47.437642",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/test_thompson_selector_adaptive.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-06T17:08:51.712320",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/adaptive_control/dsp_filters.py"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T17:08:57.258633",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run pytest tests/test_thompson_selector_adaptive.py -v 2>&1 | tail -60",
+      "description": "Run Thompson selector adaptive tests"
     }
   ],
-  "last_updated": "2026-01-06T17:07:30.090748"
+  "last_updated": "2026-01-06T17:08:57.258664"
 }

@@ -122,11 +122,11 @@
 
 **Purpose**: Final validation and cleanup
 
-- [ ] T035 Run existing ThompsonSelector tests for regression (SC-003) via test-runner agent
-- [ ] T036 Run existing ParticlePortfolio tests for regression via test-runner agent
-- [ ] T037 Run existing BayesianEnsemble tests for regression via test-runner agent
-- [ ] T038 [P] Update strategies/common/adaptive_control/__init__.py to export new classes
-- [ ] T039 [P] Add docstrings to all new public methods
+- [X] T035 Run existing ThompsonSelector tests for regression (SC-003) via test-runner agent
+- [X] T036 Run existing ParticlePortfolio tests for regression via test-runner agent
+- [X] T037 Run existing BayesianEnsemble tests for regression via test-runner agent
+- [X] T038 [P] Update strategies/common/adaptive_control/__init__.py to export new classes
+- [X] T039 [P] Add docstrings to all new public methods
 - [ ] T040 Run alpha-debug verification on adaptive_decay.py
 - [ ] T041 Run alpha-debug verification on particle_portfolio.py modifications
 - [ ] T042 Verify SC-001: Measure adaptation speed (30% faster in volatile regimes)
