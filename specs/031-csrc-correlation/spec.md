@@ -3,7 +3,18 @@
 **Feature Branch**: `031-csrc-correlation`
 **Created**: 2026-01-06
 **Status**: Draft
-**Input**: User description: "CSRC (Continuous Sharpe Ratio Covariance) Correlation-Aware Allocation for particle_portfolio.py. Problem: Current ThompsonSelector in particle_portfolio.py treats strategies as independent. Weight allocation ignores inter-strategy correlation, causing over-allocation to correlated strategies (e.g., 30%+30%+30% to three correlated momentum strategies). Solution (from Varlashova & Bilokon 2025): Add covariance-penalized objective function: reward = sharpe_portfolio - lambda_ * covariance_penalty. Track rolling correlation matrix between strategies. Penalize allocations that increase portfolio correlation concentration. Source: specs/028-validation/gap_analysis.md Gap #2"
+**Source**: Gap #2 (HIGH) | [Canonical Mapping](../028-validation/gaps_to_specs_mapping.md)
+
+## Problem Statement
+
+Current ThompsonSelector in `particle_portfolio.py` treats strategies as independent. Weight allocation ignores inter-strategy correlation, causing over-allocation to correlated strategies (e.g., 30%+30%+30% to three correlated momentum strategies).
+
+**Solution** (Varlashova & Bilokon 2025): Add covariance-penalized objective function:
+```
+reward = sharpe_portfolio - lambda * covariance_penalty
+```
+
+---
 
 ## User Scenarios & Testing *(mandatory)*
 

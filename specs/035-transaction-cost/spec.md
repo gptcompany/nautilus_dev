@@ -3,7 +3,18 @@
 **Feature Branch**: `035-transaction-cost`
 **Created**: 2026-01-06
 **Status**: Draft
-**Input**: User description: "Transaction Cost Model with Kyle's Lambda for sops_sizing.py"
+**Source**: Gap #5 (MED) | [Canonical Mapping](../028-validation/gaps_to_specs_mapping.md)
+
+## Problem Statement
+
+`sops_sizing.py` produces theoretical position sizes but does NOT adjust for market impact. Position sizing ignores transaction costs, violating Pillar P4 (Scalare).
+
+**Solution** (Almgren-Chriss 2001): Implement Kyle's Lambda market impact model:
+```
+impact = lambda * sqrt(volume / ADV)
+```
+
+---
 
 ## User Scenarios & Testing *(mandatory)*
 

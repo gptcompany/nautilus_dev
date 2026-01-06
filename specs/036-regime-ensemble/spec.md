@@ -3,7 +3,15 @@
 **Feature Branch**: `036-regime-ensemble`
 **Created**: 2026-01-06
 **Status**: Draft
-**Input**: User description: "Regime Ensemble Voting with BOCD (Bayesian Online Changepoint Detection). Problem: Current regime detection uses IIRRegimeDetector and SpectralRegimeDetector independently. No ensemble voting, no real-time changepoint detection (BOCD from Adams & MacKay 2007). Solution: Add BOCD for real-time regime change detection and create ensemble voting across multiple detectors with weighted voting based on detector confidence."
+**Source**: Gap #8 (MED) | [Canonical Mapping](../028-validation/gaps_to_specs_mapping.md)
+
+## Problem Statement
+
+Current regime detection uses IIRRegimeDetector and SpectralRegimeDetector independently. No ensemble voting, no real-time changepoint detection. Regime switches detected by FFT/HMM but not real-time BOCD.
+
+**Solution** (Adams & MacKay 2007): Add Bayesian Online Changepoint Detection (BOCD) for real-time regime change detection and create ensemble voting across multiple detectors with weighted voting based on detector confidence.
+
+---
 
 ## User Scenarios & Testing *(mandatory)*
 

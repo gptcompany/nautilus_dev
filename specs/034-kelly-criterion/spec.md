@@ -3,13 +3,16 @@
 **Feature Branch**: `034-kelly-criterion`
 **Created**: 2026-01-06
 **Status**: Draft
-**Source**: `specs/028-validation/gap_analysis.md` Gap #4, `docs/research/kelly-vs-giller-analysis.md`
+**Source**: Gap #4 (MED) | [Canonical Mapping](../028-validation/gaps_to_specs_mapping.md)
 
 ## Problem Statement
 
-Current position sizing pipeline (Signal → SOPS → Giller → Risk Limits) produces sizes based on signal strength and volatility, but does NOT optimize for long-term growth rate at the portfolio level. The Kelly Criterion provides mathematically optimal capital allocation for maximizing geometric growth, but is not integrated.
+Current position sizing pipeline (Signal → SOPS → Giller → Risk Limits) produces sizes based on signal strength and volatility, but does NOT optimize for long-term growth rate at the portfolio level.
 
-**Gap #4 from gap_analysis.md**: "Kelly Criterion Not Integrated - Sub-optimal growth rate for multi-strategy"
+**Solution** (Baker & McHale 2013, `docs/research/kelly-vs-giller-analysis.md`): Integrate Kelly Criterion as optional final layer:
+```
+Signal → SOPS → Giller → [Kelly Scaling] → Risk Limits
+```
 
 **Impact**: Without Kelly-based portfolio allocation, the system may:
 - Over-allocate to high-variance strategies (sub-optimal growth)
@@ -144,8 +147,6 @@ Signal → SOPS → Giller → [Kelly Scaling] → Risk Limits → Final Positio
 
 ## References
 
-- `docs/research/kelly-vs-giller-analysis.md` - Comprehensive analysis showing Kelly/Giller/SOPS are complementary
-- `specs/028-validation/gap_analysis.md` Gap #4 - Original gap identification
-- `specs/028-validation/action_items.md` - "Implement Kelly at Portfolio Level (4h)"
+- `docs/research/kelly-vs-giller-analysis.md` - Kelly/Giller/SOPS complementary analysis
 - Baker & McHale 2013 - Kelly with parameter uncertainty
 - Giller 2020 - Power-law sizing relationship to Kelly

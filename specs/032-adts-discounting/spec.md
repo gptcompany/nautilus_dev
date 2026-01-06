@@ -1,9 +1,20 @@
 # Feature Specification: Adaptive Discounted Thompson Sampling (ADTS)
 
-**Feature Branch**: `032-feature-adts-adaptive`
+**Feature Branch**: `032-adts-discounting`
 **Created**: 2026-01-06
 **Status**: Draft
-**Input**: User description: "ADTS (Adaptive Discounted Thompson Sampling) for particle_portfolio.py - Make decay factor a function of regime volatility based on de Freitas Fonseca et al. 2024 paper"
+**Source**: Gap #3 (HIGH) | [Canonical Mapping](../028-validation/gaps_to_specs_mapping.md)
+
+## Problem Statement
+
+Thompson Sampling in `particle_portfolio.py` uses uniform decay rate, not regime-adaptive. In volatile markets, old performance data should be forgotten faster; in stable markets, historical data should be preserved longer.
+
+**Solution** (de Freitas Fonseca et al. 2024): Make decay factor a function of regime volatility:
+```python
+decay = 0.99 - 0.04 * normalized_volatility  # Range: [0.95, 0.99]
+```
+
+---
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -99,8 +110,7 @@ As a system monitor, I need to observe how decay rates change over time and corr
 
 ## References
 
-- **Source Paper**: de Freitas Fonseca et al. 2024, "Bandit Networks with Adaptive Discounted Thompson Sampling"
-- **Gap Analysis**: specs/028-validation/gap_analysis.md Gap #3
-- **Philosophy**: CLAUDE.md Pillar P3 "Non Parametrico" - adaptive to data, not fixed parameters
-- **Existing Code**: strategies/common/adaptive_control/particle_portfolio.py (ThompsonSelector class, lines 314-425)
-- **Regime Detection**: strategies/common/adaptive_control/dsp_filters.py (IIRRegimeDetector class, lines 305-370)
+- de Freitas Fonseca et al. 2024, "Bandit Networks with Adaptive Discounted Thompson Sampling"
+- CLAUDE.md Pillar P3 "Non Parametrico" - adaptive to data, not fixed parameters
+- `strategies/common/adaptive_control/particle_portfolio.py` (ThompsonSelector class)
+- `strategies/common/adaptive_control/dsp_filters.py` (IIRRegimeDetector class)
