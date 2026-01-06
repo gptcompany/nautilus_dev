@@ -17,12 +17,13 @@ This skill automates the entire SpecKit workflow with intelligent decision-makin
 1. `/speckit.specify` - Create specification
 2. **DECISION**: Research needed? (domain complexity analysis)
 3. `/research` - Academic paper search (if needed)
-4. `/speckit.plan` - Create implementation plan
-5. **VALIDATE**: NT nightly compatibility check
-6. `/speckit.tasks` - Generate task breakdown
-7. `/speckit.analyze` - Cross-validate artifacts
-8. **VALIDATE**: Final NT compatibility check
-9. **REPORT**: Summary with validation results
+4. **PMW VALIDATION**: Prove Me Wrong analysis (counter-evidence + SWOT)
+5. `/speckit.plan` - Create implementation plan
+6. **VALIDATE**: NT nightly compatibility check
+7. `/speckit.tasks` - Generate task breakdown
+8. `/speckit.analyze` - Cross-validate artifacts
+9. **VALIDATE**: Final NT compatibility check
+10. **REPORT**: Summary with validation results
 
 ## Execution Flow
 
@@ -91,7 +92,81 @@ else:
 
 - If `needs_research == False`:
   1. Report: "Research phase skipped (infrastructure/simple feature)"
-  2. Proceed to Phase 3
+  2. Proceed to Phase 3 (skip PMW)
+
+### Phase 2b: PMW Validation (Prove Me Wrong)
+
+> **"Cerca attivamente disconferme, non conferme"**
+> Reference: CLAUDE.md Validation Philosophy
+
+**Purpose**: Before proceeding with implementation, actively search for counter-evidence that could invalidate the approach.
+
+**PMW Protocol**:
+
+1. **Counter-Evidence Search**:
+   ```
+   # Instead of searching "{topic} works"
+   Search: "{topic} failure", "{topic} poor performance", "{topic} limitations"
+
+   # Example queries:
+   - "Thompson Sampling non-stationary failure"
+   - "regime detection out of sample poor performance"
+   - "position sizing overfitting backtest"
+   ```
+
+2. **Academic Critique Search**:
+   - Search arXiv/SSRN for papers that CONTRADICT the approach
+   - Look for failure stories in practitioner literature
+   - Check for simpler alternatives that might work better
+
+3. **SWOT Assessment**:
+   ```markdown
+   **Strengths**: What actually works well?
+   **Weaknesses**: Where are we vulnerable?
+   **Opportunities**: What could we improve?
+   **Threats**: What could make us fail?
+   ```
+
+4. **Mitigations Check**:
+   - For each threat/weakness identified, verify spec addresses it
+   - Document unaddressed risks
+
+5. **Verdict**:
+   - **GO**: Proceed with implementation (solid foundation)
+   - **WAIT**: Fix identified issues before proceeding
+   - **STOP**: Rethink the approach entirely
+
+**Output**: Add PMW section to `research.md`:
+```markdown
+## PMW (Prove Me Wrong) Analysis
+
+### Counter-Evidence Search
+**Query**: "{disconfirmation query}"
+**Findings**: [list of potential issues found]
+
+### Mitigations in Spec
+- [x] Mitigation 1 (addresses threat X)
+- [ ] Mitigation 2 (NOT addressed - RISK)
+
+### SWOT Assessment
+**Strengths**: ...
+**Weaknesses**: ...
+**Opportunities**: ...
+**Threats**: ...
+
+### Verdict: GO/WAIT/STOP
+```
+
+**Handle PMW Results**:
+- **GO**: Proceed to Phase 3
+- **WAIT**:
+  1. Present issues to user
+  2. Update spec.md with mitigations
+  3. Re-run PMW validation
+- **STOP**:
+  1. Present fundamental issues
+  2. Recommend alternative approaches
+  3. Ask user how to proceed
 
 ### Phase 3: Implementation Planning
 

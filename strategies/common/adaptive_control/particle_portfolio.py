@@ -41,7 +41,10 @@ from typing import TYPE_CHECKING, Dict, List, Optional, Tuple
 if TYPE_CHECKING:
     from strategies.common.adaptive_control.correlation_tracker import (
         CorrelationMetrics,
+        OnlineCorrelationMatrix,
     )
+    from strategies.common.adaptive_control.dsp_filters import IIRRegimeDetector
+    from strategies.common.audit.emitter import AuditEventEmitter
 
 
 @dataclass
@@ -449,14 +452,34 @@ class ThompsonSelector:
 
     Unlike GA/PSO, this has NO hyperparameters (except priors).
 
+    Adaptive Discounting (Spec 032):
+    When regime_detector is provided, decay factor adapts automatically
+    based on market volatility:
+    - Low volatility (variance_ratio < 0.7): decay = 0.99 (stable estimates)
+    - High volatility (variance_ratio > 1.5): decay = 0.95 (faster adaptation)
+    - Normal volatility: Interpolated linearly
+
+    Academic Foundation:
+    - Qi et al. (2023): Discounted Thompson Sampling for Non-Stationary Bandits
+    - de Freitas Fonseca et al. (2024): RF-DSW TS
+
     Usage:
+        # Basic usage (fixed decay)
         selector = ThompsonSelector(["strat_a", "strat_b", "strat_c"])
+
+        # Adaptive decay with regime detector
+        from strategies.common.adaptive_control.dsp_filters import IIRRegimeDetector
+        detector = IIRRegimeDetector()
+        selector = ThompsonSelector(
+            strategies=["strat_a", "strat_b"],
+            regime_detector=detector,
+        )
 
         # Each period
         selected = selector.select()
         use_strategy(selected)
 
-        # Update with outcome
+        # Update with outcome (uses adaptive decay if detector provided)
         if profit > 0:
             selector.update(selected, success=True)
         else:
@@ -466,16 +489,87 @@ class ThompsonSelector:
     def __init__(
         self,
         strategies: List[str],
-        decay: float = 0.99,  # Forgetting factor
+        decay: float = 0.99,  # Base forgetting factor (used when no detector)
+        regime_detector: "IIRRegimeDetector | None" = None,  # Spec 032: Adaptive decay
+        audit_emitter: "AuditEventEmitter | None" = None,  # Spec 032: Decay audit
     ):
         """
         Args:
             strategies: List of strategy names
-            decay: How much to decay old observations (for non-stationarity)
+            decay: Base decay factor (used when regime_detector is None)
+            regime_detector: Optional IIRRegimeDetector for adaptive decay (Spec 032)
+            audit_emitter: Optional audit emitter for decay event logging (Spec 032)
         """
         self.strategies = strategies
-        self.decay = decay
+        self._fixed_decay = decay  # Store base decay
+        self._regime_detector = regime_detector
+        self._audit_emitter = audit_emitter
         self.stats: Dict[str, StrategyStats] = {s: StrategyStats() for s in strategies}
+
+        # Initialize adaptive decay calculator if detector provided
+        if regime_detector is not None:
+            from strategies.common.adaptive_control.adaptive_decay import (
+                AdaptiveDecayCalculator,
+            )
+
+            self._decay_calculator = AdaptiveDecayCalculator()
+        else:
+            self._decay_calculator = None
+
+    @property
+    def current_decay(self) -> float:
+        """Get current decay value (adaptive or fixed).
+
+        Note: Reading this property does NOT emit audit events.
+        Audit events are only emitted during update() calls.
+
+        Returns:
+            Current decay factor in [0.95, 0.99] range.
+        """
+        return self._get_decay(emit_audit=False)
+
+    def _get_decay(self, emit_audit: bool = True) -> float:
+        """Internal method to get current decay value.
+
+        If regime_detector is configured, calculates adaptive decay.
+        Otherwise returns fixed decay value.
+
+        Args:
+            emit_audit: If True, emit audit event for decay calculation.
+                       Only set True for actual update operations, not reads.
+
+        Returns:
+            Current decay factor.
+        """
+        if self._decay_calculator is not None and self._regime_detector is not None:
+            decay = self._decay_calculator.calculate_from_detector(
+                self._regime_detector
+            )
+            if emit_audit:
+                self._emit_decay_event(decay)
+            return decay
+        return self._fixed_decay
+
+    def _emit_decay_event(self, decay_value: float) -> None:
+        """Emit decay update event to audit trail (Spec 032 - US3).
+
+        Args:
+            decay_value: Current adaptive decay value.
+        """
+        if self._audit_emitter is None:
+            return
+
+        from strategies.common.audit.events import AuditEventType
+
+        self._audit_emitter.emit_system(
+            event_type=AuditEventType.SYS_DECAY_UPDATE,
+            source="thompson_selector",
+            payload={
+                "decay_value": decay_value,
+                "variance_ratio": self._regime_detector.variance_ratio,
+                "is_adaptive": True,
+            },
+        )
 
     def select(self) -> str:
         """
@@ -505,6 +599,9 @@ class ThompsonSelector:
         """
         Update strategy statistics.
 
+        Uses adaptive decay if regime_detector is configured,
+        otherwise uses fixed decay value.
+
         Args:
             strategy: Strategy name
             success: Whether the strategy was successful
@@ -512,10 +609,13 @@ class ThompsonSelector:
         if strategy not in self.stats:
             return
 
+        # Get decay (adaptive or fixed)
+        decay = self._get_decay()
+
         # Apply decay (forget old observations)
         for s in self.strategies:
-            self.stats[s].successes *= self.decay
-            self.stats[s].failures *= self.decay
+            self.stats[s].successes *= decay
+            self.stats[s].failures *= decay
 
         # Update selected strategy
         if success:
@@ -527,6 +627,9 @@ class ThompsonSelector:
         """
         Update with continuous return (not just success/failure).
 
+        Uses adaptive decay if regime_detector is configured,
+        otherwise uses fixed decay value.
+
         Args:
             strategy: Strategy name
             return_value: Strategy return (can be negative)
@@ -534,10 +637,13 @@ class ThompsonSelector:
         if strategy not in self.stats:
             return
 
+        # Get decay (adaptive or fixed)
+        decay = self._get_decay()
+
         # Apply decay FIRST (consistent with update() method)
         for s in self.strategies:
-            self.stats[s].successes *= self.decay
-            self.stats[s].failures *= self.decay
+            self.stats[s].successes *= decay
+            self.stats[s].failures *= decay
 
         # Convert continuous to pseudo-counts
         # Positive return = partial success
