@@ -1,37 +1,400 @@
 {
   "session_id": "e803c286-b789-468b-a1a6-c0c65a0f94b3",
-  "created_at": "2026-01-06T11:46:39.472500",
+  "created_at": "2026-01-06T11:57:58.466907",
   "operations": [
     {
       "operation": "bash",
-      "timestamp": "2026-01-06T11:46:39.472529",
-      "command": "git show 5fe0b08:specs/032-adts-discounting/spec.md > /tmp/032-correct.md && wc -l /tmp/032-correct.md",
-      "description": "Get correct 032 spec"
+      "timestamp": "2026-01-06T11:57:58.466932",
+      "command": "head -15 specs/037-long-short-separation/spec.md",
+      "description": "Check 037 spec header"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2026-01-06T11:58:22.842529",
+      "todo_count": 5
+    },
+    {
+      "operation": "write",
+      "timestamp": "2026-01-06T11:58:42.478626",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/028-validation/gaps_to_specs_mapping.md",
+      "content_length": 2593
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2026-01-06T11:58:49.820631",
+      "todo_count": 5
+    },
+    {
+      "operation": "grep",
+      "timestamp": "2026-01-06T11:58:56.499612",
+      "pattern": "Gap 4|Kelly|kelly",
+      "path": "/media/sam/1TB/nautilus_dev/specs/028-validation/gap_analysis.md",
+      "output_mode": "content"
     },
     {
       "operation": "bash",
-      "timestamp": "2026-01-06T11:46:39.789307",
-      "command": "rm -rf specs/032-feature-adts-adaptive && mkdir -p specs/032-adts-discounting/checklists",
-      "description": "Fix directory name"
+      "timestamp": "2026-01-06T11:59:01.764038",
+      "command": "find . -name \"*kelly*\" -o -name \"*giller*\" 2>/dev/null | grep -v \".git\"",
+      "description": "Find Kelly/Giller analysis files"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-06T11:59:08.849958",
+      "file_path": "/media/sam/1TB/nautilus_dev/docs/research/kelly-vs-giller-analysis.md"
     },
     {
       "operation": "bash",
-      "timestamp": "2026-01-06T11:46:47.426557",
-      "command": "git log --all --oneline -- \"specs/032-adts-discounting/spec.md\" | head -3",
-      "description": "Find commit with correct 032"
+      "timestamp": "2026-01-06T12:00:03.822561",
+      "command": "mkdir -p specs/034-kelly-criterion/checklists",
+      "description": "Create spec directory"
+    },
+    {
+      "operation": "write",
+      "timestamp": "2026-01-06T12:00:04.524641",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/034-kelly-criterion/spec.md",
+      "content_length": 9137
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2026-01-06T12:00:21.381434",
+      "todo_count": 5
+    },
+    {
+      "operation": "write",
+      "timestamp": "2026-01-06T12:01:01.683309",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/028-validation/README.md",
+      "content_length": 5335
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-06T12:01:10.251282",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/028-validation/gaps_to_specs_mapping.md",
+      "old_string": "| 4 | Kelly Criterion Integration | MED | 4h | **034** | kelly-criterion | **MISSING** |"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-06T12:01:19.586502",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/028-validation/gaps_to_specs_mapping.md",
+      "old_string": "## Notes\n\n1. **Gap #4 (Kelly)** was omitted from original README.md - needs spec-034 creation\n2. **G..."
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2026-01-06T12:01:27.787477",
+      "todo_count": 5
     },
     {
       "operation": "bash",
-      "timestamp": "2026-01-06T11:46:52.967144",
-      "command": "git show 6ae2c3b:specs/032-adts-discounting/spec.md > specs/032-adts-discounting/spec.md && echo \"032-adts-discounting OK\"",
-      "description": "Recover correct 032"
+      "timestamp": "2026-01-06T12:01:36.655977",
+      "command": "git status --short specs/",
+      "description": "Check specs status"
     },
     {
       "operation": "bash",
-      "timestamp": "2026-01-06T11:46:53.322873",
-      "command": "rm -rf specs/032-feature-adts-adaptive && ls -la specs/032*/",
-      "description": "Remove wrong folder and verify"
+      "timestamp": "2026-01-06T12:01:37.396636",
+      "command": "git add specs/028-validation/gaps_to_specs_mapping.md specs/028-validation/README.md specs/034-kelly-criterion/",
+      "description": "Stage new and modified files"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T12:01:47.608397",
+      "command": "git commit -m \"$(cat <<'EOF'\nfeat(specs): Add spec-034-kelly-criterion and align documentation\n\n- Create spec-034-kelly-criterion for Gap #4 (Kelly Criterion Integration)\n- Create gaps_to_specs_mapping.md as canonical gap→spec reference\n- Update README.md to align with action_items.md and all research documents\n- Complete spec sequence: 031→037 now all specified\n\nGap #4 was missing from original batch spec creation. This commit\ncompletes the gap→spec mapping from 028-validation research phase.\n\nMapping summary:\n- Gap #1 → spec-033 (Strategic Controller)\n- Gap #2 → spec-031 (CSRC Correlation)\n- Gap #3 → spec-032 (ADTS Discounting)\n- Gap #4 → spec-034 (Kelly Criterion) ← NEW\n- Gap #5 → spec-035 (Transaction Cost)\n- Gap #6 → DEFERRED (MAML)\n- Gap #7 → merged into spec-033\n- Gap #8 → spec-036 (BOCD Regime)\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n)\"",
+      "description": "Commit spec-034 and documentation alignment"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T12:01:53.003297",
+      "command": "ls -d specs/03[0-9]* | sort",
+      "description": "Final spec list"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T12:01:53.533508",
+      "command": "git log --oneline -3",
+      "description": "Show recent commits"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2026-01-06T12:01:59.253576",
+      "todo_count": 5
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2026-01-06T12:03:38.177107",
+      "todo_count": 4
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T12:03:46.486027",
+      "command": "echo \"=== gaps_to_specs_mapping.md ===\" && grep -E \"\\| [0-9] \\|\" specs/028-validation/gaps_to_specs_mapping.md",
+      "description": "Extract mapping table"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T12:03:46.506913",
+      "command": "echo \"=== action_items.md tasks ===\" && grep -E \"CSRC|ADTS|Strategic|Kelly|Transaction|BOCD|Walk-Forward\" specs/028-validation/action_items.md",
+      "description": "Extract action items"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T12:03:46.528175",
+      "command": "echo \"=== gap_analysis.md gaps ===\" && grep -E \"^\\| [0-9] \\|\" specs/028-validation/gap_analysis.md",
+      "description": "Extract gap table"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2026-01-06T12:04:01.916208",
+      "todo_count": 4
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T12:04:09.447939",
+      "command": "mkdir -p specs/028-validation/archive/consumed specs/028-validation/archive/reference",
+      "description": "Create archive subfolders"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T12:04:09.975805",
+      "command": "cd specs/028-validation && ls *.md",
+      "description": "List current files"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T12:04:21.346992",
+      "command": "cd specs/028-validation && git mv baseline_comparison.md research_plan_swot.md research_attack_plan.md archive/consumed/",
+      "description": "Move consumed files"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T12:04:23.172313",
+      "command": "cd specs/028-validation && git mv counter_evidence_academic.md counter_evidence_practitioner.md alternative_architectures.md cross_validation_metalabeling.md community_issues_analysis.md stress_test_scenarios.md swot_analysis.md risk_analysis.md research_vs_repos_analysis.md dilla_framework_insight.md extreme_edge_discovery_report.md extreme_edge_discovery_prompt.md session_prompt_swot.md executive_summary.md archive/reference/",
+      "description": "Move reference files"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T12:04:41.154052",
+      "command": "echo \"=== CHAIN OF LOGIC ===\" && echo \"\" && echo \"1. gap_analysis.md identifica:\" && grep -E \"^\\| [0-9] \\|\" specs/028-validation/gap_analysis.md | awk -F'|' '{print \"   Gap #\"$2\": \"$3\" (\"$4\")\"}' | head -8",
+      "description": "Show gap analysis logic"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T12:04:41.810683",
+      "command": "echo \"\" && echo \"2. action_items.md prioritizza:\" && grep -E \"Week|Day|Post\" specs/028-validation/action_items.md | head -6",
+      "description": "Show action items timeline"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T12:04:42.475801",
+      "command": "echo \"\" && echo \"3. Specs create:\" && ls -1 specs/03[1-7]*/spec.md 2>/dev/null | sed 's/specs\\//   /' | sed 's/\\/spec.md//'",
+      "description": "Show created specs"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T12:04:58.481640",
+      "command": "echo \"=== SPEC vs GAP VALIDATION ===\" && for spec in 031 032 033 034 035 036; do echo \"\" && echo \"--- spec-$spec ---\" && head -8 specs/$spec-*/spec.md 2>/dev/null | grep -E \"^#|Problem|Gap|Source\" | head -3; done",
+      "description": "Validate each spec addresses its gap"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T12:05:04.288487",
+      "command": "for f in specs/031-*/spec.md specs/032-*/spec.md specs/033-*/spec.md specs/034-*/spec.md specs/035-*/spec.md specs/036-*/spec.md; do echo \"=== $f ===\" && head -8 \"$f\" | grep -E \"^# |Problem|Gap #\" | head -2 && echo \"\"; done",
+      "description": "Validate specs"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T12:05:09.237797",
+      "command": "ls specs/03[1-6]*/spec.md | while read f; do echo \"=== $f ===\" && head -10 \"$f\" | grep -E \"^# |Gap\" && echo \"\"; done",
+      "description": "Validate specs with while read"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T12:05:15.018888",
+      "command": "head -6 specs/031-csrc-correlation/spec.md && echo \"---\" && head -6 specs/032-adts-discounting/spec.md && echo \"---\" && head -6 specs/034-kelly-criterion/spec.md",
+      "description": "Check spec headers directly"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T12:05:27.471795",
+      "command": "ls specs/028-validation/",
+      "description": "Verify folder structure"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T12:05:27.498825",
+      "command": "ls specs/028-validation/archive/consumed/ specs/028-validation/archive/reference/ | head -20",
+      "description": "Verify archive contents"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-06T12:05:43.699739",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/028-validation/README.md",
+      "old_string": "### CONSUMED (Work completed)\n| File | Purpose | Consumed By |\n|------|---------|-------------|\n| `b..."
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T12:05:49.794108",
+      "command": "git status --short specs/028-validation/",
+      "description": "Check status"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T12:06:34.600151",
+      "command": "git add specs/028-validation/ && git commit -m \"$(cat <<'EOF'\nrefactor(spec-028): Reorganize validation files into archive folders\n\nOrganize spec-028-validation for clarity:\n\n**ACTIVE (root level)** - Source documents for implementation:\n- README.md (index)\n- gap_analysis.md (8 gaps defined)\n- gaps_to_specs_mapping.md (canonical mapping)\n- action_items.md (timeline)\n- final_verdict.md (WAIT decision)\n\n**archive/consumed/** - Work completed, consumed by specs:\n- baseline_comparison.md → spec-029\n- research_plan_swot.md → methodology executed\n- research_attack_plan.md → P5 removed\n\n**archive/reference/** - Documentation for reference:\n- counter_evidence_*.md\n- alternative_architectures.md\n- cross_validation_metalabeling.md (spec-037 source)\n- stress_test_scenarios.md\n- etc.\n\nThis makes it clear which files are active sources vs archived reference.\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n)\"",
+      "description": "Commit reorganization"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2026-01-06T12:06:44.222073",
+      "todo_count": 4
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T12:12:03.813440",
+      "command": "grep -r \"specs/028-validation/\" specs/03[1-7]*/spec.md 2>/dev/null | grep -v archive",
+      "description": "Find references to moved files"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2026-01-06T12:14:32.125506",
+      "todo_count": 8
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-06T12:14:37.989170",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/031-csrc-correlation/spec.md"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-06T12:14:47.766961",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/031-csrc-correlation/spec.md",
+      "old_string": "**Feature Branch**: `031-csrc-correlation`\n**Created**: 2026-01-06\n**Status**: Draft\n**Input**: User..."
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2026-01-06T12:14:54.052052",
+      "todo_count": 8
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-06T12:14:58.842969",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/032-adts-discounting/spec.md"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-06T12:15:09.033974",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/032-adts-discounting/spec.md",
+      "old_string": "**Feature Branch**: `032-feature-adts-adaptive`\n**Created**: 2026-01-06\n**Status**: Draft\n**Input**:..."
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T12:15:16.750927",
+      "command": "tail -20 specs/032-adts-discounting/spec.md | grep -E \"Gap|Reference|Source|028\"",
+      "description": "Check for old references at end"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T12:15:28.319420",
+      "command": "tail -25 specs/032-adts-discounting/spec.md",
+      "description": "Read end of file"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-06T12:15:35.580940",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/032-adts-discounting/spec.md",
+      "old_string": "## References\n\n- **Source Paper**: de Freitas Fonseca et al. 2024, \"Bandit Networks with Adaptive Di..."
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2026-01-06T12:15:43.478871",
+      "todo_count": 8
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T12:15:49.871380",
+      "command": "head -10 specs/033-strategic-controller/spec.md",
+      "description": "Read 033 header"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T12:15:49.887479",
+      "command": "head -10 specs/036-regime-ensemble/spec.md",
+      "description": "Read 036 header"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-06T12:16:01.486369",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/033-strategic-controller/spec.md",
+      "old_string": "**Feature Branch**: `033-strategic-controller`\n**Created**: 2026-01-06\n**Status**: Draft\n**Input**: ..."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-06T12:16:10.567722",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/035-transaction-cost/spec.md",
+      "old_string": "**Feature Branch**: `035-transaction-cost`\n**Created**: 2026-01-06\n**Status**: Draft\n**Input**: User..."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-06T12:16:18.762092",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/036-regime-ensemble/spec.md",
+      "old_string": "**Feature Branch**: `036-regime-ensemble`\n**Created**: 2026-01-06\n**Status**: Draft\n**Input**: User ..."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-06T12:16:32.347979",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/037-long-short-separation/spec.md",
+      "old_string": "**Feature Branch**: `037-long-short-separation`\n**Created**: 2026-01-06\n**Status**: Draft\n**Input**:..."
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T12:16:37.422377",
+      "command": "head -15 specs/034-kelly-criterion/spec.md",
+      "description": "Check 034 header"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-06T12:16:45.967366",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/034-kelly-criterion/spec.md",
+      "old_string": "**Feature Branch**: `034-kelly-criterion`\n**Created**: 2026-01-06\n**Status**: Draft\n**Source**: `spe..."
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T12:16:51.409307",
+      "command": "tail -15 specs/034-kelly-criterion/spec.md",
+      "description": "Check 034 references"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-06T12:17:06.436240",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/034-kelly-criterion/spec.md",
+      "old_string": "## References\n\n- `docs/research/kelly-vs-giller-analysis.md` - Comprehensive analysis showing Kelly/..."
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2026-01-06T12:17:13.453130",
+      "todo_count": 8
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T12:17:18.247143",
+      "command": "git status --short specs/",
+      "description": "Check status before commit"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T12:17:29.381955",
+      "command": "git add specs/03[1-7]*/spec.md && git commit -m \"$(cat <<'EOF'\nstyle(specs): Standardize source references for professional consistency\n\nApply DRY principle - single source of truth in gaps_to_specs_mapping.md:\n\n**Standard format applied to all specs:**\n```\n**Source**: Gap #X (PRIORITY) | [Canonical Mapping](../028-validation/gaps_to_specs_mapping.md)\n```\n\n**Changes per spec:**\n- spec-031: Gap #2 (HIGH) + Problem Statement section\n- spec-032: Gap #3 (HIGH) + fixed branch name + Problem Statement\n- spec-033: Gap #1+#7 merged (HIGH) + Problem Statement\n- spec-034: Gap #4 (MED) + cleaned references\n- spec-035: Gap #5 (MED) + Problem Statement\n- spec-036: Gap #8 (MED) + Problem Statement\n- spec-037: JFDS Research + Problem Statement\n\n**Benefits:**\n- Traceability: Each spec links to canonical mapping\n- Maintainability: Change info in one place only\n- Clarity: Problem Statement section added to all specs\n- Professionalism: Consistent format across all specs\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n)\"",
+      "description": "Commit standardization"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2026-01-06T12:17:38.359862",
+      "todo_count": 8
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T12:17:43.754568",
+      "command": "git log --oneline -5",
+      "description": "Show final commits"
     }
   ],
-  "last_updated": "2026-01-06T11:46:53.322890"
+  "last_updated": "2026-01-06T12:17:43.754587"
 }
