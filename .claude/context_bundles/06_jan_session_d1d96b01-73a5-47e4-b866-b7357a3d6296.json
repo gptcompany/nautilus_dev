@@ -213,7 +213,43 @@
       "operation": "read",
       "timestamp": "2026-01-06T17:03:59.322287",
       "file_path": "/media/sam/1TB/nautilus_dev/tests/test_thompson_selector_adaptive.py"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T17:04:30.988255",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python3 -c \"\nfrom strategies.common.adaptive_control.dsp_filters import IIRRegimeDetector\n\n# Test the high volatility fixture\ndetector = IIRRegimeDetector()\nfor i in range(100):\n    ret = 0.05 if i % 2 == 0 else -0.05\n    detector.update(ret)\nprint(f'High volatility fixture variance_ratio: {detector.variance_ratio:.4f}')\n\n# Test with larger swings\ndetector2 = IIRRegimeDetector()\nfor i in range(100):\n    ret = 0.15 if i % 2 == 0 else -0.15\n    detector2.update(ret)\nprint(f'Larger swings variance_ratio: {detector2.variance_ratio:.4f}')\n\n# Test low volatility fixture\ndetector3 = IIRRegimeDetector()\nfor _ in range(100):\n    detector3.update(0.001)\nprint(f'Low volatility fixture variance_ratio: {detector3.variance_ratio:.4f}')\n\"\n",
+      "description": "Test variance_ratio values for fixtures"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T17:04:45.583815",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python3 -c \"\nfrom strategies.common.adaptive_control.dsp_filters import IIRRegimeDetector\n\n# To create high variance_ratio (fast > slow), we need recent volatility spike\n# Start with calm, then add volatility at the end (fast var >> slow var)\ndetector = IIRRegimeDetector()\nfor i in range(200):\n    if i < 150:\n        ret = 0.001  # Calm period\n    else:\n        ret = 0.10 if i % 2 == 0 else -0.10  # Recent volatility spike\n    detector.update(ret)\nprint(f'Volatility spike (high ratio): {detector.variance_ratio:.4f}')\n\n# To create low variance_ratio (fast < slow), we need calming down\n# Start with volatility, then calm down (slow var >> fast var)\ndetector2 = IIRRegimeDetector()\nfor i in range(200):\n    if i < 50:\n        ret = 0.10 if i % 2 == 0 else -0.10  # Early volatility\n    else:\n        ret = 0.001  # Calm period - recent\n    detector2.update(ret)\nprint(f'Calming down (low ratio): {detector2.variance_ratio:.4f}')\n\n# Normal\ndetector3 = IIRRegimeDetector()\nfor i in range(200):\n    ret = 0.02 if i % 2 == 0 else -0.02\n    detector3.update(ret)\nprint(f'Normal pattern: {detector3.variance_ratio:.4f}')\n\"\n",
+      "description": "Test different variance_ratio patterns"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T17:04:57.474793",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python3 -c \"\nfrom strategies.common.adaptive_control.dsp_filters import IIRRegimeDetector\n\n# More extreme spike: very calm then very volatile \ndetector = IIRRegimeDetector()\nfor i in range(300):\n    if i < 250:\n        ret = 0.0001  # Very calm\n    else:\n        ret = 0.20 if i % 2 == 0 else -0.20  # Recent huge volatility\n    detector.update(ret)\nprint(f'Extreme spike: {detector.variance_ratio:.4f}')\n\n# Even more extreme\ndetector2 = IIRRegimeDetector(fast_period=5, slow_period=50)  # Custom periods\nfor i in range(300):\n    if i < 280:\n        ret = 0.0001\n    else:\n        ret = 0.30 if i % 2 == 0 else -0.30\n    detector2.update(ret)\nprint(f'Custom periods extreme spike: {detector2.variance_ratio:.4f}')\n\"\n",
+      "description": "Test extreme variance_ratio patterns"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-06T17:05:12.264021",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/test_thompson_selector_adaptive.py",
+      "old_string": "class TestThompsonSelectorAdaptiveDecay:\n    \"\"\"Tests for adaptive decay with IIRRegimeDetector (US2..."
+    },
+    {
+      "operation": "task",
+      "timestamp": "2026-01-06T17:05:17.894907",
+      "subagent_type": "test-runner",
+      "prompt": "Run the tests in tests/test_thompson_selector_adaptive.py using pytest verbose mode. Report all resu..."
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T17:05:22.196079",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run pytest tests/test_thompson_selector_adaptive.py -v 2>&1",
+      "description": "Run Thompson selector adaptive tests"
     }
   ],
-  "last_updated": "2026-01-06T17:03:59.322302"
+  "last_updated": "2026-01-06T17:05:22.196095"
 }

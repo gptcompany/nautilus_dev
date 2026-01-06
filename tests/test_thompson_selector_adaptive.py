@@ -51,20 +51,36 @@ class TestThompsonSelectorAdaptiveDecay:
 
     @pytest.fixture
     def low_volatility_detector(self) -> IIRRegimeDetector:
-        """Create detector in low volatility state (variance_ratio < 0.7)."""
+        """Create detector in low volatility state (variance_ratio < 0.7).
+
+        Pattern: Start with volatility, then calm down significantly.
+        This creates fast_var << slow_var (ratio < 1.0).
+        """
         detector = IIRRegimeDetector()
-        # Feed stable returns to create low variance ratio
+        # First: volatility period (builds up slow variance)
+        for i in range(100):
+            ret = 0.10 if i % 2 == 0 else -0.10
+            detector.update(ret)
+        # Then: calm period (reduces fast variance)
         for _ in range(100):
-            detector.update(0.001)  # Small, consistent returns
+            detector.update(0.0001)
         return detector
 
     @pytest.fixture
     def high_volatility_detector(self) -> IIRRegimeDetector:
-        """Create detector in high volatility state (variance_ratio > 1.5)."""
-        detector = IIRRegimeDetector()
-        # Feed volatile returns to create high variance ratio
-        for i in range(100):
-            ret = 0.05 if i % 2 == 0 else -0.05  # Large swings
+        """Create detector in high volatility state (variance_ratio > 1.5).
+
+        Pattern: Start calm, then spike volatility recently.
+        This creates fast_var >> slow_var (ratio > 1.5).
+        Using faster response periods to achieve higher ratios.
+        """
+        detector = IIRRegimeDetector(fast_period=5, slow_period=50)
+        # First: very calm period (keeps slow variance low)
+        for _ in range(280):
+            detector.update(0.0001)
+        # Then: recent volatility spike (increases fast variance)
+        for i in range(20):
+            ret = 0.30 if i % 2 == 0 else -0.30
             detector.update(ret)
         return detector
 
