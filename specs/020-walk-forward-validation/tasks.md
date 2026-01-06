@@ -260,6 +260,13 @@
 
 - [X] T034 Verify test coverage >= 80% for walk_forward module (achieved 92%)
 
+- [ ] T-FE: Integrate luck_skill.py (LuckQuantifier) for DSR/PBO reporting per window
+  - Link `strategies/common/adaptive_control/luck_skill.py` to walk-forward validation
+  - Add DSR (Deflated Sharpe Ratio) calculation per window
+  - Add PBO (Probability of Backtest Overfitting) to WalkForwardResult
+  - Update report generation to include DSR and PBO metrics
+  - Reference: FE-002 (White's Reality Check) in spec.md
+
 ---
 
 ## Dependencies & Execution Order

@@ -208,6 +208,7 @@ def generate_report(result: WalkForwardResult) -> str:
 
 - Spec 007 (Alpha-Evolve Evaluator)
 - Spec 009 (Alpha-Evolve Controller)
+- **luck_skill.py**: `strategies/common/adaptive_control/luck_skill.py` - LuckQuantifier, DSR, PBO implementation (orphaned, linked here)
 
 ## Success Metrics
 
