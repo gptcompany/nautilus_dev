@@ -47,19 +47,19 @@
 
 ### Tests for User Story 1
 
-- [ ] T005 [P] [US1] Write test_low_volatility_high_decay in tests/test_adaptive_decay.py
-- [ ] T006 [P] [US1] Write test_high_volatility_low_decay in tests/test_adaptive_decay.py
-- [ ] T007 [P] [US1] Write test_normal_volatility_interpolated in tests/test_adaptive_decay.py
-- [ ] T008 [P] [US1] Write test_extreme_high_clamped in tests/test_adaptive_decay.py
-- [ ] T009 [P] [US1] Write test_zero_variance_ratio in tests/test_adaptive_decay.py
-- [ ] T009b [P] [US1] Write test_negative_variance_ratio in tests/test_adaptive_decay.py
+- [X] T005 [P] [US1] Write test_low_volatility_high_decay in tests/test_adaptive_decay.py
+- [X] T006 [P] [US1] Write test_high_volatility_low_decay in tests/test_adaptive_decay.py
+- [X] T007 [P] [US1] Write test_normal_volatility_interpolated in tests/test_adaptive_decay.py
+- [X] T008 [P] [US1] Write test_extreme_high_clamped in tests/test_adaptive_decay.py
+- [X] T009 [P] [US1] Write test_zero_variance_ratio in tests/test_adaptive_decay.py
+- [X] T009b [P] [US1] Write test_negative_variance_ratio in tests/test_adaptive_decay.py
 
 ### Implementation for User Story 1
 
-- [ ] T010 [US1] Implement normalized_volatility property in VolatilityContext in strategies/common/adaptive_control/adaptive_decay.py
-- [ ] T011 [US1] Implement calculate() method in AdaptiveDecayCalculator in strategies/common/adaptive_control/adaptive_decay.py
-- [ ] T012 [US1] Implement calculate_from_ratio() convenience method in strategies/common/adaptive_control/adaptive_decay.py
-- [ ] T013 [US1] Run tests via test-runner agent: verify T005-T009b pass, coverage >= 80% for adaptive_decay.py
+- [X] T010 [US1] Implement normalized_volatility property in VolatilityContext in strategies/common/adaptive_control/adaptive_decay.py
+- [X] T011 [US1] Implement calculate() method in AdaptiveDecayCalculator in strategies/common/adaptive_control/adaptive_decay.py
+- [X] T012 [US1] Implement calculate_from_ratio() convenience method in strategies/common/adaptive_control/adaptive_decay.py
+- [X] T013 [US1] Run tests via test-runner agent: verify T005-T009b pass, coverage >= 80% for adaptive_decay.py
 
 **Checkpoint**: AdaptiveDecayCalculator fully functional - can calculate adaptive decay from variance_ratio
 

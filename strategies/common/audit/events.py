@@ -47,6 +47,7 @@ class AuditEventType(str, Enum):
     SYS_REGIME_CHANGE = "sys.regime_change"
     SYS_RESAMPLING = "sys.resampling"
     SYS_CORRELATION_UPDATE = "sys.correlation_update"  # CSRC (Spec 031)
+    SYS_DECAY_UPDATE = "sys.decay_update"  # ADTS (Spec 032)
 
 
 def _now_ns() -> int:
