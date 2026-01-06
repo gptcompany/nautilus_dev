@@ -455,7 +455,47 @@
       "timestamp": "2026-01-06T17:08:57.258633",
       "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run pytest tests/test_thompson_selector_adaptive.py -v 2>&1 | tail -60",
       "description": "Run Thompson selector adaptive tests"
+    },
+    {
+      "operation": "taskoutput",
+      "timestamp": "2026-01-06T17:09:03.488959",
+      "task_id": "a13b854",
+      "block": true,
+      "timeout": 120000
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T17:09:08.021596",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run pyright strategies/common/adaptive_control/particle_portfolio.py --outputjson 2>/dev/null | python3 -c \"import sys, json; data = json.load(sys.stdin); print(json.dumps(data.get('generalDiagnostics', []), indent=2))\" | head -100",
+      "description": "Run pyright type checking on particle_portfolio.py"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T17:09:13.810455",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run ruff check strategies/common/adaptive_control/particle_portfolio.py 2>&1",
+      "description": "Run ruff linting on particle_portfolio.py"
+    },
+    {
+      "operation": "grep",
+      "timestamp": "2026-01-06T17:10:14.795556",
+      "pattern": "\\.decay[^_]|\\.decay$",
+      "path": "/media/sam/1TB/nautilus_dev/strategies",
+      "output_mode": "content"
+    },
+    {
+      "operation": "grep",
+      "timestamp": "2026-01-06T17:10:14.805726",
+      "pattern": "ThompsonSelector.*\\.decay",
+      "path": "/media/sam/1TB/nautilus_dev",
+      "output_mode": "content"
+    },
+    {
+      "operation": "grep",
+      "timestamp": "2026-01-06T17:10:19.672168",
+      "pattern": "selector\\.decay",
+      "path": "/media/sam/1TB/nautilus_dev",
+      "output_mode": "content"
     }
   ],
-  "last_updated": "2026-01-06T17:08:57.258664"
+  "last_updated": "2026-01-06T17:10:19.672210"
 }
