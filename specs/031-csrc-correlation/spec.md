@@ -149,6 +149,56 @@ The system allows tuning lambda parameter (default: 1.0) and reports portfolio c
 - **Backtesting Integration**: Feature focuses on live allocation. Backtesting validation is separate task.
 - **Transaction Cost Awareness**: Correlation penalty doesn't account for rebalancing costs (Gap #5 is separate feature).
 
+## Future Enhancements (If OOS Shows Problems)
+
+> **Philosophy**: KISS first, complexity only when evidence demands it.
+> Per DeMiguel et al. (2009): estimation error often dominates, simpler methods win OOS.
+
+### FE-001: Kendall Correlation (P2 Enhancement)
+
+**Trigger**: OOS testing shows Pearson correlation fails to capture non-linear dependencies between strategies.
+
+**Implementation**:
+```python
+# Current (linear)
+correlation = pearson(returns_a, returns_b)
+
+# P2-compliant (rank-based, captures non-linear)
+from scipy.stats import kendalltau
+tau, _ = kendalltau(returns_a, returns_b)
+```
+
+**Trade-off**: O(N log N) per pair vs O(1) for Pearson. Only add if OOS evidence justifies.
+
+**Reference**: Espana, Le Coz & Smerlak (2024) - "Kendall beats Pearson for portfolios"
+
+### FE-002: Power-Law Penalty Scaling
+
+**Trigger**: Linear penalty causes over-reaction to correlation changes.
+
+**Implementation**:
+```python
+# Current (linear)
+penalty = sum(w_i * w_j * corr_ij)
+
+# P2-compliant (Giller-style)
+penalty = sum(w_i * w_j * corr_ij) ** 0.5
+```
+
+### FE-003: Tail Dependence (Copulas)
+
+**Trigger**: Strategies show independent behavior normally but crash together (tail dependence).
+
+**When to consider**: After significant drawdown event where correlated losses weren't predicted by Pearson correlation.
+
+---
+
+**Decision Log**: Pearson + Ledoit-Wolf shrinkage chosen for MVP (2026-01-06) based on:
+1. Industry standard (Ledoit-Wolf 2004, 2020)
+2. KISS principle over theoretical purity
+3. P2 applies to sizing, not correlation estimation
+4. Research shows simple often beats complex OOS
+
 ## Risks
 
 - **Risk 1: Overfitting to Recent Correlations**: If correlations are non-stationary, recent estimates may be misleading. *Mitigation*: Use exponential weighting (decay=0.99) to balance recency vs stability.
