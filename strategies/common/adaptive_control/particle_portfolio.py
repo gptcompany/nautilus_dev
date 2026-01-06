@@ -517,16 +517,23 @@ class ThompsonSelector:
     def current_decay(self) -> float:
         """Get current decay value (adaptive or fixed).
 
+        Note: Reading this property does NOT emit audit events.
+        Audit events are only emitted during update() calls.
+
         Returns:
             Current decay factor in [0.95, 0.99] range.
         """
-        return self._get_decay()
+        return self._get_decay(emit_audit=False)
 
-    def _get_decay(self) -> float:
+    def _get_decay(self, emit_audit: bool = True) -> float:
         """Internal method to get current decay value.
 
         If regime_detector is configured, calculates adaptive decay.
         Otherwise returns fixed decay value.
+
+        Args:
+            emit_audit: If True, emit audit event for decay calculation.
+                       Only set True for actual update operations, not reads.
 
         Returns:
             Current decay factor.
@@ -535,7 +542,8 @@ class ThompsonSelector:
             decay = self._decay_calculator.calculate_from_detector(
                 self._regime_detector
             )
-            self._emit_decay_event(decay)
+            if emit_audit:
+                self._emit_decay_event(decay)
             return decay
         return self._fixed_decay
 

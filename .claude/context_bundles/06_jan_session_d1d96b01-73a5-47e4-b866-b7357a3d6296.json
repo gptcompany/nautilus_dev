@@ -495,7 +495,25 @@
       "pattern": "selector\\.decay",
       "path": "/media/sam/1TB/nautilus_dev",
       "output_mode": "content"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-06T17:10:59.103519",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/adaptive_control/particle_portfolio.py",
+      "old_string": "    @property\n    def current_decay(self) -> float:\n        \"\"\"Get current decay value (adaptive or ..."
+    },
+    {
+      "operation": "task",
+      "timestamp": "2026-01-06T17:11:04.850509",
+      "subagent_type": "test-runner",
+      "prompt": "Run these tests using pytest verbose mode to verify the bug fix didn't break anything:\n- tests/test_..."
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T17:11:09.926499",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run pytest tests/test_adaptive_decay.py tests/test_thompson_selector_adaptive.py -v 2>&1",
+      "description": "Run pytest on adaptive decay and thompson selector tests"
     }
   ],
-  "last_updated": "2026-01-06T17:10:19.672210"
+  "last_updated": "2026-01-06T17:11:09.926520"
 }
