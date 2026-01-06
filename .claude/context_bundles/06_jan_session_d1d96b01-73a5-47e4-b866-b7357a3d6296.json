@@ -584,7 +584,49 @@
       "timestamp": "2026-01-06T17:12:39.176456",
       "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -m pytest tests/integration/test_csrc_walk_forward.py -v 2>&1",
       "description": "Run integration test for CSRC walk forward"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T17:14:04.630741",
+      "command": "git status",
+      "description": "Check git status"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T17:14:04.649408",
+      "command": "git diff --stat HEAD",
+      "description": "Show changes summary"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T17:14:13.373093",
+      "command": "git status --porcelain strategies/common/adaptive_control/adaptive_decay.py tests/test_adaptive_decay.py tests/test_thompson_selector_adaptive.py",
+      "description": "Check implementation files status"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T17:14:13.392775",
+      "command": "git log --oneline -5",
+      "description": "Check recent commits"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T17:14:20.323936",
+      "command": "git show --stat HEAD",
+      "description": "Show last commit content"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T17:14:26.312954",
+      "command": "git log --oneline main..HEAD | head -20",
+      "description": "Show commits to merge"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T17:14:32.501067",
+      "command": "git add -A && git status --short",
+      "description": "Stage and check for changes"
     }
   ],
-  "last_updated": "2026-01-06T17:12:39.176472"
+  "last_updated": "2026-01-06T17:14:32.501089"
 }
