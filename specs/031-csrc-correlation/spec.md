@@ -30,7 +30,7 @@ With correlation-aware allocation, the system detects the high correlation betwe
 
 **Acceptance Scenarios**:
 
-1. **Given** three strategies with correlation > 0.8, **When** particle portfolio updates weights, **Then** total allocation to correlated group is capped (e.g., max 50% combined vs 90% without CSRC)
+1. **Given** three strategies with correlation > 0.8, **When** particle portfolio updates weights, **Then** total allocation to correlated group is significantly reduced (e.g., ~50% combined vs 90% without CSRC - exact reduction depends on lambda parameter)
 2. **Given** strategies with low correlation < 0.3, **When** particle portfolio updates, **Then** weight allocation remains similar to current implementation (no penalty for diversification)
 3. **Given** a portfolio with one dominant high-Sharpe strategy correlated with two weak strategies, **When** allocation is computed, **Then** system allocates to the dominant strategy and reduces weight to weaker correlated strategies (quality over quantity)
 
@@ -86,7 +86,7 @@ The system allows tuning lambda parameter (default: 1.0) and reports portfolio c
 
 ### Functional Requirements
 
-- **FR-001**: System MUST maintain a rolling correlation matrix between all strategy pairs, updated online with O(1) memory per pair
+- **FR-001**: System MUST maintain a rolling correlation matrix (`OnlineCorrelationMatrix` class) between all strategy pairs, stored as full N×N matrix with O(N²) total memory (20KB max for N=50)
 - **FR-002**: System MUST calculate covariance penalty term: `penalty = sum_i sum_j (w_i * w_j * corr_ij)` where i ≠ j
 - **FR-003**: Particle portfolio update MUST incorporate covariance penalty: `reward = sharpe_portfolio - lambda * covariance_penalty`
 - **FR-004**: Correlation matrix MUST use exponential weighting or sliding window (max 1000 samples in memory) for non-stationarity
@@ -94,12 +94,12 @@ The system allows tuning lambda parameter (default: 1.0) and reports portfolio c
 - **FR-006**: Correlation updates MUST complete in < 1ms for portfolios with up to 20 strategies (400 pairs)
 - **FR-007**: System MUST provide tunable lambda parameter (default: 1.0, range: [0.0, 5.0]) for penalty strength
 - **FR-008**: System MUST report portfolio concentration metrics: Herfindahl index, effective N strategies, max pairwise correlation
-- **FR-009**: Correlation estimates MUST converge to true value within 100 samples for stationary processes
+- **FR-009**: Correlation estimates MUST converge to true value within 150 samples for stationary processes (research indicates 100 may be optimistic)
 - **FR-010**: System MUST maintain backward compatibility with existing ParticlePortfolio API (no breaking changes to `update()` signature)
 
 ### Key Entities *(include if feature involves data)*
 
-- **Correlation Matrix**: N×N symmetric matrix tracking pairwise correlations between strategies. Updated online using Welford's algorithm or exponential moving average. Stored as compact upper-triangular array (N*(N-1)/2 elements).
+- **OnlineCorrelationMatrix**: N×N symmetric matrix tracking pairwise correlations between strategies. Updated online using Welford's algorithm + EMA + Ledoit-Wolf shrinkage. Stored as full N×N matrix for direct indexing (simplicity over memory efficiency for N < 50).
 - **Covariance Penalty**: Scalar value representing portfolio concentration risk. Computed as weighted sum of correlations: `sum_i sum_j (weight_i * weight_j * correlation_ij)` for i ≠ j.
 - **Portfolio State**: Existing PortfolioState object extended with correlation metrics (Herfindahl index, effective N, max correlation).
 - **Strategy Return History**: Rolling window (max 1000 samples) or exponential statistics (mean, variance, covariance) for each strategy pair. Used to compute correlations without storing full history.
@@ -110,7 +110,7 @@ The system allows tuning lambda parameter (default: 1.0) and reports portfolio c
 
 - **SC-001**: Portfolio concentration reduces by at least 20% when tested on synthetic dataset with 3 correlated strategies (correlation > 0.8) compared to baseline
 - **SC-002**: Correlation matrix updates complete in under 1 millisecond for 10-strategy portfolio (45 pairs) on standard hardware
-- **SC-003**: Correlation estimates converge to within 5% of true correlation value after observing 100 return pairs in stationary environment
+- **SC-003**: Correlation estimates converge to within 5% of true correlation value after observing 150 return pairs in stationary environment
 - **SC-004**: System handles portfolios with up to 20 strategies without performance degradation (< 1ms per allocation decision)
 - **SC-005**: Effective number of strategies increases by at least 30% when CSRC is enabled on correlated strategy portfolio (e.g., from Effective N = 2 to Effective N = 2.6 for 10 strategies)
 - **SC-006**: Zero regression in allocation quality for uncorrelated strategies (correlation < 0.3) - allocation weights within 5% of baseline implementation
@@ -120,6 +120,7 @@ The system allows tuning lambda parameter (default: 1.0) and reports portfolio c
 - **Stationarity**: Correlations are assumed quasi-stationary over rolling window (500-1000 samples). For fast-changing correlations, exponential weighting with decay=0.99 provides sufficient adaptivity.
 - **Strategy Independence Violations**: Current system assumes independence. This feature addresses violations where strategies share common factors (e.g., all momentum, all mean-reversion).
 - **Sharpe Ratio Availability**: Assumes strategies report returns at consistent intervals. Sharpe calculation requires sufficient history (min 30 samples for meaningful estimates).
+- **Min Samples Calibration**: Default `min_samples=30` is suitable for minute-bar strategies. For lower-frequency strategies (hourly, daily), increase `min_samples` proportionally (e.g., daily → min_samples=60-90).
 - **Lambda Calibration**: Default lambda=1.0 chosen based on Varlashova & Bilokon (2025). Users may tune based on portfolio risk tolerance.
 - **Matrix Invertibility**: Correlation matrices may become near-singular. Regularization (epsilon=1e-6 on diagonal) prevents numerical instability.
 - **Computational Budget**: Target < 1ms per update assumes modern CPU (2+ GHz). For HFT applications, may need optimized linear algebra libraries (NumPy/BLAS).
@@ -153,5 +154,5 @@ The system allows tuning lambda parameter (default: 1.0) and reports portfolio c
 - **Risk 1: Overfitting to Recent Correlations**: If correlations are non-stationary, recent estimates may be misleading. *Mitigation*: Use exponential weighting (decay=0.99) to balance recency vs stability.
 - **Risk 2: Numerical Instability**: Correlation matrices can become ill-conditioned. *Mitigation*: Add regularization (epsilon on diagonal), use stable algorithms (Welford's method).
 - **Risk 3: Performance Regression**: Adding O(N²) correlation updates could slow down particle updates. *Mitigation*: Profile critical path, use vectorized NumPy operations, add performance tests.
-- **Risk 4: Unclear Lambda Calibration**: Users may not know how to set lambda. *Mitigation*: Provide sensible default (1.0), document tuning guidelines, add observability metrics.
+- **Risk 4: Unclear Lambda Calibration**: Users may not know how to set lambda. *Mitigation*: Provide sensible default (1.0), document tuning guidelines with sensitivity analysis (lambda=0.5 → mild penalty, lambda=1.0 → balanced, lambda=2.0 → strong diversification, lambda=5.0 → aggressive diversification), add observability metrics.
 - **Risk 5: Correlation ≠ Causation**: High correlation doesn't mean strategies are redundant (could be different time horizons). *Mitigation*: Document limitation, recommend combining with qualitative strategy review.

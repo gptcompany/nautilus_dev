@@ -40,7 +40,7 @@
 - [ ] T008 Implement `OnlineCorrelationMatrix.update(returns: Dict[str, float])` using EMA for covariance updates in `strategies/common/adaptive_control/correlation_tracker.py`
 - [ ] T009 Implement `get_correlation_matrix() -> np.ndarray` returning shrunk N×N matrix in `strategies/common/adaptive_control/correlation_tracker.py`
 - [ ] T010 Write unit tests for `OnlineCorrelationMatrix` initialization in `tests/unit/test_correlation_tracker.py`
-- [ ] T011 Write unit tests for correlation convergence (synthetic data, known correlation 0.9, verify within 5% after 100 samples) in `tests/unit/test_correlation_tracker.py`
+- [ ] T011 Write unit tests for correlation convergence (synthetic data, known correlation 0.9, verify within 5% after 150 samples) in `tests/unit/test_correlation_tracker.py`
 
 **Checkpoint**: Foundation ready - OnlineCorrelationMatrix can track correlations. User story implementation can begin.
 
@@ -77,11 +77,11 @@
 
 **Goal**: Efficient O(N^2) correlation updates with < 1ms latency for 20 strategies
 
-**Independent Test**: Stream synthetic returns with known correlation (0.8*R + noise). Verify correlation estimate converges to 0.8 within 100 samples. Benchmark < 1ms for 10 strategies.
+**Independent Test**: Stream synthetic returns with known correlation (0.8*R + noise). Verify correlation estimate converges to 0.8 within 150 samples. Benchmark < 1ms for 10 strategies.
 
 ### Tests for User Story 2
 
-- [ ] T021 [P] [US2] Write test `test_correlation_convergence_with_known_data` (FR-009: converge within 100 samples) in `tests/unit/test_correlation_tracker.py`
+- [ ] T021 [P] [US2] Write test `test_correlation_convergence_with_known_data` (FR-009: converge within 150 samples) in `tests/unit/test_correlation_tracker.py`
 - [ ] T022 [P] [US2] Write test `test_performance_10_strategies` (FR-006: < 1ms for 10 strategies) in `tests/unit/test_correlation_tracker.py`
 - [ ] T023 [P] [US2] Write test `test_adaptive_correlation_regime_change` (correlation changes 0.5 → 0.9, adapts within 100 samples) in `tests/unit/test_correlation_tracker.py`
 
@@ -132,12 +132,13 @@
 - [ ] T037 [P] Write test `test_zero_variance_strategy` (FR-005: treated as uncorrelated) in `tests/unit/test_correlation_tracker.py`
 - [ ] T038 [P] Write test `test_all_strategies_correlated` (allocate to highest Sharpe) in `tests/integration/test_csrc_walk_forward.py`
 - [ ] T039 [P] Write test `test_two_strategy_portfolio` (N=2 works correctly) in `tests/unit/test_correlation_tracker.py`
+- [ ] T055 [P] Write test `test_sliding_window_memory_constraint` (FR-004: max 1000 samples in memory) in `tests/unit/test_correlation_tracker.py`
 
 ### Implementation for Edge Cases
 
 - [ ] T040 Add epsilon regularization (1e-6) to diagonal in `_apply_shrinkage()` in `strategies/common/adaptive_control/correlation_tracker.py`
 - [ ] T041 Handle zero variance detection in `OnlineCorrelationMatrix.update()` - set correlation to 0 in `strategies/common/adaptive_control/correlation_tracker.py`
-- [ ] T042 Run tests T036-T039 and verify they PASS in `tests/`
+- [ ] T042 Run tests T036-T039, T055 and verify they PASS in `tests/`
 
 **Checkpoint**: Edge cases handled - robust to degenerate inputs
 
@@ -158,6 +159,8 @@
 
 - [ ] T047 [P] Create `docs/adaptive_control/csrc_correlation.md` with usage examples
 - [ ] T048 [P] Update docstrings in `correlation_tracker.py` with usage examples
+- [ ] T053 [P] Add lambda sensitivity section to documentation (examples: lambda=0.5 mild, 1.0 balanced, 2.0 strong, 5.0 aggressive)
+- [ ] T054 Update `particle_portfolio.py` docstring to remove P5 "Leggi Naturali" reference (removed per CLAUDE.md 2026-01-05)
 
 ### Final Verification
 
@@ -192,13 +195,13 @@ Foundational (T004-T011)
     │
     ├──────────────────┬──────────────────┐
     ▼                  ▼                  ▼
-US1 (T012-T020)    US2 (T021-T027)   Edge Cases (T036-T042)
+US1 (T012-T020)    US2 (T021-T027)   Edge Cases (T036-T042, T055)
     │                  │                  │
     ▼                  │                  │
 US3 (T028-T035)◄───────┘                  │
     │                                     │
     ▼                                     ▼
-Polish (T043-T052)◄───────────────────────┘
+Polish (T043-T054)◄───────────────────────┘
 ```
 
 ### Parallel Opportunities
@@ -281,13 +284,13 @@ This delivers:
 
 | Metric | Value |
 |--------|-------|
-| Total Tasks | 52 |
+| Total Tasks | 55 |
 | Setup Tasks | 3 |
 | Foundational Tasks | 8 |
 | US1 Tasks | 9 |
 | US2 Tasks | 7 |
 | US3 Tasks | 8 |
-| Edge Case Tasks | 7 |
-| Polish Tasks | 10 |
-| Parallel Opportunities | 18 tasks marked [P] |
+| Edge Case Tasks | 8 (added T055 for FR-004 memory test) |
+| Polish Tasks | 12 (added T053, T054 for docs + P5 cleanup) |
+| Parallel Opportunities | 21 tasks marked [P] |
 | MVP Scope | T001-T020 (20 tasks) |
