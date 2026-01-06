@@ -3,7 +3,20 @@
 **Feature Branch**: `033-strategic-controller`
 **Created**: 2026-01-06
 **Status**: Draft
-**Input**: User description: "Level 3 Strategic Controller - The meta-meta system for weekly review, evolution gates, and portfolio-level decisions."
+**Source**: Gap #1 + #7 merged (HIGH) | [Canonical Mapping](../028-validation/gaps_to_specs_mapping.md)
+
+## Problem Statement
+
+The framework has MetaController (Level 2) but NO Level 3 "meta-meta" controller for:
+- Weekly/monthly risk budget allocation
+- Evolution triggers (when to spawn new alpha-evolve)
+- Circuit breakers at portfolio level
+- Performance evaluation for strategy graduation/retirement
+- Walk-Forward OOS integration with meta-portfolio
+
+**Solution** (Sharma 2025): 3-level hierarchies outperform 2-level by 20-40% in Sharpe ratio.
+
+---
 
 ## User Scenarios & Testing *(mandatory)*
 

@@ -3,7 +3,15 @@
 **Feature Branch**: `037-long-short-separation`
 **Created**: 2026-01-06
 **Status**: Draft
-**Input**: User description: "Long/Short Meta-Model Separation for improved strategy management"
+**Source**: JFDS Research | [Canonical Mapping](../028-validation/gaps_to_specs_mapping.md)
+
+## Problem Statement
+
+JFDS meta-labeling framework recommends separate models for long vs short positions due to asymmetric market behavior. Current implementation does not distinguish between directional biases.
+
+**Solution**: Implement Long/Short Meta-Model Separation as recommended by JFDS cross-validation analysis (4.5/8 coverage gap).
+
+---
 
 ## User Scenarios & Testing *(mandatory)*
 
