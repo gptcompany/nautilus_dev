@@ -145,3 +145,156 @@ As a system operator, I need to limit concurrent evaluations so that backtests d
 - Strategy validation beyond Python syntax
 - Real-time/live evaluation
 - Multi-venue backtesting
+
+---
+
+## Future Enhancements (Black Book Concepts)
+
+> **Source**: "The Black Book of Financial Hacking" - J.C. Lotter
+> **Philosophy**: Add complexity ONLY if OOS shows problems.
+
+### FE-001: Multi-Objective Optimization
+
+**Current**: Single fitness metric (Calmar ratio by default)
+
+**Enhancement**: Pareto front optimization for multiple objectives
+
+```python
+class ParetoFitness:
+    """
+    Multi-objective fitness using Pareto dominance.
+
+    Objectives: Maximize Sharpe, Maximize Calmar, Minimize MaxDD
+    """
+    def dominates(self, other):
+        """Returns True if self dominates other (better on all objectives)."""
+        return (
+            self.sharpe >= other.sharpe and
+            self.calmar >= other.calmar and
+            self.max_dd <= other.max_dd and
+            (self.sharpe > other.sharpe or
+             self.calmar > other.calmar or
+             self.max_dd < other.max_dd)
+        )
+
+    def pareto_rank(self, population):
+        """Assign rank based on how many strategies dominate this one."""
+        dominated_by = sum(1 for s in population if s.dominates(self))
+        return dominated_by
+```
+
+**Trigger**: When single-metric optimization produces strategies with poor secondary metrics (e.g., high Sharpe but 50% drawdown)
+
+**Trade-off**: More complex selection logic, harder to rank strategies
+
+**Reference**: Deb et al. (2002) "NSGA-II: Non-dominated Sorting Genetic Algorithm"
+
+### FE-002: Walk-Forward Validation During Evolution
+
+**Current**: Evaluation on single fixed data period
+
+**Enhancement**: Evaluate on multiple OOS windows during evolution
+
+```python
+def walk_forward_fitness(strategy_code):
+    """
+    Evaluate strategy on multiple forward windows.
+
+    Returns weighted average fitness across windows.
+    """
+    windows = [
+        ('2024-01-01', '2024-03-01'),  # Train
+        ('2024-03-01', '2024-04-01'),  # OOS test 1
+        ('2024-04-01', '2024-05-01'),  # OOS test 2
+        ('2024-05-01', '2024-06-01'),  # OOS test 3
+    ]
+
+    # Train on first window
+    train_fitness = backtest(strategy_code, windows[0])
+
+    # Evaluate on OOS windows
+    oos_fitness = [backtest(strategy_code, w) for w in windows[1:]]
+
+    # Weight: 30% train, 70% average OOS
+    return 0.3 * train_fitness + 0.7 * np.mean(oos_fitness)
+```
+
+**Trigger**: When evolved strategies perform well in-sample but fail in live trading
+
+**Trade-off**: 4x slower evaluation (multiple backtests), but reduces overfitting
+
+**Reference**: Pardo (2008) "The Evaluation and Optimization of Trading Strategies"
+
+### FE-003: Probabilistic Sharpe Ratio
+
+**Current**: Point estimate of Sharpe ratio
+
+**Enhancement**: PSR with statistical confidence intervals
+
+```python
+def probabilistic_sharpe_ratio(returns, benchmark_sharpe=0.0):
+    """
+    Calculate probability that true Sharpe > benchmark Sharpe.
+
+    Accounts for non-normality and finite sample size.
+    """
+    n = len(returns)
+    sharpe_observed = calculate_sharpe(returns)
+    skew = scipy.stats.skew(returns)
+    kurt = scipy.stats.kurtosis(returns)
+
+    # Adjust for non-normality
+    variance_sharpe = (1 + (sharpe_observed**2) / 2 - skew * sharpe_observed + (kurt - 3) / 4 * sharpe_observed**2) / n
+
+    # Z-score for observed vs benchmark
+    z_score = (sharpe_observed - benchmark_sharpe) / np.sqrt(variance_sharpe)
+
+    # Probability that true Sharpe > benchmark
+    psr = scipy.stats.norm.cdf(z_score)
+
+    return psr
+```
+
+**Trigger**: When strategies have high Sharpe but low trade count (statistically unreliable)
+
+**Trade-off**: Requires scipy dependency, more complex metric
+
+**Reference**: Bailey & Lopez de Prado (2012) "The Sharpe Ratio Efficient Frontier"
+
+### FE-004: Transaction Cost Modeling
+
+**Current**: No transaction costs in backtest
+
+**Enhancement**: Realistic slippage and fees
+
+```python
+class TransactionCostModel:
+    def __init__(self, maker_fee=0.0002, taker_fee=0.0004, slippage_bps=2):
+        self.maker_fee = maker_fee  # 0.02%
+        self.taker_fee = taker_fee  # 0.04%
+        self.slippage_bps = slippage_bps  # 2 basis points
+
+    def apply_costs(self, order):
+        """Apply realistic costs to order execution."""
+        # Use taker fee for market orders
+        fee = order.quantity * order.price * self.taker_fee
+
+        # Slippage: assume 2 bps adverse movement
+        slippage = order.quantity * order.price * (self.slippage_bps / 10000)
+
+        # Total cost
+        return fee + slippage
+```
+
+**Trigger**: When evolved strategies over-trade or use high-frequency tactics
+
+**Trade-off**: Slightly more complex backtest, but prevents unrealistic strategies
+
+**Reference**: Kissell & Glantz (2003) "Optimal Trading Strategies"
+
+---
+
+**Decision Log** (2026-01-06):
+- Single-objective Calmar ratio chosen for MVP
+- Fixed data period for evaluation (faster iteration)
+- Black Book enhancements documented for OOS performance issues
