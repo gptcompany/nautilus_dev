@@ -2,7 +2,7 @@
 name: nautilus-visualization-renderer
 description: "Trading visualization specialist for NautilusTrader. Implements equity curves, orderbook heatmaps, candlestick charts, and real-time PnL dashboards. Canvas 2D/Three.js WebGL expert."
 tools: Read, Write, Edit, Bash, Glob, Grep, WebFetch, mcp__context7__*, mcp__playwright__browser_navigate, mcp__playwright__browser_take_screenshot, mcp__playwright__browser_console_messages, mcp__chrome-devtools__navigate_page, mcp__chrome-devtools__take_screenshot, mcp__chrome-devtools__list_console_messages, mcp__chrome-devtools__evaluate_script, TodoWrite
-model: opus
+model: sonnet
 color: cyan
 skills: github-workflow
 ---

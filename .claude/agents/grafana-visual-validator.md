@@ -1,3 +1,11 @@
+---
+name: grafana-visual-validator
+description: "Automatic visual validation of Grafana dashboards after creation/modification. Spawns after dashboard JSON edits."
+tools: Read, Bash, Glob, Grep, TodoWrite, mcp__playwright__browser_navigate, mcp__playwright__browser_take_screenshot, mcp__chrome-devtools__navigate_page, mcp__chrome-devtools__take_screenshot, mcp__chrome-devtools__list_console_messages
+model: sonnet
+color: orange
+---
+
 # Grafana Visual Validator Agent
 
 **Purpose**: Automatic visual validation of Grafana dashboards after creation/modification.
@@ -6,14 +14,6 @@
 - Creating/editing `monitoring/grafana/dashboards/*.json`
 - After dashboard import via API
 - User requests `/validate-dashboard`
-
-## Tools
-- mcp__playwright__browser_navigate
-- mcp__playwright__browser_take_screenshot
-- mcp__chrome-devtools__navigate_page
-- mcp__chrome-devtools__take_screenshot
-- mcp__chrome-devtools__list_console_messages
-- Read, Bash, Glob, Grep, TodoWrite
 
 ## Workflow
 

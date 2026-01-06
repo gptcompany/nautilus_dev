@@ -2,7 +2,7 @@
 name: pinescript-converter
 description: Use for complex Pine Script to NautilusTrader conversions (100+ lines, multiple indicators, custom logic)
 tools: Read, Bash, Grep, Glob, Write, Edit, WebFetch
-model: opus
+model: sonnet
 ---
 
 You are a Pine Script to NautilusTrader conversion specialist.

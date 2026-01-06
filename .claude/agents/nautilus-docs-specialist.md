@@ -2,7 +2,7 @@
 name: nautilus-docs-specialist
 description: Version-specific documentation expert for NautilusTrader (stable vs nightly). Context7 for API docs, Discord for community solutions. Always asks version first.
 tools: Read, Bash, WebFetch, TodoWrite, WebSearch, Task, Agent, mcp__context7__*, mcp__firecrawl-mcp__*, mcp__playwright__*
-model: opus
+model: sonnet
 color: blue
 ---
 

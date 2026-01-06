@@ -2,7 +2,7 @@
 name: nautilus-data-pipeline-operator
 description: Data pipeline operator for NautilusTrader. Import historical data, monitor live feeds, validate catalog integrity. KISS approach.
 tools: Read, Write, Edit, Bash, WebFetch, TodoWrite, mcp__context7__*
-model: opus
+model: sonnet
 color: teal
 ---
 

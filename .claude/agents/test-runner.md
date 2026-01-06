@@ -2,7 +2,7 @@
 name: test-runner
 description: Use this agent when you need to run tests and analyze their results. This agent specializes in executing pytest tests for NautilusTrader strategies, capturing comprehensive logs, and performing deep analysis to surface key issues, failures, and actionable insights. Invoke after code changes that require validation, during debugging sessions, or when you need a test health report.
 tools: Glob, Grep, Read, Bash, TodoWrite
-model: opus
+model: sonnet
 color: yellow
 ---
 

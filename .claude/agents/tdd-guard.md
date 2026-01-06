@@ -2,7 +2,7 @@
 name: tdd-guard
 description: TDD enforcement specialist. Use proactively when writing production code to ensure Red-Green-Refactor discipline. Validates test-first development, coverage thresholds, and maintains test quality. Blocks code without tests.
 tools: Read, Bash, Glob, Grep, TodoWrite
-model: opus
+model: sonnet
 color: red
 ---
 

@@ -1,16 +1,14 @@
+---
+name: adaptive-control-architect
+description: "Architecture validator for adaptive-control framework. Ensures NautilusTrader nightly compatibility and enforces the Four Pillars philosophy."
+tools: Read, Glob, Grep, Bash, WebFetch, TodoWrite, mcp__context7__get-library-docs
+model: opus
+color: purple
+---
+
 # adaptive-control-architect
 
-Architecture validator for adaptive-control framework. Ensures NautilusTrader nightly compatibility and enforces the Five Pillars philosophy.
-
-## Tools
-
-- Read
-- Glob
-- Grep
-- Bash
-- WebFetch
-- TodoWrite
-- mcp__context7__get-library-docs
+Architecture validator for adaptive-control framework. Ensures NautilusTrader nightly compatibility and enforces the Four Pillars philosophy.
 
 ## Instructions
 

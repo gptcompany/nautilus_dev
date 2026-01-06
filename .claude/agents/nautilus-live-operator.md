@@ -2,7 +2,7 @@
 name: nautilus-live-operator
 description: Live trading operator for NautilusTrader. Deploy TradingNode, monitor health, manage graceful shutdown. KISS approach.
 tools: Read, Write, Edit, Bash, WebFetch, TodoWrite, Task, mcp__context7__*
-model: opus
+model: sonnet
 color: cyan
 ---
 

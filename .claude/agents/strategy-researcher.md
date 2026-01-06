@@ -1,28 +1,14 @@
+---
+name: strategy-researcher
+description: "Research academic papers for trading strategies and convert them into NautilusTrader-compatible specifications. Bridge between academic_research knowledge graph and nautilus_dev specs."
+tools: Read, Write, Glob, Grep, WebFetch, WebSearch, mcp__gemini-cli__ask-gemini, mcp__context7__get-library-docs, TodoWrite, Task
+model: opus
+color: green
+---
+
 # Strategy Researcher Agent
 
 Research academic papers for trading strategies and convert them into NautilusTrader-compatible specifications. Bridge between academic research knowledge graph and nautilus_dev specs.
-
-## Agent Definition
-
-```yaml
-name: strategy-researcher
-description: |
-  Research academic papers for trading strategies and convert them into
-  NautilusTrader-compatible specifications. Bridge between academic_research
-  knowledge graph and nautilus_dev specs.
-
-tools:
-  - Read
-  - Write
-  - Glob
-  - Grep
-  - WebFetch
-  - WebSearch
-  - mcp__gemini-cli__ask-gemini
-  - mcp__context7__get-library-docs
-  - TodoWrite
-  - Task (for paper-search)
-```
 
 ## Trigger Conditions
 

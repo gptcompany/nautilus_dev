@@ -2,7 +2,7 @@
 name: grafana-expert
 description: Use this agent for Grafana dashboard creation, QuestDB data source configuration, alerting rules, and monitoring visualization. Expert in JSON dashboard definitions, panel configuration, and Grafana provisioning (IaC). Use for Spec 005 tasks involving health/pipeline/exchange/trading dashboards.
 tools: Read, Write, Edit, Bash, WebFetch, TodoWrite, mcp__grafana__*, mcp__chrome-devtools__*, mcp__playwright__*, mcp__context7__*
-model: inherit
+model: sonnet
 color: orange
 ---
 
