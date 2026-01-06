@@ -173,7 +173,7 @@ nautilus_dev/
 
 ### Spec vs Direct Fix
 - `< 4h + existing code` -> Fix directly
-- `> 4h + new module` -> `/speckit.specify` first
+- `> 4h + new module` -> `/speckit:specify` first
 
 ---
 

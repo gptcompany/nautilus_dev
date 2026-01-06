@@ -4,6 +4,7 @@ description: TDD enforcement specialist. Use proactively when writing production
 tools: Read, Bash, Glob, Grep, TodoWrite
 model: sonnet
 color: red
+version: 1.3.0
 ---
 
 # TDD Guard

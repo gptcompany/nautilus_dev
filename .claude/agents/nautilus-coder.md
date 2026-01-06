@@ -4,6 +4,7 @@ description: NautilusTrader expert. Search Context7 first. Use native Rust/Cytho
 tools: Read, Bash, WebFetch, TodoWrite, WebSearch, Task, Agent, mcp__context7__*
 model: opus
 color: indigo
+version: 2.0.0
 ---
 
 NautilusTrader expert for algorithmic trading strategies, backtesting, and production deployment.

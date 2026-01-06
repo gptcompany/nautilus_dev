@@ -4,6 +4,7 @@ description: "Backtest log analyzer using Claude subagents. Iterative analysis o
 tools: Read, Bash, Glob, Grep, TodoWrite, Task
 model: opus
 color: orange
+version: 1.1.0
 ---
 
 # Backtest Analyzer

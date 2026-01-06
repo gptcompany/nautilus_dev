@@ -3,8 +3,8 @@
     "grafana": {
       "command": "mcp-grafana",
       "env": {
-        "GRAFANA_URL": "http://localhost:3000",
-        "GRAFANA_SERVICE_ACCOUNT_TOKEN": "glsa_ZZKIVD8E8nMUp7jvs0I1fUYF26NwlV2I_65938b10"
+        "GRAFANA_URL": "${GRAFANA_URL:-http://localhost:3000}",
+        "GRAFANA_SERVICE_ACCOUNT_TOKEN": "${GRAFANA_SERVICE_ACCOUNT_TOKEN}"
       },
       "args": [
         "--transport",

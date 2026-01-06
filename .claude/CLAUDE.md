@@ -36,7 +36,7 @@
 /tdd:spec-to-test - Spec to test cases
 ```
 
-**Integration**: `/speckit.specify` -> `/tdd:spec-to-test` -> `/tdd:cycle-safe` -> `task-master complete`
+**Integration**: `/speckit:specify` -> `/tdd:spec-to-test` -> `/tdd:cycle-safe` -> `task-master complete`
 
 ## Development Flow
 

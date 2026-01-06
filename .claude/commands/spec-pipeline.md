@@ -14,14 +14,14 @@ You **MUST** consider the user input before proceeding (if not empty).
 
 This skill automates the entire SpecKit workflow with intelligent decision-making and validation checkpoints:
 
-1. `/speckit.specify` - Create specification
+1. `/speckit:specify` - Create specification
 2. **DECISION**: Research needed? (domain complexity analysis)
 3. `/research` - Academic paper search (if needed)
 4. **PMW VALIDATION**: Prove Me Wrong analysis (counter-evidence + SWOT)
-5. `/speckit.plan` - Create implementation plan
+5. `/speckit:plan` - Create implementation plan
 6. **VALIDATE**: NT nightly compatibility check
-7. `/speckit.tasks` - Generate task breakdown
-8. `/speckit.analyze` - Cross-validate artifacts
+7. `/speckit:tasks` - Generate task breakdown
+8. `/speckit:analyze` - Cross-validate artifacts
 9. **VALIDATE**: Final NT compatibility check
 10. **REPORT**: Summary with validation results
 
@@ -29,9 +29,9 @@ This skill automates the entire SpecKit workflow with intelligent decision-makin
 
 ### Phase 1: Specification Creation
 
-1. **Invoke `/speckit.specify`** with user input:
+1. **Invoke `/speckit:specify`** with user input:
    ```
-   Run: /speckit.specify $ARGUMENTS
+   Run: /speckit:specify $ARGUMENTS
    ```
 
 2. **Wait for completion** - spec.md created and validated
@@ -170,9 +170,9 @@ else:
 
 ### Phase 3: Implementation Planning
 
-1. **Invoke `/speckit.plan`**:
+1. **Invoke `/speckit:plan`**:
    ```
-   Run: /speckit.plan
+   Run: /speckit:plan
    ```
 
 2. **Wait for completion** - plan.md created with research integration
@@ -222,18 +222,18 @@ Be specific - quote plan sections and provide exact class/API names.
 
 ### Phase 5: Task Generation
 
-1. **Invoke `/speckit.tasks`**:
+1. **Invoke `/speckit:tasks`**:
    ```
-   Run: /speckit.tasks
+   Run: /speckit:tasks
    ```
 
 2. **Wait for completion** - tasks.md created
 
 ### Phase 6: Cross-Artifact Analysis
 
-1. **Invoke `/speckit.analyze`**:
+1. **Invoke `/speckit:analyze`**:
    ```
-   Run: /speckit.analyze
+   Run: /speckit:analyze
    ```
 
 2. **Wait for analysis report**
@@ -354,7 +354,7 @@ Generate comprehensive summary report:
 1. **Review warnings** above before proceeding
 2. **Run implementation**:
    ```bash
-   /speckit.implement
+   /speckit:implement
    ```
 3. **Monitor progress** with task-master
 
@@ -477,10 +477,10 @@ Pipeline:
 ## Requirements
 
 **Skills**:
-- `/speckit.specify` - Specification creation
-- `/speckit.plan` - Implementation planning
-- `/speckit.tasks` - Task generation
-- `/speckit.analyze` - Cross-artifact validation
+- `/speckit:specify` - Specification creation
+- `/speckit:plan` - Implementation planning
+- `/speckit:tasks` - Task generation
+- `/speckit:analyze` - Cross-artifact validation
 - `/research` - Academic paper search
 
 **Subagents**:
@@ -503,17 +503,17 @@ Pipeline:
 
 **Before spec-pipeline**:
 ```bash
-/speckit.specify "my feature"
+/speckit:specify "my feature"
 # ... wait ...
 # ... decide if research needed ...
 /research "my topic"  # maybe?
 # ... wait ...
-/speckit.plan
+/speckit:plan
 # ... wait ...
 # ... manually check NT compatibility ...
-/speckit.tasks
+/speckit:tasks
 # ... wait ...
-/speckit.analyze
+/speckit:analyze
 # ... wait ...
 # ... manually verify tasks ...
 ```

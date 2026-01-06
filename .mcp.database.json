@@ -33,9 +33,9 @@
       "command": "npx",
       "args": ["influxdb-mcp-server"],
       "env": {
-        "INFLUXDB_TOKEN": "7uv7e44oquCviOT4lJBjE79NygqqEpHgYdKibjToc0g=",
-        "INFLUXDB_URL": "http://localhost:8086",
-        "INFLUXDB_ORG": "production"
+        "INFLUXDB_TOKEN": "${INFLUXDB_TOKEN}",
+        "INFLUXDB_URL": "${INFLUXDB_URL:-http://localhost:8086}",
+        "INFLUXDB_ORG": "${INFLUXDB_ORG:-production}"
       }
     }
   }

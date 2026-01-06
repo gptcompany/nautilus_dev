@@ -234,16 +234,16 @@ Output a structured report:
 
 ### Next Steps
 1. Review entities in `docs/research/strategies.json`
-2. Run `/speckit.specify spec-{N}` to create spec from findings
-3. Run `/speckit.plan spec-{N}` to plan implementation
+2. Run `/speckit:specify spec-{N}` to create spec from findings
+3. Run `/speckit:plan spec-{N}` to plan implementation
 ```
 
 ## Integration with SpecKit
 
 After `/research {topic}`, you can:
 ```
-/speckit.specify spec-020   # Uses research findings
-/speckit.plan spec-020      # Creates implementation plan
+/speckit:specify spec-020   # Uses research findings
+/speckit:plan spec-020      # Creates implementation plan
 ```
 
 ## Requirements
