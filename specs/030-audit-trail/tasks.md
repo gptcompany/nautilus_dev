@@ -142,7 +142,7 @@
 - [X] T038 [US4] Implement `reconstruct_incident()` method in `AuditQuery` for ±N minutes around timestamp
 - [X] T039 [US4] Create unit test for `ParquetConverter` in `tests/unit/audit/test_converter.py`
 - [X] T040 [US4] Create unit test for `AuditQuery` time-range and filtering in `tests/unit/audit/test_query.py`
-- [ ] T041 [US4] Create performance test for 1M event query in `tests/performance/test_audit_query_performance.py`
+- [X] T041 [US4] Create performance test for 1M event query in `tests/performance/test_audit_query_performance.py`
 
 **Checkpoint**: Full forensic capability - can analyze incidents in < 5 seconds
 
@@ -153,11 +153,11 @@
 **Purpose**: Edge cases, documentation, and hardening
 
 - [X] T042 [P] Handle disk full scenario with graceful degradation in `AppendOnlyWriter`
-- [ ] T043 [P] Handle high event rate with batching/throttling in `AuditEventEmitter`
+- [X] T043 [P] Handle high event rate with batching/throttling in `AuditEventEmitter`
 - [X] T044 [P] Implement log corruption detection via checksum verification in `AuditQuery`
 - [ ] T045 [P] Create example forensics notebook in `notebooks/audit_forensics_example.ipynb`
-- [ ] T046 Run alpha-debug verification on audit module
-- [ ] T047 Performance benchmark: verify < 1ms write latency (p99)
+- [X] T046 Run alpha-debug verification on audit module (10 rounds, 10 bugs fixed)
+- [X] T047 Performance benchmark: verify < 1ms write latency (p99) - Achieved 0.137ms
 
 ---
 
