@@ -148,3 +148,151 @@ As a user, I need to track mutation success rate so that I can understand LLM mu
 - Alerting/notification rules
 - User authentication/authorization
 - Dashboard embedding in external applications
+
+---
+
+## Future Enhancements (Black Book Concepts)
+
+> **Source**: "The Black Book of Financial Hacking" - J.C. Lotter
+> **Philosophy**: Add complexity ONLY if OOS shows problems.
+
+### FE-001: Population Diversity Heatmap
+
+**Current**: Single population statistics gauge
+
+**Enhancement**: Visualize diversity over time with heatmap
+
+```sql
+-- Query for diversity heatmap
+SELECT
+    generation,
+    AVG(code_similarity) as avg_similarity,
+    STDDEV(fitness) as fitness_variance,
+    COUNT(DISTINCT lineage_root) as unique_lineages
+FROM
+    population_history
+GROUP BY
+    generation
+ORDER BY
+    generation
+```
+
+**Visualization**: Heatmap with generation on X-axis, diversity metrics on Y-axis
+
+**Trigger**: When evolution converges too quickly (need to diagnose when diversity drops)
+
+**Trade-off**: Requires storing historical population snapshots, larger database
+
+**Reference**: Black Book - "Monitor diversity to detect premature convergence"
+
+### FE-002: Mutation Success Attribution
+
+**Current**: Overall mutation success rate pie chart
+
+**Enhancement**: Track which mutation prompts/strategies produce best results
+
+```python
+# Dashboard panel showing:
+# - Elite mutations: 85% success rate (produce better child)
+# - Exploit mutations: 45% success rate
+# - Explore mutations: 15% success rate
+
+# Bar chart: Mutation prompt → Success rate
+# "Improve entry signals": 60%
+# "Optimize exit timing": 55%
+# "Add regime filter": 40%
+# "Simplify logic": 35%
+```
+
+**Trigger**: When mutation success rate is consistently low (<30%)
+
+**Trade-off**: Requires storing mutation prompts and outcomes, more complex queries
+
+**Reference**: Black Book - "Measure what you manage - track mutation effectiveness"
+
+### FE-003: Fitness Landscape Visualization
+
+**Current**: Time-series of best fitness
+
+**Enhancement**: 2D projection of fitness landscape (PCA/t-SNE)
+
+```python
+# Reduce strategy behavior space to 2D
+# X-axis: PC1 (e.g., trade frequency)
+# Y-axis: PC2 (e.g., holding time)
+# Color: Fitness (red = low, green = high)
+# Size: Generation (larger = newer)
+
+# Shows:
+# - Clusters of similar strategies
+# - Exploration vs exploitation patterns
+# - Local optima (fitness peaks)
+```
+
+**Trigger**: When evolution gets stuck (visualize where population is exploring)
+
+**Trade-off**: Requires dimensionality reduction (PCA/t-SNE), complex computation
+
+**Reference**: Black Book - "Visualize search space to understand convergence"
+
+### FE-004: Lineage Tree Visualization
+
+**Current**: Table of top strategies with parent_id
+
+**Enhancement**: Interactive tree showing strategy lineage
+
+```python
+# D3.js tree visualization:
+# - Root: Seed strategy
+# - Branches: Lineages
+# - Nodes: Individual strategies
+# - Color: Fitness (green = good, red = poor)
+# - Click node → show strategy code diff vs parent
+
+# Shows:
+# - Which lineages are productive
+# - Dead-end branches (no improvement)
+# - Breakthrough mutations (sudden fitness jump)
+```
+
+**Trigger**: When diagnosing why certain lineages dominate hall-of-fame
+
+**Trade-off**: Requires frontend JavaScript (D3.js), more complex dashboard
+
+**Reference**: Black Book - "Track lineage to understand evolution dynamics"
+
+### FE-005: Overfitting Detection
+
+**Current**: Single fitness metric
+
+**Enhancement**: In-sample vs out-of-sample performance tracking
+
+```sql
+-- Query for overfitting detection
+SELECT
+    strategy_id,
+    in_sample_sharpe,
+    out_of_sample_sharpe,
+    (in_sample_sharpe - out_of_sample_sharpe) as degradation
+FROM
+    strategy_metrics
+WHERE
+    degradation > 0.5  -- Flag potential overfitting
+ORDER BY
+    degradation DESC
+```
+
+**Panel**: Table showing strategies with largest IS/OOS gaps (overfitting red flags)
+
+**Trigger**: When evolved strategies fail in live trading despite good backtest
+
+**Trade-off**: Requires walk-forward validation during evolution (slower), more storage
+
+**Reference**: Black Book - "Always validate OOS to detect overfitting early"
+
+---
+
+**Decision Log** (2026-01-06):
+- Simple time-series and tables chosen for MVP
+- Population stats and mutation success tracked
+- Black Book enhancements documented for deeper diagnostics
