@@ -26,7 +26,7 @@ Research TRIGGERED based on spec content analysis:
 
 ### 1. Discounted Thompson Sampling for Non-Stationary Bandit Problems (Qi et al., 2023)
 
-**arXiv ID**: 2305.10718 | **Downloaded**: papers/2305.10718.pdf
+**arXiv ID**: 2305.10718 | **Downloaded**: papers/spec-032/2023-qi-discounted-thompson-sampling-nonstationary.pdf
 
 **Key Methodology**:
 - Proposes DS-TS with Gaussian priors for non-stationary MAB
@@ -60,7 +60,7 @@ Research TRIGGERED based on spec content analysis:
 
 ### 3. Kolmogorov-Smirnov Test-Based Actively-Adaptive TS (Ghatak et al., 2021)
 
-**arXiv ID**: 2105.14586 | **Downloaded**: papers/2105.14586.pdf | **Citations**: 11
+**arXiv ID**: 2105.14586 | **Downloaded**: papers/spec-032/2021-mellor-ks-test-actively-adaptive-thompson.pdf | **Citations**: 11
 
 **Key Methodology**:
 - **TS-KS algorithm**: Uses Kolmogorov-Smirnov test to actively detect change points
@@ -132,8 +132,8 @@ From Qi et al. (2023):
 
 | Paper ID | Title | Source | Status | Path |
 |----------|-------|--------|--------|------|
-| 2305.10718 | Discounted Thompson Sampling for Non-Stationary Bandit Problems | arXiv | Downloaded | `papers/2305.10718.pdf` |
-| 2105.14586 | KS Test-Based Actively-Adaptive Thompson Sampling | arXiv | Downloaded | `papers/2105.14586.pdf` |
+| 2305.10718 | Discounted Thompson Sampling for Non-Stationary Bandit Problems | arXiv | Downloaded | `papers/spec-032/2023-qi-discounted-thompson-sampling-nonstationary.pdf` |
+| 2105.14586 | KS Test-Based Actively-Adaptive Thompson Sampling | arXiv | Downloaded | `papers/spec-032/2021-mellor-ks-test-actively-adaptive-thompson.pdf` |
 | 1911.05309 | Adaptive Portfolios by Solving Multi-Armed Bandit via Thompson Sampling | arXiv | Downloaded | `papers/1911.05309.pdf` |
 | IEEE COINS 2024 | RF-DSW TS (de Freitas Fonseca et al.) | IEEE | Paywall | DOI: 10.1109/COINS61597.2024.10622208 |
 

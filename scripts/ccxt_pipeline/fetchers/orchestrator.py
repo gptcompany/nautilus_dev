@@ -58,6 +58,26 @@ class FetchOrchestrator:
         self._connected = False
         logger.info("Closed all exchange connections")
 
+    async def force_reconnect(self) -> None:
+        """Force reconnection to all exchanges.
+
+        Used for recovery after connection errors.
+        Closes existing connections and reconnects fresh.
+        """
+        logger.info("Force reconnecting to all exchanges...")
+        self._connected = False
+
+        # Close existing connections
+        for fetcher in self.fetchers.values():
+            try:
+                await fetcher.close()
+            except Exception as e:
+                logger.warning(f"Error closing {fetcher.venue_name}: {e}")
+
+        # Reconnect
+        await self.connect_all()
+        logger.info("Force reconnection complete")
+
     async def fetch_open_interest(
         self, symbol: str, exchanges: list[str] | None = None
     ) -> list[FetchResult]:

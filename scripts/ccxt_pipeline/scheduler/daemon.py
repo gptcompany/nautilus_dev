@@ -19,8 +19,18 @@ from scripts.ccxt_pipeline.models import FundingRate, Liquidation, OpenInterest
 from scripts.ccxt_pipeline.storage.parquet_store import ParquetStore
 from scripts.ccxt_pipeline.streams import LiquidationStreamManager
 from scripts.ccxt_pipeline.utils.logging import get_logger
+from scripts.ccxt_pipeline.utils.resilience import (
+    RetryConfig,
+)
 
 logger = get_logger("daemon")
+
+# Retry configuration for REST API calls
+FETCH_RETRY_CONFIG = RetryConfig(
+    max_retries=3,
+    base_delay=2.0,
+    max_delay=30.0,
+)
 
 
 @dataclass
@@ -235,70 +245,136 @@ class DaemonRunner:
     async def _fetch_open_interest(self, symbol: str) -> None:
         """Fetch open interest for a symbol from all exchanges.
 
+        Includes retry logic with automatic reconnection on connection errors.
+
         Args:
             symbol: Trading pair symbol.
         """
         if not self._orchestrator:
             return
 
-        try:
-            results = await self._orchestrator.fetch_open_interest(symbol)
+        retry_count = 0
+        max_retries = FETCH_RETRY_CONFIG.max_retries
 
-            data_points: list[OpenInterest] = []
-            for result in results:
-                if result.success and result.data:
-                    data_points.append(result.data)
-                elif result.error:
-                    self.stats.error_count += 1
-                    self.stats.last_error = str(result.error)
-                    logger.warning(f"OI fetch error from {result.venue}: {result.error}")
+        while retry_count <= max_retries:
+            try:
+                results = await self._orchestrator.fetch_open_interest(symbol)
 
-            if data_points:
-                self._store_data(data_points)
+                data_points: list[OpenInterest] = []
+                needs_reconnect = False
 
-            self.stats.fetch_count += 1
-            self.stats.last_fetch_time = datetime.now(timezone.utc)
+                for result in results:
+                    if result.success and result.data:
+                        # Validate data before storing
+                        oi = result.data
+                        if oi.open_interest is not None and oi.open_interest >= 0:
+                            data_points.append(oi)
+                        else:
+                            logger.warning(
+                                f"Invalid OI data from {result.venue}: {oi.open_interest}"
+                            )
+                    elif result.error:
+                        self.stats.error_count += 1
+                        self.stats.last_error = str(result.error)
+                        error_msg = str(result.error).lower()
+                        # Check if this is a connection error requiring reconnect
+                        if "not connected" in error_msg or "connection" in error_msg:
+                            needs_reconnect = True
+                        logger.warning(f"OI fetch error from {result.venue}: {result.error}")
 
-            logger.debug(f"Fetched OI for {symbol}: {len(data_points)} data points")
+                # If all exchanges had connection errors, force reconnect and retry
+                if needs_reconnect and not data_points and retry_count < max_retries:
+                    retry_count += 1
+                    delay = FETCH_RETRY_CONFIG.base_delay * (2 ** (retry_count - 1))
+                    logger.warning(
+                        f"Connection errors detected. Forcing reconnect "
+                        f"(retry {retry_count}/{max_retries}) in {delay:.1f}s"
+                    )
+                    await asyncio.sleep(delay)
+                    await self._orchestrator.force_reconnect()
+                    continue
 
-        except Exception as e:
-            self.stats.error_count += 1
-            self.stats.last_error = str(e)
-            logger.error(f"Error fetching OI for {symbol}: {e}")
+                if data_points:
+                    self._store_data(data_points)
+
+                self.stats.fetch_count += 1
+                self.stats.last_fetch_time = datetime.now(timezone.utc)
+
+                logger.debug(f"Fetched OI for {symbol}: {len(data_points)} data points")
+                return  # Success, exit retry loop
+
+            except Exception as e:
+                self.stats.error_count += 1
+                self.stats.last_error = str(e)
+                logger.error(f"Error fetching OI for {symbol}: {e}")
+                return  # Non-retryable error
 
     async def _fetch_funding_rate(self, symbol: str) -> None:
         """Fetch funding rate for a symbol from all exchanges.
 
+        Includes retry logic with automatic reconnection on connection errors.
+
         Args:
             symbol: Trading pair symbol.
         """
         if not self._orchestrator:
             return
 
-        try:
-            results = await self._orchestrator.fetch_funding_rate(symbol)
+        retry_count = 0
+        max_retries = FETCH_RETRY_CONFIG.max_retries
 
-            data_points: list[FundingRate] = []
-            for result in results:
-                if result.success and result.data:
-                    data_points.append(result.data)
-                elif result.error:
-                    self.stats.error_count += 1
-                    self.stats.last_error = str(result.error)
-                    logger.warning(f"Funding fetch error from {result.venue}: {result.error}")
+        while retry_count <= max_retries:
+            try:
+                results = await self._orchestrator.fetch_funding_rate(symbol)
 
-            if data_points:
-                self._store_data(data_points)
+                data_points: list[FundingRate] = []
+                needs_reconnect = False
 
-            self.stats.fetch_count += 1
-            self.stats.last_fetch_time = datetime.now(timezone.utc)
+                for result in results:
+                    if result.success and result.data:
+                        # Validate data before storing
+                        fr = result.data
+                        if fr.funding_rate is not None:
+                            data_points.append(fr)
+                        else:
+                            logger.warning(
+                                f"Invalid funding rate data from {result.venue}: {fr.funding_rate}"
+                            )
+                    elif result.error:
+                        self.stats.error_count += 1
+                        self.stats.last_error = str(result.error)
+                        error_msg = str(result.error).lower()
+                        # Check if this is a connection error requiring reconnect
+                        if "not connected" in error_msg or "connection" in error_msg:
+                            needs_reconnect = True
+                        logger.warning(f"Funding fetch error from {result.venue}: {result.error}")
 
-            logger.debug(f"Fetched funding for {symbol}: {len(data_points)} data points")
+                # If all exchanges had connection errors, force reconnect and retry
+                if needs_reconnect and not data_points and retry_count < max_retries:
+                    retry_count += 1
+                    delay = FETCH_RETRY_CONFIG.base_delay * (2 ** (retry_count - 1))
+                    logger.warning(
+                        f"Connection errors detected. Forcing reconnect "
+                        f"(retry {retry_count}/{max_retries}) in {delay:.1f}s"
+                    )
+                    await asyncio.sleep(delay)
+                    await self._orchestrator.force_reconnect()
+                    continue
 
-        except Exception as e:
-            self.stats.error_count += 1
-            self.stats.last_error = str(e)
-            logger.error(f"Error fetching funding for {symbol}: {e}")
+                if data_points:
+                    self._store_data(data_points)
+
+                self.stats.fetch_count += 1
+                self.stats.last_fetch_time = datetime.now(timezone.utc)
+
+                logger.debug(f"Fetched funding for {symbol}: {len(data_points)} data points")
+                return  # Success, exit retry loop
+
+            except Exception as e:
+                self.stats.error_count += 1
+                self.stats.last_error = str(e)
+                logger.error(f"Error fetching funding for {symbol}: {e}")
+                return  # Non-retryable error
 
     def _start_liquidation_stream(self) -> None:
         """Start native WebSocket liquidation streaming.

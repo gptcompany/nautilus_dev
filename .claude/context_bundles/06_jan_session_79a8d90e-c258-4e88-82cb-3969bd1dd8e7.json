@@ -1,177 +1,396 @@
 {
   "session_id": "79a8d90e-c258-4e88-82cb-3969bd1dd8e7",
-  "created_at": "2026-01-06T18:37:34.290672",
+  "created_at": "2026-01-06T18:49:23.897678",
   "operations": [
     {
-      "operation": "edit",
-      "timestamp": "2026-01-06T18:37:34.290694",
-      "file_path": "/media/sam/1TB/nautilus_dev/scripts/sync_research.py",
-      "old_string": "#!/usr/bin/env python3\n\"\"\"\nSync strategy entities from academic_research to nautilus_dev.\n\nThis scri..."
+      "operation": "bash",
+      "timestamp": "2026-01-06T18:49:23.897700",
+      "command": "ls -la /media/sam/1TB/nautilus_dev/data/ 2>/dev/null || echo \"No data directory\"",
+      "description": "Check data directory"
     },
     {
       "operation": "bash",
-      "timestamp": "2026-01-06T18:37:39.347755",
-      "command": "ls -la /media/sam/1TB1/RAG-Anything/raganything",
-      "description": "Check RAG-Anything source structure"
-    },
-    {
-      "operation": "read",
-      "timestamp": "2026-01-06T18:37:39.397820",
-      "file_path": "/media/sam/1TB/academic_research/.claude/skills/paper-entity-generator/SKILL.md"
-    },
-    {
-      "operation": "edit",
-      "timestamp": "2026-01-06T18:37:41.750981",
-      "file_path": "/media/sam/1TB/nautilus_dev/scripts/sync_research.py",
-      "old_string": "# Configuration\nCONFIG = {\n    \"source\": Path(\"/media/sam/1TB/academic_research/memory.json\"),\n    \"..."
+      "timestamp": "2026-01-06T18:49:33.341780",
+      "command": "find /media/sam/1TB/nautilus_dev/data/ccxt_catalog -type f | head -20 && echo \"---\" && du -sh /media/sam/1TB/nautilus_dev/data/ccxt_catalog/",
+      "description": "Check ccxt_catalog contents"
     },
     {
       "operation": "bash",
-      "timestamp": "2026-01-06T18:37:47.091894",
-      "command": "grep -n \"EquationModalProcessor\\|class.*Equation\" /media/sam/1TB1/RAG-Anything/raganything/modalprocessors.py | head -20",
-      "description": "Search for EquationModalProcessor class"
-    },
-    {
-      "operation": "read",
-      "timestamp": "2026-01-06T18:37:47.157093",
-      "file_path": "/media/sam/1TB1/RAG-Anything/raganything/modalprocessors.py"
-    },
-    {
-      "operation": "read",
-      "timestamp": "2026-01-06T18:37:47.164392",
-      "file_path": "/media/sam/1TB/academic_research/semantic_router_mcp/routes_config.py"
-    },
-    {
-      "operation": "edit",
-      "timestamp": "2026-01-06T18:37:51.165625",
-      "file_path": "/media/sam/1TB/nautilus_dev/scripts/sync_research.py",
-      "old_string": "def print_strategy_summary(strategies: list[dict[str, Any]]) -> None:\n    \"\"\"Print summary of strate..."
+      "timestamp": "2026-01-06T18:49:33.808041",
+      "command": "ls -la /media/sam/1TB/nautilus_dev/data/ccxt_catalog/",
+      "description": "List catalog structure"
     },
     {
       "operation": "bash",
-      "timestamp": "2026-01-06T18:37:54.125853",
-      "command": "ls -la /media/sam/1TB/academic_research/.claude/skills/research-query-workflow/",
-      "description": "Check structure of existing skill"
+      "timestamp": "2026-01-06T18:49:44.242524",
+      "command": "find /media/sam/1TB/nautilus_dev/data/ccxt_catalog -name \"*.parquet\" -mtime -3 | head -10 && echo \"---\" && find /media/sam/1TB/nautilus_dev/data/ccxt_catalog -name \"*.parquet\" | sort | tail -10",
+      "description": "Check recent parquet files"
     },
     {
-      "operation": "read",
-      "timestamp": "2026-01-06T18:37:54.193915",
-      "file_path": "/media/sam/1TB1/RAG-Anything/raganything/modalprocessors.py"
-    },
-    {
-      "operation": "edit",
-      "timestamp": "2026-01-06T18:38:16.310000",
-      "file_path": "/media/sam/1TB/nautilus_dev/scripts/sync_research.py",
-      "old_string": "def main() -> None:\n    parser = argparse.ArgumentParser(\n        description=\"Sync strategy entitie..."
+      "operation": "bash",
+      "timestamp": "2026-01-06T18:49:44.771697",
+      "command": "journalctl --user -u ccxt-pipeline --since \"1 hour ago\" 2>/dev/null || tail -50 /tmp/ccxt*.log 2>/dev/null || ps aux | grep ccxt",
+      "description": "Check CCXT logs"
     },
     {
       "operation": "todowrite",
-      "timestamp": "2026-01-06T18:38:23.382475",
-      "todo_count": 4
-    },
-    {
-      "operation": "taskoutput",
-      "timestamp": "2026-01-06T18:38:28.855593",
-      "task_id": "a53709d",
-      "block": true,
-      "timeout": 60000
+      "timestamp": "2026-01-06T18:49:53.578146",
+      "todo_count": 1
     },
     {
       "operation": "bash",
-      "timestamp": "2026-01-06T18:39:33.048417",
-      "command": "mkdir -p /media/sam/1TB/academic_research/.claude/skills/math-formula-extractor",
-      "description": "Create skill directory"
+      "timestamp": "2026-01-06T18:50:13.232103",
+      "command": "python3 << 'EOF'\nimport pandas as pd\nfrom pathlib import Path\n\ncatalog = Path(\"data/ccxt_catalog\")\n\n# Check liquidations (working)\nliq_file = catalog / \"liquidations/BTCUSDT-PERP.BINANCE/2026-01-06.parquet\"\nif liq_file.exists():\n    df = pd.read_parquet(liq_file)\n    print(\"=== LIQUIDATIONS BTCUSDT 2026-01-06 ===\")\n    print(f\"Records: {len(df)}\")\n    print(f\"Columns: {list(df.columns)}\")\n    print(f\"Time range: {df['timestamp'].min()} -> {df['timestamp'].max()}\")\n    print(f\"\\nSample (last 5):\")\n    print(df.tail())\n\n# Check OI (broken - last working day)\noi_file = catalog / \"open_interest/BTCUSDT-PERP.BINANCE/2025-12-30.parquet\"\nif oi_file.exists():\n    df = pd.read_parquet(oi_file)\n    print(\"\\n\\n=== OPEN INTEREST BTCUSDT 2025-12-30 ===\")\n    print(f\"Records: {len(df)}\")\n    print(f\"Columns: {list(df.columns)}\")\n    print(f\"Time range: {df['timestamp'].min()} -> {df['timestamp'].max()}\")\n    # Check interval regularity\n    df['timestamp'] = pd.to_datetime(df['timestamp'])\n    df = df.sort_values('timestamp')\n    df['interval'] = df['timestamp'].diff()\n    print(f\"\\nInterval stats:\")\n    print(df['interval'].describe())\nEOF\n",
+      "description": "Analyze parquet data quality"
     },
     {
-      "operation": "write",
-      "timestamp": "2026-01-06T18:39:33.427484",
-      "file_path": "/media/sam/1TB/academic_research/.claude/skills/math-formula-extractor/SKILL.md",
-      "content_length": 17101
+      "operation": "bash",
+      "timestamp": "2026-01-06T18:50:25.974116",
+      "command": "python3 << 'EOF'\nimport pandas as pd\nfrom pathlib import Path\n\ncatalog = Path(\"data/ccxt_catalog\")\n\nprint(\"=== DATA INTEGRITY CHECK ===\\n\")\n\n# Liquidations\nliq_file = catalog / \"liquidations/BTCUSDT-PERP.BINANCE/2026-01-06.parquet\"\ndf = pd.read_parquet(liq_file)\nprint(\"LIQUIDATIONS (oggi):\")\nprint(f\"  Records: {len(df)}\")\nprint(f\"  NaN values: {df.isna().sum().sum()}\")\nprint(f\"  Duplicates: {df.duplicated().sum()}\")\nprint(f\"  Price range: ${df['price'].min():,.0f} - ${df['price'].max():,.0f}\")\nprint(f\"  Value range: ${df['value'].min():,.2f} - ${df['value'].max():,.2f}\")\n\n# OI\noi_file = catalog / \"open_interest/BTCUSDT-PERP.BINANCE/2025-12-30.parquet\"\ndf = pd.read_parquet(oi_file)\nprint(\"\\nOPEN INTEREST (ultimo giorno):\")\nprint(f\"  Records: {len(df)}\")\nprint(f\"  NaN values: {df.isna().sum().sum()}\")\nprint(f\"  Duplicates: {df.duplicated().sum()}\")\nprint(f\"  OI range: {df['open_interest'].min():,.0f} - {df['open_interest'].max():,.0f} BTC\")\n\n# Check all days coverage\nprint(\"\\n=== COPERTURA GIORNI ===\")\nfor dtype in [\"liquidations\", \"open_interest\", \"funding_rate\"]:\n    path = catalog / dtype / \"BTCUSDT-PERP.BINANCE\"\n    if path.exists():\n        files = sorted(path.glob(\"*.parquet\"))\n        if files:\n            print(f\"\\n{dtype.upper()}:\")\n            print(f\"  Giorni: {len(files)}\")\n            print(f\"  Da: {files[0].stem}\")\n            print(f\"  A:  {files[-1].stem}\")\nEOF\n",
+      "description": "Check data integrity"
     },
     {
       "operation": "todowrite",
-      "timestamp": "2026-01-06T18:39:41.827944",
+      "timestamp": "2026-01-06T18:51:27.393677",
+      "todo_count": 3
+    },
+    {
+      "operation": "glob",
+      "timestamp": "2026-01-06T18:51:32.085302",
+      "pattern": "**/ccxt_pipeline/**/*.py",
+      "path": "/media/sam/1TB/nautilus_dev"
+    },
+    {
+      "operation": "glob",
+      "timestamp": "2026-01-06T18:51:32.086763",
+      "pattern": "**/ccxt*.py",
+      "path": "/media/sam/1TB/nautilus_dev/scripts"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-06T18:51:40.294400",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/ccxt_pipeline/fetchers/orchestrator.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-06T18:51:40.300722",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/ccxt_pipeline/fetchers/base.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-06T18:51:51.325367",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/ccxt_pipeline/scheduler/daemon.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-06T18:51:51.331491",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/ccxt_pipeline/fetchers/binance.py"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2026-01-06T18:52:13.627700",
+      "todo_count": 3
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T18:52:52.917807",
+      "command": "python3 << 'EOF'\nimport pandas as pd\nfrom pathlib import Path\nfrom datetime import datetime, timedelta\n\ncatalog = Path(\"data/ccxt_catalog\")\n\nprint(\"=\" * 70)\nprint(\"CCXT DATA INTEGRITY REPORT\")\nprint(\"=\" * 70)\n\ndef analyze_data_type(dtype: str, symbol: str = \"BTCUSDT-PERP.BINANCE\"):\n    \"\"\"Analyze a data type for integrity.\"\"\"\n    path = catalog / dtype / symbol\n    if not path.exists():\n        print(f\"\\n❌ {dtype}/{symbol}: Directory not found\")\n        return\n    \n    files = sorted(path.glob(\"*.parquet\"))\n    if not files:\n        print(f\"\\n❌ {dtype}/{symbol}: No files\")\n        return\n    \n    print(f\"\\n{'─' * 70}\")\n    print(f\"📊 {dtype.upper()} ({symbol})\")\n    print(f\"{'─' * 70}\")\n    \n    # Load all files\n    all_data = []\n    for f in files:\n        df = pd.read_parquet(f)\n        df['_file'] = f.stem\n        all_data.append(df)\n    \n    df = pd.concat(all_data, ignore_index=True)\n    df['timestamp'] = pd.to_datetime(df['timestamp'])\n    df = df.sort_values('timestamp')\n    \n    # Basic stats\n    print(f\"📁 Files: {len(files)}\")\n    print(f\"📝 Total records: {len(df):,}\")\n    print(f\"📅 Date range: {df['timestamp'].min()} → {df['timestamp'].max()}\")\n    \n    # Check for duplicates\n    dupes = df.duplicated(subset=['timestamp']).sum()\n    if dupes > 0:\n        print(f\"⚠️  Duplicates: {dupes}\")\n    else:\n        print(f\"✅ Duplicates: 0\")\n    \n    # Check for NaN\n    nan_count = df.isna().sum().sum()\n    if nan_count > 0:\n        print(f\"⚠️  NaN values: {nan_count}\")\n    else:\n        print(f\"✅ NaN values: 0\")\n    \n    # Check gaps (for OI/FR which should be regular)\n    if dtype in [\"open_interest\", \"funding_rate\"]:\n        df_sorted = df.sort_values('timestamp')\n        df_sorted['gap'] = df_sorted['timestamp'].diff()\n        \n        expected_interval = timedelta(minutes=5) if dtype == \"open_interest\" else timedelta(hours=8)\n        tolerance = expected_interval * 1.5\n        \n        gaps = df_sorted[df_sorted['gap'] > tolerance]\n        if len(gaps) > 0:\n            print(f\"⚠️  Gaps (>{tolerance}): {len(gaps)}\")\n            print(f\"   Largest gap: {df_sorted['gap'].max()}\")\n        else:\n            print(f\"✅ No significant gaps\")\n        \n        # Interval stats\n        median_interval = df_sorted['gap'].median()\n        print(f\"📊 Median interval: {median_interval}\")\n    \n    # Check day coverage\n    dates = df['timestamp'].dt.date.unique()\n    date_range = pd.date_range(start=min(dates), end=max(dates), freq='D')\n    missing_days = set(date_range.date) - set(dates)\n    if missing_days:\n        print(f\"⚠️  Missing days: {len(missing_days)}\")\n        for d in sorted(missing_days)[:5]:\n            print(f\"      - {d}\")\n        if len(missing_days) > 5:\n            print(f\"      ... and {len(missing_days) - 5} more\")\n    else:\n        print(f\"✅ All days covered\")\n    \n    # Data value sanity check\n    if 'price' in df.columns:\n        print(f\"💰 Price range: ${df['price'].min():,.2f} - ${df['price'].max():,.2f}\")\n    if 'open_interest' in df.columns:\n        print(f\"📈 OI range: {df['open_interest'].min():,.0f} - {df['open_interest'].max():,.0f}\")\n    if 'funding_rate' in df.columns:\n        print(f\"📉 FR range: {df['funding_rate'].min():.6f} - {df['funding_rate'].max():.6f}\")\n\n# Analyze each data type\nfor dtype in [\"liquidations\", \"open_interest\", \"funding_rate\"]:\n    analyze_data_type(dtype)\n\n# Summary\nprint(\"\\n\" + \"=\" * 70)\nprint(\"SUMMARY\")\nprint(\"=\" * 70)\n\ntotal_files = len(list(catalog.glob(\"**/*.parquet\")))\ntotal_size = sum(f.stat().st_size for f in catalog.glob(\"**/*.parquet\"))\n\nprint(f\"📁 Total Parquet files: {total_files}\")\nprint(f\"💾 Total size: {total_size / 1024 / 1024:.2f} MB\")\nprint(f\"📅 Collection period: 2025-12-24 → 2026-01-06 (14 days)\")\n\n# Check if OI/FR stopped\noi_latest = max(catalog.glob(\"open_interest/**/*.parquet\"), key=lambda x: x.stem)\nfr_latest = max(catalog.glob(\"funding_rate/**/*.parquet\"), key=lambda x: x.stem)\nliq_latest = max(catalog.glob(\"liquidations/**/*.parquet\"), key=lambda x: x.stem)\n\nprint(f\"\\n🕐 Latest data:\")\nprint(f\"   Liquidations: {liq_latest.stem} ✅\")\nprint(f\"   Open Interest: {oi_latest.stem} {'⚠️ STALE' if oi_latest.stem < '2026-01-01' else '✅'}\")\nprint(f\"   Funding Rate: {fr_latest.stem} {'⚠️ STALE' if fr_latest.stem < '2026-01-01' else '✅'}\")\nEOF\n",
+      "description": "Comprehensive data integrity analysis"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T18:53:02.079213",
+      "command": "python3 << 'EOF'\nimport pandas as pd\nfrom pathlib import Path\n\n# Check what's null in funding rate\nfr_path = Path(\"data/ccxt_catalog/funding_rate/BTCUSDT-PERP.BINANCE\")\ndf = pd.concat([pd.read_parquet(f) for f in fr_path.glob(\"*.parquet\")])\n\nprint(\"FUNDING RATE NaN Analysis:\")\nprint(df.isna().sum())\nprint(\"\\nSample row:\")\nprint(df.head(1).to_dict('records'))\nEOF\n",
+      "description": "Check funding rate NaN issue"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2026-01-06T18:54:01.900814",
       "todo_count": 5
     },
     {
-      "operation": "taskoutput",
-      "timestamp": "2026-01-06T18:39:51.877144",
-      "task_id": "a53709d",
-      "block": true,
-      "timeout": 120000
-    },
-    {
-      "operation": "edit",
-      "timestamp": "2026-01-06T18:39:55.799271",
-      "file_path": "/media/sam/1TB/academic_research/docs/entity_schemas.md",
-      "old_string": "## Strategy Entities\n\nTrading strategies extracted from academic papers for implementation in Nautil..."
-    },
-    {
-      "operation": "edit",
-      "timestamp": "2026-01-06T18:40:02.217246",
-      "file_path": "/media/sam/1TB/academic_research/docs/entity_schemas.md",
-      "old_string": "## Table of Contents\n\n1. [Source Entities](#source-entities)\n2. [Concept Entities](#concept-entities..."
-    },
-    {
-      "operation": "edit",
-      "timestamp": "2026-01-06T18:40:09.508181",
-      "file_path": "/media/sam/1TB/academic_research/semantic_router_mcp/pyproject.toml",
-      "old_string": "[project]\nname = \"semantic-router-mcp\"\nversion = \"0.1.0\"\ndescription = \"MCP server for semantic quer..."
-    },
-    {
-      "operation": "bash",
-      "timestamp": "2026-01-06T18:40:19.720765",
-      "command": "find /media/sam/1TB/academic_research -name \"requirements*.txt\" -o -name \"pyproject.toml\" | grep -v semantic_router_mcp | head -5",
-      "description": "Find other dependency files"
-    },
-    {
-      "operation": "edit",
-      "timestamp": "2026-01-06T18:40:20.619914",
-      "file_path": "/media/sam/1TB/academic_research/semantic_router_mcp/routes_config.py",
-      "old_string": "    # Symbolic & Computational Mathematics\n    \"Mathematica symbolic computation and analysis\",\n    ..."
+      "operation": "read",
+      "timestamp": "2026-01-06T18:54:10.449392",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/ccxt_pipeline/utils/__init__.py"
     },
     {
       "operation": "write",
-      "timestamp": "2026-01-06T18:40:59.608161",
-      "file_path": "/media/sam/1TB/academic_research/scripts/test_formula_extraction.py",
-      "content_length": 8950
+      "timestamp": "2026-01-06T18:54:44.692301",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/ccxt_pipeline/utils/circuit_breaker.py",
+      "content_length": 8726
     },
     {
       "operation": "bash",
-      "timestamp": "2026-01-06T18:41:09.942756",
-      "command": "chmod +x /media/sam/1TB/academic_research/scripts/test_formula_extraction.py",
-      "description": "Make test script executable"
+      "timestamp": "2026-01-06T18:54:57.465944",
+      "command": "python3 << 'EOF'\nimport ccxt\nimport inspect\n\n# Check CCXT exchange options\nprint(\"=== CCXT Built-in Resilience Options ===\\n\")\n\nexchange = ccxt.binance()\n\n# Get all options\noptions = exchange.describe()\n\nprint(\"Rate Limiting:\")\nprint(f\"  enableRateLimit: {exchange.enableRateLimit}\")\nprint(f\"  rateLimit: {exchange.rateLimit}ms\")\n\nprint(\"\\nRetry Options:\")\nretry_attrs = [a for a in dir(exchange) if 'retry' in a.lower() or 'timeout' in a.lower()]\nfor attr in retry_attrs:\n    val = getattr(exchange, attr, None)\n    if val is not None and not callable(val):\n        print(f\"  {attr}: {val}\")\n\nprint(\"\\nTimeout Settings:\")\nprint(f\"  timeout: {exchange.timeout}ms\")\n\nprint(\"\\nPro (WebSocket) features:\")\ntry:\n    import ccxt.pro as ccxtpro\n    ws_exchange = ccxtpro.binance()\n    print(f\"  Has watch_* methods: Yes\")\n    print(f\"  newUpdates: {ws_exchange.options.get('newUpdates', 'N/A')}\")\nexcept:\n    print(\"  CCXT Pro not available\")\n\nprint(\"\\n=== CCXT Error Handling ===\")\nprint(\"Built-in exception hierarchy:\")\nfor exc in ['NetworkError', 'ExchangeError', 'ExchangeNotAvailable', \n            'RequestTimeout', 'DDoSProtection', 'RateLimitExceeded']:\n    if hasattr(ccxt, exc):\n        print(f\"  ✓ ccxt.{exc}\")\nEOF\n",
+      "description": "Check CCXT native resilience features"
+    },
+    {
+      "operation": "webfetch",
+      "timestamp": "2026-01-06T18:55:11.354942",
+      "url": "https://docs.ccxt.com/en/latest/manual.html",
+      "prompt": "Find information about error handling, retry mechanisms, reconnection, and best practices for handli..."
+    },
+    {
+      "operation": "websearch",
+      "timestamp": "2026-01-06T18:55:20.209003",
+      "query": "CCXT error handling retry reconnection best practices production 2025"
+    },
+    {
+      "operation": "write",
+      "timestamp": "2026-01-06T18:56:26.539853",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/ccxt_pipeline/utils/resilience.py",
+      "content_length": 8970
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2026-01-06T18:56:34.342368",
+      "todo_count": 5
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-06T18:56:45.116080",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/ccxt_pipeline/fetchers/orchestrator.py",
+      "old_string": "    async def close_all(self) -> None:\n        \"\"\"Close all exchange connections.\"\"\"\n        tasks =..."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-06T18:56:53.882100",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/ccxt_pipeline/scheduler/daemon.py",
+      "old_string": "from scripts.ccxt_pipeline.config import get_config\nfrom scripts.ccxt_pipeline.fetchers import Fetch..."
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-06T18:56:59.314641",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/ccxt_pipeline/scheduler/daemon.py"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-06T18:57:08.073034",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/ccxt_pipeline/scheduler/daemon.py",
+      "old_string": "from scripts.ccxt_pipeline.utils.logging import get_logger\n\nlogger = get_logger(\"daemon\")"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-06T18:57:13.011656",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/ccxt_pipeline/scheduler/daemon.py"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-06T18:57:27.208214",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/ccxt_pipeline/scheduler/daemon.py",
+      "old_string": "    async def _fetch_open_interest(self, symbol: str) -> None:\n        \"\"\"Fetch open interest for a ..."
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-06T18:57:41.376323",
+      "file_path": "/media/sam/1TB/nautilus_dev/CLAUDE.md"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2026-01-06T18:57:41.793905",
+      "todo_count": 3
+    },
+    {
+      "operation": "grep",
+      "timestamp": "2026-01-06T18:57:47.559352",
+      "pattern": "#### ALWAYS",
+      "path": "/media/sam/1TB/nautilus_dev/CLAUDE.md",
+      "output_mode": "content"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-06T18:57:52.272603",
+      "file_path": "/media/sam/1TB/nautilus_dev/CLAUDE.md"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-06T18:58:00.276439",
+      "file_path": "/media/sam/1TB/nautilus_dev/CLAUDE.md",
+      "old_string": "#### ALWAYS\n- Search docs first (Context7, Discord)\n- Use native Rust indicators\n- Run tests via tes..."
+    },
+    {
+      "operation": "task",
+      "timestamp": "2026-01-06T18:58:13.544551",
+      "subagent_type": "nautilus-coder",
+      "prompt": "Complete the CCXT pipeline resilience fix. The OI fetch has been updated with retry logic in daemon...."
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-06T18:58:20.449756",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/ccxt_pipeline/utils/__init__.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-06T18:58:23.978602",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/ccxt_pipeline/utils/resilience.py"
     },
     {
       "operation": "bash",
-      "timestamp": "2026-01-06T18:41:10.339689",
-      "command": "ls -lh /media/sam/1TB/academic_research/.claude/skills/",
-      "description": "Verify skill directory structure"
+      "timestamp": "2026-01-06T18:58:39.681893",
+      "command": "cat << 'EOF' > /tmp/funding_rate_fix.py\n# New _fetch_funding_rate method with retry logic\nNEW_METHOD = '''    async def _fetch_funding_rate(self, symbol: str) -> None:\n        \"\"\"Fetch funding rate for a symbol from all exchanges.\n\n        Includes retry logic with automatic reconnection on connection errors.\n\n        Args:\n            symbol: Trading pair symbol.\n        \"\"\"\n        if not self._orchestrator:\n            return\n\n        retry_count = 0\n        max_retries = FETCH_RETRY_CONFIG.max_retries\n\n        while retry_count <= max_retries:\n            try:\n                results = await self._orchestrator.fetch_funding_rate(symbol)\n\n                data_points: list[FundingRate] = []\n                needs_reconnect = False\n\n                for result in results:\n                    if result.success and result.data:\n                        # Validate data before storing\n                        fr = result.data\n                        if fr.rate is not None:\n                            data_points.append(fr)\n                        else:\n                            logger.warning(\n                                f\"Invalid funding rate data from {result.venue}: {fr.rate}\"\n                            )\n                    elif result.error:\n                        self.stats.error_count += 1\n                        self.stats.last_error = str(result.error)\n                        error_msg = str(result.error).lower()\n                        # Check if this is a connection error requiring reconnect\n                        if \"not connected\" in error_msg or \"connection\" in error_msg:\n                            needs_reconnect = True\n                        logger.warning(f\"Funding fetch error from {result.venue}: {result.error}\")\n\n                # If all exchanges had connection errors, force reconnect and retry\n                if needs_reconnect and not data_points and retry_count < max_retries:\n                    retry_count += 1\n                    delay = FETCH_RETRY_CONFIG.base_delay * (2 ** (retry_count - 1))\n                    logger.warning(\n                        f\"Connection errors detected. Forcing reconnect \"\n                        f\"(retry {retry_count}/{max_retries}) in {delay:.1f}s\"\n                    )\n                    await asyncio.sleep(delay)\n                    await self._orchestrator.force_reconnect()\n                    continue\n\n                if data_points:\n                    self._store_data(data_points)\n\n                self.stats.fetch_count += 1\n                self.stats.last_fetch_time = datetime.now(timezone.utc)\n\n                logger.debug(f\"Fetched funding for {symbol}: {len(data_points)} data points\")\n                return  # Success, exit retry loop\n\n            except Exception as e:\n                self.stats.error_count += 1\n                self.stats.last_error = str(e)\n                logger.error(f\"Error fetching funding for {symbol}: {e}\")\n                return  # Non-retryable error\n'''\nprint(NEW_METHOD)\nEOF\npython3 /tmp/funding_rate_fix.py",
+      "description": "Generate new _fetch_funding_rate method"
     },
     {
       "operation": "bash",
-      "timestamp": "2026-01-06T18:41:10.436573",
-      "command": "wc -l /media/sam/1TB/academic_research/.claude/skills/math-formula-extractor/SKILL.md /media/sam/1TB/academic_research/docs/entity_schemas.md /media/sam/1TB/academic_research/scripts/test_formula_extraction.py",
-      "description": "Count lines in created files"
+      "timestamp": "2026-01-06T18:58:51.401946",
+      "command": "cat > /tmp/apply_changes.py << 'SCRIPT'\nimport re\n\n# Read the daemon.py file\nwith open('scripts/ccxt_pipeline/scheduler/daemon.py', 'r') as f:\n    content = f.read()\n\n# New _fetch_funding_rate method\nnew_method = '''    async def _fetch_funding_rate(self, symbol: str) -> None:\n        \"\"\"Fetch funding rate for a symbol from all exchanges.\n\n        Includes retry logic with automatic reconnection on connection errors.\n\n        Args:\n            symbol: Trading pair symbol.\n        \"\"\"\n        if not self._orchestrator:\n            return\n\n        retry_count = 0\n        max_retries = FETCH_RETRY_CONFIG.max_retries\n\n        while retry_count <= max_retries:\n            try:\n                results = await self._orchestrator.fetch_funding_rate(symbol)\n\n                data_points: list[FundingRate] = []\n                needs_reconnect = False\n\n                for result in results:\n                    if result.success and result.data:\n                        # Validate data before storing\n                        fr = result.data\n                        if fr.rate is not None:\n                            data_points.append(fr)\n                        else:\n                            logger.warning(\n                                f\"Invalid funding rate data from {result.venue}: {fr.rate}\"\n                            )\n                    elif result.error:\n                        self.stats.error_count += 1\n                        self.stats.last_error = str(result.error)\n                        error_msg = str(result.error).lower()\n                        # Check if this is a connection error requiring reconnect\n                        if \"not connected\" in error_msg or \"connection\" in error_msg:\n                            needs_reconnect = True\n                        logger.warning(f\"Funding fetch error from {result.venue}: {result.error}\")\n\n                # If all exchanges had connection errors, force reconnect and retry\n                if needs_reconnect and not data_points and retry_count < max_retries:\n                    retry_count += 1\n                    delay = FETCH_RETRY_CONFIG.base_delay * (2 ** (retry_count - 1))\n                    logger.warning(\n                        f\"Connection errors detected. Forcing reconnect \"\n                        f\"(retry {retry_count}/{max_retries}) in {delay:.1f}s\"\n                    )\n                    await asyncio.sleep(delay)\n                    await self._orchestrator.force_reconnect()\n                    continue\n\n                if data_points:\n                    self._store_data(data_points)\n\n                self.stats.fetch_count += 1\n                self.stats.last_fetch_time = datetime.now(timezone.utc)\n\n                logger.debug(f\"Fetched funding for {symbol}: {len(data_points)} data points\")\n                return  # Success, exit retry loop\n\n            except Exception as e:\n                self.stats.error_count += 1\n                self.stats.last_error = str(e)\n                logger.error(f\"Error fetching funding for {symbol}: {e}\")\n                return  # Non-retryable error\n\n'''\n\n# Find the old method and replace it\n# Pattern to match from \"async def _fetch_funding_rate\" to the next method \"_start_liquidation_stream\"\nold_method_pattern = r'    async def _fetch_funding_rate\\(self, symbol: str\\) -> None:.*?(?=    def _start_liquidation_stream)'\n\nnew_content = re.sub(old_method_pattern, new_method, content, flags=re.DOTALL)\n\n# Write back\nwith open('scripts/ccxt_pipeline/scheduler/daemon.py', 'w') as f:\n    f.write(new_content)\n\nprint(\"daemon.py updated successfully\")\nSCRIPT\npython3 /tmp/apply_changes.py",
+      "description": "Apply _fetch_funding_rate update"
     },
     {
       "operation": "bash",
-      "timestamp": "2026-01-06T18:41:16.623427",
-      "command": "head -30 /media/sam/1TB/academic_research/.claude/skills/math-formula-extractor/SKILL.md",
-      "description": "Verify skill header"
+      "timestamp": "2026-01-06T18:58:59.666726",
+      "command": "cat > /media/sam/1TB/nautilus_dev/scripts/ccxt_pipeline/utils/__init__.py << 'EOF'\n\"\"\"Utility modules for CCXT pipeline.\"\"\"\n\nfrom scripts.ccxt_pipeline.utils.parsing import safe_float, safe_int, safe_str\nfrom scripts.ccxt_pipeline.utils.reconnect import ExponentialBackoff, ReconnectingStream\nfrom scripts.ccxt_pipeline.utils.resilience import (\n    RetryConfig,\n    calculate_delay,\n    is_retryable_error,\n    needs_reconnection,\n    retry_with_backoff,\n    validate_funding_rate,\n    validate_liquidation,\n    validate_open_interest,\n    with_retry,\n)\n\n__all__ = [\n    # Parsing\n    \"safe_float\",\n    \"safe_int\",\n    \"safe_str\",\n    # Reconnect\n    \"ExponentialBackoff\",\n    \"ReconnectingStream\",\n    # Resilience\n    \"RetryConfig\",\n    \"calculate_delay\",\n    \"is_retryable_error\",\n    \"needs_reconnection\",\n    \"retry_with_backoff\",\n    \"validate_funding_rate\",\n    \"validate_liquidation\",\n    \"validate_open_interest\",\n    \"with_retry\",\n]\nEOF\necho \"utils/__init__.py updated\"",
+      "description": "Update utils __init__.py exports"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-06T18:59:03.409667",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/ccxt_pipeline/scheduler/daemon.py"
     },
     {
       "operation": "bash",
-      "timestamp": "2026-01-06T18:41:16.634524",
-      "command": "grep -A 5 \"formula__\" /media/sam/1TB/academic_research/docs/entity_schemas.md | head -20",
-      "description": "Verify formula schema in entity_schemas.md"
+      "timestamp": "2026-01-06T18:59:07.675259",
+      "command": "python -m py_compile scripts/ccxt_pipeline/scheduler/daemon.py && echo \"Syntax check passed\"",
+      "description": "Syntax check daemon.py"
     },
     {
       "operation": "bash",
-      "timestamp": "2026-01-06T18:41:24.080947",
-      "command": "cd /media/sam/1TB/academic_research && find . -name \"*formula*\" -o -name \"entity_schemas.md\" -o -name \"pyproject.toml\" | grep -E \"(skill|scripts|docs|semantic)\" | sort",
-      "description": "List all files modified/created"
+      "timestamp": "2026-01-06T18:59:11.510536",
+      "command": "python -m py_compile scripts/ccxt_pipeline/utils/__init__.py && echo \"Syntax check passed for utils/__init__.py\"",
+      "description": "Syntax check utils/__init__.py"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T18:59:16.793089",
+      "command": "pkill -f ccxt_pipeline 2>/dev/null; sleep 2; pgrep -af ccxt_pipeline || echo \"No ccxt_pipeline processes running\"",
+      "description": "Stop current daemon"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T18:59:21.436940",
+      "command": "pgrep -af ccxt_pipeline || echo \"No ccxt_pipeline processes running\"",
+      "description": "Check daemon stopped"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T18:59:27.905074",
+      "command": "ps aux | grep ccxt_pipeline | grep -v grep || echo \"Daemon stopped\"",
+      "description": "Check daemon process status"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T18:59:33.947577",
+      "command": "setsid uv run python -m scripts.ccxt_pipeline daemon start >> /tmp/ccxt_daemon.log 2>&1 &\necho \"Daemon started in background. PID: $!\"\nsleep 3\nps aux | grep ccxt_pipeline | grep -v grep | head -3",
+      "description": "Start daemon fresh"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T18:59:38.445164",
+      "command": "ps aux | grep ccxt_pipeline | grep -v grep",
+      "description": "Check if daemon running"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T18:59:43.730228",
+      "command": "sleep 30 && tail -100 /tmp/ccxt_daemon.log",
+      "description": "Wait 30s then check logs"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T19:00:19.647310",
+      "command": "grep -r \"class FundingRate\" /media/sam/1TB/nautilus_dev/scripts/ccxt_pipeline/models/ -A 20",
+      "description": "Find FundingRate class definition"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-06T19:00:19.746069",
+      "file_path": "/media/sam/1TB/nautilus_dev/scripts/ccxt_pipeline/models/__init__.py"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T19:00:24.541862",
+      "command": "sed -i 's/fr.rate is not None/fr.funding_rate is not None/g' /media/sam/1TB/nautilus_dev/scripts/ccxt_pipeline/scheduler/daemon.py\nsed -i 's/{fr.rate}/{fr.funding_rate}/g' /media/sam/1TB/nautilus_dev/scripts/ccxt_pipeline/scheduler/daemon.py\necho \"Fixed attribute name\"",
+      "description": "Fix funding_rate attribute name"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T19:00:27.938678",
+      "command": "grep -n \"fr.funding_rate\" /media/sam/1TB/nautilus_dev/scripts/ccxt_pipeline/scheduler/daemon.py",
+      "description": "Verify fix"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T19:00:32.829370",
+      "command": "pkill -f \"scripts.ccxt_pipeline daemon\" 2>/dev/null; sleep 2; ps aux | grep ccxt_pipeline | grep -v grep || echo \"Stopped\"",
+      "description": "Stop daemon"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T19:00:36.295334",
+      "command": "ps aux | grep ccxt_pipeline | grep -v grep || echo \"Daemon stopped\"",
+      "description": "Verify daemon stopped"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T19:00:41.577832",
+      "command": "setsid uv run python -m scripts.ccxt_pipeline daemon start >> /tmp/ccxt_daemon.log 2>&1 &\nsleep 3\nps aux | grep ccxt_pipeline | grep -v grep | head -3",
+      "description": "Start daemon fresh"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T19:00:45.090898",
+      "command": "sleep 3",
+      "description": "Wait for daemon start"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T19:00:52.874681",
+      "command": "ps aux | grep ccxt_pipeline | grep -v grep",
+      "description": "Check daemon process"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T19:00:57.786563",
+      "command": "sleep 30 && tail -80 /tmp/ccxt_daemon.log | tail -60",
+      "description": "Wait 30s and check logs"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T19:01:33.303725",
+      "command": "ls -la /media/sam/1TB/nautilus_dev/data/ccxt_catalog/open_interest/BTCUSDT-PERP.BINANCE/ 2>/dev/null || echo \"Directory does not exist\"",
+      "description": "Check OI data files"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T19:01:38.202278",
+      "command": "ls -la /media/sam/1TB/nautilus_dev/data/ccxt_catalog/funding_rate/BTCUSDT-PERP.BINANCE/ 2>/dev/null | tail -10",
+      "description": "Check funding rate data files"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T19:01:42.647853",
+      "command": "ls -la /media/sam/1TB/nautilus_dev/data/ccxt_catalog/open_interest/ 2>/dev/null",
+      "description": "Check all OI directories"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T19:01:47.584992",
+      "command": "# Check if latest files are updating\nfor d in /media/sam/1TB/nautilus_dev/data/ccxt_catalog/open_interest/BTCUSDT-PERP.*; do\n    f=$(ls -t \"$d\"/*.parquet 2>/dev/null | head -1)\n    if [ -f \"$f\" ]; then\n        echo \"$(basename $d): $(stat -c '%y' \"$f\" | cut -d. -f1)\"\n    fi\ndone",
+      "description": "Check latest file timestamps"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T19:01:53.301631",
+      "command": "tail -30 /tmp/ccxt_daemon.log",
+      "description": "Check latest logs"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T19:02:00.732657",
+      "command": "python3 << 'SCRIPT'\nimport pandas as pd\nimport pyarrow.parquet as pq\n\n# Check OI data\noi_file = \"/media/sam/1TB/nautilus_dev/data/ccxt_catalog/open_interest/BTCUSDT-PERP.BINANCE/2026-01-06.parquet\"\ndf_oi = pd.read_parquet(oi_file)\nprint(\"Open Interest data (BTCUSDT-PERP.BINANCE):\")\nprint(df_oi.tail(3))\nprint(f\"Total rows: {len(df_oi)}\")\nprint()\n\n# Check funding rate data\nfr_file = \"/media/sam/1TB/nautilus_dev/data/ccxt_catalog/funding_rate/BTCUSDT-PERP.BINANCE/2026-01-06.parquet\"\ndf_fr = pd.read_parquet(fr_file)\nprint(\"Funding Rate data (BTCUSDT-PERP.BINANCE):\")\nprint(df_fr.tail(3))\nprint(f\"Total rows: {len(df_fr)}\")\nSCRIPT",
+      "description": "Verify parquet data content"
     }
   ],
-  "last_updated": "2026-01-06T18:41:24.080964"
+  "last_updated": "2026-01-06T19:02:00.732682"
 }

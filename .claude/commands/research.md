@@ -59,6 +59,106 @@ Create a download manifest:
 - Note: SSRN, JSTOR, Wiley often require institutional access
 - Consider open-access alternatives (preprints, author websites)
 
+### Step 2.6: Paper Renaming (MANDATORY)
+
+**CRITICAL**: Rename downloaded papers to standardized kebab-case format for discoverability.
+
+**Folder Structure**:
+```
+docs/research/papers/
+├── spec-032/                    # Papers for spec-032
+│   ├── 2021-russo-adaptive-discounted-thompson.pdf
+│   └── 2019-agrawal-thompson-sampling-contextual.pdf
+├── spec-033/                    # Papers for spec-033
+│   └── 2020-zhang-momentum-factor.pdf
+└── general/                     # Papers not tied to a spec
+    └── 2018-smith-market-microstructure.pdf
+```
+
+**File Naming Convention**:
+```
+{year}-{first_author_lastname}-{short_title_kebab}.pdf
+```
+
+**Examples**:
+- `2106.12345.pdf` → `spec-032/2021-russo-adaptive-discounted-thompson.pdf`
+- `10.1016_j.jfin.2023.pdf` → `general/2023-zhang-momentum-factor-crypto.pdf`
+
+**Folder Rules**:
+- If `/research` is called with spec context → save to `papers/spec-{NNN}/`
+- If no spec context → save to `papers/general/`
+- Create folder if it doesn't exist
+
+**Renaming Rules**:
+1. Extract year from paper metadata (publication_date or arxiv_id prefix)
+2. Extract first author's lastname (lowercase, no accents)
+3. Create short title: first 5-6 keywords, lowercase, hyphen-separated
+4. Remove special characters, keep only `[a-z0-9-]`
+5. Max 60 characters total (truncate title if needed)
+
+**Implementation** (after each download):
+```python
+import re
+from pathlib import Path
+
+PAPERS_BASE = Path("/media/sam/1TB/nautilus_dev/docs/research/papers")
+
+def standardize_paper_name(
+    original_path: str,
+    metadata: dict,
+    spec_id: str | None = None
+) -> str:
+    """Rename and move paper to standardized location.
+
+    Args:
+        original_path: Path to downloaded PDF
+        metadata: Paper metadata (year, authors, title)
+        spec_id: Optional spec number (e.g., "032") for folder organization
+
+    Returns:
+        New path to the renamed/moved paper
+    """
+    year = metadata.get("year", "unknown")
+    authors = metadata.get("authors", ["unknown"])
+    first_author = authors[0].split()[-1].lower() if authors else "unknown"
+    # Remove accents: é→e, ü→u, etc.
+    first_author = first_author.encode('ascii', 'ignore').decode()
+    title = metadata.get("title", "untitled")
+
+    # Create kebab-case short title (5 words max)
+    title_clean = re.sub(r'[^a-z0-9\s]', '', title.lower())
+    title_words = title_clean.split()[:5]
+    title_kebab = '-'.join(title_words)
+
+    # Build filename (no spec prefix - folder handles that)
+    filename = f"{year}-{first_author}-{title_kebab}"[:56] + ".pdf"
+
+    # Determine target folder
+    if spec_id:
+        target_dir = PAPERS_BASE / f"spec-{spec_id}"
+    else:
+        target_dir = PAPERS_BASE / "general"
+
+    # Create folder if needed
+    target_dir.mkdir(parents=True, exist_ok=True)
+
+    # Move and rename file
+    old_path = Path(original_path)
+    new_path = target_dir / filename
+    if old_path.exists():
+        old_path.rename(new_path)
+
+    return str(new_path)
+```
+
+**Update manifest with folder paths**:
+```markdown
+| Paper ID | Title | Source | Status | Path |
+|----------|-------|--------|--------|------|
+| arxiv:2106.12345 | Adaptive Thompson... | arXiv | ✅ Downloaded | papers/spec-032/2021-russo-adaptive-thompson.pdf |
+| arxiv:1904.56789 | General Trading... | arXiv | ✅ Downloaded | papers/general/2019-smith-general-trading-theory.pdf |
+```
+
 ### Step 3: Paper Analysis
 
 For each paper found, extract:

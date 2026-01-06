@@ -479,6 +479,7 @@ grep -r "breaking\|deprecated" docs/nautilus/ --include="*.md"
 - Execute tests directly (use test-runner agent)
 
 #### ALWAYS
+- **Check library documentation BEFORE implementing** - When using external libraries (CCXT, pandas, redis, etc.), ALWAYS search for latest docs via WebSearch/Context7 to verify API behavior and best practices. Don't assume - verify!
 - Search docs first (Context7, Discord)
 - Use native Rust indicators
 - Run tests via test-runner agent
