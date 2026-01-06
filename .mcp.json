@@ -17,6 +17,16 @@
       "args": ["-m", "paper_search_mcp.server"],
       "description": "Multi-source paper search (arXiv, PubMed, bioRxiv, Semantic Scholar, CrossRef)",
       "enabled": true
+    },
+    "wolframalpha": {
+      "command": "node",
+      "args": ["/media/sam/1TB/mcpservers/wolframalpha-llm-mcp/build/index.js"],
+      "env": {
+        "WOLFRAM_LLM_APP_ID": "VYR43J-GW3TWJ9G3K"
+      },
+      "description": "Mathematical computation, formula validation, symbolic math (WolframAlpha LLM API)",
+      "enabled": true,
+      "autoApprove": ["ask_llm", "get_simple_answer", "validate_key"]
     }
   }
 }

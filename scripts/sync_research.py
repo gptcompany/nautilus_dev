@@ -1,20 +1,27 @@
 #!/usr/bin/env python3
 """
-Sync strategy entities from academic_research to nautilus_dev.
+Sync research entities from academic_research to nautilus_dev.
 
-This script extracts strategy__ entities from the academic_research memory.json
-and syncs them to nautilus_dev/docs/research/strategies.json.
+This script extracts strategy__ and formula__ entities from the academic_research
+memory.json and syncs them to nautilus_dev/docs/research/.
+
+Synced entity types:
+- strategy__  → strategies.json  (trading strategies from papers)
+- formula__   → formulas.json    (mathematical formulas extracted from papers)
 
 Features:
-- Entity extraction with strategy__ prefix filter
+- Multi-entity type support
+- Entity extraction with prefix filter
 - Staleness detection via timestamp comparison
 - JSON output with sync metadata
 - Dry-run mode for testing
 
 Usage:
-    python scripts/sync_research.py              # Normal sync
+    python scripts/sync_research.py              # Normal sync (all types)
     python scripts/sync_research.py --dry-run    # Preview changes
     python scripts/sync_research.py --force      # Force sync even if fresh
+    python scripts/sync_research.py --type strategy  # Sync only strategies
+    python scripts/sync_research.py --type formula   # Sync only formulas
 """
 
 from __future__ import annotations
@@ -30,9 +37,22 @@ from typing import Any
 # Configuration
 CONFIG = {
     "source": Path("/media/sam/1TB/academic_research/memory.json"),
-    "target": Path("/media/sam/1TB/nautilus_dev/docs/research/strategies.json"),
-    "entity_prefix": "strategy__",
+    "target_dir": Path("/media/sam/1TB/nautilus_dev/docs/research"),
     "stale_threshold_hours": 24,
+}
+
+# Entity types to sync
+ENTITY_TYPES = {
+    "strategy": {
+        "prefix": "strategy__",
+        "target_file": "strategies.json",
+        "description": "Trading strategies from academic papers",
+    },
+    "formula": {
+        "prefix": "formula__",
+        "target_file": "formulas.json",
+        "description": "Mathematical formulas extracted from papers",
+    },
 }
 
 
@@ -140,22 +160,72 @@ def write_sync_output(output: dict[str, Any], path: Path) -> bool:
         return False
 
 
-def print_strategy_summary(strategies: list[dict[str, Any]]) -> None:
-    """Print summary of strategies."""
-    if not strategies:
-        print("No strategy__ entities found.")
+def print_entity_summary(entities: list[dict[str, Any]], entity_type: str) -> None:
+    """Print summary of entities."""
+    prefix = ENTITY_TYPES[entity_type]["prefix"]
+    if not entities:
+        print(f"No {prefix} entities found.")
         return
 
-    print(f"\nFound {len(strategies)} strategy__ entities:")
-    for s in strategies:
-        entity_id = s.get("id", "unknown")
-        name = s.get("name", "Unnamed")
+    print(f"\nFound {len(entities)} {prefix} entities:")
+    for e in entities[:10]:  # Show max 10
+        entity_id = e.get("id", "unknown")
+        name = e.get("name", "Unnamed")
         print(f"  - {entity_id}: {name}")
+    if len(entities) > 10:
+        print(f"  ... and {len(entities) - 10} more")
+
+
+def sync_entity_type(
+    entity_type: str,
+    memory: dict[str, Any],
+    target_dir: Path,
+    force: bool,
+    dry_run: bool,
+) -> bool:
+    """Sync a specific entity type. Returns True on success."""
+    type_config = ENTITY_TYPES[entity_type]
+    prefix = type_config["prefix"]
+    target_file = target_dir / type_config["target_file"]
+
+    print(f"\n--- Syncing {entity_type} ({prefix}) ---")
+
+    # Load existing sync
+    existing = load_existing_sync(target_file)
+
+    # Check staleness
+    stale = is_stale(existing, CONFIG["stale_threshold_hours"])
+
+    if existing:
+        synced_at = existing.get("synced_at", "unknown")
+        count = existing.get("count", 0)
+        print(f"Existing: {synced_at} ({count} entities)")
+
+    if not stale and not force:
+        print("Fresh, skipping. Use --force to override.")
+        return True
+
+    # Extract entities
+    entities = extract_strategies(memory, prefix)
+    print_entity_summary(entities, entity_type)
+
+    # Create output
+    output = create_sync_output(entities, CONFIG["source"])
+
+    if dry_run:
+        print(f"[DRY RUN] Would write {len(entities)} to {target_file}")
+        return True
+
+    # Write output
+    if write_sync_output(output, target_file):
+        print(f"Synced {len(entities)} {prefix} entities!")
+        return True
+    return False
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Sync strategy entities from academic_research to nautilus_dev"
+        description="Sync research entities from academic_research to nautilus_dev"
     )
     parser.add_argument(
         "--dry-run",
@@ -168,61 +238,47 @@ def main() -> None:
         help="Force sync even if not stale",
     )
     parser.add_argument(
+        "--type",
+        choices=list(ENTITY_TYPES.keys()),
+        help="Sync only specific entity type (default: all)",
+    )
+    parser.add_argument(
         "--source",
         type=Path,
         default=CONFIG["source"],
         help="Source memory.json path",
-    )
-    parser.add_argument(
-        "--target",
-        type=Path,
-        default=CONFIG["target"],
-        help="Target strategies.json path",
     )
 
     args = parser.parse_args()
 
     print("=== Research Sync ===")
     print(f"Source: {args.source}")
-    print(f"Target: {args.target}")
+    print(f"Target dir: {CONFIG['target_dir']}")
 
-    # Load existing sync
-    existing = load_existing_sync(args.target)
+    # Determine which types to sync
+    types_to_sync = [args.type] if args.type else list(ENTITY_TYPES.keys())
+    print(f"Entity types: {', '.join(types_to_sync)}")
 
-    # Check staleness
-    stale = is_stale(existing, CONFIG["stale_threshold_hours"])
-
-    if existing:
-        synced_at = existing.get("synced_at", "unknown")
-        count = existing.get("count", 0)
-        print(f"\nExisting sync: {synced_at} ({count} strategies)")
-        print(f"Stale: {stale}")
-
-    if not stale and not args.force:
-        print("\nSync is fresh, skipping. Use --force to override.")
-        return
-
-    # Load memory and extract strategies
+    # Load memory once
     print("\nLoading memory.json...")
     memory = load_memory(args.source)
 
-    strategies = extract_strategies(memory, CONFIG["entity_prefix"])
-    print_strategy_summary(strategies)
+    # Sync each entity type
+    success = True
+    for entity_type in types_to_sync:
+        if not sync_entity_type(
+            entity_type=entity_type,
+            memory=memory,
+            target_dir=CONFIG["target_dir"],
+            force=args.force,
+            dry_run=args.dry_run,
+        ):
+            success = False
 
-    # Create output
-    output = create_sync_output(strategies, args.source)
-
-    if args.dry_run:
-        print("\n[DRY RUN] Would write:")
-        print(json.dumps(output, indent=2)[:500] + "...")
-        return
-
-    # Write output
-    print(f"\nWriting to {args.target}...")
-    if write_sync_output(output, args.target):
-        print(f"Synced {len(strategies)} strategies successfully!")
-    else:
+    if not success:
         sys.exit(1)
+
+    print("\n=== Sync Complete ===")
 
 
 if __name__ == "__main__":
