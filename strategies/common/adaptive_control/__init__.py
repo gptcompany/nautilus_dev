@@ -84,6 +84,12 @@ from .particle_portfolio import (
     Particle,
     PortfolioState,
 )
+from .correlation_tracker import (
+    OnlineCorrelationMatrix,
+    OnlineStats,
+    CorrelationMetrics,
+    calculate_covariance_penalty,
+)
 from .meta_portfolio import (
     MetaPortfolio,
     BacktestMatrix,
@@ -171,6 +177,11 @@ __all__ = [
     "BayesianEnsemble",
     "Particle",
     "PortfolioState",
+    # CSRC Correlation Tracking (Spec 031)
+    "OnlineCorrelationMatrix",
+    "OnlineStats",
+    "CorrelationMetrics",
+    "calculate_covariance_penalty",
     # Meta-Portfolio (backtest matrix + production ensemble)
     "MetaPortfolio",
     "BacktestMatrix",
