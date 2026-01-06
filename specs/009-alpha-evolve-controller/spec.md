@@ -169,3 +169,181 @@ As a user, I need to organize evolution runs into named experiments so that I ca
 - Real-time visualization (see spec-010 for dashboard)
 - Automatic hyperparameter tuning
 - Strategy ensembling or combination
+
+---
+
+## Future Enhancements (Black Book Concepts)
+
+> **Source**: "The Black Book of Financial Hacking" - J.C. Lotter
+> **Philosophy**: Add complexity ONLY if OOS shows problems.
+
+### FE-001: Adaptive Mutation Rate Control
+
+**Current**: Fixed elite/exploit/explore ratios (10%/70%/20%)
+
+**Enhancement**: Dynamic adjustment based on population diversity and progress
+
+```python
+class AdaptiveMutationController:
+    """
+    Adjust mutation strategy based on evolution health metrics.
+    """
+    def select_mutation_mode(self, population, history):
+        # Calculate diversity (0-1 scale)
+        diversity = self.calculate_code_diversity(population)
+
+        # Calculate progress (fitness improvement rate)
+        recent_gains = history[-10:]  # Last 10 generations
+        progress = np.mean([g.best_fitness - g_prev.best_fitness
+                           for g, g_prev in zip(recent_gains[1:], recent_gains)])
+
+        # Low diversity + no progress = increase exploration
+        if diversity < 0.2 and progress < 0.01:
+            return {'elite': 0.05, 'exploit': 0.45, 'explore': 0.50}
+
+        # High diversity + good progress = increase exploitation
+        elif diversity > 0.6 and progress > 0.05:
+            return {'elite': 0.20, 'exploit': 0.75, 'explore': 0.05}
+
+        # Default
+        else:
+            return {'elite': 0.10, 'exploit': 0.70, 'explore': 0.20}
+```
+
+**Trigger**: When evolution plateaus (no improvement for 50+ generations) or converges too quickly
+
+**Trade-off**: Requires diversity metric (code diff? AST distance?), more complex tuning
+
+**Reference**: Eiben et al. (1999) "Parameter Control in Evolutionary Algorithms"
+
+### FE-002: Prompt Engineering Evolution
+
+**Current**: Static mutation prompts
+
+**Enhancement**: Evolve prompts based on mutation success rate
+
+```python
+class PromptEvolution:
+    """
+    Meta-learning for mutation prompts.
+
+    Track which prompt styles produce best mutations.
+    """
+    def __init__(self):
+        self.prompt_templates = [
+            "Improve entry signals to reduce false positives",
+            "Optimize exit timing to capture larger moves",
+            "Add regime filter to avoid choppy markets",
+            "Simplify logic to reduce overfitting"
+        ]
+        self.prompt_scores = [0.0] * len(self.prompt_templates)
+
+    def select_prompt(self):
+        # Thompson sampling for prompt selection
+        samples = [np.random.beta(1 + score, 1) for score in self.prompt_scores]
+        return self.prompt_templates[np.argmax(samples)]
+
+    def update_prompt_score(self, prompt_idx, child_fitness, parent_fitness):
+        improvement = child_fitness - parent_fitness
+        # Reward prompt if child improved
+        self.prompt_scores[prompt_idx] += improvement
+```
+
+**Trigger**: When mutation success rate is low (<30% produce better strategies)
+
+**Trade-off**: Requires tracking prompt→outcome, but improves mutation quality over time
+
+**Reference**: Black Book - "Evolve the evolution process itself"
+
+### FE-003: Ensemble Strategy Selection
+
+**Current**: Single best strategy from hall-of-fame
+
+**Enhancement**: Deploy ensemble of top-k strategies with voting
+
+```python
+class EnsembleSelector:
+    """
+    Instead of single best, use ensemble for robustness.
+    """
+    def select_ensemble(self, hall_of_fame, k=5):
+        # Get top-k strategies with low correlation
+        top_strategies = hall_of_fame.top_k(k=20)
+
+        # Calculate pairwise correlation of equity curves
+        correlations = self.calculate_equity_correlation(top_strategies)
+
+        # Select k strategies that maximize diversity
+        ensemble = []
+        ensemble.append(top_strategies[0])  # Best strategy
+
+        for _ in range(k - 1):
+            # Add strategy with lowest avg correlation to ensemble
+            candidates = [s for s in top_strategies if s not in ensemble]
+            best_candidate = min(
+                candidates,
+                key=lambda s: np.mean([correlations[s, e] for e in ensemble])
+            )
+            ensemble.append(best_candidate)
+
+        return ensemble
+```
+
+**Trigger**: When single best strategy has high variance or fails in live trading
+
+**Trade-off**: More complex deployment (multiple strategies), but more robust
+
+**Reference**: Black Book - "Ensembles reduce model risk"
+
+### FE-004: Novelty Search
+
+**Current**: Fitness-only selection
+
+**Enhancement**: Reward novel strategies even if not immediately high-fitness
+
+```python
+class NoveltySearch:
+    """
+    Maintain archive of novel behaviors to prevent convergence.
+    """
+    def __init__(self, k_neighbors=15):
+        self.archive = []
+        self.k_neighbors = k_neighbors
+
+    def novelty_score(self, strategy):
+        """
+        Novelty = average distance to k-nearest neighbors in behavior space.
+
+        Behavior space: equity curve shape, trade frequency, holding time, etc.
+        """
+        if len(self.archive) < self.k_neighbors:
+            return float('inf')  # Everything is novel initially
+
+        behavior = self.extract_behavior(strategy)
+        distances = [self.behavior_distance(behavior, archived)
+                    for archived in self.archive]
+        k_nearest = sorted(distances)[:self.k_neighbors]
+        return np.mean(k_nearest)
+
+    def combined_fitness(self, strategy, alpha=0.5):
+        """
+        Combine fitness and novelty.
+
+        fitness_combined = alpha * fitness + (1-alpha) * novelty
+        """
+        return alpha * strategy.fitness + (1 - alpha) * self.novelty_score(strategy)
+```
+
+**Trigger**: When evolution converges to local optimum (all strategies similar)
+
+**Trade-off**: Requires behavior extraction and distance metric, slower convergence
+
+**Reference**: Lehman & Stanley (2011) "Abandoning Objectives: Evolution Through the Search for Novelty Alone"
+
+---
+
+**Decision Log** (2026-01-06):
+- Fixed mutation ratios chosen for MVP simplicity
+- Static mutation prompts (no meta-learning yet)
+- Single best strategy selection
+- Black Book enhancements documented for plateaus and convergence issues
