@@ -13,17 +13,22 @@ This module provides:
 2. ThompsonSelector: Thompson Sampling for strategy selection
 3. BayesianEnsemble: Combines both for robust portfolio
 
-Philosophy (I Cinque Pilastri):
+Philosophy (I Quattro Pilastri):
 1. Probabilistico - Distributions, not point estimates
 2. Non Lineare - Non-linear weight updates
 3. Non Parametrico - Adapts to data
 4. Scalare - Works with any number of strategies
-5. Leggi Naturali - Like evolution, survives what works
+
+CSRC Integration (Spec 031):
+- Correlation-aware allocation via covariance penalty
+- Penalizes over-allocation to correlated strategies
+- Optional: Pass correlation_tracker and lambda_penalty to enable
 
 Reference:
 - Doucet et al. (2001): Sequential Monte Carlo Methods
 - Thompson (1933): On the Likelihood that One Unknown Probability Exceeds Another
 - Arulampalam et al. (2002): A Tutorial on Particle Filters
+- Varlashova & Bilokon (2025): Covariance-penalized portfolio optimization
 """
 
 from __future__ import annotations
@@ -34,7 +39,9 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING, Dict, List, Optional, Tuple
 
 if TYPE_CHECKING:
-    pass
+    from strategies.common.adaptive_control.correlation_tracker import (
+        CorrelationMetrics,
+    )
 
 
 @dataclass
@@ -61,6 +68,8 @@ class PortfolioState:
     weight_uncertainty: Dict[str, float]  # Uncertainty per strategy
     effective_particles: float  # Effective sample size
     resampled: bool  # Was resampling triggered?
+    # CSRC (Spec 031): Correlation metrics for observability
+    correlation_metrics: Optional["CorrelationMetrics"] = None
 
 
 class ParticlePortfolio:
@@ -101,6 +110,9 @@ class ParticlePortfolio:
         resampling_threshold: float = 0.5,
         mutation_std: float = 0.1,
         audit_emitter: "AuditEventEmitter | None" = None,
+        # CSRC (Spec 031): Correlation-aware allocation parameters
+        correlation_tracker: "OnlineCorrelationMatrix | None" = None,
+        lambda_penalty: float = 1.0,
     ):
         """
         Args:
@@ -109,6 +121,15 @@ class ParticlePortfolio:
             resampling_threshold: ESS ratio below which to resample
             mutation_std: Standard deviation for weight mutations
             audit_emitter: Optional audit emitter for logging signals
+            correlation_tracker: Optional OnlineCorrelationMatrix for CSRC (Spec 031).
+                                 If provided, enables correlation-aware allocation.
+            lambda_penalty: Covariance penalty strength (default: 1.0, range: [0.0, 5.0]).
+                            Higher = stronger diversification pressure.
+                            - 0.0: No penalty (baseline behavior)
+                            - 0.5: Mild diversification
+                            - 1.0: Balanced (default)
+                            - 2.0: Strong diversification
+                            - 5.0: Aggressive diversification
         """
         self.strategies = strategies
         self.n_particles = n_particles
@@ -117,6 +138,15 @@ class ParticlePortfolio:
 
         # Audit emitter for logging signals and resampling events (Spec 030)
         self._audit_emitter = audit_emitter
+
+        # CSRC (Spec 031): Correlation tracking for covariance penalty
+        self._correlation_tracker = correlation_tracker
+        self._lambda_penalty = lambda_penalty
+
+        # Strategy indices for penalty calculation
+        self._strategy_indices: Dict[str, int] = {
+            s: i for i, s in enumerate(strategies)
+        }
 
         # Initialize particles with random weights
         self.particles: List[Particle] = []
@@ -130,12 +160,26 @@ class ParticlePortfolio:
         """
         Update particle weights based on observed returns.
 
+        CSRC Integration (Spec 031):
+        If correlation_tracker is configured, this method:
+        1. Updates the correlation tracker with current returns
+        2. Applies covariance penalty to each particle's fitness:
+           adjusted_fitness = portfolio_return - lambda * covariance_penalty
+        3. Includes correlation_metrics in returned PortfolioState
+
         Args:
             strategy_returns: Dict of strategy -> return this period
 
         Returns:
-            PortfolioState with consensus weights and uncertainty
+            PortfolioState with consensus weights, uncertainty, and correlation_metrics
         """
+        # CSRC (Spec 031): Update correlation tracker with new returns
+        correlation_metrics = None
+        corr_matrix = None
+        if self._correlation_tracker is not None:
+            self._correlation_tracker.update(strategy_returns)
+            corr_matrix = self._correlation_tracker.get_correlation_matrix()
+
         # 1. Update particle weights based on likelihood
         for particle in self.particles:
             # Calculate portfolio return for this particle
@@ -147,7 +191,22 @@ class ParticlePortfolio:
             # Likelihood: higher return = higher weight
             # Using exponential likelihood (like softmax)
             particle.fitness = portfolio_return
-            particle.log_weight += portfolio_return  # Accumulate log-likelihood
+
+            # CSRC (Spec 031): Apply covariance penalty to fitness
+            # reward = sharpe - lambda * covariance_penalty
+            if self._correlation_tracker is not None and self._lambda_penalty > 0:
+                from strategies.common.adaptive_control.correlation_tracker import (
+                    calculate_covariance_penalty,
+                )
+
+                penalty = calculate_covariance_penalty(
+                    weights=particle.weights,
+                    corr_matrix=corr_matrix,
+                    strategy_indices=self._strategy_indices,
+                )
+                particle.fitness -= self._lambda_penalty * penalty
+
+            particle.log_weight += particle.fitness  # Accumulate log-likelihood
 
         # 2. Normalize weights
         max_log_weight = max(p.log_weight for p in self.particles)
@@ -206,11 +265,16 @@ class ParticlePortfolio:
         for s in self.strategies:
             uncertainty[s] = math.sqrt(uncertainty[s])
 
+        # CSRC (Spec 031): Get correlation metrics for observability
+        if self._correlation_tracker is not None:
+            correlation_metrics = self._correlation_tracker.get_metrics(consensus)
+
         state = PortfolioState(
             strategy_weights=consensus,
             weight_uncertainty=uncertainty,
             effective_particles=ess,
             resampled=resampled,
+            correlation_metrics=correlation_metrics,
         )
 
         # Audit: Log consensus signal
@@ -234,6 +298,22 @@ class ParticlePortfolio:
                 strategy_source=f"particle_portfolio:{dominant_strategy}",
                 source="particle_portfolio",
             )
+
+            # CSRC (Spec 031): Emit correlation metrics to audit trail
+            if correlation_metrics is not None:
+                from strategies.common.audit.events import AuditEventType
+
+                self._audit_emitter.emit_system(
+                    event_type=AuditEventType.SYS_CORRELATION_UPDATE,
+                    source="particle_portfolio",
+                    payload={
+                        "herfindahl_index": correlation_metrics.herfindahl_index,
+                        "effective_n_strategies": correlation_metrics.effective_n_strategies,
+                        "max_pairwise_correlation": correlation_metrics.max_pairwise_correlation,
+                        "avg_correlation": correlation_metrics.avg_correlation,
+                        "lambda_penalty": self._lambda_penalty,
+                    },
+                )
 
         return state
 
@@ -291,6 +371,27 @@ class ParticlePortfolio:
     def audit_emitter(self, emitter: "AuditEventEmitter | None") -> None:
         """Set the audit emitter."""
         self._audit_emitter = emitter
+
+    # CSRC (Spec 031): Correlation tracking properties
+    @property
+    def correlation_tracker(self) -> "OnlineCorrelationMatrix | None":
+        """Correlation tracker for CSRC allocation."""
+        return self._correlation_tracker
+
+    @correlation_tracker.setter
+    def correlation_tracker(self, tracker: "OnlineCorrelationMatrix | None") -> None:
+        """Set the correlation tracker."""
+        self._correlation_tracker = tracker
+
+    @property
+    def lambda_penalty(self) -> float:
+        """Covariance penalty strength for CSRC."""
+        return self._lambda_penalty
+
+    @lambda_penalty.setter
+    def lambda_penalty(self, value: float) -> None:
+        """Set the covariance penalty strength."""
+        self._lambda_penalty = value
 
 
 @dataclass

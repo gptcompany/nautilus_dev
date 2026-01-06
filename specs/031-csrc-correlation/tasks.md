@@ -39,8 +39,8 @@
 - [X] T007 [E] Implement Ledoit-Wolf shrinkage function `_apply_shrinkage()` in `strategies/common/adaptive_control/correlation_tracker.py`
 - [X] T008 Implement `OnlineCorrelationMatrix.update(returns: Dict[str, float])` using EMA for covariance updates in `strategies/common/adaptive_control/correlation_tracker.py`
 - [X] T009 Implement `get_correlation_matrix() -> np.ndarray` returning shrunk N×N matrix in `strategies/common/adaptive_control/correlation_tracker.py`
-- [ ] T010 Write unit tests for `OnlineCorrelationMatrix` initialization in `tests/unit/test_correlation_tracker.py`
-- [ ] T011 Write unit tests for correlation convergence (synthetic data, known correlation 0.9, verify within 5% after 150 samples) in `tests/unit/test_correlation_tracker.py`
+- [X] T010 Write unit tests for `OnlineCorrelationMatrix` initialization in `tests/unit/test_correlation_tracker.py`
+- [X] T011 Write unit tests for correlation convergence (synthetic data, known correlation 0.9, verify within 5% after 150 samples) in `tests/unit/test_correlation_tracker.py`
 
 **Checkpoint**: Foundation ready - OnlineCorrelationMatrix can track correlations. User story implementation can begin.
 

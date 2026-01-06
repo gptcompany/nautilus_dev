@@ -279,7 +279,140 @@
       "timestamp": "2026-01-06T12:46:53.938391",
       "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run pytest tests/unit/test_correlation_tracker.py -v 2>&1",
       "description": "Run correlation tracker unit tests"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-06T12:47:19.152507",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/031-csrc-correlation/tasks.md",
+      "old_string": "- [ ] T010 Write unit tests for `OnlineCorrelationMatrix` initialization in `tests/unit/test_correla..."
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-06T12:47:24.426163",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/adaptive_control/particle_portfolio.py"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-06T12:47:46.902233",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/adaptive_control/particle_portfolio.py",
+      "old_string": "\"\"\"\nParticle-Based Portfolio Selection\n\nFor selecting and weighting strategies/signals in a robust w..."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-06T12:47:52.970465",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/adaptive_control/particle_portfolio.py",
+      "old_string": "@dataclass\nclass PortfolioState:\n    \"\"\"Current state of the particle portfolio.\"\"\"\n\n    strategy_we..."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-06T12:47:58.495589",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/adaptive_control/particle_portfolio.py",
+      "old_string": "from __future__ import annotations\n\nimport math\nimport random\nfrom dataclasses import dataclass\nfrom..."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-06T12:48:11.094610",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/adaptive_control/particle_portfolio.py",
+      "old_string": "    def __init__(\n        self,\n        strategies: List[str],\n        n_particles: int = 100,\n     ..."
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-06T12:48:18.522037",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/adaptive_control/particle_portfolio.py"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-06T12:48:30.264586",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/adaptive_control/particle_portfolio.py",
+      "old_string": "    def update(self, strategy_returns: Dict[str, float]) -> PortfolioState:\n        \"\"\"\n        Upda..."
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-06T12:48:36.520735",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/adaptive_control/particle_portfolio.py"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-06T12:48:42.128786",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/adaptive_control/particle_portfolio.py",
+      "old_string": "        for s in self.strategies:\n            uncertainty[s] = math.sqrt(uncertainty[s])\n\n        st..."
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-06T12:48:50.107497",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/adaptive_control/particle_portfolio.py"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-06T12:48:58.787472",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/adaptive_control/particle_portfolio.py",
+      "old_string": "        # Audit: Log consensus signal\n        if self._audit_emitter:\n            # Calculate overal..."
+    },
+    {
+      "operation": "grep",
+      "timestamp": "2026-01-06T12:49:06.655090",
+      "pattern": "class AuditEventType",
+      "path": "/media/sam/1TB/nautilus_dev/strategies/common/audit",
+      "output_mode": "files_with_matches"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-06T12:49:10.456585",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/audit/events.py"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-06T12:49:15.993251",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/audit/events.py",
+      "old_string": "    # System events\n    SYS_EVOLUTION_TRIGGER = \"sys.evolution_trigger\"\n    SYS_REGIME_CHANGE = \"sys..."
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-06T12:49:20.797226",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/adaptive_control/particle_portfolio.py"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-06T12:49:29.944011",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/adaptive_control/particle_portfolio.py",
+      "old_string": "    @property\n    def audit_emitter(self) -> \"AuditEventEmitter | None\":\n        \"\"\"Audit emitter fo..."
+    },
+    {
+      "operation": "write",
+      "timestamp": "2026-01-06T12:50:27.602551",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/integration/test_csrc_walk_forward.py",
+      "content_length": 14698
+    },
+    {
+      "operation": "task",
+      "timestamp": "2026-01-06T12:50:36.653972",
+      "subagent_type": "test-runner",
+      "prompt": "Run the full CSRC test suite:\n\n```bash\ncd /media/sam/1TB/nautilus_dev\nsource /media/sam/2TB-NVMe/pro..."
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T12:50:41.215767",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run pytest tests/unit/test_correlation_tracker.py tests/integration/test_csrc_walk_forward.py -v --tb=short 2>&1 | head -200",
+      "description": "Run CSRC test suite with verbose output"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T12:50:52.054808",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -c \"import nautilus_trader; print(f'nautilus_trader version: {nautilus_trader.__version__}')\"",
+      "description": "Check nautilus_trader import in virtual env"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T12:50:52.558467",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && pytest tests/unit/test_correlation_tracker.py tests/integration/test_csrc_walk_forward.py -v --tb=short 2>&1 | head -200",
+      "description": "Run CSRC tests with pytest directly"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T12:51:00.843232",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && PYTHONPATH=/media/sam/1TB/nautilus_dev:$PYTHONPATH python -m pytest tests/unit/test_correlation_tracker.py tests/integration/test_csrc_walk_forward.py -v --tb=short 2>&1 | head -200",
+      "description": "Run CSRC tests with PYTHONPATH set"
     }
   ],
-  "last_updated": "2026-01-06T12:46:53.938408"
+  "last_updated": "2026-01-06T12:51:00.843252"
 }

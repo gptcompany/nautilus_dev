@@ -46,6 +46,7 @@ class AuditEventType(str, Enum):
     SYS_EVOLUTION_TRIGGER = "sys.evolution_trigger"
     SYS_REGIME_CHANGE = "sys.regime_change"
     SYS_RESAMPLING = "sys.resampling"
+    SYS_CORRELATION_UPDATE = "sys.correlation_update"  # CSRC (Spec 031)
 
 
 def _now_ns() -> int:
