@@ -14,7 +14,7 @@ from __future__ import annotations
 
 import json
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Iterator
 
@@ -83,11 +83,12 @@ class ParquetConverter:
             logger.warning(f"No events in {jsonl_file}")
             return None
 
-        # Group events by date
+        # Group events by date (using UTC to ensure consistent partitioning)
         events_by_date: dict[str, list[dict]] = {}
         for event in events:
             ts_ns = event.get("ts_event", 0)
-            dt = datetime.fromtimestamp(ts_ns / 1_000_000_000)
+            # Use UTC timezone for consistent date partitioning across systems
+            dt = datetime.fromtimestamp(ts_ns / 1_000_000_000, tz=timezone.utc)
             date_key = dt.strftime("%Y/%m/%d")
 
             if date_key not in events_by_date:

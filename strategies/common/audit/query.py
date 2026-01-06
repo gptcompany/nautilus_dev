@@ -20,6 +20,23 @@ from typing import Any
 logger = logging.getLogger(__name__)
 
 
+def _sanitize_sql_string(value: str) -> str:
+    """Sanitize a string value for safe SQL interpolation.
+
+    Escapes single quotes to prevent SQL injection attacks.
+
+    Args:
+        value: The string value to sanitize.
+
+    Returns:
+        Sanitized string safe for SQL interpolation.
+    """
+    if not isinstance(value, str):
+        raise ValueError(f"Expected string, got {type(value).__name__}")
+    # Escape single quotes by doubling them (standard SQL escaping)
+    return value.replace("'", "''")
+
+
 class AuditQuery:
     """Query interface for audit trail data.
 
@@ -105,10 +122,10 @@ class AuditQuery:
         """
 
         if event_type:
-            sql += f"\n  AND event_type = '{event_type}'"
+            sql += f"\n  AND event_type = '{_sanitize_sql_string(event_type)}'"
 
         if source:
-            sql += f"\n  AND source = '{source}'"
+            sql += f"\n  AND source = '{_sanitize_sql_string(source)}'"
 
         sql += f"\nORDER BY ts_event\nLIMIT {limit}"
 
@@ -216,7 +233,7 @@ class AuditQuery:
         SELECT *
         FROM read_parquet('{parquet_pattern}', union_by_name=true)
         WHERE event_type LIKE 'param.%'
-          AND param_name = '{param_name}'
+          AND param_name = '{_sanitize_sql_string(param_name)}'
         """
 
         if start_time:
@@ -264,15 +281,33 @@ class AuditQuery:
             "corrupted_events": [],
         }
 
+        # Base event field order as defined in AuditEvent (Pydantic model)
+        # The checksum is computed by Pydantic which outputs keys in definition order
+        base_field_order = ["ts_event", "event_type", "source", "trader_id", "sequence"]
+
         for event in events:
             stored_checksum = event.get("checksum")
             if not stored_checksum:
                 results["missing_checksums"] += 1
                 continue
 
-            # Recompute checksum
-            event_copy = {k: v for k, v in event.items() if k != "checksum"}
-            payload = json.dumps(event_copy, sort_keys=True)
+            # Recompute checksum - must match the format used by AuditEvent.checksum
+            # The original uses Pydantic's model_dump_json() which produces compact JSON
+            # without spaces and with keys in field definition order.
+            # Database queries may return columns in different order, so we must
+            # enforce the original field order for consistent checksums.
+            event_copy = {}
+            # First add base fields in correct order
+            for key in base_field_order:
+                if key in event and key != "checksum":
+                    event_copy[key] = event[key]
+            # Then add any additional fields (subclass-specific) in their order
+            for key, value in event.items():
+                if key not in event_copy and key != "checksum":
+                    event_copy[key] = value
+
+            # Use compact JSON without spaces (matches Pydantic's default)
+            payload = json.dumps(event_copy, separators=(",", ":"))
             computed = hashlib.sha256(payload.encode()).hexdigest()[:16]
 
             if computed == stored_checksum:

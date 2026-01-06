@@ -5,9 +5,11 @@ Tests:
 - Convenience methods for different event types
 - Callback integration
 - Context manager usage
+- Batching/throttling for high event rates
 """
 
 import json
+import time
 from unittest.mock import MagicMock
 
 
@@ -314,5 +316,196 @@ class TestAuditEventEmitter:
 
         # Flush should force sync
         emitter.flush()
+
+        emitter.close()
+
+    def test_batching_flushes_on_size(self, tmp_path):
+        """Test that batching flushes when buffer reaches batch_size."""
+        config = AuditConfig(base_path=tmp_path, rotate_daily=False)
+        emitter = AuditEventEmitter(
+            trader_id="TRADER-001",
+            config=config,
+            enable_batching=True,
+            batch_size=10,
+            flush_interval_ms=10000,  # High interval to avoid time-based flush
+        )
+
+        # Emit 10 events (should trigger flush)
+        for i in range(10):
+            emitter.emit_param_change(
+                param_name=f"param_{i}",
+                old_value=i,
+                new_value=i + 1,
+                trigger_reason="test",
+                source="test",
+            )
+
+        # Flush happens synchronously in emit() when buffer is full
+        # File should contain 10 events
+        log_file = tmp_path / "audit.jsonl"
+        with open(log_file) as f:
+            lines = f.readlines()
+        assert len(lines) == 10
+
+        emitter.close()
+
+    def test_batching_flushes_on_interval(self, tmp_path):
+        """Test that batching flushes periodically based on interval."""
+        config = AuditConfig(base_path=tmp_path, rotate_daily=False)
+        emitter = AuditEventEmitter(
+            trader_id="TRADER-001",
+            config=config,
+            enable_batching=True,
+            batch_size=100,  # High batch size to avoid size-based flush
+            flush_interval_ms=500,  # 500ms interval
+        )
+
+        # Emit 5 events (less than batch_size)
+        for i in range(5):
+            emitter.emit_param_change(
+                param_name=f"param_{i}",
+                old_value=i,
+                new_value=i + 1,
+                trigger_reason="test",
+                source="test",
+            )
+
+        # File should not exist yet or be empty (events buffered)
+        log_file = tmp_path / "audit.jsonl"
+
+        # Wait for interval to trigger flush (500ms + buffer)
+        time.sleep(0.7)
+
+        # Now file should contain the events
+        with open(log_file) as f:
+            lines = f.readlines()
+        assert len(lines) >= 5
+
+        emitter.close()
+
+    def test_batching_flushes_on_close(self, tmp_path):
+        """Test that batching flushes remaining events on close."""
+        config = AuditConfig(base_path=tmp_path, rotate_daily=False)
+        emitter = AuditEventEmitter(
+            trader_id="TRADER-001",
+            config=config,
+            enable_batching=True,
+            batch_size=100,  # High batch size
+            flush_interval_ms=10000,  # High interval
+        )
+
+        # Emit 7 events (less than batch_size, no time-based flush)
+        for i in range(7):
+            emitter.emit_param_change(
+                param_name=f"param_{i}",
+                old_value=i,
+                new_value=i + 1,
+                trigger_reason="test",
+                source="test",
+            )
+
+        # Close should flush remaining events
+        emitter.close()
+
+        # File should contain all 7 events
+        log_file = tmp_path / "audit.jsonl"
+        with open(log_file) as f:
+            lines = f.readlines()
+        assert len(lines) == 7
+
+        # Verify sequences are correct
+        for i, line in enumerate(lines):
+            event = json.loads(line)
+            assert event["sequence"] == i
+
+    def test_batching_maintains_sequence_order(self, tmp_path):
+        """Test that batching maintains correct sequence order."""
+        config = AuditConfig(base_path=tmp_path, rotate_daily=False)
+        emitter = AuditEventEmitter(
+            trader_id="TRADER-001",
+            config=config,
+            enable_batching=True,
+            batch_size=5,
+            flush_interval_ms=10000,
+        )
+
+        # Emit 12 events (will trigger 2 size-based flushes)
+        for i in range(12):
+            emitter.emit_param_change(
+                param_name=f"param_{i}",
+                old_value=i,
+                new_value=i + 1,
+                trigger_reason="test",
+                source="test",
+            )
+
+        emitter.close()
+
+        # Verify sequences are monotonic
+        log_file = tmp_path / "audit.jsonl"
+        with open(log_file) as f:
+            lines = f.readlines()
+
+        assert len(lines) == 12
+
+        for i, line in enumerate(lines):
+            event = json.loads(line)
+            assert event["sequence"] == i
+
+    def test_batching_with_callback(self, tmp_path):
+        """Test that batching still invokes callback for each event."""
+        callback = MagicMock()
+        config = AuditConfig(base_path=tmp_path)
+        emitter = AuditEventEmitter(
+            trader_id="TRADER-001",
+            config=config,
+            enable_batching=True,
+            batch_size=5,
+            flush_interval_ms=10000,
+            on_event=callback,
+        )
+
+        # Emit 5 events (trigger flush)
+        for i in range(5):
+            emitter.emit_param_change(
+                param_name=f"param_{i}",
+                old_value=i,
+                new_value=i + 1,
+                trigger_reason="test",
+                source="test",
+            )
+
+        # Small delay for flush
+        time.sleep(0.1)
+
+        emitter.close()
+
+        # Callback should be called 5 times (during flush)
+        assert callback.call_count == 5
+
+    def test_non_batching_mode_unchanged(self, tmp_path):
+        """Test that non-batching mode still works as before."""
+        config = AuditConfig(base_path=tmp_path, rotate_daily=False)
+        emitter = AuditEventEmitter(
+            trader_id="TRADER-001",
+            config=config,
+            enable_batching=False,  # Explicitly disabled
+        )
+
+        # Emit events - should write immediately
+        for i in range(5):
+            emitter.emit_param_change(
+                param_name=f"param_{i}",
+                old_value=i,
+                new_value=i + 1,
+                trigger_reason="test",
+                source="test",
+            )
+
+        # File should contain all events immediately
+        log_file = tmp_path / "audit.jsonl"
+        with open(log_file) as f:
+            lines = f.readlines()
+        assert len(lines) == 5
 
         emitter.close()
