@@ -626,7 +626,64 @@
       "timestamp": "2026-01-06T17:14:32.501067",
       "command": "git add -A && git status --short",
       "description": "Stage and check for changes"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T17:15:36.833925",
+      "command": "git checkout --theirs .claude/stats/session_metrics.jsonl .claude/stats/subagent_completions.jsonl && git add .claude/stats/ && git commit -m \"$(cat <<'EOF'\nMerge branch '032-adts-discounting' - Adaptive Discounted Thompson Sampling\n\nImplements Spec 032: Adaptive decay for ThompsonSelector based on market volatility.\n\nKey features:\n- AdaptiveDecayCalculator: decay = 0.99 - 0.04 * normalized_volatility\n- ThompsonSelector integration with IIRRegimeDetector\n- SYS_DECAY_UPDATE audit events for observability\n- Full test coverage (35 tests)\n\nAcademic foundation: Qi et al. (2023), de Freitas Fonseca et al. (2024)\nEOF\n)\"",
+      "description": "Resolve conflicts and complete merge"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T17:15:46.921024",
+      "command": "git push origin main 2>&1",
+      "description": "Push main to remote"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T17:15:57.445516",
+      "command": "git log --oneline -3 && echo \"---\" && git stash pop 2>/dev/null || echo \"No stash to pop\"",
+      "description": "Verify final state"
+    },
+    {
+      "operation": "websearch",
+      "timestamp": "2026-01-06T17:30:30.430186",
+      "query": "Dell Precision 5610 workstation NVMe SSD maximum capacity slots specifications 2024"
+    },
+    {
+      "operation": "websearch",
+      "timestamp": "2026-01-06T17:31:03.666968",
+      "query": "Dell Precision T5610 PCIe NVMe adapter M.2 upgrade compatibility"
+    },
+    {
+      "operation": "websearch",
+      "timestamp": "2026-01-06T17:41:28.471103",
+      "query": "Dell Precision T5610 PCIe slots configuration x16 x8 x4 expansion slots specifications"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T17:41:55.287051",
+      "command": "lspci -vvv | grep -E \"^[0-9]|Slot:|LnkCap:|LnkSta:\" | head -80",
+      "description": "Check PCIe slots and link status"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T17:42:06.127787",
+      "command": "echo \"=== DISPOSITIVI PCIe ATTUALMENTE INSTALLATI ===\" && lspci -v | grep -E \"^[0-9]|LnkSta:\" | grep -A1 \"^0[0-9]:\" && echo \"\" && echo \"=== NVMe GIA' PRESENTE ===\" && lspci -vvv -s 03:00.0 | grep -E \"LnkCap:|LnkSta:|Width|Speed\" && echo \"\" && echo \"=== STORAGE ATTUALE ===\" && lsblk -d -o NAME,SIZE,MODEL,TRAN | grep -v loop",
+      "description": "Check current PCIe devices and NVMe"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T17:42:19.729330",
+      "command": "echo \"=== NVMe ATTUALE ===\" && sudo nvme list 2>/dev/null || lsblk -d -o NAME,SIZE,MODEL,TRAN | grep nvme && echo \"\" && echo \"=== TUTTI I DISCHI ===\" && lsblk -d -o NAME,SIZE,MODEL,TRAN | grep -v loop && echo \"\" && echo \"=== SLOT PCIe LINK STATUS ===\" && for dev in 02:00.0 03:00.0 05:00.0; do echo \"--- $dev ---\"; lspci -vvv -s $dev 2>/dev/null | grep -E \"^[0-9]|LnkCap:|LnkSta:\" | head -5; done",
+      "description": "Get NVMe and PCIe link details"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T17:42:37.020216",
+      "command": "echo \"=== NVMe LINK SPEED ===\" && lspci -vvv -s 03:00.0 | grep -E \"LnkCap:|LnkSta:|Width|Speed|Non-Volatile\" && echo \"\" && echo \"=== GPU LINK ===\" && lspci -vvv -s 02:00.0 | grep -E \"LnkCap:|LnkSta:|VGA\" | head -5 && echo \"\" && echo \"=== SLOT FISICI DISPONIBILI ===\" && sudo dmidecode -t slot 2>/dev/null | grep -E \"Designation:|Type:|Current Usage:|Length:|Data Bus Width:\" || echo \"Serve sudo per dmidecode\"",
+      "description": "Check NVMe link speed and available slots"
     }
   ],
-  "last_updated": "2026-01-06T17:14:32.501089"
+  "last_updated": "2026-01-06T17:42:37.020238"
 }
