@@ -214,3 +214,123 @@ def generate_report(result: WalkForwardResult) -> str:
 - 100% of deployed strategies pass walk-forward
 - Robustness score > 60 for production strategies
 - Live performance within 20% of walk-forward test metrics
+
+---
+
+## Future Enhancements (Black Book Concepts)
+
+> **Source**: "The Black Book of Financial Hacking" - J.C. Lotter (Zorro Platform)
+> **Philosophy**: Aggiungi complessità SOLO se OOS mostra problemi con approccio attuale.
+
+### FE-001: Anchored vs Rolling Walk-Forward
+
+**Current**: Solo rolling window (finestra che scorre)
+
+**Enhancement**: Supportare anchored walk-forward (training sempre da inizio)
+
+```python
+# Rolling (current): training window slides
+Train: [====]      Test: [==]
+       [====]           [==]
+            [====]           [==]
+
+# Anchored: training sempre da start, cresce
+Train: [====]      Test: [==]
+       [======]         [==]
+       [========]            [==]
+```
+
+**Trigger**: Se rolling mostra instabilità tra windows, anchored può essere più stabile.
+
+**Trade-off**: Anchored usa più dati ma può soffrire di regime change vecchi.
+
+### FE-002: White's Reality Check (Multiple Testing)
+
+**Problem**: Testare N strategie → alcune passano per caso (data snooping)
+
+**Enhancement**: Bootstrap-based Reality Check per p-value corretto
+
+```python
+def whites_reality_check(strategies: list, benchmark_returns, n_bootstrap=1000):
+    """
+    Test if BEST strategy is significantly better than benchmark,
+    accounting for multiple testing.
+
+    Returns: p-value (< 0.05 = significant)
+    """
+    # Bootstrap distribution of max performance under null
+    null_max_dist = []
+    for _ in range(n_bootstrap):
+        shuffled = np.random.permutation(benchmark_returns)
+        max_perf = max(strategy.sharpe(shuffled) for strategy in strategies)
+        null_max_dist.append(max_perf)
+
+    # Compare actual best to null distribution
+    actual_best = max(s.sharpe(benchmark_returns) for s in strategies)
+    p_value = np.mean(null_max_dist >= actual_best)
+    return p_value
+```
+
+**Trigger**: Quando Alpha-Evolve genera molte varianti (>20), Reality Check previene selezione per fortuna.
+
+**Reference**: White (2000) "A Reality Check for Data Snooping"
+
+### FE-003: Combinatorial Purged Cross-Validation (CPCV)
+
+**Current**: Sequential walk-forward con embargo
+
+**Enhancement**: CPCV per più combinazioni di train/test splits
+
+```python
+# Current: 5 sequential windows
+# CPCV: C(N,K) combinazioni di windows
+
+# Esempio: 6 periodi, test size = 2
+# Combinazioni possibili: C(6,2) = 15 diverse splits
+```
+
+**Trigger**: Se 5 windows non bastano per confidenza statistica.
+
+**Trade-off**: Computazionalmente costoso (15x vs 5x), ma più robusto.
+
+**Reference**: Lopez de Prado (2018) "Advances in Financial Machine Learning" Cap. 7
+
+### FE-004: Profit Factor Decay Analysis
+
+**Problem**: Strategy può passare WF ma degradare nel tempo
+
+**Enhancement**: Tracciare profit factor per window e fittare decay
+
+```python
+def profit_factor_decay(window_results):
+    """
+    Fit: PF(t) = PF_0 * exp(-lambda * t)
+
+    Returns:
+        half_life: Giorni prima che PF dimezzi
+        is_decaying: True se lambda > threshold
+    """
+    pfs = [w.profit_factor for w in window_results]
+    times = range(len(pfs))
+
+    # Fit exponential decay
+    lambda_decay = fit_exponential_decay(times, pfs)
+    half_life = np.log(2) / lambda_decay if lambda_decay > 0 else float('inf')
+
+    return {
+        'half_life_days': half_life * avg_window_days,
+        'is_decaying': lambda_decay > 0.01,
+        'decay_rate': lambda_decay
+    }
+```
+
+**Trigger**: Se strategie passano WF ma falliscono in live dopo N mesi.
+
+**Action**: Se half_life < 6 mesi, strategia richiede re-evolution frequente.
+
+---
+
+**Decision Log** (2026-01-06):
+- Walk-forward rolling scelto per MVP (semplicità)
+- Embargo days implementato (Lopez de Prado)
+- Black Book enhancements documentati per future need
