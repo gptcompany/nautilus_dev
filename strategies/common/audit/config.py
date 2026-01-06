@@ -3,8 +3,11 @@
 This module defines the configuration for the audit trail system.
 """
 
+from __future__ import annotations
+
 from dataclasses import dataclass, field
 from pathlib import Path
+from typing import Union
 
 
 @dataclass
@@ -12,7 +15,7 @@ class AuditConfig:
     """Configuration for audit trail system.
 
     Attributes:
-        base_path: Base directory for audit logs.
+        base_path: Base directory for audit logs (accepts str or Path).
         sync_writes: If True, fsync after each write (for trade events).
         rotate_daily: If True, rotate log files daily.
         retention_days: Number of days to retain audit logs (0 = forever).
@@ -27,7 +30,9 @@ class AuditConfig:
         ... )
     """
 
-    base_path: Path = field(default_factory=lambda: Path("./data/audit/hot"))
+    base_path: Union[Path, str] = field(
+        default_factory=lambda: Path("./data/audit/hot")
+    )
     sync_writes: bool = False
     rotate_daily: bool = True
     retention_days: int = 90

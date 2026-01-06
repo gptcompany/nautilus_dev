@@ -14,7 +14,7 @@ from __future__ import annotations
 
 import logging
 import threading
-from typing import TYPE_CHECKING, Any, Callable
+from typing import TYPE_CHECKING, Any, Callable, cast
 
 from strategies.common.audit.config import AuditConfig
 from strategies.common.audit.events import (
@@ -156,16 +156,24 @@ class AuditEventEmitter:
         """Schedule periodic flush timer.
 
         Internal method to start background thread for periodic batch flushing.
+        Thread-safe: uses _buffer_lock to synchronize timer creation/cancellation.
         """
+        # Check shutdown first (outside lock for fast path)
         if self._shutdown_event.is_set():
             return
 
-        self._flush_timer = threading.Timer(
-            self._flush_interval_ms / 1000.0,
-            self._periodic_flush,
-        )
-        self._flush_timer.daemon = True
-        self._flush_timer.start()
+        # Synchronize timer creation with close()
+        with self._buffer_lock:
+            # Double-check shutdown after acquiring lock
+            if self._shutdown_event.is_set():
+                return
+
+            self._flush_timer = threading.Timer(
+                self._flush_interval_ms / 1000.0,
+                self._periodic_flush,
+            )
+            self._flush_timer.daemon = True
+            self._flush_timer.start()
 
     def _periodic_flush(self) -> None:
         """Periodic flush callback (runs in background thread)."""
@@ -290,7 +298,8 @@ class AuditEventEmitter:
             new_value=str(new_value),
             trigger_reason=trigger_reason,
         )
-        return self.emit(event)
+        # emit() modifies event in-place and returns it
+        return cast(ParameterChangeEvent, self.emit(event))
 
     def emit_trade(
         self,
@@ -336,7 +345,8 @@ class AuditEventEmitter:
             realized_pnl=str(realized_pnl),
             strategy_source=strategy_source,
         )
-        return self.emit(event)
+        # emit() modifies event in-place and returns it
+        return cast(TradeEvent, self.emit(event))
 
     def emit_signal(
         self,
@@ -367,7 +377,8 @@ class AuditEventEmitter:
             confidence=confidence,
             strategy_source=strategy_source,
         )
-        return self.emit(event)
+        # emit() modifies event in-place and returns it
+        return cast(SignalEvent, self.emit(event))
 
     def emit_system(
         self,
@@ -392,7 +403,8 @@ class AuditEventEmitter:
             source=source,
             payload=payload,
         )
-        return self.emit(event)
+        # emit() modifies event in-place and returns it
+        return cast(SystemEvent, self.emit(event))
 
     def flush(self) -> None:
         """Flush pending writes to disk.
@@ -411,20 +423,23 @@ class AuditEventEmitter:
         - Flushes remaining buffered events
         - Closes writer (if owned)
 
+        Thread-safe: properly synchronizes with background timer thread.
         Should be called when shutting down the audit system.
         """
-        # Signal shutdown to stop periodic flush
+        # Signal shutdown first (prevents new timers from being scheduled)
         self._shutdown_event.set()
 
-        # Cancel flush timer if running
-        if self._flush_timer is not None:
-            self._flush_timer.cancel()
+        # Acquire lock to synchronize with _schedule_flush() and cancel timer
+        with self._buffer_lock:
+            if self._flush_timer is not None:
+                self._flush_timer.cancel()
+                self._flush_timer = None
 
-        # Flush remaining buffered events
-        if self._enable_batching:
-            self._flush_batch()
+            # Flush remaining buffered events while holding lock
+            if self._enable_batching:
+                self._flush_batch_unsafe()
 
-        # Close writer if owned
+        # Close writer if owned (outside lock to avoid holding lock during I/O)
         if self._owns_writer:
             self._writer.close()
 

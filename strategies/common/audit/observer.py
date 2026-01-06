@@ -34,7 +34,6 @@ from strategies.common.audit.emitter import AuditEventEmitter
 from strategies.common.audit.events import AuditEventType
 
 if TYPE_CHECKING:
-
     pass
 
 
@@ -144,6 +143,9 @@ class AuditObserver(Actor):
         Args:
             event: OrderFilled event.
         """
+        # Guaranteed by caller (on_order_event checks _emitter is not None)
+        assert self._emitter is not None
+
         # Calculate slippage if we have expected price
         order_id = str(event.client_order_id)
         expected_price = self._expected_prices.pop(order_id, None)
@@ -176,6 +178,7 @@ class AuditObserver(Actor):
         Args:
             event: OrderRejected event.
         """
+        assert self._emitter is not None
         self._emitter.emit_trade(
             order_id=str(event.client_order_id),
             instrument_id=str(event.instrument_id),
@@ -192,6 +195,7 @@ class AuditObserver(Actor):
         Args:
             event: OrderCanceled event.
         """
+        assert self._emitter is not None
         # Log cancellations as system events (not trade events)
         self._emitter.emit_system(
             event_type=AuditEventType.SYS_REGIME_CHANGE,  # Using available type
@@ -225,6 +229,7 @@ class AuditObserver(Actor):
         Args:
             event: PositionOpened event.
         """
+        assert self._emitter is not None
         self._emitter.emit_trade(
             order_id=str(event.opening_order_id),
             instrument_id=str(event.instrument_id),
@@ -241,6 +246,7 @@ class AuditObserver(Actor):
         Args:
             event: PositionClosed event.
         """
+        assert self._emitter is not None
         self._emitter.emit_trade(
             order_id=str(event.closing_order_id) if event.closing_order_id else "N/A",
             instrument_id=str(event.instrument_id),
@@ -258,6 +264,7 @@ class AuditObserver(Actor):
         Args:
             event: PositionChanged event.
         """
+        assert self._emitter is not None
         # Log significant position changes
         self._emitter.emit_system(
             event_type=AuditEventType.SYS_REGIME_CHANGE,

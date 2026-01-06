@@ -59,7 +59,7 @@ class AppendOnlyWriter:
 
     def __init__(
         self,
-        base_path: Path,
+        base_path: Path | str,
         sync_writes: bool = False,
         rotate_daily: bool = True,
         min_disk_space_mb: int = 100,
@@ -67,7 +67,7 @@ class AppendOnlyWriter:
         """Initialize the AppendOnlyWriter.
 
         Args:
-            base_path: Directory for audit log files.
+            base_path: Directory for audit log files (accepts str or Path).
             sync_writes: If True, fsync after each write.
             rotate_daily: If True, create new file each day.
             min_disk_space_mb: Minimum disk space in MB before degradation.
