@@ -255,7 +255,10 @@ def update(
 - [ ] Performance tests (< 1ms for 20 strategies)
 - [ ] Walk-forward validation with synthetic correlated strategies
 - [ ] Edge case tests (singular matrix, zero variance, all strategies correlated)
+- [ ] Test for FR-004 sliding window memory constraint (max 1000 samples)
 - [ ] Documentation in `docs/adaptive_control/csrc_correlation.md`
+- [ ] Lambda sensitivity documentation with examples (0.5, 1.0, 2.0, 5.0)
+- [ ] Update `particle_portfolio.py` docstring to remove P5 (Leggi Naturali) reference per CLAUDE.md
 
 **Dependencies**: Phase 2
 
