@@ -144,7 +144,76 @@
       "timestamp": "2026-01-06T17:01:05.306765",
       "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run pytest tests/test_adaptive_decay.py -v 2>&1",
       "description": "Run adaptive decay tests with verbose output"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-06T17:01:32.757277",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/032-adts-discounting/tasks.md",
+      "old_string": "- [ ] T005 [P] [US1] Write test_low_volatility_high_decay in tests/test_adaptive_decay.py\n- [ ] T006..."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-06T17:01:39.939497",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/032-adts-discounting/tasks.md",
+      "old_string": "- [ ] T010 [US1] Implement normalized_volatility property in VolatilityContext in strategies/common/..."
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2026-01-06T17:01:46.438821",
+      "todo_count": 8
+    },
+    {
+      "operation": "write",
+      "timestamp": "2026-01-06T17:02:27.526278",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/test_thompson_selector_adaptive.py",
+      "content_length": 9933
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T17:02:38.850352",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run pytest tests/test_thompson_selector_adaptive.py -v --tb=short 2>&1 | head -100",
+      "description": "Run US2/US3 tests (expect failures)"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-06T17:02:46.190769",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/adaptive_control/particle_portfolio.py"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-06T17:02:53.890339",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/audit/events.py",
+      "old_string": "    # System events\n    SYS_EVOLUTION_TRIGGER = \"sys.evolution_trigger\"\n    SYS_REGIME_CHANGE = \"sys..."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-06T17:03:11.665772",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/adaptive_control/particle_portfolio.py",
+      "old_string": "class ThompsonSelector:\n    \"\"\"\n    Thompson Sampling for Strategy Selection.\n\n    Each strategy has..."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-06T17:03:34.109911",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/adaptive_control/particle_portfolio.py",
+      "old_string": "    def select(self) -> str:\n        \"\"\"\n        Select a strategy using Thompson Sampling.\n\n       ..."
+    },
+    {
+      "operation": "task",
+      "timestamp": "2026-01-06T17:03:40.776792",
+      "subagent_type": "test-runner",
+      "prompt": "Run the tests in tests/test_thompson_selector_adaptive.py using pytest verbose mode. Report results ..."
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T17:03:44.865161",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run pytest tests/test_thompson_selector_adaptive.py -v 2>&1",
+      "description": "Run Thompson selector adaptive tests"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-06T17:03:59.322287",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/test_thompson_selector_adaptive.py"
     }
   ],
-  "last_updated": "2026-01-06T17:01:05.306781"
+  "last_updated": "2026-01-06T17:03:59.322302"
 }
