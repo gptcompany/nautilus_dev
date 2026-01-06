@@ -65,14 +65,14 @@ It is NOT a spec itself, but the research foundation that identified gaps and re
 | `action_items.md` | Concrete tasks and timeline | Implementation |
 | `final_verdict.md` | Decision tree, red lines | All specs |
 
-### CONSUMED (Work completed)
+### CONSUMED (archive/consumed/)
 | File | Purpose | Consumed By |
 |------|---------|-------------|
 | `baseline_comparison.md` | Baseline validation design | spec-029 |
 | `research_plan_swot.md` | Research methodology | Executed |
 | `research_attack_plan.md` | P5 validation plan | P5 removed from CLAUDE.md |
 
-### REFERENCE (Documentation)
+### REFERENCE (archive/reference/)
 | File | Purpose |
 |------|---------|
 | `counter_evidence_academic.md` | Academic critiques (DeMiguel, Bailey, etc.) |
