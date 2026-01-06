@@ -68,7 +68,7 @@ As a system monitor, I need to observe how decay rates change over time and corr
 ### Edge Cases
 
 - What happens when variance_ratio is extremely high (>10)? System should cap normalized_volatility at 1.0 to prevent decay from going below 0.95
-- What happens when variance_ratio is zero or near-zero? System should handle division by zero and default to normal regime (decay ~0.97)
+- What happens when variance_ratio is zero or near-zero? System should handle gracefully (no division involved in formula) and default to low volatility regime (decay = 0.99, since variance_ratio < 0.7 maps to normalized_volatility = 0.0)
 - What happens when IIRRegimeDetector is not provided? System should fall back to fixed decay rate (0.99) for backward compatibility
 - What happens during warmup period when variance estimates are unstable? System should use default decay rate until regime detector has sufficient samples
 
@@ -87,7 +87,7 @@ As a system monitor, I need to observe how decay rates change over time and corr
 ### Key Entities
 
 - **AdaptiveDecayCalculator**: Component responsible for calculating decay factor from variance_ratio, encapsulating the mapping logic and clamping behavior
-- **VolatilityContext**: Data structure containing variance_ratio, regime type, and normalized_volatility used as input for decay calculation
+- **VolatilityContext**: Data structure containing variance_ratio as input; regime type and normalized_volatility are derived properties (regime inferred from variance_ratio thresholds)
 - **DecayEvent**: Audit trail event capturing decay_rate, variance_ratio, regime, and timestamp for observability
 
 ## Success Criteria *(mandatory)*
