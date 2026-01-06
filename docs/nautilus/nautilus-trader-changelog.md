@@ -1,26 +1,25 @@
 # NautilusTrader Status Feed
 
-## Last Update: 1/6/2026, 12:00:31 AM UTC
+## Last Update: 1/6/2026, 10:36:48 PM UTC
 
 ### Current Versions
 - **Stable**: v1.222.0
-- **Nightly Commits**: 41 commits ahead
+- **Nightly Commits**: 46 commits ahead
 
 ### Open Issues Summary
-- **Total Open Issues**: 67
-- **Bugs**: 4
+- **Total Open Issues**: 66
+- **Bugs**: 3
 - **Feature Requests**: 62
 
 ### Recent Open Issues (Top 5)
 - [#3391](https://github.com/nautechsystems/nautilus_trader/issues/3391) Pontetial data loss in writers [bug]
 - [#3389](https://github.com/nautechsystems/nautilus_trader/issues/3389) Python native method to support TRACE logging [RFC]
-- [#3384](https://github.com/nautechsystems/nautilus_trader/issues/3384) TestClock not monotonic: Repeated TimeEvents do not obey monotonicity [bug]
 - [#3374](https://github.com/nautechsystems/nautilus_trader/issues/3374) RFC: Alpaca Markets Integration [RFC]
 - [#3359](https://github.com/nautechsystems/nautilus_trader/issues/3359) Allow the instrument universe to be updated dynamically during backtesting [enhancement]
+- [#3307](https://github.com/nautechsystems/nautilus_trader/issues/3307) Add support for ticker name changes, stock splits, and corporate actions in general [enhancement]
 
 ### Active Bug Reports
 - [#3391](https://github.com/nautechsystems/nautilus_trader/issues/3391) Pontetial data loss in writers
-- [#3384](https://github.com/nautechsystems/nautilus_trader/issues/3384) TestClock not monotonic: Repeated TimeEvents do not obey monotonicity
 - [#3104](https://github.com/nautechsystems/nautilus_trader/issues/3104) [Reconciliation] LiveExecEngine fails to reconcile long-lived Binance Futures positions for HEDGING
 - [#3042](https://github.com/nautechsystems/nautilus_trader/issues/3042) [Reconciliation] Fails for routing clients when instrument venue differs from client venue
 
