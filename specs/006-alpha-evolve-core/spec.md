@@ -123,3 +123,128 @@ As a user, I need YAML configuration for evolution parameters so that I can tune
 - Evolution controller/CLI (see spec-009)
 - Grafana dashboard (see spec-010)
 - Migration tools for existing strategy libraries
+
+---
+
+## Future Enhancements (Black Book Concepts)
+
+> **Source**: "The Black Book of Financial Hacking" - J.C. Lotter
+> **Philosophy**: Add complexity ONLY if OOS shows problems.
+
+### FE-001: Fitness Sharing (Niching)
+
+**Current**: Fitness is absolute - strategies compete globally
+
+**Enhancement**: Fitness sharing to maintain diversity via niching
+
+```python
+def shared_fitness(strategy, population, sigma_share=0.3):
+    """
+    Penalize fitness based on similarity to other strategies.
+
+    Prevents premature convergence to local optima.
+    """
+    raw_fitness = strategy.fitness
+    niche_count = sum(
+        similarity(strategy, other) / sigma_share
+        for other in population
+        if similarity(strategy, other) > 0
+    )
+    return raw_fitness / (1 + niche_count)
+```
+
+**Trigger**: When evolution converges too quickly (all strategies look similar after 20 generations)
+
+**Trade-off**: Requires similarity metric (code diff? AST distance?), slower selection
+
+**Reference**: Goldberg & Richardson (1987) "Genetic Algorithms with Sharing for Multimodal Function Optimization"
+
+### FE-002: Island Model (Parallel Populations)
+
+**Current**: Single population evolves sequentially
+
+**Enhancement**: Multiple isolated populations with periodic migration
+
+```python
+class IslandPopulation:
+    def __init__(self, n_islands=4, migration_interval=10):
+        self.islands = [Population() for _ in range(n_islands)]
+        self.migration_interval = migration_interval
+
+    def evolve(self):
+        # Evolve islands independently
+        for island in self.islands:
+            island.evolve_generation()
+
+        # Every N generations, migrate best strategies
+        if self.generation % self.migration_interval == 0:
+            self.migrate_elites()
+```
+
+**Trigger**: When single population gets stuck in local optimum (no improvement for 50+ generations)
+
+**Trade-off**: Requires 4x compute resources, but explores search space better
+
+**Reference**: Whitley et al. (1999) "Island Model Genetic Algorithms and Linearly Separable Problems"
+
+### FE-003: Adaptive Mutation Rates
+
+**Current**: Fixed elite/exploit/explore ratios (10%/70%/20%)
+
+**Enhancement**: Adjust mutation rates based on population diversity
+
+```python
+def adaptive_mutation_rate(population):
+    """
+    Increase exploration when diversity is low.
+    Increase exploitation when diversity is high.
+    """
+    diversity = calculate_diversity(population)  # 0-1 scale
+
+    if diversity < 0.2:  # Low diversity
+        return {'elite': 0.05, 'exploit': 0.50, 'explore': 0.45}
+    elif diversity > 0.7:  # High diversity
+        return {'elite': 0.15, 'exploit': 0.80, 'explore': 0.05}
+    else:
+        return {'elite': 0.10, 'exploit': 0.70, 'explore': 0.20}
+```
+
+**Trigger**: When population diversity metrics show premature convergence or excessive randomness
+
+**Trade-off**: Needs diversity metric implementation, more complex parameter tuning
+
+**Reference**: Eiben et al. (1999) "Parameter Control in Evolutionary Algorithms"
+
+### FE-004: Lineage Pruning (Age-Based Selection)
+
+**Current**: Pruning based only on fitness
+
+**Enhancement**: Prune old lineages even if moderately fit
+
+```python
+def age_weighted_pruning(population, max_age=50):
+    """
+    Remove strategies from old lineages to prevent stagnation.
+    """
+    scores = []
+    for strategy in population:
+        age_penalty = 1.0 - (strategy.generation / max_age)
+        age_penalty = max(0, age_penalty)  # Clamp to 0
+        score = strategy.fitness * age_penalty
+        scores.append((strategy, score))
+
+    # Keep top N by age-weighted fitness
+    return sorted(scores, key=lambda x: x[1], reverse=True)[:population_size]
+```
+
+**Trigger**: When hall-of-fame becomes dominated by old lineages (>80% from same parent)
+
+**Trade-off**: May prune good strategies, but forces exploration of new lineages
+
+**Reference**: Hornby (2006) "ALPS: The Age-Layered Population Structure"
+
+---
+
+**Decision Log** (2026-01-06):
+- Simple fitness-based selection chosen for MVP
+- Black Book enhancements documented for future need when OOS performance degrades
