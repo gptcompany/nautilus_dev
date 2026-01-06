@@ -299,7 +299,166 @@
       "timestamp": "2026-01-06T16:21:36.361972",
       "command": "git log --oneline -5",
       "description": "Show recent commits"
+    },
+    {
+      "operation": "task",
+      "timestamp": "2026-01-06T16:24:32.622764",
+      "subagent_type": "general-purpose",
+      "prompt": "Apply fixes from statistical validation analysis and ensure future enhancement traceability.\n\n## Tas..."
+    },
+    {
+      "operation": "glob",
+      "timestamp": "2026-01-06T16:24:39.198018",
+      "pattern": "**/FUTURE_ENHANCEMENTS.md",
+      "path": "/media/sam/1TB/nautilus_dev"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T16:24:39.207919",
+      "command": "ls -la /media/sam/1TB/nautilus_dev/specs/020-walk-forward-optimization/",
+      "description": "Check if tasks.md exists in spec-020"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-06T16:24:39.362652",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/adaptive_control/luck_skill.py"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T16:24:45.975010",
+      "command": "find /media/sam/1TB/nautilus_dev/specs -type d -name \"*020*\" -o -name \"*walk*\" 2>/dev/null",
+      "description": "Find spec-020 directory"
+    },
+    {
+      "operation": "grep",
+      "timestamp": "2026-01-06T16:24:52.948131",
+      "pattern": "FE-\\d{3}",
+      "path": "/media/sam/1TB/nautilus_dev/specs",
+      "output_mode": "content"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T16:24:52.963808",
+      "command": "ls -la /media/sam/1TB/nautilus_dev/specs/020-walk-forward-validation/",
+      "description": "Check files in spec-020 directory"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-06T16:24:53.058958",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/020-walk-forward-validation/spec.md"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T16:25:00.475989",
+      "command": "grep -r \"FE-[0-9]\\{3\\}\" /media/sam/1TB/nautilus_dev/specs --include=\"*.md\" | grep -oP \"FE-\\d{3}\" | sort -u",
+      "description": "Extract all unique FE-XXX IDs"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-06T16:25:00.543223",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/020-walk-forward-validation/tasks.md"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T16:25:09.304427",
+      "command": "cd /media/sam/1TB/nautilus_dev/specs && for spec in 006-alpha-evolve-core 007-alpha-evolve-evaluator 008-alpha-evolve-templates 009-alpha-evolve-controller 010-alpha-evolve-dashboard 020-walk-forward-validation 031-csrc-correlation; do echo \"=== $spec ===\" && grep -A3 \"^### FE-\" \"$spec/spec.md\" 2>/dev/null | head -40; done",
+      "description": "Extract FE sections from all specs"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T16:25:14.214112",
+      "command": "find /media/sam/1TB/nautilus_dev/specs -name \"spec.md\" -exec grep -l \"^### FE-\" {} \\;",
+      "description": "Find all spec files with FE sections"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2026-01-06T16:25:23.482771",
+      "todo_count": 4
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-06T16:25:28.303755",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/020-walk-forward-validation/spec.md"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-06T16:25:34.806715",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/020-walk-forward-validation/spec.md",
+      "old_string": "## Dependencies\n\n- Spec 007 (Alpha-Evolve Evaluator)\n- Spec 009 (Alpha-Evolve Controller)"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2026-01-06T16:25:45.705888",
+      "todo_count": 4
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T16:25:57.711056",
+      "command": "python3 << 'PYEOF'\nimport re\nfrom pathlib import Path\n\nspecs = [\n    \"006-alpha-evolve-core\",\n    \"007-alpha-evolve-evaluator\", \n    \"008-alpha-evolve-templates\",\n    \"009-alpha-evolve-controller\",\n    \"010-alpha-evolve-dashboard\",\n    \"020-walk-forward-validation\",\n    \"031-csrc-correlation\"\n]\n\nresults = []\n\nfor spec in specs:\n    spec_file = Path(f\"/media/sam/1TB/nautilus_dev/specs/{spec}/spec.md\")\n    if spec_file.exists():\n        content = spec_file.read_text()\n        # Find all FE-XXX sections\n        pattern = r'### (FE-\\d{3}): (.+?)(?=\\n\\n|\\n###|\\Z)'\n        matches = re.finditer(pattern, content, re.DOTALL)\n        \n        for match in matches:\n            fe_id = match.group(1)\n            title_line = match.group(2).split('\\n')[0]\n            # Extract trigger if present\n            trigger_match = re.search(r'\\*\\*Trigger\\*\\*:(.+?)(?=\\n\\n|\\*\\*)', match.group(2), re.DOTALL)\n            trigger = trigger_match.group(1).strip() if trigger_match else \"See spec\"\n            trigger = trigger.replace('\\n', ' ')[:80]  # First 80 chars\n            \n            results.append({\n                'id': fe_id,\n                'spec': spec.split('-')[0],\n                'concept': title_line.strip(),\n                'trigger': trigger,\n                'status': 'documented'\n            })\n\n# Sort by ID\nresults.sort(key=lambda x: x['id'])\n\n# Print markdown table\nprint(\"| ID | Spec | Concept | Trigger | Status |\")\nprint(\"|----|------|---------|---------|--------|\")\nfor r in results:\n    print(f\"| {r['id']} | {r['spec']} | {r['concept']} | {r['trigger']} | {r['status']} |\")\nPYEOF",
+      "description": "Extract FE entries for index"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T16:26:22.383069",
+      "command": "python3 << 'PYEOF'\nimport re\nfrom pathlib import Path\n\nspecs_triggers = {\n    \"020-walk-forward-validation\": {\n        \"FE-001\": \"Rolling instability between windows\",\n        \"FE-002\": \">20 strategy variants tested\",\n        \"FE-003\": \"5 windows insufficient for confidence\",\n        \"FE-004\": \"Strategies pass WF but fail in live after N months\"\n    },\n    \"007-alpha-evolve-evaluator\": {\n        \"FE-001\": \"Trade-offs between metrics (Sharpe vs Drawdown)\",\n        \"FE-002\": \"Current single-period validation insufficient\",\n        \"FE-003\": \"Traditional Sharpe assumes normality\",\n        \"FE-004\": \"Zero-fee backtests unrealistic\"\n    },\n    \"006-alpha-evolve-core\": {\n        \"FE-001\": \"Convergence to single solution\",\n        \"FE-002\": \"Single population stagnation\",\n        \"FE-003\": \"Fixed mutation rates suboptimal\",\n        \"FE-004\": \"Old lineages dominating\"\n    },\n    \"008-alpha-evolve-templates\": {\n        \"FE-001\": \"Single evolvable block limiting\",\n        \"FE-002\": \"Complex multi-state strategies\",\n        \"FE-003\": \"Hardcoded indicators\",\n        \"FE-004\": \"Fixed position sizing\"\n    },\n    \"009-alpha-evolve-controller\": {\n        \"FE-001\": \"Fixed mutation rates suboptimal\",\n        \"FE-002\": \"Static prompts limiting exploration\",\n        \"FE-003\": \"Single best strategy fragile\",\n        \"FE-004\": \"Exploitation-only search\"\n    },\n    \"010-alpha-evolve-dashboard\": {\n        \"FE-001\": \"Population convergence unclear\",\n        \"FE-002\": \"Which mutations help?\",\n        \"FE-003\": \"Where are we in search space?\",\n        \"FE-004\": \"How did we get here?\",\n        \"FE-005\": \"Is this overfitting?\"\n    },\n    \"031-csrc-correlation\": {\n        \"FE-001\": \"Spearman assumes monotonic relationships\",\n        \"FE-002\": \"Linear penalties (correlation^2) insufficient\",\n        \"FE-003\": \"Joint extreme movements ignored\"\n    }\n}\n\nprint(\"| ID | Spec | Concept | Trigger | Status |\")\nprint(\"|----|------|---------|---------|--------|\")\n\nentries = [\n    (\"FE-001\", \"006\", \"Fitness Sharing (Niching)\", specs_triggers[\"006-alpha-evolve-core\"][\"FE-001\"]),\n    (\"FE-002\", \"006\", \"Island Model (Parallel Populations)\", specs_triggers[\"006-alpha-evolve-core\"][\"FE-002\"]),\n    (\"FE-003\", \"006\", \"Adaptive Mutation Rates\", specs_triggers[\"006-alpha-evolve-core\"][\"FE-003\"]),\n    (\"FE-004\", \"006\", \"Lineage Pruning (Age-Based Selection)\", specs_triggers[\"006-alpha-evolve-core\"][\"FE-004\"]),\n    (\"FE-001\", \"007\", \"Multi-Objective Optimization\", specs_triggers[\"007-alpha-evolve-evaluator\"][\"FE-001\"]),\n    (\"FE-002\", \"007\", \"Walk-Forward During Evolution\", specs_triggers[\"007-alpha-evolve-evaluator\"][\"FE-002\"]),\n    (\"FE-003\", \"007\", \"Probabilistic Sharpe Ratio\", specs_triggers[\"007-alpha-evolve-evaluator\"][\"FE-003\"]),\n    (\"FE-004\", \"007\", \"Transaction Cost Modeling\", specs_triggers[\"007-alpha-evolve-evaluator\"][\"FE-004\"]),\n    (\"FE-001\", \"008\", \"Multiple Evolvable Blocks\", specs_triggers[\"008-alpha-evolve-templates\"][\"FE-001\"]),\n    (\"FE-002\", \"008\", \"State Machine Templates\", specs_triggers[\"008-alpha-evolve-templates\"][\"FE-002\"]),\n    (\"FE-003\", \"008\", \"Feature Engineering Helpers\", specs_triggers[\"008-alpha-evolve-templates\"][\"FE-003\"]),\n    (\"FE-004\", \"008\", \"Risk-Aware Position Sizing\", specs_triggers[\"008-alpha-evolve-templates\"][\"FE-004\"]),\n    (\"FE-001\", \"009\", \"Adaptive Mutation Rate Control\", specs_triggers[\"009-alpha-evolve-controller\"][\"FE-001\"]),\n    (\"FE-002\", \"009\", \"Prompt Engineering Evolution\", specs_triggers[\"009-alpha-evolve-controller\"][\"FE-002\"]),\n    (\"FE-003\", \"009\", \"Ensemble Strategy Selection\", specs_triggers[\"009-alpha-evolve-controller\"][\"FE-003\"]),\n    (\"FE-004\", \"009\", \"Novelty Search\", specs_triggers[\"009-alpha-evolve-controller\"][\"FE-004\"]),\n    (\"FE-001\", \"010\", \"Population Diversity Heatmap\", specs_triggers[\"010-alpha-evolve-dashboard\"][\"FE-001\"]),\n    (\"FE-002\", \"010\", \"Mutation Success Attribution\", specs_triggers[\"010-alpha-evolve-dashboard\"][\"FE-002\"]),\n    (\"FE-003\", \"010\", \"Fitness Landscape Visualization\", specs_triggers[\"010-alpha-evolve-dashboard\"][\"FE-003\"]),\n    (\"FE-004\", \"010\", \"Lineage Tree Visualization\", specs_triggers[\"010-alpha-evolve-dashboard\"][\"FE-004\"]),\n    (\"FE-005\", \"010\", \"Overfitting Detection\", specs_triggers[\"010-alpha-evolve-dashboard\"][\"FE-005\"]),\n    (\"FE-001\", \"020\", \"Anchored vs Rolling Walk-Forward\", specs_triggers[\"020-walk-forward-validation\"][\"FE-001\"]),\n    (\"FE-002\", \"020\", \"White's Reality Check\", specs_triggers[\"020-walk-forward-validation\"][\"FE-002\"]),\n    (\"FE-003\", \"020\", \"Combinatorial Purged CV (CPCV)\", specs_triggers[\"020-walk-forward-validation\"][\"FE-003\"]),\n    (\"FE-004\", \"020\", \"Profit Factor Decay Analysis\", specs_triggers[\"020-walk-forward-validation\"][\"FE-004\"]),\n    (\"FE-001\", \"031\", \"Kendall Correlation (P2)\", specs_triggers[\"031-csrc-correlation\"][\"FE-001\"]),\n    (\"FE-002\", \"031\", \"Power-Law Penalty Scaling\", specs_triggers[\"031-csrc-correlation\"][\"FE-002\"]),\n    (\"FE-003\", \"031\", \"Tail Dependence (Copulas)\", specs_triggers[\"031-csrc-correlation\"][\"FE-003\"]),\n]\n\nfor fe_id, spec, concept, trigger in entries:\n    print(f\"| {fe_id} | {spec} | {concept} | {trigger} | Documented |\")\nPYEOF",
+      "description": "Create detailed FE index with triggers"
+    },
+    {
+      "operation": "write",
+      "timestamp": "2026-01-06T16:27:31.604271",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/FUTURE_ENHANCEMENTS.md",
+      "content_length": 14520
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2026-01-06T16:27:42.268836",
+      "todo_count": 4
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-06T16:27:47.370953",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/020-walk-forward-validation/tasks.md"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-06T16:28:04.143782",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/020-walk-forward-validation/tasks.md",
+      "old_string": "- [X] T033 Run alpha-debug verification on walk_forward module\n  - 3-5 rounds of bug hunting\n  - Foc..."
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2026-01-06T16:28:13.472725",
+      "todo_count": 4
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T16:28:17.808063",
+      "command": "git status",
+      "description": "Check git status"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T16:28:28.451644",
+      "command": "git add specs/FUTURE_ENHANCEMENTS.md specs/020-walk-forward-validation/spec.md specs/020-walk-forward-validation/tasks.md && git commit -m \"$(cat <<'EOF'\ndocs: Add future enhancements index and link luck_skill.py\n\n- Create comprehensive FUTURE_ENHANCEMENTS.md index:\n  - 27 total enhancements tracked across 7 specs\n  - Clear trigger conditions for each enhancement\n  - Cross-references and implementation workflow\n  - Prevents premature optimization via trigger-based activation\n\n- Link luck_skill.py to spec-020 dependencies:\n  - Orphaned DSR/PBO implementation now linked to walk-forward spec\n  - Clarifies intended usage for statistical validation\n\n- Add T-FE task to spec-020 tasks.md:\n  - Future task to integrate LuckQuantifier for per-window DSR/PBO\n  - References FE-002 (White's Reality Check)\n\nPhilosophy: Add complexity ONLY when triggered by observed problems.\n\nGenerated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n)\"",
+      "description": "Commit all changes"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T16:28:32.303596",
+      "command": "git push origin main",
+      "description": "Push changes to remote"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2026-01-06T16:28:41.858019",
+      "todo_count": 4
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T16:28:46.418183",
+      "command": "git log --oneline -1 && echo \"---\" && git diff HEAD~1 --stat",
+      "description": "Verify commit details"
     }
   ],
-  "last_updated": "2026-01-06T16:21:36.361988"
+  "last_updated": "2026-01-06T16:28:46.418213"
 }
