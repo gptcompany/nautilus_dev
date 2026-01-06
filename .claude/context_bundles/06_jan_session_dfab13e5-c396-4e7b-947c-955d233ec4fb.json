@@ -293,7 +293,199 @@
       "operation": "read",
       "timestamp": "2026-01-06T12:26:07.329949",
       "file_path": "/media/sam/1TB/nautilus_dev/specs/031-csrc-correlation/tasks.md"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-06T12:26:13.858381",
+      "file_path": "/media/sam/1TB/nautilus_dev/.specify/memory/constitution.md"
+    },
+    {
+      "operation": "taskoutput",
+      "timestamp": "2026-01-06T12:27:49.128798",
+      "task_id": "ac345c1",
+      "block": true,
+      "timeout": 60000
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2026-01-06T12:28:06.395729",
+      "todo_count": 9
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-06T12:28:14.295562",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/031-csrc-correlation/spec.md"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-06T12:28:38.131080",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/031-csrc-correlation/spec.md",
+      "old_string": "1. **Given** three strategies with correlation > 0.8, **When** particle portfolio updates weights, *..."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-06T12:28:44.766724",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/031-csrc-correlation/spec.md",
+      "old_string": "- **FR-001**: System MUST maintain a rolling correlation matrix between all strategy pairs, updated ..."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-06T12:28:51.059369",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/031-csrc-correlation/spec.md",
+      "old_string": "- **FR-009**: Correlation estimates MUST converge to true value within 100 samples for stationary pr..."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-06T12:28:57.490029",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/031-csrc-correlation/spec.md",
+      "old_string": "- **Correlation Matrix**: N×N symmetric matrix tracking pairwise correlations between strategies. Up..."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-06T12:29:03.291994",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/031-csrc-correlation/spec.md",
+      "old_string": "- **SC-003**: Correlation estimates converge to within 5% of true correlation value after observing ..."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-06T12:29:11.443895",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/031-csrc-correlation/spec.md",
+      "old_string": "- **Sharpe Ratio Availability**: Assumes strategies report returns at consistent intervals. Sharpe c..."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-06T12:29:20.168989",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/031-csrc-correlation/spec.md",
+      "old_string": "- **Risk 4: Unclear Lambda Calibration**: Users may not know how to set lambda. *Mitigation*: Provid..."
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-06T12:29:27.300762",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/031-csrc-correlation/plan.md"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-06T12:29:35.798340",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/031-csrc-correlation/plan.md",
+      "old_string": "**Deliverables**:\n- [ ] Integration with `BayesianEnsemble` class\n- [ ] Integration with audit trail..."
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-06T12:29:43.747237",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/031-csrc-correlation/tasks.md"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-06T12:29:51.572113",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/031-csrc-correlation/tasks.md",
+      "old_string": "- [ ] T011 Write unit tests for correlation convergence (synthetic data, known correlation 0.9, veri..."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-06T12:29:57.551209",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/031-csrc-correlation/tasks.md",
+      "old_string": "- [ ] T021 [P] [US2] Write test `test_correlation_convergence_with_known_data` (FR-009: converge wit..."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-06T12:30:04.531011",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/031-csrc-correlation/tasks.md",
+      "old_string": "**Independent Test**: Stream synthetic returns with known correlation (0.8*R + noise). Verify correl..."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-06T12:30:19.490619",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/031-csrc-correlation/tasks.md",
+      "old_string": "### Documentation\n\n- [ ] T047 [P] Create `docs/adaptive_control/csrc_correlation.md` with usage exam..."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-06T12:30:29.600940",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/031-csrc-correlation/tasks.md",
+      "old_string": "### Tests for Edge Cases\n\n- [ ] T036 [P] Write test `test_singular_matrix_regularization` (FR-005: r..."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-06T12:30:35.902626",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/031-csrc-correlation/tasks.md",
+      "old_string": "- [ ] T042 Run tests T036-T039 and verify they PASS in `tests/`"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-06T12:30:45.942904",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/031-csrc-correlation/tasks.md",
+      "old_string": "## Summary\n\n| Metric | Value |\n|--------|-------|\n| Total Tasks | 52 |\n| Setup Tasks | 3 |\n| Foundat..."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-06T12:30:54.196354",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/031-csrc-correlation/tasks.md",
+      "old_string": "```\nSetup (T001-T003)\n    │\n    ▼\nFoundational (T004-T011)\n    │\n    ├──────────────────┬───────────..."
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2026-01-06T12:31:02.560489",
+      "todo_count": 9
+    },
+    {
+      "operation": "write",
+      "timestamp": "2026-01-06T12:31:42.771355",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/031-csrc-correlation/pipeline-report.md",
+      "content_length": 6011
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2026-01-06T12:31:51.424536",
+      "todo_count": 9
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T12:31:56.781367",
+      "command": "git status",
+      "description": "Check git status for commit"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T12:31:56.816053",
+      "command": "git log --oneline -3",
+      "description": "Check recent commit style"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T12:32:05.779548",
+      "command": "git diff --name-only HEAD",
+      "description": "Check all changes since HEAD"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T12:32:05.814587",
+      "command": "ls -la specs/031-csrc-correlation/",
+      "description": "List spec-031 directory"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T12:32:12.414805",
+      "command": "git add specs/031-csrc-correlation/spec.md specs/031-csrc-correlation/plan.md specs/031-csrc-correlation/tasks.md specs/031-csrc-correlation/research.md specs/031-csrc-correlation/pipeline-report.md && git status",
+      "description": "Stage spec-031 files"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T12:32:18.297595",
+      "command": "git diff specs/031-csrc-correlation/spec.md | head -50",
+      "description": "Check spec.md changes"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T12:32:30.204695",
+      "command": "git commit -m \"$(cat <<'EOF'\nfeat(spec-031): Complete CSRC correlation pipeline with validated artifacts\n\nExecute full SpecKit pipeline for spec-031 CSRC Correlation-Aware Allocation:\n\nPhase completions:\n- Research: 8 papers analyzed (DeMiguel 2009, Ledoit-Wolf 2020, etc.)\n- Plan: 3-phase implementation with 4 technical decisions\n- Tasks: 55 tasks with TDD structure (21 parallelizable)\n- Analysis: 5 MEDIUM issues identified and resolved\n\nKey fixes from cross-artifact analysis:\n- FR-001: Updated O(1) per pair → O(N²) total memory\n- FR-009: Convergence samples 100 → 150 (per research)\n- Added T053 (lambda sensitivity docs), T054 (P5 docstring cleanup)\n- Added T055 (FR-004 sliding window memory test)\n- Clarified \"max 50% combined\" as illustrative, not hard cap\n\nNT nightly v1.222.0 validation: PASS\n- All components compatible\n- No breaking changes affect CSRC\n- 3 warnings addressed (P5, lambda docs, min_samples)\n\nReady for /speckit.implement\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n)\"",
+      "description": "Commit spec-031 pipeline artifacts"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T12:32:36.936073",
+      "command": "git log --oneline -1 && git show --stat HEAD | tail -10",
+      "description": "Verify commit"
     }
   ],
-  "last_updated": "2026-01-06T12:26:07.329973"
+  "last_updated": "2026-01-06T12:32:36.936090"
 }

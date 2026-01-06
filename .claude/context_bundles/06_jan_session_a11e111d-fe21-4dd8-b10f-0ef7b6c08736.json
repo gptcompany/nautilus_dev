@@ -1,0 +1,246 @@
+{
+  "session_id": "a11e111d-fe21-4dd8-b10f-0ef7b6c08736",
+  "created_at": "2026-01-06T12:33:02.773135",
+  "operations": [
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T12:33:02.773152",
+      "command": "bash .specify/scripts/bash/check-prerequisites.sh --json --require-tasks --include-tasks 2>&1",
+      "description": "Check spec-031 prerequisites"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T12:33:07.106165",
+      "command": "bash .specify/scripts/bash/check-prerequisites.sh --json --require-tasks --include-tasks --feature spec-031 2>&1",
+      "description": "Check spec-031 prerequisites with explicit feature"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T12:33:13.652718",
+      "command": "cd /media/sam/1TB/nautilus_dev/specs/031-csrc-correlation && bash /media/sam/1TB/nautilus_dev/.specify/scripts/bash/check-prerequisites.sh --json --require-tasks --include-tasks 2>&1",
+      "description": "Check spec-031 prerequisites from feature dir"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T12:33:17.677169",
+      "command": "ls -la /media/sam/1TB/nautilus_dev/specs/031-csrc-correlation/",
+      "description": "List spec-031 directory contents"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-06T12:33:24.373216",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/031-csrc-correlation/tasks.md"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-06T12:33:24.378697",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/031-csrc-correlation/plan.md"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T12:33:33.958618",
+      "command": "ls -la /media/sam/1TB/nautilus_dev/specs/031-csrc-correlation/checklists/ 2>/dev/null && find /media/sam/1TB/nautilus_dev/specs/031-csrc-correlation/checklists/ -name \"*.md\" -exec sh -c 'echo \"=== {} ===\" && grep -E \"^\\s*- \\[[ xX]\\]\" \"{}\" | wc -l && echo \"Incomplete:\" && grep -E \"^\\s*- \\[ \\]\" \"{}\" | wc -l && echo \"Complete:\" && grep -E \"^\\s*- \\[[xX]\\]\" \"{}\" | wc -l' \\;",
+      "description": "Check checklists status"
+    },
+    {
+      "operation": "glob",
+      "timestamp": "2026-01-06T12:33:40.010912",
+      "pattern": "strategies/common/adaptive_control/**/*.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-06T12:33:40.039479",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/adaptive_control/particle_portfolio.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-06T12:33:50.477652",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/adaptive_control/__init__.py"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T12:33:50.744464",
+      "command": "ls -la /media/sam/1TB/nautilus_dev/tests/unit/ 2>/dev/null | head -20 && echo \"---\" && ls -la /media/sam/1TB/nautilus_dev/tests/integration/ 2>/dev/null | head -20",
+      "description": "Check test directories structure"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2026-01-06T12:34:00.358705",
+      "todo_count": 7
+    },
+    {
+      "operation": "write",
+      "timestamp": "2026-01-06T12:34:49.611096",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/adaptive_control/correlation_tracker.py",
+      "content_length": 12415
+    },
+    {
+      "operation": "write",
+      "timestamp": "2026-01-06T12:35:00.405523",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/adaptive_control/correlation_tracker.py",
+      "content_length": 1042
+    },
+    {
+      "operation": "write",
+      "timestamp": "2026-01-06T12:35:19.582847",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/unit/test_correlation_tracker.py",
+      "content_length": 2491
+    },
+    {
+      "operation": "write",
+      "timestamp": "2026-01-06T12:35:20.278201",
+      "file_path": "/media/sam/1TB/nautilus_dev/tests/integration/test_csrc_walk_forward.py",
+      "content_length": 1713
+    },
+    {
+      "operation": "task",
+      "timestamp": "2026-01-06T12:35:36.498892",
+      "subagent_type": "alpha-evolve",
+      "prompt": "Implement correlation_tracker.py for CSRC (Correlation-aware Allocation) feature.\n\n## Context\nRead t..."
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-06T12:35:42.022600",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/031-csrc-correlation/spec.md"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-06T12:35:42.034661",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/031-csrc-correlation/plan.md"
+    },
+    {
+      "operation": "glob",
+      "timestamp": "2026-01-06T12:35:47.968185",
+      "pattern": "**/correlation_tracker.py",
+      "path": "/media/sam/1TB/nautilus_dev/strategies/common/adaptive_control"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-06T12:35:48.036206",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/adaptive_control/particle_portfolio.py"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-06T12:35:53.102766",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/adaptive_control/__init__.py"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2026-01-06T12:36:00.035473",
+      "todo_count": 7
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2026-01-06T12:36:12.406830",
+      "todo_count": 7
+    },
+    {
+      "operation": "write",
+      "timestamp": "2026-01-06T12:37:31.214147",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/adaptive_control/correlation_tracker.py",
+      "content_length": 17941
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2026-01-06T12:37:39.473291",
+      "todo_count": 7
+    },
+    {
+      "operation": "write",
+      "timestamp": "2026-01-06T12:39:34.630091",
+      "file_path": "/tmp/alpha_evolve_correlation_tracker.py",
+      "content_length": 30163
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T12:39:42.323630",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python /tmp/alpha_evolve_correlation_tracker.py 2>&1",
+      "description": "Run Alpha-Evolve evaluation tests"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2026-01-06T12:39:49.965962",
+      "todo_count": 7
+    },
+    {
+      "operation": "write",
+      "timestamp": "2026-01-06T12:41:21.943787",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/adaptive_control/correlation_tracker.py",
+      "content_length": 20562
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-06T12:41:27.535807",
+      "file_path": "/media/sam/1TB/claude-hooks-shared/hooks/productivity/evolve-interceptor.py"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T12:41:38.050342",
+      "command": "cat /media/sam/1TB/nautilus_dev/.claude/stats/alpha_evolve_state.json 2>/dev/null || echo \"FILE_NOT_EXISTS\"",
+      "description": "Check if alpha_evolve_state.json exists"
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-06T12:41:43.397931",
+      "file_path": "/media/sam/1TB/nautilus_dev/.claude/stats/alpha_evolve_state.json"
+    },
+    {
+      "operation": "write",
+      "timestamp": "2026-01-06T12:41:48.425053",
+      "file_path": "/media/sam/1TB/nautilus_dev/.claude/stats/alpha_evolve_state.json",
+      "content_length": 285
+    },
+    {
+      "operation": "write",
+      "timestamp": "2026-01-06T12:43:18.079695",
+      "file_path": "/media/sam/1TB/nautilus_dev/strategies/common/adaptive_control/correlation_tracker.py",
+      "content_length": 20574
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2026-01-06T12:43:27.698367",
+      "todo_count": 7
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T12:43:56.920829",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && python -c \"\nfrom strategies.common.adaptive_control.correlation_tracker import (\n    OnlineStats,\n    CorrelationMetrics,\n    OnlineCorrelationMatrix,\n    calculate_covariance_penalty,\n)\nimport numpy as np\nimport math\nimport time\n\nprint('=== VALIDATION TESTS ===')\nprint()\n\n# Test 1: OnlineStats / Welford's algorithm\nprint('Test 1: OnlineStats (Welford algorithm)')\nnp.random.seed(42)\ntrue_mean, true_std = 0.05, 0.02\nsamples = np.random.normal(true_mean, true_std, 1000)\n\nstats = OnlineStats()\nfor s in samples:\n    stats.n += 1\n    delta = s - stats.mean\n    stats.mean += delta / stats.n\n    delta2 = s - stats.mean\n    stats.m2 += delta * delta2\n\nmean_error = abs(stats.mean - true_mean)\nvar_error = abs(stats.var - true_std**2)\nprint(f'  Mean error: {mean_error:.6f} (expected < 0.01)')\nprint(f'  Variance error: {var_error:.6f} (expected < 0.001)')\nassert mean_error < 0.01, 'Mean error too high'\nassert var_error < 0.001, 'Variance error too high'\nprint('  PASS')\nprint()\n\n# Test 2: Correlation convergence\nprint('Test 2: Correlation convergence')\nnp.random.seed(42)\nn_samples = 200\ntrue_corr = 0.8\n\nbase = np.random.normal(0, 0.02, n_samples)\nnoise = np.random.normal(0, 0.02 * math.sqrt(1 - true_corr**2), n_samples)\nreturns_a = base\nreturns_b = true_corr * base + noise\n\ntracker = OnlineCorrelationMatrix(['A', 'B'], decay=0.99, shrinkage=0.1, min_samples=30)\nfor i in range(n_samples):\n    tracker.update({'A': returns_a[i], 'B': returns_b[i]})\n\ncorr_matrix = tracker.get_correlation_matrix()\nestimated_corr = corr_matrix[0, 1]\n# Account for shrinkage (pulls toward 0)\nexpected_shrunk = 0.9 * true_corr  # Approximately\nerror = abs(estimated_corr - expected_shrunk)\nprint(f'  Estimated correlation: {estimated_corr:.4f}')\nprint(f'  Expected (with shrinkage): ~{expected_shrunk:.4f}')\nprint(f'  Error from expected: {error:.4f} (expected < 0.15)')\nassert error < 0.15, 'Correlation error too high'\nprint('  PASS')\nprint()\n\n# Test 3: Penalty calculation\nprint('Test 3: Penalty calculation')\ncorr = np.array([[1.0, 0.8, 0.0], [0.8, 1.0, 0.0], [0.0, 0.0, 1.0]])\nindices = {'A': 0, 'B': 1, 'C': 2}\n\n# Correlated weights\nweights_corr = {'A': 0.5, 'B': 0.5, 'C': 0.0}\npenalty_corr = calculate_covariance_penalty(weights_corr, corr, indices)\nexpected_corr = 0.4  # 2 * 0.5 * 0.5 * 0.8\nprint(f'  Correlated penalty: {penalty_corr:.4f} (expected {expected_corr})')\nassert abs(penalty_corr - expected_corr) < 0.01, 'Correlated penalty error'\n\n# Uncorrelated weights\nweights_uncorr = {'A': 0.5, 'B': 0.0, 'C': 0.5}\npenalty_uncorr = calculate_covariance_penalty(weights_uncorr, corr, indices)\nexpected_uncorr = 0.0\nprint(f'  Uncorrelated penalty: {penalty_uncorr:.4f} (expected {expected_uncorr})')\nassert abs(penalty_uncorr - expected_uncorr) < 0.01, 'Uncorrelated penalty error'\nprint('  PASS')\nprint()\n\n# Test 4: Performance\nprint('Test 4: Performance (10 strategies, 100 updates)')\nstrategies = [f'strat_{i}' for i in range(10)]\nn_updates = 100\n\nnp.random.seed(42)\nreturns_data = [\n    {s: np.random.normal(0.001, 0.02) for s in strategies}\n    for _ in range(n_updates)\n]\n\ntracker = OnlineCorrelationMatrix(strategies, decay=0.99, shrinkage=0.1, min_samples=30)\n\nstart = time.perf_counter()\nfor returns in returns_data:\n    tracker.update(returns)\nelapsed = time.perf_counter() - start\n\navg_ms = (elapsed / n_updates) * 1000\nprint(f'  Total time: {elapsed*1000:.2f}ms')\nprint(f'  Average per update: {avg_ms:.4f}ms (expected < 1.0ms)')\nassert avg_ms < 1.0, f'Too slow: {avg_ms:.4f}ms'\nprint('  PASS')\nprint()\n\n# Test 5: Edge cases\nprint('Test 5: Edge cases')\n\n# Single strategy\ntracker_single = OnlineCorrelationMatrix(['only_one'])\ntracker_single.update({'only_one': 0.01})\ncorr_single = tracker_single.get_correlation_matrix()\nassert corr_single[0, 0] == 1.0, 'Single strategy diagonal should be 1.0'\nprint('  Single strategy: PASS')\n\n# Zero variance (constant returns)\ntracker_zero = OnlineCorrelationMatrix(['const', 'normal'], min_samples=5)\nfor _ in range(10):\n    tracker_zero.update({'const': 0.0, 'normal': np.random.normal(0, 0.01)})\ncorr_zero = tracker_zero.get_correlation_matrix()\n# Should handle gracefully without crash\nprint('  Zero variance: PASS')\n\n# Missing returns\ntracker_missing = OnlineCorrelationMatrix(['A', 'B', 'C'], min_samples=5)\ntracker_missing.update({'A': 0.01})  # B and C missing\ntracker_missing.update({'A': 0.02, 'B': 0.01})  # C missing\nprint('  Missing returns: PASS')\n\n# Validation errors\ntry:\n    OnlineCorrelationMatrix([])\n    print('  Empty strategies: FAIL (should raise)')\nexcept ValueError:\n    print('  Empty strategies validation: PASS')\n\ntry:\n    OnlineCorrelationMatrix(['A'], decay=1.5)\n    print('  Invalid decay: FAIL (should raise)')\nexcept ValueError:\n    print('  Invalid decay validation: PASS')\n\nprint()\n\n# Test 6: Metrics\nprint('Test 6: CorrelationMetrics')\ntracker = OnlineCorrelationMatrix(['A', 'B', 'C'], min_samples=5)\nfor _ in range(10):\n    tracker.update({\n        'A': np.random.normal(0, 0.01),\n        'B': np.random.normal(0, 0.01),\n        'C': np.random.normal(0, 0.01),\n    })\n\nweights = {'A': 0.5, 'B': 0.3, 'C': 0.2}\nmetrics = tracker.get_metrics(weights)\nprint(f'  Herfindahl index: {metrics.herfindahl_index:.4f}')\nprint(f'  Effective N: {metrics.effective_n_strategies:.2f}')\nprint(f'  Max correlation: {metrics.max_pairwise_correlation:.4f}')\nprint(f'  Avg correlation: {metrics.avg_correlation:.4f}')\nassert 0 < metrics.herfindahl_index <= 1.0, 'Invalid Herfindahl'\nassert metrics.effective_n_strategies >= 1.0, 'Invalid effective N'\nprint('  PASS')\nprint()\n\nprint('=' * 50)\nprint('ALL VALIDATION TESTS PASSED')\nprint('=' * 50)\n\"",
+      "description": "Run validation tests for correlation_tracker"
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2026-01-06T12:44:04.292072",
+      "todo_count": 7
+    },
+    {
+      "operation": "read",
+      "timestamp": "2026-01-06T12:44:08.566661",
+      "file_path": "/media/sam/1TB/nautilus_dev/.claude/stats/alpha_evolve_state.json"
+    },
+    {
+      "operation": "write",
+      "timestamp": "2026-01-06T12:44:14.138295",
+      "file_path": "/media/sam/1TB/nautilus_dev/.claude/stats/alpha_evolve_state.json",
+      "content_length": 302
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T12:44:25.134469",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run ruff check strategies/common/adaptive_control/correlation_tracker.py --output-format=concise 2>&1 | head -30",
+      "description": "Run ruff check on correlation_tracker.py"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T12:44:32.258994",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run ruff format strategies/common/adaptive_control/correlation_tracker.py --check 2>&1",
+      "description": "Check ruff formatting"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T12:44:37.790077",
+      "command": "rm /tmp/alpha_evolve_correlation_tracker.py 2>/dev/null; echo \"Cleaned up temporary file\"",
+      "description": "Clean up temporary evaluation file"
+    }
+  ],
+  "last_updated": "2026-01-06T12:44:37.790097"
+}
