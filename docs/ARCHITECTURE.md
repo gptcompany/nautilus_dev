@@ -555,6 +555,20 @@ Bridge between academic research knowledge graph and NautilusTrader strategy dev
 | Sync Script | nautilus_dev/scripts/sync_research.py | Cross-repo sync |
 | Strategies Output | nautilus_dev/docs/research/strategies.json | Synced entities |
 
+### Research Directory Structure
+
+```
+docs/research/
+├── books/                    # Reference PDFs (Cartea HFT, etc.)
+├── papers/
+│   ├── general/              # General trading papers
+│   └── spec-{N}/             # Spec-specific papers (e.g., spec-032/)
+├── targets_mm/               # Market making research targets
+├── indicator_mapping.md      # Paper indicators → NautilusTrader mapping
+├── order_mapping.md          # Order type mapping
+└── strategies.json           # Synced strategy entities from academic_research
+```
+
 ### Entity Schema (strategy__)
 
 ```yaml
