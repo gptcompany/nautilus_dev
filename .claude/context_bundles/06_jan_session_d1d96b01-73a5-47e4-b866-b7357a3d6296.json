@@ -249,7 +249,73 @@
       "timestamp": "2026-01-06T17:05:22.196079",
       "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run pytest tests/test_thompson_selector_adaptive.py -v 2>&1",
       "description": "Run Thompson selector adaptive tests"
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-06T17:05:41.748058",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/032-adts-discounting/tasks.md",
+      "old_string": "- [ ] T014 [P] [US2] Write test_backward_compatibility_no_detector in tests/test_thompson_selector_a..."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-06T17:05:51.453976",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/032-adts-discounting/tasks.md",
+      "old_string": "- [ ] T018 [US2] Modify ThompsonSelector.__init__() to accept regime_detector parameter in strategie..."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-06T17:05:56.734820",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/032-adts-discounting/tasks.md",
+      "old_string": "- [ ] T026 [P] [US3] Write test_decay_event_emitted in tests/test_thompson_selector_adaptive.py\n- [ ..."
+    },
+    {
+      "operation": "edit",
+      "timestamp": "2026-01-06T17:06:05.948164",
+      "file_path": "/media/sam/1TB/nautilus_dev/specs/032-adts-discounting/tasks.md",
+      "old_string": "- [ ] T029 [US3] Add SYS_DECAY_UPDATE to AuditEventType enum in strategies/common/audit/events.py\n- ..."
+    },
+    {
+      "operation": "todowrite",
+      "timestamp": "2026-01-06T17:06:13.050545",
+      "todo_count": 7
+    },
+    {
+      "operation": "glob",
+      "timestamp": "2026-01-06T17:06:19.313240",
+      "pattern": "tests/**/test*particle*.py",
+      "path": "/media/sam/1TB/nautilus_dev"
+    },
+    {
+      "operation": "grep",
+      "timestamp": "2026-01-06T17:06:19.321119",
+      "pattern": "ThompsonSelector|ParticlePortfolio|BayesianEnsemble",
+      "path": "/media/sam/1TB/nautilus_dev/tests",
+      "output_mode": "files_with_matches"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T17:06:24.582013",
+      "command": "head -100 /media/sam/1TB/nautilus_dev/tests/integration/test_csrc_walk_forward.py",
+      "description": "Check CSRC integration test"
+    },
+    {
+      "operation": "task",
+      "timestamp": "2026-01-06T17:06:30.652480",
+      "subagent_type": "test-runner",
+      "prompt": "Run the tests in tests/integration/test_csrc_walk_forward.py using pytest verbose mode. Report resul..."
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T17:06:35.042437",
+      "command": "source /media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/activate && uv run pytest tests/integration/test_csrc_walk_forward.py -v 2>&1",
+      "description": "Run walk-forward integration tests with verbose output"
+    },
+    {
+      "operation": "bash",
+      "timestamp": "2026-01-06T17:06:41.544551",
+      "command": "/media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/bin/python -m pytest tests/integration/test_csrc_walk_forward.py -v 2>&1",
+      "description": "Run tests using nightly env python directly"
     }
   ],
-  "last_updated": "2026-01-06T17:05:22.196095"
+  "last_updated": "2026-01-06T17:06:41.544573"
 }

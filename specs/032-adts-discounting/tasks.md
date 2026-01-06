@@ -73,21 +73,21 @@
 
 ### Tests for User Story 2
 
-- [ ] T014 [P] [US2] Write test_backward_compatibility_no_detector in tests/test_thompson_selector_adaptive.py
-- [ ] T015 [P] [US2] Write test_adaptive_with_detector in tests/test_thompson_selector_adaptive.py
-- [ ] T016 [P] [US2] Write test_update_uses_adaptive_decay in tests/test_thompson_selector_adaptive.py
-- [ ] T017 [P] [US2] Write test_update_continuous_uses_adaptive_decay in tests/test_thompson_selector_adaptive.py
+- [X] T014 [P] [US2] Write test_backward_compatibility_no_detector in tests/test_thompson_selector_adaptive.py
+- [X] T015 [P] [US2] Write test_adaptive_with_detector in tests/test_thompson_selector_adaptive.py
+- [X] T016 [P] [US2] Write test_update_uses_adaptive_decay in tests/test_thompson_selector_adaptive.py
+- [X] T017 [P] [US2] Write test_update_continuous_uses_adaptive_decay in tests/test_thompson_selector_adaptive.py
 
 ### Implementation for User Story 2
 
-- [ ] T018 [US2] Modify ThompsonSelector.__init__() to accept regime_detector parameter in strategies/common/adaptive_control/particle_portfolio.py
-- [ ] T019 [US2] Add _fixed_decay and _regime_detector instance variables in strategies/common/adaptive_control/particle_portfolio.py
-- [ ] T020 [US2] Add _decay_calculator initialization logic in strategies/common/adaptive_control/particle_portfolio.py
-- [ ] T021 [US2] Implement _get_decay() internal method in strategies/common/adaptive_control/particle_portfolio.py
-- [ ] T022 [US2] Modify update() to call _get_decay() instead of self.decay in strategies/common/adaptive_control/particle_portfolio.py
-- [ ] T023 [US2] Modify update_continuous() to call _get_decay() instead of self.decay in strategies/common/adaptive_control/particle_portfolio.py
-- [ ] T024 [US2] Add current_decay property to ThompsonSelector in strategies/common/adaptive_control/particle_portfolio.py
-- [ ] T025 [US2] Run tests and verify all US2 tests pass plus US1 regression
+- [X] T018 [US2] Modify ThompsonSelector.__init__() to accept regime_detector parameter in strategies/common/adaptive_control/particle_portfolio.py
+- [X] T019 [US2] Add _fixed_decay and _regime_detector instance variables in strategies/common/adaptive_control/particle_portfolio.py
+- [X] T020 [US2] Add _decay_calculator initialization logic in strategies/common/adaptive_control/particle_portfolio.py
+- [X] T021 [US2] Implement _get_decay() internal method in strategies/common/adaptive_control/particle_portfolio.py
+- [X] T022 [US2] Modify update() to call _get_decay() instead of self.decay in strategies/common/adaptive_control/particle_portfolio.py
+- [X] T023 [US2] Modify update_continuous() to call _get_decay() instead of self.decay in strategies/common/adaptive_control/particle_portfolio.py
+- [X] T024 [US2] Add current_decay property to ThompsonSelector in strategies/common/adaptive_control/particle_portfolio.py
+- [X] T025 [US2] Run tests and verify all US2 tests pass plus US1 regression
 
 **Checkpoint**: ThompsonSelector integrates with IIRRegimeDetector - adaptive decay works end-to-end
 
@@ -101,18 +101,18 @@
 
 ### Tests for User Story 3
 
-- [ ] T026 [P] [US3] Write test_decay_event_emitted in tests/test_thompson_selector_adaptive.py
-- [ ] T027 [P] [US3] Write test_no_emission_without_emitter in tests/test_thompson_selector_adaptive.py
-- [ ] T028 [P] [US3] Write test_decay_event_payload_correct in tests/test_thompson_selector_adaptive.py
+- [X] T026 [P] [US3] Write test_decay_event_emitted in tests/test_thompson_selector_adaptive.py
+- [X] T027 [P] [US3] Write test_no_emission_without_emitter in tests/test_thompson_selector_adaptive.py
+- [X] T028 [P] [US3] Write test_decay_event_payload_correct in tests/test_thompson_selector_adaptive.py
 
 ### Implementation for User Story 3
 
-- [ ] T029 [US3] Add SYS_DECAY_UPDATE to AuditEventType enum in strategies/common/audit/events.py
-- [ ] T030 [US3] Add DecayEvent dataclass in strategies/common/audit/events.py
-- [ ] T031 [US3] Modify ThompsonSelector.__init__() to accept audit_emitter parameter in strategies/common/adaptive_control/particle_portfolio.py
-- [ ] T032 [US3] Implement _emit_decay_event() method in ThompsonSelector in strategies/common/adaptive_control/particle_portfolio.py
-- [ ] T033 [US3] Add audit emission call in _get_decay() when emitter configured in strategies/common/adaptive_control/particle_portfolio.py
-- [ ] T034 [US3] Run tests and verify all US3 tests pass plus US1/US2 regression
+- [X] T029 [US3] Add SYS_DECAY_UPDATE to AuditEventType enum in strategies/common/audit/events.py
+- [X] T030 [US3] Add DecayEvent dataclass in strategies/common/audit/events.py (used SystemEvent with payload instead)
+- [X] T031 [US3] Modify ThompsonSelector.__init__() to accept audit_emitter parameter in strategies/common/adaptive_control/particle_portfolio.py
+- [X] T032 [US3] Implement _emit_decay_event() method in ThompsonSelector in strategies/common/adaptive_control/particle_portfolio.py
+- [X] T033 [US3] Add audit emission call in _get_decay() when emitter configured in strategies/common/adaptive_control/particle_portfolio.py
+- [X] T034 [US3] Run tests and verify all US3 tests pass plus US1/US2 regression
 
 **Checkpoint**: Full observability - decay changes visible in audit trail
 
