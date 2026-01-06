@@ -24,6 +24,7 @@ Example:
 """
 
 from strategies.common.audit.config import AuditConfig
+from strategies.common.audit.converter import ParquetConverter
 from strategies.common.audit.emitter import AuditEventEmitter
 from strategies.common.audit.events import (
     AuditEvent,
@@ -33,15 +34,30 @@ from strategies.common.audit.events import (
     SystemEvent,
     TradeEvent,
 )
+from strategies.common.audit.query import AuditQuery
 from strategies.common.audit.writer import AppendOnlyWriter
+
+# Observer requires NautilusTrader - import only if available
+try:
+    from strategies.common.audit.observer import AuditObserver, AuditObserverConfig
+
+    _HAS_OBSERVER = True
+except ImportError:
+    AuditObserver = None  # type: ignore[assignment, misc]
+    AuditObserverConfig = None  # type: ignore[assignment, misc]
+    _HAS_OBSERVER = False
 
 __all__ = [
     "AuditConfig",
     "AuditEvent",
     "AuditEventEmitter",
     "AuditEventType",
+    "AuditObserver",
+    "AuditObserverConfig",
+    "AuditQuery",
     "AppendOnlyWriter",
     "ParameterChangeEvent",
+    "ParquetConverter",
     "SignalEvent",
     "SystemEvent",
     "TradeEvent",
