@@ -31,9 +31,12 @@ import logging
 from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
-from typing import Callable, Dict, List, Optional
+from typing import TYPE_CHECKING, Callable, Dict, List, Optional
 
 from .meta_controller import MarketHarmony, MetaController, MetaState
+
+if TYPE_CHECKING:
+    pass
 
 logger = logging.getLogger(__name__)
 
@@ -105,14 +108,19 @@ class AlphaEvolveBridge:
         self,
         meta_controller: MetaController,
         config: Optional[EvolutionConfig] = None,
+        audit_emitter: "AuditEventEmitter | None" = None,
     ):
         """
         Args:
             meta_controller: The MetaController to observe
             config: Evolution trigger configuration
+            audit_emitter: Optional audit emitter for logging evolution triggers
         """
         self.meta = meta_controller
         self.config = config or EvolutionConfig()
+
+        # Audit emitter for logging evolution triggers (Spec 030)
+        self._audit_emitter = audit_emitter
 
         self._callbacks: List[Callable[[EvolutionRequest], None]] = []
         self._last_evolution_bar: int = 0
@@ -189,6 +197,25 @@ class AlphaEvolveBridge:
         # Update state
         self._last_evolution_bar = current_bar
         self._pending_requests.append(request)
+
+        # Audit: Log evolution trigger event
+        if self._audit_emitter:
+            from strategies.common.audit.events import AuditEventType
+
+            self._audit_emitter.emit_system(
+                event_type=AuditEventType.SYS_EVOLUTION_TRIGGER,
+                source="alpha_evolve_bridge",
+                payload={
+                    "trigger_reason": trigger.value,
+                    "underperforming_strategies": underperformers[
+                        : self.config.max_strategies_to_evolve
+                    ],
+                    "priority": request.priority,
+                    "harmony": state.market_harmony.value,
+                    "risk_multiplier": state.risk_multiplier,
+                    "current_bar": current_bar,
+                },
+            )
 
         # Notify callbacks
         for callback in self._callbacks:
@@ -314,6 +341,16 @@ class AlphaEvolveBridge:
     def get_pending_evolutions(self) -> List[EvolutionRequest]:
         """Get list of pending evolution requests."""
         return self._pending_requests.copy()
+
+    @property
+    def audit_emitter(self) -> "AuditEventEmitter | None":
+        """Audit emitter for logging evolution triggers."""
+        return self._audit_emitter
+
+    @audit_emitter.setter
+    def audit_emitter(self, emitter: "AuditEventEmitter | None") -> None:
+        """Set the audit emitter."""
+        self._audit_emitter = emitter
 
 
 class AdaptiveSurvivalSystem:

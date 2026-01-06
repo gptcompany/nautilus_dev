@@ -31,7 +31,10 @@ from __future__ import annotations
 import math
 import random
 from dataclasses import dataclass
-from typing import Dict, List, Optional, Tuple
+from typing import TYPE_CHECKING, Dict, List, Optional, Tuple
+
+if TYPE_CHECKING:
+    pass
 
 
 @dataclass
@@ -97,6 +100,7 @@ class ParticlePortfolio:
         n_particles: int = 100,
         resampling_threshold: float = 0.5,
         mutation_std: float = 0.1,
+        audit_emitter: "AuditEventEmitter | None" = None,
     ):
         """
         Args:
@@ -104,11 +108,15 @@ class ParticlePortfolio:
             n_particles: Number of particles (more = more accurate)
             resampling_threshold: ESS ratio below which to resample
             mutation_std: Standard deviation for weight mutations
+            audit_emitter: Optional audit emitter for logging signals
         """
         self.strategies = strategies
         self.n_particles = n_particles
         self.resampling_threshold = resampling_threshold
         self.mutation_std = mutation_std
+
+        # Audit emitter for logging signals and resampling events (Spec 030)
+        self._audit_emitter = audit_emitter
 
         # Initialize particles with random weights
         self.particles: List[Particle] = []
@@ -161,6 +169,21 @@ class ParticlePortfolio:
             self._resample(weights)
             resampled = True
 
+            # Audit: Log resampling event
+            if self._audit_emitter:
+                from strategies.common.audit.events import AuditEventType
+
+                self._audit_emitter.emit_system(
+                    event_type=AuditEventType.SYS_RESAMPLING,
+                    source="particle_portfolio",
+                    payload={
+                        "ess": ess,
+                        "ess_ratio": ess_ratio,
+                        "threshold": self.resampling_threshold,
+                        "n_particles": self.n_particles,
+                    },
+                )
+
         # 5. Mutate particles (exploration)
         self._mutate()
 
@@ -183,12 +206,36 @@ class ParticlePortfolio:
         for s in self.strategies:
             uncertainty[s] = math.sqrt(uncertainty[s])
 
-        return PortfolioState(
+        state = PortfolioState(
             strategy_weights=consensus,
             weight_uncertainty=uncertainty,
             effective_particles=ess,
             resampled=resampled,
         )
+
+        # Audit: Log consensus signal
+        if self._audit_emitter:
+            # Calculate overall consensus confidence
+            avg_uncertainty = (
+                sum(uncertainty.values()) / len(uncertainty) if uncertainty else 0.5
+            )
+            confidence = max(0.0, 1.0 - avg_uncertainty)
+
+            # Find dominant strategy for signal attribution
+            dominant_strategy = (
+                max(consensus, key=consensus.get) if consensus else "unknown"
+            )
+            signal_value = consensus.get(dominant_strategy, 0.0)
+
+            self._audit_emitter.emit_signal(
+                signal_value=signal_value,
+                regime="ENSEMBLE",
+                confidence=confidence,
+                strategy_source=f"particle_portfolio:{dominant_strategy}",
+                source="particle_portfolio",
+            )
+
+        return state
 
     def _resample(self, weights: List[float]) -> None:
         """Resample particles using systematic resampling."""
@@ -234,6 +281,16 @@ class ParticlePortfolio:
     def get_best_particle(self) -> Particle:
         """Get the particle with highest fitness."""
         return max(self.particles, key=lambda p: p.fitness)
+
+    @property
+    def audit_emitter(self) -> "AuditEventEmitter | None":
+        """Audit emitter for logging signals."""
+        return self._audit_emitter
+
+    @audit_emitter.setter
+    def audit_emitter(self, emitter: "AuditEventEmitter | None") -> None:
+        """Set the audit emitter."""
+        self._audit_emitter = emitter
 
 
 @dataclass

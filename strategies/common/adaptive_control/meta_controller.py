@@ -25,7 +25,10 @@ import logging
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
-from typing import Callable
+from typing import TYPE_CHECKING, Callable
+
+if TYPE_CHECKING:
+    pass
 
 
 logger = logging.getLogger(__name__)
@@ -127,6 +130,7 @@ class MetaController:
         ventral_threshold: float = 70,
         sympathetic_threshold: float = 40,
         harmony_lookback: int = 50,
+        audit_emitter: "AuditEventEmitter | None" = None,
     ):
         """
         Args:
@@ -134,11 +138,15 @@ class MetaController:
             ventral_threshold: Health score for Ventral state
             sympathetic_threshold: Health score for Sympathetic state
             harmony_lookback: Bars to calculate strategy-market harmony
+            audit_emitter: Optional audit emitter for logging state changes
         """
         self.target_drawdown = target_drawdown
         self.ventral_threshold = ventral_threshold
         self.sympathetic_threshold = sympathetic_threshold
         self.harmony_lookback = harmony_lookback
+
+        # Audit emitter for logging state changes (Spec 030)
+        self._audit_emitter = audit_emitter
 
         # Components (lazy initialized)
         self._health_monitor = None
@@ -158,6 +166,10 @@ class MetaController:
         # Peak equity for drawdown
         self._peak_equity: float = 0.0
         self._current_equity: float = 0.0
+
+        # Previous values for audit change detection
+        self._prev_risk_multiplier: float | None = None
+        self._prev_strategy_weights: dict[str, float] = {}
 
     def _ensure_components(self):
         """Lazy initialize components."""
@@ -280,13 +292,35 @@ class MetaController:
         regime_analysis = self._regime_detector.analyze()
 
         # Determine system state (polyvagal)
+        prev_state = self._current_state
         self._current_state = self._calculate_system_state(
             health_metrics.score,
             drawdown,
         )
 
+        # Audit: Log system state change
+        if self._audit_emitter and self._current_state != prev_state:
+            self._audit_emitter.emit_param_change(
+                param_name="system_state",
+                old_value=prev_state.value,
+                new_value=self._current_state.value,
+                trigger_reason=f"health_score={health_metrics.score:.1f}",
+                source="meta_controller",
+            )
+
         # Determine market harmony
+        prev_harmony = self._current_harmony
         self._current_harmony = self._calculate_harmony(regime_analysis.regime)
+
+        # Audit: Log market harmony change
+        if self._audit_emitter and self._current_harmony != prev_harmony:
+            self._audit_emitter.emit_param_change(
+                param_name="market_harmony",
+                old_value=prev_harmony.value,
+                new_value=self._current_harmony.value,
+                trigger_reason=f"regime={regime_analysis.regime}",
+                source="meta_controller",
+            )
 
         # Calculate strategy weights
         strategy_weights = self._calculate_strategy_weights(
@@ -310,12 +344,38 @@ class MetaController:
 
         risk_multiplier = pid_multiplier * state_multiplier * harmony_multiplier
 
+        # Audit: Log risk multiplier change (significant changes only)
+        if self._audit_emitter and self._prev_risk_multiplier is not None:
+            if abs(risk_multiplier - self._prev_risk_multiplier) > 0.01:
+                self._audit_emitter.emit_param_change(
+                    param_name="risk_multiplier",
+                    old_value=f"{self._prev_risk_multiplier:.4f}",
+                    new_value=f"{risk_multiplier:.4f}",
+                    trigger_reason=f"drawdown={drawdown * 100:.2f}%",
+                    source="meta_controller",
+                )
+        self._prev_risk_multiplier = risk_multiplier
+
         # Apply strategy weights via callbacks
         for name, info in self._strategies.items():
             weight = strategy_weights.get(name, 0.0)
             info["current_weight"] = weight
             if info["callback"]:
                 info["callback"](weight)
+
+        # Audit: Log strategy weight changes (significant changes only)
+        if self._audit_emitter:
+            for name, new_weight in strategy_weights.items():
+                old_weight = self._prev_strategy_weights.get(name, 0.0)
+                if abs(new_weight - old_weight) > 0.01:
+                    self._audit_emitter.emit_param_change(
+                        param_name=f"strategy_weight.{name}",
+                        old_value=f"{old_weight:.4f}",
+                        new_value=f"{new_weight:.4f}",
+                        trigger_reason=f"state={self._current_state.value}",
+                        source="meta_controller",
+                    )
+        self._prev_strategy_weights = strategy_weights.copy()
 
         return MetaState(
             timestamp=datetime.utcnow(),
@@ -421,6 +481,16 @@ class MetaController:
     def harmony(self) -> MarketHarmony:
         """Current market harmony."""
         return self._current_harmony
+
+    @property
+    def audit_emitter(self) -> "AuditEventEmitter | None":
+        """Audit emitter for logging state changes."""
+        return self._audit_emitter
+
+    @audit_emitter.setter
+    def audit_emitter(self, emitter: "AuditEventEmitter | None") -> None:
+        """Set the audit emitter."""
+        self._audit_emitter = emitter
 
     def reset(self) -> None:
         """Reset controller state."""
