@@ -5,16 +5,18 @@ Tests WebSocket endpoint, REST API, and connection management.
 """
 
 import pytest
-from fastapi.testclient import TestClient
+
+pytest.importorskip("fastapi")
 
 # Add dashboard to path
 import sys
 from pathlib import Path
 
+from fastapi.testclient import TestClient
+
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / "dashboard"))
 
 from server import app
-
 
 # =============================================================================
 # Fixtures
