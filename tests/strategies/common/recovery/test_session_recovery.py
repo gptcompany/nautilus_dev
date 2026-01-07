@@ -1198,9 +1198,13 @@ class TestRecoverableStrategy:
         """Test RecoverableStrategy initialization."""
         with patch.object(RecoverableStrategy, "cache", new_callable=PropertyMock) as mock_cache:
             mock_cache.return_value = mock_strategy_deps["cache"]
-            with patch.object(RecoverableStrategy, "clock", new_callable=PropertyMock) as mock_clock:
+            with patch.object(
+                RecoverableStrategy, "clock", new_callable=PropertyMock
+            ) as mock_clock:
                 mock_clock.return_value = mock_strategy_deps["clock"]
-                with patch.object(RecoverableStrategy, "trader_id", new_callable=PropertyMock) as mock_trader:
+                with patch.object(
+                    RecoverableStrategy, "trader_id", new_callable=PropertyMock
+                ) as mock_trader:
                     mock_trader.return_value = "TRADER-001"
 
                     strategy = RecoverableStrategy(config=strategy_config)
@@ -1214,7 +1218,9 @@ class TestRecoverableStrategy:
             bar_type="BTCUSDT-PERP.BINANCE-1-MINUTE-LAST-EXTERNAL",
             recovery=None,
         )
-        with patch.object(RecoverableStrategy, "trader_id", new_callable=PropertyMock) as mock_trader:
+        with patch.object(
+            RecoverableStrategy, "trader_id", new_callable=PropertyMock
+        ) as mock_trader:
             mock_trader.return_value = "TRADER-001"
             strategy = RecoverableStrategy(config=config)
             assert strategy.recovery_config is not None
@@ -1531,9 +1537,7 @@ class TestRecoverableStrategyWithMockedCacheAndClock:
         pos.is_open = True
         return pos
 
-    def test_handle_recovered_position_updates_state(
-        self, strategy_config, mock_open_position
-    ):
+    def test_handle_recovered_position_updates_state(self, strategy_config, mock_open_position):
         """Test _handle_recovered_position updates recovery state (lines 202-210)."""
         strategy = RecoverableStrategy(config=strategy_config)
         strategy.recovery_state = RecoveryState(
@@ -1545,9 +1549,9 @@ class TestRecoverableStrategyWithMockedCacheAndClock:
         mock_cache = MagicMock()
         mock_cache.orders_open.return_value = []
 
-        with patch.object(type(strategy), 'cache', new_callable=PropertyMock) as mock_cache_prop:
+        with patch.object(type(strategy), "cache", new_callable=PropertyMock) as mock_cache_prop:
             mock_cache_prop.return_value = mock_cache
-            with patch.object(type(strategy), 'log', new_callable=PropertyMock) as mock_log_prop:
+            with patch.object(type(strategy), "log", new_callable=PropertyMock) as mock_log_prop:
                 mock_logger = MagicMock()
                 mock_log_prop.return_value = mock_logger
 
@@ -1556,9 +1560,7 @@ class TestRecoverableStrategyWithMockedCacheAndClock:
         assert len(strategy._recovered_positions) == 1
         assert strategy.recovery_state.positions_recovered == 1
 
-    def test_handle_recovered_position_logs_details(
-        self, strategy_config, mock_open_position
-    ):
+    def test_handle_recovered_position_logs_details(self, strategy_config, mock_open_position):
         """Test _handle_recovered_position logs position details (lines 213-219)."""
         strategy = RecoverableStrategy(config=strategy_config)
         strategy.recovery_state = RecoveryState(
@@ -1569,9 +1571,9 @@ class TestRecoverableStrategyWithMockedCacheAndClock:
         mock_cache = MagicMock()
         mock_cache.orders_open.return_value = []
 
-        with patch.object(type(strategy), 'cache', new_callable=PropertyMock) as mock_cache_prop:
+        with patch.object(type(strategy), "cache", new_callable=PropertyMock) as mock_cache_prop:
             mock_cache_prop.return_value = mock_cache
-            with patch.object(type(strategy), 'log', new_callable=PropertyMock) as mock_log_prop:
+            with patch.object(type(strategy), "log", new_callable=PropertyMock) as mock_log_prop:
                 mock_logger = MagicMock()
                 mock_log_prop.return_value = mock_logger
 
@@ -1580,9 +1582,7 @@ class TestRecoverableStrategyWithMockedCacheAndClock:
                 # Should log recovery details
                 mock_logger.info.assert_called()
 
-    def test_setup_exit_orders_with_existing_stop(
-        self, strategy_config, mock_open_position
-    ):
+    def test_setup_exit_orders_with_existing_stop(self, strategy_config, mock_open_position):
         """Test _setup_exit_orders logs when stop already exists (lines 259-263)."""
         from nautilus_trader.model.enums import OrderType
 
@@ -1594,9 +1594,9 @@ class TestRecoverableStrategyWithMockedCacheAndClock:
         mock_cache = MagicMock()
         mock_cache.orders_open.return_value = [mock_stop_order]
 
-        with patch.object(type(strategy), 'cache', new_callable=PropertyMock) as mock_cache_prop:
+        with patch.object(type(strategy), "cache", new_callable=PropertyMock) as mock_cache_prop:
             mock_cache_prop.return_value = mock_cache
-            with patch.object(type(strategy), 'log', new_callable=PropertyMock) as mock_log_prop:
+            with patch.object(type(strategy), "log", new_callable=PropertyMock) as mock_log_prop:
                 mock_logger = MagicMock()
                 mock_log_prop.return_value = mock_logger
 
@@ -1607,9 +1607,7 @@ class TestRecoverableStrategyWithMockedCacheAndClock:
                 info_calls = [str(c) for c in mock_logger.info.call_args_list]
                 assert any("Stop-loss already exists" in c for c in info_calls)
 
-    def test_setup_exit_orders_without_stop(
-        self, strategy_config, mock_open_position
-    ):
+    def test_setup_exit_orders_without_stop(self, strategy_config, mock_open_position):
         """Test _setup_exit_orders warns when no stop exists (lines 265-269)."""
         from nautilus_trader.model.enums import OrderType
 
@@ -1622,9 +1620,9 @@ class TestRecoverableStrategyWithMockedCacheAndClock:
         mock_cache = MagicMock()
         mock_cache.orders_open.return_value = [mock_limit_order]
 
-        with patch.object(type(strategy), 'cache', new_callable=PropertyMock) as mock_cache_prop:
+        with patch.object(type(strategy), "cache", new_callable=PropertyMock) as mock_cache_prop:
             mock_cache_prop.return_value = mock_cache
-            with patch.object(type(strategy), 'log', new_callable=PropertyMock) as mock_log_prop:
+            with patch.object(type(strategy), "log", new_callable=PropertyMock) as mock_log_prop:
                 mock_logger = MagicMock()
                 mock_log_prop.return_value = mock_logger
 
@@ -1642,9 +1640,9 @@ class TestRecoverableStrategyWithMockedCacheAndClock:
         mock_cache = MagicMock()
         mock_cache.orders_open.return_value = []  # No orders at all
 
-        with patch.object(type(strategy), 'cache', new_callable=PropertyMock) as mock_cache_prop:
+        with patch.object(type(strategy), "cache", new_callable=PropertyMock) as mock_cache_prop:
             mock_cache_prop.return_value = mock_cache
-            with patch.object(type(strategy), 'log', new_callable=PropertyMock) as mock_log_prop:
+            with patch.object(type(strategy), "log", new_callable=PropertyMock) as mock_log_prop:
                 mock_logger = MagicMock()
                 mock_log_prop.return_value = mock_logger
 
@@ -1653,9 +1651,7 @@ class TestRecoverableStrategyWithMockedCacheAndClock:
                 # Should warn about missing stop-loss
                 mock_logger.warning.assert_called()
 
-    def test_detect_recovered_positions_open_only(
-        self, strategy_config, mock_open_position
-    ):
+    def test_detect_recovered_positions_open_only(self, strategy_config, mock_open_position):
         """Test _detect_recovered_positions only handles open positions (lines 183-189)."""
         strategy = RecoverableStrategy(config=strategy_config)
 
@@ -1667,9 +1663,9 @@ class TestRecoverableStrategyWithMockedCacheAndClock:
         mock_cache.positions.return_value = [mock_open_position, closed_pos]
         mock_cache.orders_open.return_value = []
 
-        with patch.object(type(strategy), 'cache', new_callable=PropertyMock) as mock_cache_prop:
+        with patch.object(type(strategy), "cache", new_callable=PropertyMock) as mock_cache_prop:
             mock_cache_prop.return_value = mock_cache
-            with patch.object(type(strategy), 'log', new_callable=PropertyMock) as mock_log_prop:
+            with patch.object(type(strategy), "log", new_callable=PropertyMock) as mock_log_prop:
                 mock_logger = MagicMock()
                 mock_log_prop.return_value = mock_logger
 
@@ -1678,9 +1674,7 @@ class TestRecoverableStrategyWithMockedCacheAndClock:
         # Should only recover the open position
         assert len(strategy._recovered_positions) == 1
 
-    def test_detect_recovered_positions_logs_count(
-        self, strategy_config, mock_open_position
-    ):
+    def test_detect_recovered_positions_logs_count(self, strategy_config, mock_open_position):
         """Test _detect_recovered_positions logs position count (lines 189)."""
         strategy = RecoverableStrategy(config=strategy_config)
 
@@ -1688,9 +1682,9 @@ class TestRecoverableStrategyWithMockedCacheAndClock:
         mock_cache.positions.return_value = [mock_open_position]
         mock_cache.orders_open.return_value = []
 
-        with patch.object(type(strategy), 'cache', new_callable=PropertyMock) as mock_cache_prop:
+        with patch.object(type(strategy), "cache", new_callable=PropertyMock) as mock_cache_prop:
             mock_cache_prop.return_value = mock_cache
-            with patch.object(type(strategy), 'log', new_callable=PropertyMock) as mock_log_prop:
+            with patch.object(type(strategy), "log", new_callable=PropertyMock) as mock_log_prop:
                 mock_logger = MagicMock()
                 mock_log_prop.return_value = mock_logger
 
@@ -1726,7 +1720,7 @@ class TestRecoverableStrategyWarmupMethods:
         mock_bar = MagicMock()
         mock_bar.ts_event = 1_000_000_000_000
 
-        with patch.object(type(strategy), 'log', new_callable=PropertyMock) as mock_log_prop:
+        with patch.object(type(strategy), "log", new_callable=PropertyMock) as mock_log_prop:
             mock_logger = MagicMock()
             mock_log_prop.return_value = mock_logger
 
@@ -1747,10 +1741,12 @@ class TestRecoverableStrategyWarmupMethods:
             ts_started=1_000_000_000_000,
         )
 
-        with patch.object(type(strategy), 'log', new_callable=PropertyMock) as mock_log_prop:
+        with patch.object(type(strategy), "log", new_callable=PropertyMock) as mock_log_prop:
             mock_logger = MagicMock()
             mock_log_prop.return_value = mock_logger
-            with patch.object(type(strategy), 'clock', new_callable=PropertyMock) as mock_clock_prop:
+            with patch.object(
+                type(strategy), "clock", new_callable=PropertyMock
+            ) as mock_clock_prop:
                 mock_clock = MagicMock()
                 mock_clock.timestamp_ns.return_value = 2_000_000_000_000
                 mock_clock_prop.return_value = mock_clock
@@ -1790,10 +1786,12 @@ class TestRecoverableStrategyWarmupMethods:
 
         strategy.on_historical_data = track_bars
 
-        with patch.object(type(strategy), 'log', new_callable=PropertyMock) as mock_log_prop:
+        with patch.object(type(strategy), "log", new_callable=PropertyMock) as mock_log_prop:
             mock_logger = MagicMock()
             mock_log_prop.return_value = mock_logger
-            with patch.object(type(strategy), 'clock', new_callable=PropertyMock) as mock_clock_prop:
+            with patch.object(
+                type(strategy), "clock", new_callable=PropertyMock
+            ) as mock_clock_prop:
                 mock_clock = MagicMock()
                 mock_clock.timestamp_ns.return_value = 4_000_000_000_000
                 mock_clock_prop.return_value = mock_clock
@@ -1817,10 +1815,12 @@ class TestRecoverableStrategyWarmupMethods:
         mock_bar = MagicMock()
         mock_bar.ts_event = 1_000_000_000_000
 
-        with patch.object(type(strategy), 'log', new_callable=PropertyMock) as mock_log_prop:
+        with patch.object(type(strategy), "log", new_callable=PropertyMock) as mock_log_prop:
             mock_logger = MagicMock()
             mock_log_prop.return_value = mock_logger
-            with patch.object(type(strategy), 'clock', new_callable=PropertyMock) as mock_clock_prop:
+            with patch.object(
+                type(strategy), "clock", new_callable=PropertyMock
+            ) as mock_clock_prop:
                 mock_clock = MagicMock()
                 mock_clock.timestamp_ns.return_value = 2_000_000_000_000
                 mock_clock_prop.return_value = mock_clock
@@ -1843,10 +1843,12 @@ class TestRecoverableStrategyWarmupMethods:
             ts_started=1_000_000_000_000,
         )
 
-        with patch.object(type(strategy), 'log', new_callable=PropertyMock) as mock_log_prop:
+        with patch.object(type(strategy), "log", new_callable=PropertyMock) as mock_log_prop:
             mock_logger = MagicMock()
             mock_log_prop.return_value = mock_logger
-            with patch.object(type(strategy), 'clock', new_callable=PropertyMock) as mock_clock_prop:
+            with patch.object(
+                type(strategy), "clock", new_callable=PropertyMock
+            ) as mock_clock_prop:
                 mock_clock = MagicMock()
                 mock_clock.timestamp_ns.return_value = 2_000_000_000_000
                 mock_clock_prop.return_value = mock_clock
@@ -1871,10 +1873,12 @@ class TestRecoverableStrategyWarmupMethods:
             ts_started=1_000_000_000_000,
         )
 
-        with patch.object(type(strategy), 'log', new_callable=PropertyMock) as mock_log_prop:
+        with patch.object(type(strategy), "log", new_callable=PropertyMock) as mock_log_prop:
             mock_logger = MagicMock()
             mock_log_prop.return_value = mock_logger
-            with patch.object(type(strategy), 'clock', new_callable=PropertyMock) as mock_clock_prop:
+            with patch.object(
+                type(strategy), "clock", new_callable=PropertyMock
+            ) as mock_clock_prop:
                 mock_clock = MagicMock()
                 mock_clock.timestamp_ns.return_value = 2_000_000_000_000
                 mock_clock_prop.return_value = mock_clock
@@ -1907,10 +1911,12 @@ class TestRecoverableStrategyWarmupMethods:
 
         strategy.on_warmup_complete = hook_wrapper
 
-        with patch.object(type(strategy), 'log', new_callable=PropertyMock) as mock_log_prop:
+        with patch.object(type(strategy), "log", new_callable=PropertyMock) as mock_log_prop:
             mock_logger = MagicMock()
             mock_log_prop.return_value = mock_logger
-            with patch.object(type(strategy), 'clock', new_callable=PropertyMock) as mock_clock_prop:
+            with patch.object(
+                type(strategy), "clock", new_callable=PropertyMock
+            ) as mock_clock_prop:
                 mock_clock = MagicMock()
                 mock_clock.timestamp_ns.return_value = 2_000_000_000_000
                 mock_clock_prop.return_value = mock_clock
@@ -1930,10 +1936,12 @@ class TestRecoverableStrategyWarmupMethods:
             ts_started=1_000_000_000_000,
         )
 
-        with patch.object(type(strategy), 'log', new_callable=PropertyMock) as mock_log_prop:
+        with patch.object(type(strategy), "log", new_callable=PropertyMock) as mock_log_prop:
             mock_logger = MagicMock()
             mock_log_prop.return_value = mock_logger
-            with patch.object(type(strategy), 'clock', new_callable=PropertyMock) as mock_clock_prop:
+            with patch.object(
+                type(strategy), "clock", new_callable=PropertyMock
+            ) as mock_clock_prop:
                 mock_clock = MagicMock()
                 mock_clock.timestamp_ns.return_value = 2_000_000_000_000
                 mock_clock_prop.return_value = mock_clock

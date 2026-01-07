@@ -193,9 +193,7 @@ class TestProperties:
 
         money = MagicMock()
         money.__float__ = MagicMock(return_value=150.0)
-        mock_strategy.portfolio.unrealized_pnls.return_value = {
-            Currency.from_str("USD"): money
-        }
+        mock_strategy.portfolio.unrealized_pnls.return_value = {Currency.from_str("USD"): money}
 
         assert tracker.total_daily_pnl == Decimal("350")
 
@@ -323,9 +321,7 @@ class TestLimitChecking:
 
         money = MagicMock()
         money.__float__ = MagicMock(return_value=-450.0)
-        mock_strategy.portfolio.unrealized_pnls.return_value = {
-            Currency.from_str("USD"): money
-        }
+        mock_strategy.portfolio.unrealized_pnls.return_value = {Currency.from_str("USD"): money}
 
         # Total: -600 + (-450) = -1050, exceeds 1000
         assert tracker.check_limit() is True
@@ -346,6 +342,7 @@ class TestLimitChecking:
     def test_warning_threshold_emits_warning(self, tracker, caplog):
         """check_limit should emit warning at 50% threshold."""
         import logging
+
         caplog.set_level(logging.WARNING)
 
         # 50% of 1000 = 500
@@ -359,6 +356,7 @@ class TestLimitChecking:
     def test_warning_only_emitted_once(self, tracker, caplog):
         """Warning should only be emitted once."""
         import logging
+
         caplog.set_level(logging.WARNING)
 
         tracker._daily_realized = Decimal("-500")
@@ -499,6 +497,7 @@ class TestPositionClosing:
     def test_trigger_limit_handles_close_errors(self, tracker, mock_strategy, caplog):
         """Should log errors but continue closing other positions."""
         import logging
+
         caplog.set_level(logging.ERROR)
 
         position1 = MagicMock()
@@ -588,9 +587,7 @@ class TestReset:
         old_day_start = tracker.day_start
 
         # Advance clock
-        mock_strategy.clock.utc_now.return_value = datetime(
-            2024, 1, 16, 0, 0, 0, tzinfo=UTC
-        )
+        mock_strategy.clock.utc_now.return_value = datetime(2024, 1, 16, 0, 0, 0, tzinfo=UTC)
 
         tracker.reset()
 
@@ -602,9 +599,7 @@ class TestReset:
         # Mock new balance
         money = MagicMock()
         money.__float__ = MagicMock(return_value=75000.0)
-        mock_strategy.portfolio.balances.return_value = {
-            Currency.from_str("USD"): money
-        }
+        mock_strategy.portfolio.balances.return_value = {Currency.from_str("USD"): money}
 
         tracker.reset()
 
@@ -613,6 +608,7 @@ class TestReset:
     def test_reset_logs_info_message(self, tracker, caplog):
         """reset should log info message."""
         import logging
+
         caplog.set_level(logging.INFO)
 
         tracker.reset()
@@ -689,9 +685,7 @@ class TestEquityCalculation:
         money = MagicMock()
         money.__float__ = MagicMock(return_value=0.0)
 
-        mock_strategy.portfolio.balances.return_value = {
-            Currency.from_str("USD"): money
-        }
+        mock_strategy.portfolio.balances.return_value = {Currency.from_str("USD"): money}
 
         equity = tracker._calculate_total_equity()
 
@@ -868,6 +862,7 @@ class TestIntegration:
     def test_warning_then_limit_progression(self, tracker, caplog):
         """Test progression from warning to limit trigger."""
         import logging
+
         caplog.set_level(logging.WARNING)
 
         # First loss - trigger warning

@@ -153,7 +153,9 @@ class TestPurgingAndEmbargo:
         splits = splitter.split(n_samples)
         purged_splits = splitter.purge_splits(splits, max_holding_bars=max_holding)
 
-        for (orig_train, _), (purged_train, purged_test) in zip(splits, purged_splits, strict=False):
+        for (orig_train, _), (purged_train, purged_test) in zip(
+            splits, purged_splits, strict=False
+        ):
             # Purged train should be smaller or equal
             assert len(purged_train) <= len(orig_train)
 

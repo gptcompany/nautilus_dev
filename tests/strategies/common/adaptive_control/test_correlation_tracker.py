@@ -254,9 +254,7 @@ class TestOnlineCorrelationMatrixUpdate:
         tracker.update({"A": 0.01, "B": 0.02})
 
         assert tracker.n_samples == 1
-        np.testing.assert_array_almost_equal(
-            tracker._ema_means, np.array([0.01, 0.02])
-        )
+        np.testing.assert_array_almost_equal(tracker._ema_means, np.array([0.01, 0.02]))
 
     def test_missing_strategy_uses_zero(self):
         """Test missing strategy in returns uses 0.0."""
@@ -304,9 +302,7 @@ class TestOnlineCorrelationMatrixUpdate:
 
     def test_multiple_strategies_update(self):
         """Test update with multiple strategies."""
-        tracker = OnlineCorrelationMatrix(
-            strategies=["mom", "rev", "trend"], min_samples=1
-        )
+        tracker = OnlineCorrelationMatrix(strategies=["mom", "rev", "trend"], min_samples=1)
 
         # Feed correlated returns
         for _ in range(50):
@@ -347,9 +343,7 @@ class TestGetCorrelationMatrix:
 
     def test_computes_correlation_at_min_samples(self):
         """Test computes correlation at exactly min_samples."""
-        tracker = OnlineCorrelationMatrix(
-            strategies=["A", "B"], min_samples=30, shrinkage=0.0
-        )
+        tracker = OnlineCorrelationMatrix(strategies=["A", "B"], min_samples=30, shrinkage=0.0)
 
         np.random.seed(42)
         for _ in range(30):
@@ -363,17 +357,17 @@ class TestGetCorrelationMatrix:
 
     def test_diagonal_is_one(self):
         """Test diagonal is always 1.0."""
-        tracker = OnlineCorrelationMatrix(
-            strategies=["A", "B", "C"], min_samples=10
-        )
+        tracker = OnlineCorrelationMatrix(strategies=["A", "B", "C"], min_samples=10)
 
         np.random.seed(42)
         for _ in range(20):
-            tracker.update({
-                "A": np.random.normal(0, 0.01),
-                "B": np.random.normal(0, 0.02),
-                "C": np.random.normal(0, 0.03),
-            })
+            tracker.update(
+                {
+                    "A": np.random.normal(0, 0.01),
+                    "B": np.random.normal(0, 0.02),
+                    "C": np.random.normal(0, 0.03),
+                }
+            )
 
         corr = tracker.get_correlation_matrix()
         for i in range(3):
@@ -381,34 +375,34 @@ class TestGetCorrelationMatrix:
 
     def test_symmetric_matrix(self):
         """Test correlation matrix is symmetric."""
-        tracker = OnlineCorrelationMatrix(
-            strategies=["A", "B", "C"], min_samples=10
-        )
+        tracker = OnlineCorrelationMatrix(strategies=["A", "B", "C"], min_samples=10)
 
         np.random.seed(42)
         for _ in range(20):
-            tracker.update({
-                "A": np.random.normal(0, 0.01),
-                "B": np.random.normal(0, 0.02),
-                "C": np.random.normal(0, 0.03),
-            })
+            tracker.update(
+                {
+                    "A": np.random.normal(0, 0.01),
+                    "B": np.random.normal(0, 0.02),
+                    "C": np.random.normal(0, 0.03),
+                }
+            )
 
         corr = tracker.get_correlation_matrix()
         np.testing.assert_array_almost_equal(corr, corr.T)
 
     def test_values_in_valid_range(self):
         """Test all correlation values are in [-1, 1]."""
-        tracker = OnlineCorrelationMatrix(
-            strategies=["A", "B", "C"], min_samples=10
-        )
+        tracker = OnlineCorrelationMatrix(strategies=["A", "B", "C"], min_samples=10)
 
         np.random.seed(42)
         for _ in range(50):
-            tracker.update({
-                "A": np.random.normal(0, 0.01),
-                "B": np.random.normal(0, 0.02),
-                "C": np.random.normal(0, 0.03),
-            })
+            tracker.update(
+                {
+                    "A": np.random.normal(0, 0.01),
+                    "B": np.random.normal(0, 0.02),
+                    "C": np.random.normal(0, 0.03),
+                }
+            )
 
         corr = tracker.get_correlation_matrix()
         assert np.all(corr >= -1.0)
@@ -416,9 +410,7 @@ class TestGetCorrelationMatrix:
 
     def test_positive_correlation_detected(self):
         """Test positive correlation is detected."""
-        tracker = OnlineCorrelationMatrix(
-            strategies=["A", "B"], min_samples=5, shrinkage=0.0
-        )
+        tracker = OnlineCorrelationMatrix(strategies=["A", "B"], min_samples=5, shrinkage=0.0)
 
         np.random.seed(42)
         for _ in range(50):
@@ -430,9 +422,7 @@ class TestGetCorrelationMatrix:
 
     def test_negative_correlation_detected(self):
         """Test negative correlation is detected."""
-        tracker = OnlineCorrelationMatrix(
-            strategies=["A", "B"], min_samples=5, shrinkage=0.0
-        )
+        tracker = OnlineCorrelationMatrix(strategies=["A", "B"], min_samples=5, shrinkage=0.0)
 
         np.random.seed(42)
         for _ in range(50):
@@ -444,9 +434,7 @@ class TestGetCorrelationMatrix:
 
     def test_zero_variance_handled(self):
         """Test zero variance strategy is handled gracefully."""
-        tracker = OnlineCorrelationMatrix(
-            strategies=["constant", "variable"], min_samples=5
-        )
+        tracker = OnlineCorrelationMatrix(strategies=["constant", "variable"], min_samples=5)
 
         for _ in range(10):
             tracker.update({"constant": 0.0, "variable": np.random.normal(0, 0.01)})
@@ -468,9 +456,7 @@ class TestApplyShrinkage:
 
     def test_no_shrinkage(self):
         """Test shrinkage=0 leaves matrix unchanged (except regularization)."""
-        tracker = OnlineCorrelationMatrix(
-            strategies=["A", "B"], shrinkage=0.0, min_samples=5
-        )
+        tracker = OnlineCorrelationMatrix(strategies=["A", "B"], shrinkage=0.0, min_samples=5)
 
         np.random.seed(42)
         for _ in range(20):
@@ -483,9 +469,7 @@ class TestApplyShrinkage:
 
     def test_full_shrinkage(self):
         """Test shrinkage=1.0 returns near-identity matrix."""
-        tracker = OnlineCorrelationMatrix(
-            strategies=["A", "B"], shrinkage=1.0, min_samples=5
-        )
+        tracker = OnlineCorrelationMatrix(strategies=["A", "B"], shrinkage=1.0, min_samples=5)
 
         np.random.seed(42)
         for _ in range(20):
@@ -549,17 +533,17 @@ class TestGetPairwiseCorrelation:
 
     def test_pairwise_matches_matrix(self):
         """Test pairwise correlation matches matrix value."""
-        tracker = OnlineCorrelationMatrix(
-            strategies=["A", "B", "C"], min_samples=5
-        )
+        tracker = OnlineCorrelationMatrix(strategies=["A", "B", "C"], min_samples=5)
 
         np.random.seed(42)
         for _ in range(20):
-            tracker.update({
-                "A": np.random.normal(0, 0.01),
-                "B": np.random.normal(0, 0.02),
-                "C": np.random.normal(0, 0.03),
-            })
+            tracker.update(
+                {
+                    "A": np.random.normal(0, 0.01),
+                    "B": np.random.normal(0, 0.02),
+                    "C": np.random.normal(0, 0.03),
+                }
+            )
 
         corr = tracker.get_correlation_matrix()
         assert tracker.get_pairwise_correlation("A", "B") == corr[0, 1]
@@ -568,18 +552,20 @@ class TestGetPairwiseCorrelation:
 
     def test_symmetric_pairwise(self):
         """Test pairwise correlation is symmetric."""
-        tracker = OnlineCorrelationMatrix(
-            strategies=["A", "B"], min_samples=5
-        )
+        tracker = OnlineCorrelationMatrix(strategies=["A", "B"], min_samples=5)
 
         np.random.seed(42)
         for _ in range(20):
-            tracker.update({
-                "A": np.random.normal(0, 0.01),
-                "B": np.random.normal(0, 0.02),
-            })
+            tracker.update(
+                {
+                    "A": np.random.normal(0, 0.01),
+                    "B": np.random.normal(0, 0.02),
+                }
+            )
 
-        assert tracker.get_pairwise_correlation("A", "B") == tracker.get_pairwise_correlation("B", "A")
+        assert tracker.get_pairwise_correlation("A", "B") == tracker.get_pairwise_correlation(
+            "B", "A"
+        )
 
 
 # =============================================================================
@@ -645,18 +631,18 @@ class TestGetMetrics:
 
     def test_max_pairwise_correlation(self):
         """Test max pairwise correlation."""
-        tracker = OnlineCorrelationMatrix(
-            strategies=["A", "B", "C"], min_samples=5, shrinkage=0.0
-        )
+        tracker = OnlineCorrelationMatrix(strategies=["A", "B", "C"], min_samples=5, shrinkage=0.0)
 
         np.random.seed(42)
         for _ in range(20):
             r = np.random.normal(0, 0.01)
-            tracker.update({
-                "A": r,
-                "B": r,  # Perfectly correlated with A
-                "C": np.random.normal(0, 0.01),  # Independent
-            })
+            tracker.update(
+                {
+                    "A": r,
+                    "B": r,  # Perfectly correlated with A
+                    "C": np.random.normal(0, 0.01),  # Independent
+                }
+            )
 
         metrics = tracker.get_metrics()
         # A-B correlation should be close to 1.0
@@ -664,9 +650,7 @@ class TestGetMetrics:
 
     def test_avg_correlation(self):
         """Test average correlation calculation."""
-        tracker = OnlineCorrelationMatrix(
-            strategies=["A", "B"], min_samples=5, shrinkage=0.0
-        )
+        tracker = OnlineCorrelationMatrix(strategies=["A", "B"], min_samples=5, shrinkage=0.0)
 
         np.random.seed(42)
         for _ in range(20):
@@ -816,26 +800,26 @@ class TestCalculateCovariancePenalty:
 
     def test_three_strategies(self):
         """Test penalty with three strategies."""
-        weights = {"A": 1/3, "B": 1/3, "C": 1/3}
+        weights = {"A": 1 / 3, "B": 1 / 3, "C": 1 / 3}
         # All pairwise correlations = 0.5
-        corr = np.array([
-            [1.0, 0.5, 0.5],
-            [0.5, 1.0, 0.5],
-            [0.5, 0.5, 1.0],
-        ])
+        corr = np.array(
+            [
+                [1.0, 0.5, 0.5],
+                [0.5, 1.0, 0.5],
+                [0.5, 0.5, 1.0],
+            ]
+        )
         indices = {"A": 0, "B": 1, "C": 2}
 
         penalty = calculate_covariance_penalty(weights, corr, indices)
         # 6 off-diagonal pairs, each contributes (1/3)^2 * 0.5 = 0.5/9
         # Total = 6 * 0.5/9 = 3/9 = 1/3
-        expected = 6 * (1/3) * (1/3) * 0.5
+        expected = 6 * (1 / 3) * (1 / 3) * 0.5
         assert abs(penalty - expected) < 1e-10
 
     def test_integration_with_tracker(self):
         """Test penalty calculation with actual tracker output."""
-        tracker = OnlineCorrelationMatrix(
-            strategies=["A", "B"], min_samples=5, shrinkage=0.0
-        )
+        tracker = OnlineCorrelationMatrix(strategies=["A", "B"], min_samples=5, shrinkage=0.0)
 
         np.random.seed(42)
         for _ in range(20):
@@ -922,9 +906,7 @@ class TestEdgeCases:
 
     def test_very_small_returns(self):
         """Test with very small return values."""
-        tracker = OnlineCorrelationMatrix(
-            strategies=["A", "B"], min_samples=5
-        )
+        tracker = OnlineCorrelationMatrix(strategies=["A", "B"], min_samples=5)
 
         for _ in range(20):
             tracker.update({"A": 1e-12, "B": 1e-12})
@@ -935,9 +917,7 @@ class TestEdgeCases:
 
     def test_very_large_returns(self):
         """Test with very large return values."""
-        tracker = OnlineCorrelationMatrix(
-            strategies=["A", "B"], min_samples=5
-        )
+        tracker = OnlineCorrelationMatrix(strategies=["A", "B"], min_samples=5)
 
         for _ in range(20):
             tracker.update({"A": 1e6, "B": 1e6})
@@ -948,16 +928,16 @@ class TestEdgeCases:
 
     def test_mixed_positive_negative_returns(self):
         """Test with mixed positive and negative returns."""
-        tracker = OnlineCorrelationMatrix(
-            strategies=["A", "B"], min_samples=5
-        )
+        tracker = OnlineCorrelationMatrix(strategies=["A", "B"], min_samples=5)
 
         np.random.seed(42)
         for _ in range(20):
-            tracker.update({
-                "A": np.random.uniform(-0.1, 0.1),
-                "B": np.random.uniform(-0.1, 0.1),
-            })
+            tracker.update(
+                {
+                    "A": np.random.uniform(-0.1, 0.1),
+                    "B": np.random.uniform(-0.1, 0.1),
+                }
+            )
 
         corr = tracker.get_correlation_matrix()
         assert np.all(corr >= -1.0)
@@ -966,9 +946,7 @@ class TestEdgeCases:
     def test_many_strategies(self):
         """Test with many strategies (N=20)."""
         strategies = [f"strat_{i}" for i in range(20)]
-        tracker = OnlineCorrelationMatrix(
-            strategies=strategies, min_samples=5
-        )
+        tracker = OnlineCorrelationMatrix(strategies=strategies, min_samples=5)
 
         np.random.seed(42)
         for _ in range(30):
@@ -981,9 +959,7 @@ class TestEdgeCases:
 
     def test_constant_returns_handled(self):
         """Test constant returns (zero variance) are handled."""
-        tracker = OnlineCorrelationMatrix(
-            strategies=["A", "B"], min_samples=5
-        )
+        tracker = OnlineCorrelationMatrix(strategies=["A", "B"], min_samples=5)
 
         for _ in range(20):
             tracker.update({"A": 0.01, "B": 0.02})  # Constant

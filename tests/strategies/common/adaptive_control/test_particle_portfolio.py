@@ -366,9 +366,7 @@ class TestParticlePortfolioUpdate:
             state = portfolio.update(simple_returns)
             assert isinstance(state, PortfolioState)
 
-    def test_update_with_missing_strategy_returns(
-        self, portfolio: ParticlePortfolio
-    ) -> None:
+    def test_update_with_missing_strategy_returns(self, portfolio: ParticlePortfolio) -> None:
         """Test update with incomplete returns (missing strategies)."""
         partial_returns = {"momentum": 0.01}  # Missing mean_rev and trend
 
@@ -569,9 +567,7 @@ class TestParticlePortfolioCSRC:
 class TestParticlePortfolioResample:
     """Tests for ParticlePortfolio._resample() method."""
 
-    def test_resample_preserves_particle_count(
-        self, portfolio: ParticlePortfolio
-    ) -> None:
+    def test_resample_preserves_particle_count(self, portfolio: ParticlePortfolio) -> None:
         """Test that resampling preserves the number of particles."""
         initial_count = len(portfolio.particles)
         weights = [1.0 / initial_count] * initial_count
@@ -601,9 +597,7 @@ class TestParticlePortfolioResample:
 
         assert len(portfolio.particles) == n
 
-    def test_resample_with_concentrated_weights(
-        self, portfolio: ParticlePortfolio
-    ) -> None:
+    def test_resample_with_concentrated_weights(self, portfolio: ParticlePortfolio) -> None:
         """Test resampling with one dominant particle."""
         n = len(portfolio.particles)
         weights = [0.0] * n
@@ -620,9 +614,7 @@ class TestParticlePortfolioResample:
         )
         assert similar_count >= n // 2
 
-    def test_resample_fallback_on_nan_weights(
-        self, portfolio: ParticlePortfolio
-    ) -> None:
+    def test_resample_fallback_on_nan_weights(self, portfolio: ParticlePortfolio) -> None:
         """Test resampling falls back to uniform on NaN weights (lines 328-343)."""
         n = len(portfolio.particles)
         weights = [float("nan")] * n
@@ -632,9 +624,7 @@ class TestParticlePortfolioResample:
 
         assert len(portfolio.particles) == n
 
-    def test_resample_fallback_on_inf_weights(
-        self, portfolio: ParticlePortfolio
-    ) -> None:
+    def test_resample_fallback_on_inf_weights(self, portfolio: ParticlePortfolio) -> None:
         """Test resampling falls back to uniform on Inf weights."""
         n = len(portfolio.particles)
         weights = [float("inf")] * n
@@ -643,9 +633,7 @@ class TestParticlePortfolioResample:
 
         assert len(portfolio.particles) == n
 
-    def test_resample_fallback_on_zero_total(
-        self, portfolio: ParticlePortfolio
-    ) -> None:
+    def test_resample_fallback_on_zero_total(self, portfolio: ParticlePortfolio) -> None:
         """Test resampling falls back when total weight is zero."""
         n = len(portfolio.particles)
         weights = [0.0] * n
@@ -681,9 +669,7 @@ class TestParticlePortfolioMutate:
 
         assert changed, "Mutation should change weights"
 
-    def test_mutate_keeps_weights_non_negative(
-        self, portfolio: ParticlePortfolio
-    ) -> None:
+    def test_mutate_keeps_weights_non_negative(self, portfolio: ParticlePortfolio) -> None:
         """Test that mutation keeps weights >= 0 (line 380)."""
         # Force some weights to be small
         for p in portfolio.particles:
@@ -929,9 +915,7 @@ class TestThompsonSelectorSelect:
         assert len(selected) == 2
         assert all(s in strategies for s in selected)
 
-    def test_select_top_k_k_greater_than_strategies(
-        self, strategies: list[str]
-    ) -> None:
+    def test_select_top_k_k_greater_than_strategies(self, strategies: list[str]) -> None:
         """Test select_top_k with k > len(strategies)."""
         selector = ThompsonSelector(strategies=strategies)
 
@@ -1215,9 +1199,7 @@ class TestBayesianEnsembleGetAllocation:
         assert len(selected) >= 1
         assert all(s in strategies for s in selected)
 
-    def test_get_allocation_returns_normalized_weights(
-        self, strategies: list[str]
-    ) -> None:
+    def test_get_allocation_returns_normalized_weights(self, strategies: list[str]) -> None:
         """Test get_allocation returns normalized weights (lines 723-726)."""
         random.seed(42)
         ensemble = BayesianEnsemble(strategies=strategies)
@@ -1281,9 +1263,7 @@ class TestBayesianEnsembleUpdate:
         """Test update also updates Thompson selector (lines 745-746)."""
         ensemble = BayesianEnsemble(strategies=strategies)
 
-        initial_successes = {
-            s: ensemble.thompson.stats[s].successes for s in strategies
-        }
+        initial_successes = {s: ensemble.thompson.stats[s].successes for s in strategies}
 
         ensemble.update({"momentum": 0.01, "mean_rev": 0.005, "trend": 0.008})
 
@@ -1292,8 +1272,7 @@ class TestBayesianEnsembleUpdate:
             # Due to continuous update, successes or failures should change
             stats = ensemble.thompson.stats[s]
             changed = (
-                stats.successes != initial_successes[s]
-                or stats.failures != 1.0  # Initial default
+                stats.successes != initial_successes[s] or stats.failures != 1.0  # Initial default
             )
             assert changed or True  # Decay may cause small changes
 

@@ -274,6 +274,7 @@ class TestEquityTracking:
 
         # Wait a tiny bit
         import time
+
         time.sleep(0.01)
 
         circuit_breaker.update(equity=Decimal("100000"))
@@ -659,6 +660,7 @@ class TestManualReset:
 
         old_timestamp = circuit_breaker.last_check
         import time
+
         time.sleep(0.01)
 
         circuit_breaker.reset()
@@ -716,9 +718,7 @@ class TestEdgeCases:
         circuit_breaker.update(equity=Decimal("96000"))  # Rapid recovery
         assert circuit_breaker.state == CircuitBreakerState.ACTIVE
 
-    def test_oscillating_equity_near_threshold(
-        self, tight_config: CircuitBreakerConfig
-    ) -> None:
+    def test_oscillating_equity_near_threshold(self, tight_config: CircuitBreakerConfig) -> None:
         """Should handle oscillating equity near thresholds."""
         cb = CircuitBreaker(config=tight_config, portfolio=None)
         cb.set_initial_equity(Decimal("100000"))
@@ -776,7 +776,9 @@ class TestEdgeCases:
         circuit_breaker.update(equity=Decimal("85000.098765"))
 
         # Should maintain precision
-        expected_dd = (Decimal("100000.123456") - Decimal("85000.098765")) / Decimal("100000.123456")
+        expected_dd = (Decimal("100000.123456") - Decimal("85000.098765")) / Decimal(
+            "100000.123456"
+        )
         assert circuit_breaker.current_drawdown == expected_dd
 
 
@@ -846,11 +848,11 @@ class TestCircuitBreakerIntegration:
 
         # Volatile swings
         equities = [
-            Decimal("95000"),   # ACTIVE
+            Decimal("95000"),  # ACTIVE
             Decimal("105000"),  # ACTIVE (new peak)
-            Decimal("94500"),   # WARNING (10% from 105k)
-            Decimal("89250"),   # REDUCING (15% from 105k)
-            Decimal("99750"),   # ACTIVE (recovered)
+            Decimal("94500"),  # WARNING (10% from 105k)
+            Decimal("89250"),  # REDUCING (15% from 105k)
+            Decimal("99750"),  # ACTIVE (recovered)
         ]
 
         for equity in equities:
@@ -865,12 +867,12 @@ class TestCircuitBreakerIntegration:
 
         # Growth with periodic drawdowns
         milestones = [
-            (Decimal("110000"), CircuitBreakerState.ACTIVE),    # Growth
-            (Decimal("100000"), CircuitBreakerState.ACTIVE),    # 9% DD (safe)
-            (Decimal("120000"), CircuitBreakerState.ACTIVE),    # New peak
-            (Decimal("108000"), CircuitBreakerState.WARNING),   # 10% DD
-            (Decimal("115000"), CircuitBreakerState.ACTIVE),    # Recovery
-            (Decimal("130000"), CircuitBreakerState.ACTIVE),    # New peak
+            (Decimal("110000"), CircuitBreakerState.ACTIVE),  # Growth
+            (Decimal("100000"), CircuitBreakerState.ACTIVE),  # 9% DD (safe)
+            (Decimal("120000"), CircuitBreakerState.ACTIVE),  # New peak
+            (Decimal("108000"), CircuitBreakerState.WARNING),  # 10% DD
+            (Decimal("115000"), CircuitBreakerState.ACTIVE),  # Recovery
+            (Decimal("130000"), CircuitBreakerState.ACTIVE),  # New peak
         ]
 
         for equity, expected_state in milestones:
@@ -909,11 +911,12 @@ class TestConcurrencyConsiderations:
             circuit_breaker.update(equity=Decimal("100000"))
             timestamps.append(circuit_breaker.last_check)
             import time
+
             time.sleep(0.001)
 
         # Timestamps should be monotonically increasing
         for i in range(1, len(timestamps)):
-            assert timestamps[i] >= timestamps[i-1]
+            assert timestamps[i] >= timestamps[i - 1]
 
 
 # =============================================================================
@@ -947,18 +950,27 @@ class TestCircuitBreakerProperties:
 
         # Peaks should be monotonically non-decreasing
         for i in range(1, len(peaks)):
-            assert peaks[i] >= peaks[i-1]
+            assert peaks[i] >= peaks[i - 1]
 
     def test_state_always_valid(self, circuit_breaker: CircuitBreaker) -> None:
         """State should always be one of the valid enum values."""
         circuit_breaker.set_initial_equity(Decimal("100000"))
 
-        valid_states = {CircuitBreakerState.ACTIVE, CircuitBreakerState.WARNING,
-                       CircuitBreakerState.REDUCING, CircuitBreakerState.HALTED}
+        valid_states = {
+            CircuitBreakerState.ACTIVE,
+            CircuitBreakerState.WARNING,
+            CircuitBreakerState.REDUCING,
+            CircuitBreakerState.HALTED,
+        }
 
         # Test various scenarios
-        equities = [Decimal("90000"), Decimal("85000"), Decimal("80000"),
-                   Decimal("96000"), Decimal("110000")]
+        equities = [
+            Decimal("90000"),
+            Decimal("85000"),
+            Decimal("80000"),
+            Decimal("96000"),
+            Decimal("110000"),
+        ]
 
         for equity in equities:
             circuit_breaker.update(equity=equity)

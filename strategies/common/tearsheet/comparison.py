@@ -751,7 +751,8 @@ def create_comparison_tearsheet(
 
     # Extract metrics from all engines
     metrics_list = [
-        StrategyMetrics.from_engine(engine, name) for engine, name in zip(engines, strategy_names, strict=False)
+        StrategyMetrics.from_engine(engine, name)
+        for engine, name in zip(engines, strategy_names, strict=False)
     ]
 
     # Create subplots layout

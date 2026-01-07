@@ -410,9 +410,7 @@ class MarketProfileTargets:
             }
 
     @staticmethod
-    def eighty_percent_rule(
-        prev_vah: float, prev_val: float, current_price: float
-    ) -> dict | None:
+    def eighty_percent_rule(prev_vah: float, prev_val: float, current_price: float) -> dict | None:
         """
         80% Rule: Se il prezzo entra nella VA precedente,
         80% probabilità di raggiungere l'altro estremo

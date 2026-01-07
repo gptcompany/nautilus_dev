@@ -262,9 +262,7 @@ class TestUpdateMethodFlow:
 
     def test_flow_regime_mapping_transitional(self, detector):
         """Unknown flow regime should map to 'transitional'."""
-        with patch.object(
-            detector._flow, "get_flow_regime", return_value="transitional"
-        ):
+        with patch.object(detector._flow, "get_flow_regime", return_value="transitional"):
             detector.update(price=100.0)
             result = detector.update(
                 price=101.0,
@@ -286,9 +284,7 @@ class TestUpdateMethodFlow:
         mock_state.reynolds_number = 10.0  # High value
 
         with patch.object(detector._flow, "update", return_value=mock_state):
-            with patch.object(
-                detector._flow, "get_flow_regime", return_value="turbulent"
-            ):
+            with patch.object(detector._flow, "get_flow_regime", return_value="turbulent"):
                 detector.update(price=100.0)
                 result = detector.update(
                     price=101.0,
@@ -366,11 +362,7 @@ class TestCalculateConsensus:
 
     def test_single_mean_reverting_dimension(self, detector):
         """Single mean_reverting dimension should give MEAN_REVERTING consensus."""
-        dims = [
-            DimensionResult(
-                name="iir", regime="mean_reverting", confidence=0.9, raw_value=0.5
-            )
-        ]
+        dims = [DimensionResult(name="iir", regime="mean_reverting", confidence=0.9, raw_value=0.5)]
 
         result = detector._calculate_consensus(dims)
 
@@ -379,9 +371,7 @@ class TestCalculateConsensus:
 
     def test_single_turbulent_dimension(self, detector):
         """Single turbulent dimension should give TURBULENT consensus."""
-        dims = [
-            DimensionResult(name="flow", regime="turbulent", confidence=0.7, raw_value=2.0)
-        ]
+        dims = [DimensionResult(name="flow", regime="turbulent", confidence=0.7, raw_value=2.0)]
 
         result = detector._calculate_consensus(dims)
 
@@ -405,9 +395,7 @@ class TestCalculateConsensus:
         """Two disagreeing dimensions should give CONFLICT."""
         dims = [
             DimensionResult(name="iir", regime="trending", confidence=0.8, raw_value=1.5),
-            DimensionResult(
-                name="flow", regime="mean_reverting", confidence=0.7, raw_value=0.5
-            ),
+            DimensionResult(name="flow", regime="mean_reverting", confidence=0.7, raw_value=0.5),
         ]
 
         result = detector._calculate_consensus(dims)
@@ -422,9 +410,7 @@ class TestCalculateConsensus:
             DimensionResult(name="d1", regime="trending", confidence=0.8, raw_value=1.5),
             DimensionResult(name="d2", regime="trending", confidence=0.7, raw_value=1.3),
             DimensionResult(name="d3", regime="trending", confidence=0.9, raw_value=1.8),
-            DimensionResult(
-                name="d4", regime="mean_reverting", confidence=0.6, raw_value=0.5
-            ),
+            DimensionResult(name="d4", regime="mean_reverting", confidence=0.6, raw_value=0.5),
         ]
 
         result = detector._calculate_consensus(dims)
@@ -437,9 +423,7 @@ class TestCalculateConsensus:
     def test_transitional_regime_mapping(self, detector):
         """Test transitional/normal regime handling."""
         dims = [
-            DimensionResult(
-                name="d1", regime="transitional", confidence=0.8, raw_value=1.0
-            ),
+            DimensionResult(name="d1", regime="transitional", confidence=0.8, raw_value=1.0),
         ]
 
         result = detector._calculate_consensus(dims)
@@ -464,9 +448,7 @@ class TestCalculateConsensus:
         """Low agreement should result in uncertainty_penalty risk."""
         dims = [
             DimensionResult(name="d1", regime="trending", confidence=0.8, raw_value=1.5),
-            DimensionResult(
-                name="d2", regime="mean_reverting", confidence=0.7, raw_value=0.5
-            ),
+            DimensionResult(name="d2", regime="mean_reverting", confidence=0.7, raw_value=0.5),
             DimensionResult(name="d3", regime="turbulent", confidence=0.6, raw_value=2.0),
         ]
 
@@ -507,9 +489,7 @@ class TestCalculateConsensus:
         """Should not trade when agreement is low."""
         dims = [
             DimensionResult(name="d1", regime="trending", confidence=0.8, raw_value=1.5),
-            DimensionResult(
-                name="d2", regime="mean_reverting", confidence=0.7, raw_value=0.5
-            ),
+            DimensionResult(name="d2", regime="mean_reverting", confidence=0.7, raw_value=0.5),
             DimensionResult(name="d3", regime="turbulent", confidence=0.6, raw_value=2.0),
         ]
 
@@ -523,9 +503,7 @@ class TestCalculateConsensus:
         # Create a conflict scenario with very low agreement
         dims = [
             DimensionResult(name="d1", regime="trending", confidence=0.8, raw_value=1.5),
-            DimensionResult(
-                name="d2", regime="mean_reverting", confidence=0.8, raw_value=0.5
-            ),
+            DimensionResult(name="d2", regime="mean_reverting", confidence=0.8, raw_value=0.5),
             DimensionResult(name="d3", regime="turbulent", confidence=0.8, raw_value=2.0),
             DimensionResult(name="d4", regime="normal", confidence=0.8, raw_value=1.0),
         ]
@@ -714,7 +692,11 @@ class TestIntegrationScenarios:
 
         # After warmup, should detect trend
         assert detector.is_ready
-        assert result.consensus in [ConsensusRegime.TRENDING, ConsensusRegime.TRANSITIONAL, ConsensusRegime.UNKNOWN]
+        assert result.consensus in [
+            ConsensusRegime.TRENDING,
+            ConsensusRegime.TRANSITIONAL,
+            ConsensusRegime.UNKNOWN,
+        ]
 
     def test_mean_reverting_market_detection(self, detector):
         """Test detection of mean-reverting market conditions."""
@@ -880,9 +862,7 @@ class TestDataclasses:
 
     def test_dimension_result_creation(self):
         """Test DimensionResult dataclass."""
-        dim = DimensionResult(
-            name="test", regime="trending", confidence=0.8, raw_value=1.5
-        )
+        dim = DimensionResult(name="test", regime="trending", confidence=0.8, raw_value=1.5)
         assert dim.name == "test"
         assert dim.regime == "trending"
         assert dim.confidence == 0.8
@@ -890,9 +870,7 @@ class TestDataclasses:
 
     def test_multi_dimensional_result_creation(self):
         """Test MultiDimensionalResult dataclass."""
-        dims = [
-            DimensionResult(name="iir", regime="trending", confidence=0.8, raw_value=1.5)
-        ]
+        dims = [DimensionResult(name="iir", regime="trending", confidence=0.8, raw_value=1.5)]
         result = MultiDimensionalResult(
             dimensions=dims,
             consensus=ConsensusRegime.TRENDING,

@@ -211,9 +211,7 @@ class TestLimitBreaches:
         manager = RiskManager(config=config, strategy=mock_strategy)
 
         # Current position: 0.5 BTC
-        current_position = create_mock_position(
-            instrument_id, PositionSide.LONG, "50000.00", "0.5"
-        )
+        current_position = create_mock_position(instrument_id, PositionSide.LONG, "50000.00", "0.5")
         mock_strategy.cache.positions_open.return_value = [current_position]
 
         # New order: 0.5 BTC (total = 1.0 BTC, exactly at limit)
@@ -232,9 +230,7 @@ class TestLimitBreaches:
         manager = RiskManager(config=config, strategy=mock_strategy)
 
         # Current position: 0.5 BTC
-        current_position = create_mock_position(
-            instrument_id, PositionSide.LONG, "50000.00", "0.5"
-        )
+        current_position = create_mock_position(instrument_id, PositionSide.LONG, "50000.00", "0.5")
         mock_strategy.cache.positions_open.return_value = [current_position]
 
         # New order: 0.50001 BTC (total > 1.0 BTC)
@@ -377,9 +373,7 @@ class TestRapidUpdates:
         )
         manager = RiskManager(config=config, strategy=mock_strategy)
 
-        position = create_mock_position(
-            instrument_id, PositionSide.LONG, "50000.00", "0.1"
-        )
+        position = create_mock_position(instrument_id, PositionSide.LONG, "50000.00", "0.1")
 
         # Set up mock stop order
         mock_stop_order = MagicMock()
@@ -415,9 +409,7 @@ class TestRapidUpdates:
         config = RiskConfig(trailing_stop=True)
         manager = RiskManager(config=config, strategy=mock_strategy)
 
-        position = create_mock_position(
-            instrument_id, PositionSide.LONG, "50000.00", "0.1"
-        )
+        position = create_mock_position(instrument_id, PositionSide.LONG, "50000.00", "0.1")
 
         # Send PositionChanged without opening position first
         changed_event = MagicMock(spec=PositionChanged)
@@ -438,9 +430,7 @@ class TestRapidUpdates:
         config = RiskConfig(trailing_stop=False)
         manager = RiskManager(config=config, strategy=mock_strategy)
 
-        position = create_mock_position(
-            instrument_id, PositionSide.LONG, "50000.00", "0.1"
-        )
+        position = create_mock_position(instrument_id, PositionSide.LONG, "50000.00", "0.1")
         mock_strategy.cache.position.return_value = position
 
         # Open position
@@ -472,9 +462,7 @@ class TestErrorHandling:
         instrument_id: InstrumentId,
     ) -> None:
         """Closing position with missing stop order should not raise."""
-        position = create_mock_position(
-            instrument_id, PositionSide.LONG, "50000.00", "0.1"
-        )
+        position = create_mock_position(instrument_id, PositionSide.LONG, "50000.00", "0.1")
 
         # Manually add stop mapping without actual order in cache
         risk_manager._active_stops[position.id] = ClientOrderId("O-MISSING")
@@ -499,9 +487,7 @@ class TestErrorHandling:
         config = RiskConfig(trailing_stop=True)
         manager = RiskManager(config=config, strategy=mock_strategy)
 
-        position = create_mock_position(
-            instrument_id, PositionSide.LONG, "50000.00", "0.1"
-        )
+        position = create_mock_position(instrument_id, PositionSide.LONG, "50000.00", "0.1")
 
         # Add to active stops
         manager._active_stops[position.id] = ClientOrderId("O-STOP-001")
@@ -522,9 +508,7 @@ class TestErrorHandling:
         instrument_id: InstrumentId,
     ) -> None:
         """PositionOpened with missing position should not create stop."""
-        position = create_mock_position(
-            instrument_id, PositionSide.LONG, "50000.00", "0.1"
-        )
+        position = create_mock_position(instrument_id, PositionSide.LONG, "50000.00", "0.1")
 
         # Position not in cache
         mock_strategy.cache.position.return_value = None
@@ -545,9 +529,7 @@ class TestErrorHandling:
         instrument_id: InstrumentId,
     ) -> None:
         """Exception during cancel_order should not prevent mapping cleanup."""
-        position = create_mock_position(
-            instrument_id, PositionSide.LONG, "50000.00", "0.1"
-        )
+        position = create_mock_position(instrument_id, PositionSide.LONG, "50000.00", "0.1")
 
         # Set up stop order
         mock_stop_order = MagicMock()
@@ -583,9 +565,7 @@ class TestErrorHandling:
         config = RiskConfig(trailing_stop=True)
         manager = RiskManager(config=config, strategy=mock_strategy)
 
-        position = create_mock_position(
-            instrument_id, PositionSide.LONG, "50000.00", "0.1"
-        )
+        position = create_mock_position(instrument_id, PositionSide.LONG, "50000.00", "0.1")
 
         # Set up mock stop order
         old_stop_id = ClientOrderId("O-STOP-OLD")
@@ -752,9 +732,7 @@ class TestShortPositions:
         instrument_id: InstrumentId,
     ) -> None:
         """SHORT position stop should be ABOVE entry (protects from upward move)."""
-        position = create_mock_position(
-            instrument_id, PositionSide.SHORT, "50000.00", "0.1"
-        )
+        position = create_mock_position(instrument_id, PositionSide.SHORT, "50000.00", "0.1")
 
         stop_price = risk_manager._calculate_stop_price(position)
 
@@ -795,9 +773,7 @@ class TestShortPositions:
         )
         manager = RiskManager(config=config, strategy=mock_strategy)
 
-        position = create_mock_position(
-            instrument_id, PositionSide.SHORT, "50000.00", "0.1"
-        )
+        position = create_mock_position(instrument_id, PositionSide.SHORT, "50000.00", "0.1")
 
         # Calculate trailing stop
         trailing_price = manager._calculate_trailing_stop_price(position)
@@ -839,9 +815,7 @@ class TestDailyTrackerEventRouting:
             daily_tracker=daily_tracker,
         )
 
-        position = create_mock_position(
-            instrument_id, PositionSide.LONG, "50000.00", "0.1"
-        )
+        position = create_mock_position(instrument_id, PositionSide.LONG, "50000.00", "0.1")
 
         # Send PositionOpened
         open_event = MagicMock(spec=PositionOpened)
@@ -878,9 +852,7 @@ class TestInstrumentNotFound:
         """_calculate_stop_price should use Price.from_str when instrument missing."""
         mock_strategy.cache.instrument.return_value = None
 
-        position = create_mock_position(
-            instrument_id, PositionSide.LONG, "50000.00", "0.1"
-        )
+        position = create_mock_position(instrument_id, PositionSide.LONG, "50000.00", "0.1")
 
         stop_price = risk_manager._calculate_stop_price(position)
 
@@ -899,9 +871,7 @@ class TestInstrumentNotFound:
 
         mock_strategy.cache.instrument.return_value = None
 
-        position = create_mock_position(
-            instrument_id, PositionSide.LONG, "52000.00", "0.1"
-        )
+        position = create_mock_position(instrument_id, PositionSide.LONG, "52000.00", "0.1")
 
         trailing_price = manager._calculate_trailing_stop_price(position)
 

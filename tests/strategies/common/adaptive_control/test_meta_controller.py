@@ -63,6 +63,7 @@ def mean_reverting_returns():
 @dataclass
 class MockHealthMetrics:
     """Mock health metrics."""
+
     score: float = 80.0
     state: str = "healthy"
     latency_mean_ms: float = 10.0
@@ -81,6 +82,7 @@ class MockHealthMetrics:
 @dataclass
 class MockRegimeAnalysis:
     """Mock regime analysis result."""
+
     regime: Any  # MarketRegime enum
     alpha: float = 1.0
     confidence: float = 0.8
@@ -128,6 +130,7 @@ class MockSpectralRegimeDetector:
 
     def analyze(self) -> MockRegimeAnalysis:
         from strategies.common.adaptive_control.spectral_regime import MarketRegime
+
         return MockRegimeAnalysis(
             regime=self._regime or MarketRegime.NORMAL,
             alpha=1.0,
@@ -173,13 +176,15 @@ class MockAuditEventEmitter:
         trigger_reason: str,
         source: str,
     ) -> None:
-        self.events.append({
-            "param_name": param_name,
-            "old_value": old_value,
-            "new_value": new_value,
-            "trigger_reason": trigger_reason,
-            "source": source,
-        })
+        self.events.append(
+            {
+                "param_name": param_name,
+                "old_value": old_value,
+                "new_value": new_value,
+                "trigger_reason": trigger_reason,
+                "source": source,
+            }
+        )
 
 
 # ==============================================================================
@@ -1546,7 +1551,9 @@ class TestIntegrationWithRealComponents:
 
         controller = MetaController()
         controller.register_strategy("momentum", regime_affinity={"trending": 1.0, "normal": 0.5})
-        controller.register_strategy("mean_revert", regime_affinity={"mean_reverting": 1.0, "normal": 0.5})
+        controller.register_strategy(
+            "mean_revert", regime_affinity={"mean_reverting": 1.0, "normal": 0.5}
+        )
 
         # Run multiple updates
         for i in range(100):
@@ -1568,9 +1575,16 @@ class TestIntegrationWithRealComponents:
 
         # Final state should be valid
         assert isinstance(state, MetaState)
-        assert state.system_state in [SystemState.VENTRAL, SystemState.SYMPATHETIC, SystemState.DORSAL]
+        assert state.system_state in [
+            SystemState.VENTRAL,
+            SystemState.SYMPATHETIC,
+            SystemState.DORSAL,
+        ]
         assert 0.0 <= state.risk_multiplier <= 1.0
-        assert sum(state.strategy_weights.values()) == pytest.approx(1.0, abs=0.01) or state.strategy_weights == {}
+        assert (
+            sum(state.strategy_weights.values()) == pytest.approx(1.0, abs=0.01)
+            or state.strategy_weights == {}
+        )
 
     def test_drawdown_triggers_state_change(self):
         """Test that significant drawdown triggers state change."""

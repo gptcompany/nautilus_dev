@@ -459,8 +459,9 @@ class TestEdgeCases:
         assert all(0.0 <= m <= 1.0 for m in multipliers)
 
         # Should not have wild swings
-        max_change = max(abs(multipliers[i+1] - multipliers[i])
-                        for i in range(len(multipliers)-1))
+        max_change = max(
+            abs(multipliers[i + 1] - multipliers[i]) for i in range(len(multipliers) - 1)
+        )
         assert max_change < 0.5  # Reasonable smoothness
 
     def test_steady_state_at_target(self, default_pid):
@@ -617,11 +618,11 @@ class TestStateReporting:
         state = default_pid.get_state()
 
         assert isinstance(state, PIDState)
-        assert hasattr(state, 'error')
-        assert hasattr(state, 'integral')
-        assert hasattr(state, 'derivative')
-        assert hasattr(state, 'output')
-        assert hasattr(state, 'timestamp')
+        assert hasattr(state, "error")
+        assert hasattr(state, "integral")
+        assert hasattr(state, "derivative")
+        assert hasattr(state, "output")
+        assert hasattr(state, "timestamp")
 
     def test_state_reflects_current_error(self, default_pid):
         """State should reflect current error."""
@@ -749,10 +750,10 @@ class TestPIDvsSimple:
             simple_mults.append(simple_scaler.get_multiplier(current_drawdown=dd))
 
         # Calculate variance of changes
-        pid_changes = [abs(pid_mults[i+1] - pid_mults[i])
-                      for i in range(len(pid_mults)-1)]
-        simple_changes = [abs(simple_mults[i+1] - simple_mults[i])
-                         for i in range(len(simple_mults)-1)]
+        pid_changes = [abs(pid_mults[i + 1] - pid_mults[i]) for i in range(len(pid_mults) - 1)]
+        simple_changes = [
+            abs(simple_mults[i + 1] - simple_mults[i]) for i in range(len(simple_mults) - 1)
+        ]
 
         # PID derivative term should help smooth oscillations
         # (This test may fail if tuning is aggressive)

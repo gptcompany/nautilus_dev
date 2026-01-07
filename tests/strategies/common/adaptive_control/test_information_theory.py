@@ -592,7 +592,7 @@ class TestWienerFilter:
 
         # Expected: filter_coeff * noisy + (1 - filter_coeff) * prev
         # filter_coeff = 2/3
-        expected = (2/3) * 10.0 + (1/3) * 5.0
+        expected = (2 / 3) * 10.0 + (1 / 3) * 5.0
         assert abs(result - expected) < 1e-10
         assert wf._prev_output == result
 
@@ -686,11 +686,11 @@ class TestInformationBasedRiskManager:
         state = rm.update(0.01)
 
         assert isinstance(state, InformationState)
-        assert hasattr(state, 'entropy')
-        assert hasattr(state, 'normalized_entropy')
-        assert hasattr(state, 'information_rate')
-        assert hasattr(state, 'signal_to_noise')
-        assert hasattr(state, 'risk_multiplier')
+        assert hasattr(state, "entropy")
+        assert hasattr(state, "normalized_entropy")
+        assert hasattr(state, "information_rate")
+        assert hasattr(state, "signal_to_noise")
+        assert hasattr(state, "risk_multiplier")
 
     def test_update_entropy_calculation(self):
         """Test entropy is updated during update calls."""
@@ -743,7 +743,6 @@ class TestInformationBasedRiskManager:
         # Clean signal (high SNR)
         for i in range(30):
             rm.update(float(i) * 0.1)
-
 
         # Noisy signal
         np.random.seed(42)
@@ -910,7 +909,7 @@ class TestWienerFilterEdgeCases:
         result = wf.update(-10.0)
 
         # Should handle negative values correctly
-        expected = (2/3) * (-10.0) + (1/3) * (-5.0)
+        expected = (2 / 3) * (-10.0) + (1 / 3) * (-5.0)
         assert abs(result - expected) < 1e-10
 
 

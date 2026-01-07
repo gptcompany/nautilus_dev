@@ -317,9 +317,7 @@ class TestCalculateAgreement:
         enhanced = EnhancedRegimeManager(regime_manager=mock_rm)
 
         # Both trending up + spectral trending = 1.0 agreement
-        agreement = enhanced._calculate_agreement(
-            RegimeState.TRENDING_UP, MarketRegime.TRENDING
-        )
+        agreement = enhanced._calculate_agreement(RegimeState.TRENDING_UP, MarketRegime.TRENDING)
         assert agreement == 1.0
 
     def test_agreement_full_trending_down(self):
@@ -328,9 +326,7 @@ class TestCalculateAgreement:
         enhanced = EnhancedRegimeManager(regime_manager=mock_rm)
 
         # Both trending down + spectral trending = 1.0 agreement
-        agreement = enhanced._calculate_agreement(
-            RegimeState.TRENDING_DOWN, MarketRegime.TRENDING
-        )
+        agreement = enhanced._calculate_agreement(RegimeState.TRENDING_DOWN, MarketRegime.TRENDING)
         assert agreement == 1.0
 
     def test_agreement_full_mean_reverting(self):
@@ -339,9 +335,7 @@ class TestCalculateAgreement:
         enhanced = EnhancedRegimeManager(regime_manager=mock_rm)
 
         # HMM ranging + spectral mean reverting = 1.0 agreement
-        agreement = enhanced._calculate_agreement(
-            RegimeState.RANGING, MarketRegime.MEAN_REVERTING
-        )
+        agreement = enhanced._calculate_agreement(RegimeState.RANGING, MarketRegime.MEAN_REVERTING)
         assert agreement == 1.0
 
     def test_agreement_partial_normal(self):
@@ -350,9 +344,7 @@ class TestCalculateAgreement:
         enhanced = EnhancedRegimeManager(regime_manager=mock_rm)
 
         # Spectral normal = 0.5 agreement
-        agreement = enhanced._calculate_agreement(
-            RegimeState.TRENDING_UP, MarketRegime.NORMAL
-        )
+        agreement = enhanced._calculate_agreement(RegimeState.TRENDING_UP, MarketRegime.NORMAL)
         assert agreement == 0.5
 
     def test_agreement_partial_ranging_normal(self):
@@ -360,9 +352,7 @@ class TestCalculateAgreement:
         mock_rm = MockRegimeManager()
         enhanced = EnhancedRegimeManager(regime_manager=mock_rm)
 
-        agreement = enhanced._calculate_agreement(
-            RegimeState.RANGING, MarketRegime.NORMAL
-        )
+        agreement = enhanced._calculate_agreement(RegimeState.RANGING, MarketRegime.NORMAL)
         assert agreement == 0.5
 
     def test_agreement_disagreement_trending_vs_mean_reverting(self):
@@ -381,9 +371,7 @@ class TestCalculateAgreement:
         mock_rm = MockRegimeManager()
         enhanced = EnhancedRegimeManager(regime_manager=mock_rm)
 
-        agreement = enhanced._calculate_agreement(
-            RegimeState.RANGING, MarketRegime.TRENDING
-        )
+        agreement = enhanced._calculate_agreement(RegimeState.RANGING, MarketRegime.TRENDING)
         assert agreement == 0.0
 
     def test_agreement_volatile_hmm(self):
@@ -392,9 +380,7 @@ class TestCalculateAgreement:
         enhanced = EnhancedRegimeManager(regime_manager=mock_rm)
 
         # Volatile is neither trending nor ranging, so disagreement expected
-        agreement = enhanced._calculate_agreement(
-            RegimeState.VOLATILE, MarketRegime.TRENDING
-        )
+        agreement = enhanced._calculate_agreement(RegimeState.VOLATILE, MarketRegime.TRENDING)
         assert agreement == 0.0
 
 

@@ -1,4 +1,5 @@
 """Test fixtures for adaptive_control tests."""
+
 import numpy as np
 import pytest
 
