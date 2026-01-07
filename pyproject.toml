@@ -17,6 +17,12 @@ dev = [
 [tool.ruff]
 line-length = 100
 target-version = "py312"
+exclude = [
+    "**/templates/*_template.py",
+    "**/*_template.py",
+    ".venv",
+    "__pycache__",
+]
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "UP", "B", "C4"]
