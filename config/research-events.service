@@ -1,0 +1,23 @@
+[Unit]
+Description=Research Events Sync Daemon
+Documentation=https://github.com/nautilus_dev/scripts/research_events.py
+After=network.target neo4j.service
+
+[Service]
+Type=simple
+User=sam
+WorkingDirectory=/media/sam/1TB/nautilus_dev
+ExecStart=/usr/bin/python3 /media/sam/1TB/nautilus_dev/scripts/research_events.py daemon
+Restart=always
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+Environment=PYTHONUNBUFFERED=1
+
+# Graceful shutdown
+TimeoutStopSec=30
+KillMode=mixed
+KillSignal=SIGTERM
+
+[Install]
+WantedBy=multi-user.target
