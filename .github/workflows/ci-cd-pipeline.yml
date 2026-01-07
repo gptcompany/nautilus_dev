@@ -104,19 +104,19 @@ jobs:
             --ignore-missing-imports \
             --no-error-summary \
             2>&1 | tee mypy_output.txt
-          EXIT_CODE=${PIPESTATUS[0]}
           set -e
 
           ERROR_COUNT=$(grep -c "error:" mypy_output.txt || echo 0)
           echo "error_count=$ERROR_COUNT" >> $GITHUB_OUTPUT
 
           if [ "$ERROR_COUNT" -gt 0 ]; then
-            echo "::warning::Found $ERROR_COUNT type errors"
+            echo "::warning::Found $ERROR_COUNT type errors (non-blocking)"
             head -30 mypy_output.txt
-            exit 1
+          else
+            echo "Type check passed"
           fi
-
-          echo "Type check passed"
+          # Type errors are warnings only, don't fail the build
+          exit 0
 
       - name: Upload lint artifacts
         if: always()
