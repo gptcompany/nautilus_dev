@@ -338,29 +338,29 @@ class TestIntegratedSizerBasic:
     def test_positive_signal(self, sizer: IntegratedSizer) -> None:
         """Positive signal should return positive size."""
         result = sizer.calculate(signal=1.0)
-        assert result.size > 0
+        assert result.final_size > 0
         assert result.direction == 1
 
     def test_negative_signal(self, sizer: IntegratedSizer) -> None:
         """Negative signal should return negative size (SHORT)."""
         result = sizer.calculate(signal=-1.0)
-        assert result.size < 0
+        assert result.final_size < 0
         assert result.direction == -1
 
     def test_zero_signal(self, sizer: IntegratedSizer) -> None:
         """Zero signal should return zero size."""
         result = sizer.calculate(signal=0.0)
-        assert result.size == 0.0
+        assert result.final_size == 0.0
         assert result.direction == 0
 
     def test_returns_factor_breakdown(self, sizer: IntegratedSizer) -> None:
         """Should return breakdown of all factors."""
         result = sizer.calculate(signal=1.0)
-        assert "signal_factor" in result.factor_breakdown
-        assert "meta_confidence" in result.factor_breakdown
-        assert "regime_weight" in result.factor_breakdown
-        assert "toxicity_penalty" in result.factor_breakdown
-        assert "kelly_fraction" in result.factor_breakdown
+        assert "signal" in result.factors
+        assert "meta_confidence" in result.factors
+        assert "regime_weight" in result.factors
+        assert "toxicity_penalty" in result.factors
+        assert "kelly_fraction" in result.factors
 
 
 class TestIntegratedSizerWithMetaConfidence:
@@ -374,17 +374,17 @@ class TestIntegratedSizerWithMetaConfidence:
         """High meta confidence should give larger size."""
         low = sizer.calculate(signal=1.0, meta_confidence=0.3)
         high = sizer.calculate(signal=1.0, meta_confidence=0.9)
-        assert high.size > low.size
+        assert high.final_size > low.final_size
 
     def test_zero_confidence_zero_size(self, sizer: IntegratedSizer) -> None:
         """Zero meta confidence should give zero size."""
         result = sizer.calculate(signal=1.0, meta_confidence=0.0)
-        assert result.size == 0.0
+        assert result.final_size == 0.0
 
     def test_uses_default_when_none(self, sizer: IntegratedSizer) -> None:
         """Should use default meta confidence when None provided."""
         result = sizer.calculate(signal=1.0, meta_confidence=None)
-        assert result.factor_breakdown["meta_confidence"] == 0.5  # default
+        assert result.factors["meta_confidence"] == 0.5  # default
 
 
 class TestIntegratedSizerMaxSize:
@@ -395,12 +395,12 @@ class TestIntegratedSizerMaxSize:
         sizer = IntegratedSizer(IntegratedSizingConfig(max_size=0.5, fractional_kelly=1.0))
         # Use very high signal to try to exceed max
         result = sizer.calculate(signal=100.0, meta_confidence=1.0, regime_weight=1.0)
-        assert abs(result.size) <= 0.5
+        assert abs(result.final_size) <= 0.5
 
     def test_direction_reset_on_clamp(self) -> None:
         """Direction should be reset to 0 if size is clamped to 0."""
         sizer = IntegratedSizer(IntegratedSizingConfig(min_size=0.5, max_size=1.0))
         # Toxicity 1.0 should make size 0, not min_size
         result = sizer.calculate(signal=1.0, toxicity=1.0)
-        assert result.size == 0.0
+        assert result.final_size == 0.0
         assert result.direction == 0

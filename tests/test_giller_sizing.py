@@ -83,10 +83,10 @@ class TestGillerRegimeWeight:
         assert size_no_weight == pytest.approx(size_full_weight, rel=0.01)
 
     def test_giller_with_zero_regime_weight(self, giller_sizer: GillerSizer) -> None:
-        """Test that regime weight 0.0 produces minimum size."""
-        # Regime weight 0 should still produce min_size (not zero)
+        """Test that regime weight 0.0 produces zero size (don't trade)."""
+        # Regime weight 0 should produce 0 (zero takes precedence over min_size)
         size = giller_sizer.calculate(signal=4.0, regime_weight=0.0)
-        assert abs(size) == pytest.approx(0.1, rel=0.01)  # min_size
+        assert size == 0.0  # Zero = don't trade when regime not favorable
 
 
 class TestGillerToxicity:
