@@ -24,20 +24,46 @@ Target: 90%+ coverage
 from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 from unittest.mock import MagicMock
+import sys
+from pathlib import Path
 
 import pytest
 from pydantic import ValidationError
 
-# Import directly from modules to avoid nautilus_trader dependency in __init__.py
-import sys
-from pathlib import Path
+# Add project root to path and import modules directly
 project_root = Path(__file__).parent.parent.parent
 if str(project_root) not in sys.path:
     sys.path.insert(0, str(project_root))
 
-from risk.circuit_breaker import CircuitBreaker
-from risk.circuit_breaker_config import CircuitBreakerConfig
-from risk.circuit_breaker_state import CircuitBreakerState
+# Import directly from module files to avoid __init__.py dependencies
+import importlib.util
+
+# Load circuit_breaker module
+cb_spec = importlib.util.spec_from_file_location(
+    "circuit_breaker",
+    project_root / "risk" / "circuit_breaker.py"
+)
+circuit_breaker_module = importlib.util.module_from_spec(cb_spec)
+cb_spec.loader.exec_module(circuit_breaker_module)
+CircuitBreaker = circuit_breaker_module.CircuitBreaker
+
+# Load circuit_breaker_config module
+config_spec = importlib.util.spec_from_file_location(
+    "circuit_breaker_config",
+    project_root / "risk" / "circuit_breaker_config.py"
+)
+config_module = importlib.util.module_from_spec(config_spec)
+config_spec.loader.exec_module(config_module)
+CircuitBreakerConfig = config_module.CircuitBreakerConfig
+
+# Load circuit_breaker_state module
+state_spec = importlib.util.spec_from_file_location(
+    "circuit_breaker_state",
+    project_root / "risk" / "circuit_breaker_state.py"
+)
+state_module = importlib.util.module_from_spec(state_spec)
+state_spec.loader.exec_module(state_module)
+CircuitBreakerState = state_module.CircuitBreakerState
 
 
 # =============================================================================
