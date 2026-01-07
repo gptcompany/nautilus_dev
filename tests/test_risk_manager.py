@@ -11,7 +11,6 @@ from decimal import Decimal
 from unittest.mock import MagicMock
 
 import pytest
-
 from nautilus_trader.model.enums import OrderSide, PositionSide
 from nautilus_trader.model.identifiers import (
     ClientOrderId,
@@ -439,7 +438,8 @@ class TestOnPositionClosed:
         # Verify cancel called with stop order ID
         mock_strategy.cancel_order.assert_called_once()
         call_args = mock_strategy.cancel_order.call_args[0]
-        assert call_args[0] == mock_stop_order.client_order_id
+        # Use string comparison for cross-version compatibility
+        assert str(call_args[0]) == str(mock_stop_order.client_order_id)
 
     def test_removes_mapping_on_position_closed(
         self,
