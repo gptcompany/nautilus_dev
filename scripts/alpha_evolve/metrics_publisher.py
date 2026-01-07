@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import logging
 from datetime import UTC, datetime
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, Any, Literal
 
 if TYPE_CHECKING:
     from monitoring.client import MetricsClient
@@ -61,10 +61,12 @@ class EvolutionMetricsPublisher:
             logger.warning(f"Program {program.id[:8]} has no metrics, skipping publish")
             return False
 
+        from typing import cast
+
         metrics = EvolutionMetrics(
             timestamp=datetime.now(UTC),
             program_id=program.id,
-            experiment=program.experiment,
+            experiment=program.experiment or "unknown",
             generation=program.generation,
             parent_id=program.parent_id,
             sharpe=program.metrics.sharpe_ratio,
@@ -72,13 +74,13 @@ class EvolutionMetricsPublisher:
             max_dd=abs(program.metrics.max_drawdown * 100),  # Convert to percentage
             cagr=program.metrics.cagr,
             total_return=program.metrics.total_return,
-            trade_count=program.metrics.total_trades,
+            trade_count=program.metrics.trade_count,
             win_rate=program.metrics.win_rate,
             mutation_outcome=mutation_outcome,
             mutation_latency_ms=mutation_latency_ms,
         )
 
-        success = await self._client.write(metrics)
+        success = await self._client.write(cast(Any, metrics))
         if success:
             logger.debug(f"Published metrics for {program.id[:8]} (gen={program.generation})")
         else:
@@ -124,6 +126,8 @@ class EvolutionMetricsPublisher:
         # Use placeholder values since we have no actual metrics
         # NOTE: generation=0 used for failures (Pydantic constraint ge=0)
         # Failures are distinguished by mutation_outcome field instead
+        from typing import cast
+
         metrics = EvolutionMetrics(
             timestamp=datetime.now(UTC),
             program_id="failed-mutation",
@@ -141,7 +145,7 @@ class EvolutionMetricsPublisher:
             mutation_latency_ms=latency_ms,
         )
 
-        success = await self._client.write(metrics)
+        success = await self._client.write(cast(Any, metrics))
         if success:
             logger.debug(f"Published mutation failure: {outcome} ({latency_ms:.0f}ms)")
         else:

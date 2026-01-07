@@ -5,7 +5,7 @@ Funding Rates, and Liquidations from Binance Futures using CCXT.
 """
 
 from datetime import datetime, timezone
-from typing import Callable
+from typing import Any, Callable, cast
 
 import ccxt.async_support as ccxt
 
@@ -402,11 +402,11 @@ class BinanceFetcher(BaseFetcher):
 
         stream = ReconnectingStream()
 
-        async def watch_fn() -> list[dict]:
+        async def watch_fn() -> list[dict[str, Any]]:
             """Coroutine to watch liquidations from WebSocket."""
-            return await exchange.watch_liquidations(ccxt_symbol)
+            return cast(list[dict[str, Any]], await exchange.watch_liquidations(ccxt_symbol))
 
-        def process_fn(liquidations: list[dict]) -> None:
+        def process_fn(liquidations: list[dict[str, Any]]) -> None:
             """Process received liquidation events."""
             for liq_data in liquidations:
                 liq = self._parse_liquidation(symbol, liq_data)

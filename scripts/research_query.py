@@ -28,6 +28,7 @@ Usage:
 
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Any
 
 import duckdb
 
@@ -144,7 +145,9 @@ class ResearchQuery:
             result = conn.execute(query, params or [])
             columns = [desc[0] for desc in result.description] if result.description else []
             rows = result.fetchall()
-            data = [dict(zip(columns, row, strict=False)) for row in rows]
+            from typing import cast
+
+            data = [dict(zip(columns, cast(tuple, row), strict=True)) for row in rows]
             return QueryResult(engine="duckdb", data=data, columns=columns, query=query)
         except Exception as e:
             return QueryResult(engine="duckdb", data=[], error=str(e), query=query)
@@ -319,8 +322,8 @@ class ResearchQuery:
         limit: int = 20,
     ) -> QueryResult:
         """Search papers with filters."""
-        conditions = []
-        params = []
+        conditions: list[str] = []
+        params: list[str | float] = []
 
         if title_contains:
             conditions.append("title ILIKE ?")
@@ -362,7 +365,7 @@ class ResearchQuery:
     # Hybrid Queries
     # ========================
 
-    def get_full_strategy_report(self, strategy_id: str) -> dict:
+    def get_full_strategy_report(self, strategy_id: str) -> dict[str, Any]:
         """
         Get complete strategy report combining graph and analytics.
 
@@ -383,7 +386,7 @@ class ResearchQuery:
             [strategy_id],
         )
 
-        report = {
+        report: dict[str, Any] = {
             "strategy_id": strategy_id,
             "graph_data": graph_result.data[0] if graph_result.data else {},
             "analytics": analytics_result.data[0] if analytics_result.data else {},

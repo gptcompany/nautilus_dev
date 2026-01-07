@@ -5,7 +5,7 @@ Tracks processed files and timestamps to support resumable and incremental opera
 
 import json
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import UTC, datetime
 from pathlib import Path
 
 
@@ -34,7 +34,7 @@ class SymbolState:
         """Add or update a processed file."""
         self.files[file_state.filename] = file_state
         self.total_records = sum(f.record_count for f in self.files.values())
-        self.last_updated = datetime.utcnow().isoformat()
+        self.last_updated = datetime.now(UTC).isoformat()
 
 
 @dataclass
@@ -49,7 +49,7 @@ class ConversionState:
 
     def __post_init__(self) -> None:
         if not self.created_at:
-            self.created_at = datetime.utcnow().isoformat()
+            self.created_at = datetime.now(UTC).isoformat()
 
     def get_symbol_state(self, symbol: str, data_type: str) -> SymbolState:
         """Get or create state for a symbol/data_type."""
@@ -87,10 +87,10 @@ class ConversionState:
                 record_count=record_count,
                 first_timestamp_ns=first_timestamp_ns,
                 last_timestamp_ns=last_timestamp_ns,
-                processed_at=datetime.utcnow().isoformat(),
+                processed_at=datetime.now(UTC).isoformat(),
             )
         )
-        self.updated_at = datetime.utcnow().isoformat()
+        self.updated_at = datetime.now(UTC).isoformat()
 
     def get_pending_files(
         self,

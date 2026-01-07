@@ -21,6 +21,7 @@ import asyncio
 import json
 import re
 import sys
+from typing import cast
 
 try:
     from playwright.async_api import async_playwright
@@ -166,7 +167,7 @@ async def extract_pinescript(url: str) -> dict:
         result["source"] = source_code
 
         # Extract metadata from API response
-        if api_data:
+        if api_data and isinstance(api_data, dict):
             result["metadata"] = {
                 "created": api_data.get("created"),
                 "updated": api_data.get("updated"),
@@ -174,14 +175,17 @@ async def extract_pinescript(url: str) -> dict:
                 "script_name": api_data.get("scriptName"),
                 "script_access": api_data.get("scriptAccess"),
             }
-            if api_data.get("extra"):
-                result["metadata"]["kind"] = api_data["extra"].get("kind")
+            extra = api_data.get("extra")
+            if extra and isinstance(extra, dict):
+                metadata = cast(dict, result["metadata"])
+                metadata["kind"] = extra.get("kind")
 
         # Parse version from source if not in metadata
-        if not result["metadata"].get("version"):
+        metadata = cast(dict, result["metadata"])
+        if not metadata.get("version"):
             version_match = re.search(r"//@version=(\d+)", source_code)
             if version_match:
-                result["metadata"]["pine_version"] = int(version_match.group(1))
+                metadata["pine_version"] = int(version_match.group(1))
 
     else:
         result["error"] = (

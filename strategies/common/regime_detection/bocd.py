@@ -76,7 +76,7 @@ class BaseBOCD(ABC):
     """Abstract base class for BOCD implementations."""
 
     @abstractmethod
-    def update(self, observation: float) -> None:
+    def update(self, observation: float) -> float | None:
         """Process observation."""
         pass
 
@@ -308,7 +308,10 @@ class BOCD(BaseBOCD):
         # Clip to prevent overflow/underflow
         log_pdf = np.clip(log_pdf, -700, 0)
 
-        return np.exp(log_pdf)
+        result = np.exp(log_pdf)
+        from typing import cast
+
+        return cast(NDArray[np.floating], result)
 
     def _vectorized_update_stats(self, x: float, old_n: int, new_n: int) -> None:
         """Vectorized update of sufficient statistics.

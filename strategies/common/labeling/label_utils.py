@@ -17,7 +17,7 @@ if TYPE_CHECKING:
 def get_vertical_barriers(
     n: int,
     max_holding_bars: int,
-) -> NDArray[np.int64]:
+) -> NDArray[np.signedinteger]:
     """Calculate vertical barrier (timeout) indices.
 
     For each entry index i, the vertical barrier is at i + max_holding_bars,
@@ -41,12 +41,13 @@ def get_vertical_barriers(
         return np.array([], dtype=np.int64)
 
     indices = np.arange(n, dtype=np.int64)
-    barriers = indices + max_holding_bars
+    barriers_raw = indices + max_holding_bars
 
     # Cap at last valid index
-    barriers = np.minimum(barriers, n - 1)
+    from typing import cast
 
-    return barriers
+    result = np.minimum(barriers_raw, n - 1).astype(np.int64)
+    return cast(NDArray[np.signedinteger], result)
 
 
 def get_horizontal_barriers(

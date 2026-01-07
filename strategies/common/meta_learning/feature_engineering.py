@@ -174,7 +174,10 @@ def _volume_ratio(volumes: NDArray[np.floating], window: int) -> NDArray[np.floa
     rolling_avg = _rolling_mean(volumes, window)
     # Avoid division by zero
     safe_avg = np.where(rolling_avg > 0, rolling_avg, 1.0)
-    return volumes / safe_avg
+    result = volumes / safe_avg
+    from typing import cast
+
+    return cast(NDArray[np.floating], result)
 
 
 def get_feature_names(

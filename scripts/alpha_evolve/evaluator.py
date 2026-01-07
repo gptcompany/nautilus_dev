@@ -21,7 +21,7 @@ import uuid
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 if TYPE_CHECKING:
     from nautilus_trader.backtest.engine import BacktestEngine
@@ -300,7 +300,7 @@ class StrategyEvaluator:
             return -1.0  # Total loss
 
         years = days / 365.0
-        return (1 + total_return) ** (1 / years) - 1
+        return cast(float, (1 + total_return) ** (1 / years) - 1)
 
     def _calculate_calmar(self, cagr: float, max_drawdown: float) -> float:
         """

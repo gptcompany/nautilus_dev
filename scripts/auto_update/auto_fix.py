@@ -6,7 +6,7 @@ from __future__ import annotations
 
 import re
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 from scripts.auto_update.models import AffectedFile
 
@@ -187,8 +187,8 @@ def auto_fix_files(
     for affected in affected_files:
         # Skip files not marked as auto-fixable
         if not affected.can_auto_fix:
-            results["files_skipped"] += 1
-            results["details"].append(
+            results["files_skipped"] = cast(int, results["files_skipped"]) + 1
+            cast(list[dict[str, Any]], results["details"]).append(
                 {
                     "file": str(affected.path),
                     "status": "skipped",
@@ -217,9 +217,11 @@ def auto_fix_files(
 
         if fix_result["success"]:
             if fix_result.get("changes_made", 0) > 0:
-                results["files_fixed"] += 1
-                results["total_changes"] += fix_result.get("changes_made", 0)
-            results["details"].append(
+                results["files_fixed"] = cast(int, results["files_fixed"]) + 1
+                results["total_changes"] = cast(int, results["total_changes"]) + cast(
+                    int, fix_result.get("changes_made", 0)
+                )
+            cast(list[dict[str, Any]], results["details"]).append(
                 {
                     "file": str(affected.path),
                     "status": "fixed",
@@ -227,9 +229,9 @@ def auto_fix_files(
                 }
             )
         else:
-            results["files_failed"] += 1
+            results["files_failed"] = cast(int, results["files_failed"]) + 1
             results["success"] = False
-            results["details"].append(
+            cast(list[dict[str, Any]], results["details"]).append(
                 {
                     "file": str(affected.path),
                     "status": "failed",

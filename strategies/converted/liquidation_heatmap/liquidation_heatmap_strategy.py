@@ -155,6 +155,9 @@ class LiquidationHeatMapStrategy(Strategy):
         if not self._can_trade():
             return
 
+        if self.instrument is None:
+            return
+
         self._current_target_zone = zone
 
         order = self.order_factory.market(
@@ -172,6 +175,9 @@ class LiquidationHeatMapStrategy(Strategy):
     def _enter_short(self, bar: Bar, zone: LiquidationZone) -> None:
         """Enter short position at liquidation zone."""
         if not self._can_trade():
+            return
+
+        if self.instrument is None:
             return
 
         self._current_target_zone = zone
@@ -198,7 +204,8 @@ class LiquidationHeatMapStrategy(Strategy):
 
     def _is_flat(self) -> bool:
         """Check if no position."""
-        return self.portfolio.is_flat(self.instrument_id)
+        result = self.portfolio.is_flat(self.instrument_id)
+        return bool(result)
 
     def _can_trade(self) -> bool:
         """Check if trading is allowed."""

@@ -8,7 +8,7 @@ Focus on:
 - Edge cases: extreme drawdowns, many reconnections
 """
 
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from unittest.mock import Mock
 
 from strategies.common.adaptive_control.system_health import (
@@ -33,7 +33,7 @@ class TestHealthMetrics:
 
     def test_health_metrics_creation(self):
         """Test creating HealthMetrics instance."""
-        now = datetime.utcnow()
+        now = datetime.now(UTC)
         metrics = HealthMetrics(
             timestamp=now,
             latency_mean_ms=45.0,
@@ -670,7 +670,7 @@ class TestEdgeCases:
         health = SystemHealthMonitor()
 
         # Manually add old event (>1 hour ago)
-        old_time = datetime.utcnow() - timedelta(hours=2)
+        old_time = datetime.now(UTC) - timedelta(hours=2)
         health._latencies.append((old_time, 1000.0))
 
         # Add recent event

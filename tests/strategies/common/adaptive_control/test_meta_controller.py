@@ -19,7 +19,7 @@ Run with: pytest tests/strategies/common/adaptive_control/test_meta_controller.p
 from __future__ import annotations
 
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Any
 from unittest.mock import Mock
 
@@ -76,7 +76,7 @@ class MockHealthMetrics:
 
     def __post_init__(self):
         if self.timestamp is None:
-            self.timestamp = datetime.utcnow()
+            self.timestamp = datetime.now(UTC)
 
 
 @dataclass
@@ -1468,7 +1468,7 @@ class TestMetaStateDataclass:
         )
 
         state = MetaState(
-            timestamp=datetime.utcnow(),
+            timestamp=datetime.now(UTC),
             system_state=SystemState.VENTRAL,
             market_harmony=MarketHarmony.CONSONANT,
             health_score=85.0,
@@ -1495,7 +1495,7 @@ class TestMetaStateDataclass:
         )
 
         state = MetaState(
-            timestamp=datetime.utcnow(),
+            timestamp=datetime.now(UTC),
             system_state=SystemState.VENTRAL,
             market_harmony=MarketHarmony.CONSONANT,
             health_score=85.0,

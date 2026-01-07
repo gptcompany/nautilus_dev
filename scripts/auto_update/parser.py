@@ -7,7 +7,7 @@ from __future__ import annotations
 import json
 import re
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 from scripts.auto_update.models import BreakingChange, ChangelogData, Severity
 
@@ -29,7 +29,7 @@ def load_changelog_json(path: Path) -> dict[str, Any]:
         raise FileNotFoundError(f"Changelog file not found: {path}")
 
     with open(path, encoding="utf-8") as f:
-        return json.load(f)
+        return cast(dict[str, Any], json.load(f))
 
 
 def parse_changelog(source: Path | dict[str, Any]) -> ChangelogData:
@@ -171,13 +171,13 @@ def _generate_grep_pattern(description: str) -> str:
 
         # Generic identifier pattern
         else:
-            return re.escape(identifier)
+            return cast(str, re.escape(identifier))
 
     # No backtick identifier found - try to extract from text
     # Look for CamelCase or snake_case identifiers
     camel_match = re.findall(r"\b([A-Z][a-zA-Z]+(?:\.[a-z_]+)?)\b", description)
     if camel_match:
-        return camel_match[0]
+        return cast(str, camel_match[0])
 
     # Fallback: empty pattern (manual review needed)
     return ""

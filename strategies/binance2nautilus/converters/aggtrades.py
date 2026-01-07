@@ -13,6 +13,7 @@ Features:
 from collections.abc import Generator
 from datetime import datetime
 from pathlib import Path
+from typing import cast
 
 import pandas as pd
 from nautilus_trader.model.data import TradeTick
@@ -199,7 +200,7 @@ class AggTradesConverter(BaseConverter):
         Returns:
             List of TradeTick objects
         """
-        return self._wrangler.process(df)
+        return cast(list[TradeTick], self._wrangler.process(df))
 
     def process_file_chunked(
         self,

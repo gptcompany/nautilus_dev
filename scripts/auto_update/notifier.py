@@ -5,7 +5,7 @@
 from __future__ import annotations
 
 import smtplib
-from datetime import datetime
+from datetime import datetime, UTC
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from typing import Any
@@ -52,7 +52,7 @@ def build_discord_embed(
         embed["footer"] = {"text": footer}
 
     if timestamp:
-        embed["timestamp"] = datetime.utcnow().isoformat() + "Z"
+        embed["timestamp"] = datetime.now(UTC).isoformat() + "Z"
 
     return embed
 

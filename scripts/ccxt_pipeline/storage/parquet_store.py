@@ -2,7 +2,7 @@
 
 from datetime import datetime
 from pathlib import Path
-from typing import TypeVar
+from typing import Any, TypeVar, cast
 
 import pyarrow as pa
 import pyarrow.parquet as pq
@@ -184,7 +184,7 @@ class ParquetStore:
         if end:
             df = df[df["timestamp"] <= end]
 
-        return df.to_dict("records")
+        return cast(list[dict[Any, Any]], df.to_dict("records"))
 
     def get_last_timestamp(self, data_type: type[T], symbol: str, venue: str) -> datetime | None:
         """Get the most recent timestamp for a symbol/venue.

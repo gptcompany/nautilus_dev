@@ -18,7 +18,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from datetime import datetime
 from decimal import Decimal
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 from nautilus_trader.config import StrategyConfig
 from nautilus_trader.core.datetime import unix_nanos_to_dt
@@ -276,4 +276,4 @@ class BaseEvolveStrategy(Strategy, ABC):
         Returns:
             Positive for long, negative for short, zero for flat.
         """
-        return self.portfolio.net_position(self.config.instrument_id)
+        return cast(Decimal, self.portfolio.net_position(self.config.instrument_id))

@@ -11,7 +11,7 @@ import logging
 from collections import deque
 from collections.abc import Callable
 from dataclasses import dataclass
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from enum import Enum
 
 import numpy as np
@@ -90,19 +90,19 @@ class SystemHealthMonitor:
 
     def record_latency(self, latency_ms: float) -> None:
         """Record order/message latency."""
-        self._latencies.append((datetime.utcnow(), latency_ms))
+        self._latencies.append((datetime.now(UTC), latency_ms))
 
     def record_fill(self, slippage_bps: float = 0.0) -> None:
         """Record successful fill with slippage."""
-        self._fills.append((datetime.utcnow(), slippage_bps))
+        self._fills.append((datetime.now(UTC), slippage_bps))
 
     def record_rejection(self) -> None:
         """Record order rejection."""
-        self._rejections.append(datetime.utcnow())
+        self._rejections.append(datetime.now(UTC))
 
     def record_reconnect(self) -> None:
         """Record connection drop/reconnect."""
-        self._reconnects.append(datetime.utcnow())
+        self._reconnects.append(datetime.now(UTC))
         logger.warning("SystemHealth: Reconnection event")
 
     def set_equity(self, equity: float) -> None:
@@ -123,7 +123,7 @@ class SystemHealthMonitor:
 
     def get_metrics(self) -> HealthMetrics:
         """Calculate current health metrics."""
-        now = datetime.utcnow()
+        now = datetime.now(UTC)
         cutoff = now - timedelta(hours=1)
 
         # Filter to 1-hour window

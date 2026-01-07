@@ -122,9 +122,9 @@ class RiskManagedStrategy(Strategy):
 
     def _has_position(self) -> bool:
         """Check if we have an open position."""
-        return self.portfolio.is_net_long(self.instrument_id) or self.portfolio.is_net_short(
-            self.instrument_id
-        )
+        is_long = self.portfolio.is_net_long(self.instrument_id)
+        is_short = self.portfolio.is_net_short(self.instrument_id)
+        return bool(is_long or is_short)
 
     def _enter_long(self) -> None:
         """Submit a market buy order with position limit validation."""

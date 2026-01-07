@@ -5,7 +5,7 @@ Funding Rates, and Liquidations from Bybit Linear Perpetuals using CCXT.
 """
 
 from datetime import datetime, timezone
-from typing import Callable
+from typing import Callable, cast, Any
 
 import ccxt.async_support as ccxt
 
@@ -416,11 +416,11 @@ class BybitFetcher(BaseFetcher):
 
         stream = ReconnectingStream()
 
-        async def watch_func() -> list[dict]:
+        async def watch_func() -> list[dict[str, Any]]:
             """Watch for liquidation events via WebSocket."""
-            return await exchange.watch_liquidations(ccxt_symbol)
+            return cast(list[dict[str, Any]], await exchange.watch_liquidations(ccxt_symbol))
 
-        def process_func(liquidations: list[dict]) -> None:
+        def process_func(liquidations: list[dict[str, Any]]) -> None:
             """Process batch of liquidation events."""
             for liq_data in liquidations:
                 try:

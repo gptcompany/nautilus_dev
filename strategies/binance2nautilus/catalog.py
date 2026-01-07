@@ -9,6 +9,7 @@ Note: FundingRateUpdate requires Arrow serialization registration.
 
 from collections.abc import Sequence
 from pathlib import Path
+from typing import cast
 
 import pyarrow as pa
 from nautilus_trader.model.data import Bar, FundingRateUpdate, TradeTick
@@ -176,7 +177,7 @@ class CatalogWriter:
 
     def get_instruments(self) -> list[Instrument]:
         """Get all instruments from the catalog."""
-        return self.catalog.instruments()
+        return cast(list[Instrument], self.catalog.instruments())
 
     def get_bars(self, instrument_id: str | None = None) -> list[Bar]:
         """Get bars from the catalog.
@@ -188,8 +189,8 @@ class CatalogWriter:
             List of bars
         """
         if instrument_id:
-            return self.catalog.bars(instrument_ids=[instrument_id])
-        return self.catalog.bars()
+            return cast(list[Bar], self.catalog.bars(instrument_ids=[instrument_id]))
+        return cast(list[Bar], self.catalog.bars())
 
     def get_ticks(self, instrument_id: str | None = None) -> list[TradeTick]:
         """Get trade ticks from the catalog.
@@ -201,8 +202,8 @@ class CatalogWriter:
             List of trade ticks
         """
         if instrument_id:
-            return self.catalog.trade_ticks(instrument_ids=[instrument_id])
-        return self.catalog.trade_ticks()
+            return cast(list[TradeTick], self.catalog.trade_ticks(instrument_ids=[instrument_id]))
+        return cast(list[TradeTick], self.catalog.trade_ticks())
 
 
 def create_catalog(catalog_path: Path | str) -> CatalogWriter:

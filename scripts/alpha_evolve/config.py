@@ -115,7 +115,7 @@ class EvolutionConfig(BaseSettings):
         # Create config - Pydantic will use env > final_values > defaults
         return cls(**final_values)
 
-    def validate(self) -> None:
+    def validate(self) -> None:  # type: ignore[override]
         """
         Re-validate configuration parameters.
 

@@ -106,9 +106,9 @@ def normalize_features(
     Returns:
         Tuple of (normalized_features, mean, std).
     """
-    mean = np.nanmean(features)
-    std = np.nanstd(features)
-    if std == 0 or np.isnan(std):
-        std = 1.0
-    normalized = (features - mean) / std
-    return normalized, mean, std
+    mean = float(np.nanmean(features))
+    std_val = float(np.nanstd(features))
+    if std_val == 0 or np.isnan(std_val):
+        std_val = 1.0
+    normalized = (features - mean) / std_val
+    return normalized, mean, std_val

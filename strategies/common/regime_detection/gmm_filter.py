@@ -152,4 +152,7 @@ class GMMVolatilityFilter:
 
         X = np.array([[volatility]])
         probs = self.model.predict_proba(X)
-        return probs[0]
+        result = probs[0]
+        from typing import cast
+
+        return cast(NDArray[np.floating], result)

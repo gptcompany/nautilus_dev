@@ -8,6 +8,7 @@ import asyncio
 import time
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
+from pathlib import Path
 from typing import Any
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
@@ -88,7 +89,7 @@ class DaemonRunner:
         self._shutdown_requested = False
         self._liquidation_task: asyncio.Task | None = None
         self._liquidation_manager: LiquidationStreamManager | None = None
-        self._pending_writes: list[OpenInterest | FundingRate | Liquidation] = []
+        self._pending_writes: list[Liquidation] = []
 
         self.stats = DaemonStats()
 
@@ -106,7 +107,7 @@ class DaemonRunner:
         # Initialize components
         fetchers = get_all_fetchers(self._exchanges)
         self._orchestrator = FetchOrchestrator(fetchers)
-        self._store = ParquetStore(self._catalog_path)
+        self._store = ParquetStore(Path(self._catalog_path))
 
         # Connect to exchanges
         await self._orchestrator.connect_all()
@@ -267,12 +268,15 @@ class DaemonRunner:
                     if result.success and result.data:
                         # Validate data before storing
                         oi = result.data
-                        if oi.open_interest is not None and oi.open_interest >= 0:
+                        if (
+                            isinstance(oi, OpenInterest)
+                            and oi.open_interest is not None
+                            and oi.open_interest >= 0
+                        ):
                             data_points.append(oi)
                         else:
-                            logger.warning(
-                                f"Invalid OI data from {result.venue}: {oi.open_interest}"
-                            )
+                            oi_val = oi.open_interest if isinstance(oi, OpenInterest) else "unknown"
+                            logger.warning(f"Invalid OI data from {result.venue}: {oi_val}")
                     elif result.error:
                         self.stats.error_count += 1
                         self.stats.last_error = str(result.error)
@@ -295,7 +299,7 @@ class DaemonRunner:
                     continue
 
                 if data_points:
-                    self._store_data(data_points)
+                    self._store_data_oi(data_points)
 
                 self.stats.fetch_count += 1
                 self.stats.last_fetch_time = datetime.now(timezone.utc)
@@ -334,11 +338,12 @@ class DaemonRunner:
                     if result.success and result.data:
                         # Validate data before storing
                         fr = result.data
-                        if fr.funding_rate is not None:
+                        if isinstance(fr, FundingRate) and fr.funding_rate is not None:
                             data_points.append(fr)
                         else:
+                            fr_val = fr.funding_rate if isinstance(fr, FundingRate) else "unknown"
                             logger.warning(
-                                f"Invalid funding rate data from {result.venue}: {fr.funding_rate}"
+                                f"Invalid funding rate data from {result.venue}: {fr_val}"
                             )
                     elif result.error:
                         self.stats.error_count += 1
@@ -362,7 +367,7 @@ class DaemonRunner:
                     continue
 
                 if data_points:
-                    self._store_data(data_points)
+                    self._store_data_funding(data_points)
 
                 self.stats.fetch_count += 1
                 self.stats.last_fetch_time = datetime.now(timezone.utc)
@@ -432,11 +437,11 @@ class DaemonRunner:
             f"{liquidation.side.value} {liquidation.quantity} @ {liquidation.price}"
         )
 
-    def _store_data(self, data: list[OpenInterest | FundingRate | Liquidation]) -> None:
-        """Store data to Parquet.
+    def _store_data_oi(self, data: list[OpenInterest]) -> None:
+        """Store open interest data to Parquet.
 
         Args:
-            data: List of data points to store.
+            data: List of open interest data points to store.
         """
         if not self._store or not data:
             return
@@ -444,7 +449,39 @@ class DaemonRunner:
         try:
             self._store.write(data)
         except Exception as e:
-            logger.error(f"Error storing data: {e}")
+            logger.error(f"Error storing OI data: {e}")
+            self.stats.error_count += 1
+            self.stats.last_error = str(e)
+
+    def _store_data_funding(self, data: list[FundingRate]) -> None:
+        """Store funding rate data to Parquet.
+
+        Args:
+            data: List of funding rate data points to store.
+        """
+        if not self._store or not data:
+            return
+
+        try:
+            self._store.write(data)
+        except Exception as e:
+            logger.error(f"Error storing funding rate data: {e}")
+            self.stats.error_count += 1
+            self.stats.last_error = str(e)
+
+    def _store_data(self, data: list[Liquidation]) -> None:
+        """Store liquidation data to Parquet.
+
+        Args:
+            data: List of liquidation data points to store.
+        """
+        if not self._store or not data:
+            return
+
+        try:
+            self._store.write(data)
+        except Exception as e:
+            logger.error(f"Error storing liquidation data: {e}")
             self.stats.error_count += 1
             self.stats.last_error = str(e)
 

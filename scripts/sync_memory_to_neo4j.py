@@ -13,6 +13,7 @@ import json
 import sys
 from datetime import datetime
 from pathlib import Path
+from typing import cast
 
 from neo4j import GraphDatabase
 
@@ -30,7 +31,7 @@ def load_memory_json() -> dict:
 
     try:
         with open(MEMORY_JSON_PATH) as f:
-            return json.load(f)
+            return cast(dict, json.load(f))
     except json.JSONDecodeError as e:
         print(f"Error: Failed to parse {MEMORY_JSON_PATH}: {e}")
         return {"entities": [], "relations": []}

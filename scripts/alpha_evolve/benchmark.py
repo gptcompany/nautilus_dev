@@ -162,7 +162,13 @@ async def run_evolution_benchmark(
     if db_path.exists():
         db_path.unlink()
 
-    config = EvolutionConfig()
+    config = EvolutionConfig(
+        population_size=500,
+        archive_size=50,
+        elite_ratio=0.1,
+        exploration_ratio=0.2,
+        max_concurrent=2,
+    )
     store = ProgramStore(
         db_path,
         population_size=config.population_size,

@@ -199,7 +199,7 @@ async def test_duplicate_shutdown():
     config = ShutdownConfig(timeout_secs=10.0)
 
     original_exit = sys.exit
-    sys.exit = lambda code: None
+    sys.exit = lambda code: None  # type: ignore[assignment,misc]
 
     try:
         handler = GracefulShutdownHandler(node, config)
@@ -226,7 +226,7 @@ async def test_exception_handler():
     handler = GracefulShutdownHandler(node, ShutdownConfig(timeout_secs=10.0))
 
     original_exit = sys.exit
-    sys.exit = lambda code: None
+    sys.exit = lambda code: None  # type: ignore[assignment,misc]
 
     try:
         # Trigger exception handler (will call shutdown internally)

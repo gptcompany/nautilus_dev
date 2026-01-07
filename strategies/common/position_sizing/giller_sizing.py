@@ -84,4 +84,4 @@ class GillerSizer:
             size = self.config.max_size
 
         # Restore sign
-        return sign * size
+        return float(sign * size)

@@ -11,7 +11,7 @@ import asyncio
 import logging
 import signal
 import sys
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import TYPE_CHECKING
 
 from config.shutdown.shutdown_config import ShutdownConfig, ShutdownReason
@@ -116,7 +116,7 @@ class GracefulShutdownHandler:
                 return
 
             self._shutdown_requested = True
-            self._shutdown_started_at = datetime.utcnow()
+            self._shutdown_started_at = datetime.now(UTC)
         # Map reason string to enum, default to MANUAL for unknown reasons
         try:
             self._shutdown_reason = ShutdownReason(reason)
@@ -164,7 +164,7 @@ class GracefulShutdownHandler:
 
         # Log completion
         if self._shutdown_started_at is not None:
-            elapsed = (datetime.utcnow() - self._shutdown_started_at).total_seconds()
+            elapsed = (datetime.now(UTC) - self._shutdown_started_at).total_seconds()
         else:
             elapsed = 0.0
         self._logger.info(

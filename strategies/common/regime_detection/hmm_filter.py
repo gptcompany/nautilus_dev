@@ -174,6 +174,9 @@ class HMMRegimeFilter:
         features_scaled = self._scaler.transform(features)
         state_idx = int(self.model.predict(features_scaled)[0])
 
+        if self._state_means is None:
+            raise RuntimeError("State means not initialized")
+
         return RegimeState.from_hmm_state(
             state_idx=state_idx,
             mean_returns=list(self._state_means[:, 0]),
@@ -203,4 +206,7 @@ class HMMRegimeFilter:
         features = np.array([[returns, volatility]])
         features_scaled = self._scaler.transform(features)
         _, posteriors = self.model.score_samples(features_scaled)
-        return posteriors[0]
+        result = posteriors[0]
+        from typing import cast
+
+        return cast(NDArray[np.floating], result)

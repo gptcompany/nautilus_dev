@@ -13,7 +13,7 @@ from __future__ import annotations
 
 import tempfile
 import time
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 import duckdb
@@ -123,7 +123,7 @@ def test_query_1m_events_performance(audit_dir, cold_storage_dir):
     config = AuditConfig(base_path=audit_dir, rotate_daily=False)
     emitter = AuditEventEmitter(trader_id="PERF-TEST", config=config)
 
-    start_time = datetime.utcnow()
+    start_time = datetime.now(UTC)
 
     print("\nGenerating 1,000,000 test events...")
     gen_start = time.perf_counter()
@@ -174,7 +174,7 @@ def test_query_1m_events_performance(audit_dir, cold_storage_dir):
 
     # Step 3: Query all events using DuckDB directly
     # (bypassing AuditQuery for simpler performance test)
-    end_time = datetime.utcnow() + timedelta(hours=1)
+    end_time = datetime.now(UTC) + timedelta(hours=1)
 
     print("\nQuerying 1,000,000 events...")
     query_start = time.perf_counter()

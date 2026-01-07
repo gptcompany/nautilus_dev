@@ -418,9 +418,10 @@ class DigitalRootAnalyzer:
         vortex_count = sum(1 for r in roots if r in vortex_cycle)
         trinity_count = sum(1 for r in roots if r in trinity_cycle)
 
+        most_common_val = max(distribution, key=lambda k: distribution[k]) if distribution else None
         return {
             "distribution": distribution,
             "vortex_ratio": vortex_count / len(roots) if roots else 0,
             "trinity_ratio": trinity_count / len(roots) if roots else 0,
-            "most_common": max(distribution, key=distribution.get) if distribution else None,
+            "most_common": most_common_val,
         }

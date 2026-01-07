@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import sys
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import UTC, datetime
 from enum import Enum
 from unittest.mock import MagicMock, Mock, patch
 
@@ -196,7 +196,7 @@ class TestEvolutionRequest:
 
     def test_creation(self):
         """Test creating an EvolutionRequest."""
-        now = datetime.utcnow()
+        now = datetime.now(UTC)
         state = MockMetaState()
 
         request = EvolutionRequest(
@@ -308,7 +308,7 @@ class TestAlphaEvolveBridgeCheckAndTrigger:
         # Add pending requests to hit the limit
         mock_request = EvolutionRequest(
             trigger=EvolutionTrigger.DISSONANCE,
-            timestamp=datetime.utcnow(),
+            timestamp=datetime.now(UTC),
             current_state=MockMetaState(),
             underperforming_strategies=["s1"],
             market_conditions={},
@@ -822,7 +822,7 @@ class TestAlphaEvolveBridgeMarkEvolutionComplete:
 
         request = EvolutionRequest(
             trigger=EvolutionTrigger.DISSONANCE,
-            timestamp=datetime.utcnow(),
+            timestamp=datetime.now(UTC),
             current_state=MockMetaState(),
             underperforming_strategies=["s1"],
             market_conditions={},
@@ -841,7 +841,7 @@ class TestAlphaEvolveBridgeMarkEvolutionComplete:
 
         request = EvolutionRequest(
             trigger=EvolutionTrigger.DISSONANCE,
-            timestamp=datetime.utcnow(),
+            timestamp=datetime.now(UTC),
             current_state=MockMetaState(),
             underperforming_strategies=["s1"],
             market_conditions={},
@@ -862,7 +862,7 @@ class TestAlphaEvolveBridgeGetPendingEvolutions:
 
         request = EvolutionRequest(
             trigger=EvolutionTrigger.DISSONANCE,
-            timestamp=datetime.utcnow(),
+            timestamp=datetime.now(UTC),
             current_state=MockMetaState(),
             underperforming_strategies=["s1"],
             market_conditions={},

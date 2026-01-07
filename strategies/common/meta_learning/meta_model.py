@@ -200,10 +200,13 @@ class MetaModel:
         # Get probability of positive class (meta_label = 1 = correct)
         # Classes are sorted, so if both classes present: [0, 1]
         if proba.shape[1] == 2:
-            return proba[:, 1].astype(np.float64)
+            result = proba[:, 1].astype(np.float64)
         else:
             # Edge case: only one class in training (should not happen after validation)
-            return np.full(n_samples, self._config.default_confidence, dtype=np.float64)
+            result = np.full(n_samples, self._config.default_confidence, dtype=np.float64)
+        from typing import cast
+
+        return cast(NDArray[np.floating], result)
 
     def predict(
         self,

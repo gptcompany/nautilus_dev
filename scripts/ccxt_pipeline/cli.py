@@ -8,7 +8,7 @@ import asyncio
 import signal
 import sys
 from datetime import datetime, timedelta, timezone
-from typing import Any
+from typing import Any, cast, Type
 
 import click
 from rich.console import Console
@@ -770,7 +770,7 @@ def query_data(
         "funding": FundingRate,
         "liquidations": Liquidation,
     }
-    model_class = model_map[data_type]
+    model_class = cast(Type[OpenInterest], model_map[data_type])
 
     # Query data
     venue = exchange.upper() if exchange else None

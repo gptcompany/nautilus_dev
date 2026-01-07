@@ -5,6 +5,7 @@ import asyncio
 import sys
 from datetime import datetime
 from pathlib import Path
+from typing import Any
 
 from scripts.alpha_evolve.walk_forward.config import WalkForwardConfig
 from scripts.alpha_evolve.walk_forward.report import export_json, generate_report
@@ -150,11 +151,21 @@ async def run_validate(args: argparse.Namespace) -> int:
 
     # Import evaluator (would be from actual evaluator module)
     try:
-        from scripts.alpha_evolve.evaluator import StrategyEvaluator
+        from typing import cast
 
-        evaluator = StrategyEvaluator()
+        from scripts.alpha_evolve.evaluator import BacktestConfig, StrategyEvaluator
+
+        # Create default backtest config
+        default_config = BacktestConfig(
+            catalog_path="/media/sam/1TB/data/catalog",
+            instrument_id="BTCUSDT-PERP.BINANCE",
+            start_date="2024-01-01",
+            end_date="2024-12-31",
+        )
+        evaluator = StrategyEvaluator(default_config)
     except ImportError:
         print("Warning: StrategyEvaluator not available, using mock", file=sys.stderr)
+        from typing import cast
         from unittest.mock import AsyncMock
 
         from scripts.alpha_evolve.walk_forward.models import WindowMetrics
@@ -172,7 +183,7 @@ async def run_validate(args: argparse.Namespace) -> int:
         )
 
     # Run validation
-    validator = WalkForwardValidator(config, evaluator)
+    validator = WalkForwardValidator(config, cast(Any, evaluator))
     result = await validator.validate(strategy_code)
 
     # Generate output

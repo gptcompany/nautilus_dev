@@ -16,7 +16,7 @@ from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     from monitoring.client import MetricsClient
@@ -25,6 +25,8 @@ if TYPE_CHECKING:
     from scripts.alpha_evolve.mutator import MutationResponse, Mutator
     from scripts.alpha_evolve.store import Program, ProgramStore
     from scripts.alpha_evolve.walk_forward import WalkForwardConfig, WalkForwardResult
+
+from scripts.alpha_evolve.metrics_publisher import MutationOutcome
 
 logger = logging.getLogger("alpha_evolve.controller")
 
@@ -456,7 +458,10 @@ class EvolutionController:
 
         # Get source code
         strategy_class = seeds[seed_name]
-        code = inspect.getsource(inspect.getmodule(strategy_class))
+        module = inspect.getmodule(strategy_class)
+        if module is None:
+            raise RuntimeError(f"Could not get module for {seed_name}")
+        code = inspect.getsource(module)
 
         # Store as generation 0
         seed_id = self.store.insert(
@@ -575,9 +580,12 @@ class EvolutionController:
             )
             # Publish mutation failure to dashboard (spec-010)
             if self._metrics_publisher:
-                outcome = (
+                outcome_str = (
                     "syntax_error" if "syntax" in str(response.error).lower() else "runtime_error"
                 )
+                from typing import cast
+
+                outcome = cast(MutationOutcome, outcome_str)
                 await self._metrics_publisher.publish_mutation_failure(
                     experiment=experiment,
                     outcome=outcome,
@@ -594,10 +602,12 @@ class EvolutionController:
         # 3. Evaluate mutated strategy
         self._emit_progress(ProgressEventType.EVALUATION_START, {})
 
+        from typing import cast
+
         from scripts.alpha_evolve.evaluator import EvaluationRequest
 
         eval_request = EvaluationRequest(
-            strategy_code=response.mutated_code,
+            strategy_code=cast(str, response.mutated_code),
             strategy_class_name="MomentumEvolveStrategy",
             config_class_name="MomentumEvolveConfig",
         )
@@ -627,7 +637,7 @@ class EvolutionController:
 
         # 4. Store result
         child_id = self.store.insert(
-            code=response.mutated_code,
+            code=cast(str, response.mutated_code),
             metrics=metrics,
             parent_id=parent.id,
             experiment=experiment,
@@ -808,7 +818,9 @@ class EvolutionController:
         # Run walk-forward validation
         logger.info("Starting walk-forward validation on best strategy")
 
-        validator = WalkForwardValidator(walk_forward_config, self.evaluator)
+        from typing import cast
+
+        validator = WalkForwardValidator(walk_forward_config, cast(Any, self.evaluator))
 
         try:
             validation_result = await validator.validate(evolution_result.best_strategy.code)

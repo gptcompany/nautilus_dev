@@ -168,7 +168,7 @@ def emit_event(
             [event_type_str, entity_type, entity_id, data_json, checksum],
         ).fetchone()
 
-        return result[0]
+        return result[0] if result else None
     finally:
         db.close()
 
@@ -545,9 +545,10 @@ def replay_events(from_event: int = 0) -> None:
             [from_event],
         )
 
-        count = db.execute(
+        result = db.execute(
             "SELECT COUNT(*) FROM events WHERE event_id >= ?", [from_event]
-        ).fetchone()[0]
+        ).fetchone()
+        count = result[0] if result else 0
 
         print(f"Reset {count} events for replay from event_id {from_event}")
         print("Run 'daemon' to process them")
@@ -609,17 +610,24 @@ def show_stats() -> None:
 
         print("=== Event Log Statistics ===\n")
 
-        total = db.execute("SELECT COUNT(*) FROM events").fetchone()[0]
-        processed = db.execute(
+        total_result = db.execute("SELECT COUNT(*) FROM events").fetchone()
+        total = total_result[0] if total_result else 0
+
+        processed_result = db.execute(
             "SELECT COUNT(*) FROM events WHERE processed_neo4j = TRUE"
-        ).fetchone()[0]
-        pending = db.execute(
+        ).fetchone()
+        processed = processed_result[0] if processed_result else 0
+
+        pending_result = db.execute(
             "SELECT COUNT(*) FROM events WHERE processed_neo4j = FALSE AND retry_count < ?",
             [MAX_RETRIES],
-        ).fetchone()[0]
-        dlq_count = db.execute(
+        ).fetchone()
+        pending = pending_result[0] if pending_result else 0
+
+        dlq_result = db.execute(
             "SELECT COUNT(*) FROM dead_letter_queue WHERE resolved = FALSE"
-        ).fetchone()[0]
+        ).fetchone()
+        dlq_count = dlq_result[0] if dlq_result else 0
 
         print(f"Total Events:    {total}")
         print(f"  Processed:     {processed}")

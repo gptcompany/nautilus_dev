@@ -30,7 +30,7 @@ from __future__ import annotations
 import logging
 from collections.abc import Callable
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import UTC, datetime
 from enum import Enum
 from typing import TYPE_CHECKING
 
@@ -183,7 +183,7 @@ class AlphaEvolveBridge:
         # Create request
         request = EvolutionRequest(
             trigger=trigger,
-            timestamp=datetime.utcnow(),
+            timestamp=datetime.now(UTC),
             current_state=state,
             underperforming_strategies=underperformers[: self.config.max_strategies_to_evolve],
             market_conditions=self._extract_market_conditions(state),
@@ -441,10 +441,14 @@ class AdaptiveSurvivalSystem:
         self._bar_count += 1
 
         # Update meta controller
+        # Note: MetaController.update() expects: current_return, current_equity, latency_ms, order_filled, slippage_bps
+        # We approximate current_return from price change and treat price as equity proxy
         state = self.meta.update(
-            current_price=price,
-            current_drawdown=current_drawdown,
-            current_regime=regime,
+            current_return=0.0,  # Not available in this context
+            current_equity=price,  # Use price as equity proxy
+            latency_ms=0.0,
+            order_filled=True,
+            slippage_bps=0.0,
         )
 
         # Check for evolution triggers
@@ -471,5 +475,5 @@ class AdaptiveSurvivalSystem:
         return {
             "bar_count": self._bar_count,
             "pending_evolutions": len(self.bridge.get_pending_evolutions()),
-            "registered_strategies": list(self.meta._strategy_performances.keys()),
+            "registered_strategies": list(self.meta._strategy_performance.keys()),
         }

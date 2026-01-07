@@ -19,7 +19,7 @@ from __future__ import annotations
 import random
 from dataclasses import dataclass
 from datetime import datetime, timedelta
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 from scripts.alpha_evolve.walk_forward.models import Window
 from scripts.baseline_validation.comparison_metrics import (
@@ -62,7 +62,7 @@ class ContenderResult:
         variance = sum((s - mean) ** 2 for s in self.window_sharpes) / (
             len(self.window_sharpes) - 1
         )
-        return variance**0.5
+        return cast(float, variance**0.5)  # type: ignore[return-value]
 
     @property
     def avg_return(self) -> float:
@@ -271,7 +271,7 @@ class ComparisonValidator:
         }
 
         comparison = compare_all_contenders(
-            comparison_data,
+            cast(dict[str, dict[str, list[float]]], comparison_data),
             sharpe_edge_threshold=self._config.success_criteria.sharpe_edge,
         )
 

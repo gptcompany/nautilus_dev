@@ -417,7 +417,7 @@ class GillerScaler:
         sign = 1 if position > 0 else -1
         magnitude = abs(position) ** self.power
 
-        return sign * magnitude
+        return float(sign * magnitude)
 
 
 class SOPSGillerSizer:

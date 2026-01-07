@@ -82,7 +82,8 @@ class BaseStrategy(Strategy):
 
     def is_flat(self) -> bool:
         """Check if no position."""
-        return self.portfolio.is_flat(self.instrument_id)
+        result = self.portfolio.is_flat(self.instrument_id)
+        return bool(result)
 
     def is_long(self) -> bool:
         """Check if long position."""
@@ -112,6 +113,9 @@ class BaseStrategy(Strategy):
         if not self._check_position_limit(qty):
             return
 
+        if self.instrument is None:
+            return
+
         order = self.order_factory.market(
             instrument_id=self.instrument_id,
             order_side=OrderSide.BUY,
@@ -130,6 +134,9 @@ class BaseStrategy(Strategy):
         if not self._check_position_limit(qty):
             return
 
+        if self.instrument is None:
+            return
+
         order = self.order_factory.market(
             instrument_id=self.instrument_id,
             order_side=OrderSide.SELL,
@@ -143,7 +150,7 @@ class BaseStrategy(Strategy):
         """Close current position."""
         pos = self.get_position()
         if pos:
-            self.close_position(pos)
+            super().close_position(pos)
             self.log.info("Position closed")
 
     # ─────────────────────────────────────────────────────────────────

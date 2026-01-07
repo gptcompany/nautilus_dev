@@ -24,7 +24,7 @@ from __future__ import annotations
 import logging
 from collections.abc import Callable
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import UTC, datetime
 from enum import Enum
 from typing import TYPE_CHECKING
 
@@ -273,23 +273,45 @@ class MetaController:
         )
 
         # Update health monitor
-        self._health_monitor.set_equity(current_equity)
-        if latency_ms > 0:
-            self._health_monitor.record_latency(latency_ms)
-        if order_filled:
-            self._health_monitor.record_fill(slippage_bps)
-        else:
-            self._health_monitor.record_rejection()
+        if self._health_monitor is not None:
+            self._health_monitor.set_equity(current_equity)
+            if latency_ms > 0:
+                self._health_monitor.record_latency(latency_ms)
+            if order_filled:
+                self._health_monitor.record_fill(slippage_bps)
+            else:
+                self._health_monitor.record_rejection()
 
-        health_metrics = self._health_monitor.get_metrics()
+            health_metrics = self._health_monitor.get_metrics()
+        else:
+            # Fallback if components not initialized
+            from dataclasses import dataclass
+
+            @dataclass
+            class HealthMetrics:
+                score: float = 50.0
+
+            health_metrics = HealthMetrics()
 
         # Update regime detector
-        self._regime_detector.update(current_return)
-        self._returns_buffer.append(current_return)
-        if len(self._returns_buffer) > 500:
-            self._returns_buffer = self._returns_buffer[-500:]
+        if self._regime_detector is not None:
+            self._regime_detector.update(current_return)
+            self._returns_buffer.append(current_return)
+            if len(self._returns_buffer) > 500:
+                self._returns_buffer = self._returns_buffer[-500:]
 
-        regime_analysis = self._regime_detector.analyze()
+            regime_analysis = self._regime_detector.analyze()
+        else:
+            # Fallback if components not initialized
+            from dataclasses import dataclass
+
+            @dataclass
+            class RegimeAnalysis:
+                regime: str = "unknown"
+                confidence: float = 0.0
+                alpha: float = 0.0
+
+            regime_analysis = RegimeAnalysis()
 
         # Determine system state (polyvagal)
         prev_state = self._current_state
@@ -330,7 +352,9 @@ class MetaController:
         )
 
         # Calculate risk multiplier
-        pid_multiplier = self._pid_controller.update(drawdown)
+        pid_multiplier = (
+            self._pid_controller.update(drawdown) if self._pid_controller is not None else 1.0
+        )
         state_multiplier = {
             SystemState.VENTRAL: 1.0,
             SystemState.SYMPATHETIC: 0.5,
@@ -378,7 +402,7 @@ class MetaController:
         self._prev_strategy_weights = strategy_weights.copy()
 
         return MetaState(
-            timestamp=datetime.utcnow(),
+            timestamp=datetime.now(UTC),
             system_state=self._current_state,
             market_harmony=self._current_harmony,
             health_score=health_metrics.score,

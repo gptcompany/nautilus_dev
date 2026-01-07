@@ -534,7 +534,7 @@ def calculate_covariance_penalty(
     # Normalize weights if they don't sum to 1
     total_weight = np.sum(weight_array)
     if total_weight > 0 and abs(total_weight - 1.0) > 1e-6:
-        weight_array = weight_array / total_weight
+        weight_array = weight_array / total_weight  # type: ignore[assignment]
 
     # Efficient matrix computation: w.T @ C @ w
     full_penalty = float(weight_array @ corr_matrix @ weight_array)

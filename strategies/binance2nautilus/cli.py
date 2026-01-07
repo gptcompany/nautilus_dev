@@ -8,6 +8,7 @@ import json
 import sys
 from datetime import datetime
 from pathlib import Path
+from typing import cast
 
 import click
 from tqdm import tqdm
@@ -15,6 +16,7 @@ from tqdm import tqdm
 from .catalog import CatalogWriter
 from .config import ConverterConfig
 from .converters.aggtrades import AggTradesConverter, get_aggtrades_date_range
+from .converters.base import BaseConverter
 from .converters.funding import FundingRateConverter
 from .converters.klines import KlinesConverter
 from .converters.trades import TradesConverter
@@ -310,14 +312,16 @@ def update(ctx: click.Context, symbol: str | None, force: bool) -> None:
                 # Process similar to convert command...
 
         # Update trades
-        converter = TradesConverter(sym, config, state if not force else None)
-        pending = converter.get_pending_files()
+        converter_trades: BaseConverter = TradesConverter(sym, config, state if not force else None)
+        pending = converter_trades.get_pending_files()
         if pending:
             click.echo(f"  trades: {len(pending)} new files")
 
         # Update funding rates
-        converter = FundingRateConverter(sym, config, state if not force else None)
-        pending = converter.get_pending_files()
+        converter_funding: BaseConverter = FundingRateConverter(
+            sym, config, state if not force else None
+        )
+        pending = converter_funding.get_pending_files()
         if pending:
             click.echo(f"  funding: {len(pending)} new files")
 
@@ -407,14 +411,15 @@ def status(ctx: click.Context, json_out: bool) -> None:
     state = load_state(config.output_dir)
 
     if json_out:
-        output = {
+        output: dict = {
             "source_dir": str(config.source_dir),
             "catalog_path": str(config.output_dir),
             "symbols": {},
         }
         for symbol, data_types in state.symbols.items():
             output["symbols"][symbol] = {}
-            for data_type, sym_state in data_types.items():
+            data_types_dict: dict = cast(dict, data_types)
+            for data_type, sym_state in data_types_dict.items():
                 output["symbols"][symbol][data_type] = {
                     "files_processed": len(sym_state.files),
                     "total_records": sym_state.total_records,
@@ -557,8 +562,8 @@ def aggtrades(
                 converter.mark_processed(
                     file_path=file_path,
                     record_count=len(file_ticks_list),
-                    first_ts=first_ts,
-                    last_ts=last_ts,
+                    first_ts=cast(int, first_ts),
+                    last_ts=cast(int, last_ts),
                 )
                 total_ticks += len(file_ticks_list)
                 # Explicit cleanup

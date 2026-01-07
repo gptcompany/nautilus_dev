@@ -238,6 +238,10 @@ class VPINIndicator:
         remaining_volume = classification.volume
 
         while remaining_volume > 0:
+            # Check that we have a valid bucket
+            if self._current_bucket is None:
+                break
+
             # Calculate how much volume this bucket can still accept
             space_in_bucket = (
                 self._current_bucket.volume_target - self._current_bucket.accumulated_volume

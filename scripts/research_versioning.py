@@ -91,7 +91,7 @@ def get_entity_state_at(
 
         if at_time:
             query += " AND created_at <= ?"
-            params.append(at_time)
+            params.append(at_time.isoformat() if isinstance(at_time, datetime) else at_time)
 
         query += " ORDER BY event_id ASC"
 
@@ -101,7 +101,7 @@ def get_entity_state_at(
             return {}
 
         # Replay events to reconstruct state
-        state = {"entity_id": entity_id}
+        state: dict[str, Any] = {"entity_id": entity_id}
 
         for event_type, data, created_at in result:
             data_dict = json.loads(data) if data else {}
@@ -114,7 +114,8 @@ def get_entity_state_at(
                 # Update - merge fields
                 state.update(data_dict)
 
-            state["last_modified"] = created_at.isoformat() if created_at else None
+            last_modified_str: str | None = created_at.isoformat() if created_at else None
+            state["last_modified"] = last_modified_str
             state["last_event"] = event_type
 
         return state
@@ -259,12 +260,14 @@ def get_version_stats() -> dict[str, Any]:
     db = duckdb.connect(str(DUCKDB_PATH), read_only=True)
     try:
         # Total events
-        total_events = db.execute("SELECT COUNT(*) FROM events").fetchone()[0]
+        total_result = db.execute("SELECT COUNT(*) FROM events").fetchone()
+        total_events = total_result[0] if total_result else 0
 
         # Unique entities
-        unique_entities = db.execute(
+        unique_result = db.execute(
             "SELECT COUNT(DISTINCT entity_id) FROM events WHERE entity_id IS NOT NULL"
-        ).fetchone()[0]
+        ).fetchone()
+        unique_entities = unique_result[0] if unique_result else 0
 
         # Events per entity type
         events_by_type = db.execute(

@@ -5,6 +5,7 @@ NautilusTrader Bar objects using V1 BarDataWrangler.
 """
 
 from pathlib import Path
+from typing import cast
 
 import pandas as pd
 from nautilus_trader.model.data import Bar, BarType
@@ -163,7 +164,7 @@ class KlinesConverter(BaseConverter):
         Returns:
             List of Bar objects
         """
-        return self._wrangler.process(df)
+        return cast(list[Bar], self._wrangler.process(df))
 
 
 def convert_klines(

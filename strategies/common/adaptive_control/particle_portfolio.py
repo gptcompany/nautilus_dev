@@ -194,7 +194,11 @@ class ParticlePortfolio:
 
             # CSRC (Spec 031): Apply covariance penalty to fitness
             # reward = sharpe - lambda * covariance_penalty
-            if self._correlation_tracker is not None and self._lambda_penalty > 0:
+            if (
+                self._correlation_tracker is not None
+                and self._lambda_penalty > 0
+                and corr_matrix is not None
+            ):
                 from strategies.common.adaptive_control.correlation_tracker import (
                     calculate_covariance_penalty,
                 )
@@ -284,7 +288,9 @@ class ParticlePortfolio:
             confidence = max(0.0, 1.0 - avg_uncertainty)
 
             # Find dominant strategy for signal attribution
-            dominant_strategy = max(consensus, key=consensus.get) if consensus else "unknown"
+            dominant_strategy = (
+                max(consensus.items(), key=lambda x: x[1])[0] if consensus else "unknown"
+            )
             signal_value = consensus.get(dominant_strategy, 0.0)
 
             self._audit_emitter.emit_signal(
@@ -500,14 +506,13 @@ class ThompsonSelector:
         self.stats: dict[str, StrategyStats] = {s: StrategyStats() for s in strategies}
 
         # Initialize adaptive decay calculator if detector provided
+        self._decay_calculator: AdaptiveDecayCalculator | None = None
         if regime_detector is not None:
             from strategies.common.adaptive_control.adaptive_decay import (
                 AdaptiveDecayCalculator,
             )
 
             self._decay_calculator = AdaptiveDecayCalculator()
-        else:
-            self._decay_calculator = None
 
     @property
     def current_decay(self) -> float:
@@ -547,7 +552,7 @@ class ThompsonSelector:
         Args:
             decay_value: Current adaptive decay value.
         """
-        if self._audit_emitter is None:
+        if self._audit_emitter is None or self._regime_detector is None:
             return
 
         from strategies.common.audit.events import AuditEventType
@@ -570,7 +575,7 @@ class ThompsonSelector:
             Selected strategy name
         """
         samples = {s: self.stats[s].sample() for s in self.strategies}
-        return max(samples, key=samples.get)
+        return max(samples.items(), key=lambda x: x[1])[0]
 
     def select_top_k(self, k: int) -> list[str]:
         """

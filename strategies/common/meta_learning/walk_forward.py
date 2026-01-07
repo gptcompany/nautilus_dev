@@ -75,7 +75,7 @@ class WalkForwardSplitter:
         Note:
             The last split may have fewer test samples if the data ends early.
         """
-        splits = []
+        splits: list[tuple[NDArray[np.intp], NDArray[np.intp]]] = []
 
         # Minimum samples needed for one complete split
         min_required = (
@@ -207,9 +207,9 @@ def walk_forward_train(
     if max_holding_bars is not None:
         splits = splitter.purge_splits(splits, max_holding_bars)
 
-    all_predictions = []
-    all_actuals = []
-    all_indices = []
+    all_predictions: list[np.floating] = []
+    all_actuals: list[np.signedinteger] = []
+    all_indices: list[np.intp] = []
 
     for train_idx, test_idx in splits:
         if len(train_idx) == 0 or len(test_idx) == 0:

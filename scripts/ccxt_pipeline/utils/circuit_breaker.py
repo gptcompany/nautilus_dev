@@ -15,7 +15,7 @@ import asyncio
 import time
 from dataclasses import dataclass
 from enum import Enum
-from typing import Any, Callable, TypeVar
+from typing import Any, Callable, TypeVar, cast
 
 from scripts.ccxt_pipeline.utils.logging import get_logger
 
@@ -216,9 +216,9 @@ class CircuitBreaker:
         # Execute outside lock
         try:
             if asyncio.iscoroutinefunction(func):
-                result = await func(*args, **kwargs)
+                result: T = await func(*args, **kwargs)  # type: ignore[assignment]
             else:
-                result = func(*args, **kwargs)
+                result = cast(T, func(*args, **kwargs))
 
             async with self._lock:
                 self._record_success()

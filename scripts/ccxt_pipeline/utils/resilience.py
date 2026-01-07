@@ -14,7 +14,7 @@ import asyncio
 import random
 from dataclasses import dataclass
 from functools import wraps
-from typing import Any, Callable, TypeVar
+from typing import Any, Callable, TypeVar, cast, Awaitable
 
 import ccxt.async_support as ccxt
 
@@ -121,7 +121,7 @@ def needs_reconnection(error: Exception) -> bool:
 
 
 async def retry_with_backoff(
-    func: Callable[..., T],
+    func: Callable[..., Awaitable[T]],
     *args: Any,
     config: RetryConfig | None = None,
     reconnect_func: Callable[[], Any] | None = None,
@@ -220,7 +220,7 @@ def with_retry(
         Decorated function with retry logic.
     """
 
-    def decorator(func: Callable[..., T]) -> Callable[..., T]:
+    def decorator(func: Callable[..., Awaitable[T]]) -> Callable[..., Awaitable[T]]:
         @wraps(func)
         async def wrapper(*args: Any, **kwargs: Any) -> T:
             name = operation_name or func.__name__
@@ -228,7 +228,7 @@ def with_retry(
                 func, *args, config=config, operation_name=name, **kwargs
             )
 
-        return wrapper
+        return cast(Callable[..., Awaitable[T]], wrapper)
 
     return decorator
 

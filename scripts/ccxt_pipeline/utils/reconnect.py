@@ -6,7 +6,7 @@ with exponential backoff delays.
 
 import asyncio
 from dataclasses import dataclass
-from typing import Callable, TypeVar
+from typing import Awaitable, Callable, TypeVar
 
 from scripts.ccxt_pipeline.utils.logging import get_logger
 
@@ -87,7 +87,7 @@ class ReconnectingStream:
 
     async def run(
         self,
-        stream_func: Callable[[], T],
+        stream_func: Callable[[], Awaitable[T]],
         process_func: Callable[[T], None],
         symbol: str,
     ) -> None:

@@ -18,6 +18,7 @@ Known crypto flash crashes included in analysis:
 import sys
 from datetime import datetime
 from pathlib import Path
+from typing import Any, cast
 
 import numpy as np
 import pandas as pd
@@ -37,7 +38,7 @@ def load_bars_from_catalog(
     bar_type: BarType,
     start: datetime,
     end: datetime,
-) -> list[Bar]:
+) -> list[Any]:
     """Load bars for a date range from the catalog.
 
     Args:
@@ -49,7 +50,7 @@ def load_bars_from_catalog(
     Returns:
         List of Bar objects
     """
-    bars = catalog.bars(bar_types=[bar_type], start=start, end=end)
+    bars = cast(list[Any], catalog.bars(bar_types=[bar_type], start=start, end=end))
     return bars
 
 

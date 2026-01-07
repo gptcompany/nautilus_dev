@@ -135,7 +135,7 @@ class LogarithmicSpiral:
     def get_harmonic_levels(
         self,
         price: float,
-        angles: list[float] = None,
+        angles: list[float] | None = None,
     ) -> list[float]:
         """
         Get harmonic price levels from current price.
@@ -185,7 +185,7 @@ class FibonacciAnalyzer:
         # Returns key Fibonacci price levels
     """
 
-    def __init__(self, ratios: list[float] = None):
+    def __init__(self, ratios: list[float] | None = None):
         """
         Args:
             ratios: Custom Fibonacci ratios (default: standard set)
@@ -353,7 +353,7 @@ class FractalDimensionEstimator:
         log_rs = np.log(rs_values)
 
         # Simple linear regression
-        slope = np.polyfit(log_lags, log_rs, 1)[0]
+        slope = float(np.polyfit(log_lags, log_rs, 1)[0])
 
         # Clamp to valid range
         return max(0.0, min(1.0, slope))

@@ -12,7 +12,7 @@ import asyncio
 import json
 from abc import ABC, abstractmethod
 from datetime import datetime, timezone
-from typing import Callable
+from typing import Any, Callable
 
 import websockets
 from websockets.exceptions import ConnectionClosed
@@ -30,7 +30,7 @@ class BaseLiquidationStream(ABC):
         self.symbols = symbols
         self.callback = callback
         self._running = False
-        self._ws = None
+        self._ws: Any = None
         self._reconnect_delay = 1.0
         self._max_reconnect_delay = 60.0
 
@@ -97,7 +97,8 @@ class BaseLiquidationStream(ABC):
                     if liquidation:
                         self.callback(liquidation)
                 except json.JSONDecodeError:
-                    logger.warning(f"Invalid JSON from {self.venue.value}: {message[:100]}")
+                    msg_preview = message.decode() if isinstance(message, bytes) else message
+                    logger.warning(f"Invalid JSON from {self.venue.value}: {msg_preview[:100]}")
                 except Exception as e:
                     logger.error(f"Error parsing {self.venue.value} message: {e}")
 
@@ -371,7 +372,7 @@ class LiquidationStreamManager:
 
     def _create_streams(self) -> list[BaseLiquidationStream]:
         """Create stream instances for configured exchanges."""
-        streams = []
+        streams: list[BaseLiquidationStream] = []
         for exchange in self.exchanges:
             if exchange.lower() == "binance":
                 streams.append(BinanceLiquidationStream(self.symbols, self.callback))

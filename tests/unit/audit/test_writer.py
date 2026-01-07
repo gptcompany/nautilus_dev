@@ -9,7 +9,7 @@ Tests:
 
 import json
 import threading
-from datetime import datetime
+from datetime import UTC, datetime
 from unittest.mock import patch
 
 from strategies.common.audit.events import AuditEvent, AuditEventType
@@ -134,7 +134,7 @@ class TestAppendOnlyWriter:
         writer.close()
 
         # Check filename has today's date
-        today = datetime.utcnow().strftime("%Y%m%d")
+        today = datetime.now(UTC).strftime("%Y%m%d")
         expected_file = tmp_path / f"audit_{today}.jsonl"
         assert expected_file.exists()
 
