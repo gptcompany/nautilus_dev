@@ -1,0 +1,304 @@
+# Development Loop Automation
+# Syncs tasks.md <-> GitHub Issues with milestone support
+#
+# Features:
+#   1. On tasks.md push: Create milestones per user story + issues per task
+#   2. On issue close: Auto-update tasks.md [ ] → [X]
+#   3. On milestone complete: Close milestone + notify
+
+name: Development Loop
+
+on:
+  push:
+    paths:
+      - 'specs/**/tasks.md'
+    branches:
+      - main
+      - develop
+  issues:
+    types: [closed, reopened]
+  milestone:
+    types: [closed]
+  workflow_dispatch:
+    inputs:
+      spec_dir:
+        description: 'Spec directory to process (e.g., specs/001-feature)'
+        required: false
+        type: string
+      dry_run:
+        description: 'Dry run (no changes made)'
+        type: boolean
+        default: true
+      sync_direction:
+        description: 'Sync direction'
+        type: choice
+        options:
+          - tasks-to-issues
+          - issues-to-tasks
+          - bidirectional
+        default: bidirectional
+
+env:
+  PYTHON_VERSION: '3.12'
+
+jobs:
+  # ===========================================================================
+  # Tasks → Issues: Create milestones and issues from tasks.md
+  # ===========================================================================
+  tasks-to-issues:
+    name: "Sync Tasks → Issues"
+    runs-on: [self-hosted, nautilus]
+    if: |
+      github.event_name == 'push' ||
+      (github.event_name == 'workflow_dispatch' &&
+       (inputs.sync_direction == 'tasks-to-issues' || inputs.sync_direction == 'bidirectional'))
+
+    outputs:
+      milestones_created: ${{ steps.sync.outputs.milestones_created }}
+      issues_created: ${{ steps.sync.outputs.issues_created }}
+      spec_dir: ${{ steps.find.outputs.spec_dir }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          enable-cache: true
+
+      - name: Install dependencies
+        run: uv sync --frozen
+
+      - name: Find changed tasks.md
+        id: find
+        run: |
+          if [ -n "${{ inputs.spec_dir }}" ]; then
+            SPEC_DIR="${{ inputs.spec_dir }}"
+          else
+            # Get changed tasks.md from commit
+            CHANGED=$(git diff --name-only HEAD~1 HEAD | grep 'specs/.*/tasks.md' | head -1)
+            if [ -z "$CHANGED" ]; then
+              echo "No tasks.md changes found"
+              echo "has_tasks=false" >> $GITHUB_OUTPUT
+              exit 0
+            fi
+            SPEC_DIR=$(dirname "$CHANGED")
+          fi
+
+          if [ -f "$SPEC_DIR/tasks.md" ]; then
+            echo "spec_dir=$SPEC_DIR" >> $GITHUB_OUTPUT
+            echo "has_tasks=true" >> $GITHUB_OUTPUT
+            echo "Found tasks.md in $SPEC_DIR"
+          else
+            echo "has_tasks=false" >> $GITHUB_OUTPUT
+            echo "No tasks.md found in $SPEC_DIR"
+          fi
+
+      - name: Create milestones and issues
+        id: sync
+        if: steps.find.outputs.has_tasks == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DRY_RUN: ${{ inputs.dry_run || 'false' }}
+        run: |
+          SPEC_DIR="${{ steps.find.outputs.spec_dir }}"
+
+          # Run sync script
+          uv run python scripts/ci/taskstoissues_with_milestones.py \
+            --tasks-file "$SPEC_DIR/tasks.md" \
+            --spec-dir "$SPEC_DIR" \
+            $( [ "$DRY_RUN" == "true" ] && echo "--dry-run" ) \
+            --output-json /tmp/sync_result.json
+
+          # Extract results
+          MILESTONES=$(jq -r '.milestones_created // 0' /tmp/sync_result.json)
+          ISSUES=$(jq -r '.issues_created // 0' /tmp/sync_result.json)
+
+          echo "milestones_created=$MILESTONES" >> $GITHUB_OUTPUT
+          echo "issues_created=$ISSUES" >> $GITHUB_OUTPUT
+
+          echo "Created $MILESTONES milestones and $ISSUES issues"
+
+  # ===========================================================================
+  # Issues → Tasks: Update tasks.md when issues close
+  # ===========================================================================
+  issues-to-tasks:
+    name: "Sync Issues → Tasks"
+    runs-on: [self-hosted, nautilus]
+    if: |
+      github.event_name == 'issues' ||
+      (github.event_name == 'workflow_dispatch' &&
+       (inputs.sync_direction == 'issues-to-tasks' || inputs.sync_direction == 'bidirectional'))
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract task ID from issue
+        id: extract
+        if: github.event_name == 'issues'
+        run: |
+          TITLE="${{ github.event.issue.title }}"
+
+          # Extract task ID (T001, T002, etc.)
+          TASK_ID=$(echo "$TITLE" | grep -oE 'T[0-9]+' | head -1)
+
+          if [ -z "$TASK_ID" ]; then
+            echo "No task ID found in issue title"
+            echo "has_task=false" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          echo "task_id=$TASK_ID" >> $GITHUB_OUTPUT
+          echo "has_task=true" >> $GITHUB_OUTPUT
+          echo "Found task ID: $TASK_ID"
+
+          # Try to find which spec this belongs to
+          ISSUE_BODY="${{ github.event.issue.body }}"
+          SPEC_DIR=$(echo "$ISSUE_BODY" | grep -oE 'specs/[^/]+' | head -1)
+
+          if [ -n "$SPEC_DIR" ]; then
+            echo "spec_dir=$SPEC_DIR" >> $GITHUB_OUTPUT
+            echo "Found spec directory: $SPEC_DIR"
+          fi
+
+      - name: Find tasks.md containing task
+        id: find
+        if: steps.extract.outputs.has_task == 'true'
+        run: |
+          TASK_ID="${{ steps.extract.outputs.task_id }}"
+          SPEC_DIR="${{ steps.extract.outputs.spec_dir }}"
+
+          # If spec_dir known, use it
+          if [ -n "$SPEC_DIR" ] && [ -f "$SPEC_DIR/tasks.md" ]; then
+            TASKS_FILE="$SPEC_DIR/tasks.md"
+          else
+            # Search all tasks.md files
+            TASKS_FILE=$(grep -rl "$TASK_ID" specs/*/tasks.md 2>/dev/null | head -1)
+          fi
+
+          if [ -z "$TASKS_FILE" ] || [ ! -f "$TASKS_FILE" ]; then
+            echo "No tasks.md found containing $TASK_ID"
+            echo "found=false" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          echo "tasks_file=$TASKS_FILE" >> $GITHUB_OUTPUT
+          echo "found=true" >> $GITHUB_OUTPUT
+          echo "Found: $TASKS_FILE"
+
+      - name: Update task status
+        if: steps.find.outputs.found == 'true'
+        run: |
+          TASK_ID="${{ steps.extract.outputs.task_id }}"
+          TASKS_FILE="${{ steps.find.outputs.tasks_file }}"
+          EVENT="${{ github.event.action }}"
+
+          if [ "$EVENT" == "closed" ]; then
+            # Mark as complete: [ ] → [X]
+            sed -i "s/^\(\s*-\s*\)\[ \]\(\s*$TASK_ID\)/\1[X]\2/" "$TASKS_FILE"
+            COMMIT_MSG="chore: mark $TASK_ID complete (issue #${{ github.event.issue.number }} closed)"
+          elif [ "$EVENT" == "reopened" ]; then
+            # Mark as incomplete: [X] → [ ]
+            sed -i "s/^\(\s*-\s*\)\[X\]\(\s*$TASK_ID\)/\1[ ]\2/" "$TASKS_FILE"
+            COMMIT_MSG="chore: mark $TASK_ID incomplete (issue #${{ github.event.issue.number }} reopened)"
+          fi
+
+          # Check if file changed
+          if git diff --quiet "$TASKS_FILE"; then
+            echo "No changes to commit"
+            exit 0
+          fi
+
+          # Commit the change
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add "$TASKS_FILE"
+          git commit -m "$COMMIT_MSG
+
+          🤖 Generated by Development Loop workflow"
+
+          git push
+
+  # ===========================================================================
+  # Milestone Completion: Notify and close
+  # ===========================================================================
+  milestone-complete:
+    name: "Handle Milestone Completion"
+    runs-on: [self-hosted, nautilus]
+    if: github.event_name == 'milestone' && github.event.action == 'closed'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Generate completion report
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          MILESTONE_TITLE="${{ github.event.milestone.title }}"
+          MILESTONE_NUM="${{ github.event.milestone.number }}"
+
+          # Get milestone stats
+          OPEN_ISSUES=$(gh api repos/${{ github.repository }}/milestones/$MILESTONE_NUM -q '.open_issues')
+          CLOSED_ISSUES=$(gh api repos/${{ github.repository }}/milestones/$MILESTONE_NUM -q '.closed_issues')
+
+          if [ "$OPEN_ISSUES" -gt 0 ]; then
+            echo "::warning::Milestone closed with $OPEN_ISSUES open issues"
+          fi
+
+          echo "## 🎉 Milestone Complete: $MILESTONE_TITLE"
+          echo ""
+          echo "- Closed Issues: $CLOSED_ISSUES"
+          echo "- Open Issues: $OPEN_ISSUES"
+
+      - name: Send notification
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: |
+          if [ -n "$DISCORD_WEBHOOK_URL" ]; then
+            MILESTONE_TITLE="${{ github.event.milestone.title }}"
+
+            curl -X POST "$DISCORD_WEBHOOK_URL" \
+              -H "Content-Type: application/json" \
+              -d "{\"content\": \"🎉 Milestone complete: **$MILESTONE_TITLE**\"}" \
+              2>/dev/null || echo "Discord notification failed"
+          fi
+
+  # ===========================================================================
+  # Summary
+  # ===========================================================================
+  summary:
+    name: "Summary"
+    runs-on: [self-hosted, nautilus]
+    needs: [tasks-to-issues, issues-to-tasks, milestone-complete]
+    if: always()
+
+    steps:
+      - name: Print summary
+        run: |
+          echo "=== Development Loop Summary ==="
+          echo ""
+          echo "Event: ${{ github.event_name }}"
+          echo "Action: ${{ github.event.action }}"
+          echo ""
+
+          if [ -n "${{ needs.tasks-to-issues.outputs.milestones_created }}" ]; then
+            echo "Tasks → Issues:"
+            echo "  Milestones: ${{ needs.tasks-to-issues.outputs.milestones_created }}"
+            echo "  Issues: ${{ needs.tasks-to-issues.outputs.issues_created }}"
+          fi
+
+          echo ""
+          echo "Sync complete"

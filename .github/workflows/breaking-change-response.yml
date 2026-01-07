@@ -1,0 +1,390 @@
+# Breaking Change Response Loop
+# Triggered after NT update detection to auto-generate fix tasks and issues
+#
+# Flow:
+#   NT Update Detected → Analyze Impact → Generate tasks.md → Create Issues → Dispatch Fix
+
+name: Breaking Change Response
+
+on:
+  workflow_run:
+    workflows: ["NautilusTrader Update Check"]
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Target NT version to analyze'
+        required: false
+        type: string
+      dry_run:
+        description: 'Dry run (no issues created)'
+        type: boolean
+        default: true
+      force:
+        description: 'Force analysis even for high confidence updates'
+        type: boolean
+        default: false
+
+env:
+  PYTHON_VERSION: '3.12'
+
+jobs:
+  # ===========================================================================
+  # Analyze Impact
+  # ===========================================================================
+  analyze-impact:
+    name: "Analyze Breaking Changes"
+    runs-on: [self-hosted, nautilus]
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
+
+    outputs:
+      needs_fix: ${{ steps.analyze.outputs.needs_fix }}
+      confidence: ${{ steps.analyze.outputs.confidence }}
+      breaking_count: ${{ steps.analyze.outputs.breaking_count }}
+      version: ${{ steps.analyze.outputs.version }}
+      spec_dir: ${{ steps.analyze.outputs.spec_dir }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          enable-cache: true
+
+      - name: Install dependencies
+        run: uv sync --frozen
+
+      - name: Analyze breaking changes
+        id: analyze
+        run: |
+          # Get version from input or auto-detect
+          if [ -n "${{ inputs.version }}" ]; then
+            VERSION="${{ inputs.version }}"
+          else
+            # Get from changelog
+            VERSION=$(uv run python -m scripts.auto_update check --format json 2>/dev/null | jq -r '.latest_version // "unknown"')
+          fi
+
+          echo "Analyzing NT version: $VERSION"
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+          # Run impact analysis
+          ANALYSIS=$(uv run python -m scripts.auto_update check --format json --verbose 2>/dev/null || echo '{}')
+
+          # Extract metrics
+          CONFIDENCE=$(echo "$ANALYSIS" | jq -r '.impact_report.confidence_score // 100')
+          BREAKING_COUNT=$(echo "$ANALYSIS" | jq -r '.impact_report.breaking_changes | length // 0')
+
+          echo "confidence=$CONFIDENCE" >> $GITHUB_OUTPUT
+          echo "breaking_count=$BREAKING_COUNT" >> $GITHUB_OUTPUT
+
+          # Save analysis for later steps
+          echo "$ANALYSIS" > /tmp/impact_analysis.json
+
+          # Determine if fix needed
+          FORCE="${{ inputs.force }}"
+
+          if [ "$BREAKING_COUNT" -eq 0 ]; then
+            echo "needs_fix=false" >> $GITHUB_OUTPUT
+            echo "No breaking changes detected"
+          elif [ "$FORCE" == "true" ] || (( $(echo "$CONFIDENCE < 85" | bc -l) )); then
+            echo "needs_fix=true" >> $GITHUB_OUTPUT
+            SPEC_DIR="specs/auto-fix-${VERSION}"
+            echo "spec_dir=$SPEC_DIR" >> $GITHUB_OUTPUT
+            echo "Fix needed: $BREAKING_COUNT breaking changes, confidence: $CONFIDENCE%"
+          else
+            echo "needs_fix=false" >> $GITHUB_OUTPUT
+            echo "Auto-update possible: confidence $CONFIDENCE% >= 85%"
+          fi
+
+      - name: Upload analysis artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: impact-analysis
+          path: /tmp/impact_analysis.json
+          retention-days: 7
+
+  # ===========================================================================
+  # Generate Fix Tasks
+  # ===========================================================================
+  generate-tasks:
+    name: "Generate Fix Tasks"
+    runs-on: [self-hosted, nautilus]
+    needs: analyze-impact
+    if: needs.analyze-impact.outputs.needs_fix == 'true'
+
+    outputs:
+      tasks_created: ${{ steps.generate.outputs.tasks_created }}
+      task_count: ${{ steps.generate.outputs.task_count }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          enable-cache: true
+
+      - name: Install dependencies
+        run: uv sync --frozen
+
+      - name: Download analysis artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: impact-analysis
+          path: /tmp
+
+      - name: Generate tasks.md from ImpactReport
+        id: generate
+        run: |
+          SPEC_DIR="${{ needs.analyze-impact.outputs.spec_dir }}"
+          VERSION="${{ needs.analyze-impact.outputs.version }}"
+
+          mkdir -p "$SPEC_DIR"
+
+          # Generate tasks.md
+          uv run python scripts/ci/generate_fix_tasks.py \
+            --impact-file /tmp/impact_analysis.json \
+            --output "$SPEC_DIR/tasks.md" \
+            --version "$VERSION"
+
+          # Count tasks
+          TASK_COUNT=$(grep -c '^\s*-\s*\[ \]' "$SPEC_DIR/tasks.md" 2>/dev/null || echo 0)
+
+          echo "tasks_created=true" >> $GITHUB_OUTPUT
+          echo "task_count=$TASK_COUNT" >> $GITHUB_OUTPUT
+
+          echo "Generated $TASK_COUNT fix tasks in $SPEC_DIR/tasks.md"
+
+      - name: Create spec.md stub
+        run: |
+          SPEC_DIR="${{ needs.analyze-impact.outputs.spec_dir }}"
+          VERSION="${{ needs.analyze-impact.outputs.version }}"
+
+          cat > "$SPEC_DIR/spec.md" << EOF
+          # Auto-Fix: NautilusTrader $VERSION Breaking Changes
+
+          ## Overview
+
+          This specification tracks automatic fixes for breaking changes introduced in NautilusTrader version $VERSION.
+
+          ## User Stories
+
+          ### US1: Auto-Fix Breaking Changes
+
+          As a developer, I want breaking changes from NT $VERSION to be automatically fixed so that my strategies continue to work.
+
+          ## Breaking Changes Detected
+
+          - Total: ${{ needs.analyze-impact.outputs.breaking_count }}
+          - Confidence Score: ${{ needs.analyze-impact.outputs.confidence }}%
+
+          ## Status
+
+          - [ ] Tasks generated
+          - [ ] Issues created
+          - [ ] Fixes applied
+          - [ ] Tests passing
+
+          ---
+          *Auto-generated by Breaking Change Response workflow*
+          EOF
+
+      - name: Commit tasks.md
+        if: ${{ !inputs.dry_run }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add "${{ needs.analyze-impact.outputs.spec_dir }}"
+          git commit -m "chore: generate fix tasks for NT ${{ needs.analyze-impact.outputs.version }} breaking changes
+
+          Breaking changes: ${{ needs.analyze-impact.outputs.breaking_count }}
+          Confidence: ${{ needs.analyze-impact.outputs.confidence }}%
+
+          🤖 Generated by Breaking Change Response workflow"
+
+          git push
+
+  # ===========================================================================
+  # Create GitHub Issues
+  # ===========================================================================
+  create-issues:
+    name: "Create GitHub Issues"
+    runs-on: [self-hosted, nautilus]
+    needs: [analyze-impact, generate-tasks]
+    if: needs.generate-tasks.outputs.tasks_created == 'true' && !inputs.dry_run
+
+    outputs:
+      issues_created: ${{ steps.create.outputs.count }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: main  # Get latest with tasks.md
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          enable-cache: true
+
+      - name: Install dependencies
+        run: uv sync --frozen
+
+      - name: Create issues from tasks
+        id: create
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          SPEC_DIR="${{ needs.analyze-impact.outputs.spec_dir }}"
+          VERSION="${{ needs.analyze-impact.outputs.version }}"
+
+          # Create milestone
+          MILESTONE_TITLE="NT $VERSION Auto-Fix"
+          gh api repos/${{ github.repository }}/milestones \
+            --method POST \
+            -f title="$MILESTONE_TITLE" \
+            -f state="open" \
+            -f description="Automated fixes for NautilusTrader $VERSION breaking changes" \
+            2>/dev/null || echo "Milestone may already exist"
+
+          # Get milestone number
+          MILESTONE_NUM=$(gh api repos/${{ github.repository }}/milestones \
+            -q ".[] | select(.title == \"$MILESTONE_TITLE\") | .number")
+
+          # Create issues from tasks
+          CREATED=0
+          while IFS= read -r LINE; do
+            if [[ "$LINE" =~ ^\s*-\s*\[\s*\]\s*(T[0-9]+) ]]; then
+              TASK_ID="${BASH_REMATCH[1]}"
+              DESCRIPTION=$(echo "$LINE" | sed 's/.*\] //')
+
+              gh issue create \
+                --title "$TASK_ID: $DESCRIPTION" \
+                --body "## Task from Breaking Change Response
+
+          **Version**: NT $VERSION
+          **Task ID**: $TASK_ID
+
+          ### Description
+          $DESCRIPTION
+
+          ### Source
+          - Spec: $SPEC_DIR/spec.md
+          - Tasks: $SPEC_DIR/tasks.md
+
+          ---
+          *Auto-generated by Breaking Change Response workflow*" \
+                --label "auto-fix,breaking-change,nt-$VERSION" \
+                --milestone "$MILESTONE_NUM" \
+                2>/dev/null && CREATED=$((CREATED + 1)) || echo "Failed to create issue for $TASK_ID"
+            fi
+          done < "$SPEC_DIR/tasks.md"
+
+          echo "count=$CREATED" >> $GITHUB_OUTPUT
+          echo "Created $CREATED issues"
+
+  # ===========================================================================
+  # Dispatch Claude Code for Auto-Fix
+  # ===========================================================================
+  dispatch-claude:
+    name: "Dispatch Auto-Fix"
+    runs-on: [self-hosted, nautilus]
+    needs: [analyze-impact, create-issues]
+    if: needs.create-issues.outputs.issues_created > 0 && !inputs.dry_run
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          enable-cache: true
+
+      - name: Install dependencies
+        run: uv sync --frozen
+
+      - name: Dispatch Claude Code
+        run: |
+          VERSION="${{ needs.analyze-impact.outputs.version }}"
+          SPEC_DIR="${{ needs.analyze-impact.outputs.spec_dir }}"
+
+          echo "Dispatching Claude Code for auto-fix..."
+
+          # Use existing dispatcher if available
+          if [ -f "scripts/auto_update/dispatcher.py" ]; then
+            uv run python -m scripts.auto_update dispatch \
+              --version "$VERSION" \
+              --timeout 1800 \
+              2>&1 || echo "Dispatcher failed - manual fix may be required"
+          else
+            echo "::warning::Dispatcher not available - manual fix required"
+          fi
+
+      - name: Send notification
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: |
+          if [ -n "$DISCORD_WEBHOOK_URL" ]; then
+            VERSION="${{ needs.analyze-impact.outputs.version }}"
+            ISSUES="${{ needs.create-issues.outputs.issues_created }}"
+
+            uv run python -m scripts.auto_update notify \
+              "🔧 NT $VERSION Breaking Changes: $ISSUES issues created, auto-fix dispatched" \
+              --channel discord \
+              --level info \
+              --webhook-url "$DISCORD_WEBHOOK_URL" \
+              2>/dev/null || echo "Notification failed"
+          fi
+
+  # ===========================================================================
+  # Summary
+  # ===========================================================================
+  summary:
+    name: "Summary"
+    runs-on: [self-hosted, nautilus]
+    needs: [analyze-impact, generate-tasks, create-issues, dispatch-claude]
+    if: always()
+
+    steps:
+      - name: Print summary
+        run: |
+          echo "=== Breaking Change Response Summary ==="
+          echo ""
+          echo "Version: ${{ needs.analyze-impact.outputs.version }}"
+          echo "Breaking Changes: ${{ needs.analyze-impact.outputs.breaking_count }}"
+          echo "Confidence: ${{ needs.analyze-impact.outputs.confidence }}%"
+          echo "Needs Fix: ${{ needs.analyze-impact.outputs.needs_fix }}"
+          echo ""
+          echo "Tasks Generated: ${{ needs.generate-tasks.outputs.task_count }}"
+          echo "Issues Created: ${{ needs.create-issues.outputs.issues_created }}"
+          echo ""
+
+          if [ "${{ inputs.dry_run }}" == "true" ]; then
+            echo "DRY RUN - no changes made"
+          fi

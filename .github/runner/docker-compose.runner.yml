@@ -1,0 +1,88 @@
+# Self-hosted GitHub Actions runner for NautilusTrader CI/CD
+# Access to local services: Neo4j, QuestDB, Redis, DuckDB
+#
+# Usage:
+#   export GITHUB_RUNNER_TOKEN="your-token"
+#   export GITHUB_REPOSITORY="owner/repo"
+#   docker-compose -f docker-compose.runner.yml up -d
+#
+# Get runner token: Settings > Actions > Runners > New self-hosted runner
+
+version: '3.8'
+
+services:
+  github-runner:
+    build:
+      context: .
+      dockerfile: Dockerfile.runner
+    container_name: nautilus-github-runner
+    hostname: nautilus-runner
+
+    environment:
+      # GitHub runner configuration
+      - RUNNER_NAME=${RUNNER_NAME:-nautilus-local-runner}
+      - RUNNER_TOKEN=${GITHUB_RUNNER_TOKEN}
+      - RUNNER_REPOSITORY=${GITHUB_REPOSITORY:-}
+      - RUNNER_LABELS=self-hosted,linux,x64,nautilus
+      - RUNNER_WORKDIR=/home/runner/work
+
+      # Local service connections (via host network)
+      - REDIS_HOST=host.docker.internal
+      - REDIS_PORT=6379
+      - NEO4J_URI=bolt://host.docker.internal:7687
+      - NEO4J_USER=neo4j
+      - NEO4J_PASSWORD=research123
+      - QUESTDB_HOST=host.docker.internal
+      - QUESTDB_HTTP_PORT=9000
+      - QUESTDB_PG_PORT=8812
+      - DUCKDB_PATH=/data/research.duckdb
+
+      # Python environment
+      - VIRTUAL_ENV=/opt/nautilus_env
+      - PATH=/opt/nautilus_env/bin:/usr/local/bin:/usr/bin:/bin
+      - PYTHONPATH=/workspace
+
+      # CI flags
+      - CI=true
+      - ALPHA_DEBUG_MAX_ROUNDS=3
+      - ALPHA_DEBUG_COOLDOWN_SECS=600
+
+    volumes:
+      # Mount nautilus_dev repository (read-only for safety)
+      - /media/sam/1TB/nautilus_dev:/workspace:ro
+
+      # Mount data directories (read-only)
+      - /media/sam/1TB/nautilus_dev/data:/data:ro
+
+      # Runner work directory (writable)
+      - runner_work:/home/runner/work
+
+      # Docker socket for nested docker commands if needed
+      - /var/run/docker.sock:/var/run/docker.sock
+
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+    networks:
+      - nautilus-network
+
+    restart: unless-stopped
+
+    # Resource limits
+    deploy:
+      resources:
+        limits:
+          cpus: '4'
+          memory: 8G
+        reservations:
+          cpus: '2'
+          memory: 4G
+
+volumes:
+  runner_work:
+    driver: local
+
+networks:
+  nautilus-network:
+    external: true
+    name: nautilus-network

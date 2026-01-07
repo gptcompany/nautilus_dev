@@ -1,0 +1,383 @@
+# Backtest Failure Response
+# Analyzes backtest failures, generates diagnostic tasks, and creates issues
+#
+# Triggers: CI pipeline backtest stage failure
+# Actions: Parse logs → Generate tasks → Create issues → Notify
+
+name: Backtest Failure Response
+
+on:
+  workflow_run:
+    workflows: ["CI/CD Pipeline"]
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      log_file:
+        description: 'Path to backtest log file'
+        required: false
+        type: string
+      strategy_name:
+        description: 'Strategy name that failed'
+        required: false
+        type: string
+      dry_run:
+        description: 'Dry run (no issues created)'
+        type: boolean
+        default: true
+
+env:
+  PYTHON_VERSION: '3.12'
+
+jobs:
+  # ===========================================================================
+  # Check if Backtest Failed
+  # ===========================================================================
+  check-failure:
+    name: "Check Backtest Failure"
+    runs-on: [self-hosted, nautilus]
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.conclusion == 'failure')
+
+    outputs:
+      backtest_failed: ${{ steps.check.outputs.backtest_failed }}
+      log_artifact: ${{ steps.check.outputs.log_artifact }}
+      strategy_name: ${{ steps.check.outputs.strategy_name }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check for backtest failure
+        id: check
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            echo "backtest_failed=true" >> $GITHUB_OUTPUT
+            echo "log_artifact=${{ inputs.log_file }}" >> $GITHUB_OUTPUT
+            echo "strategy_name=${{ inputs.strategy_name }}" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          RUN_ID="${{ github.event.workflow_run.id }}"
+
+          # Get job details
+          JOBS=$(gh api repos/${{ github.repository }}/actions/runs/$RUN_ID/jobs -q '.jobs[]')
+
+          # Check if backtest job failed
+          BACKTEST_JOB=$(echo "$JOBS" | jq -r 'select(.name | contains("Backtest")) | .conclusion')
+
+          if [ "$BACKTEST_JOB" == "failure" ]; then
+            echo "backtest_failed=true" >> $GITHUB_OUTPUT
+            echo "Backtest job failed"
+
+            # Try to get log artifact
+            ARTIFACTS=$(gh api repos/${{ github.repository }}/actions/runs/$RUN_ID/artifacts -q '.artifacts[].name')
+            LOG_ARTIFACT=$(echo "$ARTIFACTS" | grep -i backtest | head -1)
+            echo "log_artifact=$LOG_ARTIFACT" >> $GITHUB_OUTPUT
+
+            # Try to extract strategy name from job logs
+            STRATEGY=$(gh run view "$RUN_ID" --log 2>/dev/null | grep -oP 'strategy[:\s]+\K\w+' | head -1)
+            echo "strategy_name=${STRATEGY:-unknown}" >> $GITHUB_OUTPUT
+          else
+            echo "backtest_failed=false" >> $GITHUB_OUTPUT
+            echo "Backtest did not fail"
+          fi
+
+  # ===========================================================================
+  # Analyze Failure
+  # ===========================================================================
+  analyze-failure:
+    name: "Analyze Backtest Failure"
+    runs-on: [self-hosted, nautilus]
+    needs: check-failure
+    if: needs.check-failure.outputs.backtest_failed == 'true'
+
+    outputs:
+      analysis_complete: ${{ steps.analyze.outputs.complete }}
+      failure_type: ${{ steps.analyze.outputs.failure_type }}
+      root_cause: ${{ steps.analyze.outputs.root_cause }}
+      spec_dir: ${{ steps.analyze.outputs.spec_dir }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          enable-cache: true
+
+      - name: Install dependencies
+        run: uv sync --frozen
+
+      - name: Download log artifact
+        if: needs.check-failure.outputs.log_artifact != ''
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ needs.check-failure.outputs.log_artifact }}
+          path: /tmp/backtest-logs
+
+      - name: Analyze backtest failure
+        id: analyze
+        run: |
+          STRATEGY="${{ needs.check-failure.outputs.strategy_name }}"
+          LOG_DIR="/tmp/backtest-logs"
+
+          # Create spec directory for this failure
+          TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+          SPEC_DIR="specs/backtest-failure-${STRATEGY}-${TIMESTAMP}"
+          mkdir -p "$SPEC_DIR"
+
+          echo "spec_dir=$SPEC_DIR" >> $GITHUB_OUTPUT
+
+          # Find log files
+          if [ -d "$LOG_DIR" ]; then
+            LOG_FILES=$(find "$LOG_DIR" -name "*.log" -o -name "*.txt" | head -5)
+          else
+            LOG_FILES=""
+          fi
+
+          # Run analysis script
+          if [ -n "$LOG_FILES" ]; then
+            uv run python scripts/ci/analyze_backtest_failure.py \
+              --log-files $LOG_FILES \
+              --strategy "$STRATEGY" \
+              --output "$SPEC_DIR/analysis.json" \
+              2>&1 || echo "Analysis script failed"
+          fi
+
+          # Extract results
+          if [ -f "$SPEC_DIR/analysis.json" ]; then
+            FAILURE_TYPE=$(jq -r '.failure_type // "unknown"' "$SPEC_DIR/analysis.json")
+            ROOT_CAUSE=$(jq -r '.root_cause // "Unknown"' "$SPEC_DIR/analysis.json")
+
+            echo "failure_type=$FAILURE_TYPE" >> $GITHUB_OUTPUT
+            echo "root_cause=$ROOT_CAUSE" >> $GITHUB_OUTPUT
+            echo "complete=true" >> $GITHUB_OUTPUT
+          else
+            echo "failure_type=unknown" >> $GITHUB_OUTPUT
+            echo "root_cause=Analysis failed - manual investigation needed" >> $GITHUB_OUTPUT
+            echo "complete=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Upload analysis artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: failure-analysis
+          path: ${{ steps.analyze.outputs.spec_dir }}
+          retention-days: 30
+
+  # ===========================================================================
+  # Generate Diagnostic Tasks
+  # ===========================================================================
+  generate-tasks:
+    name: "Generate Diagnostic Tasks"
+    runs-on: [self-hosted, nautilus]
+    needs: [check-failure, analyze-failure]
+    if: needs.analyze-failure.outputs.analysis_complete == 'true'
+
+    outputs:
+      tasks_created: ${{ steps.generate.outputs.tasks_created }}
+      task_count: ${{ steps.generate.outputs.task_count }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          enable-cache: true
+
+      - name: Install dependencies
+        run: uv sync --frozen
+
+      - name: Download analysis artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: failure-analysis
+          path: ${{ needs.analyze-failure.outputs.spec_dir }}
+
+      - name: Generate diagnostic tasks
+        id: generate
+        run: |
+          SPEC_DIR="${{ needs.analyze-failure.outputs.spec_dir }}"
+          STRATEGY="${{ needs.check-failure.outputs.strategy_name }}"
+
+          # Generate tasks.md
+          uv run python scripts/ci/generate_diagnostic_tasks.py \
+            --analysis-file "$SPEC_DIR/analysis.json" \
+            --strategy "$STRATEGY" \
+            --output "$SPEC_DIR/tasks.md"
+
+          # Count tasks
+          TASK_COUNT=$(grep -c '^\\s*-\\s*\\[ \\]' "$SPEC_DIR/tasks.md" 2>/dev/null || echo 0)
+
+          echo "tasks_created=true" >> $GITHUB_OUTPUT
+          echo "task_count=$TASK_COUNT" >> $GITHUB_OUTPUT
+
+          echo "Generated $TASK_COUNT diagnostic tasks"
+
+      - name: Create spec.md
+        run: |
+          SPEC_DIR="${{ needs.analyze-failure.outputs.spec_dir }}"
+          STRATEGY="${{ needs.check-failure.outputs.strategy_name }}"
+          FAILURE_TYPE="${{ needs.analyze-failure.outputs.failure_type }}"
+          ROOT_CAUSE="${{ needs.analyze-failure.outputs.root_cause }}"
+
+          cat > "$SPEC_DIR/spec.md" << EOF
+          # Backtest Failure Investigation: $STRATEGY
+
+          ## Overview
+
+          Investigation of backtest failure for strategy: **$STRATEGY**
+
+          ## Failure Details
+
+          - **Type**: $FAILURE_TYPE
+          - **Root Cause**: $ROOT_CAUSE
+          - **Timestamp**: $(date -Iseconds)
+          - **CI Run**: ${{ github.event.workflow_run.id || 'manual' }}
+
+          ## User Stories
+
+          ### US1: Diagnose Failure
+
+          As a developer, I want to understand why the backtest failed
+          so that I can fix the underlying issue.
+
+          ### US2: Implement Fix
+
+          As a developer, I want to implement a fix for the failure
+          so that the backtest passes.
+
+          ## Status
+
+          - [X] Failure detected
+          - [X] Analysis complete
+          - [ ] Root cause identified
+          - [ ] Fix implemented
+          - [ ] Tests passing
+
+          ---
+          *Auto-generated by Backtest Failure Response workflow*
+          EOF
+
+      - name: Commit spec files
+        if: ${{ !inputs.dry_run }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add "${{ needs.analyze-failure.outputs.spec_dir }}"
+          git commit -m "chore: create diagnostic spec for backtest failure (${{ needs.check-failure.outputs.strategy_name }})
+
+          Failure type: ${{ needs.analyze-failure.outputs.failure_type }}
+          Tasks: ${{ steps.generate.outputs.task_count }}
+
+          🤖 Generated by Backtest Failure Response workflow" || echo "No changes to commit"
+
+          git push || echo "Push failed"
+
+  # ===========================================================================
+  # Create GitHub Issues
+  # ===========================================================================
+  create-issues:
+    name: "Create Investigation Issues"
+    runs-on: [self-hosted, nautilus]
+    needs: [check-failure, analyze-failure, generate-tasks]
+    if: needs.generate-tasks.outputs.tasks_created == 'true' && !inputs.dry_run
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Create issues
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          SPEC_DIR="${{ needs.analyze-failure.outputs.spec_dir }}"
+          STRATEGY="${{ needs.check-failure.outputs.strategy_name }}"
+          FAILURE_TYPE="${{ needs.analyze-failure.outputs.failure_type }}"
+
+          # Create milestone
+          MILESTONE_TITLE="Fix: $STRATEGY backtest failure"
+          gh api repos/${{ github.repository }}/milestones \
+            --method POST \
+            -f title="$MILESTONE_TITLE" \
+            -f state="open" \
+            -f description="Investigation and fix for backtest failure" \
+            2>/dev/null || echo "Milestone may exist"
+
+          # Get milestone number
+          MILESTONE_NUM=$(gh api repos/${{ github.repository }}/milestones \
+            -q ".[] | select(.title == \"$MILESTONE_TITLE\") | .number")
+
+          # Create main investigation issue
+          gh issue create \
+            --title "🔴 Backtest Failure: $STRATEGY ($FAILURE_TYPE)" \
+            --body "## Backtest Failure Investigation
+
+          **Strategy**: $STRATEGY
+          **Failure Type**: $FAILURE_TYPE
+          **Root Cause**: ${{ needs.analyze-failure.outputs.root_cause }}
+
+          ### Spec Files
+          - Spec: \`$SPEC_DIR/spec.md\`
+          - Tasks: \`$SPEC_DIR/tasks.md\`
+          - Analysis: \`$SPEC_DIR/analysis.json\`
+
+          ### CI Run
+          - Run ID: ${{ github.event.workflow_run.id || 'manual' }}
+          - [View Logs](${{ github.event.workflow_run.html_url || '#' }})
+
+          ---
+          *Auto-generated by Backtest Failure Response workflow*" \
+            --label "bug,backtest-failure,priority-high" \
+            --milestone "$MILESTONE_NUM" \
+            2>/dev/null || echo "Failed to create issue"
+
+  # ===========================================================================
+  # Notify
+  # ===========================================================================
+  notify:
+    name: "Send Notification"
+    runs-on: [self-hosted, nautilus]
+    needs: [check-failure, analyze-failure, generate-tasks, create-issues]
+    if: always() && needs.check-failure.outputs.backtest_failed == 'true'
+
+    steps:
+      - name: Send Discord notification
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: |
+          if [ -n "$DISCORD_WEBHOOK_URL" ]; then
+            STRATEGY="${{ needs.check-failure.outputs.strategy_name }}"
+            FAILURE_TYPE="${{ needs.analyze-failure.outputs.failure_type }}"
+            TASKS="${{ needs.generate-tasks.outputs.task_count }}"
+
+            curl -X POST "$DISCORD_WEBHOOK_URL" \
+              -H "Content-Type: application/json" \
+              -d "{
+                \"embeds\": [{
+                  \"title\": \"🔴 Backtest Failure: $STRATEGY\",
+                  \"description\": \"Failure type: $FAILURE_TYPE\\nDiagnostic tasks: $TASKS\",
+                  \"color\": 15158332
+                }]
+              }" \
+              2>/dev/null || echo "Discord notification failed"
+          fi

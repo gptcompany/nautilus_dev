@@ -1,0 +1,251 @@
+# Pre-Merge Quality Gate
+# Validates tasks.md completion and issue cross-reference before merge
+#
+# Triggers: PR to specs/** directories
+# Validates:
+#   1. All tasks in tasks.md marked [X] complete
+#   2. PR closes corresponding GitHub issues
+#   3. Cross-reference task IDs with issue titles
+
+name: Pre-Merge Quality Gate
+
+on:
+  pull_request:
+    types: [opened, synchronize, ready_for_review]
+    paths:
+      - 'specs/**'
+
+jobs:
+  # ===========================================================================
+  # Validate Task Completion
+  # ===========================================================================
+  validate-tasks:
+    name: "Validate Task Completion"
+    runs-on: [self-hosted, nautilus]
+    if: ${{ !github.event.pull_request.draft }}
+
+    outputs:
+      gate_passed: ${{ steps.validate.outputs.gate_passed }}
+      message: ${{ steps.validate.outputs.message }}
+      spec_dir: ${{ steps.find.outputs.spec_dir }}
+      total_tasks: ${{ steps.validate.outputs.total }}
+      complete_tasks: ${{ steps.validate.outputs.complete }}
+      incomplete_tasks: ${{ steps.validate.outputs.incomplete }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 10
+
+      - name: Find tasks.md in PR
+        id: find
+        run: |
+          # Find spec directory from changed files
+          CHANGED_FILES=$(git diff --name-only origin/${{ github.base_ref }}...HEAD)
+          echo "Changed files:"
+          echo "$CHANGED_FILES"
+
+          # Extract spec directory
+          SPEC_DIR=$(echo "$CHANGED_FILES" | grep "^specs/" | head -1 | cut -d'/' -f1-2)
+
+          if [ -z "$SPEC_DIR" ]; then
+            echo "has_tasks=false" >> $GITHUB_OUTPUT
+            echo "No spec directory found in changes"
+            exit 0
+          fi
+
+          echo "spec_dir=$SPEC_DIR" >> $GITHUB_OUTPUT
+
+          if [ -f "$SPEC_DIR/tasks.md" ]; then
+            echo "has_tasks=true" >> $GITHUB_OUTPUT
+            echo "Found tasks.md in $SPEC_DIR"
+          else
+            echo "has_tasks=false" >> $GITHUB_OUTPUT
+            echo "No tasks.md in $SPEC_DIR"
+          fi
+
+      - name: Validate task completion
+        id: validate
+        if: steps.find.outputs.has_tasks == 'true'
+        run: |
+          TASKS_FILE="${{ steps.find.outputs.spec_dir }}/tasks.md"
+
+          # Count tasks
+          TOTAL=$(grep -cE "^\s*-\s*\[.\]\s*T[0-9]+" "$TASKS_FILE" 2>/dev/null || echo 0)
+          COMPLETE=$(grep -cE "^\s*-\s*\[X\]\s*T[0-9]+" "$TASKS_FILE" 2>/dev/null || echo 0)
+          INCOMPLETE=$((TOTAL - COMPLETE))
+
+          echo "total=$TOTAL" >> $GITHUB_OUTPUT
+          echo "complete=$COMPLETE" >> $GITHUB_OUTPUT
+          echo "incomplete=$INCOMPLETE" >> $GITHUB_OUTPUT
+
+          if [ "$TOTAL" -eq 0 ]; then
+            echo "gate_passed=true" >> $GITHUB_OUTPUT
+            echo "message=No tasks found in tasks.md" >> $GITHUB_OUTPUT
+          elif [ "$INCOMPLETE" -gt 0 ]; then
+            echo "gate_passed=false" >> $GITHUB_OUTPUT
+            echo "message=BLOCKED: $INCOMPLETE of $TOTAL tasks incomplete" >> $GITHUB_OUTPUT
+
+            echo "::error::$INCOMPLETE tasks are incomplete"
+            echo ""
+            echo "Incomplete tasks:"
+            grep -E "^\s*-\s*\[ \]\s*T[0-9]+" "$TASKS_FILE" | head -10
+          else
+            echo "gate_passed=true" >> $GITHUB_OUTPUT
+            echo "message=All $TOTAL tasks complete" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Skip message (no tasks)
+        if: steps.find.outputs.has_tasks != 'true'
+        run: |
+          echo "gate_passed=true" >> $GITHUB_OUTPUT
+          echo "message=No tasks.md found - gate skipped" >> $GITHUB_OUTPUT
+          echo "total=0" >> $GITHUB_OUTPUT
+          echo "complete=0" >> $GITHUB_OUTPUT
+          echo "incomplete=0" >> $GITHUB_OUTPUT
+
+  # ===========================================================================
+  # Validate Issue Cross-Reference
+  # ===========================================================================
+  validate-issues:
+    name: "Validate Issue Links"
+    runs-on: [self-hosted, nautilus]
+    needs: validate-tasks
+    if: needs.validate-tasks.outputs.gate_passed == 'true' && needs.validate-tasks.outputs.total_tasks > 0
+
+    outputs:
+      issues_valid: ${{ steps.crossref.outputs.valid }}
+      missing_issues: ${{ steps.crossref.outputs.missing }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+
+      - name: Cross-reference tasks with issues
+        id: crossref
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          SPEC_DIR="${{ needs.validate-tasks.outputs.spec_dir }}"
+          TASKS_FILE="$SPEC_DIR/tasks.md"
+
+          if [ ! -f "$TASKS_FILE" ]; then
+            echo "valid=true" >> $GITHUB_OUTPUT
+            echo "missing=0" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          # Extract task IDs from tasks.md
+          TASK_IDS=$(grep -oE "T[0-9]+" "$TASKS_FILE" | sort -u)
+
+          # Get linked issues from PR
+          PR_BODY=$(gh pr view ${{ github.event.pull_request.number }} --json body -q '.body' 2>/dev/null || echo "")
+          LINKED_ISSUES=$(gh pr view ${{ github.event.pull_request.number }} \
+            --json closingIssuesReferences -q '.closingIssuesReferences[].number' 2>/dev/null || echo "")
+
+          # Also check for issues mentioned in PR body
+          MENTIONED=$(echo "$PR_BODY" | grep -oE '#[0-9]+' | tr -d '#' || echo "")
+
+          ALL_ISSUES="$LINKED_ISSUES $MENTIONED"
+          ALL_ISSUES=$(echo "$ALL_ISSUES" | tr ' ' '\n' | sort -u | tr '\n' ' ')
+
+          echo "Task IDs found: $TASK_IDS"
+          echo "Linked issues: $ALL_ISSUES"
+
+          # Check each task has an issue (optional - warning only)
+          MISSING=0
+          for TASK_ID in $TASK_IDS; do
+            # Check if any issue title contains this task ID
+            ISSUE_EXISTS=$(gh issue list --search "$TASK_ID in:title" --state all --json number -q '.[0].number' 2>/dev/null || echo "")
+
+            if [ -z "$ISSUE_EXISTS" ]; then
+              echo "::warning::Task $TASK_ID has no corresponding GitHub issue"
+              MISSING=$((MISSING + 1))
+            fi
+          done
+
+          echo "missing=$MISSING" >> $GITHUB_OUTPUT
+
+          # This is a warning, not a blocker
+          if [ "$MISSING" -gt 0 ]; then
+            echo "valid=true" >> $GITHUB_OUTPUT
+            echo "::warning::$MISSING tasks have no corresponding GitHub issues"
+          else
+            echo "valid=true" >> $GITHUB_OUTPUT
+            echo "All tasks have corresponding issues"
+          fi
+
+  # ===========================================================================
+  # Update PR Status
+  # ===========================================================================
+  update-status:
+    name: "Update PR Status"
+    runs-on: [self-hosted, nautilus]
+    needs: [validate-tasks, validate-issues]
+    if: always()
+
+    steps:
+      - name: Update PR labels and comments
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR_NUMBER=${{ github.event.pull_request.number }}
+          GATE_PASSED="${{ needs.validate-tasks.outputs.gate_passed }}"
+          MESSAGE="${{ needs.validate-tasks.outputs.message }}"
+          TOTAL="${{ needs.validate-tasks.outputs.total_tasks }}"
+          COMPLETE="${{ needs.validate-tasks.outputs.complete_tasks }}"
+          INCOMPLETE="${{ needs.validate-tasks.outputs.incomplete_tasks }}"
+          MISSING_ISSUES="${{ needs.validate-issues.outputs.missing_issues }}"
+
+          if [ "$GATE_PASSED" == "true" ]; then
+            # Add verified label
+            gh pr edit "$PR_NUMBER" --add-label "tasks-verified" 2>/dev/null || true
+            gh pr edit "$PR_NUMBER" --remove-label "tasks-incomplete" 2>/dev/null || true
+
+            # Success comment
+            gh pr comment "$PR_NUMBER" --body "## ✅ Quality Gate Passed
+
+          **Task Completion**: $COMPLETE/$TOTAL tasks complete
+
+          $MESSAGE
+
+          ${MISSING_ISSUES:+⚠️ Note: $MISSING_ISSUES tasks have no corresponding GitHub issues}
+
+          ---
+          *Pre-Merge Quality Gate*" 2>/dev/null || true
+
+          else
+            # Add incomplete label
+            gh pr edit "$PR_NUMBER" --add-label "tasks-incomplete" 2>/dev/null || true
+            gh pr edit "$PR_NUMBER" --remove-label "tasks-verified" 2>/dev/null || true
+
+            # Failure comment
+            gh pr comment "$PR_NUMBER" --body "## ❌ Quality Gate Failed
+
+          **Task Completion**: $COMPLETE/$TOTAL tasks complete
+          **Incomplete**: $INCOMPLETE tasks remaining
+
+          $MESSAGE
+
+          ### Action Required
+
+          Please complete all tasks in \`tasks.md\` before merging.
+
+          \`\`\`
+          # To see incomplete tasks:
+          grep -E '^\s*-\s*\[ \]' specs/*/tasks.md
+          \`\`\`
+
+          ---
+          *Pre-Merge Quality Gate*" 2>/dev/null || true
+          fi
+
+      - name: Fail if gate not passed
+        if: needs.validate-tasks.outputs.gate_passed != 'true'
+        run: |
+          echo "::error::Quality gate failed - ${{ needs.validate-tasks.outputs.message }}"
+          exit 1
