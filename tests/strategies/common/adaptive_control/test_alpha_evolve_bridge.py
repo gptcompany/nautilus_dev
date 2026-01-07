@@ -7,6 +7,7 @@ Missing lines: 119-129, 141, 162-227, 236-261, 265-280, 285-292, 297, 301, 317-3
 
 from __future__ import annotations
 
+import sys
 import logging
 from dataclasses import dataclass, field
 from datetime import datetime
@@ -74,59 +75,27 @@ class MockMetaController:
 
 
 # ============================================================================
-# Patch the imports before importing the module under test
+# Setup mocked meta_controller module before importing the module under test
 # ============================================================================
 
+# Create mock module
+_mock_meta_module = MagicMock()
+_mock_meta_module.MetaController = MockMetaController
+_mock_meta_module.MetaState = MockMetaState
+_mock_meta_module.SystemState = MockSystemState
+_mock_meta_module.MarketHarmony = MockMarketHarmony
 
-@pytest.fixture(autouse=True)
-def mock_meta_controller_imports():
-    """Mock the meta_controller imports."""
-    with patch.dict('sys.modules', {
-        'strategies.common.adaptive_control.meta_controller': MagicMock(
-            MetaController=MockMetaController,
-            MetaState=MockMetaState,
-            SystemState=MockSystemState,
-            MarketHarmony=MockMarketHarmony,
-        )
-    }):
-        # Reload the module to pick up the mocks
-        import importlib
-        import sys
-        if 'strategies.common.adaptive_control.alpha_evolve_bridge' in sys.modules:
-            del sys.modules['strategies.common.adaptive_control.alpha_evolve_bridge']
-        yield
+# Patch before any imports
+sys.modules['strategies.common.adaptive_control.meta_controller'] = _mock_meta_module
 
-
-# ============================================================================
-# Import the actual module under test with mocked dependencies
-# ============================================================================
-
-
-def get_module():
-    """Import module with mocked dependencies."""
-    # Patch before import
-    import sys
-    from unittest.mock import MagicMock
-    
-    # Create mock module
-    mock_meta_module = MagicMock()
-    mock_meta_module.MetaController = MockMetaController
-    mock_meta_module.MetaState = MockMetaState
-    mock_meta_module.SystemState = MockSystemState
-    mock_meta_module.MarketHarmony = MockMarketHarmony
-    
-    sys.modules['strategies.common.adaptive_control.meta_controller'] = mock_meta_module
-    
-    # Now import
-    from strategies.common.adaptive_control.alpha_evolve_bridge import (
-        AlphaEvolveBridge,
-        EvolutionConfig,
-        EvolutionRequest,
-        EvolutionTrigger,
-        AdaptiveSurvivalSystem,
-    )
-    
-    return AlphaEvolveBridge, EvolutionConfig, EvolutionRequest, EvolutionTrigger, AdaptiveSurvivalSystem
+# Now import the module under test
+from strategies.common.adaptive_control.alpha_evolve_bridge import (
+    AlphaEvolveBridge,
+    EvolutionConfig,
+    EvolutionRequest,
+    EvolutionTrigger,
+    AdaptiveSurvivalSystem,
+)
 
 
 # ============================================================================
@@ -139,8 +108,6 @@ class TestEvolutionTrigger:
     
     def test_all_trigger_values(self):
         """Test all trigger values exist."""
-        _, _, _, EvolutionTrigger, _ = get_module()
-        
         assert EvolutionTrigger.DISSONANCE.value == "market_system_dissonance"
         assert EvolutionTrigger.DRAWDOWN.value == "excessive_drawdown"
         assert EvolutionTrigger.STAGNATION.value == "performance_stagnation"
@@ -158,8 +125,6 @@ class TestEvolutionConfig:
     
     def test_default_values(self):
         """Test default configuration values."""
-        _, EvolutionConfig, _, _, _ = get_module()
-        
         config = EvolutionConfig()
         assert config.dissonance_threshold == 0.3
         assert config.drawdown_threshold == 0.15
@@ -171,8 +136,6 @@ class TestEvolutionConfig:
     
     def test_custom_values(self):
         """Test custom configuration values."""
-        _, EvolutionConfig, _, _, _ = get_module()
-        
         config = EvolutionConfig(
             dissonance_threshold=0.5,
             drawdown_threshold=0.20,
@@ -198,8 +161,6 @@ class TestEvolutionRequest:
     
     def test_creation(self):
         """Test creating an EvolutionRequest."""
-        _, _, EvolutionRequest, EvolutionTrigger, _ = get_module()
-        
         now = datetime.utcnow()
         state = MockMetaState()
         
@@ -230,8 +191,6 @@ class TestAlphaEvolveBridgeInit:
     
     def test_init_with_defaults(self):
         """Test initialization with default config."""
-        AlphaEvolveBridge, _, _, _, _ = get_module()
-        
         meta = MockMetaController()
         bridge = AlphaEvolveBridge(meta)
         
@@ -246,8 +205,6 @@ class TestAlphaEvolveBridgeInit:
     
     def test_init_with_custom_config(self):
         """Test initialization with custom config."""
-        AlphaEvolveBridge, EvolutionConfig, _, _, _ = get_module()
-        
         meta = MockMetaController()
         config = EvolutionConfig(dissonance_threshold=0.5)
         bridge = AlphaEvolveBridge(meta, config=config)
@@ -256,8 +213,6 @@ class TestAlphaEvolveBridgeInit:
     
     def test_init_with_audit_emitter(self):
         """Test initialization with audit emitter."""
-        AlphaEvolveBridge, _, _, _, _ = get_module()
-        
         meta = MockMetaController()
         audit_emitter = Mock()
         bridge = AlphaEvolveBridge(meta, audit_emitter=audit_emitter)
@@ -270,8 +225,6 @@ class TestAlphaEvolveBridgeOnEvolutionRequest:
     
     def test_register_callback(self):
         """Test registering a callback."""
-        AlphaEvolveBridge, _, _, _, _ = get_module()
-        
         meta = MockMetaController()
         bridge = AlphaEvolveBridge(meta)
         
@@ -282,8 +235,6 @@ class TestAlphaEvolveBridgeOnEvolutionRequest:
     
     def test_register_multiple_callbacks(self):
         """Test registering multiple callbacks."""
-        AlphaEvolveBridge, _, _, _, _ = get_module()
-        
         meta = MockMetaController()
         bridge = AlphaEvolveBridge(meta)
         
@@ -302,8 +253,6 @@ class TestAlphaEvolveBridgeCheckAndTrigger:
     
     def test_cooldown_prevents_trigger(self):
         """Test cooldown period prevents evolution."""
-        AlphaEvolveBridge, EvolutionConfig, _, _, _ = get_module()
-        
         config = EvolutionConfig(min_bars_between_evolution=100)
         meta = MockMetaController()
         bridge = AlphaEvolveBridge(meta, config=config)
@@ -317,8 +266,6 @@ class TestAlphaEvolveBridgeCheckAndTrigger:
     
     def test_max_concurrent_evolutions(self):
         """Test max concurrent evolutions limit."""
-        AlphaEvolveBridge, EvolutionConfig, EvolutionRequest, EvolutionTrigger, _ = get_module()
-        
         config = EvolutionConfig(max_concurrent_evolutions=2)
         meta = MockMetaController()
         bridge = AlphaEvolveBridge(meta, config=config)
@@ -341,8 +288,6 @@ class TestAlphaEvolveBridgeCheckAndTrigger:
     
     def test_no_trigger_without_conditions(self):
         """Test no evolution triggered when conditions not met."""
-        AlphaEvolveBridge, EvolutionConfig, _, _, _ = get_module()
-        
         config = EvolutionConfig()
         meta = MockMetaController()
         bridge = AlphaEvolveBridge(meta, config=config)
@@ -359,8 +304,6 @@ class TestAlphaEvolveBridgeCheckAndTrigger:
     
     def test_trigger_on_dissonance(self):
         """Test evolution triggered on dissonance."""
-        AlphaEvolveBridge, EvolutionConfig, _, EvolutionTrigger, _ = get_module()
-        
         config = EvolutionConfig(
             min_bars_between_evolution=10,
             dissonance_threshold=0.5,
@@ -384,8 +327,6 @@ class TestAlphaEvolveBridgeCheckAndTrigger:
     
     def test_trigger_on_drawdown(self):
         """Test evolution triggered on excessive drawdown."""
-        AlphaEvolveBridge, EvolutionConfig, _, EvolutionTrigger, _ = get_module()
-        
         config = EvolutionConfig(
             min_bars_between_evolution=10,
             drawdown_threshold=0.15,
@@ -408,8 +349,6 @@ class TestAlphaEvolveBridgeCheckAndTrigger:
     
     def test_trigger_on_stagnation(self):
         """Test evolution triggered on performance stagnation."""
-        AlphaEvolveBridge, EvolutionConfig, _, EvolutionTrigger, _ = get_module()
-        
         config = EvolutionConfig(
             min_bars_between_evolution=1,
             stagnation_periods=5,
@@ -434,8 +373,6 @@ class TestAlphaEvolveBridgeCheckAndTrigger:
     
     def test_not_enough_underperformers(self):
         """Test no trigger when not enough underperforming strategies."""
-        AlphaEvolveBridge, EvolutionConfig, _, _, _ = get_module()
-        
         config = EvolutionConfig(
             min_bars_between_evolution=1,
             min_strategies_to_evolve=5,  # Require more than we have
@@ -455,8 +392,6 @@ class TestAlphaEvolveBridgeCheckAndTrigger:
     
     def test_callback_error_handling(self):
         """Test error handling in callbacks (lines 217-220)."""
-        AlphaEvolveBridge, EvolutionConfig, _, _, _ = get_module()
-        
         config = EvolutionConfig(
             min_bars_between_evolution=1,
             min_strategies_to_evolve=1,
@@ -485,8 +420,6 @@ class TestAlphaEvolveBridgeCheckAndTrigger:
     
     def test_audit_emitter_called(self):
         """Test audit emitter is called when evolution triggers."""
-        AlphaEvolveBridge, EvolutionConfig, _, _, _ = get_module()
-        
         config = EvolutionConfig(
             min_bars_between_evolution=1,
             min_strategies_to_evolve=1,
@@ -501,14 +434,15 @@ class TestAlphaEvolveBridgeCheckAndTrigger:
             strategy_weights={"strat1": 0.3, "strat2": 0.7},
         )
         
-        with patch('strategies.common.adaptive_control.alpha_evolve_bridge.AuditEventType') as MockAuditEventType:
-            MockAuditEventType.SYS_EVOLUTION_TRIGGER = "SYS_EVOLUTION_TRIGGER"
-            
-            # Patch the import inside the function
-            with patch.dict('sys.modules', {'strategies.common.audit.events': MagicMock(AuditEventType=MockAuditEventType)}):
-                result = bridge.check_and_trigger(state, current_bar=200)
+        # Mock the audit events module
+        mock_audit_events = MagicMock()
+        mock_audit_events.AuditEventType.SYS_EVOLUTION_TRIGGER = "SYS_EVOLUTION_TRIGGER"
+        
+        with patch.dict(sys.modules, {'strategies.common.audit.events': mock_audit_events}):
+            result = bridge.check_and_trigger(state, current_bar=200)
         
         assert result is not None
+        audit_emitter.emit_system.assert_called_once()
 
 
 class TestAlphaEvolveBridgeEvaluateTriggers:
@@ -516,8 +450,6 @@ class TestAlphaEvolveBridgeEvaluateTriggers:
     
     def test_dissonance_severe_enough(self):
         """Test dissonance trigger when severe enough."""
-        AlphaEvolveBridge, EvolutionConfig, _, EvolutionTrigger, _ = get_module()
-        
         config = EvolutionConfig(dissonance_threshold=0.3)
         meta = MockMetaController()
         bridge = AlphaEvolveBridge(meta, config=config)
@@ -533,8 +465,6 @@ class TestAlphaEvolveBridgeEvaluateTriggers:
     
     def test_dissonance_not_severe_enough(self):
         """Test dissonance not triggered when not severe."""
-        AlphaEvolveBridge, EvolutionConfig, _, _, _ = get_module()
-        
         config = EvolutionConfig(dissonance_threshold=0.3)
         meta = MockMetaController()
         bridge = AlphaEvolveBridge(meta, config=config)
@@ -551,8 +481,6 @@ class TestAlphaEvolveBridgeEvaluateTriggers:
     
     def test_drawdown_trigger(self):
         """Test drawdown trigger."""
-        AlphaEvolveBridge, EvolutionConfig, _, EvolutionTrigger, _ = get_module()
-        
         config = EvolutionConfig(drawdown_threshold=0.15)
         meta = MockMetaController()
         bridge = AlphaEvolveBridge(meta, config=config)
@@ -568,8 +496,6 @@ class TestAlphaEvolveBridgeEvaluateTriggers:
     
     def test_stagnation_increments_counter(self):
         """Test stagnation counter increments."""
-        AlphaEvolveBridge, EvolutionConfig, _, _, _ = get_module()
-        
         config = EvolutionConfig(stagnation_periods=10)
         meta = MockMetaController()
         bridge = AlphaEvolveBridge(meta, config=config)
@@ -587,8 +513,6 @@ class TestAlphaEvolveBridgeEvaluateTriggers:
     
     def test_stagnation_resets_on_improvement(self):
         """Test stagnation counter resets on improvement."""
-        AlphaEvolveBridge, EvolutionConfig, _, _, _ = get_module()
-        
         config = EvolutionConfig(stagnation_periods=10)
         meta = MockMetaController()
         bridge = AlphaEvolveBridge(meta, config=config)
@@ -607,8 +531,6 @@ class TestAlphaEvolveBridgeEvaluateTriggers:
     
     def test_stagnation_triggers_at_threshold(self):
         """Test stagnation triggers at threshold."""
-        AlphaEvolveBridge, EvolutionConfig, _, EvolutionTrigger, _ = get_module()
-        
         config = EvolutionConfig(stagnation_periods=5)
         meta = MockMetaController()
         bridge = AlphaEvolveBridge(meta, config=config)
@@ -631,8 +553,6 @@ class TestAlphaEvolveBridgeFindUnderperformers:
     
     def test_empty_strategy_weights(self):
         """Test empty strategy weights returns empty list."""
-        AlphaEvolveBridge, _, _, _, _ = get_module()
-        
         meta = MockMetaController()
         bridge = AlphaEvolveBridge(meta)
         
@@ -644,8 +564,6 @@ class TestAlphaEvolveBridgeFindUnderperformers:
     
     def test_finds_bottom_performers(self):
         """Test finds bottom 25% performers."""
-        AlphaEvolveBridge, EvolutionConfig, _, _, _ = get_module()
-        
         config = EvolutionConfig(min_strategies_to_evolve=1)
         meta = MockMetaController()
         bridge = AlphaEvolveBridge(meta, config=config)
@@ -661,8 +579,6 @@ class TestAlphaEvolveBridgeFindUnderperformers:
     
     def test_min_strategies_to_evolve(self):
         """Test respects min_strategies_to_evolve."""
-        AlphaEvolveBridge, EvolutionConfig, _, _, _ = get_module()
-        
         config = EvolutionConfig(min_strategies_to_evolve=2)
         meta = MockMetaController()
         bridge = AlphaEvolveBridge(meta, config=config)
@@ -683,8 +599,6 @@ class TestAlphaEvolveBridgeEstimateHarmonyScore:
     
     def test_consonant_harmony(self):
         """Test harmony score for CONSONANT state."""
-        AlphaEvolveBridge, _, _, _, _ = get_module()
-        
         meta = MockMetaController()
         bridge = AlphaEvolveBridge(meta)
         
@@ -700,8 +614,6 @@ class TestAlphaEvolveBridgeEstimateHarmonyScore:
     
     def test_resolving_harmony(self):
         """Test harmony score for RESOLVING state."""
-        AlphaEvolveBridge, _, _, _, _ = get_module()
-        
         meta = MockMetaController()
         bridge = AlphaEvolveBridge(meta)
         
@@ -717,8 +629,6 @@ class TestAlphaEvolveBridgeEstimateHarmonyScore:
     
     def test_dissonant_harmony(self):
         """Test harmony score for DISSONANT state."""
-        AlphaEvolveBridge, _, _, _, _ = get_module()
-        
         meta = MockMetaController()
         bridge = AlphaEvolveBridge(meta)
         
@@ -738,8 +648,6 @@ class TestAlphaEvolveBridgeEstimateSharpe:
     
     def test_uses_risk_multiplier_as_proxy(self):
         """Test sharpe estimation uses risk multiplier."""
-        AlphaEvolveBridge, _, _, _, _ = get_module()
-        
         meta = MockMetaController()
         bridge = AlphaEvolveBridge(meta)
         
@@ -755,8 +663,6 @@ class TestAlphaEvolveBridgeExtractMarketConditions:
     
     def test_extract_consonant_conditions(self):
         """Test market conditions extraction for CONSONANT."""
-        AlphaEvolveBridge, _, _, _, _ = get_module()
-        
         meta = MockMetaController()
         bridge = AlphaEvolveBridge(meta)
         
@@ -774,8 +680,6 @@ class TestAlphaEvolveBridgeExtractMarketConditions:
     
     def test_extract_resolving_conditions(self):
         """Test market conditions extraction for RESOLVING."""
-        AlphaEvolveBridge, _, _, _, _ = get_module()
-        
         meta = MockMetaController()
         bridge = AlphaEvolveBridge(meta)
         
@@ -792,8 +696,6 @@ class TestAlphaEvolveBridgeExtractMarketConditions:
     
     def test_extract_dissonant_conditions(self):
         """Test market conditions extraction for DISSONANT."""
-        AlphaEvolveBridge, _, _, _, _ = get_module()
-        
         meta = MockMetaController()
         bridge = AlphaEvolveBridge(meta)
         
@@ -814,8 +716,6 @@ class TestAlphaEvolveBridgeCalculatePriority:
     
     def test_drawdown_priority(self):
         """Test DRAWDOWN gives highest priority."""
-        AlphaEvolveBridge, _, _, EvolutionTrigger, _ = get_module()
-        
         meta = MockMetaController()
         bridge = AlphaEvolveBridge(meta)
         
@@ -827,8 +727,6 @@ class TestAlphaEvolveBridgeCalculatePriority:
     
     def test_dissonance_severe_priority(self):
         """Test severe DISSONANCE gives priority 4."""
-        AlphaEvolveBridge, _, _, EvolutionTrigger, _ = get_module()
-        
         meta = MockMetaController()
         bridge = AlphaEvolveBridge(meta)
         
@@ -840,8 +738,6 @@ class TestAlphaEvolveBridgeCalculatePriority:
     
     def test_dissonance_moderate_priority(self):
         """Test moderate DISSONANCE gives priority 3."""
-        AlphaEvolveBridge, _, _, EvolutionTrigger, _ = get_module()
-        
         meta = MockMetaController()
         bridge = AlphaEvolveBridge(meta)
         
@@ -853,8 +749,6 @@ class TestAlphaEvolveBridgeCalculatePriority:
     
     def test_regime_shift_priority(self):
         """Test REGIME_SHIFT gives priority 3."""
-        AlphaEvolveBridge, _, _, EvolutionTrigger, _ = get_module()
-        
         meta = MockMetaController()
         bridge = AlphaEvolveBridge(meta)
         
@@ -866,8 +760,6 @@ class TestAlphaEvolveBridgeCalculatePriority:
     
     def test_stagnation_priority(self):
         """Test STAGNATION gives priority 2."""
-        AlphaEvolveBridge, _, _, EvolutionTrigger, _ = get_module()
-        
         meta = MockMetaController()
         bridge = AlphaEvolveBridge(meta)
         
@@ -879,8 +771,6 @@ class TestAlphaEvolveBridgeCalculatePriority:
     
     def test_scheduled_priority(self):
         """Test SCHEDULED gives priority 1."""
-        AlphaEvolveBridge, _, _, EvolutionTrigger, _ = get_module()
-        
         meta = MockMetaController()
         bridge = AlphaEvolveBridge(meta)
         
@@ -896,8 +786,6 @@ class TestAlphaEvolveBridgeMarkEvolutionComplete:
     
     def test_removes_completed_request(self):
         """Test removes request from pending list."""
-        AlphaEvolveBridge, _, EvolutionRequest, EvolutionTrigger, _ = get_module()
-        
         meta = MockMetaController()
         bridge = AlphaEvolveBridge(meta)
         
@@ -917,8 +805,6 @@ class TestAlphaEvolveBridgeMarkEvolutionComplete:
     
     def test_does_not_fail_on_missing_request(self):
         """Test doesn't fail when request not in list."""
-        AlphaEvolveBridge, _, EvolutionRequest, EvolutionTrigger, _ = get_module()
-        
         meta = MockMetaController()
         bridge = AlphaEvolveBridge(meta)
         
@@ -940,8 +826,6 @@ class TestAlphaEvolveBridgeGetPendingEvolutions:
     
     def test_returns_copy(self):
         """Test returns a copy of pending requests."""
-        AlphaEvolveBridge, _, EvolutionRequest, EvolutionTrigger, _ = get_module()
-        
         meta = MockMetaController()
         bridge = AlphaEvolveBridge(meta)
         
@@ -962,8 +846,6 @@ class TestAlphaEvolveBridgeGetPendingEvolutions:
     
     def test_empty_list(self):
         """Test returns empty list when no pending."""
-        AlphaEvolveBridge, _, _, _, _ = get_module()
-        
         meta = MockMetaController()
         bridge = AlphaEvolveBridge(meta)
         
@@ -977,8 +859,6 @@ class TestAlphaEvolveBridgeAuditEmitterProperty:
     
     def test_getter(self):
         """Test audit_emitter getter."""
-        AlphaEvolveBridge, _, _, _, _ = get_module()
-        
         meta = MockMetaController()
         emitter = Mock()
         bridge = AlphaEvolveBridge(meta, audit_emitter=emitter)
@@ -987,8 +867,6 @@ class TestAlphaEvolveBridgeAuditEmitterProperty:
     
     def test_setter(self):
         """Test audit_emitter setter."""
-        AlphaEvolveBridge, _, _, _, _ = get_module()
-        
         meta = MockMetaController()
         bridge = AlphaEvolveBridge(meta)
         
@@ -1008,26 +886,20 @@ class TestAdaptiveSurvivalSystemInit:
     
     def test_init_defaults(self):
         """Test default initialization."""
-        _, EvolutionConfig, _, _, AdaptiveSurvivalSystem = get_module()
-        
-        with patch('strategies.common.adaptive_control.alpha_evolve_bridge.MetaController', MockMetaController):
-            system = AdaptiveSurvivalSystem()
+        system = AdaptiveSurvivalSystem()
         
         assert system._bar_count == 0
         assert system._risk_callbacks == []
     
     def test_init_with_configs(self):
         """Test initialization with custom configs."""
-        _, EvolutionConfig, _, _, AdaptiveSurvivalSystem = get_module()
-        
         meta_config = {"target_drawdown": 0.10}
         evolution_config = EvolutionConfig(dissonance_threshold=0.5)
         
-        with patch('strategies.common.adaptive_control.alpha_evolve_bridge.MetaController', MockMetaController):
-            system = AdaptiveSurvivalSystem(
-                meta_config=meta_config,
-                evolution_config=evolution_config,
-            )
+        system = AdaptiveSurvivalSystem(
+            meta_config=meta_config,
+            evolution_config=evolution_config,
+        )
         
         assert system.bridge.config.dissonance_threshold == 0.5
 
@@ -1037,11 +909,8 @@ class TestAdaptiveSurvivalSystemRegisterStrategy:
     
     def test_registers_strategy(self):
         """Test strategy registration."""
-        _, _, _, _, AdaptiveSurvivalSystem = get_module()
-        
-        with patch('strategies.common.adaptive_control.alpha_evolve_bridge.MetaController', MockMetaController):
-            system = AdaptiveSurvivalSystem()
-            system.register_strategy("test_strategy")
+        system = AdaptiveSurvivalSystem()
+        system.register_strategy("test_strategy")
         
         assert "test_strategy" in system.meta._strategy_performances
 
@@ -1051,12 +920,9 @@ class TestAdaptiveSurvivalSystemOnEvolutionNeeded:
     
     def test_registers_callback(self):
         """Test callback registration."""
-        _, _, _, _, AdaptiveSurvivalSystem = get_module()
-        
-        with patch('strategies.common.adaptive_control.alpha_evolve_bridge.MetaController', MockMetaController):
-            system = AdaptiveSurvivalSystem()
-            callback = Mock()
-            system.on_evolution_needed(callback)
+        system = AdaptiveSurvivalSystem()
+        callback = Mock()
+        system.on_evolution_needed(callback)
         
         assert callback in system.bridge._callbacks
 
@@ -1066,12 +932,9 @@ class TestAdaptiveSurvivalSystemOnRiskChange:
     
     def test_registers_risk_callback(self):
         """Test risk callback registration."""
-        _, _, _, _, AdaptiveSurvivalSystem = get_module()
-        
-        with patch('strategies.common.adaptive_control.alpha_evolve_bridge.MetaController', MockMetaController):
-            system = AdaptiveSurvivalSystem()
-            callback = Mock()
-            system.on_risk_change(callback)
+        system = AdaptiveSurvivalSystem()
+        callback = Mock()
+        system.on_risk_change(callback)
         
         assert callback in system._risk_callbacks
 
@@ -1081,12 +944,9 @@ class TestAdaptiveSurvivalSystemUpdateStrategyPerformance:
     
     def test_updates_performance(self):
         """Test performance update."""
-        _, _, _, _, AdaptiveSurvivalSystem = get_module()
-        
-        with patch('strategies.common.adaptive_control.alpha_evolve_bridge.MetaController', MockMetaController):
-            system = AdaptiveSurvivalSystem()
-            system.register_strategy("test_strategy")
-            system.update_strategy_performance("test_strategy", 100.0)
+        system = AdaptiveSurvivalSystem()
+        system.register_strategy("test_strategy")
+        system.update_strategy_performance("test_strategy", 100.0)
         
         assert 100.0 in system.meta._strategy_performances["test_strategy"]
 
@@ -1096,25 +956,19 @@ class TestAdaptiveSurvivalSystemProcess:
     
     def test_increments_bar_count(self):
         """Test bar count increments."""
-        _, _, _, _, AdaptiveSurvivalSystem = get_module()
+        system = AdaptiveSurvivalSystem()
+        system.register_strategy("test")
         
-        with patch('strategies.common.adaptive_control.alpha_evolve_bridge.MetaController', MockMetaController):
-            system = AdaptiveSurvivalSystem()
-            system.register_strategy("test")
-            
-            result = system.process(price=100.0, current_drawdown=0.02)
+        result = system.process(price=100.0, current_drawdown=0.02)
         
         assert system._bar_count == 1
     
     def test_returns_expected_structure(self):
         """Test return value structure."""
-        _, _, _, _, AdaptiveSurvivalSystem = get_module()
+        system = AdaptiveSurvivalSystem()
+        system.register_strategy("test")
         
-        with patch('strategies.common.adaptive_control.alpha_evolve_bridge.MetaController', MockMetaController):
-            system = AdaptiveSurvivalSystem()
-            system.register_strategy("test")
-            
-            result = system.process(price=100.0, current_drawdown=0.02)
+        result = system.process(price=100.0, current_drawdown=0.02)
         
         assert "risk_multiplier" in result
         assert "strategy_weights" in result
@@ -1125,45 +979,36 @@ class TestAdaptiveSurvivalSystemProcess:
     
     def test_calls_risk_callbacks(self):
         """Test risk callbacks are called."""
-        _, _, _, _, AdaptiveSurvivalSystem = get_module()
+        system = AdaptiveSurvivalSystem()
+        callback = Mock()
+        system.on_risk_change(callback)
+        system.register_strategy("test")
         
-        with patch('strategies.common.adaptive_control.alpha_evolve_bridge.MetaController', MockMetaController):
-            system = AdaptiveSurvivalSystem()
-            callback = Mock()
-            system.on_risk_change(callback)
-            system.register_strategy("test")
-            
-            system.process(price=100.0, current_drawdown=0.02)
+        system.process(price=100.0, current_drawdown=0.02)
         
         callback.assert_called_once()
     
     def test_risk_callback_error_handling(self):
         """Test risk callback error handling (lines 456-457)."""
-        _, _, _, _, AdaptiveSurvivalSystem = get_module()
+        system = AdaptiveSurvivalSystem()
+        failing_callback = Mock(side_effect=Exception("Callback error"))
+        success_callback = Mock()
+        system.on_risk_change(failing_callback)
+        system.on_risk_change(success_callback)
+        system.register_strategy("test")
         
-        with patch('strategies.common.adaptive_control.alpha_evolve_bridge.MetaController', MockMetaController):
-            system = AdaptiveSurvivalSystem()
-            failing_callback = Mock(side_effect=Exception("Callback error"))
-            success_callback = Mock()
-            system.on_risk_change(failing_callback)
-            system.on_risk_change(success_callback)
-            system.register_strategy("test")
-            
-            # Should not raise
-            result = system.process(price=100.0, current_drawdown=0.02)
+        # Should not raise
+        result = system.process(price=100.0, current_drawdown=0.02)
         
         failing_callback.assert_called_once()
         success_callback.assert_called_once()
     
     def test_with_regime(self):
         """Test process with regime parameter."""
-        _, _, _, _, AdaptiveSurvivalSystem = get_module()
+        system = AdaptiveSurvivalSystem()
+        system.register_strategy("test")
         
-        with patch('strategies.common.adaptive_control.alpha_evolve_bridge.MetaController', MockMetaController):
-            system = AdaptiveSurvivalSystem()
-            system.register_strategy("test")
-            
-            result = system.process(price=100.0, current_drawdown=0.02, regime="trending")
+        result = system.process(price=100.0, current_drawdown=0.02, regime="trending")
         
         assert result is not None
 
@@ -1173,13 +1018,10 @@ class TestAdaptiveSurvivalSystemGetStatus:
     
     def test_returns_status(self):
         """Test status return value."""
-        _, _, _, _, AdaptiveSurvivalSystem = get_module()
+        system = AdaptiveSurvivalSystem()
+        system.register_strategy("test_strategy")
         
-        with patch('strategies.common.adaptive_control.alpha_evolve_bridge.MetaController', MockMetaController):
-            system = AdaptiveSurvivalSystem()
-            system.register_strategy("test_strategy")
-            
-            status = system.get_status()
+        status = system.get_status()
         
         assert "bar_count" in status
         assert "pending_evolutions" in status
@@ -1198,8 +1040,6 @@ class TestIntegration:
     
     def test_full_evolution_workflow(self):
         """Test complete evolution workflow."""
-        AlphaEvolveBridge, EvolutionConfig, _, EvolutionTrigger, _ = get_module()
-        
         config = EvolutionConfig(
             min_bars_between_evolution=1,
             dissonance_threshold=0.5,
@@ -1232,34 +1072,31 @@ class TestIntegration:
     
     def test_survival_system_full_cycle(self):
         """Test AdaptiveSurvivalSystem full cycle."""
-        _, _, _, _, AdaptiveSurvivalSystem = get_module()
+        system = AdaptiveSurvivalSystem()
         
-        with patch('strategies.common.adaptive_control.alpha_evolve_bridge.MetaController', MockMetaController):
-            system = AdaptiveSurvivalSystem()
-            
-            # Register strategies
-            system.register_strategy("momentum_1")
-            system.register_strategy("mean_rev_1")
-            
-            # Register callbacks
-            evolution_requests = []
-            risk_changes = []
-            system.on_evolution_needed(lambda r: evolution_requests.append(r))
-            system.on_risk_change(lambda r: risk_changes.append(r))
-            
-            # Process bars
-            for i in range(10):
-                result = system.process(
-                    price=100 + i,
-                    current_drawdown=0.01 * i,
-                )
-                system.update_strategy_performance("momentum_1", 10 - i)
-                system.update_strategy_performance("mean_rev_1", i)
-            
-            # Check status
-            status = system.get_status()
-            assert status["bar_count"] == 10
-            assert len(risk_changes) == 10
+        # Register strategies
+        system.register_strategy("momentum_1")
+        system.register_strategy("mean_rev_1")
+        
+        # Register callbacks
+        evolution_requests = []
+        risk_changes = []
+        system.on_evolution_needed(lambda r: evolution_requests.append(r))
+        system.on_risk_change(lambda r: risk_changes.append(r))
+        
+        # Process bars
+        for i in range(10):
+            result = system.process(
+                price=100 + i,
+                current_drawdown=0.01 * i,
+            )
+            system.update_strategy_performance("momentum_1", 10 - i)
+            system.update_strategy_performance("mean_rev_1", i)
+        
+        # Check status
+        status = system.get_status()
+        assert status["bar_count"] == 10
+        assert len(risk_changes) == 10
 
 
 # ============================================================================
@@ -1272,8 +1109,6 @@ class TestEdgeCases:
     
     def test_very_high_risk_multiplier(self):
         """Test with very high risk multiplier."""
-        AlphaEvolveBridge, _, _, _, _ = get_module()
-        
         meta = MockMetaController()
         bridge = AlphaEvolveBridge(meta)
         
@@ -1288,8 +1123,6 @@ class TestEdgeCases:
     
     def test_zero_risk_multiplier(self):
         """Test with zero risk multiplier."""
-        AlphaEvolveBridge, _, _, _, _ = get_module()
-        
         meta = MockMetaController()
         bridge = AlphaEvolveBridge(meta)
         
@@ -1304,8 +1137,6 @@ class TestEdgeCases:
     
     def test_negative_risk_multiplier(self):
         """Test with negative risk multiplier."""
-        AlphaEvolveBridge, EvolutionConfig, _, EvolutionTrigger, _ = get_module()
-        
         config = EvolutionConfig(drawdown_threshold=0.15)
         meta = MockMetaController()
         bridge = AlphaEvolveBridge(meta, config=config)
@@ -1321,8 +1152,6 @@ class TestEdgeCases:
     
     def test_single_strategy(self):
         """Test with single strategy."""
-        AlphaEvolveBridge, EvolutionConfig, _, _, _ = get_module()
-        
         config = EvolutionConfig(min_strategies_to_evolve=1)
         meta = MockMetaController()
         bridge = AlphaEvolveBridge(meta, config=config)
@@ -1335,8 +1164,6 @@ class TestEdgeCases:
     
     def test_many_strategies(self):
         """Test with many strategies."""
-        AlphaEvolveBridge, EvolutionConfig, _, _, _ = get_module()
-        
         config = EvolutionConfig(min_strategies_to_evolve=1, max_strategies_to_evolve=3)
         meta = MockMetaController()
         bridge = AlphaEvolveBridge(meta, config=config)

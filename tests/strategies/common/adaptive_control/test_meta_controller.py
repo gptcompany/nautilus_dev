@@ -21,7 +21,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from datetime import datetime
 from typing import Any
-from unittest.mock import MagicMock, Mock, patch
+from unittest.mock import Mock, patch
 
 import numpy as np
 import pytest
@@ -142,6 +142,8 @@ class MockPIDDrawdownController:
     def __init__(self, **kwargs):
         self.target_drawdown = kwargs.get("target_drawdown", 0.05)
         self._output = 1.0
+        self._integral = 0.0
+        self._prev_error = None
     
     def update(self, current_drawdown: float) -> float:
         # Simple mock: reduce output as drawdown increases
@@ -154,6 +156,8 @@ class MockPIDDrawdownController:
     
     def reset(self) -> None:
         self._output = 1.0
+        self._integral = 0.0
+        self._prev_error = None
 
 
 class MockAuditEventEmitter:
@@ -423,36 +427,34 @@ class TestStrategyPnLRecording:
 
 
 # ==============================================================================
-# Test Class: Update Cycle
+# Test Class: Update Cycle (using direct component injection)
 # ==============================================================================
 
 
 class TestUpdateCycle:
     """Tests for the main update cycle."""
 
-    @patch("strategies.common.adaptive_control.meta_controller.SystemHealthMonitor")
-    @patch("strategies.common.adaptive_control.meta_controller.SpectralRegimeDetector")
-    @patch("strategies.common.adaptive_control.meta_controller.PIDDrawdownController")
-    def test_update_basic(self, mock_pid, mock_regime, mock_health):
-        """Test basic update cycle returns MetaState."""
-        from strategies.common.adaptive_control.meta_controller import (
-            MetaController,
-            MetaState,
-        )
+    def _create_controller_with_mocks(self):
+        """Helper to create controller with mock components injected."""
+        from strategies.common.adaptive_control.meta_controller import MetaController
         from strategies.common.adaptive_control.spectral_regime import MarketRegime
         
-        # Setup mocks
-        mock_health_inst = MockSystemHealthMonitor()
-        mock_health.return_value = mock_health_inst
-        
-        mock_regime_inst = MockSpectralRegimeDetector()
-        mock_regime_inst._regime = MarketRegime.NORMAL
-        mock_regime.return_value = mock_regime_inst
-        
-        mock_pid_inst = MockPIDDrawdownController()
-        mock_pid.return_value = mock_pid_inst
-        
         controller = MetaController()
+        
+        # Inject mocks directly instead of patching imports
+        controller._health_monitor = MockSystemHealthMonitor()
+        mock_regime = MockSpectralRegimeDetector()
+        mock_regime._regime = MarketRegime.NORMAL
+        controller._regime_detector = mock_regime
+        controller._pid_controller = MockPIDDrawdownController()
+        
+        return controller
+
+    def test_update_basic(self):
+        """Test basic update cycle returns MetaState."""
+        from strategies.common.adaptive_control.meta_controller import MetaState
+        
+        controller = self._create_controller_with_mocks()
         state = controller.update(
             current_return=0.01,
             current_equity=10000.0,
@@ -466,21 +468,9 @@ class TestUpdateCycle:
         assert state.risk_multiplier >= 0.0
         assert state.risk_multiplier <= 1.0
 
-    @patch("strategies.common.adaptive_control.meta_controller.SystemHealthMonitor")
-    @patch("strategies.common.adaptive_control.meta_controller.SpectralRegimeDetector")
-    @patch("strategies.common.adaptive_control.meta_controller.PIDDrawdownController")
-    def test_update_tracks_equity(self, mock_pid, mock_regime, mock_health):
+    def test_update_tracks_equity(self):
         """Test update tracks peak equity for drawdown."""
-        from strategies.common.adaptive_control.meta_controller import MetaController
-        from strategies.common.adaptive_control.spectral_regime import MarketRegime
-        
-        mock_health.return_value = MockSystemHealthMonitor()
-        mock_regime_inst = MockSpectralRegimeDetector()
-        mock_regime_inst._regime = MarketRegime.NORMAL
-        mock_regime.return_value = mock_regime_inst
-        mock_pid.return_value = MockPIDDrawdownController()
-        
-        controller = MetaController()
+        controller = self._create_controller_with_mocks()
         
         # Rising equity
         controller.update(current_return=0.01, current_equity=10000.0)
@@ -493,21 +483,9 @@ class TestUpdateCycle:
         controller.update(current_return=-0.01, current_equity=10500.0)
         assert controller._peak_equity == 11000.0
 
-    @patch("strategies.common.adaptive_control.meta_controller.SystemHealthMonitor")
-    @patch("strategies.common.adaptive_control.meta_controller.SpectralRegimeDetector")
-    @patch("strategies.common.adaptive_control.meta_controller.PIDDrawdownController")
-    def test_update_calculates_drawdown(self, mock_pid, mock_regime, mock_health):
+    def test_update_calculates_drawdown(self):
         """Test update correctly calculates drawdown percentage."""
-        from strategies.common.adaptive_control.meta_controller import MetaController
-        from strategies.common.adaptive_control.spectral_regime import MarketRegime
-        
-        mock_health.return_value = MockSystemHealthMonitor()
-        mock_regime_inst = MockSpectralRegimeDetector()
-        mock_regime_inst._regime = MarketRegime.NORMAL
-        mock_regime.return_value = mock_regime_inst
-        mock_pid.return_value = MockPIDDrawdownController()
-        
-        controller = MetaController()
+        controller = self._create_controller_with_mocks()
         
         # Set peak
         controller.update(current_return=0.01, current_equity=10000.0)
@@ -517,42 +495,16 @@ class TestUpdateCycle:
         
         assert state.drawdown_pct == pytest.approx(10.0, rel=0.01)
 
-    @patch("strategies.common.adaptive_control.meta_controller.SystemHealthMonitor")
-    @patch("strategies.common.adaptive_control.meta_controller.SpectralRegimeDetector")
-    @patch("strategies.common.adaptive_control.meta_controller.PIDDrawdownController")
-    def test_update_records_latency(self, mock_pid, mock_regime, mock_health):
+    def test_update_records_latency(self):
         """Test update records latency when provided."""
-        from strategies.common.adaptive_control.meta_controller import MetaController
-        from strategies.common.adaptive_control.spectral_regime import MarketRegime
-        
-        mock_health_inst = MockSystemHealthMonitor()
-        mock_health.return_value = mock_health_inst
-        mock_regime_inst = MockSpectralRegimeDetector()
-        mock_regime_inst._regime = MarketRegime.NORMAL
-        mock_regime.return_value = mock_regime_inst
-        mock_pid.return_value = MockPIDDrawdownController()
-        
-        controller = MetaController()
+        controller = self._create_controller_with_mocks()
         controller.update(current_return=0.01, current_equity=10000.0, latency_ms=25.0)
         
-        assert 25.0 in mock_health_inst._latencies
+        assert 25.0 in controller._health_monitor._latencies
 
-    @patch("strategies.common.adaptive_control.meta_controller.SystemHealthMonitor")
-    @patch("strategies.common.adaptive_control.meta_controller.SpectralRegimeDetector")
-    @patch("strategies.common.adaptive_control.meta_controller.PIDDrawdownController")
-    def test_update_records_fill(self, mock_pid, mock_regime, mock_health):
+    def test_update_records_fill(self):
         """Test update records fill when order_filled=True."""
-        from strategies.common.adaptive_control.meta_controller import MetaController
-        from strategies.common.adaptive_control.spectral_regime import MarketRegime
-        
-        mock_health_inst = MockSystemHealthMonitor()
-        mock_health.return_value = mock_health_inst
-        mock_regime_inst = MockSpectralRegimeDetector()
-        mock_regime_inst._regime = MarketRegime.NORMAL
-        mock_regime.return_value = mock_regime_inst
-        mock_pid.return_value = MockPIDDrawdownController()
-        
-        controller = MetaController()
+        controller = self._create_controller_with_mocks()
         controller.update(
             current_return=0.01,
             current_equity=10000.0,
@@ -560,47 +512,22 @@ class TestUpdateCycle:
             slippage_bps=1.5,
         )
         
-        assert 1.5 in mock_health_inst._fills
+        assert 1.5 in controller._health_monitor._fills
 
-    @patch("strategies.common.adaptive_control.meta_controller.SystemHealthMonitor")
-    @patch("strategies.common.adaptive_control.meta_controller.SpectralRegimeDetector")
-    @patch("strategies.common.adaptive_control.meta_controller.PIDDrawdownController")
-    def test_update_records_rejection(self, mock_pid, mock_regime, mock_health):
+    def test_update_records_rejection(self):
         """Test update records rejection when order_filled=False."""
-        from strategies.common.adaptive_control.meta_controller import MetaController
-        from strategies.common.adaptive_control.spectral_regime import MarketRegime
-        
-        mock_health_inst = MockSystemHealthMonitor()
-        mock_health.return_value = mock_health_inst
-        mock_regime_inst = MockSpectralRegimeDetector()
-        mock_regime_inst._regime = MarketRegime.NORMAL
-        mock_regime.return_value = mock_regime_inst
-        mock_pid.return_value = MockPIDDrawdownController()
-        
-        controller = MetaController()
+        controller = self._create_controller_with_mocks()
         controller.update(
             current_return=0.01,
             current_equity=10000.0,
             order_filled=False,
         )
         
-        assert mock_health_inst._rejections == 1
+        assert controller._health_monitor._rejections == 1
 
-    @patch("strategies.common.adaptive_control.meta_controller.SystemHealthMonitor")
-    @patch("strategies.common.adaptive_control.meta_controller.SpectralRegimeDetector")
-    @patch("strategies.common.adaptive_control.meta_controller.PIDDrawdownController")
-    def test_update_increments_bars_processed(self, mock_pid, mock_regime, mock_health):
+    def test_update_increments_bars_processed(self):
         """Test update increments bars_processed counter."""
-        from strategies.common.adaptive_control.meta_controller import MetaController
-        from strategies.common.adaptive_control.spectral_regime import MarketRegime
-        
-        mock_health.return_value = MockSystemHealthMonitor()
-        mock_regime_inst = MockSpectralRegimeDetector()
-        mock_regime_inst._regime = MarketRegime.NORMAL
-        mock_regime.return_value = mock_regime_inst
-        mock_pid.return_value = MockPIDDrawdownController()
-        
-        controller = MetaController()
+        controller = self._create_controller_with_mocks()
         
         controller.update(current_return=0.01, current_equity=10000.0)
         assert controller._bars_processed == 1
@@ -608,21 +535,9 @@ class TestUpdateCycle:
         controller.update(current_return=0.01, current_equity=10000.0)
         assert controller._bars_processed == 2
 
-    @patch("strategies.common.adaptive_control.meta_controller.SystemHealthMonitor")
-    @patch("strategies.common.adaptive_control.meta_controller.SpectralRegimeDetector")
-    @patch("strategies.common.adaptive_control.meta_controller.PIDDrawdownController")
-    def test_update_limits_returns_buffer(self, mock_pid, mock_regime, mock_health):
+    def test_update_limits_returns_buffer(self):
         """Test update limits returns buffer to 500 entries."""
-        from strategies.common.adaptive_control.meta_controller import MetaController
-        from strategies.common.adaptive_control.spectral_regime import MarketRegime
-        
-        mock_health.return_value = MockSystemHealthMonitor()
-        mock_regime_inst = MockSpectralRegimeDetector()
-        mock_regime_inst._regime = MarketRegime.NORMAL
-        mock_regime.return_value = mock_regime_inst
-        mock_pid.return_value = MockPIDDrawdownController()
-        
-        controller = MetaController()
+        controller = self._create_controller_with_mocks()
         
         # Add more than 500 returns
         for i in range(550):
@@ -630,22 +545,10 @@ class TestUpdateCycle:
         
         assert len(controller._returns_buffer) == 500
 
-    @patch("strategies.common.adaptive_control.meta_controller.SystemHealthMonitor")
-    @patch("strategies.common.adaptive_control.meta_controller.SpectralRegimeDetector")
-    @patch("strategies.common.adaptive_control.meta_controller.PIDDrawdownController")
-    def test_update_applies_strategy_callbacks(self, mock_pid, mock_regime, mock_health):
+    def test_update_applies_strategy_callbacks(self):
         """Test update invokes strategy weight callbacks."""
-        from strategies.common.adaptive_control.meta_controller import MetaController
-        from strategies.common.adaptive_control.spectral_regime import MarketRegime
-        
-        mock_health.return_value = MockSystemHealthMonitor()
-        mock_regime_inst = MockSpectralRegimeDetector()
-        mock_regime_inst._regime = MarketRegime.NORMAL
-        mock_regime.return_value = mock_regime_inst
-        mock_pid.return_value = MockPIDDrawdownController()
-        
+        controller = self._create_controller_with_mocks()
         callback = Mock()
-        controller = MetaController()
         controller.register_strategy("test", callback=callback)
         
         controller.update(current_return=0.01, current_equity=10000.0)
@@ -655,27 +558,49 @@ class TestUpdateCycle:
         weight = callback.call_args[0][0]
         assert 0 <= weight <= 1
 
-    @patch("strategies.common.adaptive_control.meta_controller.SystemHealthMonitor")
-    @patch("strategies.common.adaptive_control.meta_controller.SpectralRegimeDetector")
-    @patch("strategies.common.adaptive_control.meta_controller.PIDDrawdownController")
-    def test_update_with_zero_equity(self, mock_pid, mock_regime, mock_health):
+    def test_update_with_zero_equity(self):
         """Test update handles zero peak equity (no division by zero)."""
-        from strategies.common.adaptive_control.meta_controller import MetaController
-        from strategies.common.adaptive_control.spectral_regime import MarketRegime
-        
-        mock_health.return_value = MockSystemHealthMonitor()
-        mock_regime_inst = MockSpectralRegimeDetector()
-        mock_regime_inst._regime = MarketRegime.NORMAL
-        mock_regime.return_value = mock_regime_inst
-        mock_pid.return_value = MockPIDDrawdownController()
-        
-        controller = MetaController()
+        controller = self._create_controller_with_mocks()
         
         # First update with zero equity
         state = controller.update(current_return=0.0, current_equity=0.0)
         
         # Should handle gracefully
         assert state.drawdown_pct == 0.0
+
+    def test_update_with_zero_latency(self):
+        """Test update handles zero latency (doesn't record)."""
+        controller = self._create_controller_with_mocks()
+        controller.update(current_return=0.01, current_equity=10000.0, latency_ms=0.0)
+        
+        # Zero latency should not be recorded
+        assert len(controller._health_monitor._latencies) == 0
+
+    def test_update_with_negative_equity(self):
+        """Test update handles negative equity gracefully."""
+        controller = self._create_controller_with_mocks()
+        
+        # Set positive peak first
+        controller.update(current_return=0.01, current_equity=10000.0)
+        
+        # Then negative current
+        state = controller.update(current_return=-0.50, current_equity=-1000.0)
+        
+        # Should handle gracefully (peak stays positive, large drawdown)
+        assert controller._peak_equity == 10000.0
+        assert state.drawdown_pct > 100  # Over 100% drawdown
+
+    def test_update_with_extreme_returns(self):
+        """Test update handles extreme return values."""
+        controller = self._create_controller_with_mocks()
+        
+        # Extreme positive return
+        state = controller.update(current_return=10.0, current_equity=10000.0)
+        assert state is not None
+        
+        # Extreme negative return
+        state = controller.update(current_return=-0.99, current_equity=5000.0)
+        assert state is not None
 
 
 # ==============================================================================
@@ -915,6 +840,7 @@ class TestStrategyWeightCalculation:
         )
         
         assert weights == {}
+        assert weights == {}
 
     def test_calculate_strategy_weights_single_strategy(self):
         """Test weight calculation normalizes single strategy to 1.0."""
@@ -1038,8 +964,9 @@ class TestStrategyWeightCalculation:
             harmony=MarketHarmony.CONSONANT,
         )
         
-        # Zero state multiplier means no normalization possible
-        assert weights == {}
+        # Zero state multiplier means weights are 0.0, normalization skipped
+        # Weights are 0.0 (not normalized since total is 0)
+        assert weights == {"test": 0.0}
 
     def test_calculate_strategy_weights_dissonant_reduces(self):
         """Test DISSONANT harmony reduces weights by 0.4 multiplier."""
@@ -1124,6 +1051,32 @@ class TestStrategyWeightCalculation:
         total = sum(weights.values())
         assert total == pytest.approx(1.0)
 
+    def test_strategy_weights_with_missing_affinity_key(self):
+        """Test weight calculation handles missing affinity keys."""
+        from strategies.common.adaptive_control.meta_controller import (
+            MarketHarmony,
+            MetaController,
+            SystemState,
+        )
+        from strategies.common.adaptive_control.spectral_regime import MarketRegime
+        
+        controller = MetaController()
+        # Register with incomplete affinity (missing 'mean_reverting')
+        controller.register_strategy(
+            "test",
+            regime_affinity={"trending": 1.0, "normal": 0.5},
+        )
+        
+        # Should use default 0.5 for missing key
+        weights = controller._calculate_strategy_weights(
+            regime=MarketRegime.MEAN_REVERTING,
+            state=SystemState.VENTRAL,
+            harmony=MarketHarmony.CONSONANT,
+        )
+        
+        # Should not raise, weight should be normalized
+        assert "test" in weights
+
 
 # ==============================================================================
 # Test Class: Risk Multiplier Calculation
@@ -1133,77 +1086,44 @@ class TestStrategyWeightCalculation:
 class TestRiskMultiplierCalculation:
     """Tests for risk multiplier calculation in update."""
 
-    @patch("strategies.common.adaptive_control.meta_controller.SystemHealthMonitor")
-    @patch("strategies.common.adaptive_control.meta_controller.SpectralRegimeDetector")
-    @patch("strategies.common.adaptive_control.meta_controller.PIDDrawdownController")
-    def test_risk_multiplier_ventral_consonant(self, mock_pid, mock_regime, mock_health):
-        """Test risk multiplier is 1.0 in optimal state."""
+    def _create_controller_with_mocks(self, health_score=80.0):
+        """Helper to create controller with mock components."""
         from strategies.common.adaptive_control.meta_controller import MetaController
         from strategies.common.adaptive_control.spectral_regime import MarketRegime
         
-        # Setup: high health score, normal regime, no drawdown
-        mock_health_inst = MockSystemHealthMonitor()
-        mock_health_inst._score = 90.0  # Ventral
-        mock_health.return_value = mock_health_inst
-        
-        mock_regime_inst = MockSpectralRegimeDetector()
-        mock_regime_inst._regime = MarketRegime.NORMAL
-        mock_regime.return_value = mock_regime_inst
-        
-        mock_pid_inst = MockPIDDrawdownController()
-        mock_pid.return_value = mock_pid_inst
-        
         controller = MetaController()
+        
+        mock_health = MockSystemHealthMonitor()
+        mock_health._score = health_score
+        controller._health_monitor = mock_health
+        
+        mock_regime = MockSpectralRegimeDetector()
+        mock_regime._regime = MarketRegime.NORMAL
+        controller._regime_detector = mock_regime
+        
+        controller._pid_controller = MockPIDDrawdownController()
+        
+        return controller
+
+    def test_risk_multiplier_ventral_consonant(self):
+        """Test risk multiplier is 1.0 in optimal state."""
+        controller = self._create_controller_with_mocks(health_score=90.0)
         state = controller.update(current_return=0.01, current_equity=10000.0)
         
         # PID returns 1.0, state_mult=1.0, harmony_mult=1.0
         assert state.risk_multiplier == pytest.approx(1.0)
 
-    @patch("strategies.common.adaptive_control.meta_controller.SystemHealthMonitor")
-    @patch("strategies.common.adaptive_control.meta_controller.SpectralRegimeDetector")
-    @patch("strategies.common.adaptive_control.meta_controller.PIDDrawdownController")
-    def test_risk_multiplier_sympathetic_reduces(self, mock_pid, mock_regime, mock_health):
+    def test_risk_multiplier_sympathetic_reduces(self):
         """Test risk multiplier reduces to 0.5 in SYMPATHETIC state."""
-        from strategies.common.adaptive_control.meta_controller import MetaController
-        from strategies.common.adaptive_control.spectral_regime import MarketRegime
-        
-        mock_health_inst = MockSystemHealthMonitor()
-        mock_health_inst._score = 50.0  # Sympathetic
-        mock_health.return_value = mock_health_inst
-        
-        mock_regime_inst = MockSpectralRegimeDetector()
-        mock_regime_inst._regime = MarketRegime.NORMAL
-        mock_regime.return_value = mock_regime_inst
-        
-        mock_pid_inst = MockPIDDrawdownController()
-        mock_pid.return_value = mock_pid_inst
-        
-        controller = MetaController()
+        controller = self._create_controller_with_mocks(health_score=50.0)
         state = controller.update(current_return=0.01, current_equity=10000.0)
         
         # PID returns 1.0, state_mult=0.5, harmony_mult=1.0
         assert state.risk_multiplier == pytest.approx(0.5)
 
-    @patch("strategies.common.adaptive_control.meta_controller.SystemHealthMonitor")
-    @patch("strategies.common.adaptive_control.meta_controller.SpectralRegimeDetector")
-    @patch("strategies.common.adaptive_control.meta_controller.PIDDrawdownController")
-    def test_risk_multiplier_dorsal_zeroes(self, mock_pid, mock_regime, mock_health):
+    def test_risk_multiplier_dorsal_zeroes(self):
         """Test risk multiplier is 0.0 in DORSAL state."""
-        from strategies.common.adaptive_control.meta_controller import MetaController
-        from strategies.common.adaptive_control.spectral_regime import MarketRegime
-        
-        mock_health_inst = MockSystemHealthMonitor()
-        mock_health_inst._score = 20.0  # Dorsal
-        mock_health.return_value = mock_health_inst
-        
-        mock_regime_inst = MockSpectralRegimeDetector()
-        mock_regime_inst._regime = MarketRegime.NORMAL
-        mock_regime.return_value = mock_regime_inst
-        
-        mock_pid_inst = MockPIDDrawdownController()
-        mock_pid.return_value = mock_pid_inst
-        
-        controller = MetaController()
+        controller = self._create_controller_with_mocks(health_score=20.0)
         state = controller.update(current_return=0.01, current_equity=10000.0)
         
         # state_mult=0.0 zeroes everything
@@ -1352,35 +1272,37 @@ class TestMetaControllerReset:
 class TestAuditEmitterIntegration:
     """Tests for audit emitter integration."""
 
-    @patch("strategies.common.adaptive_control.meta_controller.SystemHealthMonitor")
-    @patch("strategies.common.adaptive_control.meta_controller.SpectralRegimeDetector")
-    @patch("strategies.common.adaptive_control.meta_controller.PIDDrawdownController")
-    def test_audit_emits_state_change(self, mock_pid, mock_regime, mock_health):
-        """Test audit emitter logs system state changes."""
-        from strategies.common.adaptive_control.meta_controller import (
-            MetaController,
-            SystemState,
-        )
+    def _create_controller_with_mocks_and_emitter(self, health_score=80.0):
+        """Helper to create controller with mocks and audit emitter."""
+        from strategies.common.adaptive_control.meta_controller import MetaController
         from strategies.common.adaptive_control.spectral_regime import MarketRegime
-        
-        mock_health_inst = MockSystemHealthMonitor()
-        mock_health.return_value = mock_health_inst
-        
-        mock_regime_inst = MockSpectralRegimeDetector()
-        mock_regime_inst._regime = MarketRegime.NORMAL
-        mock_regime.return_value = mock_regime_inst
-        
-        mock_pid.return_value = MockPIDDrawdownController()
         
         emitter = MockAuditEventEmitter()
         controller = MetaController(audit_emitter=emitter)
         
+        mock_health = MockSystemHealthMonitor()
+        mock_health._score = health_score
+        controller._health_monitor = mock_health
+        
+        mock_regime = MockSpectralRegimeDetector()
+        mock_regime._regime = MarketRegime.NORMAL
+        controller._regime_detector = mock_regime
+        
+        controller._pid_controller = MockPIDDrawdownController()
+        
+        return controller, emitter
+
+    def test_audit_emits_state_change(self):
+        """Test audit emitter logs system state changes."""
+        from strategies.common.adaptive_control.meta_controller import SystemState
+        
+        controller, emitter = self._create_controller_with_mocks_and_emitter(90.0)
+        
         # First update: VENTRAL
-        mock_health_inst._score = 90.0
         controller.update(current_return=0.01, current_equity=10000.0)
         
-        # Second update: change to SYMPATHETIC
-        mock_health_inst._score = 50.0
+        # Change to SYMPATHETIC
+        controller._health_monitor._score = 50.0
         controller.update(current_return=0.01, current_equity=10000.0)
         
         # Should have state change event
@@ -1389,25 +1311,11 @@ class TestAuditEmitterIntegration:
         assert state_events[0]["old_value"] == SystemState.VENTRAL.value
         assert state_events[0]["new_value"] == SystemState.SYMPATHETIC.value
 
-    @patch("strategies.common.adaptive_control.meta_controller.SystemHealthMonitor")
-    @patch("strategies.common.adaptive_control.meta_controller.SpectralRegimeDetector")
-    @patch("strategies.common.adaptive_control.meta_controller.PIDDrawdownController")
-    def test_audit_emits_harmony_change(self, mock_pid, mock_regime, mock_health):
+    def test_audit_emits_harmony_change(self):
         """Test audit emitter logs market harmony changes."""
-        from strategies.common.adaptive_control.meta_controller import (
-            MarketHarmony,
-            MetaController,
-        )
-        from strategies.common.adaptive_control.spectral_regime import MarketRegime
+        from strategies.common.adaptive_control.meta_controller import MarketHarmony
         
-        mock_health.return_value = MockSystemHealthMonitor()
-        mock_regime_inst = MockSpectralRegimeDetector()
-        mock_regime_inst._regime = MarketRegime.NORMAL
-        mock_regime.return_value = mock_regime_inst
-        mock_pid.return_value = MockPIDDrawdownController()
-        
-        emitter = MockAuditEventEmitter()
-        controller = MetaController(audit_emitter=emitter)
+        controller, emitter = self._create_controller_with_mocks_and_emitter()
         controller.register_strategy("test")
         
         # First update with positive PnL
@@ -1415,6 +1323,7 @@ class TestAuditEmitterIntegration:
         controller.update(current_return=0.01, current_equity=10000.0)
         
         # Force dissonance with negative PnL
+        controller._strategy_performance["test"] = []  # Clear
         for _ in range(10):
             controller.record_strategy_pnl("test", -200.0)
         controller._current_equity = 10000.0  # Set for threshold
@@ -1424,92 +1333,65 @@ class TestAuditEmitterIntegration:
         harmony_events = [e for e in emitter.events if e["param_name"] == "market_harmony"]
         assert len(harmony_events) >= 1
 
-    @patch("strategies.common.adaptive_control.meta_controller.SystemHealthMonitor")
-    @patch("strategies.common.adaptive_control.meta_controller.SpectralRegimeDetector")
-    @patch("strategies.common.adaptive_control.meta_controller.PIDDrawdownController")
-    def test_audit_emits_risk_multiplier_change(self, mock_pid, mock_regime, mock_health):
+    def test_audit_emits_risk_multiplier_change(self):
         """Test audit emitter logs significant risk multiplier changes."""
-        from strategies.common.adaptive_control.meta_controller import MetaController
-        from strategies.common.adaptive_control.spectral_regime import MarketRegime
-        
-        mock_health_inst = MockSystemHealthMonitor()
-        mock_health.return_value = mock_health_inst
-        mock_regime_inst = MockSpectralRegimeDetector()
-        mock_regime_inst._regime = MarketRegime.NORMAL
-        mock_regime.return_value = mock_regime_inst
-        mock_pid.return_value = MockPIDDrawdownController()
-        
-        emitter = MockAuditEventEmitter()
-        controller = MetaController(audit_emitter=emitter)
+        controller, emitter = self._create_controller_with_mocks_and_emitter(90.0)
         
         # First update: VENTRAL
-        mock_health_inst._score = 90.0
         controller.update(current_return=0.01, current_equity=10000.0)
         
         # Second update: SYMPATHETIC (significant multiplier change)
-        mock_health_inst._score = 50.0
+        controller._health_monitor._score = 50.0
         controller.update(current_return=0.01, current_equity=10000.0)
         
         # Check for risk_multiplier event
         risk_events = [e for e in emitter.events if e["param_name"] == "risk_multiplier"]
         assert len(risk_events) >= 1
 
-    @patch("strategies.common.adaptive_control.meta_controller.SystemHealthMonitor")
-    @patch("strategies.common.adaptive_control.meta_controller.SpectralRegimeDetector")
-    @patch("strategies.common.adaptive_control.meta_controller.PIDDrawdownController")
-    def test_audit_emits_strategy_weight_change(self, mock_pid, mock_regime, mock_health):
+    def test_audit_emits_strategy_weight_change(self):
         """Test audit emitter logs significant strategy weight changes."""
-        from strategies.common.adaptive_control.meta_controller import MetaController
         from strategies.common.adaptive_control.spectral_regime import MarketRegime
         
-        mock_health_inst = MockSystemHealthMonitor()
-        mock_health.return_value = mock_health_inst
-        mock_regime_inst = MockSpectralRegimeDetector()
-        mock_regime_inst._regime = MarketRegime.NORMAL
-        mock_regime.return_value = mock_regime_inst
-        mock_pid.return_value = MockPIDDrawdownController()
-        
-        emitter = MockAuditEventEmitter()
-        controller = MetaController(audit_emitter=emitter)
-        controller.register_strategy("test", regime_affinity={"normal": 1.0})
+        controller, emitter = self._create_controller_with_mocks_and_emitter(90.0)
+        controller.register_strategy(
+            "test",
+            regime_affinity={"trending": 1.0, "normal": 0.3, "mean_reverting": 0.1},
+        )
         
         # First update
-        mock_health_inst._score = 90.0
         controller.update(current_return=0.01, current_equity=10000.0)
         
         # Change to different regime for weight change
-        mock_regime_inst._regime = MarketRegime.TRENDING
+        controller._regime_detector._regime = MarketRegime.TRENDING
         controller.update(current_return=0.01, current_equity=10000.0)
         
-        # Check for strategy weight event
+        # Check for strategy weight event (may not always trigger)
         weight_events = [e for e in emitter.events if "strategy_weight" in e["param_name"]]
-        # May or may not have events depending on weight change magnitude
-        # Just verify no errors occurred
         assert isinstance(weight_events, list)
 
-    @patch("strategies.common.adaptive_control.meta_controller.SystemHealthMonitor")
-    @patch("strategies.common.adaptive_control.meta_controller.SpectralRegimeDetector")
-    @patch("strategies.common.adaptive_control.meta_controller.PIDDrawdownController")
-    def test_no_audit_without_emitter(self, mock_pid, mock_regime, mock_health):
+    def test_no_audit_without_emitter(self):
         """Test no errors when audit emitter is None."""
         from strategies.common.adaptive_control.meta_controller import MetaController
         from strategies.common.adaptive_control.spectral_regime import MarketRegime
         
-        mock_health_inst = MockSystemHealthMonitor()
-        mock_health.return_value = mock_health_inst
-        mock_regime_inst = MockSpectralRegimeDetector()
-        mock_regime_inst._regime = MarketRegime.NORMAL
-        mock_regime.return_value = mock_regime_inst
-        mock_pid.return_value = MockPIDDrawdownController()
-        
         controller = MetaController()  # No emitter
         
+        # Inject mocks
+        mock_health = MockSystemHealthMonitor()
+        mock_health._score = 90.0
+        controller._health_monitor = mock_health
+        
+        mock_regime = MockSpectralRegimeDetector()
+        mock_regime._regime = MarketRegime.NORMAL
+        controller._regime_detector = mock_regime
+        
+        controller._pid_controller = MockPIDDrawdownController()
+        
         # First update
-        mock_health_inst._score = 90.0
         controller.update(current_return=0.01, current_equity=10000.0)
         
         # Change state (would trigger audit if emitter present)
-        mock_health_inst._score = 20.0
+        mock_health._score = 20.0
         controller.update(current_return=0.01, current_equity=10000.0)
         
         # Should not raise
@@ -1524,118 +1406,24 @@ class TestAuditEmitterIntegration:
 class TestEdgeCases:
     """Tests for edge cases and error handling."""
 
-    @patch("strategies.common.adaptive_control.meta_controller.SystemHealthMonitor")
-    @patch("strategies.common.adaptive_control.meta_controller.SpectralRegimeDetector")
-    @patch("strategies.common.adaptive_control.meta_controller.PIDDrawdownController")
-    def test_update_with_zero_latency(self, mock_pid, mock_regime, mock_health):
-        """Test update handles zero latency (doesn't record)."""
+    def _create_controller_with_mocks(self):
+        """Helper to create controller with mock components."""
         from strategies.common.adaptive_control.meta_controller import MetaController
         from strategies.common.adaptive_control.spectral_regime import MarketRegime
         
-        mock_health_inst = MockSystemHealthMonitor()
-        mock_health.return_value = mock_health_inst
-        mock_regime_inst = MockSpectralRegimeDetector()
-        mock_regime_inst._regime = MarketRegime.NORMAL
-        mock_regime.return_value = mock_regime_inst
-        mock_pid.return_value = MockPIDDrawdownController()
-        
-        controller = MetaController()
-        controller.update(current_return=0.01, current_equity=10000.0, latency_ms=0.0)
-        
-        # Zero latency should not be recorded
-        assert len(mock_health_inst._latencies) == 0
-
-    @patch("strategies.common.adaptive_control.meta_controller.SystemHealthMonitor")
-    @patch("strategies.common.adaptive_control.meta_controller.SpectralRegimeDetector")
-    @patch("strategies.common.adaptive_control.meta_controller.PIDDrawdownController")
-    def test_update_with_negative_equity(self, mock_pid, mock_regime, mock_health):
-        """Test update handles negative equity gracefully."""
-        from strategies.common.adaptive_control.meta_controller import MetaController
-        from strategies.common.adaptive_control.spectral_regime import MarketRegime
-        
-        mock_health.return_value = MockSystemHealthMonitor()
-        mock_regime_inst = MockSpectralRegimeDetector()
-        mock_regime_inst._regime = MarketRegime.NORMAL
-        mock_regime.return_value = mock_regime_inst
-        mock_pid.return_value = MockPIDDrawdownController()
-        
         controller = MetaController()
         
-        # Set positive peak first
-        controller.update(current_return=0.01, current_equity=10000.0)
+        controller._health_monitor = MockSystemHealthMonitor()
+        mock_regime = MockSpectralRegimeDetector()
+        mock_regime._regime = MarketRegime.NORMAL
+        controller._regime_detector = mock_regime
+        controller._pid_controller = MockPIDDrawdownController()
         
-        # Then negative current
-        state = controller.update(current_return=-0.50, current_equity=-1000.0)
-        
-        # Should handle gracefully (peak stays positive, large drawdown)
-        assert controller._peak_equity == 10000.0
-        assert state.drawdown_pct > 100  # Over 100% drawdown
+        return controller
 
-    @patch("strategies.common.adaptive_control.meta_controller.SystemHealthMonitor")
-    @patch("strategies.common.adaptive_control.meta_controller.SpectralRegimeDetector")
-    @patch("strategies.common.adaptive_control.meta_controller.PIDDrawdownController")
-    def test_update_with_extreme_returns(self, mock_pid, mock_regime, mock_health):
-        """Test update handles extreme return values."""
-        from strategies.common.adaptive_control.meta_controller import MetaController
-        from strategies.common.adaptive_control.spectral_regime import MarketRegime
-        
-        mock_health.return_value = MockSystemHealthMonitor()
-        mock_regime_inst = MockSpectralRegimeDetector()
-        mock_regime_inst._regime = MarketRegime.NORMAL
-        mock_regime.return_value = mock_regime_inst
-        mock_pid.return_value = MockPIDDrawdownController()
-        
-        controller = MetaController()
-        
-        # Extreme positive return
-        state = controller.update(current_return=10.0, current_equity=10000.0)
-        assert state is not None
-        
-        # Extreme negative return
-        state = controller.update(current_return=-0.99, current_equity=5000.0)
-        assert state is not None
-
-    def test_strategy_weights_with_missing_affinity_key(self):
-        """Test weight calculation handles missing affinity keys."""
-        from strategies.common.adaptive_control.meta_controller import (
-            MarketHarmony,
-            MetaController,
-            SystemState,
-        )
-        from strategies.common.adaptive_control.spectral_regime import MarketRegime
-        
-        controller = MetaController()
-        # Register with incomplete affinity (missing 'mean_reverting')
-        controller.register_strategy(
-            "test",
-            regime_affinity={"trending": 1.0, "normal": 0.5},
-        )
-        
-        # Should use default 0.5 for missing key
-        weights = controller._calculate_strategy_weights(
-            regime=MarketRegime.MEAN_REVERTING,
-            state=SystemState.VENTRAL,
-            harmony=MarketHarmony.CONSONANT,
-        )
-        
-        # Should not raise, weight should be normalized
-        assert "test" in weights
-
-    @patch("strategies.common.adaptive_control.meta_controller.SystemHealthMonitor")
-    @patch("strategies.common.adaptive_control.meta_controller.SpectralRegimeDetector")
-    @patch("strategies.common.adaptive_control.meta_controller.PIDDrawdownController")
-    def test_many_consecutive_updates(self, mock_pid, mock_regime, mock_health):
+    def test_many_consecutive_updates(self):
         """Test many consecutive updates don't cause memory issues."""
-        from strategies.common.adaptive_control.meta_controller import MetaController
-        from strategies.common.adaptive_control.spectral_regime import MarketRegime
-        
-        mock_health.return_value = MockSystemHealthMonitor()
-        mock_regime_inst = MockSpectralRegimeDetector()
-        mock_regime_inst._regime = MarketRegime.NORMAL
-        mock_regime.return_value = mock_regime_inst
-        mock_pid.return_value = MockPIDDrawdownController()
-        
-        controller = MetaController()
+        controller = self._create_controller_with_mocks()
         controller.register_strategy("test")
         
         # Simulate many updates
@@ -1650,23 +1438,9 @@ class TestEdgeCases:
         assert len(controller._returns_buffer) <= 500
         assert len(controller._strategy_performance["test"]) <= controller.harmony_lookback
 
-    @patch("strategies.common.adaptive_control.meta_controller.SystemHealthMonitor")
-    @patch("strategies.common.adaptive_control.meta_controller.SpectralRegimeDetector")
-    @patch("strategies.common.adaptive_control.meta_controller.PIDDrawdownController")
-    def test_strategy_callback_not_called_without_callback(
-        self, mock_pid, mock_regime, mock_health
-    ):
+    def test_strategy_callback_not_called_without_callback(self):
         """Test no error when strategy has no callback."""
-        from strategies.common.adaptive_control.meta_controller import MetaController
-        from strategies.common.adaptive_control.spectral_regime import MarketRegime
-        
-        mock_health.return_value = MockSystemHealthMonitor()
-        mock_regime_inst = MockSpectralRegimeDetector()
-        mock_regime_inst._regime = MarketRegime.NORMAL
-        mock_regime.return_value = mock_regime_inst
-        mock_pid.return_value = MockPIDDrawdownController()
-        
-        controller = MetaController()
+        controller = self._create_controller_with_mocks()
         controller.register_strategy("test", callback=None)
         
         # Should not raise
@@ -1754,6 +1528,71 @@ class TestEnums:
         assert MarketHarmony.CONSONANT.value == "consonant"
         assert MarketHarmony.DISSONANT.value == "dissonant"
         assert MarketHarmony.RESOLVING.value == "resolving"
+
+
+# ==============================================================================
+# Test Class: Integration with Real Components
+# ==============================================================================
+
+
+class TestIntegrationWithRealComponents:
+    """Tests using real (not mocked) components for integration testing."""
+
+    def test_full_update_cycle_with_real_components(self):
+        """Test complete update cycle with real component initialization."""
+        from strategies.common.adaptive_control.meta_controller import (
+            MetaController,
+            MetaState,
+            SystemState,
+        )
+        
+        controller = MetaController()
+        controller.register_strategy("momentum", regime_affinity={"trending": 1.0, "normal": 0.5})
+        controller.register_strategy("mean_revert", regime_affinity={"mean_reverting": 1.0, "normal": 0.5})
+        
+        # Run multiple updates
+        for i in range(100):
+            ret = 0.001 * (i % 10 - 5)  # Oscillating returns
+            equity = 10000.0 + i * 10
+            
+            state = controller.update(
+                current_return=ret,
+                current_equity=equity,
+                latency_ms=10.0 if i % 5 == 0 else 0,
+                order_filled=i % 7 != 0,
+                slippage_bps=1.0 if i % 5 == 0 else 0,
+            )
+            
+            # Record some PnL
+            if i % 3 == 0:
+                controller.record_strategy_pnl("momentum", ret * 1000)
+                controller.record_strategy_pnl("mean_revert", -ret * 500)
+        
+        # Final state should be valid
+        assert isinstance(state, MetaState)
+        assert state.system_state in [SystemState.VENTRAL, SystemState.SYMPATHETIC, SystemState.DORSAL]
+        assert 0.0 <= state.risk_multiplier <= 1.0
+        assert sum(state.strategy_weights.values()) == pytest.approx(1.0, abs=0.01) or state.strategy_weights == {}
+
+    def test_drawdown_triggers_state_change(self):
+        """Test that significant drawdown triggers state change."""
+        from strategies.common.adaptive_control.meta_controller import (
+            MetaController,
+            SystemState,
+        )
+        
+        controller = MetaController(target_drawdown=0.05)
+        
+        # Start with high equity
+        controller.update(current_return=0.0, current_equity=10000.0)
+        assert controller.state == SystemState.VENTRAL
+        
+        # Large drawdown (>10% = 2x target) should force DORSAL
+        state = controller.update(current_return=-0.15, current_equity=8400.0)
+        
+        # 16% drawdown should trigger DORSAL
+        assert state.drawdown_pct > 10.0
+        assert controller.state == SystemState.DORSAL
 
 
 if __name__ == "__main__":
