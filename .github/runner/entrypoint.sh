@@ -55,25 +55,27 @@ else
     log_info "Runner already configured"
 fi
 
-# Verify service connectivity
+# Verify service connectivity (non-blocking with timeouts)
 log_info "Checking service connectivity..."
 
-# Redis check
-if redis-cli -h "${REDIS_HOST:-localhost}" -p "${REDIS_PORT:-6379}" ping > /dev/null 2>&1; then
+# Redis check (timeout 3s)
+if timeout 3 redis-cli -h "${REDIS_HOST:-localhost}" -p "${REDIS_PORT:-6379}" ping > /dev/null 2>&1; then
     log_info "Redis: OK"
 else
     log_warn "Redis: NOT AVAILABLE (tests requiring Redis may fail)"
 fi
 
-# Neo4j check (bolt protocol)
-if timeout 5 bash -c "echo > /dev/tcp/${NEO4J_URI#bolt://}/7687" 2>/dev/null; then
+# Neo4j check (bolt protocol, timeout 3s)
+NEO4J_HOST="${NEO4J_URI#bolt://}"
+NEO4J_HOST="${NEO4J_HOST%:*}"
+if timeout 3 bash -c "echo > /dev/tcp/${NEO4J_HOST}/7687" 2>/dev/null; then
     log_info "Neo4j: OK"
 else
     log_warn "Neo4j: NOT AVAILABLE"
 fi
 
-# QuestDB check
-if curl -s "http://${QUESTDB_HOST:-localhost}:${QUESTDB_HTTP_PORT:-9000}/status" > /dev/null 2>&1; then
+# QuestDB check (timeout 3s)
+if timeout 3 curl -s "http://${QUESTDB_HOST:-localhost}:${QUESTDB_HTTP_PORT:-9000}/status" > /dev/null 2>&1; then
     log_info "QuestDB: OK"
 else
     log_warn "QuestDB: NOT AVAILABLE"
