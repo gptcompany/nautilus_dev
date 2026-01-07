@@ -3,7 +3,7 @@
 from decimal import Decimal
 
 import pytest
-from nautilus_trader.indicators.average.ema import ExponentialMovingAverage
+from nautilus_trader.indicators import ExponentialMovingAverage
 from nautilus_trader.model.data import BarType
 from nautilus_trader.model.identifiers import InstrumentId
 
@@ -13,7 +13,6 @@ from scripts.alpha_evolve.templates.momentum import (
     MomentumEvolveConfig,
     MomentumEvolveStrategy,
 )
-
 
 # =============================================================================
 # T018: Test Momentum Config Validation

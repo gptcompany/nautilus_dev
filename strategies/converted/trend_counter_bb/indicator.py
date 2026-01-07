@@ -20,7 +20,7 @@ from enum import IntEnum
 from typing import TYPE_CHECKING
 
 from nautilus_trader.indicators import Indicator
-from nautilus_trader.indicators.averages import ExponentialMovingAverage
+from nautilus_trader.indicators import ExponentialMovingAverage
 
 if TYPE_CHECKING:
     from nautilus_trader.model.data import Bar
