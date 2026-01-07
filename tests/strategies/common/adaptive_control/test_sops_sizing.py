@@ -49,36 +49,40 @@ class TestAdaptiveKEstimator:
 
     def test_high_volatility_lowers_k(self):
         """Test that high volatility lowers k."""
-        estimator = AdaptiveKEstimator(k_base=1.0, vol_alpha=0.2)
+        # Use longer lookback to keep baseline stable
+        estimator = AdaptiveKEstimator(k_base=1.0, vol_alpha=0.1, lookback=100)
 
-        # Feed low volatility first
-        for _ in range(30):
+        # Feed low volatility to establish baseline
+        for _ in range(100):
             estimator.update(0.001)
         k_low_vol = estimator.k
 
-        # Feed high volatility - need MORE samples to overcome EMA smoothing
-        for _ in range(100):
+        # Feed high volatility - not enough to change baseline significantly,
+        # but enough to increase vol_ema
+        for _ in range(20):
             estimator.update(0.1)
         k_high_vol = estimator.k
 
-        # High vol should lower k
+        # High vol (higher vol_ema relative to baseline) should lower k
         assert k_high_vol < k_low_vol
 
     def test_low_volatility_raises_k(self):
         """Test that low volatility raises k."""
-        estimator = AdaptiveKEstimator(k_base=1.0, vol_alpha=0.2)
+        # Use longer lookback to keep baseline stable
+        estimator = AdaptiveKEstimator(k_base=1.0, vol_alpha=0.1, lookback=100)
 
-        # Feed high volatility first
-        for _ in range(30):
+        # Feed high volatility to establish baseline
+        for _ in range(100):
             estimator.update(0.1)
         k_high_vol = estimator.k
 
-        # Feed low volatility - need MORE samples to overcome EMA smoothing
-        for _ in range(100):
+        # Feed low volatility - not enough to change baseline significantly,
+        # but enough to decrease vol_ema
+        for _ in range(20):
             estimator.update(0.001)
         k_low_vol = estimator.k
 
-        # Low vol should raise k
+        # Low vol (lower vol_ema relative to baseline) should raise k
         assert k_low_vol > k_high_vol
 
     def test_k_bounds(self):

@@ -510,13 +510,13 @@ class TestRiskMultiplier:
         """Test risk multiplier for DEGRADED state."""
         health = SystemHealthMonitor()
 
-        # Trigger DEGRADED - 40% rejection rate plus high latency
-        for _ in range(40):
+        # Trigger DEGRADED - 45% rejection rate plus high latency
+        for _ in range(45):
             health.record_rejection()
-        for _ in range(60):
+        for _ in range(55):
             health.record_fill()
         for _ in range(20):
-            health.record_latency(150.0)
+            health.record_latency(200.0)
 
         # risk_multiplier property calls get_metrics() internally
         assert health.risk_multiplier == 0.5
@@ -549,13 +549,13 @@ class TestShouldTrade:
         """Test should trade in DEGRADED state."""
         health = SystemHealthMonitor()
 
-        # Trigger DEGRADED - 40% rejection rate plus high latency
-        for _ in range(40):
+        # Trigger DEGRADED - 45% rejection rate plus high latency
+        for _ in range(45):
             health.record_rejection()
-        for _ in range(60):
+        for _ in range(55):
             health.record_fill()
         for _ in range(20):
-            health.record_latency(150.0)
+            health.record_latency(200.0)
 
         # should_trade() calls get_metrics() internally
         should_trade, reason = health.should_trade()
@@ -638,7 +638,15 @@ class TestEdgeCases:
 
         for _ in range(10):
             health.record_latency(10000.0)  # 10 seconds!
-        health.record_fill()
+        # Add rejections and reconnects to push into CRITICAL (score < 40)
+        # Latency penalty: 20, Rejection (50%): 25, Reconnects (5): 25
+        # Score = 100 - 20 - 25 - 25 = 30 (CRITICAL)
+        for _ in range(50):
+            health.record_rejection()
+        for _ in range(50):
+            health.record_fill()
+        for _ in range(5):
+            health.record_reconnect()
 
         # Check state via property first
         assert health.state == HealthState.CRITICAL
