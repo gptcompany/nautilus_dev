@@ -834,7 +834,9 @@ class TestMetaPortfolioUpdateWeightsFromProbs:
 
     def test_update_weights_adapts_to_probs(self):
         """Test that weights adapt to probabilities."""
-        portfolio = MetaPortfolio(adaptation_rate=0.5, max_weight=1.0)  # max_weight=1.0 to avoid clamping
+        portfolio = MetaPortfolio(
+            adaptation_rate=0.5, max_weight=1.0
+        )  # max_weight=1.0 to avoid clamping
         portfolio.register_system("a", initial_weight=0.4)
         portfolio.register_system("b", initial_weight=0.4)
 
@@ -1149,15 +1151,9 @@ class TestCreateMetaPortfolioFromBacktest:
     def test_create_portfolio_selects_top_k(self):
         """Test that top K systems are selected by Sharpe."""
         results = [
-            make_backtest_result(
-                config=make_system_config(name="low"), sharpe_ratio=0.5
-            ),
-            make_backtest_result(
-                config=make_system_config(name="high"), sharpe_ratio=2.0
-            ),
-            make_backtest_result(
-                config=make_system_config(name="mid"), sharpe_ratio=1.0
-            ),
+            make_backtest_result(config=make_system_config(name="low"), sharpe_ratio=0.5),
+            make_backtest_result(config=make_system_config(name="high"), sharpe_ratio=2.0),
+            make_backtest_result(config=make_system_config(name="mid"), sharpe_ratio=1.0),
         ]
 
         portfolio = create_meta_portfolio_from_backtest(results, top_k=2)
@@ -1170,12 +1166,8 @@ class TestCreateMetaPortfolioFromBacktest:
     def test_create_portfolio_weights_by_sharpe(self):
         """Test that weights are proportional to Sharpe ratios."""
         results = [
-            make_backtest_result(
-                config=make_system_config(name="a"), sharpe_ratio=2.0
-            ),
-            make_backtest_result(
-                config=make_system_config(name="b"), sharpe_ratio=1.0
-            ),
+            make_backtest_result(config=make_system_config(name="a"), sharpe_ratio=2.0),
+            make_backtest_result(config=make_system_config(name="b"), sharpe_ratio=1.0),
         ]
 
         portfolio = create_meta_portfolio_from_backtest(results, top_k=2)
@@ -1188,12 +1180,8 @@ class TestCreateMetaPortfolioFromBacktest:
     def test_create_portfolio_negative_sharpe(self):
         """Test handling of negative Sharpe ratios."""
         results = [
-            make_backtest_result(
-                config=make_system_config(name="negative"), sharpe_ratio=-0.5
-            ),
-            make_backtest_result(
-                config=make_system_config(name="zero"), sharpe_ratio=0.0
-            ),
+            make_backtest_result(config=make_system_config(name="negative"), sharpe_ratio=-0.5),
+            make_backtest_result(config=make_system_config(name="zero"), sharpe_ratio=0.0),
         ]
 
         portfolio = create_meta_portfolio_from_backtest(results, top_k=2)
@@ -1204,12 +1192,8 @@ class TestCreateMetaPortfolioFromBacktest:
     def test_create_portfolio_equal_weights_fallback(self):
         """Test equal weights when all Sharpe ratios are negative."""
         results = [
-            make_backtest_result(
-                config=make_system_config(name="a"), sharpe_ratio=-1.0
-            ),
-            make_backtest_result(
-                config=make_system_config(name="b"), sharpe_ratio=-0.5
-            ),
+            make_backtest_result(config=make_system_config(name="a"), sharpe_ratio=-1.0),
+            make_backtest_result(config=make_system_config(name="b"), sharpe_ratio=-0.5),
         ]
 
         portfolio = create_meta_portfolio_from_backtest(results, top_k=2)
@@ -1221,12 +1205,8 @@ class TestCreateMetaPortfolioFromBacktest:
     def test_create_portfolio_min_weight_enforcement(self):
         """Test that minimum weight of 0.1 is enforced."""
         results = [
-            make_backtest_result(
-                config=make_system_config(name="huge"), sharpe_ratio=10.0
-            ),
-            make_backtest_result(
-                config=make_system_config(name="tiny"), sharpe_ratio=0.01
-            ),
+            make_backtest_result(config=make_system_config(name="huge"), sharpe_ratio=10.0),
+            make_backtest_result(config=make_system_config(name="tiny"), sharpe_ratio=0.01),
         ]
 
         portfolio = create_meta_portfolio_from_backtest(results, top_k=2)
@@ -1245,6 +1225,7 @@ class TestMetaPortfolioIntegration:
 
     def test_full_lifecycle(self):
         """Test complete portfolio lifecycle."""
+
         # 1. Setup backtest matrix
         def runner(config: SystemConfig) -> BacktestResult:
             return make_backtest_result(
@@ -1311,7 +1292,7 @@ class TestMetaPortfolioIntegration:
         portfolio.register_system("winner", initial_weight=0.4)
         portfolio.register_system("loser", initial_weight=0.4)
 
-        portfolio._systems["winner"].weight
+        _ = portfolio._systems["winner"].weight  # verify access works
 
         # Winner consistently outperforms - Thompson Sampling will favor it
         for _ in range(50):  # More iterations for clearer adaptation

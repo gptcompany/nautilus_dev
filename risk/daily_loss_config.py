@@ -73,8 +73,8 @@ class DailyLossConfig(BaseModel):
             hour, minute = int(hour_str), int(minute_str)
             if not (0 <= hour <= 23 and 0 <= minute <= 59):
                 raise ValueError
-        except (ValueError, AttributeError, TypeError):
-            raise ValueError(f"reset_time_utc must be in HH:MM format, got: {time_str}")
+        except (ValueError, AttributeError, TypeError) as err:
+            raise ValueError(f"reset_time_utc must be in HH:MM format, got: {time_str}") from err
         return self
 
     def get_effective_limit(self, starting_equity: Decimal) -> Decimal:

@@ -35,8 +35,8 @@ def _safe_int(value: str, name: str, default: int) -> int:
     """Safely parse int from env var with clear error message."""
     try:
         return int(value)
-    except ValueError:
-        raise RedisConfigError(f"{name} must be an integer, got: {value!r}")
+    except ValueError as err:
+        raise RedisConfigError(f"{name} must be an integer, got: {value!r}") from err
 
 
 def validate_redis_config(

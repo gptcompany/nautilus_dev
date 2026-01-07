@@ -4,7 +4,7 @@
 
 import asyncio
 import logging
-from typing import Any, Union
+from typing import Any
 
 import httpx
 
@@ -18,7 +18,7 @@ from monitoring.models import (
 
 logger = logging.getLogger(__name__)
 
-MetricType = Union[DaemonMetrics, ExchangeStatus, PipelineMetrics, TradingMetrics]
+MetricType = DaemonMetrics | ExchangeStatus | PipelineMetrics | TradingMetrics
 
 
 class MetricsClient:

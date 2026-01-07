@@ -3,7 +3,7 @@
 # Base interface and implementations for daemon, exchange, pipeline, trading collectors
 
 from abc import ABC, abstractmethod
-from typing import Generic, TypeVar
+from typing import TypeVar
 
 T = TypeVar("T")
 
