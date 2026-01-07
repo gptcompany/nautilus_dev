@@ -1,424 +1,8 @@
 # NautilusTrader - #questions
 
 **Period:** Last 90 days
-**Messages:** 336
-**Last updated:** 2025-12-22 18:01:49
-
----
-
-#### [2025-09-24 01:56:57] @aaron_g0130
-
-Hi there！Do I need to re-write BarDataWrangler from wranglers.pyx if I want to custom the fields of bar data (like: open,high,low,close,vwap,taker_buy,taker_sell etc.) or is there a general reusable template available？
-
----
-
-#### [2025-09-24 22:47:21] @gabadia5003
-
-The issue was the tag name.  I tried other tag names but not that one - thanks
-
----
-
-#### [2025-09-25 00:19:27] @gabadia5003
-
-Another question -  I am creating TradingNode's programatically and found out that one can only create a TradingNode once the strategy and all other configuration parameters for the TradingNode are know. I can work around this but would be great if I could create a TradingNode with the entire trading environment configured (market data and execution clients, etc.) except the strategy. Then when I know what strategy I want to execute I would just register/inject it with the TradingNode. Is this something that can be done ?
-
----
-
-#### [2025-09-25 00:27:36] @yfclark
-
-you need controller for dynamic strategies control
-
----
-
-#### [2025-09-25 00:37:17] @topast
-
-Does NautilusTrader take into account the impact on the OrderBook from simulated trades?
-With candlesitcks it seems that I can fill in as many contracts regardless of volume.
-
----
-
-#### [2025-09-25 01:29:57] @cjdsellers
-
-Hi <@120670750326652928> 
-Correct, there is no persistent market impact yet (I've made a note to spell this out more clearly in the backtesting docs). This is definitely a feature we can add once bandwidth opens up post Rust port of the core
-
----
-
-#### [2025-09-25 12:07:10] @gabadia5003
-
-Hi <@910880171576393728> , I do have some logic that I call a supervisor that allows me to configure and start many TradingNodes.  However, I have not been able to inject a strategy into the TradingNode onces it is created.  Could you please elaborate more on what a controller would do and what api it uses to do this.
-
----
-
-#### [2025-09-25 12:12:13] @yfclark
-
-I haven't looked into this for a long time. You can check here, and it might offer you some help.https://github.com/nautechsystems/nautilus_trader/issues/1936
-
-**Links:**
-- Add multi-instrument rotation trading example with Controller · Is...
-
----
-
-#### [2025-09-29 03:56:34] @3sberzerk
-
-Hi, I checked the docs and Discord but couldn’t find an answer to this:
-How does the on_bar method in the Actor class behave for internal vs external bars?
-
-For example, using 1-minute bar data:
- - Internal bars: It works as expected, with a new bar provided once per minute.
- - External bars: It seems to trigger on every tick, continuously updating the current 1-minute bar.
-
-Is this the intended behavior?
-I’m using Interactive Brokers with the latest stable version of Nautilus Trader.
-
----
-
-#### [2025-09-29 04:40:21] @cjdsellers
-
-Hi <@312252646314737666> 
-Thanks for the report. This sounds like it could be a bug. While some traders would like to consume partial external bars continuously as they are formed, we *should* just be emitting closed bars per the spec
-
----
-
-#### [2025-09-29 09:23:47] @mk27mk
-
-Hi everyone!
-
-I'm implementing a `NewsActor` to process and publish news events.
-DeepWiki told me that I could publish all the events inside `on_start` and they would've been sorted by their `ts_init`, but they actually get consumed instantly by subscribers.
-Am I missing something or I should publish each event inside `on_bar` when `bar.ts_init == event.ts_init`?
-Thank you 😗 
-
-```python
-class NewsActorConfig(ActorConfig, frozen=True):
-    start: str | int
-    end: str | int
-    impacts: set[NewsImpact] | None = None
-    currencies: set[Currency] | None = None
-    event_names: set[str] | None = None
-
-
-class NewsActor(Actor):
-    if TYPE_CHECKING:
-        config: NewsActorConfig
-
-    def __init__(self, config: NewsActorConfig) -> None:
-        super().__init__(config)
-
-    # ------------------------------------------------------------------
-    # Start and stop
-    # ------------------------------------------------------------------
-
-    def on_start(self) -> None:
-        catalog = catalog_from_env()
-        news_events = NewsEvent.from_catalog(
-            catalog=catalog,
-            start=self.config.start,
-            end=self.config.end,
-            impacts=self.config.impacts,
-            currencies=self.config.currencies,
-            event_names=self.config.event_names,
-        )
-        for e in news_events:
-            self.publish_data(DataType(NewsEvent), e)
-            self.log.info(f"Published {e}", color=LogColor.YELLOW)
-```
-
-edit: I was able to do it using alerts
-
----
-
-#### [2025-09-30 13:29:03] @ido3936
-
-Hello,
-I am trying to modify the slippage model into something more severe, while running on a bars based strategy. 
-For starters I tried the `OneTickSlippageFillModel`. When I run it - no order is fulfilled (these are MARKET orders). In fact, all of the fill model variants only fulfill demand if there is immediate supply available (BookOrder with positive quantity).
-
-It is easy to show this also on a toy example.
-
-When I asked the AI - based on code analysis - if this could be a bug, it responded with:
-"You should verify your backtesting engine's market order implementation to ensure it can "walk the book" to find available liquidity at slipped prices."
-
-Has anyone been able to make these fill models work with bars?
-
----
-
-#### [2025-09-30 15:35:21] @haakonflaar
-
-What number of bars/second can one expect from a backtest with no on_bar logic? I am currently seeing 20 000 bars/second which seems quite low. It's obviously CPU dependent but my CPU don't suck. I am running backtests through the low level API.
-
----
-
-#### [2025-09-30 20:20:43] @theliminator
-
-that seems pretty low, i vaguely recall my CPU doing 100-200k/s half a year ago
-
----
-
-#### [2025-09-30 20:20:45] @theliminator
-
-with no logic
-
----
-
-#### [2025-09-30 20:20:54] @theliminator
-
-might be your data loading?
-
----
-
-#### [2025-10-01 03:49:31] @xcabel
-
-I'm new to this and can be wrong. But I think you are mostly right that you need to publish per event but depends on how you define the NewsEvent class as subclass Data or Bar, you may want to publish in the on_data() and filter by data type to be NewsEvent
-
----
-
-#### [2025-10-01 06:34:55] @haakonflaar
-
-I am querying data from the catalog and adding it to the engine..I'll have to do some debugging
-
----
-
-#### [2025-10-03 15:16:13] @ido3936
-
-During reconciliation, what happens when a db-persisted cache contains information about open positions, but the client has already closed them? 
-This is probably not meant to happen, but can still easily occur, and - in my case - had also caused my 'reduce only' order to open a new  SHORT position (as it tried to close  an already closed LONG position)
-Both my understanding of the code, and actual runs, seem to point to this not being handled...
-
-I will open a bug - but would love to learn that I got it wrong... <@757548402689966131> 
-
-https://github.com/nautechsystems/nautilus_trader/issues/3023
-
-**Links:**
-- Reconcile positions that are open in the cache but closed in the cl...
-
----
-
-#### [2025-10-04 11:26:03] @ido3936
-
-I've created a bug with a minimal reproducing example. <@965894631017578537> ? Fixing cython code is beyond me
-
-https://github.com/nautechsystems/nautilus_trader/issues/3031
-
-**Links:**
-- FillModel derived extensions do not "walk the order book" when usin...
-
----
-
-#### [2025-10-04 12:44:24] @faysou.
-
-I think that existing fill models are examples, you are supposed to write your own fill models. If you think the default models should be modified you can do a PR. Also cython is almost like Python, once you have a dev environment set up, you can do changes.
-
----
-
-#### [2025-10-04 12:45:17] @faysou.
-
-And with AI agents you have some help for programming and finding how to solve bugs.
-
----
-
-#### [2025-10-04 13:52:31] @ido3936
-
-My point is that they don't work (as advertised), and so also any variation on the same base model will not work at current
-But if they are not on the main dev path - thats ok - at least theres now a bug with MRE set up
-
----
-
-#### [2025-10-04 15:57:51] @faysou.
-
-Ok thanks, I'll have a look at some point
-
----
-
-#### [2025-10-04 20:13:14] @donaldcuckman
-
-what do you guys use for visualizing your backtesting results? Just custom matplotlibs or is there something built in that i cant find?
-
----
-
-#### [2025-10-05 00:10:00] @braindr0p
-
-I'm just using customized mplfinance on top of matplotlibs .  Would be interesting to see what others are doing.
-
----
-
-#### [2025-10-05 03:36:55] @fudgemin
-
-if been using grafana for most everything visual, and am quite satisfied with the decision
-
-**Attachments:**
-- [grafana.png](https://cdn.discordapp.com/attachments/924506736927334400/1424238899936624650/grafana.png?ex=694ab716&is=69496596&hm=e543f45903e91108553f1620a61b279d9ecfa57b2bda67a91d353110803f80f4&)
-
----
-
-#### [2025-10-05 07:54:51] @dariohett
-
-What is the standard way of interacting with a running system, such as changing a parameter without restarting? Is it defining an external stream and publishing on Redis?
-
----
-
-#### [2025-10-05 14:36:14] @donaldcuckman
-
-How long did that take to set up? Looks great!
-
----
-
-#### [2025-10-05 16:23:13] @fudgemin
-
-a day or two maybe. quite simple. Its using plugin charts, built ontop on js-react and  echarts. Allows near any custom panel i want. Data injestion is through QuestDB, simple query to the database with grafana. Ive used the platform for a year prior, but its faily intuitive once you play around. I dont think, actually im fully convinced i could not replicate the same thing, anywhere else, in such a fast manner, whille having it remain dynamic and scalable. This visual setup works across any strategy or backtest results i post to my database. Its once and done
-
----
-
-#### [2025-10-05 16:24:27] @fudgemin
-
-this is actually vectorbt backtest lol. I quick run against 150 sl, tp combos. Then i run event process tests in naut
-
----
-
-#### [2025-10-05 16:56:52] @gabadia5003
-
-Thanks for that example.  I created a "supervisor/manager" that receives strategies and launches them.  If I launch a new TradingNode for eah strategy it all works fine.  However, I do not think that is the best use of resources.  So, I was giving it a go to see if I could add/inject/register a Strategy to a running TradingNode.  I create my own controller following the example you gave, but unfortunately whatever I try I end up with errors like the ones below.  Can you please confirm or negate that it is possible to add new strategies to a running TradingNode.  And by new strategies I mean strategies that may not have even existed before the TradingNode was started.
-
-
-2025-10-05T16:37:58.845224590Z [ERROR] TRADER-001.TRADER-001: Cannot add a strategy to a running trader
-2025-10-05T16:37:58.845405090Z [ERROR] TRADER-001.BuyAtTheBidStrategy-82492e25: InvalidStateTrigger('PRE_INITIALIZED -> START') state PRE_INITIALIZED
-2025-10-05T16:37:58.845422632Z [ERROR] TRADER-001.BuyAtTheBidStrategy-82492e25: InvalidStateTrigger('PRE_INITIALIZED -> START_COMPLETED') state PRE_INITIALIZED
-2025-10-05T16:37:58.845467299Z [INFO] TRADER-001.DynamicStrategyController: Created and started strategy BuyAtTheBidStrategy-82492e25-ACCT-01
-2025-10-05 16:37:58,845 - supervisor - INFO - Strategy created: BuyAtTheBidStrategy-82492e25-ACCT-01
-2025-10-05 16:37:58,845 - supervisor - ERROR - DynamicStrategyController.add_strategy() failed: Strategy BuyAtTheBidStrategy-82492e25-ACCT-01 not registered in Trader after injection
-2025-10-05 16:37:58,845 - supervisor - ERROR - Error type: RuntimeError
-2025-10-05 16:37:58,845 - supervisor - ERROR - Trader state: 3
-2025-10-05 16:37:58,845 - supervisor - ERROR - Current strategies in trader: []
-2025-10-05 16:37:58,846 - supervisor - ERROR - Failed to execute strategy (job_id=82492e25): DynamicStrategyController failed to add strategy: Strategy BuyAtTheBidStrategy-82492e25-ACCT-01 not registered in Trader after injection
-
----
-
-#### [2025-10-06 09:09:27] @ido3936
-
-Hi <@797412687784312862> , much as I tried - I could not get the flow from Redis to the system working. I ended up setting an asyncio based server on a separate thread, with a handle to the message bus for passing on instructions. A client on a sperate process can then send instructions to the system
-
----
-
-#### [2025-10-06 12:08:05] @donaldcuckman
-
-what about for live trading?
-
----
-
-#### [2025-10-06 12:09:00] @donaldcuckman
-
-Im using rich in the terminal to display positions pnl etc but it kinda sucks
-
----
-
-#### [2025-10-06 14:20:34] @gabadia5003
-
-Hi there @imemo I have the same question now.  Did you ever figure out how to do this ?
-
----
-
-#### [2025-10-06 14:21:47] @gabadia5003
-
-Hi <@942323961809743892>, did you ever figure out how to add strategies to a running TradingNode ?
-
----
-
-#### [2025-10-06 16:44:54] @dariohett
-
-Appreciate the experience report, I’ll probably wrap the thing into FastApi then
-
----
-
-#### [2025-10-07 16:07:12] @mohamadshoumar
-
-Hey, we’re evaluating how to handle tick-level historical data for ~10 USDT pairs. Future plan is to add perpetuals pairs as well as all pairs for each coin. 
-We had 2 options, add the data in house or use a 3rd party provider. 
-
-Kaiko for example offers two options:
-1️⃣ API-based – capped at 6,000 calls/min, each returning 1,000 ticks (≈6M ticks/min).
-Given BTC averages ~500K ticks/day, that’s roughly a minute to fetch 12 days of data.
-2️⃣ S3 dump – bulk historical data (CSV/Parquet) we can download directly (to be tested)
-
-The other route is self-hosting on AWS (TimescaleDB), but it requires a proper data architecture (compression, tiering, etc.).
-
-Our internal POC with NautilusTrader hit ~350K ticks/sec during backtests and ~500–600K ticks/sec retrieval from local TimescaleDB.
-
-Curious if you’ve already tackled a setup like this before, or if you’d recommend one approach over the other or have a better provider in mind. 
-
-Thanks
-
----
-
-#### [2025-10-07 23:23:33] @topast
-
-INB4 - I only use NautilusTrader for research purposes.
-
-Personally, I would go with the S3 dump. If the data is in parquet format and you need an SQL like syntax you can use duckdb.
-
----
-
-#### [2025-10-07 23:29:47] @topast
-
-I mean, if you have the resources (human and capital) the timescaleDB is nice. But if you have such resources, I would just go for kdb or OneTick I suppose.
-
----
-
-#### [2025-10-07 23:42:15] @topast
-
-Thank you - to confirm your answer applies regardless if we are working with candlesticks, L1, L2 or L3 data correct?
-In theory, it should be possible, or am I seeing something wrong?
-https://github.com/nautechsystems/nautilus_trader/tree/develop/crates/execution
-
-**Links:**
-- nautilus_trader/crates/execution at develop · nautechsystems/nauti...
-
----
-
-#### [2025-10-08 08:59:25] @cjdsellers
-
-Hi <@120670750326652928> 
-With L2 or L3 data you can simulate walking the book. The limitation right now is the next order to have execution simulated will see exactly the same data (it's always based on the historical data) - so no persistent changes to book state based on user orders yet. So yes, it is theoretically possible, just a future feature for now
-
----
-
-#### [2025-10-08 09:49:31] @eleelegentbanboo
-
-I’m having trouble backtesting with Tardis L2 market data.
-I recorded the data using run_tardis_machine_replay, and here’s my configuration file: “{
-  "tardis_ws_url": "ws://localhost:18001",
-  "tardis_http_url": "http://localhost:18000",
-  "normalize_symbols": true,
-  "output_path": null,
-  "options": [
-    {
-      "exchange": "bitmex",
-      "symbols": [
-        "linkusdt"
-      ], 
-      "data_types": [
-        "book_change",
-        "book_snapshot_2_50ms"
-      ],
-      "from": "2025-10-01",
-      "to": "2025-10-03"
-    }
-  ]
-}
-”After recording, I only got one file like this:
-/project/nautilus_trader/user_data/nt_oftrend/tardis/catalog/data/order_book_deltas/LINKUSDT-PERP.BINANCE/20251001.parquet
-
-However, this file cannot be loaded directly using ParquetDataCatalog.
-
-Has anyone successfully used this approach to build an L2 order book and run a backtest?
-
----
-
-#### [2025-10-08 09:52:14] @eleelegentbanboo
-
-
-
-**Attachments:**
-- [image.png](https://cdn.discordapp.com/attachments/924506736927334400/1425420516264640542/image.png?ex=694a664e&is=694914ce&hm=fc799f3ba51f176b822f443304e7931153fe042a056061356a0f4f7a2d81eff3&)
+**Messages:** 339
+**Last updated:** 2026-01-07 01:29:38
 
 ---
 
@@ -566,7 +150,7 @@ In a pairs trading strategy how should i ensure the bar for each instrument is f
 
 
 **Attachments:**
-- [image.png](https://cdn.discordapp.com/attachments/924506736927334400/1427422004180418620/image.png?ex=694a6e16&is=69491c96&hm=fefc009b50d6754500fbeca9a90272656f96955aecdcf98e5b2c9ac5fd3557ee&)
+- [image.png](https://cdn.discordapp.com/attachments/924506736927334400/1427422004180418620/image.png?ex=695edd56&is=695d8bd6&hm=6060ecd539e306303b4b717a66478916c3fdcf51d98f5ef10f416b19a8464932&)
 
 ---
 
@@ -624,7 +208,7 @@ anybody know how subscribe_instrument() works? if i call it in on_start(), it al
 I previously built a terminal-based dashboard using `textual`, but achieving high FPS in the terminal was challenging. So I later tried rewriting it with `Tauri` and only managed to create a demo. Now, I’m thinking of giving `iced` a try.
 
 **Attachments:**
-- [SCR-20240423-rpnc_.png](https://cdn.discordapp.com/attachments/924506736927334400/1428425670047957143/SCR-20240423-rpnc_.png?ex=694ac912&is=69497792&hm=b4eaece737289e35ed7dac2b810082d938798c98b6e130233c8ad6ff52a37a97&)
+- [SCR-20240423-rpnc_.png](https://cdn.discordapp.com/attachments/924506736927334400/1428425670047957143/SCR-20240423-rpnc_.png?ex=695e8f92&is=695d3e12&hm=217b6d3d3de4d66672cd739bb0e4a0bcca8f6c6c36c43ef34e139ce522863d2c&)
 
 ---
 
@@ -634,7 +218,7 @@ Hello ! If we have Trades ticks and aggregating bars in 1 or 5 minutes, does tra
 
 ---
 
-#### [2025-10-17 14:00:25] @rmadanagopal_42070
+#### [2025-10-17 14:00:25] @Deleted User
 
 Hello <@757548402689966131> I would like to simulate auction order fills in backtest. I gather that its not fully supported based on your comments above. Is this still  the case  or with the newer releases, it was supported. Also have a quick question regarding trade conditions and how nautilus simulated engine handles them. Like settlements, security close / open indication etc. Thank you
 
@@ -797,7 +381,7 @@ From what I read about L3 in databento there's a daily snapshot in the data, I w
 I dunno if this helps but here's a screenshot showing the order book printout from NT vs. what is in the DBN data for the same times
 
 **Attachments:**
-- [Screenshot_20251020_172951.png](https://cdn.discordapp.com/attachments/924506736927334400/1429748820719304714/Screenshot_20251020_172951.png?ex=694a535a&is=694901da&hm=7ae0654225ed181a1b71bde5f54454e482312eb479cd36bde2ae39ae76fed3c2&)
+- [Screenshot_20251020_172951.png](https://cdn.discordapp.com/attachments/924506736927334400/1429748820719304714/Screenshot_20251020_172951.png?ex=695ec29a&is=695d711a&hm=55c0f41157c42d2e40660da42639da056dd7acefcb247970236f827f41c3a172&)
 
 ---
 
@@ -807,7 +391,7 @@ The order book is badly corrupted.. ask prices below bids..
 
 ---
 
-#### [2025-10-20 08:40:46] @deleted_user_3434563
+#### [2025-10-20 08:40:46] @Deleted User
 
 What do people use in order to visualize backtests?
 
@@ -909,7 +493,7 @@ No, I eventually stopped using it myself — the FPS couldn’t keep up under HF
 
 ---
 
-#### [2025-10-21 15:44:33] @deleted_user_3434563
+#### [2025-10-21 15:44:33] @Deleted User
 
 Look into Dioxus, it might be a decent alternative based on specific requirements. Or you could go with Svelte + Tauri for desktop app. Or simply nextjs and have it based on the web.
 
@@ -927,13 +511,13 @@ I used to work with `Svelte + Tauri + Tailwind`.
 
 ---
 
-#### [2025-10-21 15:49:28] @deleted_user_3434563
+#### [2025-10-21 15:49:28] @Deleted User
 
 Its a great setup aswell
 
 ---
 
-#### [2025-10-21 15:49:53] @deleted_user_3434563
+#### [2025-10-21 15:49:53] @Deleted User
 
 But what do you get from a desktop application that web can’t deliver?
 
@@ -957,13 +541,13 @@ It’s purely a personal preference — I just like terminal or desktop applicat
 
 ---
 
-#### [2025-10-21 17:51:29] @deleted_user_3434563
+#### [2025-10-21 17:51:29] @Deleted User
 
 Yes they do for now. Dioxus working on a replacement called Blitz
 
 ---
 
-#### [2025-10-21 17:52:00] @deleted_user_3434563
+#### [2025-10-21 17:52:00] @Deleted User
 
 Tauri might be able to render via Servo but its experimental
 
@@ -1667,8 +1251,8 @@ Whats the point when you know that a strategy is ready for forward or live testi
 Been working on a few strategies, and have two that seems okay, that I will be putting to forward testing soon, however just wanted to hear you guys out if you do anything besides following the sharp and sortino ratio?
 
 **Attachments:**
-- [image.png](https://cdn.discordapp.com/attachments/924506736927334400/1438279193992495145/image.png?ex=694a60a1&is=69490f21&hm=a935051772fe66f1bf7f894644fa19b8ae6400305966a965f3623eb8c9d9f328&)
-- [image.png](https://cdn.discordapp.com/attachments/924506736927334400/1438279194541953045/image.png?ex=694a60a1&is=69490f21&hm=cdd858086e08e04f9c847b5b727d56ec07ad4d53356a42855f37089dd069a6aa&)
+- [image.png](https://cdn.discordapp.com/attachments/924506736927334400/1438279193992495145/image.png?ex=695ecfe1&is=695d7e61&hm=43a0fa8c5792632659fadcb042a59e18286a763a9f53e2ca09001e081100146a&)
+- [image.png](https://cdn.discordapp.com/attachments/924506736927334400/1438279194541953045/image.png?ex=695ecfe1&is=695d7e61&hm=9cca5eedc4dc8a20755905131cdd5a4e1bb25d76f642fed67255f67daec7dcab&)
 
 ---
 
@@ -1991,7 +1575,7 @@ I would set `ts_init` to when you would have expected the bar to close live
 
 ---
 
-#### [2025-11-25 08:15:23] @cauta
+#### [2025-11-25 08:15:23] @mrrothz
 
 hi, i'm new here.
 i'm trying to record data from live binance, and use for testing later.
@@ -2033,7 +1617,7 @@ and error happen when i try to convert CryptoFuture instrument to parquet
 please help me find out what is the best practice for record live data prepare for testing and why error here?
 
 **Attachments:**
-- [anh.png](https://cdn.discordapp.com/attachments/924506736927334400/1442790761564471367/anh.png?ex=694a4f9b&is=6948fe1b&hm=aa0e877053481f1323194056dfb188f50b76b79f643feb239047cdc4d3389317&)
+- [anh.png](https://cdn.discordapp.com/attachments/924506736927334400/1442790761564471367/anh.png?ex=695ebedb&is=695d6d5b&hm=13eade598b0344b4034a4726ef7502d88ed33321fa10ab6c26976bc72d6b3ff5&)
 
 ---
 
@@ -2076,7 +1660,7 @@ Maybe this thread will help you.  But it sounds like you have the opposite probl
 Is it normal to have most of the PnL and return stats to be 0 or NaN?
 
 **Attachments:**
-- [Screenshot_2025-11-26_at_3.10.11_PM.png](https://cdn.discordapp.com/attachments/924506736927334400/1443378614187069541/Screenshot_2025-11-26_at_3.10.11_PM.png?ex=694a78d6&is=69492756&hm=3966efefc3b0b225540a5c0b9d2ac7f434a46377ee6f76bdc309045f5f227c89&)
+- [Screenshot_2025-11-26_at_3.10.11_PM.png](https://cdn.discordapp.com/attachments/924506736927334400/1443378614187069541/Screenshot_2025-11-26_at_3.10.11_PM.png?ex=695ee816&is=695d9696&hm=0d24da7bd88d3fc5a8937e562f8c85f6bbd4da97c37fb7d9df3857fa12bd9355&)
 
 ---
 
@@ -2092,7 +1676,7 @@ Also i got a "Long Ratio" of 0.84 in a long-only portfolio😂  How should i int
 
 ---
 
-#### [2025-11-27 04:06:34] @cauta
+#### [2025-11-27 04:06:34] @mrrothz
 
 hi <@965894631017578537> <@757548402689966131> , do we have best practice for recording live data for later using in backtest?
 i did use streaming config and got feather files, which are large. Later i need to convert to parquet, cost time also
@@ -2105,7 +1689,7 @@ Hi <@872066994151776296>  , <@224557998284996618> has implemented a way to rotat
 
 ---
 
-#### [2025-11-28 06:38:38] @cauta
+#### [2025-11-28 06:38:38] @mrrothz
 
 Do we have plan for write `CryptoPerpetual`, `CryptoFuture`, etc. which are `Instrument` childs when doing streaming?
 i met problem when doing live data record for later backtest. there are only some of them has been recorded:
@@ -2136,7 +1720,7 @@ But the more people are able to improve the code the better. Of course quality n
 
 ---
 
-#### [2025-11-28 08:00:41] @cauta
+#### [2025-11-28 08:00:41] @mrrothz
 
 this is my recommend for streaming instrument into live data, which is necessary for later testing conversion:
 ```python
@@ -2190,13 +1774,13 @@ I've just done a PR with this and a subtle change so the conversion of streamed 
 
 ---
 
-#### [2025-11-28 13:59:32] @cauta
+#### [2025-11-28 13:59:32] @mrrothz
 
 Oh ok, i suppose to have pr tmr. Thank you let me check a bit
 
 ---
 
-#### [2025-11-28 14:27:56] @cauta
+#### [2025-11-28 14:27:56] @mrrothz
 
 it seem better version than mine. no need to have lots of folder for instrument.
 i also draft a PR here: https://github.com/nautechsystems/nautilus_trader/pull/3236
@@ -2207,7 +1791,7 @@ help take a look
 
 ---
 
-#### [2025-11-28 14:29:10] @cauta
+#### [2025-11-28 14:29:10] @mrrothz
 
 it seem also solve this error, when i try to convert instrument feather files into catalog and met deserialize problem
 
@@ -2271,7 +1855,7 @@ could you perhaps elaborate on this part, because it can be a multitude of thing
 
 ---
 
-#### [2025-12-01 08:25:10] @cauta
+#### [2025-12-01 08:25:10] @mrrothz
 
 <@965894631017578537> from `parquet.py` function `def _handle_table_nautilus(`
 if data is empty then error list index throw
@@ -2612,7 +2196,7 @@ I am still far away to bother about this yet, but I’m also interested in this 
 
 ---
 
-#### [2025-12-08 04:32:49] @cauta
+#### [2025-12-08 04:32:49] @mrrothz
 
 <@965894631017578537> <@757548402689966131> do we have any options that can stream our position while doing backtest?
 
@@ -2857,8 +2441,8 @@ Did your message contain 3-4 images? that can trigger it sometimes. I'm not able
 yep let me try to repost, here is the order dataframe dump after backtesting. odd rows are the sell stop market orders in question. even rows are buy take profit limit orders working totally fine. observe the odd rows trigger_price and avg_px. I hardcoded the trigger price to 100000 on NQZ25 futures (dec 2025) when creating orders. I crosschecked the 1min bar data in catalog and they are perfectly fine. I did not use bid ask data in backtest however.
 
 **Attachments:**
-- [2025-12-15_4.07.42.png](https://cdn.discordapp.com/attachments/924506736927334400/1450037884718547055/2025-12-15_4.07.42.png?ex=694a4f04&is=6948fd84&hm=2b3000275618c759ed614d861ca11345b08c86f36de16627e54eea4dc2eb3438&)
-- [2025-12-15_4.08.27.png](https://cdn.discordapp.com/attachments/924506736927334400/1450037885037445222/2025-12-15_4.08.27.png?ex=694a4f04&is=6948fd84&hm=e7a29250a0dd208d425f50bbfec358143b2194c941c0fa0c86b6aac734b23987&)
+- [2025-12-15_4.07.42.png](https://cdn.discordapp.com/attachments/924506736927334400/1450037884718547055/2025-12-15_4.07.42.png?ex=695ebe44&is=695d6cc4&hm=4f4237004e04f3ec00c9e11984426ab361a7c476a93c72822e16526e19b3adc2&)
+- [2025-12-15_4.08.27.png](https://cdn.discordapp.com/attachments/924506736927334400/1450037885037445222/2025-12-15_4.08.27.png?ex=695ebe44&is=695d6cc4&hm=923d37d11e69f63a73071a718618732c2411a492063652496e6d4cc30144565c&)
 
 ---
 
@@ -2867,7 +2451,7 @@ yep let me try to repost, here is the order dataframe dump after backtesting. od
 with BestPriceFillModel the avg_px is correct
 
 **Attachments:**
-- [2025-12-15_4.16.30.png](https://cdn.discordapp.com/attachments/924506736927334400/1450039080778862675/2025-12-15_4.16.30.png?ex=694a5021&is=6948fea1&hm=26b76a3849f5ada0063c37b104c8fcb323cb5b9d567e7d351b3e890c4e78bd1f&)
+- [2025-12-15_4.16.30.png](https://cdn.discordapp.com/attachments/924506736927334400/1450039080778862675/2025-12-15_4.16.30.png?ex=695ebf61&is=695d6de1&hm=67ed19a46bf32307d38a4b9cb6df7dd631b20472690988aa603ff3813ece2e2f&)
 
 ---
 
@@ -2970,8 +2554,8 @@ I also observed that all my other orders are filled at exact open high low close
 maybe I should just switch to tick data, but then it will slow down the backtest by a lot I suppose.
 
 **Attachments:**
-- [2025-12-20_5.33.41.png](https://cdn.discordapp.com/attachments/924506736927334400/1451874710882226309/2025-12-20_5.33.41.png?ex=694a6631&is=694914b1&hm=130646159cfa1f7b9abe3b94a0f4d1d77beef9838b7119aa488ca2a2daf9cc4d&)
-- [2025-12-20_5.34.44.png](https://cdn.discordapp.com/attachments/924506736927334400/1451874711310176391/2025-12-20_5.34.44.png?ex=694a6631&is=694914b1&hm=bd9e376ad01d09aa2294291afac99cbd9b0dfdbb785a266d19334a0634a04ce6&)
+- [2025-12-20_5.33.41.png](https://cdn.discordapp.com/attachments/924506736927334400/1451874710882226309/2025-12-20_5.33.41.png?ex=695ed571&is=695d83f1&hm=8c09bdaccb22549597680dac361486b3d7c3057be9bb4f61ef09b2ab90888281&)
+- [2025-12-20_5.34.44.png](https://cdn.discordapp.com/attachments/924506736927334400/1451874711310176391/2025-12-20_5.34.44.png?ex=695ed571&is=695d83f1&hm=3a7f7acb833de1ec9118742e0b7b1130e2906c9d63ef6968fe93cf95c420446b&)
 
 ---
 
@@ -2987,5 +2571,497 @@ Version: 1.222.0a20251219```
 #### [2025-12-20 09:53:39] @conayuki
 
 the first order is a sell stop-market and the second order is a buy stop-market.
+
+---
+
+#### [2025-12-23 09:54:45] @mrrothz
+
+hi <@965894631017578537> , do you have any tips for enhance backtest speed? by leverage RAM and CPU? i have big machine but no document mention about this
+
+---
+
+#### [2025-12-23 10:03:43] @faysou.
+
+Backtests are single threaded so, it's hard to optimize this, apart from minimising the logic executed in python. You can also compile your strategy in cython.
+
+---
+
+#### [2025-12-23 10:04:58] @faysou.
+
+Also the less data flows into the backtest engine the faster the backtest. So load as less data as possible.
+
+---
+
+#### [2025-12-28 04:21:58] @thisisrahul.
+
+For horizontal scaling, you can run multiple backtest instances on different process using concurrent.futures, works really good. I use this to test multiple strategies/hyper parameter tuning
+
+---
+
+#### [2025-12-29 12:44:47] @vasilvestre_akawaka
+
+I have a lot of code to adapt for backtest, quotes not existing for example but only having bars. Is that normal ?
+
+---
+
+#### [2025-12-30 22:06:37] @javdu10
+
+Hello there, i did not find in the different configs and llms seems to halucinate...
+
+Let's say I have sensitive signals to send buy orders, is there any config or system in place where I can say "i'd like maximum X amount of shares including the in flight orders for an instrument" (i'd like to mention that this instrument is dynamic, so I cannot really put it in the config, I only have it at run time)
+
+---
+
+#### [2025-12-30 22:08:21] @javdu10
+
+like within the risk engine or so ? 
+
+So far I can only find to do "portofolio.net_position + loop on cache.orders_inflight", i'm not sure how expensive those operations are
+
+EDIT: welll... `self.cache.orders_inflight_count() > 0` is just plenty
+
+---
+
+#### [2026-01-03 10:50:27] @yite7836
+
+Hi team, I was wondering how can I get accountId from Strategy properly?  I see there is an API in Strategy call self.cache.account(self, AccountId account_id) → Account.  However, I can't find a way to set/get accountId explicitly.
+
+---
+
+#### [2026-01-03 13:13:15] @heliusdk
+
+is it possible to edit a limit order?
+
+Right now I have what I think might be a race condition.
+
+Overall I have a strategy that subscribe to 15 minute bars, and quote ticks.
+The 15 minute bars are responsible to entry and exit signals, and the quote ticks are to handle the limit orders.
+
+En entry I try to start 1.0 bps away from the bid price, if nothing happens after 30 second, then I want to move the price 0.2 bps closer to the current tick, e.g 0.8 away from the tick at time 30 second.
+
+More or less the same for exit.
+
+~~However I have not been able to find any way to editing unfilled orders, so instead I ventured down trying to cancel and open a new order and using tags, however none of the secondary orders are executed ever.~~
+
+```Python
+    def on_order_canceled(self, event: OrderCanceled):
+        if self.order_table.get(event.client_order_id):
+            del self.order_table[event.client_order_id]
+        order = self.cache.order(event.client_order_id)
+        if order.tags:
+            tries = max([int(tag) for tag in order.tags])
+
+            if tries == 5:
+                self.log.info(f"Order canceled: {order}")
+                return
+
+            bar_type = BarType.from_str(f"{order.instrument_id}-1-MINUTE-LAST-EXTERNAL")
+            order = self.order_type(
+                self.cache.bar(bar_type),
+                order.side,
+                tries=tries+1
+            )
+            self.submit_order(order)
+```
+
+is there perhaps a more streamlined way to handle this?
+
+---
+
+#### [2026-01-03 13:14:26] @heliusdk
+
+Also note that for some reason then on_order_expired never triggers for my limit orders with 30 seconds time to live, but the orders them selves in nautilus have the correct expire time, but I suspect this may be a binance issue.
+
+```Python
+    def limit_order(self, bar: Bar, side: OrderSide, tries=1):
+        instrument = self.cache.instrument(instrument_id=bar.bar_type.instrument_id)
+        last: QuoteTick = self.cache.quote_tick(instrument.id)
+        if last is None:
+            return
+
+        price_offset = self.get_price_offset(bar, side, instrument.price_precision)
+        if not price_offset:
+            return
+
+        if side == OrderSide.BUY:
+            price = instrument.make_price(last.bid_price - price_offset)
+        elif side == OrderSide.SELL:
+            price = instrument.make_price(last.ask_price + price_offset)
+        else:
+            raise NotImplemented
+
+        qty = self.calculate_qty(bar, price)
+        if not qty:
+            return
+
+        return self.order_factory.limit(
+            instrument_id=bar.bar_type.instrument_id,
+            order_side=side,
+            quantity=qty,
+            price=price,
+            time_in_force=TimeInForce.GTD,
+            expire_time=self.clock.utc_now() + timedelta(seconds=30),
+            post_only=True,
+            reduce_only=False,
+            display_qty=qty,
+            emulation_trigger=TriggerType.NO_TRIGGER,
+            tags=[str(tries)],
+    )
+```
+
+---
+
+#### [2026-01-03 13:21:27] @heliusdk
+
+If you want the account id, simply call the .id attribute on the account object 🙂
+
+```Python
+for account in self.cache.accounts():
+  print(account.id)
+```
+
+**Attachments:**
+- [image.png](https://cdn.discordapp.com/attachments/924506736927334400/1457000913494474782/image.png?ex=695f0697&is=695db517&hm=143c3bf19c4a74cdfd45ab1978e87fb2c5cac7332ca2253622dff1382b65b556&)
+- [image.png](https://cdn.discordapp.com/attachments/924506736927334400/1457000913968562386/image.png?ex=695f0697&is=695db517&hm=3c0a6d7ee76f85a627991289c149ecc28d3d154085ba75d1e3971811a85aaa53&)
+
+---
+
+#### [2026-01-03 20:39:12] @heliusdk
+
+For reference, then I think my usecase is probably too niche.
+I ended up making it with an actor that basicly just checks expired and runs a bunch of processes, and intercommunication by the message bus between my strategy and the actor
+
+---
+
+#### [2026-01-04 16:11:30] @deep_val_algo
+
+Any reasons for instrument definitions not to be stored in self._per_instrument_writers in persistence/writer.py  ?
+
+---
+
+#### [2026-01-04 21:05:43] @faysou.
+
+No reason, you can do a PR if you want to change it, this will allow you to select which instrument to write in a catalog.
+
+---
+
+#### [2026-01-05 04:39:28] @francomascarelo_ai
+
+Is there any integration with Ninja Trader or any plans to do so? I'm thinking of creating this and making a PR, if it's useful to anyone else.
+
+---
+
+#### [2026-01-05 04:41:26] @cjdsellers
+
+Hey <@1102242409544421448> thanks for reaching out. I don't think this would be a good fit though
+
+---
+
+#### [2026-01-05 04:42:20] @francomascarelo_ai
+
+Out of curiosity, why? I was thinking of using it at Prop Firm Apex.
+
+---
+
+#### [2026-01-05 07:49:43] @deep_val_algo
+
+i think there might be some data loss risk in writers. Could someone have a look? Happy to create a pr with one of the solutions mentioned here if someone can confirm it's an issue https://github.com/nautechsystems/nautilus_trader/issues/3391
+
+**Links:**
+- Pontetial data loss in writers · Issue #3391 · nautechsystems/nau...
+
+---
+
+#### [2026-01-05 08:53:01] @faysou.
+
+Hi <@604418857297510400> I think it would be better to use close for the writer in dispose, as stop can be used in the backtest engine and we wouldn't want to close a writer if a backtest would expect it to still be there when using the backtest engine several time after reseting it
+
+---
+
+#### [2026-01-05 14:48:22] @thisisrahul.
+
+I was working with request_bar and it was successfully calling on_historical_data and passing the bars.
+But now I have changed the code to request_aggregated_bar, and its not working anymore. I can see that the composite 1min bars are being pulled from the data client, but the aggregated bar is never passed to the on_historical_data.
+can anyone help me?
+
+        min_1_bar_type = BarType.from_str(f"{self.instrument_id}-15-MINUTE-LAST-INTERNAL@1-MINUTE-EXTERNAL")
+       
+
+        self.request_aggregated_bars(
+            bar_types=[min_1_bar_type],
+            start=start_time,
+            end=end_time,
+            #include_external_data=True,
+            #update_subscriptions=True,
+            limit=200,  
+            update_catalog=True,
+            
+        )
+
+---
+
+#### [2026-01-05 16:30:52] @arandott
+
+I fixed something similar on my branch before but didn’t leave any notes. Could you share a runnable minimal repro so I can reproduce it locally?
+
+---
+
+#### [2026-01-05 16:32:32] @thisisrahul.
+
+hello I have fixed it in my adapter, the idea is to have ts_init equal or greater than the ts_event ( bar close)
+Since I was pulling large historical data, i was assigning the ts_init = clock.now()
+
+---
+
+#### [2026-01-05 16:42:40] @arandott
+
+Oh right, I remember now .I also remember that after this, I ran into a related issue: in live trading, when requesting aggregated bars, the warm-up basic bars could get mixed with live basic bars, which could prevent the aggregation engine from updating. I solved it by caching the live basic bars first.
+
+---
+
+#### [2026-01-05 17:27:25] @francomascarelo_ai
+
+Has anyone tried creating an adapter for MT5? To operate forex
+
+---
+
+#### [2026-01-05 18:18:52] @thisisrahul.
+
+strange, does the issue still persist? and by mix do you mean that blending of the very first live bar? or all the live bars? I believe using update_subscriptions=True will blend the first live bar with the partial/incomplete warm up bar
+
+---
+
+#### [2026-01-05 18:39:09] @deep_val_algo
+
+I got this from claude, so I think backtester wouldnt be affected:
+
+  Different usage patterns:
+
+  Live Trading (TradingNode):
+
+  # nautilus_trader/live/node.py:407
+  async def stop_async(self) -> None:
+      await self.kernel.stop_async()  # ← DOES call kernel.stop
+
+  Backtest (BacktestEngine):
+
+  # nautilus_trader/backtest/engine.pyx:1143
+  def reset(self) -> None:
+      self._kernel.data_engine.stop()  # ← Only stops individual engines
+      self._kernel.exec_engine.stop()   # ← NOT kernel.stop()
+      # ... resets everything for next run
+
+  # nautilus_trader/backtest/engine.pyx:1266  
+  def dispose(self) -> None:
+      self._kernel.dispose()  # ← Only when truly disposing
+
+  I verified: BacktestEngine has ZERO calls to kernel.stop() in the entire file.
+
+  So is Solution A safe?
+
+  YES, because:
+  - BacktestEngine never calls kernel.stop()
+  - It only calls dispose() when truly done (which already closes the writer)
+  - If someone DID call kernel.stop() on a backtest kernel, closing the writer would be correct (they're stopping it)
+
+  Your concern would be valid IF:
+  - Someone called kernel.stop() expecting to reset and reuse
+  - But that's not how the codebase works - dispose() is for terminal cleanup
+
+---
+
+#### [2026-01-05 18:49:36] @faysou.
+
+Ok, then you can do solution A as it's easier
+
+---
+
+#### [2026-01-06 07:46:42] @thisisrahul.
+
+Hello <@965894631017578537>  
+I encountered an issue where the DataEngine fails to correctly unsubscribe a historical aggregator when transitioning to a live subscription if the BarType definition (specifically the composite/source part) changes between the request and the subscription.
+
+eg - 
+
+        bar_type = f"{self.instrument_id}-15-MINUTE-LAST-INTERNAL@1-MINUTE-EXTERNAL"  #  <----- aggregate from 1 - Minute Data
+        min_1_bar_type = BarType.from_str(bar_type)
+
+
+        self.request_aggregated_bars(
+            bar_types=[min_1_bar_type],
+            start=start_time,
+            end=end_time,
+            limit=warmup_bars,  
+            update_catalog=True,
+            update_subscriptions=True,  # <---- persist aggregator
+            callback=self._on_warmup_complete,
+           
+        )
+
+        self.log.info(f"DonchianVhfAtrStrategy started for {self.instrument_id} | bar_type={self.bar_type}")
+
+    def _on_warmup_complete(self, request_id) -> None:
+            bar_type = f"{self.instrument_id}-15-MINUTE-LAST-INTERNAL" #  <----- aggregate from ticks
+            self.subscribe_bars( BarType.from_str(bar_type))
+
+I get warning like this -
+
+Subscription(topic=historical.data.bars.SILVERMIC26FEBFUT.ZERODHA-1-MINUTE-LAST-INTERNAL, handler=<bound method BarAggregator.handle_bar of <nautilus_trader.data.aggregation.TimeBarAggregator object at 0x000001EE5317AAE0>>, priority=0) not found
+
+---
+
+#### [2026-01-06 07:50:02] @faysou.
+
+Are you using the develop version? Also I would need a script with data to reproduce this. Too often people send partial info like logs or some code but to debug something I need a way to reproduce what you see. I've worked a lot recently on the transition from historical to live data, I'm open to debug things but I need a minimum reproducible example.
+
+---
+
+#### [2026-01-06 07:54:25] @faysou.
+
+You can also just use the latest released version as it contains my latest changes on the data side
+
+---
+
+#### [2026-01-06 07:56:33] @thisisrahul.
+
+<@965894631017578537>  Yes im using the develop version, ill share you a script with some sample data. Right now the engine is using the standard part of the bartype to identify the aggregator and uses the Source/composite part of the live bar to calculate the topic to unsubscribe when transitioning from historical to live, but since the agregator was never subscribed to that topic ( since the source/composite part  of historical bartype is different), it throws a warning subscrition not found, but the ghost subscription ( historical composite) remains in the msg bus
+
+---
+
+#### [2026-01-06 07:57:08] @thisisrahul.
+
+I saw ur PR which was pushed in last 2 weeks
+
+---
+
+#### [2026-01-06 08:00:21] @faysou.
+
+Ok thank you. These things are quite complex, but over time they get more reliable. I've done a large refactor of how historical data is processed in the last release but I think it's a long term solution, it makes historical data work like live data, just with different topics.
+
+---
+
+#### [2026-01-06 08:02:07] @faysou.
+
+The benefit of it is composability, components like aggregators, the data engine or actors can participate to data transformation for historical data the same way it happens for live data.
+
+---
+
+#### [2026-01-06 08:16:36] @.cinl
+
+Hi <@965894631017578537> , I’ve noticed two changes in how request_aggregated_bars behaves in v1.222 compared to v1.221. I wanted to check if these are intended or potential regressions:
+
+1. Immediate Initialization of Partial Bars
+
+In v1.221, if I requested 5-minute bars aggregated from 1-minute source data starting at 13:45, the aggregator would wait until 13:50 (after receiving 5 minutes of data) to emit the first aligned bar.
+
+In v1.222, the aggregator emits a 5-minute bar at the very first 1-minute tick (e.g., at 13:45), where the 5-min OHLC is identical to the first 1-min bar. This results in an "incomplete" or unaligned first bar that doesn't represent a full 5-minute period.
+
+Question: Is there a new configuration flag to enforce the old "waiting" behavior for alignment, or is this the new default for how internal aggregators initialize?
+
+2. After-Hours "Ghost Bars" with Internal Aggregation
+
+During backtests for Equities , I’m seeing INTERNAL 5-min aggregated bars being emitted during after-hours in on_historical_data(), even when the catalog contains no data for those times. In v1.1.21, these "ghost bars" did not appear; the aggregator would simply stop until the next day's data arrived.
+
+As seen in my data log below(backtesting SPY):
+
+1) At 20:05, the 5-min bar has the same value as next-day 13:31 5-min bar, which at 20:05 it shouldn't have any value at all.  
+2) 5-min bars continue to pulse every 5 minutes throughout the non-trading hours (e.g., 20:10, 20:15, etc.) with 0 volume.
+
+
+Question: This seems to imply the internal aggregator is now "filling forward" to maintain a continuous time series regardless of the underlying data source availability. Is there a way to suppress these empty bars during non-trading sessions?
+
+Data Log:
+2025-09-26T13:45:00.000000000Z[INFO] BACKTESTER-001.Strategy: Historical bar SPY.XNAS-1-MINUTE-LAST-EXTERNAL,667.23,667.23,666.92,666.92,114042,1758571140000000000 , ts_init = 2025-09-22T19:59:00.000000000Z.
+2025-09-26T13:45:00.000000000Z[INFO] BACKTESTER-001.Strategy: Historical bar SPY.XNAS-1-MINUTE-LAST-EXTERNAL,666.92,667.11,666.72,666.78,331016,1758571200000000000 , ts_init = 2025-09-22T20:00:00.000000000Z.
+2025-09-26T13:45:00.000000000Z[INFO] BACKTESTER-001.Strategy: Historical bar SPY.XNAS-5-MINUTE-LAST-INTERNAL,667.07,667.26,666.72,666.78,691939,1758571200000000000 , ts_init = 2025-09-22T20:00:00.000000000Z.
+2025-09-26T13:45:00.000000000Z[INFO] BACKTESTER-001.Strategy: Historical bar SPY.XNAS-1-MINUTE-LAST-EXTERNAL,666.72,666.83,666.61,666.76,105270,1758634260000000000 , ts_init = 2025-09-23T13:31:00.000000000Z.
+2025-09-26T13:45:00.000000000Z[INFO] BACKTESTER-001.Strategy: Historical bar SPY.XNAS-5-MINUTE-LAST-INTERNAL,666.72,666.83,666.61,666.76,105270,1758571500000000000 , ts_init = 2025-09-22T20:05:00.000000000Z.
+2025-09-26T13:45:00.000000000Z[INFO] BACKTESTER-001.Strategy: Historical bar SPY.XNAS-5-MINUTE-LAST-INTERNAL,666.76,666.76,666.76,666.76,0,1758571800000000000 , ts_init = 2025-09-22T20:10:00.000000000Z.
+2025-09-26T13:45:00.000000000Z[INFO] BACKTESTER-001.Strategy: Historical bar SPY.XNAS-5-MINUTE-LAST-INTERNAL,666.76,666.76,666.76,666.76,0,1758572100000000000 , ts_init = 2025-09-22T20:15:00.000000000Z.
+
+If you need, I can also provide a simple script with sample data (very cheap) to reproduce the difference.
+
+---
+
+#### [2026-01-06 08:21:20] @faysou.
+
+regarding 2) there's a time_bars_build_with_no_updates config in DataEngineConfig, you can see how it's used in the time bar aggregator and passed to the aggregator from the data engine. you need to use this
+
+---
+
+#### [2026-01-06 08:22:40] @faysou.
+
+for 1) my understanding is that the behaviour is unchanged compared to before. If you don't want the incomplete bar you can start requesting at 46
+
+---
+
+#### [2026-01-06 08:26:49] @faysou.
+
+but if the behaviour changes for 1), it's the new behaviour, I won't change it again
+
+---
+
+#### [2026-01-06 08:31:01] @faysou.
+
+there's this config for 1) time_bars_skip_first_non_full_bar, I will check if it works on historical data for an edge case like here where the first data received is on the close of a bar
+
+---
+
+#### [2026-01-06 08:42:11] @faysou.
+
+I've just done a PR for it
+
+---
+
+#### [2026-01-06 08:42:25] @faysou.
+
+Easy fix, thanks for the analysis
+
+---
+
+#### [2026-01-06 08:57:56] @.cinl
+
+thx for the suggestions! i tried time_bars_build_with_no_updates and  time_bars_skip_first_non_full_bar in DataEngineConfig:
+* behavior 1) is not changed. For an edge case like that, the first 5-min bar still has the same value as the first 1-min bar.
+* behavior 2) is a lot better. No ghost bars emitted in after-hours. But still 1 buggy behavior: at 20:05 (which is 4:05 pm EST), a 5-min bar gets emitted with the same value as the next-day first 1-min bar.  I think this particular bar shouldn't get emitted at all?
+
+---
+
+#### [2026-01-06 09:06:55] @faysou.
+
+Ok, I'll fix 1) thanks for reporting, should be easy to fix
+
+---
+
+#### [2026-01-06 09:10:14] @arandott
+
+I did enable update_subscriptions, but my situation is a bit special: during warmup I subscribe to 15-minute bars aggregated from 1-minute bars, while in the live environment I subscribe to 15-minute bars aggregated from trade ticks. However, I’m not sure whether this issue has been fixed in the latest version.
+
+---
+
+#### [2026-01-06 09:12:42] @thisisrahul.
+
+this is exactly what im doing, but the blending is only for the 1st bar, every other bar uses live data
+
+---
+
+#### [2026-01-06 15:52:36] @faysou.
+
+I've just done a PR for a fix for 1), it was hard to fix (because of an edge case), but I think I've found a good solution
+
+---
+
+#### [2026-01-06 15:53:41] @faysou.
+
+for 2) I would need an example to reproduce it
+
+---
+
+#### [2026-01-07 01:09:57] @.cinl
+
+thanks for help <@965894631017578537> ! here's the gist to reproduce the bugs: https://gist.github.com/flatlander-upup/cac706b7a5f5a14e7b4245d74d808210
+
+**Links:**
+- reproduce bugs on bar emission in after-hours
 
 ---

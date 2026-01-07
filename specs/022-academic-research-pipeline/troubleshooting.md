@@ -85,7 +85,7 @@ ValidationError: observations.methodology_type: Invalid type 'trend_reversal'
 
 **Symptoms**:
 ```
-ERROR: Invalid JSON in /media/sam/1TB/academic_research/memory.json: Expecting ',' delimiter
+ERROR: Invalid JSON in /media/sam/1TB1/academic_research/memory.json: Expecting ',' delimiter
 ```
 
 **Solutions**:
@@ -196,14 +196,14 @@ Warning: Indicator 'VWMA' not found in indicator_mapping.md
 
 **Symptoms**:
 ```
-ERROR: Source file not found: /media/sam/1TB/academic_research/memory.json
+ERROR: Source file not found: /media/sam/1TB1/academic_research/memory.json
 ```
 
 **Solutions**:
 
 1. **Verify path exists**:
    ```bash
-   ls -la /media/sam/1TB/academic_research/memory.json
+   ls -la /media/sam/1TB1/academic_research/memory.json
    ```
 
 2. **Check mount** (if external drive):
@@ -223,10 +223,10 @@ ERROR: Source file not found: /media/sam/1TB/academic_research/memory.json
 **Solutions**:
 ```bash
 # Check permissions
-ls -la /media/sam/1TB/academic_research/memory.json
+ls -la /media/sam/1TB1/academic_research/memory.json
 
 # Fix permissions if needed
-chmod 644 /media/sam/1TB/academic_research/memory.json
+chmod 644 /media/sam/1TB1/academic_research/memory.json
 ```
 
 ---
@@ -235,7 +235,7 @@ chmod 644 /media/sam/1TB/academic_research/memory.json
 
 ### Test semantic router classification
 ```bash
-cd /media/sam/1TB/academic_research/semantic_router_mcp
+cd /media/sam/1TB1/academic_research/semantic_router_mcp
 python -c "
 from routes_config import *
 from semantic_router import Route, SemanticRouter
@@ -261,7 +261,7 @@ for q in test_queries:
 
 ### Test entity validation
 ```bash
-cd /media/sam/1TB/academic_research
+cd /media/sam/1TB1/academic_research
 python scripts/validate_entity.py --test
 ```
 

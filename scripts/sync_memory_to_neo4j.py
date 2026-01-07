@@ -27,13 +27,19 @@ def load_memory_json() -> dict:
         print(f"Warning: {MEMORY_JSON_PATH} not found")
         return {"entities": [], "relations": []}
 
-    with open(MEMORY_JSON_PATH) as f:
-        return json.load(f)
+    try:
+        with open(MEMORY_JSON_PATH) as f:
+            return json.load(f)
+    except json.JSONDecodeError as e:
+        print(f"Error: Failed to parse {MEMORY_JSON_PATH}: {e}")
+        return {"entities": [], "relations": []}
 
 
 def sync_entity_to_neo4j(tx, entity: dict):
     """Sync a single entity to Neo4j based on its type."""
     name = entity.get("name", "")
+    if not name or not name.strip():
+        return None  # Skip entities without valid names
     entity_type = entity.get("entityType", "Entity")
     observations = entity.get("observations", [])
 
@@ -43,6 +49,20 @@ def sync_entity_to_neo4j(tx, entity: dict):
         if ": " in obs:
             key, value = obs.split(": ", 1)
             props[key.replace(" ", "_").lower()] = value
+
+    # Whitelist of allowed labels to prevent Cypher injection
+    ALLOWED_LABELS = {
+        "Strategy",
+        "Paper",
+        "Formula",
+        "Concept",
+        "Author",
+        "Entity",
+        "Source",
+        "Code",
+        "Indicator",
+        "Methodology",
+    }
 
     # Determine node label based on entity type or name prefix
     if name.startswith("strategy__"):
@@ -57,7 +77,11 @@ def sync_entity_to_neo4j(tx, entity: dict):
     elif entity_type == "concept":
         label = "Concept"
     else:
+        # Sanitize label: only allow alphanumeric
         label = entity_type.title().replace("_", "")
+        # Validate against whitelist
+        if label not in ALLOWED_LABELS:
+            label = "Entity"  # Safe default
 
     # Create or update node
     query = f"""
@@ -73,7 +97,30 @@ def sync_relation_to_neo4j(tx, relation: dict):
     """Sync a relation to Neo4j."""
     from_entity = relation.get("from", "")
     to_entity = relation.get("to", "")
+
+    # Skip invalid relations with empty from/to
+    if not from_entity or not to_entity:
+        return None
+
     rel_type = relation.get("relationType", "RELATED_TO").upper().replace(" ", "_")
+
+    # Whitelist of allowed relationship types to prevent Cypher injection
+    ALLOWED_REL_TYPES = {
+        "RELATED_TO",
+        "BASED_ON",
+        "USES",
+        "CONTAINS",
+        "WRITTEN_BY",
+        "CITES",
+        "IMPLEMENTS",
+        "DERIVED_FROM",
+        "HAS_FORMULA",
+        "HAS_INDICATOR",
+    }
+
+    # Validate relationship type - ONLY allow whitelisted types
+    if rel_type not in ALLOWED_REL_TYPES:
+        rel_type = "RELATED_TO"  # Safe default - whitelist only
 
     query = (
         """
@@ -96,7 +143,7 @@ def sync_relation_to_neo4j(tx, relation: dict):
 
 
 def main():
-    force = "--force" in sys.argv
+    _force = "--force" in sys.argv  # Reserved for future use
 
     print(f"Loading memory.json from {MEMORY_JSON_PATH}...")
     memory = load_memory_json()

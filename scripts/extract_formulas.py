@@ -266,7 +266,15 @@ def main():
         print(f"Error: File not found: {md_path}", file=sys.stderr)
         sys.exit(1)
 
-    content = md_path.read_text(encoding="utf-8")
+    try:
+        content = md_path.read_text(encoding="utf-8")
+    except UnicodeDecodeError:
+        # Try with latin-1 fallback for non-UTF-8 files
+        try:
+            content = md_path.read_text(encoding="latin-1")
+        except Exception as e:
+            print(f"Error: Cannot read file {md_path}: {e}", file=sys.stderr)
+            sys.exit(1)
     formulas = extract_latex_formulas(content)
 
     if args.output == "summary":

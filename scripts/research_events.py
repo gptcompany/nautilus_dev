@@ -25,7 +25,6 @@ import argparse
 import hashlib
 import json
 import signal
-import sys
 import time
 from datetime import datetime
 from enum import Enum
@@ -144,35 +143,36 @@ def emit_event(
         event_id if created, None if duplicate skipped
     """
     db = duckdb.connect(str(DUCKDB_PATH))
-    init_tables(db)
+    try:
+        init_tables(db)
 
-    event_type_str = (
-        event_type.value if isinstance(event_type, EventType) else event_type
-    )
-    data = data or {}
-    data_json = json.dumps(data)
-    checksum = compute_checksum(event_type_str, entity_id or "", data)
+        event_type_str = (
+            event_type.value if isinstance(event_type, EventType) else event_type
+        )
+        data = data or {}
+        data_json = json.dumps(data)
+        checksum = compute_checksum(event_type_str, entity_id or "", data)
 
-    # Check for duplicate (idempotency)
-    if skip_duplicate:
-        existing = db.execute(
-            "SELECT event_id FROM events WHERE checksum = ?", [checksum]
+        # Check for duplicate (idempotency)
+        if skip_duplicate:
+            existing = db.execute(
+                "SELECT event_id FROM events WHERE checksum = ?", [checksum]
+            ).fetchone()
+            if existing:
+                return None  # Duplicate, skip
+
+        result = db.execute(
+            """
+            INSERT INTO events (event_id, event_type, entity_type, entity_id, data, checksum)
+            VALUES (nextval('events_seq'), ?, ?, ?, ?, ?)
+            RETURNING event_id
+        """,
+            [event_type_str, entity_type, entity_id, data_json, checksum],
         ).fetchone()
-        if existing:
-            db.close()
-            return None  # Duplicate, skip
 
-    result = db.execute(
-        """
-        INSERT INTO events (event_id, event_type, entity_type, entity_id, data, checksum)
-        VALUES (nextval('events_seq'), ?, ?, ?, ?, ?)
-        RETURNING event_id
-    """,
-        [event_type_str, entity_type, entity_id, data_json, checksum],
-    ).fetchone()
-
-    db.close()
-    return result[0]
+        return result[0]
+    finally:
+        db.close()
 
 
 def get_unprocessed_events(
@@ -389,11 +389,29 @@ def sync_event_to_neo4j(event: dict) -> tuple[bool, str]:
                 )
 
             elif event_type == EventType.STRATEGY_UPDATED.value:
+                # Whitelist of allowed property names to prevent Cypher injection
+                ALLOWED_PROPERTIES = {
+                    "name",
+                    "methodology_type",
+                    "entry_logic",
+                    "exit_logic",
+                    "position_sizing",
+                    "risk_management",
+                    "implementation_status",
+                    "implementation_path",
+                    "sharpe_ratio",
+                    "max_drawdown",
+                    "win_rate",
+                    "profit_factor",
+                    "spec_path",
+                }
                 set_parts = []
                 params = {"strategy_id": entity_id}
                 for key, value in data.items():
-                    set_parts.append(f"s.{key} = ${key}")
-                    params[key] = value
+                    # Only allow whitelisted property names (prevent injection)
+                    if key in ALLOWED_PROPERTIES:
+                        set_parts.append(f"s.{key} = ${key}")
+                        params[key] = value
                 if set_parts:
                     session.run(
                         f"""
@@ -450,7 +468,9 @@ def run_daemon() -> None:
     signal.signal(signal.SIGINT, signal_handler)
 
     # Write PID file
-    PID_FILE.write_text(str(sys.platform == "linux" and __import__("os").getpid()))
+    import os
+
+    PID_FILE.write_text(str(os.getpid()))
 
     print(f"Starting research event daemon (polling every {POLL_INTERVAL}s)...")
     print(f"DuckDB: {DUCKDB_PATH}")
@@ -528,113 +548,116 @@ def run_daemon() -> None:
 def replay_events(from_event: int = 0) -> None:
     """Replay all events from a given event_id."""
     db = duckdb.connect(str(DUCKDB_PATH))
+    try:
+        db.execute(
+            """
+            UPDATE events SET processed_neo4j = FALSE, processed_at = NULL, retry_count = 0
+            WHERE event_id >= ?
+        """,
+            [from_event],
+        )
 
-    db.execute(
-        """
-        UPDATE events SET processed_neo4j = FALSE, processed_at = NULL, retry_count = 0
-        WHERE event_id >= ?
-    """,
-        [from_event],
-    )
+        count = db.execute(
+            "SELECT COUNT(*) FROM events WHERE event_id >= ?", [from_event]
+        ).fetchone()[0]
 
-    count = db.execute(
-        "SELECT COUNT(*) FROM events WHERE event_id >= ?", [from_event]
-    ).fetchone()[0]
-
-    db.close()
-    print(f"Reset {count} events for replay from event_id {from_event}")
-    print("Run 'daemon' to process them")
+        print(f"Reset {count} events for replay from event_id {from_event}")
+        print("Run 'daemon' to process them")
+    finally:
+        db.close()
 
 
 def retry_dlq() -> None:
     """Retry events in dead letter queue."""
     db = duckdb.connect(str(DUCKDB_PATH))
-    init_tables(db)
+    try:
+        init_tables(db)
 
-    result = db.execute("""
-        SELECT dlq_id, event_id, event_type, entity_id, data
-        FROM dead_letter_queue
-        WHERE resolved = FALSE
-    """).fetchall()
+        result = db.execute("""
+            SELECT dlq_id, event_id, event_type, entity_id, data
+            FROM dead_letter_queue
+            WHERE resolved = FALSE
+        """).fetchall()
 
-    if not result:
-        print("Dead letter queue is empty")
+        if not result:
+            print("Dead letter queue is empty")
+            return
+
+        print(f"Retrying {len(result)} events from DLQ...")
+
+        for row in result:
+            dlq_id, event_id, event_type, entity_id, data = row
+            event = {
+                "event_id": event_id,
+                "event_type": event_type,
+                "entity_id": entity_id,
+                "data": json.loads(data) if data else {},
+                "retry_count": 0,
+            }
+
+            success, error = sync_event_to_neo4j(event)
+            if success:
+                db.execute(
+                    "UPDATE dead_letter_queue SET resolved = TRUE WHERE dlq_id = ?",
+                    [dlq_id],
+                )
+                print(f"  ✓ Resolved: {event_type} - {entity_id}")
+            else:
+                db.execute(
+                    "UPDATE dead_letter_queue SET retry_count = retry_count + 1 WHERE dlq_id = ?",
+                    [dlq_id],
+                )
+                print(f"  ✗ Still failing: {event_type} - {entity_id}: {error}")
+    finally:
+        close_neo4j_driver()
         db.close()
-        return
-
-    print(f"Retrying {len(result)} events from DLQ...")
-
-    for row in result:
-        dlq_id, event_id, event_type, entity_id, data = row
-        event = {
-            "event_id": event_id,
-            "event_type": event_type,
-            "entity_id": entity_id,
-            "data": json.loads(data) if data else {},
-            "retry_count": 0,
-        }
-
-        success, error = sync_event_to_neo4j(event)
-        if success:
-            db.execute(
-                "UPDATE dead_letter_queue SET resolved = TRUE WHERE dlq_id = ?",
-                [dlq_id],
-            )
-            print(f"  ✓ Resolved: {event_type} - {entity_id}")
-        else:
-            db.execute(
-                "UPDATE dead_letter_queue SET retry_count = retry_count + 1 WHERE dlq_id = ?",
-                [dlq_id],
-            )
-            print(f"  ✗ Still failing: {event_type} - {entity_id}: {error}")
-
-    db.close()
 
 
 def show_stats() -> None:
     """Show event statistics."""
     db = duckdb.connect(str(DUCKDB_PATH))
-    init_tables(db)
+    try:
+        init_tables(db)
 
-    print("=== Event Log Statistics ===\n")
+        print("=== Event Log Statistics ===\n")
 
-    total = db.execute("SELECT COUNT(*) FROM events").fetchone()[0]
-    processed = db.execute(
-        "SELECT COUNT(*) FROM events WHERE processed_neo4j = TRUE"
-    ).fetchone()[0]
-    pending = db.execute(
-        "SELECT COUNT(*) FROM events WHERE processed_neo4j = FALSE AND retry_count < ?",
-        [MAX_RETRIES],
-    ).fetchone()[0]
-    dlq_count = db.execute(
-        "SELECT COUNT(*) FROM dead_letter_queue WHERE resolved = FALSE"
-    ).fetchone()[0]
+        total = db.execute("SELECT COUNT(*) FROM events").fetchone()[0]
+        processed = db.execute(
+            "SELECT COUNT(*) FROM events WHERE processed_neo4j = TRUE"
+        ).fetchone()[0]
+        pending = db.execute(
+            "SELECT COUNT(*) FROM events WHERE processed_neo4j = FALSE AND retry_count < ?",
+            [MAX_RETRIES],
+        ).fetchone()[0]
+        dlq_count = db.execute(
+            "SELECT COUNT(*) FROM dead_letter_queue WHERE resolved = FALSE"
+        ).fetchone()[0]
 
-    print(f"Total Events:    {total}")
-    print(f"  Processed:     {processed}")
-    print(f"  Pending:       {pending}")
-    print(f"  In DLQ:        {dlq_count}\n")
+        print(f"Total Events:    {total}")
+        print(f"  Processed:     {processed}")
+        print(f"  Pending:       {pending}")
+        print(f"  In DLQ:        {dlq_count}\n")
 
-    print("By Event Type:")
-    result = db.execute("""
-        SELECT event_type, COUNT(*), SUM(CASE WHEN processed_neo4j THEN 1 ELSE 0 END)
-        FROM events GROUP BY event_type ORDER BY COUNT(*) DESC
-    """).fetchall()
+        print("By Event Type:")
+        result = db.execute("""
+            SELECT event_type, COUNT(*), SUM(CASE WHEN processed_neo4j THEN 1 ELSE 0 END)
+            FROM events GROUP BY event_type ORDER BY COUNT(*) DESC
+        """).fetchall()
 
-    for row in result:
-        print(f"  {row[0]}: {row[1]} ({row[2]} synced)")
+        for row in result:
+            print(f"  {row[0]}: {row[1]} ({row[2]} synced)")
 
-    print("\nRecent Events (last 10):")
-    result = db.execute("""
-        SELECT event_id, event_type, entity_id, created_at, processed_neo4j, retry_count
-        FROM events ORDER BY event_id DESC LIMIT 10
-    """).fetchall()
+        print("\nRecent Events (last 10):")
+        result = db.execute("""
+            SELECT event_id, event_type, entity_id, created_at, processed_neo4j, retry_count
+            FROM events ORDER BY event_id DESC LIMIT 10
+        """).fetchall()
 
-    for row in result:
-        status = "✓" if row[4] else f"○ ({row[5]} retries)"
-        print(f"  [{row[0]}] {row[1]} - {row[2]} {status}")
-
-    db.close()
+        for row in result:
+            status = "✓" if row[4] else f"○ ({row[5]} retries)"
+            print(f"  [{row[0]}] {row[1]} - {row[2]} {status}")
+    finally:
+        db.close()
 
 
 def show_health() -> None:

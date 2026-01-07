@@ -1,8 +1,8 @@
 # NautilusTrader - #bybit
 
 **Period:** Last 90 days
-**Messages:** 24
-**Last updated:** 2025-12-22 18:02:01
+**Messages:** 25
+**Last updated:** 2026-01-07 01:29:50
 
 ---
 
@@ -102,7 +102,7 @@ Hey, when using the bybit integration, my stop market order gets instantly fille
 Edit: It doesn't matter if I set the stop market order trigger price to be above or below the current price, it still triggers on the same bar regardless.
 
 **Attachments:**
-- [message.txt](https://cdn.discordapp.com/attachments/1151424136283947028/1444054248324071625/message.txt?ex=694a4b12&is=6948f992&hm=9b674d45845d07fd74ef2c169a145badfc2b7960582e6fef986b64e97a28cf18&)
+- [message.txt](https://cdn.discordapp.com/attachments/1151424136283947028/1444054248324071625/message.txt?ex=695eba52&is=695d68d2&hm=dceb86215bb16ae1c6eda3f08f01a91ccc4eee26becee2cdb5a2200a861050bd&)
 
 ---
 
@@ -253,7 +253,7 @@ The WebSocket bar has the same OHLCV data but timestamp is 1 minute earlier.
 Hi, <@757548402689966131> More details about the bybit adapter bug  here
 
 **Attachments:**
-- [IMG-20251220-WA0003.jpg](https://cdn.discordapp.com/attachments/1151424136283947028/1452004501702840513/IMG-20251220-WA0003.jpg?ex=694a3652&is=6948e4d2&hm=093bc2dca5eccf57025cbe84078513d6678fe4d56c91c34a0594f044ff6f8b88&)
+- [IMG-20251220-WA0003.jpg](https://cdn.discordapp.com/attachments/1151424136283947028/1452004501702840513/IMG-20251220-WA0003.jpg?ex=695ea592&is=695d5412&hm=379339f9fcbde4baf82ff19a4806833e23c18ff915363bb89addbcc8499fd423&)
 
 ---
 
@@ -272,5 +272,17 @@ Yeah I solved it using the same approach as is_leverage. Been testing it since I
 #### [2025-12-22 08:15:46] @dxwil
 
 That would be great
+
+---
+
+#### [2025-12-22 22:26:30] @cjdsellers
+
+Hey <@136668228700078081> 
+Thanks for the detailed report. Bybit timestamp on open by default, so we just needed to be passing through the `bars_timestamp_on_close` config to the websocket - now fixed:
+
+https://github.com/nautechsystems/nautilus_trader/commit/2a505d661c95e72bc444fc0e4181b50b9f5aba8e
+
+**Links:**
+- Fix Bybit WebSocket bars to respect timestamp_on_close config · na...
 
 ---

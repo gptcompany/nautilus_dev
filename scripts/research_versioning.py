@@ -37,31 +37,39 @@ def get_entity_history(entity_type: str, entity_id: str) -> list[dict[str, Any]]
     Returns list of events that modified this entity, in chronological order.
     """
     db = duckdb.connect(str(DUCKDB_PATH), read_only=True)
+    try:
+        result = db.execute(
+            """
+            SELECT event_id, event_type, data, created_at, processed_neo4j
+            FROM events
+            WHERE entity_id = ?
+            ORDER BY event_id ASC
+        """,
+            [entity_id],
+        ).fetchall()
 
-    result = db.execute(
-        """
-        SELECT event_id, event_type, data, created_at, processed_neo4j
-        FROM events
-        WHERE entity_id = ?
-        ORDER BY event_id ASC
-    """,
-        [entity_id],
-    ).fetchall()
+        history = []
+        for event_id, event_type, data, created_at, processed in result:
+            # Handle timestamp conversion safely
+            timestamp = None
+            if created_at is not None:
+                try:
+                    timestamp = created_at.isoformat()
+                except AttributeError:
+                    timestamp = str(created_at)
+            history.append(
+                {
+                    "version": event_id,
+                    "event_type": event_type,
+                    "data": json.loads(data) if data else {},
+                    "timestamp": timestamp,
+                    "synced": processed,
+                }
+            )
 
-    history = []
-    for event_id, event_type, data, created_at, processed in result:
-        history.append(
-            {
-                "version": event_id,
-                "event_type": event_type,
-                "data": json.loads(data) if data else {},
-                "timestamp": created_at.isoformat() if created_at else None,
-                "synced": processed,
-            }
-        )
-
-    db.close()
-    return history
+        return history
+    finally:
+        db.close()
 
 
 def get_entity_state_at(
@@ -73,44 +81,45 @@ def get_entity_state_at(
     If at_time is None, returns current state.
     """
     db = duckdb.connect(str(DUCKDB_PATH), read_only=True)
+    try:
+        query = """
+            SELECT event_type, data, created_at
+            FROM events
+            WHERE entity_id = ?
+        """
+        params = [entity_id]
 
-    query = """
-        SELECT event_type, data, created_at
-        FROM events
-        WHERE entity_id = ?
-    """
-    params = [entity_id]
+        if at_time:
+            query += " AND created_at <= ?"
+            params.append(at_time)
 
-    if at_time:
-        query += " AND created_at <= ?"
-        params.append(at_time)
+        query += " ORDER BY event_id ASC"
 
-    query += " ORDER BY event_id ASC"
+        result = db.execute(query, params).fetchall()
 
-    result = db.execute(query, params).fetchall()
-    db.close()
+        if not result:
+            return {}
 
-    if not result:
-        return {}
+        # Replay events to reconstruct state
+        state = {"entity_id": entity_id}
 
-    # Replay events to reconstruct state
-    state = {"entity_id": entity_id}
+        for event_type, data, created_at in result:
+            data_dict = json.loads(data) if data else {}
 
-    for event_type, data, created_at in result:
-        data_dict = json.loads(data) if data else {}
+            if event_type.endswith("_discovered") or event_type.endswith("_created"):
+                # Initial creation - set all fields
+                state.update(data_dict)
+                state["created_at"] = created_at.isoformat() if created_at else None
+            else:
+                # Update - merge fields
+                state.update(data_dict)
 
-        if event_type.endswith("_discovered") or event_type.endswith("_created"):
-            # Initial creation - set all fields
-            state.update(data_dict)
-            state["created_at"] = created_at.isoformat() if created_at else None
-        else:
-            # Update - merge fields
-            state.update(data_dict)
+            state["last_modified"] = created_at.isoformat() if created_at else None
+            state["last_event"] = event_type
 
-        state["last_modified"] = created_at.isoformat() if created_at else None
-        state["last_event"] = event_type
-
-    return state
+        return state
+    finally:
+        db.close()
 
 
 def get_version_diff(entity_id: str, version1: int, version2: int) -> dict[str, Any]:
@@ -118,41 +127,41 @@ def get_version_diff(entity_id: str, version1: int, version2: int) -> dict[str, 
     Get diff between two versions of an entity.
     """
     db = duckdb.connect(str(DUCKDB_PATH), read_only=True)
+    try:
+        v1 = db.execute(
+            "SELECT data FROM events WHERE entity_id = ? AND event_id = ?",
+            [entity_id, version1],
+        ).fetchone()
 
-    v1 = db.execute(
-        "SELECT data FROM events WHERE entity_id = ? AND event_id = ?",
-        [entity_id, version1],
-    ).fetchone()
+        v2 = db.execute(
+            "SELECT data FROM events WHERE entity_id = ? AND event_id = ?",
+            [entity_id, version2],
+        ).fetchone()
 
-    v2 = db.execute(
-        "SELECT data FROM events WHERE entity_id = ? AND event_id = ?",
-        [entity_id, version2],
-    ).fetchone()
+        if not v1 or not v2:
+            return {"error": "Version not found"}
 
-    db.close()
+        data1 = json.loads(v1[0]) if v1[0] else {}
+        data2 = json.loads(v2[0]) if v2[0] else {}
 
-    if not v1 or not v2:
-        return {"error": "Version not found"}
+        # Calculate diff
+        added = {k: v for k, v in data2.items() if k not in data1}
+        removed = {k: v for k, v in data1.items() if k not in data2}
+        changed = {
+            k: {"from": data1[k], "to": data2[k]}
+            for k in data1.keys() & data2.keys()
+            if data1[k] != data2[k]
+        }
 
-    data1 = json.loads(v1[0]) if v1[0] else {}
-    data2 = json.loads(v2[0]) if v2[0] else {}
-
-    # Calculate diff
-    added = {k: v for k, v in data2.items() if k not in data1}
-    removed = {k: v for k, v in data1.items() if k not in data2}
-    changed = {
-        k: {"from": data1[k], "to": data2[k]}
-        for k in data1.keys() & data2.keys()
-        if data1[k] != data2[k]
-    }
-
-    return {
-        "version1": version1,
-        "version2": version2,
-        "added": added,
-        "removed": removed,
-        "changed": changed,
-    }
+        return {
+            "version1": version1,
+            "version2": version2,
+            "added": added,
+            "removed": removed,
+            "changed": changed,
+        }
+    finally:
+        db.close()
 
 
 def check_duplicate(
@@ -164,145 +173,145 @@ def check_duplicate(
     Returns matching papers if found.
     """
     db = duckdb.connect(str(DUCKDB_PATH), read_only=True)
+    try:
+        duplicates = []
 
-    duplicates = []
-
-    # Check by arXiv ID
-    if arxiv_id:
-        result = db.execute(
-            """
-            SELECT paper_id, title, arxiv_id, doi
-            FROM papers
-            WHERE arxiv_id = ? OR paper_id LIKE ?
-        """,
-            [arxiv_id, f"%{arxiv_id}%"],
-        ).fetchall()
-        for r in result:
-            duplicates.append(
-                {
-                    "paper_id": r[0],
-                    "title": r[1],
-                    "arxiv_id": r[2],
-                    "doi": r[3],
-                    "match_type": "arxiv_id",
-                }
-            )
-
-    # Check by DOI
-    if doi:
-        result = db.execute(
-            """
-            SELECT paper_id, title, arxiv_id, doi
-            FROM papers
-            WHERE doi = ?
-        """,
-            [doi],
-        ).fetchall()
-        for r in result:
-            if r[0] not in [d["paper_id"] for d in duplicates]:
+        # Check by arXiv ID
+        if arxiv_id:
+            result = db.execute(
+                """
+                SELECT paper_id, title, arxiv_id, doi
+                FROM papers
+                WHERE arxiv_id = ? OR paper_id LIKE ?
+            """,
+                [arxiv_id, f"%{arxiv_id}%"],
+            ).fetchall()
+            for r in result:
                 duplicates.append(
                     {
                         "paper_id": r[0],
                         "title": r[1],
                         "arxiv_id": r[2],
                         "doi": r[3],
-                        "match_type": "doi",
+                        "match_type": "arxiv_id",
                     }
                 )
 
-    # Check by title similarity (exact match)
-    if title:
-        result = db.execute(
-            """
-            SELECT paper_id, title, arxiv_id, doi
-            FROM papers
-            WHERE title = ? OR title ILIKE ?
-        """,
-            [title, f"%{title}%"],
-        ).fetchall()
-        for r in result:
-            if r[0] not in [d["paper_id"] for d in duplicates]:
-                duplicates.append(
-                    {
-                        "paper_id": r[0],
-                        "title": r[1],
-                        "arxiv_id": r[2],
-                        "doi": r[3],
-                        "match_type": "title",
-                    }
-                )
+        # Check by DOI
+        if doi:
+            result = db.execute(
+                """
+                SELECT paper_id, title, arxiv_id, doi
+                FROM papers
+                WHERE doi = ?
+            """,
+                [doi],
+            ).fetchall()
+            for r in result:
+                if r[0] not in [d["paper_id"] for d in duplicates]:
+                    duplicates.append(
+                        {
+                            "paper_id": r[0],
+                            "title": r[1],
+                            "arxiv_id": r[2],
+                            "doi": r[3],
+                            "match_type": "doi",
+                        }
+                    )
 
-    db.close()
+        # Check by title similarity (exact match)
+        if title:
+            result = db.execute(
+                """
+                SELECT paper_id, title, arxiv_id, doi
+                FROM papers
+                WHERE title = ? OR title ILIKE ?
+            """,
+                [title, f"%{title}%"],
+            ).fetchall()
+            for r in result:
+                if r[0] not in [d["paper_id"] for d in duplicates]:
+                    duplicates.append(
+                        {
+                            "paper_id": r[0],
+                            "title": r[1],
+                            "arxiv_id": r[2],
+                            "doi": r[3],
+                            "match_type": "title",
+                        }
+                    )
 
-    return {
-        "is_duplicate": len(duplicates) > 0,
-        "matches": duplicates,
-        "checked": {
-            "arxiv_id": arxiv_id,
-            "doi": doi,
-            "title": title,
-        },
-    }
+        return {
+            "is_duplicate": len(duplicates) > 0,
+            "matches": duplicates,
+            "checked": {
+                "arxiv_id": arxiv_id,
+                "doi": doi,
+                "title": title,
+            },
+        }
+    finally:
+        db.close()
 
 
 def get_version_stats() -> dict[str, Any]:
     """Get versioning statistics from event log."""
     db = duckdb.connect(str(DUCKDB_PATH), read_only=True)
+    try:
+        # Total events
+        total_events = db.execute("SELECT COUNT(*) FROM events").fetchone()[0]
 
-    # Total events
-    total_events = db.execute("SELECT COUNT(*) FROM events").fetchone()[0]
+        # Unique entities
+        unique_entities = db.execute(
+            "SELECT COUNT(DISTINCT entity_id) FROM events WHERE entity_id IS NOT NULL"
+        ).fetchone()[0]
 
-    # Unique entities
-    unique_entities = db.execute(
-        "SELECT COUNT(DISTINCT entity_id) FROM events WHERE entity_id IS NOT NULL"
-    ).fetchone()[0]
-
-    # Events per entity type
-    events_by_type = db.execute(
+        # Events per entity type
+        events_by_type = db.execute(
+            """
+            SELECT event_type, COUNT(*) as count
+            FROM events
+            GROUP BY event_type
+            ORDER BY count DESC
         """
-        SELECT event_type, COUNT(*) as count
-        FROM events
-        GROUP BY event_type
-        ORDER BY count DESC
-    """
-    ).fetchall()
+        ).fetchall()
 
-    # Most modified entities
-    most_modified = db.execute(
+        # Most modified entities
+        most_modified = db.execute(
+            """
+            SELECT entity_id, COUNT(*) as version_count
+            FROM events
+            WHERE entity_id IS NOT NULL
+            GROUP BY entity_id
+            HAVING COUNT(*) > 1
+            ORDER BY version_count DESC
+            LIMIT 10
         """
-        SELECT entity_id, COUNT(*) as version_count
-        FROM events
-        WHERE entity_id IS NOT NULL
-        GROUP BY entity_id
-        HAVING COUNT(*) > 1
-        ORDER BY version_count DESC
-        LIMIT 10
-    """
-    ).fetchall()
+        ).fetchall()
 
-    # Event timeline
-    timeline = db.execute(
+        # Event timeline
+        timeline = db.execute(
+            """
+            SELECT DATE(created_at) as date, COUNT(*) as events
+            FROM events
+            WHERE created_at IS NOT NULL
+            GROUP BY DATE(created_at)
+            ORDER BY date DESC
+            LIMIT 30
         """
-        SELECT DATE(created_at) as date, COUNT(*) as events
-        FROM events
-        WHERE created_at IS NOT NULL
-        GROUP BY DATE(created_at)
-        ORDER BY date DESC
-        LIMIT 30
-    """
-    ).fetchall()
+        ).fetchall()
 
-    db.close()
-
-    return {
-        "total_events": total_events,
-        "unique_entities": unique_entities,
-        "events_by_type": {r[0]: r[1] for r in events_by_type},
-        "most_modified": [
-            {"entity_id": r[0], "version_count": r[1]} for r in most_modified
-        ],
-        "timeline": [{"date": str(r[0]), "events": r[1]} for r in timeline],
-    }
+        return {
+            "total_events": total_events,
+            "unique_entities": unique_entities,
+            "events_by_type": {r[0]: r[1] for r in events_by_type},
+            "most_modified": [
+                {"entity_id": r[0], "version_count": r[1]} for r in most_modified
+            ],
+            "timeline": [{"date": str(r[0]), "events": r[1]} for r in timeline],
+        }
+    finally:
+        db.close()
 
 
 def list_entity_versions(entity_id: str) -> None:

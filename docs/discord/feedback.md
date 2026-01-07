@@ -1,8 +1,8 @@
 # NautilusTrader - #feedback
 
 **Period:** Last 90 days
-**Messages:** 32
-**Last updated:** 2025-12-22 18:01:51
+**Messages:** 33
+**Last updated:** 2026-01-07 01:29:39
 
 ---
 
@@ -15,7 +15,7 @@ docs/concepts/     Concept guides with concise code snippets illustrating key fe
 both links are dead
 
 **Attachments:**
-- [image.png](https://cdn.discordapp.com/attachments/926698977678737418/1426654467264217118/image.png?ex=694a4642&is=6948f4c2&hm=3dd570510e04661e85bfee51dc35f07f2f3672b4108dea8422f84c7b9a5ec950&)
+- [image.png](https://cdn.discordapp.com/attachments/926698977678737418/1426654467264217118/image.png?ex=695eb582&is=695d6402&hm=22fa9967fef1424f77d8ff11813659647d5d9d2fd23e60cb1829c554184ef77f&)
 
 ---
 
@@ -39,7 +39,7 @@ https://nautilustrader.io/docs/latest/getting_started/installation#available-ver
 There's an extra parenthesis that renders the whole command useless
 
 **Attachments:**
-- [Screenshot_20251024_115047.png](https://cdn.discordapp.com/attachments/926698977678737418/1431114946833289336/Screenshot_20251024_115047.png?ex=694aae68&is=69495ce8&hm=8f9751f72d8ee8d769db5fb0a31ae91339c9ab16149ee5c43ffc02ec84428c42&)
+- [Screenshot_20251024_115047.png](https://cdn.discordapp.com/attachments/926698977678737418/1431114946833289336/Screenshot_20251024_115047.png?ex=695e74e8&is=695d2368&hm=1d5eaa6b08dafb8a13a439e0b3624fcf6393bc6e60ea5189f83ce2f22c9d30d3&)
 
 ---
 
@@ -103,7 +103,7 @@ if __name__ == "__main__":
 
 
 **Attachments:**
-- [2025-10-28_223328.png](https://cdn.discordapp.com/attachments/926698977678737418/1432829707828859174/2025-10-28_223328.png?ex=694a53e7&is=69490267&hm=8d82c9bac3218006f65d73957147826b6d3411df44be11a854279d075216ef9c&)
+- [2025-10-28_223328.png](https://cdn.discordapp.com/attachments/926698977678737418/1432829707828859174/2025-10-28_223328.png?ex=695ec327&is=695d71a7&hm=41b452c083f995673da613adfdbb5d3f2e4a84c3d7738b9b53c8bb9aa689c086&)
 
 ---
 
@@ -201,7 +201,7 @@ is there any way to get account equity over time for a backtest? it seems only r
 something which compute the green line, NT only provides the blue/orange line
 
 **Attachments:**
-- [2025-11-19_170606.png](https://cdn.discordapp.com/attachments/926698977678737418/1440719938963636365/2025-11-19_170606.png?ex=694ab000&is=69495e80&hm=127a0540aaf93c11395252950ec3225d01e04b86f1ab907e5dc15d2e5f0ebe1a&)
+- [2025-11-19_170606.png](https://cdn.discordapp.com/attachments/926698977678737418/1440719938963636365/2025-11-19_170606.png?ex=695e7680&is=695d2500&hm=954e4a88190badba3e5dfb5db4a44519601ed337af815551e6679ffbae1c61f3&)
 
 ---
 
@@ -294,5 +294,11 @@ what a pleasant surprise to find out that there is already a component (Streamin
 #### [2025-12-09 21:08:29] @faysou.
 
 with open source things get better over time as long as people use them, there were for examples existing things regarding streaming feather writer and catalog, and I've made them better, then some people report bugs sometimes and it makes the things even better, because over time there's no more bugs. also people can have requests for new features that improve things as well.
+
+---
+
+#### [2026-01-01 22:55:00] @deep_val_algo
+
+Hey <@1434239765137326213> , are you talking about the bybit_options_data_collector.py file (doesnt seem to use StreamingFeatherWriter) ? or are there other examples?
 
 ---

@@ -7,14 +7,14 @@
 
 ## Architecture Overview
 
-This feature creates a bridge between the academic research system (`/media/sam/1TB/academic_research`) and the trading strategy development pipeline (`nautilus_dev`), enabling automatic conversion of academic trading papers into NautilusTrader-compatible specifications.
+This feature creates a bridge between the academic research system (`/media/sam/1TB1/academic_research`) and the trading strategy development pipeline (`nautilus_dev`), enabling automatic conversion of academic trading papers into NautilusTrader-compatible specifications.
 
 ### System Context
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
 │                    RESEARCH DOMAIN                                   │
-│                 /media/sam/1TB/academic_research                     │
+│                 /media/sam/1TB1/academic_research                     │
 │                                                                      │
 │  User: "Research momentum strategies"                               │
 │         ↓                                                           │
@@ -168,7 +168,7 @@ memory.json
 
 **Dependencies**: None
 
-**Location**: `/media/sam/1TB/academic_research/`
+**Location**: `/media/sam/1TB1/academic_research/`
 
 **Estimated Effort**: 1 day
 
@@ -427,7 +427,7 @@ See `spec.md` Component 1 for the full `TRADING_STRATEGY_UTTERANCES` list (20+ u
 # scripts/sync_research.py
 
 CONFIG = {
-    "source": "/media/sam/1TB/academic_research/memory.json",
+    "source": "/media/sam/1TB1/academic_research/memory.json",
     "target": "/media/sam/1TB/nautilus_dev/docs/research/strategies.json",
     "entity_prefix": "strategy__",
     "stale_threshold_hours": 24,

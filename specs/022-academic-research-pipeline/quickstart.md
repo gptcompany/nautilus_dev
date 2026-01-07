@@ -4,7 +4,7 @@
 
 ## Prerequisites
 
-- `/media/sam/1TB/academic_research` configured and operational
+- `/media/sam/1TB1/academic_research` configured and operational
 - semantic-router MCP running
 - paper-search MCP available
 - nautilus_dev environment activated
@@ -15,7 +15,7 @@
 
 ```bash
 # In academic_research workspace
-cd /media/sam/1TB/academic_research
+cd /media/sam/1TB1/academic_research
 
 # Start Claude Code
 claude
@@ -112,7 +112,7 @@ Claude: [Executes research-query-workflow]
 **Step 2: Review Entities**
 ```bash
 # Check memory.json
-cat /media/sam/1TB/academic_research/memory.json | jq '.entities[] | select(.id | startswith("strategy__"))'
+cat /media/sam/1TB1/academic_research/memory.json | jq '.entities[] | select(.id | startswith("strategy__"))'
 ```
 
 **Step 3: Convert to Spec**
@@ -183,7 +183,7 @@ Session 3: "Compare all momentum strategies found"
 
 **Solution**: Check if TRADING_STRATEGY_UTTERANCES installed
 ```bash
-grep -r "momentum trading" /media/sam/1TB/academic_research/semantic_router_mcp/routes_config.py
+grep -r "momentum trading" /media/sam/1TB1/academic_research/semantic_router_mcp/routes_config.py
 ```
 
 ### No Strategy Entities Created
@@ -192,7 +192,7 @@ grep -r "momentum trading" /media/sam/1TB/academic_research/semantic_router_mcp/
 
 **Solution**: Verify entity schema is defined
 ```bash
-grep -r "strategy__" /media/sam/1TB/academic_research/docs/entity_schemas.md
+grep -r "strategy__" /media/sam/1TB1/academic_research/docs/entity_schemas.md
 ```
 
 ### Spec Generation Fails

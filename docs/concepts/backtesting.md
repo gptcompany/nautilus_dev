@@ -779,6 +779,34 @@ engine.add_venue(
 )
 ```
 
+### Internal bar aggregation timing
+
+When aggregating time bars internally from tick data, the data engine uses timers to close bars at
+interval boundaries. A timing edge case occurs when data arrives at the exact bar close timestamp—the
+timer may fire before processing boundary data.
+
+Configure `time_bars_build_delay` in `DataEngineConfig` to delay bar close timers:
+
+```python
+from nautilus_trader.config import BacktestEngineConfig
+from nautilus_trader.data.config import DataEngineConfig
+
+config = BacktestEngineConfig(
+    data_engine=DataEngineConfig(
+        time_bars_build_delay=1,  # Microseconds
+    ),
+)
+```
+
+:::tip
+A small delay (1 microsecond) ensures boundary data is processed before the bar closes.
+Useful when tick data clusters at round interval timestamps.
+:::
+
+:::note
+Only affects internally aggregated bars (`AggregationSource.INTERNAL`).
+:::
+
 ### Fill models
 
 Fill models simulate order execution dynamics during backtesting. They address a fundamental challenge:
