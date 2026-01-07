@@ -8,8 +8,7 @@ Example:
     >>> data_config = create_hyperliquid_data_client(testnet=True)
 """
 
-from nautilus_trader.adapters.hyperliquid import HYPERLIQUID
-from nautilus_trader.adapters.hyperliquid import HyperliquidDataClientConfig
+from nautilus_trader.adapters.hyperliquid import HYPERLIQUID, HyperliquidDataClientConfig
 from nautilus_trader.config import InstrumentProviderConfig, TradingNodeConfig
 
 # Default instruments for Hyperliquid perpetual futures

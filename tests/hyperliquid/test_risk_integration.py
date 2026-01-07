@@ -9,8 +9,8 @@ import pytest
 from nautilus_trader.model.identifiers import InstrumentId
 
 from risk import RiskConfig, StopLossType
-from strategies.hyperliquid.config import HyperliquidStrategyConfig
 from strategies.hyperliquid.base_strategy import HyperliquidBaseStrategy
+from strategies.hyperliquid.config import HyperliquidStrategyConfig
 
 
 class TestHyperliquidStrategyConfig:

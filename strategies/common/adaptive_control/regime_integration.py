@@ -17,7 +17,6 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import TYPE_CHECKING
 
-
 from .spectral_regime import MarketRegime, SpectralRegimeDetector
 
 if TYPE_CHECKING:

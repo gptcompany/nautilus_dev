@@ -11,8 +11,9 @@ Options:
 
 import json
 import sys
-from pathlib import Path
 from datetime import datetime
+from pathlib import Path
+
 from neo4j import GraphDatabase
 
 # Configuration

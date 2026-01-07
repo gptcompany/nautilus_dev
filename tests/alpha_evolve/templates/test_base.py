@@ -1,8 +1,8 @@
 """Tests for BaseEvolveStrategy base class."""
 
-import pytest
 from decimal import Decimal
 
+import pytest
 from nautilus_trader.trading.strategy import Strategy
 
 from scripts.alpha_evolve.templates.base import (
@@ -10,7 +10,6 @@ from scripts.alpha_evolve.templates.base import (
     BaseEvolveStrategy,
     EquityPoint,
 )
-
 
 # =============================================================================
 # T007: Test Base Strategy Inheritance
@@ -123,7 +122,7 @@ class TestLifecycleMethods:
 
         # Check that _on_bar_evolved is abstract
         assert hasattr(BaseEvolveStrategy, "_on_bar_evolved")
-        method = getattr(BaseEvolveStrategy, "_on_bar_evolved")
+        method = BaseEvolveStrategy._on_bar_evolved
         assert getattr(method, "__isabstractmethod__", False)
 
 

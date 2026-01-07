@@ -8,8 +8,8 @@ Key Components:
 - HyperliquidBaseStrategy: Base strategy with RiskManager integration
 """
 
-from strategies.hyperliquid.config import HyperliquidStrategyConfig
 from strategies.hyperliquid.base_strategy import HyperliquidBaseStrategy
+from strategies.hyperliquid.config import HyperliquidStrategyConfig
 
 __all__ = [
     "HyperliquidStrategyConfig",

@@ -156,6 +156,7 @@ async def run_validate(args: argparse.Namespace) -> int:
     except ImportError:
         print("Warning: StrategyEvaluator not available, using mock", file=sys.stderr)
         from unittest.mock import AsyncMock
+
         from scripts.alpha_evolve.walk_forward.models import WindowMetrics
 
         evaluator = AsyncMock()

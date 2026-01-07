@@ -53,10 +53,9 @@ from typing import TYPE_CHECKING, Any, ClassVar
 import pandas as pd
 
 if TYPE_CHECKING:
+    import plotly.graph_objects as go
     from nautilus_trader.analysis import TearsheetConfig
     from nautilus_trader.backtest.engine import BacktestEngine
-
-    import plotly.graph_objects as go
 
 __all__ = [
     "StrategyMetrics",
@@ -139,7 +138,7 @@ class StrategyMetrics:
     }
 
     @classmethod
-    def from_engine(cls, engine: "BacktestEngine", name: str) -> "StrategyMetrics":
+    def from_engine(cls, engine: BacktestEngine, name: str) -> StrategyMetrics:
         """
         Extract metrics from a completed backtest engine.
 
@@ -372,7 +371,7 @@ def render_comparison_equity(
     metrics_list: list[StrategyMetrics],
     config: ComparisonConfig | None = None,
     title: str = "Equity Curve Comparison",
-) -> "go.Figure":
+) -> go.Figure:
     """
     Render overlaid equity curves for multiple strategies.
 
@@ -474,7 +473,7 @@ def render_comparison_drawdown(
     metrics_list: list[StrategyMetrics],
     config: ComparisonConfig | None = None,
     title: str = "Drawdown Comparison",
-) -> "go.Figure":
+) -> go.Figure:
     """
     Render overlaid drawdown charts for multiple strategies.
 
@@ -567,7 +566,7 @@ def render_comparison_stats_table(
     metrics_list: list[StrategyMetrics],
     config: ComparisonConfig | None = None,
     title: str = "Strategy Comparison",
-) -> "go.Figure":
+) -> go.Figure:
     """
     Render side-by-side metrics comparison table.
 
@@ -670,10 +669,10 @@ def render_comparison_stats_table(
 
 
 def create_comparison_tearsheet(
-    engines: list["BacktestEngine"],
+    engines: list[BacktestEngine],
     strategy_names: list[str] | None = None,
     output_path: str = "comparison.html",
-    config: "TearsheetConfig | None" = None,
+    config: TearsheetConfig | None = None,
     normalize_equity: bool = True,
     colors: list[str] | None = None,
 ) -> str:
@@ -752,7 +751,7 @@ def create_comparison_tearsheet(
 
     # Extract metrics from all engines
     metrics_list = [
-        StrategyMetrics.from_engine(engine, name) for engine, name in zip(engines, strategy_names)
+        StrategyMetrics.from_engine(engine, name) for engine, name in zip(engines, strategy_names, strict=False)
     ]
 
     # Create subplots layout

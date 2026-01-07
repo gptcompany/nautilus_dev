@@ -5,10 +5,10 @@ This module defines the public interface for the EVOLVE-BLOCK patching system.
 Implementation should match these signatures exactly.
 """
 
-from typing import Dict, Any, Tuple
+from typing import Any
 
 
-def apply_patch(parent_code: str, diff: Dict[str, Any]) -> str:
+def apply_patch(parent_code: str, diff: dict[str, Any]) -> str:
     """
     Apply a mutation patch to strategy code.
 
@@ -39,7 +39,7 @@ def apply_patch(parent_code: str, diff: Dict[str, Any]) -> str:
     ...
 
 
-def extract_blocks(code: str) -> Dict[str, str]:
+def extract_blocks(code: str) -> dict[str, str]:
     """
     Extract all EVOLVE-BLOCK sections from code.
 
@@ -62,7 +62,7 @@ def extract_blocks(code: str) -> Dict[str, str]:
     ...
 
 
-def validate_syntax(code: str) -> Tuple[bool, str]:
+def validate_syntax(code: str) -> tuple[bool, str]:
     """
     Validate Python syntax of code.
 

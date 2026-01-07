@@ -162,7 +162,7 @@ class TestCSRCNoRegression:
 
         # Generate uncorrelated returns
         returns_list = []
-        for i in range(n_samples):
+        for _i in range(n_samples):
             returns_list.append(
                 {
                     "strat_a": np.random.randn() * 0.01,

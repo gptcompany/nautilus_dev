@@ -12,10 +12,10 @@ Questi metodi sono più rigorosi perché basati su dati reali di volume
 e transazioni, non solo su pattern geometrici di prezzo.
 """
 
+from dataclasses import dataclass
+
 import numpy as np
 import pandas as pd
-from typing import Dict, List, Tuple, Optional
-from dataclasses import dataclass
 
 
 @dataclass
@@ -25,8 +25,8 @@ class VolumeProfileResult:
     poc: float  # Point of Control
     vah: float  # Value Area High
     val: float  # Value Area Low
-    hvn: List[float]  # High Volume Nodes
-    lvn: List[float]  # Low Volume Nodes
+    hvn: list[float]  # High Volume Nodes
+    lvn: list[float]  # Low Volume Nodes
     va_percent: float  # Percentuale Value Area
 
 
@@ -36,7 +36,7 @@ class VWAPResult:
 
     vwap: float
     std: float
-    bands: Dict[str, float]
+    bands: dict[str, float]
 
 
 class VolumeProfileAnalyzer:
@@ -69,7 +69,7 @@ class VolumeProfileAnalyzer:
         # Crea bins di prezzo
         bins = np.linspace(price_min, price_max, self.num_bins + 1)
         bin_centers = (bins[:-1] + bins[1:]) / 2
-        bin_width = bins[1] - bins[0]
+        bins[1] - bins[0]
 
         # Calcola volume per ogni bin
         volume_profile = np.zeros(self.num_bins)
@@ -99,7 +99,7 @@ class VolumeProfileAnalyzer:
                         overlap_ratio = (overlap_high - overlap_low) / bar_range
                         volume_profile[i] += bar_volume * overlap_ratio
 
-        self.profile = dict(zip(bin_centers, volume_profile))
+        self.profile = dict(zip(bin_centers, volume_profile, strict=False))
 
         # POC - Point of Control
         poc_idx = np.argmax(volume_profile)
@@ -150,7 +150,7 @@ class VolumeProfileAnalyzer:
 
         return self.result
 
-    def get_targets(self, current_price: float, direction: str = "long") -> List[Dict]:
+    def get_targets(self, current_price: float, direction: str = "long") -> list[dict]:
         """
         Genera target basati sul Volume Profile
         """
@@ -284,7 +284,7 @@ class VWAPCalculator:
         self.result = VWAPResult(vwap=vwap, std=std, bands=bands)
         return self.result
 
-    def get_targets(self, current_price: float, direction: str = "long") -> List[Dict]:
+    def get_targets(self, current_price: float, direction: str = "long") -> list[dict]:
         """
         Genera target basati su VWAP bands
         """
@@ -384,7 +384,7 @@ class MarketProfileTargets:
     @staticmethod
     def initial_balance_targets(
         ib_high: float, ib_low: float, direction: str = "long"
-    ) -> Dict[str, float]:
+    ) -> dict[str, float]:
         """
         Target da Initial Balance (prime 1-2 ore)
 
@@ -412,7 +412,7 @@ class MarketProfileTargets:
     @staticmethod
     def eighty_percent_rule(
         prev_vah: float, prev_val: float, current_price: float
-    ) -> Optional[Dict]:
+    ) -> dict | None:
         """
         80% Rule: Se il prezzo entra nella VA precedente,
         80% probabilità di raggiungere l'altro estremo
@@ -459,7 +459,7 @@ class OrderFlowTargetCalculator:
         self.volume_profile = VolumeProfileAnalyzer(df)
         self.vwap = VWAPCalculator(df)
 
-    def get_all_targets(self, current_price: float, direction: str = "long") -> Dict:
+    def get_all_targets(self, current_price: float, direction: str = "long") -> dict:
         """
         Calcola tutti i target da tutti i metodi
         """
@@ -490,7 +490,7 @@ class OrderFlowTargetCalculator:
             else (all_targets[0] if all_targets else None),
         }
 
-    def _find_confluences(self, targets: List[Dict], tolerance: float = 0.005) -> List[Dict]:
+    def _find_confluences(self, targets: list[dict], tolerance: float = 0.005) -> list[dict]:
         """
         Trova livelli dove più target convergono
         """
@@ -541,13 +541,13 @@ class OrderFlowTargetCalculator:
 
 
 def quick_vwap_targets(
-    highs: List[float],
-    lows: List[float],
-    closes: List[float],
-    volumes: List[float],
+    highs: list[float],
+    lows: list[float],
+    closes: list[float],
+    volumes: list[float],
     current_price: float,
     direction: str = "long",
-) -> Dict:
+) -> dict:
     """
     Calcolo rapido VWAP targets da liste
     """
@@ -561,13 +561,13 @@ def quick_vwap_targets(
 
 
 def quick_volume_profile_targets(
-    highs: List[float],
-    lows: List[float],
-    closes: List[float],
-    volumes: List[float],
+    highs: list[float],
+    lows: list[float],
+    closes: list[float],
+    volumes: list[float],
     current_price: float,
     direction: str = "long",
-) -> Dict:
+) -> dict:
     """
     Calcolo rapido Volume Profile targets da liste
     """

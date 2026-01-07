@@ -25,7 +25,6 @@ from strategies.common.adaptive_control.correlation_tracker import (
     calculate_covariance_penalty,
 )
 
-
 # =============================================================================
 # OnlineStats Tests
 # =============================================================================

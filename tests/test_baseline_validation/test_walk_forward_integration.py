@@ -126,7 +126,7 @@ class TestReproducibility:
 
         assert len(windows1) == len(windows2)
 
-        for w1, w2 in zip(windows1, windows2):
+        for w1, w2 in zip(windows1, windows2, strict=False):
             assert w1.train_start == w2.train_start
             assert w1.train_end == w2.train_end
             assert w1.test_start == w2.test_start

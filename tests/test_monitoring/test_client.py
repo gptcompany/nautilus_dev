@@ -6,9 +6,10 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
+from datetime import UTC, datetime
+from unittest.mock import AsyncMock, MagicMock, patch
+
 import pytest
-from datetime import datetime, timezone
-from unittest.mock import AsyncMock, patch, MagicMock
 
 
 class TestMetricsClient:
@@ -42,7 +43,7 @@ class TestMetricsClient:
 
         client = MetricsClient()
         metrics = DaemonMetrics(
-            timestamp=datetime.now(timezone.utc),
+            timestamp=datetime.now(UTC),
             host="test-server",
             env="dev",
             fetch_count=10,
@@ -65,7 +66,7 @@ class TestMetricsClient:
         from monitoring.models import DaemonMetrics
 
         client = MetricsClient()
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         metrics_batch = [
             DaemonMetrics(
                 timestamp=now,
@@ -105,7 +106,7 @@ class TestMetricsClient:
             for i in range(15):
                 await client.buffer(
                     DaemonMetrics(
-                        timestamp=datetime.now(timezone.utc),
+                        timestamp=datetime.now(UTC),
                         host="server",
                         env="dev",
                         fetch_count=i,
@@ -121,13 +122,14 @@ class TestMetricsClient:
     @pytest.mark.asyncio
     async def test_client_handles_connection_error(self):
         """Client should handle QuestDB connection errors gracefully."""
+        import httpx
+
         from monitoring.client import MetricsClient
         from monitoring.models import DaemonMetrics
-        import httpx
 
         client = MetricsClient()
         metrics = DaemonMetrics(
-            timestamp=datetime.now(timezone.utc),
+            timestamp=datetime.now(UTC),
             host="server",
             env="dev",
             fetch_count=0,

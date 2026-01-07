@@ -24,7 +24,6 @@ from strategies.common.recovery.recoverable_strategy import (
     RecoverableStrategyConfig,
 )
 
-
 # NFR-001 target: Full state recovery < 30 seconds (p95)
 FULL_RECOVERY_TARGET_SECS = 30.0
 

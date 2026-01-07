@@ -23,7 +23,6 @@ from strategies.common.adaptive_control.vibration_analysis import (
     VibrationMode,
 )
 
-
 # =============================================================================
 # Fixtures
 # =============================================================================
@@ -435,7 +434,7 @@ class TestPredictNextExtreme:
             va.update(p)
         # Don't call get_dominant_modes explicitly
         assert len(va._modes) == 0
-        result = va.predict_next_extreme()
+        va.predict_next_extreme()
         # Should auto-calculate modes
         assert len(va._modes) > 0
 
@@ -831,7 +830,7 @@ class TestVibrationAnalyzerIntegration:
         assert len(modes) > 0
 
         # 3. Check resonance
-        resonance = va.check_resonance()
+        va.check_resonance()
         # May or may not have resonance
 
         # 4. Predict next extreme
@@ -848,7 +847,7 @@ class TestVibrationAnalyzerIntegration:
             va.update(price)
 
             if i % 100 == 99:
-                modes = va.get_dominant_modes(n_modes=3)
+                va.get_dominant_modes(n_modes=3)
                 va.check_resonance()
                 va.predict_next_extreme()
 
@@ -864,7 +863,7 @@ class TestHarmonicRatioAnalyzerIntegration:
         base_price = 100
 
         # Get levels
-        levels = harmonic_analyzer.get_harmonic_levels(base_price)
+        harmonic_analyzer.get_harmonic_levels(base_price)
 
         # Check some known prices
         prices_to_check = [100, 150, 200, 125, 133.3]
@@ -931,7 +930,7 @@ class TestEdgeCases:
             VibrationMode(frequency=0.1, period=10.0, amplitude=1.0, phase=0.5),
         ]
         va._buffer = list(range(128))
-        result = va.check_resonance()
+        va.check_resonance()
         # Coherence depends on actual phase values
         # With phase diff of 0.5 rad, coherence should be > 0.7
 

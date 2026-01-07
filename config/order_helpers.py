@@ -56,9 +56,9 @@ if TYPE_CHECKING:
 def validate_order_params(
     instrument_id: InstrumentId,
     side: OrderSide,
-    quantity: "Quantity",
-    price: "Price | None" = None,
-    trigger_price: "Price | None" = None,
+    quantity: Quantity,
+    price: Price | None = None,
+    trigger_price: Price | None = None,
 ) -> None:
     """
     Validate order parameters before submission.
@@ -101,13 +101,13 @@ def validate_order_params(
 
 
 def create_market_order(
-    order_factory: "OrderFactory",
+    order_factory: OrderFactory,
     instrument_id: InstrumentId,
     side: OrderSide,
-    quantity: "Quantity",
+    quantity: Quantity,
     reduce_only: bool = False,
     tags: list[str] | None = None,
-) -> "MarketOrder":
+) -> MarketOrder:
     """
     Create a market order for immediate execution.
 
@@ -148,16 +148,16 @@ def create_market_order(
 
 
 def create_limit_order(
-    order_factory: "OrderFactory",
+    order_factory: OrderFactory,
     instrument_id: InstrumentId,
     side: OrderSide,
-    quantity: "Quantity",
-    price: "Price",
+    quantity: Quantity,
+    price: Price,
     post_only: bool = False,
     reduce_only: bool = False,
     time_in_force: TimeInForce = TimeInForce.GTC,
     tags: list[str] | None = None,
-) -> "LimitOrder":
+) -> LimitOrder:
     """
     Create a limit order at a specified price.
 
@@ -211,15 +211,15 @@ def create_limit_order(
 
 
 def create_stop_market_order(
-    order_factory: "OrderFactory",
+    order_factory: OrderFactory,
     instrument_id: InstrumentId,
     side: OrderSide,
-    quantity: "Quantity",
-    trigger_price: "Price",
+    quantity: Quantity,
+    trigger_price: Price,
     trigger_type: TriggerType = TriggerType.LAST_PRICE,
     reduce_only: bool = False,
     tags: list[str] | None = None,
-) -> "StopMarketOrder":
+) -> StopMarketOrder:
     """
     Create a stop-market order (Algo Order API).
 
@@ -280,17 +280,17 @@ def create_stop_market_order(
 
 
 def create_stop_limit_order(
-    order_factory: "OrderFactory",
+    order_factory: OrderFactory,
     instrument_id: InstrumentId,
     side: OrderSide,
-    quantity: "Quantity",
-    price: "Price",
-    trigger_price: "Price",
+    quantity: Quantity,
+    price: Price,
+    trigger_price: Price,
     trigger_type: TriggerType = TriggerType.LAST_PRICE,
     post_only: bool = False,
     reduce_only: bool = False,
     tags: list[str] | None = None,
-) -> "StopLimitOrder":
+) -> StopLimitOrder:
     """
     Create a stop-limit order (Algo Order API).
 

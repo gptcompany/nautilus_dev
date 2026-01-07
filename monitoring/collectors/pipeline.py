@@ -5,8 +5,8 @@
 import asyncio
 import logging
 import socket
-from datetime import datetime, timezone
-from typing import Callable
+from collections.abc import Callable
+from datetime import UTC, datetime
 
 from monitoring.collectors import BaseCollector
 from monitoring.config import MonitoringConfig
@@ -137,7 +137,7 @@ class PipelineCollector(BaseCollector[PipelineMetrics]):
             List of PipelineMetrics instances.
         """
         metrics_list = []
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         exchanges = stats.get("exchanges", {})
         gaps = stats.get("gaps", [])
 

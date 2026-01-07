@@ -1,8 +1,7 @@
 """Unit tests for storage."""
 
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
-
 
 from scripts.ccxt_pipeline.models import OpenInterest, Venue
 from scripts.ccxt_pipeline.storage.parquet_store import ParquetStore
@@ -93,7 +92,7 @@ class TestParquetStore:
 
     def test_write_multiple_records_same_date(self, parquet_store: ParquetStore) -> None:
         """Test writing multiple records for the same date."""
-        base_time = datetime(2025, 1, 15, 12, 0, 0, tzinfo=timezone.utc)
+        base_time = datetime(2025, 1, 15, 12, 0, 0, tzinfo=UTC)
         records = [
             OpenInterest(
                 timestamp=base_time + timedelta(minutes=i * 5),

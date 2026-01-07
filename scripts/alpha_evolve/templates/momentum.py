@@ -116,7 +116,7 @@ class MomentumEvolveStrategy(BaseEvolveStrategy):
         self.fast_ema.reset()
         self.slow_ema.reset()
 
-    def _on_bar_evolved(self, bar: "Bar") -> None:
+    def _on_bar_evolved(self, bar: Bar) -> None:
         """
         Handle bar with evolvable decision logic.
 

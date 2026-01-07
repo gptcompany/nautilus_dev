@@ -5,8 +5,8 @@ Position Persistence Test Script (Spec 018 - T012)
 Tests that positions persist to Redis and survive restarts.
 """
 
-import sys
 import os
+import sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -17,8 +17,8 @@ def main():
     host = os.getenv("REDIS_HOST", "localhost")
     port = int(os.getenv("REDIS_PORT", "6379"))
 
-    print(f"Position Persistence Test")
-    print(f"=" * 40)
+    print("Position Persistence Test")
+    print("=" * 40)
 
     # Check Redis is available
     if not check_redis_health(host, port):
@@ -44,16 +44,16 @@ def main():
         # Read back
         result = r.get(test_key)
         if result == test_value:
-            print(f"✓ Read back matches")
+            print("✓ Read back matches")
         else:
             print(f"✗ Read back mismatch: {result}")
             sys.exit(1)
 
         # Cleanup
         r.delete(test_key)
-        print(f"✓ Cleaned up test key")
+        print("✓ Cleaned up test key")
 
-        print(f"\n✓ Position persistence test passed")
+        print("\n✓ Position persistence test passed")
 
     except ImportError:
         print("⚠ redis-py not installed, skipping detailed test")

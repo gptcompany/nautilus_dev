@@ -36,7 +36,7 @@ from __future__ import annotations
 import math
 import random
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Dict, List, Optional, Tuple
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from strategies.common.adaptive_control.correlation_tracker import (
@@ -51,7 +51,7 @@ if TYPE_CHECKING:
 class Particle:
     """A single particle representing a portfolio hypothesis."""
 
-    weights: Dict[str, float]  # Strategy -> weight
+    weights: dict[str, float]  # Strategy -> weight
     log_weight: float = 0.0  # Log-likelihood weight of this particle
     fitness: float = 0.0  # Recent performance
 
@@ -67,12 +67,12 @@ class Particle:
 class PortfolioState:
     """Current state of the particle portfolio."""
 
-    strategy_weights: Dict[str, float]  # Consensus weights
-    weight_uncertainty: Dict[str, float]  # Uncertainty per strategy
+    strategy_weights: dict[str, float]  # Consensus weights
+    weight_uncertainty: dict[str, float]  # Uncertainty per strategy
     effective_particles: float  # Effective sample size
     resampled: bool  # Was resampling triggered?
     # CSRC (Spec 031): Correlation metrics for observability
-    correlation_metrics: Optional["CorrelationMetrics"] = None
+    correlation_metrics: CorrelationMetrics | None = None
 
 
 class ParticlePortfolio:
@@ -108,13 +108,13 @@ class ParticlePortfolio:
 
     def __init__(
         self,
-        strategies: List[str],
+        strategies: list[str],
         n_particles: int = 100,
         resampling_threshold: float = 0.5,
         mutation_std: float = 0.1,
-        audit_emitter: "AuditEventEmitter | None" = None,
+        audit_emitter: AuditEventEmitter | None = None,
         # CSRC (Spec 031): Correlation-aware allocation parameters
-        correlation_tracker: "OnlineCorrelationMatrix | None" = None,
+        correlation_tracker: OnlineCorrelationMatrix | None = None,
         lambda_penalty: float = 1.0,
     ):
         """
@@ -147,17 +147,17 @@ class ParticlePortfolio:
         self._lambda_penalty = lambda_penalty
 
         # Strategy indices for penalty calculation
-        self._strategy_indices: Dict[str, int] = {s: i for i, s in enumerate(strategies)}
+        self._strategy_indices: dict[str, int] = {s: i for i, s in enumerate(strategies)}
 
         # Initialize particles with random weights
-        self.particles: List[Particle] = []
+        self.particles: list[Particle] = []
         for _ in range(n_particles):
             weights = {s: random.random() for s in strategies}
             p = Particle(weights=weights)
             p.normalize_weights()
             self.particles.append(p)
 
-    def update(self, strategy_returns: Dict[str, float]) -> PortfolioState:
+    def update(self, strategy_returns: dict[str, float]) -> PortfolioState:
         """
         Update particle weights based on observed returns.
 
@@ -247,8 +247,8 @@ class ParticlePortfolio:
         self._mutate()
 
         # 6. Calculate consensus weights (weighted average)
-        consensus = {s: 0.0 for s in self.strategies}
-        uncertainty = {s: 0.0 for s in self.strategies}
+        consensus = dict.fromkeys(self.strategies, 0.0)
+        uncertainty = dict.fromkeys(self.strategies, 0.0)
 
         for i, particle in enumerate(self.particles):
             w = weights[i] if not resampled else 1.0 / self.n_particles
@@ -313,7 +313,7 @@ class ParticlePortfolio:
 
         return state
 
-    def _resample(self, weights: List[float]) -> None:
+    def _resample(self, weights: list[float]) -> None:
         """Resample particles using systematic resampling.
 
         Handles edge cases:
@@ -385,23 +385,23 @@ class ParticlePortfolio:
         return max(self.particles, key=lambda p: p.fitness)
 
     @property
-    def audit_emitter(self) -> "AuditEventEmitter | None":
+    def audit_emitter(self) -> AuditEventEmitter | None:
         """Audit emitter for logging signals."""
         return self._audit_emitter
 
     @audit_emitter.setter
-    def audit_emitter(self, emitter: "AuditEventEmitter | None") -> None:
+    def audit_emitter(self, emitter: AuditEventEmitter | None) -> None:
         """Set the audit emitter."""
         self._audit_emitter = emitter
 
     # CSRC (Spec 031): Correlation tracking properties
     @property
-    def correlation_tracker(self) -> "OnlineCorrelationMatrix | None":
+    def correlation_tracker(self) -> OnlineCorrelationMatrix | None:
         """Correlation tracker for CSRC allocation."""
         return self._correlation_tracker
 
     @correlation_tracker.setter
-    def correlation_tracker(self, tracker: "OnlineCorrelationMatrix | None") -> None:
+    def correlation_tracker(self, tracker: OnlineCorrelationMatrix | None) -> None:
         """Set the correlation tracker."""
         self._correlation_tracker = tracker
 
@@ -481,10 +481,10 @@ class ThompsonSelector:
 
     def __init__(
         self,
-        strategies: List[str],
+        strategies: list[str],
         decay: float = 0.99,  # Base forgetting factor (used when no detector)
-        regime_detector: "IIRRegimeDetector | None" = None,  # Spec 032: Adaptive decay
-        audit_emitter: "AuditEventEmitter | None" = None,  # Spec 032: Decay audit
+        regime_detector: IIRRegimeDetector | None = None,  # Spec 032: Adaptive decay
+        audit_emitter: AuditEventEmitter | None = None,  # Spec 032: Decay audit
     ):
         """
         Args:
@@ -497,7 +497,7 @@ class ThompsonSelector:
         self._fixed_decay = decay  # Store base decay
         self._regime_detector = regime_detector
         self._audit_emitter = audit_emitter
-        self.stats: Dict[str, StrategyStats] = {s: StrategyStats() for s in strategies}
+        self.stats: dict[str, StrategyStats] = {s: StrategyStats() for s in strategies}
 
         # Initialize adaptive decay calculator if detector provided
         if regime_detector is not None:
@@ -572,7 +572,7 @@ class ThompsonSelector:
         samples = {s: self.stats[s].sample() for s in self.strategies}
         return max(samples, key=samples.get)
 
-    def select_top_k(self, k: int) -> List[str]:
+    def select_top_k(self, k: int) -> list[str]:
         """
         Select top k strategies.
 
@@ -643,7 +643,7 @@ class ThompsonSelector:
         else:
             self.stats[strategy].failures += min(1.0, abs(return_value) * 10)
 
-    def get_probabilities(self) -> Dict[str, float]:
+    def get_probabilities(self) -> dict[str, float]:
         """Get current success probability estimates."""
         return {s: self.stats[s].mean for s in self.strategies}
 
@@ -676,7 +676,7 @@ class BayesianEnsemble:
 
     def __init__(
         self,
-        strategies: List[str],
+        strategies: list[str],
         n_particles: int = 50,
         selection_fraction: float = 0.5,
     ):
@@ -695,9 +695,9 @@ class BayesianEnsemble:
         )
         self.thompson = ThompsonSelector(strategies=strategies)
 
-        self._last_state: Optional[PortfolioState] = None
+        self._last_state: PortfolioState | None = None
 
-    def get_allocation(self) -> Tuple[Dict[str, float], List[str]]:
+    def get_allocation(self) -> tuple[dict[str, float], list[str]]:
         """
         Get current allocation.
 
@@ -727,7 +727,7 @@ class BayesianEnsemble:
 
         return weights, selected
 
-    def update(self, strategy_returns: Dict[str, float]) -> PortfolioState:
+    def update(self, strategy_returns: dict[str, float]) -> PortfolioState:
         """
         Update with observed returns.
 
@@ -747,7 +747,7 @@ class BayesianEnsemble:
 
         return state
 
-    def get_strategy_rankings(self) -> List[Tuple[str, float, float]]:
+    def get_strategy_rankings(self) -> list[tuple[str, float, float]]:
         """
         Get strategy rankings with uncertainty.
 

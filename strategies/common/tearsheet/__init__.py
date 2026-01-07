@@ -54,8 +54,8 @@ from typing import TYPE_CHECKING
 
 # Lazy imports for performance
 if TYPE_CHECKING:
-    from nautilus_trader.backtest.engine import BacktestEngine
     from nautilus_trader.analysis import TearsheetConfig
+    from nautilus_trader.backtest.engine import BacktestEngine
 
 __all__ = [
     # Core wrapper
@@ -129,9 +129,9 @@ def _get_custom_charts():
 
 # Public API delegators
 def generate_tearsheet(
-    engine: "BacktestEngine",
+    engine: BacktestEngine,
     output_path: str = "tearsheet.html",
-    config: "TearsheetConfig | None" = None,
+    config: TearsheetConfig | None = None,
     **kwargs,
 ) -> str:
     """
@@ -165,10 +165,10 @@ def generate_tearsheet(
 
 
 def create_comparison_tearsheet(
-    engines: list["BacktestEngine"],
+    engines: list[BacktestEngine],
     strategy_names: list[str] | None = None,
     output_path: str = "comparison.html",
-    config: "TearsheetConfig | None" = None,
+    config: TearsheetConfig | None = None,
     normalize_equity: bool = True,
     colors: list[str] | None = None,
 ) -> str:
@@ -218,7 +218,7 @@ def register_custom_charts() -> None:
     _get_custom_charts().register_custom_charts()
 
 
-def check_edge_cases(engine: "BacktestEngine") -> list:
+def check_edge_cases(engine: BacktestEngine) -> list:
     """
     Check for edge cases in backtest results.
 

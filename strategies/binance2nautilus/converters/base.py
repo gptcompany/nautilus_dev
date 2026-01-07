@@ -8,8 +8,9 @@ Provides common functionality for all converters including:
 
 import glob
 from abc import ABC, abstractmethod
+from collections.abc import Generator
 from pathlib import Path
-from typing import Any, Generator
+from typing import Any
 
 import pandas as pd
 

@@ -251,7 +251,7 @@ class TestMutualInformationEstimator:
         x = np.random.normal(0, 1, 100)
         y = np.random.normal(0, 1, 100)
 
-        for xi, yi in zip(x, y):
+        for xi, yi in zip(x, y, strict=False):
             mi.update(xi, yi)
 
         # Independent → low MI (less than identical signals)
@@ -283,7 +283,7 @@ class TestMutualInformationEstimator:
         x = np.random.normal(0, 1, 100)
         y = x + np.random.normal(0, 0.1, 100)
 
-        for xi, yi in zip(x, y):
+        for xi, yi in zip(x, y, strict=False):
             mi.update(xi, yi)
 
         # Correlated → moderate to high MI
@@ -317,7 +317,7 @@ class TestMutualInformationEstimator:
         for _ in range(50):
             x = np.random.normal(0, 1)
             y = np.random.normal(0, 1)
-            result = mi.update(x, y)
+            mi.update(x, y)
 
         # MI is always >= 0
         assert mi.mutual_information >= 0.0
@@ -507,7 +507,7 @@ class TestEdgeCases:
         x = np.random.uniform(0, 1, 100)
         y = np.random.exponential(1.0, 100)
 
-        for xi, yi in zip(x, y):
+        for xi, yi in zip(x, y, strict=False):
             mi.update(xi, yi)
 
         # Independent but different distributions
@@ -544,8 +544,8 @@ class TestEdgeCases:
 # ==============================================================================
 
 from strategies.common.adaptive_control.information_theory import (
-    WienerFilter,
     InformationBasedRiskManager,
+    WienerFilter,
 )
 
 
@@ -555,7 +555,7 @@ class TestWienerFilter:
     def test_initialization(self):
         """Test WienerFilter initialization (lines 366-370)."""
         wf = WienerFilter(signal_to_noise=2.0)
-        
+
         assert wf.snr == 2.0
         assert wf._filter_coeff == 2.0 / (2.0 + 1)  # snr / (snr + 1)
         assert wf._prev_output == 0.0
@@ -571,10 +571,10 @@ class TestWienerFilter:
     def test_first_update_initializes(self):
         """Test first update initializes filter (lines 382-385)."""
         wf = WienerFilter(signal_to_noise=2.0)
-        
+
         # First update
         result = wf.update(5.0)
-        
+
         # First update returns input unchanged and initializes
         assert result == 5.0
         assert wf._initialized is True
@@ -583,13 +583,13 @@ class TestWienerFilter:
     def test_subsequent_updates_filter(self):
         """Test subsequent updates apply filtering (lines 388-391)."""
         wf = WienerFilter(signal_to_noise=2.0)
-        
+
         # First update (initialization)
         wf.update(5.0)
-        
+
         # Second update (filtering)
         result = wf.update(10.0)
-        
+
         # Expected: filter_coeff * noisy + (1 - filter_coeff) * prev
         # filter_coeff = 2/3
         expected = (2/3) * 10.0 + (1/3) * 5.0
@@ -599,10 +599,10 @@ class TestWienerFilter:
     def test_update_snr(self):
         """Test update_snr method (lines 395-396)."""
         wf = WienerFilter(signal_to_noise=2.0)
-        
+
         # Update SNR
         wf.update_snr(5.0)
-        
+
         assert wf.snr == 5.0
         assert wf._filter_coeff == 5.0 / (5.0 + 1)
 
@@ -610,32 +610,32 @@ class TestWienerFilter:
         """Test that filtering reduces noise."""
         np.random.seed(42)
         wf = WienerFilter(signal_to_noise=2.0)
-        
+
         # True signal + noise
         true_signal = 10.0
         noisy_samples = true_signal + np.random.normal(0, 1, 20)
-        
+
         filtered = []
         for sample in noisy_samples:
             filtered.append(wf.update(sample))
-        
+
         # Filtered signal should be closer to true signal (on average)
         filtered_mean = np.mean(filtered[-10:])  # Last 10 samples
-        noisy_mean = np.mean(noisy_samples[-10:])
-        
+        np.mean(noisy_samples[-10:])
+
         # Both should be close to true signal, filter should be stable
         assert abs(filtered_mean - true_signal) < 3.0
 
     def test_low_snr_heavy_filtering(self):
         """Test low SNR results in heavy filtering (smoother output)."""
         wf = WienerFilter(signal_to_noise=0.5)  # Low SNR
-        
+
         # Initialize
         wf.update(0.0)
-        
+
         # Filter coefficient is low, so previous value has more weight
         result = wf.update(10.0)
-        
+
         # filter_coeff = 0.5 / 1.5 = 0.333
         expected = (0.5 / 1.5) * 10.0 + (1 - 0.5 / 1.5) * 0.0
         assert abs(result - expected) < 1e-10
@@ -643,13 +643,13 @@ class TestWienerFilter:
     def test_high_snr_light_filtering(self):
         """Test high SNR results in light filtering (follows input closely)."""
         wf = WienerFilter(signal_to_noise=10.0)  # High SNR
-        
+
         # Initialize
         wf.update(0.0)
-        
+
         # Filter coefficient is high, so input has more weight
         result = wf.update(10.0)
-        
+
         # filter_coeff = 10 / 11 = 0.909
         expected = (10.0 / 11.0) * 10.0 + (1.0 / 11.0) * 0.0
         assert abs(result - expected) < 1e-10
@@ -665,7 +665,7 @@ class TestInformationBasedRiskManager:
             entropy_bins=15,
             snr_estimate=2.0,
         )
-        
+
         assert rm._entropy.window_size == 50
         assert rm._entropy.n_bins == 15
         assert rm._wiener.snr == 2.0
@@ -674,7 +674,7 @@ class TestInformationBasedRiskManager:
     def test_initialization_defaults(self):
         """Test InformationBasedRiskManager with default values."""
         rm = InformationBasedRiskManager()
-        
+
         assert rm._entropy.window_size == 50
         assert rm._entropy.n_bins == 15
         assert rm._snr_estimate == 2.0
@@ -682,9 +682,9 @@ class TestInformationBasedRiskManager:
     def test_update_returns_information_state(self):
         """Test update returns InformationState (lines 442-467)."""
         rm = InformationBasedRiskManager()
-        
+
         state = rm.update(0.01)
-        
+
         assert isinstance(state, InformationState)
         assert hasattr(state, 'entropy')
         assert hasattr(state, 'normalized_entropy')
@@ -695,42 +695,42 @@ class TestInformationBasedRiskManager:
     def test_update_entropy_calculation(self):
         """Test entropy is updated during update calls."""
         rm = InformationBasedRiskManager(entropy_bins=10, entropy_window=30)
-        
+
         # Feed enough data to calculate entropy
         for i in range(40):
             state = rm.update(float(i) / 40)
-        
+
         assert state.entropy > 0
         assert 0 <= state.normalized_entropy <= 1.0 + 1e-9  # Allow float precision
 
     def test_update_snr_estimation(self):
         """Test SNR is estimated during updates."""
         rm = InformationBasedRiskManager(snr_estimate=2.0)
-        
+
         # Feed consistent signal
         for i in range(20):
             state = rm.update(1.0 + 0.01 * i)
-        
+
         # SNR estimate should have changed
         assert state.signal_to_noise >= 0
 
     def test_update_risk_multiplier_bounds(self):
         """Test risk multiplier is always in [0, 1]."""
         rm = InformationBasedRiskManager()
-        
+
         # Various input patterns
-        for i in range(50):
+        for _i in range(50):
             state = rm.update(np.random.normal(0, 1))
             assert 0 <= state.risk_multiplier <= 1
 
     def test_update_with_constant_signal(self):
         """Test update with constant signal (low entropy path)."""
         rm = InformationBasedRiskManager(entropy_bins=10, entropy_window=30)
-        
+
         # Constant signal
         for _ in range(40):
             state = rm.update(1.0)
-        
+
         # Constant signal has zero entropy
         assert state.entropy == 0.0
         # Risk multiplier should be high (full risk allowed)
@@ -739,18 +739,17 @@ class TestInformationBasedRiskManager:
     def test_update_snr_adaptive(self):
         """Test that SNR estimate adapts to signal quality."""
         rm = InformationBasedRiskManager(snr_estimate=2.0)
-        
+
         # Clean signal (high SNR)
         for i in range(30):
             rm.update(float(i) * 0.1)
-        
-        initial_snr = rm._snr_estimate
-        
+
+
         # Noisy signal
         np.random.seed(42)
         for _ in range(30):
             rm.update(np.random.normal(0, 10))
-        
+
         # SNR estimate should have changed
         # Note: exact change depends on filtering dynamics
         assert rm._snr_estimate >= 0
@@ -758,19 +757,19 @@ class TestInformationBasedRiskManager:
     def test_update_information_rate(self):
         """Test information_rate is set from filtered signal."""
         rm = InformationBasedRiskManager()
-        
+
         state = rm.update(5.0)
-        
+
         # First update: filtered = input (Wiener init)
         assert state.information_rate == 5.0
 
     def test_update_instantaneous_snr_zero_filtered(self):
         """Test instantaneous SNR calculation when filtered is near zero."""
         rm = InformationBasedRiskManager(snr_estimate=2.0)
-        
+
         # Initialize with zero
         state = rm.update(0.0)
-        
+
         # When filtered is near zero, instantaneous_snr should be 0
         # This tests line 453
         assert state.signal_to_noise >= 0
@@ -778,11 +777,11 @@ class TestInformationBasedRiskManager:
     def test_update_snr_factor_calculation(self):
         """Test SNR factor in risk calculation."""
         rm = InformationBasedRiskManager(snr_estimate=0.5)  # Low SNR
-        
+
         # Initialize filter
         rm.update(1.0)
         state = rm.update(1.0)
-        
+
         # Low SNR → snr_factor = min(1.0, 0.5/2.0) = 0.25
         # This affects risk_multiplier
         assert state.risk_multiplier <= 1.0
@@ -795,15 +794,15 @@ class TestInformationBasedRiskManager:
             entropy_bins=10,
             snr_estimate=2.0,
         )
-        
+
         # Simulate returns
         returns = np.random.normal(0, 0.02, 100)
-        
+
         states = []
         for ret in returns:
             state = rm.update(ret)
             states.append(state)
-        
+
         # Verify all states are valid
         for state in states:
             assert 0 <= state.normalized_entropy <= 1.0 + 1e-9  # Allow float precision
@@ -817,30 +816,30 @@ class TestEntropyEdgeCases:
     def test_calculate_entropy_single_element(self):
         """Test _calculate_entropy with single element (line 110)."""
         estimator = EntropyEstimator(n_bins=10)
-        
+
         # Directly set buffer to single element
         estimator._buffer = [1.0]
-        
+
         # Should return 0.0 for insufficient data
         assert estimator._calculate_entropy() == 0.0
 
     def test_calculate_entropy_empty_buffer(self):
         """Test _calculate_entropy with empty buffer."""
         estimator = EntropyEstimator(n_bins=10)
-        
+
         # Empty buffer
         estimator._buffer = []
-        
+
         # Should return 0.0
         assert estimator._calculate_entropy() == 0.0
 
     def test_normalized_entropy_zero_max_entropy(self):
         """Test normalized_entropy when max_entropy is zero (line 146)."""
         estimator = EntropyEstimator(n_bins=1)  # log2(1) = 0
-        
+
         # With n_bins=1, max_entropy = log2(1) = 0
         assert estimator._max_entropy == 0.0
-        
+
         # Should return 0.0 to avoid division by zero
         assert estimator.normalized_entropy == 0.0
 
@@ -851,24 +850,24 @@ class TestMutualInformationEdgeCases:
     def test_calculate_mi_insufficient_samples(self):
         """Test _calculate_mi with n < n_bins (line 225)."""
         mi = MutualInformationEstimator(n_bins=20)
-        
+
         # Add fewer samples than n_bins
         for i in range(15):
             mi._x_buffer.append(float(i))
             mi._y_buffer.append(float(i))
-        
+
         # Should return 0.0
         assert mi._calculate_mi() == 0.0
 
     def test_calculate_mi_exactly_n_bins(self):
         """Test _calculate_mi with exactly n_bins samples."""
         mi = MutualInformationEstimator(n_bins=10)
-        
+
         # Exactly n_bins samples
         for i in range(10):
             mi._x_buffer.append(float(i))
             mi._y_buffer.append(float(i))
-        
+
         # Should calculate MI
         result = mi._calculate_mi()
         assert result >= 0.0
@@ -880,36 +879,36 @@ class TestWienerFilterEdgeCases:
     def test_zero_snr(self):
         """Test WienerFilter with zero SNR."""
         wf = WienerFilter(signal_to_noise=0.0)
-        
+
         # filter_coeff = 0 / 1 = 0
         assert wf._filter_coeff == 0.0
-        
+
         wf.update(5.0)  # Initialize
         result = wf.update(10.0)
-        
+
         # With zero coefficient, output is entirely previous value
         assert result == 5.0
 
     def test_very_high_snr(self):
         """Test WienerFilter with very high SNR."""
         wf = WienerFilter(signal_to_noise=1000.0)
-        
+
         # filter_coeff approaches 1
         assert wf._filter_coeff > 0.999
-        
+
         wf.update(5.0)  # Initialize
         result = wf.update(10.0)
-        
+
         # With high coefficient, output follows input closely
         assert result > 9.99
 
     def test_negative_values(self):
         """Test WienerFilter with negative values."""
         wf = WienerFilter(signal_to_noise=2.0)
-        
+
         wf.update(-5.0)  # Initialize
         result = wf.update(-10.0)
-        
+
         # Should handle negative values correctly
         expected = (2/3) * (-10.0) + (1/3) * (-5.0)
         assert abs(result - expected) < 1e-10
@@ -921,36 +920,36 @@ class TestInformationBasedRiskManagerEdgeCases:
     def test_near_zero_filtered_signal(self):
         """Test when filtered signal is near zero (line 450-453)."""
         rm = InformationBasedRiskManager(snr_estimate=2.0)
-        
+
         # Very small values
         for _ in range(10):
             state = rm.update(1e-15)
-        
+
         # Should not crash, SNR should be valid
         assert state.signal_to_noise >= 0
 
     def test_large_value_spikes(self):
         """Test handling of large value spikes."""
         rm = InformationBasedRiskManager()
-        
+
         # Normal values
         for _ in range(20):
             rm.update(0.01)
-        
+
         # Large spike
         state = rm.update(1000.0)
-        
+
         # Should handle without crashing
         assert 0 <= state.risk_multiplier <= 1
 
     def test_alternating_signs(self):
         """Test with alternating positive/negative values."""
         rm = InformationBasedRiskManager()
-        
+
         for i in range(50):
             value = 0.01 if i % 2 == 0 else -0.01
             state = rm.update(value)
-        
+
         # Should produce valid state
         assert 0 <= state.normalized_entropy <= 1.0 + 1e-9  # Allow float precision
         assert 0 <= state.risk_multiplier <= 1

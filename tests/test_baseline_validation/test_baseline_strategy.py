@@ -10,7 +10,6 @@ TDD: Tests written first to define expected behavior.
 
 from __future__ import annotations
 
-
 # Note: BaselineStrategy will be implemented in Phase 3 implementation
 # These tests define the expected behavior
 
@@ -20,8 +19,8 @@ class TestBaselineStrategyInit:
 
     def test_init_with_sizer(self) -> None:
         """Test initialization with a sizer."""
-        from scripts.baseline_validation.sizers import FixedFractionalSizer
         from scripts.baseline_validation.baseline_strategy import BaselineStrategy
+        from scripts.baseline_validation.sizers import FixedFractionalSizer
 
         sizer = FixedFractionalSizer(risk_pct=0.02)
         strategy = BaselineStrategy(sizer=sizer)
@@ -30,8 +29,8 @@ class TestBaselineStrategyInit:
 
     def test_init_with_ema_periods(self) -> None:
         """Test initialization with custom EMA periods."""
-        from scripts.baseline_validation.sizers import FixedFractionalSizer
         from scripts.baseline_validation.baseline_strategy import BaselineStrategy
+        from scripts.baseline_validation.sizers import FixedFractionalSizer
 
         sizer = FixedFractionalSizer(risk_pct=0.02)
         strategy = BaselineStrategy(
@@ -49,8 +48,8 @@ class TestBaselineStrategySignalGeneration:
 
     def test_signal_initial_is_zero(self) -> None:
         """Test that initial signal is zero (before warmup)."""
-        from scripts.baseline_validation.sizers import FixedFractionalSizer
         from scripts.baseline_validation.baseline_strategy import BaselineStrategy
+        from scripts.baseline_validation.sizers import FixedFractionalSizer
 
         sizer = FixedFractionalSizer(risk_pct=0.02)
         strategy = BaselineStrategy(sizer=sizer)
@@ -60,8 +59,8 @@ class TestBaselineStrategySignalGeneration:
 
     def test_signal_after_warmup(self) -> None:
         """Test signal generation after warmup."""
-        from scripts.baseline_validation.sizers import FixedFractionalSizer
         from scripts.baseline_validation.baseline_strategy import BaselineStrategy
+        from scripts.baseline_validation.sizers import FixedFractionalSizer
 
         sizer = FixedFractionalSizer(risk_pct=0.02)
         strategy = BaselineStrategy(
@@ -82,8 +81,8 @@ class TestBaselineStrategySignalGeneration:
 
     def test_signal_negative_for_downtrend(self) -> None:
         """Test negative signal for downtrend."""
-        from scripts.baseline_validation.sizers import FixedFractionalSizer
         from scripts.baseline_validation.baseline_strategy import BaselineStrategy
+        from scripts.baseline_validation.sizers import FixedFractionalSizer
 
         sizer = FixedFractionalSizer(risk_pct=0.02)
         strategy = BaselineStrategy(
@@ -104,8 +103,8 @@ class TestBaselineStrategySignalGeneration:
 
     def test_signal_bounded(self) -> None:
         """Test that signal is bounded to [-1, 1]."""
-        from scripts.baseline_validation.sizers import FixedFractionalSizer
         from scripts.baseline_validation.baseline_strategy import BaselineStrategy
+        from scripts.baseline_validation.sizers import FixedFractionalSizer
 
         sizer = FixedFractionalSizer(risk_pct=0.02)
         strategy = BaselineStrategy(
@@ -129,8 +128,8 @@ class TestBaselineStrategySizerIntegration:
 
     def test_calculate_position_uses_sizer(self) -> None:
         """Test that position calculation uses the sizer."""
-        from scripts.baseline_validation.sizers import FixedFractionalSizer
         from scripts.baseline_validation.baseline_strategy import BaselineStrategy
+        from scripts.baseline_validation.sizers import FixedFractionalSizer
 
         sizer = FixedFractionalSizer(risk_pct=0.02)
         strategy = BaselineStrategy(sizer=sizer)
@@ -150,11 +149,11 @@ class TestBaselineStrategySizerIntegration:
 
     def test_calculate_position_different_sizers(self) -> None:
         """Test that different sizers give different positions."""
-        from scripts.baseline_validation.sizers import (
-            FixedFractionalSizer,
-            AdaptiveSizer,
-        )
         from scripts.baseline_validation.baseline_strategy import BaselineStrategy
+        from scripts.baseline_validation.sizers import (
+            AdaptiveSizer,
+            FixedFractionalSizer,
+        )
 
         # Create two strategies with different sizers
         fixed_strategy = BaselineStrategy(sizer=FixedFractionalSizer(risk_pct=0.02))
@@ -188,8 +187,8 @@ class TestBaselineStrategyState:
 
     def test_reset_clears_indicators(self) -> None:
         """Test that reset clears indicator state."""
-        from scripts.baseline_validation.sizers import FixedFractionalSizer
         from scripts.baseline_validation.baseline_strategy import BaselineStrategy
+        from scripts.baseline_validation.sizers import FixedFractionalSizer
 
         sizer = FixedFractionalSizer(risk_pct=0.02)
         strategy = BaselineStrategy(sizer=sizer)
@@ -207,8 +206,8 @@ class TestBaselineStrategyState:
 
     def test_is_warmed_up_property(self) -> None:
         """Test is_warmed_up property."""
-        from scripts.baseline_validation.sizers import FixedFractionalSizer
         from scripts.baseline_validation.baseline_strategy import BaselineStrategy
+        from scripts.baseline_validation.sizers import FixedFractionalSizer
 
         sizer = FixedFractionalSizer(risk_pct=0.02)
         strategy = BaselineStrategy(

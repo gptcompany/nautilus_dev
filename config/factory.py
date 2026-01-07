@@ -18,8 +18,8 @@ from nautilus_trader.adapters.bybit.config import (
     BybitProductType,
 )
 from nautilus_trader.config import (
-    DatabaseConfig,
     CacheConfig,
+    DatabaseConfig,
     InstrumentProviderConfig,
     LiveDataEngineConfig,
     LiveExecEngineConfig,

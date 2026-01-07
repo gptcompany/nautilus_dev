@@ -15,7 +15,6 @@ from pydantic import BaseModel, Field
 from config.reconciliation.config import ReconciliationConfig
 from config.reconciliation.presets import ReconciliationPreset
 
-
 logger = logging.getLogger(__name__)
 
 

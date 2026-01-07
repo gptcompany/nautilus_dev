@@ -14,9 +14,9 @@ from __future__ import annotations
 
 import json
 import logging
-from datetime import datetime, timedelta, timezone
+from collections.abc import Iterator
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
-from typing import Iterator
 
 logger = logging.getLogger(__name__)
 
@@ -88,7 +88,7 @@ class ParquetConverter:
         for event in events:
             ts_ns = event.get("ts_event", 0)
             # Use UTC timezone for consistent date partitioning across systems
-            dt = datetime.fromtimestamp(ts_ns / 1_000_000_000, tz=timezone.utc)
+            dt = datetime.fromtimestamp(ts_ns / 1_000_000_000, tz=UTC)
             date_key = dt.strftime("%Y/%m/%d")
 
             if date_key not in events_by_date:
@@ -230,7 +230,7 @@ class ParquetConverter:
         Yields:
             Event dictionaries.
         """
-        with open(path, "r") as f:
+        with open(path) as f:
             for line in f:
                 line = line.strip()
                 if not line:

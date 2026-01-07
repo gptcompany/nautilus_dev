@@ -31,7 +31,6 @@ from scripts.alpha_evolve.evaluator import BacktestConfig, StrategyEvaluator
 from scripts.alpha_evolve.mutator import LLMMutator
 from scripts.alpha_evolve.store import ProgramStore
 
-
 # Exit codes
 EXIT_SUCCESS = 0
 EXIT_ERROR = 1

@@ -11,7 +11,6 @@ import re
 
 from pydantic import BaseModel, Field, field_validator, model_validator
 
-
 # NautilusTrader instrument ID pattern: SYMBOL[-EXPIRY].VENUE
 # Examples: BTCUSDT-PERP.BINANCE, ETHUSDT.BINANCE, ES-Z24.CME
 INSTRUMENT_ID_PATTERN = re.compile(r"^[A-Z0-9_-]+\.[A-Z]+$")

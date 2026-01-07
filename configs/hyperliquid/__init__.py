@@ -12,15 +12,15 @@ Key Components:
 """
 
 from configs.hyperliquid.data_client import (
-    create_hyperliquid_data_client,
-    create_data_only_trading_node,
     DEFAULT_INSTRUMENTS,
+    create_data_only_trading_node,
+    create_hyperliquid_data_client,
 )
 from configs.hyperliquid.exec_client import create_hyperliquid_exec_client
 from configs.hyperliquid.persistence import (
+    DEFAULT_CATALOG_PATH,
     create_persistence_config,
     create_recording_trading_node,
-    DEFAULT_CATALOG_PATH,
 )
 from configs.hyperliquid.testnet import create_testnet_trading_node
 from configs.hyperliquid.trading_node import create_hyperliquid_trading_node

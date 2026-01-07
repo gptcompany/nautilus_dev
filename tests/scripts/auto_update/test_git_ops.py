@@ -5,14 +5,12 @@
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
-
 from scripts.auto_update.git_ops import (
     create_pr,
     git_commit_changes,
     git_create_branch,
     git_push_branch,
 )
-
 
 # =============================================================================
 # T033: Test git_create_branch

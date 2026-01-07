@@ -5,14 +5,15 @@ Demonstrates how to configure TradingNode for position, order,
 account, and instrument persistence with Redis backend.
 """
 
-from nautilus_trader.config import (
-    TradingNodeConfig,
-    LiveExecEngineConfig,
-)
+import os
 
 # Import our Redis cache config factory
 import sys
-import os
+
+from nautilus_trader.config import (
+    LiveExecEngineConfig,
+    TradingNodeConfig,
+)
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 from config.cache.redis_config import create_redis_cache_config

@@ -6,7 +6,6 @@ Implementation should match these signatures exactly.
 """
 
 from pathlib import Path
-from typing import Optional
 
 
 class EvolutionConfig:
@@ -24,7 +23,7 @@ class EvolutionConfig:
     max_concurrent: int  # Max parallel evals (default: 2)
 
     @classmethod
-    def load(cls, config_path: Optional[Path] = None) -> "EvolutionConfig":
+    def load(cls, config_path: Path | None = None) -> "EvolutionConfig":
         """
         Load configuration from file and environment.
 

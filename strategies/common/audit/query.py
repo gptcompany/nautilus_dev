@@ -132,7 +132,7 @@ class AuditQuery:
         try:
             result = conn.execute(sql).fetchall()
             columns = [desc[0] for desc in conn.description]
-            return [dict(zip(columns, row)) for row in result]
+            return [dict(zip(columns, row, strict=False)) for row in result]
         except Exception as e:
             logger.error(f"Query failed: {e}")
             return []
@@ -247,7 +247,7 @@ class AuditQuery:
         try:
             result = conn.execute(sql).fetchall()
             columns = [desc[0] for desc in conn.description]
-            return [dict(zip(columns, row)) for row in result]
+            return [dict(zip(columns, row, strict=False)) for row in result]
         except Exception as e:
             logger.error(f"Parameter history query failed: {e}")
             return []
@@ -355,7 +355,7 @@ class AuditQuery:
             self._conn.close()
             self._conn = None
 
-    def __enter__(self) -> "AuditQuery":
+    def __enter__(self) -> AuditQuery:
         """Context manager entry."""
         return self
 

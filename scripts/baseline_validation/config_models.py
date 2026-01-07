@@ -158,7 +158,7 @@ class ValidationConfig(BaseModel):
         return v
 
     @model_validator(mode="after")
-    def validate_sufficient_data(self) -> "ValidationConfig":
+    def validate_sufficient_data(self) -> ValidationConfig:
         """Validate sufficient data for minimum windows."""
         total_days = (self.data_end - self.data_start).days
 
@@ -248,7 +248,7 @@ class BaselineValidationConfig(BaseModel):
     )
 
     @classmethod
-    def from_yaml(cls, path: Path | str) -> "BaselineValidationConfig":
+    def from_yaml(cls, path: Path | str) -> BaselineValidationConfig:
         """Load configuration from YAML file.
 
         Args:
@@ -265,7 +265,7 @@ class BaselineValidationConfig(BaseModel):
         return cls.model_validate(data)
 
     @classmethod
-    def default(cls) -> "BaselineValidationConfig":
+    def default(cls) -> BaselineValidationConfig:
         """Create default configuration.
 
         Returns:

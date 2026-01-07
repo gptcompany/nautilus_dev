@@ -53,10 +53,11 @@ from __future__ import annotations
 import json
 import logging
 import math
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional, Tuple
+from typing import Any
 
 from .particle_portfolio import BayesianEnsemble, ThompsonSelector
 
@@ -70,8 +71,8 @@ class SystemConfig:
     name: str
     selector_type: str  # "thompson", "particle", "bayesian"
     n_particles: int
-    strategies: List[str]
-    parameters: Dict[str, Any] = field(default_factory=dict)
+    strategies: list[str]
+    parameters: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -85,7 +86,7 @@ class BacktestResult:
     total_return: float
     win_rate: float
     n_trades: int
-    pnl_series: List[float] = field(default_factory=list)
+    pnl_series: list[float] = field(default_factory=list)
 
 
 @dataclass
@@ -95,7 +96,7 @@ class SystemState:
     name: str
     weight: float
     cumulative_pnl: float
-    recent_pnl: List[float]
+    recent_pnl: list[float]
     n_updates: int
     is_active: bool
 
@@ -110,15 +111,15 @@ class BacktestMatrix:
 
     def __init__(
         self,
-        backtest_runner: Optional[Callable[[SystemConfig], BacktestResult]] = None,
+        backtest_runner: Callable[[SystemConfig], BacktestResult] | None = None,
     ):
         """
         Args:
             backtest_runner: Function that runs backtest and returns result
         """
         self.backtest_runner = backtest_runner
-        self.configs: List[SystemConfig] = []
-        self.results: List[BacktestResult] = []
+        self.configs: list[SystemConfig] = []
+        self.results: list[BacktestResult] = []
 
     def add_config(self, config: SystemConfig) -> None:
         """Add a configuration to test."""
@@ -126,9 +127,9 @@ class BacktestMatrix:
 
     def generate_configs(
         self,
-        selector_types: List[str],
-        particle_counts: List[int],
-        strategy_sets: List[List[str]],
+        selector_types: list[str],
+        particle_counts: list[int],
+        strategy_sets: list[list[str]],
     ) -> None:
         """
         Generate configuration matrix.
@@ -157,7 +158,7 @@ class BacktestMatrix:
 
         logger.info(f"Generated {len(self.configs)} configurations")
 
-    def run_all(self) -> List[BacktestResult]:
+    def run_all(self) -> list[BacktestResult]:
         """Run all backtests and return results."""
         if not self.backtest_runner:
             raise ValueError("No backtest_runner provided")
@@ -178,7 +179,7 @@ class BacktestMatrix:
         k: int,
         metric: str = "sharpe_ratio",
         min_trades: int = 30,
-    ) -> List[BacktestResult]:
+    ) -> list[BacktestResult]:
         """
         Select top K configurations by metric.
 
@@ -262,13 +263,13 @@ class MetaPortfolio:
         self.max_weight = max_weight
         self.deactivation_threshold = deactivation_threshold
 
-        self._systems: Dict[str, SystemState] = {}
-        self._ensemble: Optional[BayesianEnsemble] = None
-        self._thompson: Optional[ThompsonSelector] = None
+        self._systems: dict[str, SystemState] = {}
+        self._ensemble: BayesianEnsemble | None = None
+        self._thompson: ThompsonSelector | None = None
 
         self._total_pnl: float = 0.0
         self._peak_equity: float = 0.0
-        self._history: List[Dict] = []
+        self._history: list[dict] = []
 
     def register_system(
         self,
@@ -318,8 +319,8 @@ class MetaPortfolio:
 
     def aggregate(
         self,
-        signals: Dict[str, float],
-    ) -> Tuple[float, float]:
+        signals: dict[str, float],
+    ) -> tuple[float, float]:
         """
         Aggregate signals from all systems into portfolio signal and size.
 
@@ -360,7 +361,7 @@ class MetaPortfolio:
 
         return portfolio_signal, position_size
 
-    def _get_current_weights(self) -> Dict[str, float]:
+    def _get_current_weights(self) -> dict[str, float]:
         """Get current system weights."""
         weights = {}
         total = 0.0
@@ -376,7 +377,7 @@ class MetaPortfolio:
 
         return weights
 
-    def update_pnl(self, pnls: Dict[str, float]) -> Dict[str, float]:
+    def update_pnl(self, pnls: dict[str, float]) -> dict[str, float]:
         """
         Update system weights based on observed PnL.
 
@@ -438,7 +439,7 @@ class MetaPortfolio:
 
         return self._get_current_weights()
 
-    def _update_weights_from_probs(self, probs: Dict[str, float]) -> None:
+    def _update_weights_from_probs(self, probs: dict[str, float]) -> None:
         """Update system weights from Thompson probabilities."""
         for name, prob in probs.items():
             if name not in self._systems:
@@ -463,7 +464,7 @@ class MetaPortfolio:
             self._rebuild_ensemble()
             logger.info(f"Reactivated system '{name}'")
 
-    def get_status(self) -> Dict:
+    def get_status(self) -> dict:
         """Get current portfolio status."""
         active = [s for s in self._systems.values() if s.is_active]
         inactive = [s for s in self._systems.values() if not s.is_active]
@@ -487,7 +488,7 @@ class MetaPortfolio:
             },
         }
 
-    def _calculate_sharpe(self, pnls: List[float], risk_free: float = 0.0) -> float:
+    def _calculate_sharpe(self, pnls: list[float], risk_free: float = 0.0) -> float:
         """Calculate Sharpe ratio from PnL series."""
         if len(pnls) < 2:
             return 0.0
@@ -540,7 +541,7 @@ class MetaPortfolio:
 
 
 def create_meta_portfolio_from_backtest(
-    backtest_results: List[BacktestResult],
+    backtest_results: list[BacktestResult],
     top_k: int = 3,
     base_size: float = 1000.0,
 ) -> MetaPortfolio:

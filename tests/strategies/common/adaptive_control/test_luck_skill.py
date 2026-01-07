@@ -10,14 +10,11 @@ Focus on:
 
 import math
 
-import pytest
-
 from strategies.common.adaptive_control.luck_skill import (
     LuckQuantifier,
     SkillAssessment,
     TrackRecordAnalyzer,
 )
-
 
 # =============================================================================
 # Test SkillAssessment Dataclass
@@ -879,7 +876,7 @@ class TestEdgeCases:
         # Should handle gracefully
         sharpe = analyzer._calculate_sharpe()
         skew = analyzer._calculate_skewness()
-        kurt = analyzer._calculate_kurtosis()
+        analyzer._calculate_kurtosis()
 
         assert sharpe == 0.0
         # With zero std, skewness calculation handles division

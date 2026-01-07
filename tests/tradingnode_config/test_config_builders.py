@@ -8,9 +8,9 @@ from __future__ import annotations
 
 from config.data import build_data_engine_config
 from config.logging_config import build_logging_config
+from config.models import LoggingSettings, StreamingSettings, TradingNodeSettings
 from config.risk import build_risk_engine_config
 from config.streaming import build_streaming_config
-from config.models import LoggingSettings, StreamingSettings, TradingNodeSettings
 
 
 class TestBuildDataEngineConfig:

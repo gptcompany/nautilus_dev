@@ -214,7 +214,7 @@ class EvolvedStrategy(Strategy):
         pass
 """
 
-    request = EvaluationRequest(
+    EvaluationRequest(
         strategy_code=strategy_code,
         backtest_config=config,
     )
@@ -229,7 +229,7 @@ class EvolvedStrategy(Strategy):
     # Example 2: Error handling
     invalid_code = "def foo(:"  # Syntax error
 
-    error_request = EvaluationRequest(strategy_code=invalid_code)
+    EvaluationRequest(strategy_code=invalid_code)
     # result = evaluator.evaluate_sync(error_request)
     # assert result.success is False
     # assert result.error_type == "syntax"

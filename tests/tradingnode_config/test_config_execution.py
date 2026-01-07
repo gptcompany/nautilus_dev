@@ -6,7 +6,6 @@ TDD: RED phase - tests written before implementation.
 
 from __future__ import annotations
 
-
 from config.execution import build_exec_engine_config
 from config.models import TradingNodeSettings
 

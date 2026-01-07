@@ -1,8 +1,8 @@
 # Trend Counter [BigBeluga Style] - Converted from Pine Script
 # This is a test conversion to validate the /pinescript skill
 
-from .trend_counter_strategy import TrendCounterBBStrategy, TrendCounterBBConfig
-from .indicator import TrendCounterIndicator, Trend
+from .indicator import Trend, TrendCounterIndicator
+from .trend_counter_strategy import TrendCounterBBConfig, TrendCounterBBStrategy
 
 __all__ = [
     "TrendCounterBBStrategy",

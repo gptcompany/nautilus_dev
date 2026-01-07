@@ -10,7 +10,6 @@ from scripts.auto_update.notifier import (
     send_email_notification,
 )
 
-
 # =============================================================================
 # T062: Test send_discord_notification
 # =============================================================================

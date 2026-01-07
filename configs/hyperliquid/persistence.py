@@ -10,13 +10,12 @@ Example:
 
 from pathlib import Path
 
+from nautilus_trader.adapters.hyperliquid import HYPERLIQUID, HyperliquidDataClientConfig
 from nautilus_trader.config import (
+    InstrumentProviderConfig,
     StreamingConfig,
     TradingNodeConfig,
 )
-from nautilus_trader.adapters.hyperliquid import HYPERLIQUID
-from nautilus_trader.adapters.hyperliquid import HyperliquidDataClientConfig
-from nautilus_trader.config import InstrumentProviderConfig
 
 from configs.hyperliquid.data_client import DEFAULT_INSTRUMENTS
 

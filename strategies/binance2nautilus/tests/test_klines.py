@@ -9,7 +9,7 @@ import pandas as pd
 import pytest
 
 from strategies.binance2nautilus import ConverterConfig
-from strategies.binance2nautilus.converters.klines import KlinesConverter, TIMEFRAME_MAP
+from strategies.binance2nautilus.converters.klines import TIMEFRAME_MAP, KlinesConverter
 
 
 @pytest.fixture

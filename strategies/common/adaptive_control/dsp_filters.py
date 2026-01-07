@@ -22,7 +22,6 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass
-from typing import Optional
 
 
 @dataclass
@@ -394,7 +393,7 @@ class DSPRegimeDetector:
         self._momentum_filter = IIRLowPass(cutoff_period=momentum_period)
         self._volatility = RecursiveVariance(alpha=2.0 / (slow_period + 1))
 
-    def update(self, price: float, prev_price: Optional[float] = None) -> dict:
+    def update(self, price: float, prev_price: float | None = None) -> dict:
         """
         Update with new price.
 

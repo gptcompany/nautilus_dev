@@ -75,7 +75,7 @@ def create_redis_cache_config(
     password: str | None = None,
     ssl: bool | None = None,
     timeout: int | None = None,
-) -> "CacheConfig":
+) -> CacheConfig:
     """
     Create production Redis cache configuration.
 
@@ -142,7 +142,7 @@ def create_redis_cache_config(
 def create_debug_cache_config(
     host: str | None = None,
     port: int | None = None,
-) -> "CacheConfig":
+) -> CacheConfig:
     """
     Create debug Redis cache configuration with JSON encoding.
 
@@ -205,7 +205,7 @@ def check_redis_health(
         sock.settimeout(_timeout)
         result = sock.connect_ex((_host, _port))
         return result == 0
-    except (OSError, socket.error):
+    except OSError:
         return False
     finally:
         sock.close()
@@ -215,7 +215,7 @@ def build_cache_config(
     redis_config: object,
     tick_capacity: int = 10_000,
     bar_capacity: int = 10_000,
-) -> "CacheConfig":
+) -> CacheConfig:
     """
     Build CacheConfig from a RedisConfig object (T017).
 

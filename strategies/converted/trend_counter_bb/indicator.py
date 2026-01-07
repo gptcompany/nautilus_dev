@@ -19,8 +19,7 @@ from collections import deque
 from enum import IntEnum
 from typing import TYPE_CHECKING
 
-from nautilus_trader.indicators import Indicator
-from nautilus_trader.indicators import ExponentialMovingAverage
+from nautilus_trader.indicators import ExponentialMovingAverage, Indicator
 
 if TYPE_CHECKING:
     from nautilus_trader.model.data import Bar

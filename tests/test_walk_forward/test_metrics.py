@@ -2,21 +2,19 @@
 
 from datetime import datetime
 
-
+from scripts.alpha_evolve.walk_forward.metrics import (
+    _norm_cdf,
+    _norm_ppf,
+    calculate_deflated_sharpe_ratio,
+    calculate_robustness_score,
+    estimate_probability_backtest_overfitting,
+    simulate_combinatorial_paths,
+)
 from scripts.alpha_evolve.walk_forward.models import (
     Window,
     WindowMetrics,
     WindowResult,
 )
-from scripts.alpha_evolve.walk_forward.metrics import (
-    calculate_robustness_score,
-    calculate_deflated_sharpe_ratio,
-    estimate_probability_backtest_overfitting,
-    simulate_combinatorial_paths,
-    _norm_cdf,
-    _norm_ppf,
-)
-
 
 # === Fixtures ===
 

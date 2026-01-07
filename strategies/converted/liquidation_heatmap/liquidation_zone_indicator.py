@@ -11,9 +11,8 @@ This indicator identifies potential liquidation zones based on:
 - Zone "consumption" when price crosses through midpoint
 """
 
-from dataclasses import dataclass
-from typing import Optional
 from collections import deque
+from dataclasses import dataclass
 
 from nautilus_trader.indicators import AverageTrueRange, Indicator
 from nautilus_trader.model.data import Bar
@@ -98,8 +97,8 @@ class LiquidationZoneIndicator(Indicator):
         self._bar_count: int = 0
 
         # Cached values
-        self._last_zone_above: Optional[LiquidationZone] = None
-        self._last_zone_below: Optional[LiquidationZone] = None
+        self._last_zone_above: LiquidationZone | None = None
+        self._last_zone_below: LiquidationZone | None = None
 
     @property
     def name(self) -> str:
@@ -129,7 +128,7 @@ class LiquidationZoneIndicator(Indicator):
         return [z for z in self.zones if not z.is_above_price]
 
     @property
-    def nearest_zone_above(self) -> Optional[LiquidationZone]:
+    def nearest_zone_above(self) -> LiquidationZone | None:
         """Get nearest unconsumed zone above current price."""
         if not self._bar_history:
             return None
@@ -140,7 +139,7 @@ class LiquidationZoneIndicator(Indicator):
         return min(above, key=lambda z: z.bottom)
 
     @property
-    def nearest_zone_below(self) -> Optional[LiquidationZone]:
+    def nearest_zone_below(self) -> LiquidationZone | None:
         """Get nearest unconsumed zone below current price."""
         if not self._bar_history:
             return None

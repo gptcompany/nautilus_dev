@@ -12,7 +12,6 @@ Trading Logic:
 """
 
 from decimal import Decimal
-from typing import Optional
 
 from nautilus_trader.config import StrategyConfig
 from nautilus_trader.model.data import Bar, BarType
@@ -21,7 +20,7 @@ from nautilus_trader.model.identifiers import InstrumentId
 from nautilus_trader.model.instruments import Instrument
 from nautilus_trader.trading.strategy import Strategy
 
-from .liquidation_zone_indicator import LiquidationZoneIndicator, LiquidationZone
+from .liquidation_zone_indicator import LiquidationZone, LiquidationZoneIndicator
 
 
 class LiquidationHeatMapConfig(StrategyConfig, frozen=True):
@@ -88,9 +87,9 @@ class LiquidationHeatMapStrategy(Strategy):
         )
 
         # State
-        self.instrument: Optional[Instrument] = None
-        self._last_bar: Optional[Bar] = None
-        self._current_target_zone: Optional[LiquidationZone] = None
+        self.instrument: Instrument | None = None
+        self._last_bar: Bar | None = None
+        self._current_target_zone: LiquidationZone | None = None
 
     def on_start(self) -> None:
         """Initialize strategy on start."""

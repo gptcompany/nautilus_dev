@@ -60,7 +60,7 @@ class CircuitBreakerActor:
         self._previous_state = CircuitBreakerState.ACTIVE
         self._trader_id = trader_id
         self._env = env
-        self._collector: "CircuitBreakerCollector | None" = None
+        self._collector: CircuitBreakerCollector | None = None
 
     @property
     def circuit_breaker(self) -> CircuitBreaker:

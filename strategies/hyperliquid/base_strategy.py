@@ -18,8 +18,8 @@ Example:
     ...         pass
 """
 
-from nautilus_trader.model.data import QuoteTick, TradeTick, OrderBookDelta
-from nautilus_trader.model.events import PositionOpened, PositionClosed, PositionChanged
+from nautilus_trader.model.data import OrderBookDelta, QuoteTick, TradeTick
+from nautilus_trader.model.events import PositionChanged, PositionClosed, PositionOpened
 from nautilus_trader.model.identifiers import InstrumentId
 from nautilus_trader.trading.strategy import Strategy
 

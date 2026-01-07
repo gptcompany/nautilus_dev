@@ -433,7 +433,7 @@ class TestStrategyRecovery:
         """Test multiple positions are recovered correctly."""
         # Setup multiple positions
         positions = []
-        for i, qty in enumerate([Decimal("1.0"), Decimal("2.0")]):
+        for _i, qty in enumerate([Decimal("1.0"), Decimal("2.0")]):
             pos = MagicMock()
             pos.instrument_id = mock_instrument.id
             pos.instrument_id.value = "BTCUSDT-PERP.BINANCE"

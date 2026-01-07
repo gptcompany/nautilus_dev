@@ -421,6 +421,7 @@ class TestPerformance1Year:
     def test_tearsheet_generation_under_5_seconds(self, mock_engine):
         """Test tearsheet generates in < 5 seconds."""
         import time
+
         from strategies.common.tearsheet import generate_tearsheet
 
         with tempfile.TemporaryDirectory() as tmpdir:

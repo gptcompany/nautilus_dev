@@ -148,8 +148,8 @@ class TestFullPipeline:
     def test_no_lookahead_bias(self):
         """Verify pipeline doesn't use future information."""
         from strategies.common.meta_learning import (
-            WalkForwardSplitter,
             WalkForwardConfig,
+            WalkForwardSplitter,
         )
 
         n = 200
@@ -260,6 +260,7 @@ class TestPerformanceRequirements:
     def test_bocd_update_latency(self):
         """BOCD update: <5ms."""
         import time
+
         from strategies.common.regime_detection import BOCD
 
         bocd = BOCD()
@@ -281,6 +282,7 @@ class TestPerformanceRequirements:
     def test_integrated_sizing_latency(self):
         """Integrated sizing: <20ms end-to-end."""
         import time
+
         from strategies.common.position_sizing import IntegratedSizer
 
         sizer = IntegratedSizer()

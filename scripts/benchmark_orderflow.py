@@ -7,21 +7,21 @@ Tests:
 """
 
 import random
-import time
-from typing import NamedTuple
 
 # Add strategies to path
 import sys
+import time
+from typing import NamedTuple
 
 sys.path.insert(0, "/media/sam/1TB/nautilus_dev")
 
-from strategies.common.orderflow.config import VPINConfig, HawkesConfig
-from strategies.common.orderflow.vpin import VPINIndicator
+from strategies.common.orderflow.config import HawkesConfig, VPINConfig
 from strategies.common.orderflow.hawkes_ofi import HawkesOFI
 from strategies.common.orderflow.trade_classifier import (
     TradeClassification,
     TradeSide,
 )
+from strategies.common.orderflow.vpin import VPINIndicator
 
 
 class BenchmarkResult(NamedTuple):
@@ -51,7 +51,7 @@ def generate_classifications(count: int, bucket_size: float = 1000.0) -> list[Tr
     base_price = 100.0
     timestamp_ns = 1_000_000_000_000  # Start at 1 second
 
-    for i in range(count):
+    for _i in range(count):
         # Random price movement
         base_price += random.uniform(-0.5, 0.5)
 
@@ -171,7 +171,7 @@ def benchmark_hawkes_refit(events: int = 10000, threshold_ms: float = 1000.0) ->
         indicator.update(classification)
 
     # Now benchmark the refit
-    print(f"  - Timing refit...")
+    print("  - Timing refit...")
     start = time.perf_counter()
 
     indicator.refit()

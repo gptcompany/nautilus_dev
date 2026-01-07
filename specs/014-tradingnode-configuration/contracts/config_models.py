@@ -157,13 +157,13 @@ class TradingNodeSettings(BaseModel):
     max_order_modify_rate: str = Field(default="100/00:00:01")
 
     @model_validator(mode="after")
-    def validate_at_least_one_exchange(self) -> "TradingNodeSettings":
+    def validate_at_least_one_exchange(self) -> TradingNodeSettings:
         if self.binance is None and self.bybit is None:
             raise ValueError("At least one exchange must be configured")
         return self
 
     @classmethod
-    def from_env(cls) -> "TradingNodeSettings":
+    def from_env(cls) -> TradingNodeSettings:
         """Load settings from environment variables."""
         # Core environment
         environment = ConfigEnvironment(

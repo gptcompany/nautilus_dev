@@ -43,7 +43,6 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass
-from typing import Dict, List, Optional
 
 import numpy as np
 
@@ -175,7 +174,7 @@ class OnlineCorrelationMatrix:
 
     def __init__(
         self,
-        strategies: List[str],
+        strategies: list[str],
         decay: float = 0.99,
         shrinkage: float = 0.1,
         min_samples: int = 30,
@@ -202,10 +201,10 @@ class OnlineCorrelationMatrix:
         self.epsilon = epsilon
 
         # Strategy name -> index mapping for O(1) lookup
-        self._strategy_indices: Dict[str, int] = {s: i for i, s in enumerate(strategies)}
+        self._strategy_indices: dict[str, int] = {s: i for i, s in enumerate(strategies)}
 
         # Welford statistics per strategy (for individual variance tracking)
-        self._stats: List[OnlineStats] = [OnlineStats() for _ in range(self.n_strategies)]
+        self._stats: list[OnlineStats] = [OnlineStats() for _ in range(self.n_strategies)]
 
         # EMA-based running statistics (NumPy for efficiency)
         self._ema_means: np.ndarray = np.zeros(self.n_strategies, dtype=np.float64)
@@ -216,7 +215,7 @@ class OnlineCorrelationMatrix:
         # Sample counter
         self._n_samples: int = 0
 
-    def update(self, returns: Dict[str, float]) -> None:
+    def update(self, returns: dict[str, float]) -> None:
         """
         Update correlation estimates with new strategy returns.
 
@@ -399,7 +398,7 @@ class OnlineCorrelationMatrix:
         corr_matrix = self.get_correlation_matrix()
         return float(corr_matrix[i, j])
 
-    def get_metrics(self, weights: Optional[Dict[str, float]] = None) -> CorrelationMetrics:
+    def get_metrics(self, weights: dict[str, float] | None = None) -> CorrelationMetrics:
         """
         Get correlation metrics for portfolio observability.
 
@@ -460,7 +459,7 @@ class OnlineCorrelationMatrix:
         return self._n_samples
 
     @property
-    def strategy_indices(self) -> Dict[str, int]:
+    def strategy_indices(self) -> dict[str, int]:
         """
         Mapping from strategy name to matrix index.
 
@@ -470,9 +469,9 @@ class OnlineCorrelationMatrix:
 
 
 def calculate_covariance_penalty(
-    weights: Dict[str, float],
+    weights: dict[str, float],
     corr_matrix: np.ndarray,
-    strategy_indices: Dict[str, int],
+    strategy_indices: dict[str, int],
 ) -> float:
     """
     Calculate covariance penalty for portfolio weights.

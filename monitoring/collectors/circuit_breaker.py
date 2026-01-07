@@ -3,8 +3,9 @@
 # T030: Create CircuitBreakerCollector for QuestDB metrics
 
 import logging
-from datetime import datetime, timezone
-from typing import Callable, Literal
+from collections.abc import Callable
+from datetime import UTC, datetime
+from typing import Literal
 
 from monitoring.models import CircuitBreakerMetrics
 
@@ -73,7 +74,7 @@ class CircuitBreakerCollector:
         self._last_state = state
 
         metrics = CircuitBreakerMetrics(
-            timestamp=datetime.now(timezone.utc),
+            timestamp=datetime.now(UTC),
             trader_id=self._trader_id,
             state=state,
             current_drawdown=current_drawdown,

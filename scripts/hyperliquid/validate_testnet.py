@@ -35,15 +35,15 @@ from nautilus_trader.model.events import (
     OrderAccepted,
     OrderFilled,
     OrderRejected,
-    PositionOpened,
     PositionClosed,
+    PositionOpened,
 )
 from nautilus_trader.model.objects import Quantity
 
 from configs.hyperliquid.testnet import create_testnet_trading_node
+from risk import RiskConfig
 from strategies.hyperliquid.base_strategy import HyperliquidBaseStrategy
 from strategies.hyperliquid.config import HyperliquidStrategyConfig
-from risk import RiskConfig
 
 
 class ValidationState(Enum):

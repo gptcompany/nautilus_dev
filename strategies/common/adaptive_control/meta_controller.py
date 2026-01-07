@@ -22,13 +22,14 @@ This is NOT a strategy - it's the brain that manages strategies.
 from __future__ import annotations
 
 import logging
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
-from typing import TYPE_CHECKING, Callable
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    pass
+    from strategies.common.audit.events import AuditEventEmitter
 
 
 logger = logging.getLogger(__name__)
@@ -130,7 +131,7 @@ class MetaController:
         ventral_threshold: float = 70,
         sympathetic_threshold: float = 40,
         harmony_lookback: int = 50,
-        audit_emitter: "AuditEventEmitter | None" = None,
+        audit_emitter: AuditEventEmitter | None = None,
     ):
         """
         Args:
@@ -414,7 +415,7 @@ class MetaController:
 
         # Check if strategies are performing in current regime
         total_pnl = 0.0
-        for name, pnls in self._strategy_performance.items():
+        for _name, pnls in self._strategy_performance.items():
             if pnls:
                 recent_pnl = sum(pnls[-10:])  # Last 10 observations
                 total_pnl += recent_pnl
@@ -482,12 +483,12 @@ class MetaController:
         return self._current_harmony
 
     @property
-    def audit_emitter(self) -> "AuditEventEmitter | None":
+    def audit_emitter(self) -> AuditEventEmitter | None:
         """Audit emitter for logging state changes."""
         return self._audit_emitter
 
     @audit_emitter.setter
-    def audit_emitter(self, emitter: "AuditEventEmitter | None") -> None:
+    def audit_emitter(self, emitter: AuditEventEmitter | None) -> None:
         """Set the audit emitter."""
         self._audit_emitter = emitter
 

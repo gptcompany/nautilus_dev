@@ -6,12 +6,11 @@ of data conversion between Binance CSV and NautilusTrader ParquetDataCatalog.
 
 import json
 import sys
+from datetime import datetime
 from pathlib import Path
 
 import click
 from tqdm import tqdm
-
-from datetime import datetime
 
 from .catalog import CatalogWriter
 from .config import ConverterConfig

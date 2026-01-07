@@ -6,7 +6,6 @@ Provides common functionality for position management, logging, and lifecycle.
 """
 
 from decimal import Decimal
-from typing import Optional
 
 from nautilus_trader.config import StrategyConfig
 from nautilus_trader.model.enums import OrderSide, TimeInForce
@@ -45,7 +44,7 @@ class BaseStrategy(Strategy):
         self.max_position_size = config.max_position_size
 
         # Will be set on_start
-        self.instrument: Optional[Instrument] = None
+        self.instrument: Instrument | None = None
 
     def on_start(self) -> None:
         """Initialize strategy on start."""
@@ -77,7 +76,7 @@ class BaseStrategy(Strategy):
     # Position Helpers
     # ─────────────────────────────────────────────────────────────────
 
-    def get_position(self) -> Optional[Position]:
+    def get_position(self) -> Position | None:
         """Get current position for instrument."""
         return self.portfolio.position(self.instrument_id)
 
@@ -104,7 +103,7 @@ class BaseStrategy(Strategy):
     # Order Helpers
     # ─────────────────────────────────────────────────────────────────
 
-    def buy(self, quantity: Optional[Decimal] = None) -> None:
+    def buy(self, quantity: Decimal | None = None) -> None:
         """Submit market buy order."""
         if not self._can_trade():
             return
@@ -122,7 +121,7 @@ class BaseStrategy(Strategy):
         self.submit_order(order)
         self.log.info(f"BUY {qty} @ MARKET")
 
-    def sell(self, quantity: Optional[Decimal] = None) -> None:
+    def sell(self, quantity: Decimal | None = None) -> None:
         """Submit market sell order."""
         if not self._can_trade():
             return

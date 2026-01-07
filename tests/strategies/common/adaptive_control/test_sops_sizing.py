@@ -433,8 +433,8 @@ class TestSOPSGillerSizer:
             sizer_without.update(return_value=0.01, timestamp=i * 0.1)
 
         # Sizes will differ if tape weight != 1.0
-        size_with = sizer_with.size(1.0)
-        size_without = sizer_without.size(1.0)
+        sizer_with.size(1.0)
+        sizer_without.size(1.0)
 
         # Without tape weight should use weight=1.0
         state_without = sizer_without.get_state(1.0)

@@ -21,8 +21,7 @@ import threading
 import time
 from decimal import Decimal
 from pathlib import Path
-from typing import Any
-from unittest.mock import MagicMock, Mock, PropertyMock, call, patch
+from unittest.mock import MagicMock, PropertyMock, patch
 
 import pytest
 from pydantic import ValidationError
@@ -40,7 +39,6 @@ from strategies.common.recovery.events import (
     PositionLoadedEvent,
     PositionReconciledEvent,
     RecoveryCompletedEvent,
-    RecoveryEventType,
     RecoveryFailedEvent,
     RecoveryStartedEvent,
     RecoveryTimeoutEvent,
@@ -58,7 +56,6 @@ from strategies.common.recovery.recoverable_strategy import (
     RecoverableStrategyConfig,
 )
 from strategies.common.recovery.state_manager import RecoveryStateManager
-
 
 # =============================================================================
 # Fixtures
@@ -1266,7 +1263,7 @@ class TestEdgeCases:
 
         def save_repeatedly():
             try:
-                for i in range(20):
+                for _i in range(20):
                     state_manager.increment_positions_recovered(count=1)
                     state_manager.save_state()
                     save_count[0] += 1
@@ -1327,7 +1324,7 @@ class TestEdgeCases:
     def test_missing_state_directory_parent(self, temp_state_dir):
         """Test state manager creates missing parent directories."""
         nested_dir = temp_state_dir / "level1" / "level2" / "level3"
-        manager = RecoveryStateManager(
+        RecoveryStateManager(
             trader_id="TRADER-001",
             state_dir=nested_dir,
         )

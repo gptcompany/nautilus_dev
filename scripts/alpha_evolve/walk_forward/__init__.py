@@ -14,13 +14,13 @@ Public API:
 
 from scripts.alpha_evolve.walk_forward.config import WalkForwardConfig
 from scripts.alpha_evolve.walk_forward.models import (
+    WalkForwardResult,
     Window,
     WindowMetrics,
     WindowResult,
-    WalkForwardResult,
 )
+from scripts.alpha_evolve.walk_forward.report import export_json, generate_report
 from scripts.alpha_evolve.walk_forward.validator import WalkForwardValidator
-from scripts.alpha_evolve.walk_forward.report import generate_report, export_json
 
 __all__ = [
     "WalkForwardConfig",

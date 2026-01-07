@@ -18,7 +18,6 @@ import json
 import math
 import tempfile
 from pathlib import Path
-from typing import Dict, List
 
 import pytest
 
@@ -31,7 +30,6 @@ from strategies.common.adaptive_control.meta_portfolio import (
     create_meta_portfolio_from_backtest,
 )
 
-
 # =============================================================================
 # Test Fixtures (local for --noconftest)
 # =============================================================================
@@ -41,7 +39,7 @@ def make_system_config(
     name: str = "test_system",
     selector_type: str = "thompson",
     n_particles: int = 0,
-    strategies: List[str] = None,
+    strategies: list[str] = None,
 ) -> SystemConfig:
     """Create a test SystemConfig."""
     return SystemConfig(
@@ -60,7 +58,7 @@ def make_backtest_result(
     total_return: float = 0.25,
     win_rate: float = 0.55,
     n_trades: int = 100,
-    pnl_series: List[float] = None,
+    pnl_series: list[float] = None,
 ) -> BacktestResult:
     """Create a test BacktestResult."""
     return BacktestResult(
@@ -1275,11 +1273,11 @@ class TestMetaPortfolioIntegration:
 
         # 5. Simulate trading
         for _ in range(10):
-            signals = {name: 0.5 for name in portfolio._systems}
+            signals = dict.fromkeys(portfolio._systems, 0.5)
             signal, size = portfolio.aggregate(signals)
             assert abs(signal) <= 1.0
 
-            pnls = {name: 10.0 for name in portfolio._systems}
+            pnls = dict.fromkeys(portfolio._systems, 10.0)
             portfolio.update_pnl(pnls)
 
         # 6. Check status
@@ -1313,7 +1311,7 @@ class TestMetaPortfolioIntegration:
         portfolio.register_system("winner", initial_weight=0.4)
         portfolio.register_system("loser", initial_weight=0.4)
 
-        initial_winner_weight = portfolio._systems["winner"].weight
+        portfolio._systems["winner"].weight
 
         # Winner consistently outperforms - Thompson Sampling will favor it
         for _ in range(50):  # More iterations for clearer adaptation

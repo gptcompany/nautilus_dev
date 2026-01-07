@@ -5,7 +5,7 @@ These contracts ensure consistent behavior across implementations.
 """
 
 from abc import ABC, abstractmethod
-from typing import Callable
+from collections.abc import Callable
 
 from nautilus_trader.model.identifiers import InstrumentId, TraderId
 from nautilus_trader.model.position import Position

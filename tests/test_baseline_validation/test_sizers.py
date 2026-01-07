@@ -11,7 +11,6 @@ TDD: Tests written first to define expected behavior.
 
 from __future__ import annotations
 
-
 import pytest
 
 from scripts.baseline_validation.sizers import (

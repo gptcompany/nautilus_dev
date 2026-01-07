@@ -3,12 +3,10 @@
 from decimal import Decimal
 
 import pytest
-
 from nautilus_trader.model.data import BarType
 from nautilus_trader.model.identifiers import InstrumentId
 from nautilus_trader.test_kit.stubs.data import TestDataStubs
 from nautilus_trader.test_kit.stubs.identifiers import TestIdStubs
-
 
 # === NAUTILUS FIXTURES ===
 

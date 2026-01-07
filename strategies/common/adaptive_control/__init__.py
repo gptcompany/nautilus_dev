@@ -21,100 +21,100 @@
 # - meta_learning/meta_model.py: RandomForest confidence
 # - regime_detection/regime_manager.py: HMM + GMM + Spectral
 
-from .spectral_regime import SpectralRegimeDetector, MarketRegime
-from .system_health import SystemHealthMonitor, HealthState
-from .pid_drawdown import PIDDrawdownController, SimpleDrawdownScaler
-from .meta_controller import MetaController, MetaState, SystemState, MarketHarmony
-from .regime_integration import (
-    EnhancedRegimeManager,
-    CombinedRegime,
-    EnhancedRegimeResult,
-)
-from .dsp_filters import (
-    IIRLowPass,
-    IIRHighPass,
-    RecursiveVariance,
-    KalmanFilter1D,
-    LMSAdaptiveFilter,
-    IIRRegimeDetector,
-    DSPRegimeDetector,
+from .adaptive_decay import (
+    AdaptiveDecayCalculator,
+    VolatilityContext,
 )
 from .alpha_evolve_bridge import (
-    AlphaEvolveBridge,
     AdaptiveSurvivalSystem,
+    AlphaEvolveBridge,
+    EvolutionConfig,
     EvolutionRequest,
     EvolutionTrigger,
-    EvolutionConfig,
 )
+from .correlation_tracker import (
+    CorrelationMetrics,
+    OnlineCorrelationMatrix,
+    OnlineStats,
+    calculate_covariance_penalty,
+)
+from .dsp_filters import (
+    DSPRegimeDetector,
+    IIRHighPass,
+    IIRLowPass,
+    IIRRegimeDetector,
+    KalmanFilter1D,
+    LMSAdaptiveFilter,
+    RecursiveVariance,
+)
+from .flow_physics import (
+    FlowState,
+    InformationDiffusion,
+    MarketFlowAnalyzer,
+    WaveEquationAnalyzer,
+)
+from .information_theory import (
+    EntropyEstimator,
+    InformationBasedRiskManager,
+    InformationState,
+    MutualInformationEstimator,
+    OptimalSamplingAnalyzer,
+    WienerFilter,
+)
+from .luck_skill import (
+    LuckQuantifier,
+    SkillAssessment,
+    TrackRecordAnalyzer,
+)
+from .meta_controller import MarketHarmony, MetaController, MetaState, SystemState
+from .meta_portfolio import (
+    BacktestMatrix,
+    BacktestResult,
+    MetaPortfolio,
+    SystemConfig,
+    create_meta_portfolio_from_backtest,
+)
+from .multi_dimensional_regime import (
+    ConsensusRegime,
+    DimensionResult,
+    MultiDimensionalRegimeDetector,
+    MultiDimensionalResult,
+    create_multi_regime_detector,
+)
+from .particle_portfolio import (
+    BayesianEnsemble,
+    Particle,
+    ParticlePortfolio,
+    PortfolioState,
+    ThompsonSelector,
+)
+from .pid_drawdown import PIDDrawdownController, SimpleDrawdownScaler
+from .regime_integration import (
+    CombinedRegime,
+    EnhancedRegimeManager,
+    EnhancedRegimeResult,
+)
+from .sops_sizing import (
+    SOPS,
+    AdaptiveKEstimator,
+    GillerScaler,
+    SOPSGillerSizer,
+    SOPSState,
+    TapeSpeed,
+    TapeSpeedState,
+    create_sops_sizer,
+)
+from .spectral_regime import MarketRegime, SpectralRegimeDetector
+from .system_health import HealthState, SystemHealthMonitor
 
 # NOTE: universal_laws removed (2026-01-05) - PMW validation found no academic evidence
 # for Fibonacci/wave physics in trading. See CLAUDE.md for details.
 from .vibration_analysis import (
+    DigitalRootAnalyzer,
+    HarmonicRatioAnalyzer,
+    ResonanceEvent,
     VibrationAnalyzer,
     VibrationMode,
-    ResonanceEvent,
-    HarmonicRatioAnalyzer,
-    DigitalRootAnalyzer,
-)
-from .flow_physics import (
-    MarketFlowAnalyzer,
-    FlowState,
-    WaveEquationAnalyzer,
-    InformationDiffusion,
-)
-from .multi_dimensional_regime import (
-    MultiDimensionalRegimeDetector,
-    MultiDimensionalResult,
-    ConsensusRegime,
-    DimensionResult,
-    create_multi_regime_detector,
-)
-from .information_theory import (
-    EntropyEstimator,
-    MutualInformationEstimator,
-    WienerFilter,
-    InformationBasedRiskManager,
-    InformationState,
-    OptimalSamplingAnalyzer,
-)
-from .particle_portfolio import (
-    ParticlePortfolio,
-    ThompsonSelector,
-    BayesianEnsemble,
-    Particle,
-    PortfolioState,
-)
-from .correlation_tracker import (
-    OnlineCorrelationMatrix,
-    OnlineStats,
-    CorrelationMetrics,
-    calculate_covariance_penalty,
-)
-from .meta_portfolio import (
-    MetaPortfolio,
-    BacktestMatrix,
-    BacktestResult,
-    SystemConfig,
-    create_meta_portfolio_from_backtest,
-)
-from .luck_skill import (
-    LuckQuantifier,
-    TrackRecordAnalyzer,
-    SkillAssessment,
-)
-from .sops_sizing import (
-    SOPS,
-    TapeSpeed,
-    GillerScaler,
-    SOPSGillerSizer,
-    AdaptiveKEstimator,
-    SOPSState,
-    TapeSpeedState,
-    create_sops_sizer,
-)
-from .adaptive_decay import (
-    VolatilityContext,
-    AdaptiveDecayCalculator,
 )
 
 __all__ = [

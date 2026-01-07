@@ -16,8 +16,8 @@ Known crypto flash crashes included in analysis:
 """
 
 import sys
+from datetime import datetime
 from pathlib import Path
-from datetime import datetime, timedelta
 
 import numpy as np
 import pandas as pd
@@ -26,8 +26,8 @@ from scipy import stats
 # Add project to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from nautilus_trader.persistence.catalog import ParquetDataCatalog
 from nautilus_trader.model.data import Bar, BarType
+from nautilus_trader.persistence.catalog import ParquetDataCatalog
 
 from strategies.common.orderflow import VPINConfig, VPINIndicator
 
@@ -219,7 +219,7 @@ def main():
         classification_method="bvc",  # Bulk Volume Classification for bars
     )
 
-    print(f"\nVPIN Configuration:")
+    print("\nVPIN Configuration:")
     print(f"  - Bucket Size: {vpin_config.bucket_size} BTC")
     print(f"  - N Buckets: {vpin_config.n_buckets}")
     print(f"  - Classification: {vpin_config.classification_method}")
@@ -236,7 +236,7 @@ def main():
 
         try:
             # Load data
-            print(f"\nLoading bars...")
+            print("\nLoading bars...")
             bars = load_bars_from_catalog(catalog, bar_type, start_dt, end_dt)
             print(f"Total bars loaded: {len(bars)}")
 
@@ -279,7 +279,7 @@ def main():
             all_analysis_dfs.append(results["analysis_df"])
 
             # Print period results
-            print(f"\n  Results:")
+            print("\n  Results:")
             print(f"    Data points: {results['n_points']}")
             print(
                 f"    Pearson r:   {results['pearson_correlation']:.4f} (p={results['pearson_pvalue']:.2e})"
@@ -295,7 +295,7 @@ def main():
             )
 
             if results["lag_correlations"]:
-                print(f"    Lagged correlations (VPIN leads):")
+                print("    Lagged correlations (VPIN leads):")
                 for lag, corr in results["lag_correlations"].items():
                     print(f"      {lag}: {corr:.4f}")
 
@@ -324,13 +324,13 @@ def main():
         print(f"  Overall Spearman correlation: {spearman_r:.4f} (p={spearman_p:.2e})")
 
         # Summary statistics
-        print(f"\n  VPIN Statistics:")
+        print("\n  VPIN Statistics:")
         print(f"    Mean: {all_merged['vpin'].mean():.4f}")
         print(f"    Std:  {all_merged['vpin'].std():.4f}")
         print(f"    Min:  {all_merged['vpin'].min():.4f}")
         print(f"    Max:  {all_merged['vpin'].max():.4f}")
 
-        print(f"\n  Volatility Statistics:")
+        print("\n  Volatility Statistics:")
         print(f"    Mean: {all_merged['volatility'].mean():.6f}")
         print(f"    Std:  {all_merged['volatility'].std():.6f}")
         print(f"    Min:  {all_merged['volatility'].min():.6f}")
@@ -340,7 +340,7 @@ def main():
         high_vpin = all_merged[all_merged["vpin"] >= 0.6]
         low_vpin = all_merged[all_merged["vpin"] < 0.4]
 
-        print(f"\n  Toxicity Analysis:")
+        print("\n  Toxicity Analysis:")
         print(
             f"    High VPIN (>=0.6): {len(high_vpin)} observations ({100 * len(high_vpin) / len(all_merged):.1f}%)"
         )
@@ -356,7 +356,7 @@ def main():
             print(f"    Ratio: {vol_high / vol_low:.2f}x")
 
         # Per-period summary
-        print(f"\n  Per-Period Correlations:")
+        print("\n  Per-Period Correlations:")
         for period_name, results in all_results.items():
             r = results["spearman_correlation"]
             n = results["n_points"]
@@ -399,12 +399,12 @@ def main():
             print(f"\n  [FAIL] VPIN-Volatility correlation: {best_correlation:.4f} < {threshold}")
 
             # Provide diagnostic info for failure
-            print(f"\n  Diagnostic Notes:")
-            print(f"    - Correlation is positive but below threshold")
-            print(f"    - This may indicate:")
-            print(f"      1. VPIN bucket size needs tuning for crypto markets")
-            print(f"      2. BVC classification may not capture all trade direction signals")
-            print(f"      3. 5-minute bars may smooth out tick-level VPIN signals")
+            print("\n  Diagnostic Notes:")
+            print("    - Correlation is positive but below threshold")
+            print("    - This may indicate:")
+            print("      1. VPIN bucket size needs tuning for crypto markets")
+            print("      2. BVC classification may not capture all trade direction signals")
+            print("      3. 5-minute bars may smooth out tick-level VPIN signals")
 
         print(f"\n  Statistical Significance: p < 0.05 = {min(pearson_p, spearman_p) < 0.05}")
 

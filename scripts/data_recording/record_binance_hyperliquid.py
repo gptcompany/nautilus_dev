@@ -30,23 +30,27 @@ import signal
 from datetime import datetime
 from pathlib import Path
 
-from nautilus_trader.adapters.binance import BINANCE
-from nautilus_trader.adapters.binance import BinanceAccountType
-from nautilus_trader.adapters.binance import BinanceDataClientConfig
-from nautilus_trader.adapters.binance import BinanceLiveDataClientFactory
-from nautilus_trader.adapters.binance import BinanceFuturesMarkPriceUpdate
-from nautilus_trader.adapters.hyperliquid import HYPERLIQUID
-from nautilus_trader.adapters.hyperliquid import HyperliquidDataClientConfig
-from nautilus_trader.adapters.hyperliquid import HyperliquidLiveDataClientFactory
-from nautilus_trader.config import InstrumentProviderConfig
-from nautilus_trader.config import LoggingConfig
-from nautilus_trader.config import StreamingConfig
-from nautilus_trader.config import TradingNodeConfig
+from nautilus_trader.adapters.binance import (
+    BINANCE,
+    BinanceAccountType,
+    BinanceDataClientConfig,
+    BinanceFuturesMarkPriceUpdate,
+    BinanceLiveDataClientFactory,
+)
+from nautilus_trader.adapters.hyperliquid import (
+    HYPERLIQUID,
+    HyperliquidDataClientConfig,
+    HyperliquidLiveDataClientFactory,
+)
+from nautilus_trader.config import (
+    InstrumentProviderConfig,
+    LoggingConfig,
+    StreamingConfig,
+    TradingNodeConfig,
+)
 from nautilus_trader.live.node import TradingNode
 from nautilus_trader.model.data import DataType
-from nautilus_trader.model.identifiers import ClientId
-from nautilus_trader.model.identifiers import InstrumentId
-
+from nautilus_trader.model.identifiers import ClientId, InstrumentId
 
 # Configuration
 CATALOG_PATH = Path("/media/sam/1TB/nautilus_dev/data/live_catalog")
@@ -152,7 +156,7 @@ class DataRecorder:
 
         self._running = True
         print(f"[INFO] Starting data recording at {datetime.now()}")
-        print(f"[INFO] Press Ctrl+C to stop")
+        print("[INFO] Press Ctrl+C to stop")
 
         try:
             self.node.run()

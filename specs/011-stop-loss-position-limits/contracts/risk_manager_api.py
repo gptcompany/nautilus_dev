@@ -12,9 +12,9 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from nautilus_trader.model.events import (
         Event,
-        PositionOpened,
-        PositionClosed,
         PositionChanged,
+        PositionClosed,
+        PositionOpened,
     )
     from nautilus_trader.model.identifiers import ClientOrderId, PositionId
     from nautilus_trader.model.objects import Price

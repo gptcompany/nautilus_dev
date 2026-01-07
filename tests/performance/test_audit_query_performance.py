@@ -23,7 +23,6 @@ from strategies.common.audit.config import AuditConfig
 from strategies.common.audit.emitter import AuditEventEmitter
 from strategies.common.audit.events import AuditEventType
 
-
 # Performance targets
 QUERY_1M_TARGET_SECS = 5.0  # < 5s for 1M events
 WRITE_P99_TARGET_MS = 1.0  # < 1ms per event (p99)

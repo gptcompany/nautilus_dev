@@ -45,7 +45,17 @@ exclude = [
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "UP", "B", "C4"]
-ignore = ["E501"]
+ignore = [
+    "E501",   # Line too long (handled by formatter)
+    "E402",   # Module level import not at top (sometimes needed for mocking)
+    "B017",   # Do not assert blind exception (common in tests)
+    "B007",   # Loop control variable not used (intentional in tests)
+    "E741",   # Ambiguous variable name (l, I, O)
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["B017", "B007", "F841"]
+"docs/*" = ["B006", "B905"]
 
 [tool.mypy]
 python_version = "3.12"

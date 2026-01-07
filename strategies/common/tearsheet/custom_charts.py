@@ -87,11 +87,11 @@ def _register_rolling_volatility() -> None:
 
 
 def create_rolling_volatility_chart(
-    returns: "pd.Series",
+    returns: pd.Series,
     window: int = 30,
     annualize: bool = True,
     **kwargs,
-) -> "go.Figure":
+) -> go.Figure:
     """
     Create a rolling volatility chart.
 

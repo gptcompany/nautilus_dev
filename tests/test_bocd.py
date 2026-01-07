@@ -43,7 +43,7 @@ class TestBOCDUpdate:
         bocd = BOCD(bocd_config)
 
         # Process 100 observations
-        for i in range(100):
+        for _i in range(100):
             bocd.update(np.random.normal(0, 0.01))
 
         assert bocd.t == 100

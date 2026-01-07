@@ -1,6 +1,6 @@
 """Unit tests for data models."""
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import pytest
 from pydantic import ValidationError
@@ -21,7 +21,7 @@ class TestOpenInterest:
     def test_symbol_normalized_to_uppercase(self) -> None:
         """Test that symbol is normalized to uppercase."""
         oi = OpenInterest(
-            timestamp=datetime(2025, 1, 15, 12, 0, 0, tzinfo=timezone.utc),
+            timestamp=datetime(2025, 1, 15, 12, 0, 0, tzinfo=UTC),
             symbol="btcusdt-perp",
             venue=Venue.BINANCE,
             open_interest=100.0,
@@ -33,7 +33,7 @@ class TestOpenInterest:
         """Test that empty symbol is rejected."""
         with pytest.raises(ValidationError):
             OpenInterest(
-                timestamp=datetime(2025, 1, 15, 12, 0, 0, tzinfo=timezone.utc),
+                timestamp=datetime(2025, 1, 15, 12, 0, 0, tzinfo=UTC),
                 symbol="",
                 venue=Venue.BINANCE,
                 open_interest=100.0,
@@ -44,7 +44,7 @@ class TestOpenInterest:
         """Test that negative open interest is rejected."""
         with pytest.raises(ValidationError):
             OpenInterest(
-                timestamp=datetime(2025, 1, 15, 12, 0, 0, tzinfo=timezone.utc),
+                timestamp=datetime(2025, 1, 15, 12, 0, 0, tzinfo=UTC),
                 symbol="BTCUSDT-PERP",
                 venue=Venue.BINANCE,
                 open_interest=-100.0,
@@ -55,7 +55,7 @@ class TestOpenInterest:
         """Test that negative value is rejected."""
         with pytest.raises(ValidationError):
             OpenInterest(
-                timestamp=datetime(2025, 1, 15, 12, 0, 0, tzinfo=timezone.utc),
+                timestamp=datetime(2025, 1, 15, 12, 0, 0, tzinfo=UTC),
                 symbol="BTCUSDT-PERP",
                 venue=Venue.BINANCE,
                 open_interest=100.0,
@@ -80,7 +80,7 @@ class TestFundingRate:
     def test_negative_funding_rate_allowed(self) -> None:
         """Test that negative funding rate is allowed (shorts pay longs)."""
         fr = FundingRate(
-            timestamp=datetime(2025, 1, 15, 8, 0, 0, tzinfo=timezone.utc),
+            timestamp=datetime(2025, 1, 15, 8, 0, 0, tzinfo=UTC),
             symbol="BTCUSDT-PERP",
             venue=Venue.BINANCE,
             funding_rate=-0.0005,
@@ -90,7 +90,7 @@ class TestFundingRate:
     def test_optional_fields(self) -> None:
         """Test that optional fields can be None."""
         fr = FundingRate(
-            timestamp=datetime(2025, 1, 15, 8, 0, 0, tzinfo=timezone.utc),
+            timestamp=datetime(2025, 1, 15, 8, 0, 0, tzinfo=UTC),
             symbol="BTCUSDT-PERP",
             venue=Venue.BINANCE,
             funding_rate=0.0001,
@@ -112,7 +112,7 @@ class TestLiquidation:
     def test_short_side(self) -> None:
         """Test creating a SHORT liquidation."""
         liq = Liquidation(
-            timestamp=datetime(2025, 1, 15, 12, 0, 0, tzinfo=timezone.utc),
+            timestamp=datetime(2025, 1, 15, 12, 0, 0, tzinfo=UTC),
             symbol="BTCUSDT-PERP",
             venue=Venue.BYBIT,
             side=Side.SHORT,
@@ -126,7 +126,7 @@ class TestLiquidation:
         """Test that zero quantity is rejected."""
         with pytest.raises(ValidationError):
             Liquidation(
-                timestamp=datetime(2025, 1, 15, 12, 0, 0, tzinfo=timezone.utc),
+                timestamp=datetime(2025, 1, 15, 12, 0, 0, tzinfo=UTC),
                 symbol="BTCUSDT-PERP",
                 venue=Venue.BINANCE,
                 side=Side.LONG,
@@ -139,7 +139,7 @@ class TestLiquidation:
         """Test that zero price is rejected."""
         with pytest.raises(ValidationError):
             Liquidation(
-                timestamp=datetime(2025, 1, 15, 12, 0, 0, tzinfo=timezone.utc),
+                timestamp=datetime(2025, 1, 15, 12, 0, 0, tzinfo=UTC),
                 symbol="BTCUSDT-PERP",
                 venue=Venue.BINANCE,
                 side=Side.LONG,

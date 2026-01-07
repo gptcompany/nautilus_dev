@@ -214,7 +214,7 @@ class MetricsClient:
             columns = [col["name"] for col in data.get("columns", [])]
             rows = data.get("dataset", [])
 
-            return [dict(zip(columns, row)) for row in rows]
+            return [dict(zip(columns, row, strict=False)) for row in rows]
         except Exception as e:
             logger.error(f"Error executing query: {e}")
             return []

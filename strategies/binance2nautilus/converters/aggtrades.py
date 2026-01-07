@@ -10,12 +10,11 @@ Features:
 - Streaming writes to catalog
 """
 
+from collections.abc import Generator
 from datetime import datetime
 from pathlib import Path
-from typing import Generator
 
 import pandas as pd
-
 from nautilus_trader.model.data import TradeTick
 
 from ..config import ConverterConfig
@@ -23,7 +22,6 @@ from ..instruments import get_instrument
 from ..state import ConversionState
 from ..wrangler_factory import get_trade_wrangler
 from .base import BaseConverter
-
 
 # Standard Binance aggTrades column names
 AGGTRADES_COLUMNS = [

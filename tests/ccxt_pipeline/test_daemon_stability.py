@@ -15,6 +15,7 @@ import gc
 import tempfile
 import time
 import tracemalloc
+from datetime import UTC
 from pathlib import Path
 from unittest.mock import AsyncMock, patch
 
@@ -37,12 +38,13 @@ class TestDaemonStabilityAutomated:
     @pytest.fixture
     def mock_fetchers(self):
         """Create mock fetchers that return realistic data."""
-        from datetime import datetime, timezone
-        from scripts.ccxt_pipeline.models import OpenInterest, FundingRate, Venue
+        from datetime import datetime
+
+        from scripts.ccxt_pipeline.models import FundingRate, OpenInterest, Venue
 
         def create_oi(venue: Venue, symbol: str) -> OpenInterest:
             return OpenInterest(
-                timestamp=datetime.now(timezone.utc),
+                timestamp=datetime.now(UTC),
                 symbol=symbol,
                 venue=venue,
                 open_interest=50000.0 + (hash(venue.value) % 10000),
@@ -51,11 +53,11 @@ class TestDaemonStabilityAutomated:
 
         def create_funding(venue: Venue, symbol: str) -> FundingRate:
             return FundingRate(
-                timestamp=datetime.now(timezone.utc),
+                timestamp=datetime.now(UTC),
                 symbol=symbol,
                 venue=venue,
                 funding_rate=0.0001,
-                next_funding_time=datetime.now(timezone.utc),
+                next_funding_time=datetime.now(UTC),
             )
 
         mock_binance = AsyncMock()
@@ -139,7 +141,7 @@ class TestDaemonStabilityAutomated:
             await runner.start()
 
             # Manually trigger scheduled jobs multiple times
-            for i in range(5):
+            for _i in range(5):
                 await runner._scheduled_oi_fetch()
                 await runner._scheduled_funding_fetch()
                 await asyncio.sleep(0.1)
@@ -239,9 +241,10 @@ class TestDaemonStabilityAutomated:
     @pytest.mark.timeout(60)
     async def test_daemon_error_recovery(self, temp_catalog):
         """Test daemon recovers from transient errors without stopping."""
-        from datetime import datetime, timezone
-        from scripts.ccxt_pipeline.scheduler.daemon import DaemonRunner
+        from datetime import datetime
+
         from scripts.ccxt_pipeline.models import OpenInterest, Venue
+        from scripts.ccxt_pipeline.scheduler.daemon import DaemonRunner
 
         # Create fetcher that fails intermittently
         error_count = 0
@@ -252,7 +255,7 @@ class TestDaemonStabilityAutomated:
             if error_count % 3 == 0:  # Fail every 3rd call
                 raise ConnectionError("Network timeout")
             return OpenInterest(
-                timestamp=datetime.now(timezone.utc),
+                timestamp=datetime.now(UTC),
                 symbol=symbol,
                 venue=Venue.BINANCE,
                 open_interest=50000.0,
@@ -330,7 +333,7 @@ class TestDaemonStabilityAutomated:
             assert len(parquet_files) > 0, "No parquet files found after daemon run"
 
             # Verify data is readable
-            store = ParquetStore(temp_catalog)
+            ParquetStore(temp_catalog)
             # Data should exist (we can't query specific types without knowing schema)
             assert catalog_path.exists()
 

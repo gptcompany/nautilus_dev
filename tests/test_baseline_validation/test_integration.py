@@ -117,7 +117,7 @@ class TestComponentInteraction:
         assert isinstance(result, ValidationRun)
         assert len(result.contender_results) > 0
 
-        for name, cr in result.contender_results.items():
+        for _name, cr in result.contender_results.items():
             assert isinstance(cr, ContenderResult)
             assert len(cr.window_sharpes) > 0
 

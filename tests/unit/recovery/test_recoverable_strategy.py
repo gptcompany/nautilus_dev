@@ -181,7 +181,7 @@ class TestPositionRecoveryHooks:
 
         # Verify the method exists and is callable
         assert hasattr(RecoverableStrategy, "on_position_recovered")
-        assert callable(getattr(RecoverableStrategy, "on_position_recovered"))
+        assert callable(RecoverableStrategy.on_position_recovered)
 
     def test_handle_recovered_position_updates_state(self, mock_btc_position):
         """Test that _handle_recovered_position updates recovery state."""

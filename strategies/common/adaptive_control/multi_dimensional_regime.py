@@ -38,7 +38,6 @@ from __future__ import annotations
 import logging
 from dataclasses import dataclass
 from enum import Enum
-from typing import List, Optional
 
 from .dsp_filters import IIRRegimeDetector
 from .flow_physics import MarketFlowAnalyzer
@@ -72,7 +71,7 @@ class MultiDimensionalResult:
     """Combined result from all dimensions."""
 
     # Individual dimensions
-    dimensions: List[DimensionResult]
+    dimensions: list[DimensionResult]
 
     # Consensus
     consensus: ConsensusRegime
@@ -139,18 +138,18 @@ class MultiDimensionalRegimeDetector:
         )
 
         # State
-        self._last_price: Optional[float] = None
+        self._last_price: float | None = None
         self._update_count: int = 0
-        self._history: List[MultiDimensionalResult] = []
+        self._history: list[MultiDimensionalResult] = []
 
     def update(
         self,
         price: float,
-        bid: Optional[float] = None,
-        ask: Optional[float] = None,
-        bid_size: Optional[float] = None,
-        ask_size: Optional[float] = None,
-        volume: Optional[float] = None,
+        bid: float | None = None,
+        ask: float | None = None,
+        bid_size: float | None = None,
+        ask_size: float | None = None,
+        volume: float | None = None,
     ) -> MultiDimensionalResult:
         """
         Update all dimensions with new data.
@@ -228,7 +227,7 @@ class MultiDimensionalRegimeDetector:
 
     def _calculate_consensus(
         self,
-        dimensions: List[DimensionResult],
+        dimensions: list[DimensionResult],
     ) -> MultiDimensionalResult:
         """Calculate consensus from all dimensions."""
         if not dimensions:
@@ -251,7 +250,7 @@ class MultiDimensionalRegimeDetector:
             "unknown": 0,
         }
 
-        weighted_votes = {k: 0.0 for k in votes}
+        weighted_votes = dict.fromkeys(votes, 0.0)
 
         for dim in dimensions:
             regime = dim.regime.lower()
@@ -313,7 +312,7 @@ class MultiDimensionalRegimeDetector:
             turbulent_votes=votes["turbulent"],
         )
 
-    def get_regime_history(self, n: int = 10) -> List[ConsensusRegime]:
+    def get_regime_history(self, n: int = 10) -> list[ConsensusRegime]:
         """Get recent regime history."""
         return [r.consensus for r in self._history[-n:]]
 

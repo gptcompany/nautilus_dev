@@ -6,7 +6,6 @@ TDD: RED phase - tests written before implementation.
 
 from __future__ import annotations
 
-
 from config.factory import TradingNodeConfigFactory
 from config.models import (
     BinanceCredentials,

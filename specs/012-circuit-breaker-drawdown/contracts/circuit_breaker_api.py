@@ -16,6 +16,8 @@ if TYPE_CHECKING:
     from nautilus_trader.model.events import AccountState
     from nautilus_trader.portfolio.portfolio import Portfolio
 
+    from .circuit_breaker_config import CircuitBreakerConfig
+
 
 class CircuitBreakerState(Enum):
     """
@@ -51,8 +53,8 @@ class ICircuitBreaker(ABC):
     @abstractmethod
     def __init__(
         self,
-        config: "CircuitBreakerConfig",
-        portfolio: "Portfolio",
+        config: CircuitBreakerConfig,
+        portfolio: Portfolio,
     ) -> None:
         """
         Initialize the circuit breaker.
@@ -68,7 +70,7 @@ class ICircuitBreaker(ABC):
 
     @property
     @abstractmethod
-    def config(self) -> "CircuitBreakerConfig":
+    def config(self) -> CircuitBreakerConfig:
         """Return the circuit breaker configuration."""
         ...
 
@@ -105,7 +107,7 @@ class ICircuitBreaker(ABC):
 
     @property
     @abstractmethod
-    def last_check(self) -> "datetime":
+    def last_check(self) -> datetime:
         """Return the timestamp of the last update."""
         ...
 
@@ -200,7 +202,7 @@ class ICircuitBreakerActor(ABC):
         ...
 
     @abstractmethod
-    def on_account_state(self, event: "AccountState") -> None:
+    def on_account_state(self, event: AccountState) -> None:
         """
         Handle account state updates.
 

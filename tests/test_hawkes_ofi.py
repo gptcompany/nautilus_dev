@@ -16,16 +16,15 @@ from __future__ import annotations
 
 import pytest
 
+from strategies.common.orderflow.config import HawkesConfig
 from strategies.common.orderflow.hawkes_ofi import (
     HawkesOFI,
     HawkesState,
 )
-from strategies.common.orderflow.config import HawkesConfig
 from strategies.common.orderflow.trade_classifier import (
     TradeClassification,
     TradeSide,
 )
-
 
 # ==============================================================================
 # Fixtures

@@ -29,6 +29,14 @@ Order Helpers (Spec 015)::
 
 from __future__ import annotations
 
+from config.binance_errors import (
+    BinanceErrorCategory,
+    calculate_backoff_delay,
+    get_error_category,
+    get_error_message,
+    is_retryable_error,
+    should_retry,
+)
 from config.factory import TradingNodeConfigFactory
 from config.models import (
     BinanceCredentials,
@@ -47,14 +55,6 @@ from config.order_helpers import (
     create_stop_limit_order,
     create_stop_market_order,
     validate_order_params,
-)
-from config.binance_errors import (
-    BinanceErrorCategory,
-    calculate_backoff_delay,
-    get_error_category,
-    get_error_message,
-    is_retryable_error,
-    should_retry,
 )
 
 __all__ = [

@@ -5,8 +5,8 @@
 import asyncio
 import logging
 import socket
-from datetime import datetime, timezone
-from typing import Callable
+from collections.abc import Callable
+from datetime import UTC, datetime
 
 from monitoring.collectors import BaseCollector
 from monitoring.config import MonitoringConfig
@@ -65,7 +65,7 @@ class DaemonCollector(BaseCollector[DaemonMetrics]):
             # Return degraded metrics on error
             return [
                 DaemonMetrics(
-                    timestamp=datetime.now(timezone.utc),
+                    timestamp=datetime.now(UTC),
                     host=self._host,
                     env=self._env,
                     fetch_count=0,
@@ -121,7 +121,7 @@ class DaemonCollector(BaseCollector[DaemonMetrics]):
             DaemonMetrics instance.
         """
         return DaemonMetrics(
-            timestamp=datetime.now(timezone.utc),
+            timestamp=datetime.now(UTC),
             host=self._host,
             env=self._env,
             fetch_count=status.get("fetch_count", 0),

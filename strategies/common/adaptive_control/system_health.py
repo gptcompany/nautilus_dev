@@ -9,10 +9,10 @@ from __future__ import annotations
 
 import logging
 from collections import deque
+from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from enum import Enum
-from typing import Callable, Deque, Optional
 
 import numpy as np
 
@@ -73,10 +73,10 @@ class SystemHealthMonitor:
         self.drawdown_halt_pct = drawdown_halt_pct
 
         # Data stores (last hour)
-        self._latencies: Deque[tuple[datetime, float]] = deque(maxlen=5000)
-        self._fills: Deque[tuple[datetime, float]] = deque(maxlen=1000)
-        self._rejections: Deque[datetime] = deque(maxlen=500)
-        self._reconnects: Deque[datetime] = deque(maxlen=100)
+        self._latencies: deque[tuple[datetime, float]] = deque(maxlen=5000)
+        self._fills: deque[tuple[datetime, float]] = deque(maxlen=1000)
+        self._rejections: deque[datetime] = deque(maxlen=500)
+        self._reconnects: deque[datetime] = deque(maxlen=100)
 
         # Equity tracking
         self._peak_equity: float = 0.0
@@ -86,7 +86,7 @@ class SystemHealthMonitor:
         self._on_state_change: list[Callable] = []
 
         # Cached state
-        self._last_state: Optional[HealthState] = None
+        self._last_state: HealthState | None = None
 
     def record_latency(self, latency_ms: float) -> None:
         """Record order/message latency."""

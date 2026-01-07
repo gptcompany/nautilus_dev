@@ -28,15 +28,16 @@ This is how we survive: by being water, not rock.
 from __future__ import annotations
 
 import logging
+from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
-from typing import TYPE_CHECKING, Callable, Dict, List, Optional
+from typing import TYPE_CHECKING
 
 from .meta_controller import MarketHarmony, MetaController, MetaState
 
 if TYPE_CHECKING:
-    pass
+    from strategies.common.audit.events import AuditEventEmitter
 
 logger = logging.getLogger(__name__)
 
@@ -58,8 +59,8 @@ class EvolutionRequest:
     trigger: EvolutionTrigger
     timestamp: datetime
     current_state: MetaState
-    underperforming_strategies: List[str]
-    market_conditions: Dict[str, float]
+    underperforming_strategies: list[str]
+    market_conditions: dict[str, float]
     priority: int  # 1-5, 5 = urgent
 
 
@@ -107,8 +108,8 @@ class AlphaEvolveBridge:
     def __init__(
         self,
         meta_controller: MetaController,
-        config: Optional[EvolutionConfig] = None,
-        audit_emitter: "AuditEventEmitter | None" = None,
+        config: EvolutionConfig | None = None,
+        audit_emitter: AuditEventEmitter | None = None,
     ):
         """
         Args:
@@ -122,11 +123,11 @@ class AlphaEvolveBridge:
         # Audit emitter for logging evolution triggers (Spec 030)
         self._audit_emitter = audit_emitter
 
-        self._callbacks: List[Callable[[EvolutionRequest], None]] = []
+        self._callbacks: list[Callable[[EvolutionRequest], None]] = []
         self._last_evolution_bar: int = 0
         self._bars_since_improvement: int = 0
         self._best_sharpe: float = float("-inf")
-        self._pending_requests: List[EvolutionRequest] = []
+        self._pending_requests: list[EvolutionRequest] = []
 
     def on_evolution_request(
         self,
@@ -144,7 +145,7 @@ class AlphaEvolveBridge:
         self,
         state: MetaState,
         current_bar: int = 0,
-    ) -> Optional[EvolutionRequest]:
+    ) -> EvolutionRequest | None:
         """
         Check if evolution should be triggered based on current state.
 
@@ -230,7 +231,7 @@ class AlphaEvolveBridge:
         self,
         state: MetaState,
         current_bar: int,
-    ) -> Optional[EvolutionTrigger]:
+    ) -> EvolutionTrigger | None:
         """Evaluate which trigger condition is met (if any)."""
         # 1. Dissonance check (most important)
         if state.market_harmony == MarketHarmony.DISSONANT:
@@ -260,7 +261,7 @@ class AlphaEvolveBridge:
 
         return None
 
-    def _find_underperformers(self, state: MetaState) -> List[str]:
+    def _find_underperformers(self, state: MetaState) -> list[str]:
         """Find strategies that are underperforming."""
         if not state.strategy_weights:
             return []
@@ -296,7 +297,7 @@ class AlphaEvolveBridge:
         # Use risk multiplier as proxy (higher = better recent performance)
         return state.risk_multiplier
 
-    def _extract_market_conditions(self, state: MetaState) -> Dict[str, float]:
+    def _extract_market_conditions(self, state: MetaState) -> dict[str, float]:
         """Extract market conditions for Alpha-Evolve context."""
         return {
             "risk_multiplier": state.risk_multiplier,
@@ -333,17 +334,17 @@ class AlphaEvolveBridge:
             self._pending_requests.remove(request)
             logger.info(f"Evolution complete: {request.trigger.value}")
 
-    def get_pending_evolutions(self) -> List[EvolutionRequest]:
+    def get_pending_evolutions(self) -> list[EvolutionRequest]:
         """Get list of pending evolution requests."""
         return self._pending_requests.copy()
 
     @property
-    def audit_emitter(self) -> "AuditEventEmitter | None":
+    def audit_emitter(self) -> AuditEventEmitter | None:
         """Audit emitter for logging evolution triggers."""
         return self._audit_emitter
 
     @audit_emitter.setter
-    def audit_emitter(self, emitter: "AuditEventEmitter | None") -> None:
+    def audit_emitter(self, emitter: AuditEventEmitter | None) -> None:
         """Set the audit emitter."""
         self._audit_emitter = emitter
 
@@ -380,8 +381,8 @@ class AdaptiveSurvivalSystem:
 
     def __init__(
         self,
-        meta_config: Optional[dict] = None,
-        evolution_config: Optional[EvolutionConfig] = None,
+        meta_config: dict | None = None,
+        evolution_config: EvolutionConfig | None = None,
     ):
         """Initialize the survival system."""
         from .meta_controller import MetaController
@@ -390,7 +391,7 @@ class AdaptiveSurvivalSystem:
         self.bridge = AlphaEvolveBridge(self.meta, evolution_config)
 
         self._bar_count: int = 0
-        self._risk_callbacks: List[Callable[[float], None]] = []
+        self._risk_callbacks: list[Callable[[float], None]] = []
 
     def register_strategy(self, name: str) -> None:
         """Register a strategy with the meta system."""
@@ -419,8 +420,8 @@ class AdaptiveSurvivalSystem:
         self,
         price: float,
         current_drawdown: float,
-        regime: Optional[str] = None,
-    ) -> Dict:
+        regime: str | None = None,
+    ) -> dict:
         """
         Process a new bar and return recommended actions.
 
@@ -465,7 +466,7 @@ class AdaptiveSurvivalSystem:
             "market_harmony": state.market_harmony.value,
         }
 
-    def get_status(self) -> Dict:
+    def get_status(self) -> dict:
         """Get current system status."""
         return {
             "bar_count": self._bar_count,

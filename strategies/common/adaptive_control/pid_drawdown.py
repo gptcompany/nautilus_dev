@@ -13,7 +13,6 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass
-from typing import Optional
 
 logger = logging.getLogger(__name__)
 
@@ -81,7 +80,7 @@ class PIDDrawdownController:
         self.integral_limit = integral_limit
 
         self._integral: float = 0.0
-        self._prev_error: Optional[float] = None
+        self._prev_error: float | None = None
         self._step_count: int = 0
 
     def update(self, current_drawdown: float, dt: float = 1.0) -> float:

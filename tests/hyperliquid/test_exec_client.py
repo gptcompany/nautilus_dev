@@ -8,13 +8,12 @@ import pytest
 # Skip entire module if Hyperliquid adapter not available
 pytest.importorskip("nautilus_trader.adapters.hyperliquid")
 
-from nautilus_trader.adapters.hyperliquid import HYPERLIQUID
-from nautilus_trader.adapters.hyperliquid import HyperliquidExecClientConfig
+from nautilus_trader.adapters.hyperliquid import HYPERLIQUID, HyperliquidExecClientConfig
 from nautilus_trader.config import TradingNodeConfig
 
+from configs.hyperliquid.data_client import DEFAULT_INSTRUMENTS
 from configs.hyperliquid.exec_client import create_hyperliquid_exec_client
 from configs.hyperliquid.testnet import create_testnet_trading_node
-from configs.hyperliquid.data_client import DEFAULT_INSTRUMENTS
 
 
 class TestCreateHyperliquidExecClient:

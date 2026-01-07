@@ -4,16 +4,16 @@ Tests for LiquidationHeatMap strategy.
 Converted from: Liquidation HeatMap [BigBeluga]
 """
 
-import pytest
 from decimal import Decimal
 
+import pytest
 from nautilus_trader.model.identifiers import InstrumentId
 
 from strategies.converted.liquidation_heatmap import (
-    LiquidationZone,
-    LiquidationZoneIndicator,
     LiquidationHeatMapConfig,
     LiquidationHeatMapStrategy,
+    LiquidationZone,
+    LiquidationZoneIndicator,
 )
 
 

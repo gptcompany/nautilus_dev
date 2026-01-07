@@ -23,15 +23,15 @@ from pathlib import Path
 from nautilus_trader.common.enums import LogLevel
 from nautilus_trader.config import LoggingConfig
 from nautilus_trader.live.node import TradingNode
-from nautilus_trader.model.data import QuoteTick, TradeTick, OrderBookDelta
+from nautilus_trader.model.data import OrderBookDelta, QuoteTick, TradeTick
 from nautilus_trader.model.identifiers import InstrumentId
 from nautilus_trader.trading.strategy import Strategy
 
-from configs.hyperliquid.persistence import (
-    create_recording_trading_node,
-    DEFAULT_CATALOG_PATH,
-)
 from configs.hyperliquid.data_client import DEFAULT_INSTRUMENTS
+from configs.hyperliquid.persistence import (
+    DEFAULT_CATALOG_PATH,
+    create_recording_trading_node,
+)
 
 
 class DataRecordingStrategy(Strategy):

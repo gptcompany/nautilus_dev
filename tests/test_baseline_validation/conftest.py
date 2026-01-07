@@ -21,7 +21,7 @@ if TYPE_CHECKING:
 
 
 @pytest.fixture
-def sample_window() -> "Window":
+def sample_window() -> Window:
     """Create a sample Window for testing."""
     from scripts.alpha_evolve.walk_forward.models import Window
 
@@ -35,7 +35,7 @@ def sample_window() -> "Window":
 
 
 @pytest.fixture
-def profitable_window_result() -> "WindowResult":
+def profitable_window_result() -> WindowResult:
     """Create a profitable WindowResult for testing."""
     from scripts.alpha_evolve.walk_forward.models import (
         Window,
@@ -77,7 +77,7 @@ def profitable_window_result() -> "WindowResult":
 
 
 @pytest.fixture
-def unprofitable_window_result() -> "WindowResult":
+def unprofitable_window_result() -> WindowResult:
     """Create an unprofitable WindowResult for testing."""
     from scripts.alpha_evolve.walk_forward.models import (
         Window,
@@ -120,15 +120,15 @@ def unprofitable_window_result() -> "WindowResult":
 
 @pytest.fixture
 def sample_window_results(
-    profitable_window_result: "WindowResult",
-    unprofitable_window_result: "WindowResult",
-) -> list["WindowResult"]:
+    profitable_window_result: WindowResult,
+    unprofitable_window_result: WindowResult,
+) -> list[WindowResult]:
     """Create a list of sample WindowResults."""
     return [profitable_window_result, unprofitable_window_result]
 
 
 @pytest.fixture
-def multiple_profitable_windows() -> list["WindowResult"]:
+def multiple_profitable_windows() -> list[WindowResult]:
     """Create multiple profitable WindowResults for testing."""
     from scripts.alpha_evolve.walk_forward.models import (
         Window,

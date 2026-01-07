@@ -12,7 +12,7 @@ from decimal import Decimal
 from unittest.mock import MagicMock
 
 import pytest
-
+from nautilus_trader.model.currencies import USDT
 from nautilus_trader.model.enums import OrderSide, PositionSide
 from nautilus_trader.model.identifiers import (
     ClientOrderId,
@@ -21,11 +21,9 @@ from nautilus_trader.model.identifiers import (
     StrategyId,
     TraderId,
 )
-from nautilus_trader.model.currencies import USDT
 from nautilus_trader.model.objects import Money, Price, Quantity
 
 from risk import RiskConfig, RiskManager
-
 
 # --- Fixtures ---
 

@@ -218,7 +218,7 @@ class MetricsOrchestrator:
         lines = []
 
         # Generate Prometheus format metrics
-        for key, data in self._prometheus_metrics.items():
+        for _key, data in self._prometheus_metrics.items():
             category = data["category"]
             metrics_data = data["data"]
 

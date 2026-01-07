@@ -4,7 +4,12 @@
 
 from pathlib import Path
 
-
+from scripts.auto_update.analyzer import (
+    calculate_confidence,
+    classify_severity,
+    generate_impact_report,
+    grep_codebase,
+)
 from scripts.auto_update.models import (
     AffectedFile,
     BreakingChange,
@@ -13,13 +18,6 @@ from scripts.auto_update.models import (
     Recommendation,
     Severity,
 )
-from scripts.auto_update.analyzer import (
-    calculate_confidence,
-    classify_severity,
-    generate_impact_report,
-    grep_codebase,
-)
-
 
 # =============================================================================
 # T021: Test grep_codebase

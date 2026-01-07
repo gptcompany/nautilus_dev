@@ -2,7 +2,6 @@
 
 from datetime import datetime
 
-
 from scripts.alpha_evolve.walk_forward.config import WalkForwardConfig
 from scripts.alpha_evolve.walk_forward.validator import WalkForwardValidator
 

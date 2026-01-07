@@ -20,7 +20,6 @@ from strategies.common.orderflow.config import (
 )
 from strategies.common.orderflow.vpin import ToxicityLevel
 
-
 # ==============================================================================
 # Fixtures
 # ==============================================================================
@@ -474,8 +473,8 @@ class TestOrderflowManagerGillerIntegration:
     def test_toxicity_compatible_with_giller_sizer(self, default_config: OrderflowConfig) -> None:
         """T035.1: OrderflowManager.toxicity should work with GillerSizer."""
         from strategies.common.orderflow.orderflow_manager import OrderflowManager
-        from strategies.common.position_sizing.giller_sizing import GillerSizer
         from strategies.common.position_sizing.config import GillerConfig
+        from strategies.common.position_sizing.giller_sizing import GillerSizer
 
         manager = OrderflowManager(config=default_config)
         sizer = GillerSizer(config=GillerConfig())
@@ -506,8 +505,8 @@ class TestOrderflowManagerGillerIntegration:
     def test_high_toxicity_reduces_position_size(self, default_config: OrderflowConfig) -> None:
         """T035.3: High VPIN should result in smaller position size."""
         from strategies.common.orderflow.orderflow_manager import OrderflowManager
-        from strategies.common.position_sizing.giller_sizing import GillerSizer
         from strategies.common.position_sizing.config import GillerConfig
+        from strategies.common.position_sizing.giller_sizing import GillerSizer
 
         manager = OrderflowManager(config=default_config)
         sizer = GillerSizer(config=GillerConfig())
@@ -557,8 +556,8 @@ class TestOrderflowManagerGillerIntegration:
     def test_orderflow_manager_workflow_with_giller(self, default_config: OrderflowConfig) -> None:
         """T035.4: Complete workflow: OrderflowManager -> GillerSizer."""
         from strategies.common.orderflow.orderflow_manager import OrderflowManager
-        from strategies.common.position_sizing.giller_sizing import GillerSizer
         from strategies.common.position_sizing.config import GillerConfig
+        from strategies.common.position_sizing.giller_sizing import GillerSizer
 
         # Setup
         orderflow = OrderflowManager(config=default_config)

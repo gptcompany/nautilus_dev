@@ -28,6 +28,19 @@ from strategies.common.orderflow.config import (
     VPINConfig,
 )
 
+# Hawkes OFI indicator
+from strategies.common.orderflow.hawkes_ofi import (
+    HawkesOFI,
+    HawkesResult,
+    HawkesState,
+)
+
+# Unified manager
+from strategies.common.orderflow.orderflow_manager import (
+    OrderflowManager,
+    OrderflowResult,
+)
+
 # Trade classification
 from strategies.common.orderflow.trade_classifier import (
     BVCClassifier,
@@ -44,19 +57,6 @@ from strategies.common.orderflow.vpin import (
     VPINBucket,
     VPINIndicator,
     VPINResult,
-)
-
-# Hawkes OFI indicator
-from strategies.common.orderflow.hawkes_ofi import (
-    HawkesOFI,
-    HawkesResult,
-    HawkesState,
-)
-
-# Unified manager
-from strategies.common.orderflow.orderflow_manager import (
-    OrderflowManager,
-    OrderflowResult,
 )
 
 __all__ = [

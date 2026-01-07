@@ -8,8 +8,8 @@ This script extends the original validation to:
 """
 
 import sys
+from datetime import datetime
 from pathlib import Path
-from datetime import datetime, timedelta
 
 import numpy as np
 import pandas as pd
@@ -17,8 +17,8 @@ from scipy import stats
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from nautilus_trader.persistence.catalog import ParquetDataCatalog
 from nautilus_trader.model.data import Bar, BarType
+from nautilus_trader.persistence.catalog import ParquetDataCatalog
 
 from strategies.common.orderflow import VPINConfig, VPINIndicator
 
@@ -115,12 +115,12 @@ def main():
     pearson_r, pearson_p = stats.pearsonr(combined["vpin"], combined["volatility"])
     spearman_r, spearman_p = stats.spearmanr(combined["vpin"], combined["volatility"])
 
-    print(f"\nOverall Correlations:")
+    print("\nOverall Correlations:")
     print(f"  Pearson:  {pearson_r:.4f} (p={pearson_p:.2e})")
     print(f"  Spearman: {spearman_r:.4f} (p={spearman_p:.2e})")
 
     # Regime comparison
-    print(f"\nRegime Comparison:")
+    print("\nRegime Comparison:")
     for regime in ["volatile", "normal"]:
         subset = combined[combined["regime"] == regime]
         print(f"  {regime.upper()}:")
@@ -130,7 +130,7 @@ def main():
     # VPIN quartile analysis
     combined["vpin_quartile"] = pd.qcut(combined["vpin"], q=4, labels=["Q1", "Q2", "Q3", "Q4"])
 
-    print(f"\nVolatility by VPIN Quartile:")
+    print("\nVolatility by VPIN Quartile:")
     quartile_stats = combined.groupby("vpin_quartile")["volatility"].agg(["mean", "std", "count"])
     for q in ["Q1", "Q2", "Q3", "Q4"]:
         if q in quartile_stats.index:
@@ -180,14 +180,14 @@ def main():
         print(f"\n  [PASS] Primary criterion met: r >= {threshold}")
         return 0
     elif alt_pass:
-        print(f"\n  [PASS] Alternative criteria met:")
-        print(f"    - VPIN quartiles show monotonic relationship with volatility")
+        print("\n  [PASS] Alternative criteria met:")
+        print("    - VPIN quartiles show monotonic relationship with volatility")
         print(f"    - Q4/Q1 volatility ratio = {ratio:.2f}x (>= 1.5x)")
-        print(f"    - Difference is statistically significant (p < 0.05)")
+        print("    - Difference is statistically significant (p < 0.05)")
         print(f"  Note: Raw correlation {best_corr:.4f} < {threshold} due to VPIN saturation")
         return 0
     else:
-        print(f"\n  [FAIL] Neither primary nor alternative criteria met")
+        print("\n  [FAIL] Neither primary nor alternative criteria met")
         return 1
 
 

@@ -37,10 +37,10 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    pass
+    from strategies.common.audit.events import AuditEventEmitter
 
 
 @dataclass
@@ -98,8 +98,8 @@ class AdaptiveKEstimator:
         self.vol_alpha = vol_alpha
         self.lookback = lookback
 
-        self._vol_ema: Optional[float] = None
-        self._vol_baseline: Optional[float] = None
+        self._vol_ema: float | None = None
+        self._vol_baseline: float | None = None
         self._returns_buffer: list[float] = []
 
     def update(self, return_value: float) -> float:
@@ -283,9 +283,9 @@ class TapeSpeed:
         self.fast_threshold = fast_threshold
         self.slow_threshold = slow_threshold
 
-        self._lambda: Optional[float] = None
-        self._last_timestamp: Optional[float] = None
-        self._lambda_baseline: Optional[float] = None
+        self._lambda: float | None = None
+        self._last_timestamp: float | None = None
+        self._lambda_baseline: float | None = None
         self._lambda_buffer: list[float] = []
 
     def update(self, timestamp: float, count: int = 1) -> TapeSpeedState:
@@ -462,7 +462,7 @@ class SOPSGillerSizer:
         tape_alpha: float = 0.1,
         max_position: float = 1.0,
         enable_tape_weight: bool = True,
-        audit_emitter: "AuditEventEmitter | None" = None,
+        audit_emitter: AuditEventEmitter | None = None,
     ):
         """
         Args:
@@ -493,7 +493,7 @@ class SOPSGillerSizer:
     def update(
         self,
         return_value: float,
-        timestamp: Optional[float] = None,
+        timestamp: float | None = None,
         trade_count: int = 1,
     ) -> None:
         """
@@ -505,7 +505,6 @@ class SOPSGillerSizer:
             trade_count: Number of trades in this update
         """
         # Update volatility for SOPS k
-        prev_k = self._sops.k
         self._sops.update_volatility(return_value)
         new_k = self._sops.k
 
@@ -526,7 +525,6 @@ class SOPSGillerSizer:
 
         # Update tape speed if timestamp provided
         if timestamp is not None:
-            prev_regime = self._tape.regime
             self._tape.update(timestamp, trade_count)
             new_regime = self._tape.regime
 
@@ -632,12 +630,12 @@ class SOPSGillerSizer:
         return self._tape.lambda_rate
 
     @property
-    def audit_emitter(self) -> "AuditEventEmitter | None":
+    def audit_emitter(self) -> AuditEventEmitter | None:
         """Audit emitter for logging k parameter changes."""
         return self._audit_emitter
 
     @audit_emitter.setter
-    def audit_emitter(self, emitter: "AuditEventEmitter | None") -> None:
+    def audit_emitter(self, emitter: AuditEventEmitter | None) -> None:
         """Set the audit emitter."""
         self._audit_emitter = emitter
 

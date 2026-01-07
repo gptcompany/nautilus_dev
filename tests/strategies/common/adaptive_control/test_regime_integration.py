@@ -13,11 +13,9 @@ Tests cover:
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
 import numpy as np
-import pytest
 
 from strategies.common.adaptive_control.regime_integration import (
     CombinedRegime,
@@ -26,7 +24,6 @@ from strategies.common.adaptive_control.regime_integration import (
 )
 from strategies.common.adaptive_control.spectral_regime import (
     MarketRegime,
-    RegimeAnalysis,
 )
 from strategies.common.regime_detection.types import RegimeState
 
@@ -88,7 +85,7 @@ class TestCombinedRegime:
 
     def test_combined_regime_enum_members(self):
         """Test all enum members exist."""
-        members = [m for m in CombinedRegime]
+        members = list(CombinedRegime)
         assert len(members) == 6
 
 

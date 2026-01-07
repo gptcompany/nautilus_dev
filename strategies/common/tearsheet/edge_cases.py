@@ -70,7 +70,7 @@ class TearsheetWarning:
         return f"[{self.severity.value.upper()}] {self.message}"
 
 
-def check_edge_cases(engine: "BacktestEngine") -> list[TearsheetWarning]:
+def check_edge_cases(engine: BacktestEngine) -> list[TearsheetWarning]:
     """
     Check for all edge cases in backtest results.
 
@@ -114,7 +114,7 @@ def check_edge_cases(engine: "BacktestEngine") -> list[TearsheetWarning]:
     return warnings
 
 
-def check_zero_trades(engine: "BacktestEngine") -> TearsheetWarning | None:
+def check_zero_trades(engine: BacktestEngine) -> TearsheetWarning | None:
     """
     Check for zero trades edge case.
 
@@ -146,7 +146,7 @@ def check_zero_trades(engine: "BacktestEngine") -> TearsheetWarning | None:
     return None
 
 
-def check_open_positions(engine: "BacktestEngine") -> TearsheetWarning | None:
+def check_open_positions(engine: BacktestEngine) -> TearsheetWarning | None:
     """
     Check for open positions at backtest end (epoch bug).
 
@@ -181,7 +181,7 @@ def check_open_positions(engine: "BacktestEngine") -> TearsheetWarning | None:
 
 
 def check_long_backtest(
-    engine: "BacktestEngine",
+    engine: BacktestEngine,
     year_threshold: int = 10,
 ) -> TearsheetWarning | None:
     """
@@ -222,7 +222,7 @@ def check_long_backtest(
 
 
 def check_high_frequency(
-    engine: "BacktestEngine",
+    engine: BacktestEngine,
     trades_per_day_threshold: int = 1000,
 ) -> TearsheetWarning | None:
     """
@@ -268,7 +268,7 @@ def check_high_frequency(
     return None
 
 
-def check_all_losses(engine: "BacktestEngine") -> TearsheetWarning | None:
+def check_all_losses(engine: BacktestEngine) -> TearsheetWarning | None:
     """
     Check for all-losses scenario.
 
@@ -301,7 +301,7 @@ def check_all_losses(engine: "BacktestEngine") -> TearsheetWarning | None:
     return None
 
 
-def should_use_scattergl(engine: "BacktestEngine", threshold: int = 5000) -> bool:
+def should_use_scattergl(engine: BacktestEngine, threshold: int = 5000) -> bool:
     """
     Determine if ScatterGL should be used for performance.
 
@@ -324,7 +324,7 @@ def should_use_scattergl(engine: "BacktestEngine", threshold: int = 5000) -> boo
         return False
 
 
-def should_aggregate_trades(engine: "BacktestEngine", threshold: int = 50000) -> bool:
+def should_aggregate_trades(engine: BacktestEngine, threshold: int = 50000) -> bool:
     """
     Determine if trades should be aggregated for display.
 

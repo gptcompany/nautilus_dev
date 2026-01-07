@@ -9,27 +9,28 @@ Validates the Five Pillars:
 """
 
 import math
+
 import pytest
 
 from strategies.common.adaptive_control import (
+    ConsensusRegime,
+    HarmonicRatioAnalyzer,
+    IIRHighPass,
     # DSP Filters
     IIRLowPass,
-    IIRHighPass,
-    RecursiveVariance,
-    KalmanFilter1D,
     IIRRegimeDetector,
-    MetaController,
-    SystemState,
-    MarketHarmony,
-    # Multi-dimensional
-    MultiDimensionalRegimeDetector,
-    ConsensusRegime,
+    KalmanFilter1D,
     # Flow Physics
     MarketFlowAnalyzer,
-    WaveEquationAnalyzer,
+    MarketHarmony,
+    MetaController,
+    # Multi-dimensional
+    MultiDimensionalRegimeDetector,
+    RecursiveVariance,
+    SystemState,
     # Vibration
     VibrationAnalyzer,
-    HarmonicRatioAnalyzer,
+    WaveEquationAnalyzer,
 )
 
 

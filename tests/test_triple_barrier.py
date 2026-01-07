@@ -145,7 +145,7 @@ class TestTripleBarrierLabeler:
 
         # Only entries with non-zero signals should have labels
         # (other entries should remain 0 as no trade was taken)
-        signal_indices = np.where(signals != 0)[0]
+        np.where(signals != 0)[0]
         non_signal_indices = np.where(signals == 0)[0]
 
         # Non-signal entries should be 0 (no label)

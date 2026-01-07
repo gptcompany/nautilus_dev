@@ -8,7 +8,6 @@ from pathlib import Path
 
 import pandas as pd
 import pytest
-
 from nautilus_trader.backtest.engine import BacktestEngine, BacktestEngineConfig
 from nautilus_trader.model.data import BarType
 from nautilus_trader.persistence.catalog import ParquetDataCatalog

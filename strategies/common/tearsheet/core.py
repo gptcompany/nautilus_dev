@@ -18,9 +18,9 @@ _logger = logging.getLogger(__name__)
 
 
 def generate_tearsheet(
-    engine: "BacktestEngine",
+    engine: BacktestEngine,
     output_path: str = "tearsheet.html",
-    config: "TearsheetConfig | None" = None,
+    config: TearsheetConfig | None = None,
     **kwargs,
 ) -> str:
     """
@@ -81,9 +81,9 @@ def generate_tearsheet(
 
 
 def _create_tearsheet_native(
-    engine: "BacktestEngine",
+    engine: BacktestEngine,
     output_path: str,
-    config: "TearsheetConfig | None" = None,
+    config: TearsheetConfig | None = None,
     **kwargs,
 ) -> None:
     """

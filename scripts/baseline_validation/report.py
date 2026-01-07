@@ -33,7 +33,7 @@ if TYPE_CHECKING:
 
 
 def create_report_from_validation_run(
-    validation_run: "ValidationRun",
+    validation_run: ValidationRun,
     sharpe_edge_threshold: float = 0.2,
 ) -> ValidationReport:
     """Create ValidationReport from ValidationRun result.

@@ -7,7 +7,6 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Union
 
 
 @dataclass
@@ -30,7 +29,7 @@ class AuditConfig:
         ... )
     """
 
-    base_path: Union[Path, str] = field(default_factory=lambda: Path("./data/audit/hot"))
+    base_path: Path | str = field(default_factory=lambda: Path("./data/audit/hot"))
     sync_writes: bool = False
     rotate_daily: bool = True
     retention_days: int = 90

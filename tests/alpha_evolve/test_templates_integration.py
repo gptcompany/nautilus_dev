@@ -5,13 +5,12 @@ from decimal import Decimal
 from nautilus_trader.model.data import BarType
 from nautilus_trader.model.identifiers import InstrumentId
 
-from scripts.alpha_evolve.patching import extract_blocks, apply_patch
+from scripts.alpha_evolve.patching import apply_patch, extract_blocks
 from scripts.alpha_evolve.templates import (
     BaseEvolveStrategy,
     MomentumEvolveConfig,
     MomentumEvolveStrategy,
 )
-
 
 # =============================================================================
 # T041: Test Strategy Evaluation Returns Metrics

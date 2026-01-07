@@ -106,8 +106,8 @@ class TestCLIConfig:
 
     def test_loads_yaml_config(self) -> None:
         """Test that CLI loads YAML config."""
-        from click.testing import CliRunner
         import yaml
+        from click.testing import CliRunner
 
         from scripts.baseline_validation.cli import cli
 
@@ -166,8 +166,9 @@ class TestCLIIntegration:
 
     def test_json_output(self) -> None:
         """Test JSON output format."""
-        from click.testing import CliRunner
         import json
+
+        from click.testing import CliRunner
 
         from scripts.baseline_validation.cli import cli
 

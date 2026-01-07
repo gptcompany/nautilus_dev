@@ -5,13 +5,13 @@
 import asyncio
 import logging
 import socket
-from datetime import datetime, timezone
-from typing import Callable
+from collections.abc import Callable
+from datetime import UTC, datetime
 
 from monitoring.collectors import BaseCollector
 from monitoring.config import MonitoringConfig
-from monitoring.models import TradingMetrics
 from monitoring.constants import VALID_EXCHANGES
+from monitoring.models import TradingMetrics
 
 logger = logging.getLogger(__name__)
 
@@ -149,7 +149,7 @@ class TradingCollector(BaseCollector[TradingMetrics]):
             List of TradingMetrics instances.
         """
         metrics_list = []
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
 
         for strategy_id, data in metrics_dict.items():
             # Calculate fill rate
@@ -191,7 +191,7 @@ class TradingCollector(BaseCollector[TradingMetrics]):
         Returns:
             Orders per minute rate.
         """
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
 
         # Check if this is the first collection for this strategy
         if strategy_id not in self._last_orders or strategy_id not in self._last_collection_times:

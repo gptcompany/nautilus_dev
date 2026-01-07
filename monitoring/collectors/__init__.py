@@ -8,7 +8,7 @@ from typing import Generic, TypeVar
 T = TypeVar("T")
 
 
-class BaseCollector(ABC, Generic[T]):
+class BaseCollector[T](ABC):
     """Base class for metrics collectors.
 
     Collectors poll data sources and emit metrics to QuestDB via MetricsClient.

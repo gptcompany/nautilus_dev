@@ -14,7 +14,7 @@ Usage:
 
 from __future__ import annotations
 
-from typing import Iterator
+from collections.abc import Iterator
 
 from scripts.baseline_validation.sizers import (
     AdaptiveSizer,
@@ -118,7 +118,7 @@ class ContenderRegistry:
         return name in self._contenders
 
     @classmethod
-    def from_config(cls, config: dict) -> "ContenderRegistry":
+    def from_config(cls, config: dict) -> ContenderRegistry:
         """Create registry from configuration dict or Pydantic models.
 
         Args:
@@ -155,7 +155,7 @@ class ContenderRegistry:
         return registry
 
     @classmethod
-    def default(cls) -> "ContenderRegistry":
+    def default(cls) -> ContenderRegistry:
         """Create registry with default contenders (A, B, C).
 
         Returns:

@@ -29,10 +29,9 @@ from __future__ import annotations
 import argparse
 import json
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
-
 
 # Configuration
 CONFIG = {
@@ -121,7 +120,7 @@ def is_stale(existing: dict[str, Any] | None, threshold_hours: int) -> bool:
 
     try:
         sync_time = datetime.fromisoformat(synced_at.replace("Z", "+00:00"))
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         age_hours = (now - sync_time).total_seconds() / 3600
         return age_hours > threshold_hours
     except (ValueError, TypeError):
@@ -134,7 +133,7 @@ def create_sync_output(
 ) -> dict[str, Any]:
     """Create the sync output structure."""
     return {
-        "synced_at": datetime.now(timezone.utc).isoformat(),
+        "synced_at": datetime.now(UTC).isoformat(),
         "source": str(source_path),
         "count": len(strategies),
         "strategies": strategies,

@@ -18,7 +18,6 @@ from scripts.alpha_evolve.walk_forward.models import (
     WindowResult,
 )
 
-
 logger = logging.getLogger(__name__)
 
 

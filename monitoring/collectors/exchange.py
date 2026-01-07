@@ -5,13 +5,13 @@
 import asyncio
 import logging
 import socket
-from datetime import datetime, timezone
-from typing import Callable
+from collections.abc import Callable
+from datetime import UTC, datetime
 
 from monitoring.collectors import BaseCollector
 from monitoring.config import MonitoringConfig
-from monitoring.models import ExchangeStatus
 from monitoring.constants import VALID_EXCHANGES
+from monitoring.models import ExchangeStatus
 
 logger = logging.getLogger(__name__)
 
@@ -134,7 +134,7 @@ class ExchangeCollector(BaseCollector[ExchangeStatus]):
             List of ExchangeStatus instances.
         """
         metrics_list = []
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
 
         for exchange, data in status_dict.items():
             # Skip unknown exchanges to avoid Pydantic validation errors

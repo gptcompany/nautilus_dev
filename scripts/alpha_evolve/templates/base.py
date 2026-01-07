@@ -53,8 +53,8 @@ class BaseEvolveConfig(StrategyConfig, frozen=True):
         trade_size: Order quantity per trade (must be positive)
     """
 
-    instrument_id: "InstrumentId"
-    bar_type: "BarType"
+    instrument_id: InstrumentId
+    bar_type: BarType
     trade_size: Decimal
 
     def __post_init__(self) -> None:
@@ -110,7 +110,7 @@ class BaseEvolveStrategy(Strategy, ABC):
         self.subscribe_bars(self.config.bar_type)
         self.log.info(f"Started with instrument: {self.config.instrument_id}")
 
-    def on_bar(self, bar: "Bar") -> None:
+    def on_bar(self, bar: Bar) -> None:
         """
         Handle bar event.
 
@@ -155,7 +155,7 @@ class BaseEvolveStrategy(Strategy, ABC):
     # =========================================================================
 
     @abstractmethod
-    def _on_bar_evolved(self, bar: "Bar") -> None:
+    def _on_bar_evolved(self, bar: Bar) -> None:
         """
         Handle bar with evolvable decision logic.
 

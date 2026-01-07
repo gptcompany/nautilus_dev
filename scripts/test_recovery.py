@@ -5,8 +5,8 @@ Recovery Test Script (Spec 018 - T013)
 Tests that state recovers correctly after TradingNode restart.
 """
 
-import sys
 import os
+import sys
 import time
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -18,8 +18,8 @@ def main():
     host = os.getenv("REDIS_HOST", "localhost")
     port = int(os.getenv("REDIS_PORT", "6379"))
 
-    print(f"Recovery Test")
-    print(f"=" * 40)
+    print("Recovery Test")
+    print("=" * 40)
 
     if not check_redis_health(host, port):
         print(f"✗ Redis not available at {host}:{port}")
@@ -37,7 +37,7 @@ def main():
         # Step 1: Write position (simulates trading)
         print("\n1. Simulating active position...")
         r.set(position_key, position_data)
-        print(f"   ✓ Position written to Redis")
+        print("   ✓ Position written to Redis")
 
         # Step 2: Simulate restart (just verify data persists)
         print("\n2. Simulating TradingNode restart...")
@@ -48,15 +48,15 @@ def main():
         recovered = r.get(position_key)
 
         if recovered == position_data:
-            print(f"   ✓ Position recovered successfully")
+            print("   ✓ Position recovered successfully")
             print(f"   Data: {recovered[:50]}...")
         else:
-            print(f"   ✗ Recovery mismatch")
+            print("   ✗ Recovery mismatch")
             sys.exit(1)
 
         # Cleanup
         r.delete(position_key)
-        print(f"\n✓ Recovery test passed")
+        print("\n✓ Recovery test passed")
 
     except ImportError:
         print("⚠ redis-py not installed")

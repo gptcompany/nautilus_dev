@@ -13,12 +13,12 @@ Tests cover:
 - T011b: Edge cases (startup, rapid drawdown, oscillation, division by zero)
 """
 
+from datetime import UTC
 from decimal import Decimal
 
 import pytest
 
 from risk import CircuitBreaker, CircuitBreakerConfig, CircuitBreakerState
-
 
 # --- Fixtures ---
 
@@ -437,12 +437,12 @@ class TestProperties:
 
     def test_last_check_property(self, circuit_breaker: CircuitBreaker) -> None:
         """last_check property should return timestamp of last update."""
-        from datetime import datetime, timezone
+        from datetime import datetime
 
         circuit_breaker.update(equity=Decimal("100000"))
 
         assert isinstance(circuit_breaker.last_check, datetime)
-        assert circuit_breaker.last_check.tzinfo == timezone.utc
+        assert circuit_breaker.last_check.tzinfo == UTC
 
 
 # --- T016-T018: CircuitBreakerActor Tests ---

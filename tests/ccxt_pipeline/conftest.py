@@ -1,6 +1,6 @@
 """Test fixtures for CCXT pipeline tests."""
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
@@ -15,7 +15,7 @@ from scripts.ccxt_pipeline.storage.parquet_store import ParquetStore
 def sample_open_interest() -> OpenInterest:
     """Create a sample OpenInterest record."""
     return OpenInterest(
-        timestamp=datetime(2025, 1, 15, 12, 0, 0, tzinfo=timezone.utc),
+        timestamp=datetime(2025, 1, 15, 12, 0, 0, tzinfo=UTC),
         symbol="BTCUSDT-PERP",
         venue=Venue.BINANCE,
         open_interest=125432.50,
@@ -27,11 +27,11 @@ def sample_open_interest() -> OpenInterest:
 def sample_funding_rate() -> FundingRate:
     """Create a sample FundingRate record."""
     return FundingRate(
-        timestamp=datetime(2025, 1, 15, 8, 0, 0, tzinfo=timezone.utc),
+        timestamp=datetime(2025, 1, 15, 8, 0, 0, tzinfo=UTC),
         symbol="BTCUSDT-PERP",
         venue=Venue.BINANCE,
         funding_rate=0.0001,
-        next_funding_time=datetime(2025, 1, 15, 16, 0, 0, tzinfo=timezone.utc),
+        next_funding_time=datetime(2025, 1, 15, 16, 0, 0, tzinfo=UTC),
         predicted_rate=0.00012,
     )
 
@@ -40,7 +40,7 @@ def sample_funding_rate() -> FundingRate:
 def sample_liquidation() -> Liquidation:
     """Create a sample Liquidation record."""
     return Liquidation(
-        timestamp=datetime(2025, 1, 15, 12, 34, 56, tzinfo=timezone.utc),
+        timestamp=datetime(2025, 1, 15, 12, 34, 56, tzinfo=UTC),
         symbol="BTCUSDT-PERP",
         venue=Venue.BINANCE,
         side=Side.LONG,
@@ -74,21 +74,21 @@ def multiple_open_interests() -> list[OpenInterest]:
     """Create multiple OpenInterest records for different exchanges."""
     return [
         OpenInterest(
-            timestamp=datetime(2025, 1, 15, 12, 0, 0, tzinfo=timezone.utc),
+            timestamp=datetime(2025, 1, 15, 12, 0, 0, tzinfo=UTC),
             symbol="BTCUSDT-PERP",
             venue=Venue.BINANCE,
             open_interest=125432.50,
             open_interest_value=12543250000.0,
         ),
         OpenInterest(
-            timestamp=datetime(2025, 1, 15, 12, 0, 0, tzinfo=timezone.utc),
+            timestamp=datetime(2025, 1, 15, 12, 0, 0, tzinfo=UTC),
             symbol="BTCUSDT-PERP",
             venue=Venue.BYBIT,
             open_interest=85123.25,
             open_interest_value=8512325000.0,
         ),
         OpenInterest(
-            timestamp=datetime(2025, 1, 15, 12, 0, 0, tzinfo=timezone.utc),
+            timestamp=datetime(2025, 1, 15, 12, 0, 0, tzinfo=UTC),
             symbol="BTC-USD-PERP",
             venue=Venue.HYPERLIQUID,
             open_interest=42567.10,

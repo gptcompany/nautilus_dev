@@ -1,7 +1,7 @@
 """Unit tests for exchange fetchers."""
 
 import asyncio
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from unittest.mock import AsyncMock, patch
 
 import pytest
@@ -189,8 +189,8 @@ class TestBinanceFetcherHistory:
             mock_exchange.fetch_open_interest_history = AsyncMock(side_effect=[page1, page2, []])
             fetcher._connected = True
 
-            start = datetime.fromtimestamp(base_ts / 1000, tz=timezone.utc)
-            end = datetime.fromtimestamp((base_ts + 3600000) / 1000, tz=timezone.utc)
+            start = datetime.fromtimestamp(base_ts / 1000, tz=UTC)
+            end = datetime.fromtimestamp((base_ts + 3600000) / 1000, tz=UTC)
 
             results = await fetcher.fetch_open_interest_history("BTCUSDT-PERP", start, end)
 
@@ -206,8 +206,8 @@ class TestBinanceFetcherHistory:
             mock_exchange.fetch_open_interest_history = AsyncMock(return_value=[])
             fetcher._connected = True
 
-            start = datetime(2024, 1, 15, tzinfo=timezone.utc)
-            end = datetime(2024, 1, 16, tzinfo=timezone.utc)
+            start = datetime(2024, 1, 15, tzinfo=UTC)
+            end = datetime(2024, 1, 16, tzinfo=UTC)
 
             results = await fetcher.fetch_open_interest_history("BTCUSDT-PERP", start, end)
 
@@ -234,9 +234,9 @@ class TestBinanceFetcherHistory:
             mock_exchange.fetch_open_interest_history = AsyncMock(return_value=records)
             fetcher._connected = True
 
-            start = datetime.fromtimestamp(base_ts / 1000, tz=timezone.utc)
+            start = datetime.fromtimestamp(base_ts / 1000, tz=UTC)
             # Only want 3 hours of data
-            end = datetime.fromtimestamp((base_ts + 10800000) / 1000, tz=timezone.utc)
+            end = datetime.fromtimestamp((base_ts + 10800000) / 1000, tz=UTC)
 
             results = await fetcher.fetch_open_interest_history("BTCUSDT-PERP", start, end)
 
@@ -268,8 +268,8 @@ class TestBybitFetcherHistory:
             )
             fetcher._connected = True
 
-            start = datetime(2024, 1, 15, tzinfo=timezone.utc)
-            end = datetime(2024, 1, 16, tzinfo=timezone.utc)
+            start = datetime(2024, 1, 15, tzinfo=UTC)
+            end = datetime(2024, 1, 16, tzinfo=UTC)
 
             # Should not raise, returns empty list on error
             results = await fetcher.fetch_open_interest_history("BTCUSDT-PERP", start, end)
@@ -385,8 +385,8 @@ class TestFetchFundingRate:
             mock_exchange.fetch_funding_rate_history = AsyncMock(side_effect=[records, []])
             binance_fetcher._connected = True
 
-            start = datetime.fromtimestamp(base_ts / 1000, tz=timezone.utc)
-            end = datetime.fromtimestamp((base_ts + 86400000) / 1000, tz=timezone.utc)
+            start = datetime.fromtimestamp(base_ts / 1000, tz=UTC)
+            end = datetime.fromtimestamp((base_ts + 86400000) / 1000, tz=UTC)
 
             results = await binance_fetcher.fetch_funding_rate_history("BTCUSDT-PERP", start, end)
 

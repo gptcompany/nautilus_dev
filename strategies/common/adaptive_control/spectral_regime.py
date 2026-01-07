@@ -15,7 +15,6 @@ import logging
 from collections import deque
 from dataclasses import dataclass
 from enum import Enum
-from typing import Deque, Optional
 
 import numpy as np
 from scipy import signal
@@ -45,7 +44,7 @@ class RegimeAnalysis:
     regime: MarketRegime
     alpha: float  # Spectral slope
     confidence: float  # R-squared of linear fit
-    dominant_period: Optional[float]  # Most significant cycle period
+    dominant_period: float | None  # Most significant cycle period
     timestamp: float
 
 
@@ -91,9 +90,9 @@ class SpectralRegimeDetector:
         self.min_samples = min_samples
         self.update_interval = update_interval
 
-        self._returns: Deque[float] = deque(maxlen=window_size)
+        self._returns: deque[float] = deque(maxlen=window_size)
         self._update_count: int = 0
-        self._cached_analysis: Optional[RegimeAnalysis] = None
+        self._cached_analysis: RegimeAnalysis | None = None
 
     def update(self, return_value: float) -> None:
         """Add new return value."""

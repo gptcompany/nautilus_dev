@@ -25,7 +25,6 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass
-from typing import List, Optional, Tuple
 
 import numpy as np
 
@@ -46,7 +45,7 @@ class ResonanceEvent:
 
     timestamp: int  # Sample index
     strength: float  # How strong the alignment
-    participating_modes: List[VibrationMode]
+    participating_modes: list[VibrationMode]
 
 
 class VibrationAnalyzer:
@@ -89,9 +88,9 @@ class VibrationAnalyzer:
         self.min_period = min_period
         self.max_period = max_period
 
-        self._buffer: List[float] = []
-        self._modes: List[VibrationMode] = []
-        self._last_price: Optional[float] = None
+        self._buffer: list[float] = []
+        self._modes: list[VibrationMode] = []
+        self._last_price: float | None = None
 
     def update(self, price: float) -> None:
         """Add new price observation."""
@@ -100,7 +99,7 @@ class VibrationAnalyzer:
             self._buffer = self._buffer[-self.window_size * 2 :]
         self._last_price = price
 
-    def get_dominant_modes(self, n_modes: int = 3) -> List[VibrationMode]:
+    def get_dominant_modes(self, n_modes: int = 3) -> list[VibrationMode]:
         """
         Extract dominant vibration modes using FFT.
 
@@ -133,7 +132,7 @@ class VibrationAnalyzer:
 
         # Convert to periods and filter
         modes = []
-        for i, (freq, amp, phase) in enumerate(zip(freqs, amplitudes, phases)):
+        for _i, (freq, amp, phase) in enumerate(zip(freqs, amplitudes, phases, strict=False)):
             if freq == 0:
                 continue
             period = 1.0 / freq
@@ -152,7 +151,7 @@ class VibrationAnalyzer:
         self._modes = modes[:n_modes]
         return self._modes
 
-    def check_resonance(self, tolerance: float = 0.1) -> Optional[ResonanceEvent]:
+    def check_resonance(self, tolerance: float = 0.1) -> ResonanceEvent | None:
         """
         Check if current vibration modes are in resonance.
 
@@ -187,7 +186,7 @@ class VibrationAnalyzer:
 
         return None
 
-    def predict_next_extreme(self) -> Optional[Tuple[int, str]]:
+    def predict_next_extreme(self) -> tuple[int, str] | None:
         """
         Predict when next local extreme might occur.
 
@@ -258,7 +257,7 @@ class HarmonicRatioAnalyzer:
         self,
         price_a: float,
         price_b: float,
-    ) -> Optional[str]:
+    ) -> str | None:
         """
         Check if two prices are in a harmonic relationship.
 
@@ -307,7 +306,7 @@ class HarmonicRatioAnalyzer:
 
     def calculate_consonance_score(
         self,
-        prices: List[float],
+        prices: list[float],
     ) -> float:
         """
         Calculate how "harmonic" a set of prices are.
@@ -374,7 +373,7 @@ class DigitalRootAnalyzer:
         return root if root != 0 else 9
 
     @staticmethod
-    def vortex_sequence(n: int = 24) -> List[int]:
+    def vortex_sequence(n: int = 24) -> list[int]:
         """
         Generate the Vortex Math doubling sequence.
 
@@ -393,7 +392,7 @@ class DigitalRootAnalyzer:
             value *= 2
         return sequence
 
-    def analyze_price_pattern(self, prices: List[float]) -> dict:
+    def analyze_price_pattern(self, prices: list[float]) -> dict:
         """
         Analyze digital root patterns in price movements.
 

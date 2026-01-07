@@ -14,6 +14,36 @@ Provides foundational components for evolutionary strategy discovery:
 __version__ = "0.1.0"
 
 # Patching exports
+# Config exports
+from scripts.alpha_evolve.config import EvolutionConfig
+
+# Controller exports (added in spec-009)
+from scripts.alpha_evolve.controller import (
+    EvolutionController,
+    EvolutionProgress,
+    EvolutionResult,
+    EvolutionStatus,
+    ProgressEvent,
+    ProgressEventType,
+    StopCondition,
+)
+
+# Evaluator exports
+from scripts.alpha_evolve.evaluator import (
+    BacktestConfig,
+    EvaluationRequest,
+    EvaluationResult,
+    StrategyEvaluator,
+)
+
+# Mutator exports (added in spec-009)
+from scripts.alpha_evolve.mutator import (
+    LLMMutator,
+    MockMutator,
+    MutationRequest,
+    MutationResponse,
+    Mutator,
+)
 from scripts.alpha_evolve.patching import (
     BLOCK_RE,
     apply_patch,
@@ -28,17 +58,6 @@ from scripts.alpha_evolve.store import (
     ProgramStore,
 )
 
-# Config exports
-from scripts.alpha_evolve.config import EvolutionConfig
-
-# Evaluator exports
-from scripts.alpha_evolve.evaluator import (
-    BacktestConfig,
-    EvaluationRequest,
-    EvaluationResult,
-    StrategyEvaluator,
-)
-
 # Template exports (added in spec-008)
 from scripts.alpha_evolve.templates import (
     BaseEvolveConfig,
@@ -46,26 +65,6 @@ from scripts.alpha_evolve.templates import (
     EquityPoint,
     MomentumEvolveConfig,
     MomentumEvolveStrategy,
-)
-
-# Controller exports (added in spec-009)
-from scripts.alpha_evolve.controller import (
-    EvolutionController,
-    EvolutionProgress,
-    EvolutionResult,
-    EvolutionStatus,
-    ProgressEvent,
-    ProgressEventType,
-    StopCondition,
-)
-
-# Mutator exports (added in spec-009)
-from scripts.alpha_evolve.mutator import (
-    LLMMutator,
-    MockMutator,
-    MutationRequest,
-    MutationResponse,
-    Mutator,
 )
 
 __all__ = [

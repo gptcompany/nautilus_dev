@@ -18,7 +18,7 @@ if TYPE_CHECKING:
 _logger = logging.getLogger(__name__)
 
 
-def validate_equity_curve(engine: "BacktestEngine") -> tuple[bool, str]:
+def validate_equity_curve(engine: BacktestEngine) -> tuple[bool, str]:
     """
     Validate equity curve data from engine.
 
@@ -61,7 +61,7 @@ def validate_equity_curve(engine: "BacktestEngine") -> tuple[bool, str]:
         return False, f"Error validating equity curve: {e}"
 
 
-def validate_drawdown(engine: "BacktestEngine") -> tuple[bool, str]:
+def validate_drawdown(engine: BacktestEngine) -> tuple[bool, str]:
     """
     Validate drawdown data from engine.
 
@@ -109,7 +109,7 @@ def validate_drawdown(engine: "BacktestEngine") -> tuple[bool, str]:
         return False, f"Error validating drawdown: {e}"
 
 
-def validate_returns_data(engine: "BacktestEngine") -> tuple[bool, str]:
+def validate_returns_data(engine: BacktestEngine) -> tuple[bool, str]:
     """
     Validate returns data for heatmap generation.
 
@@ -148,7 +148,7 @@ def validate_returns_data(engine: "BacktestEngine") -> tuple[bool, str]:
         return False, f"Error validating returns data: {e}"
 
 
-def validate_trade_metrics(engine: "BacktestEngine") -> tuple[bool, str]:
+def validate_trade_metrics(engine: BacktestEngine) -> tuple[bool, str]:
     """
     Validate trade metrics from engine.
 
@@ -192,7 +192,7 @@ def validate_trade_metrics(engine: "BacktestEngine") -> tuple[bool, str]:
         return False, f"Error validating trade metrics: {e}"
 
 
-def run_all_validations(engine: "BacktestEngine") -> dict[str, tuple[bool, str]]:
+def run_all_validations(engine: BacktestEngine) -> dict[str, tuple[bool, str]]:
     """
     Run all validation checks on engine data.
 

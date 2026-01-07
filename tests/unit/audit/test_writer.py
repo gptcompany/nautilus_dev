@@ -12,7 +12,6 @@ import threading
 from datetime import datetime
 from unittest.mock import patch
 
-
 from strategies.common.audit.events import AuditEvent, AuditEventType
 from strategies.common.audit.writer import AppendOnlyWriter
 

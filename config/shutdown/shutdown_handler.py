@@ -132,7 +132,7 @@ class GracefulShutdownHandler:
                 self._shutdown_sequence(),
                 timeout=self.config.timeout_secs,
             )
-        except asyncio.TimeoutError:
+        except TimeoutError:
             self._logger.error(
                 f"Shutdown timed out after {self.config.timeout_secs}s, forcing exit"
             )

@@ -23,7 +23,6 @@ from strategies.common.recovery.models import (
     RecoveryStatus,
 )
 
-
 # Module logger
 _log = logging.getLogger(__name__)
 

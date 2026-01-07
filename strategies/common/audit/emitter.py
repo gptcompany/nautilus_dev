@@ -14,7 +14,8 @@ from __future__ import annotations
 
 import logging
 import threading
-from typing import TYPE_CHECKING, Any, Callable, cast
+from collections.abc import Callable
+from typing import TYPE_CHECKING, Any, cast
 
 from strategies.common.audit.config import AuditConfig
 from strategies.common.audit.events import (
@@ -445,7 +446,7 @@ class AuditEventEmitter:
 
         _log.debug("AuditEventEmitter closed")
 
-    def __enter__(self) -> "AuditEventEmitter":
+    def __enter__(self) -> AuditEventEmitter:
         """Context manager entry."""
         return self
 

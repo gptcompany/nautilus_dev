@@ -7,13 +7,14 @@ Tests verify:
 - US3: DecayEvent audit emission
 """
 
-import pytest
 from unittest.mock import MagicMock
 
+import pytest
+
+from strategies.common.adaptive_control.dsp_filters import IIRRegimeDetector
 from strategies.common.adaptive_control.particle_portfolio import (
     ThompsonSelector,
 )
-from strategies.common.adaptive_control.dsp_filters import IIRRegimeDetector
 
 
 class TestThompsonSelectorBackwardCompatibility:

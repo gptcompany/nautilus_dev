@@ -11,9 +11,11 @@ Example:
     >>> node = TradingNode(config=config)
 """
 
-from nautilus_trader.adapters.hyperliquid import HYPERLIQUID
-from nautilus_trader.adapters.hyperliquid import HyperliquidDataClientConfig
-from nautilus_trader.adapters.hyperliquid import HyperliquidExecClientConfig
+from nautilus_trader.adapters.hyperliquid import (
+    HYPERLIQUID,
+    HyperliquidDataClientConfig,
+    HyperliquidExecClientConfig,
+)
 from nautilus_trader.config import InstrumentProviderConfig, TradingNodeConfig
 
 from configs.hyperliquid.data_client import DEFAULT_INSTRUMENTS

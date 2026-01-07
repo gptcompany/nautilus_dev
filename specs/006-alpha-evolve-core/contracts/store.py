@@ -5,7 +5,6 @@ This module defines the public interface for the strategy persistence layer.
 Implementation should match these signatures exactly.
 """
 
-from typing import Optional, List
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -19,8 +18,8 @@ class FitnessMetrics:
     max_drawdown: float
     cagr: float
     total_return: float
-    trade_count: Optional[int] = None
-    win_rate: Optional[float] = None
+    trade_count: int | None = None
+    win_rate: float | None = None
 
 
 @dataclass
@@ -29,10 +28,10 @@ class Program:
 
     id: str
     code: str
-    parent_id: Optional[str]
+    parent_id: str | None
     generation: int
-    experiment: Optional[str]
-    metrics: Optional[FitnessMetrics]
+    experiment: str | None
+    metrics: FitnessMetrics | None
     created_at: float
 
 
@@ -64,9 +63,9 @@ class ProgramStore:
     def insert(
         self,
         code: str,
-        metrics: Optional[FitnessMetrics] = None,
-        parent_id: Optional[str] = None,
-        experiment: Optional[str] = None,
+        metrics: FitnessMetrics | None = None,
+        parent_id: str | None = None,
+        experiment: str | None = None,
     ) -> str:
         """
         Insert a new strategy.
@@ -98,7 +97,7 @@ class ProgramStore:
         """
         ...
 
-    def get(self, prog_id: str) -> Optional[Program]:
+    def get(self, prog_id: str) -> Program | None:
         """
         Get strategy by ID.
 
@@ -114,8 +113,8 @@ class ProgramStore:
         self,
         k: int = 10,
         metric: str = "calmar",
-        experiment: Optional[str] = None,
-    ) -> List[Program]:
+        experiment: str | None = None,
+    ) -> list[Program]:
         """
         Get top k strategies by fitness metric.
 
@@ -132,8 +131,8 @@ class ProgramStore:
     def sample(
         self,
         strategy: str = "exploit",
-        experiment: Optional[str] = None,
-    ) -> Optional[Program]:
+        experiment: str | None = None,
+    ) -> Program | None:
         """
         Sample a parent strategy for mutation.
 
@@ -149,7 +148,7 @@ class ProgramStore:
         """
         ...
 
-    def get_lineage(self, prog_id: str) -> List[Program]:
+    def get_lineage(self, prog_id: str) -> list[Program]:
         """
         Get full lineage chain from strategy to seed.
 
@@ -161,7 +160,7 @@ class ProgramStore:
         """
         ...
 
-    def count(self, experiment: Optional[str] = None) -> int:
+    def count(self, experiment: str | None = None) -> int:
         """
         Count strategies in store.
 

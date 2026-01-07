@@ -16,8 +16,8 @@ Reference:
 from __future__ import annotations
 
 import math
+from collections.abc import Sequence
 from dataclasses import dataclass
-from typing import Sequence
 
 
 @dataclass
@@ -180,7 +180,7 @@ def calculate_win_loss_ratio(
     a_wins = 0
     b_wins = 0
 
-    for r_a, r_b in zip(returns_a, returns_b):
+    for r_a, r_b in zip(returns_a, returns_b, strict=False):
         if r_a > r_b:
             a_wins += 1
         elif r_b > r_a:
@@ -219,7 +219,7 @@ def calculate_t_statistic(
         return 0.0, 1.0
 
     # Calculate differences
-    differences = [a - b for a, b in zip(returns_a, returns_b)]
+    differences = [a - b for a, b in zip(returns_a, returns_b, strict=False)]
 
     # Mean difference
     mean_diff = sum(differences) / n

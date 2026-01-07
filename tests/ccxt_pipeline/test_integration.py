@@ -5,7 +5,7 @@ concurrent fetching and storage operations.
 """
 
 import tempfile
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from unittest.mock import AsyncMock, patch
 
@@ -15,7 +15,7 @@ from scripts.ccxt_pipeline.fetchers import FetchOrchestrator
 from scripts.ccxt_pipeline.fetchers.binance import BinanceFetcher
 from scripts.ccxt_pipeline.fetchers.bybit import BybitFetcher
 from scripts.ccxt_pipeline.fetchers.hyperliquid import HyperliquidFetcher
-from scripts.ccxt_pipeline.models import OpenInterest, FundingRate, Venue
+from scripts.ccxt_pipeline.models import FundingRate, OpenInterest, Venue
 from scripts.ccxt_pipeline.storage.parquet_store import ParquetStore
 
 
@@ -25,7 +25,7 @@ class TestFetchOIAllExchanges:
     @pytest.fixture
     def mock_oi_responses(self) -> dict[str, dict]:
         """Create mock OI responses for each exchange."""
-        ts = int(datetime.now(timezone.utc).timestamp() * 1000)
+        ts = int(datetime.now(UTC).timestamp() * 1000)
         return {
             "binance": {
                 "symbol": "BTC/USDT:USDT",
@@ -101,7 +101,7 @@ class TestFetchOIAllExchanges:
         fetchers = [BinanceFetcher(), BybitFetcher()]
         orchestrator = FetchOrchestrator(fetchers)
 
-        ts = int(datetime.now(timezone.utc).timestamp() * 1000)
+        ts = int(datetime.now(UTC).timestamp() * 1000)
         success_response = {
             "symbol": "BTC/USDT:USDT",
             "openInterestAmount": 125000.0,
@@ -149,7 +149,7 @@ class TestFetchAndStore:
     @pytest.mark.asyncio
     async def test_fetch_and_store_open_interest(self, temp_catalog: Path) -> None:
         """Test fetching OI and storing to Parquet."""
-        ts = int(datetime.now(timezone.utc).timestamp() * 1000)
+        ts = int(datetime.now(UTC).timestamp() * 1000)
         mock_response = {
             "symbol": "BTC/USDT:USDT",
             "openInterestAmount": 125000.0,
@@ -182,7 +182,7 @@ class TestFetchAndStore:
     @pytest.mark.asyncio
     async def test_fetch_and_store_funding_rate(self, temp_catalog: Path) -> None:
         """Test fetching funding rate and storing to Parquet."""
-        ts = int(datetime.now(timezone.utc).timestamp() * 1000)
+        ts = int(datetime.now(UTC).timestamp() * 1000)
         mock_response = {
             "symbol": "BTC/USDT:USDT",
             "fundingRate": 0.0001,
@@ -215,7 +215,7 @@ class TestFetchAndStore:
     @pytest.mark.asyncio
     async def test_fetch_and_store_multiple_exchanges(self, temp_catalog: Path) -> None:
         """Test fetching from multiple exchanges and storing all data."""
-        ts = int(datetime.now(timezone.utc).timestamp() * 1000)
+        ts = int(datetime.now(UTC).timestamp() * 1000)
 
         mock_responses = {
             "binance": {
@@ -283,7 +283,7 @@ class TestIncrementalUpdate:
         store = ParquetStore(temp_catalog)
 
         # Create initial data
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         initial_data = [
             OpenInterest(
                 timestamp=now - timedelta(hours=2),
@@ -314,7 +314,7 @@ class TestIncrementalUpdate:
         """Test that new data is appended to existing data."""
         store = ParquetStore(temp_catalog)
 
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
 
         # Write initial data
         initial = OpenInterest(
@@ -357,7 +357,7 @@ class TestFundingRateStorage:
     @pytest.mark.asyncio
     async def test_funding_storage(self, temp_catalog: Path) -> None:
         """Test storing funding rates to Parquet (T045)."""
-        ts = int(datetime.now(timezone.utc).timestamp() * 1000)
+        ts = int(datetime.now(UTC).timestamp() * 1000)
 
         mock_responses = {
             "binance": {
@@ -413,7 +413,7 @@ class TestFundingRateStorage:
     @pytest.mark.asyncio
     async def test_funding_history_storage(self, temp_catalog: Path) -> None:
         """Test storing historical funding rates."""
-        base_ts = int(datetime.now(timezone.utc).timestamp() * 1000) - 86400000
+        base_ts = int(datetime.now(UTC).timestamp() * 1000) - 86400000
 
         # 8-hour intervals for funding history
         mock_history = [
@@ -433,8 +433,8 @@ class TestFundingRateStorage:
         with patch.object(fetcher, "_exchange", create=True) as mock_exchange:
             mock_exchange.fetch_funding_rate_history = AsyncMock(side_effect=[mock_history, []])
 
-            start = datetime.fromtimestamp(base_ts / 1000, tz=timezone.utc)
-            end = datetime.now(timezone.utc)
+            start = datetime.fromtimestamp(base_ts / 1000, tz=UTC)
+            end = datetime.now(UTC)
 
             results = await fetcher.fetch_funding_rate_history("BTCUSDT-PERP", start, end)
 
@@ -464,7 +464,7 @@ class TestLiquidationStorage:
         """Test storing a single liquidation to Parquet (T052)."""
         from scripts.ccxt_pipeline.models import Liquidation, Side
 
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         liquidation = Liquidation(
             timestamp=now,
             symbol="BTCUSDT-PERP",
@@ -493,7 +493,7 @@ class TestLiquidationStorage:
         from scripts.ccxt_pipeline.models import Liquidation, Side
 
         # Use past timestamps to avoid "future timestamp" validation error
-        now = datetime.now(timezone.utc) - timedelta(seconds=10)
+        now = datetime.now(UTC) - timedelta(seconds=10)
         liquidations = [
             Liquidation(
                 timestamp=now,
@@ -528,7 +528,7 @@ class TestLiquidationStorage:
         """Test storing liquidations from multiple exchanges."""
         from scripts.ccxt_pipeline.models import Liquidation, Side
 
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         liquidations = [
             Liquidation(
                 timestamp=now,
@@ -566,7 +566,7 @@ class TestLiquidationStorage:
         """Test getting last timestamp for liquidations."""
         from scripts.ccxt_pipeline.models import Liquidation, Side
 
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         liquidations = [
             Liquidation(
                 timestamp=now - timedelta(minutes=5),

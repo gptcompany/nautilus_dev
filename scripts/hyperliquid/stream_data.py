@@ -22,13 +22,13 @@ from datetime import datetime
 from nautilus_trader.common.enums import LogLevel
 from nautilus_trader.config import LoggingConfig
 from nautilus_trader.live.node import TradingNode
-from nautilus_trader.model.data import QuoteTick, TradeTick, OrderBookDelta
+from nautilus_trader.model.data import OrderBookDelta, QuoteTick, TradeTick
 from nautilus_trader.model.identifiers import InstrumentId
 from nautilus_trader.trading.strategy import Strategy
 
 from configs.hyperliquid.data_client import (
-    create_data_only_trading_node,
     DEFAULT_INSTRUMENTS,
+    create_data_only_trading_node,
 )
 
 

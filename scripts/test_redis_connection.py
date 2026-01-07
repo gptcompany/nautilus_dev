@@ -5,16 +5,16 @@ Redis Connection Test Script (Spec 018 - T007)
 Tests Redis connectivity and reports status.
 """
 
-import sys
 import os
+import sys
 
 # Add project root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from config.cache.redis_config import (
+    RedisConnectionError,
     check_redis_health,
     wait_for_redis,
-    RedisConnectionError,
 )
 
 

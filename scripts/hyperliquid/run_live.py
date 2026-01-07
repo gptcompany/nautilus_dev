@@ -33,7 +33,6 @@ from nautilus_trader.common.enums import LogLevel
 from nautilus_trader.config import LoggingConfig
 from nautilus_trader.live.node import TradingNode
 
-
 from configs.hyperliquid.trading_node import create_hyperliquid_trading_node
 
 

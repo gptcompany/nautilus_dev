@@ -28,7 +28,6 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass
-from typing import List, Optional
 
 
 @dataclass
@@ -81,7 +80,7 @@ class EntropyEstimator:
         self.window_size = window_size
         self.smoothing = smoothing
 
-        self._buffer: List[float] = []
+        self._buffer: list[float] = []
         self._entropy: float = 0.0
         self._max_entropy = math.log2(n_bins)  # Maximum possible entropy
 
@@ -193,8 +192,8 @@ class MutualInformationEstimator:
         self.n_bins = n_bins
         self.window_size = window_size
 
-        self._x_buffer: List[float] = []
-        self._y_buffer: List[float] = []
+        self._x_buffer: list[float] = []
+        self._y_buffer: list[float] = []
 
     def update(self, x: float, y: float) -> float:
         """
@@ -239,7 +238,7 @@ class MutualInformationEstimator:
         x_marginal = [0] * self.n_bins
         y_marginal = [0] * self.n_bins
 
-        for x, y in zip(self._x_buffer, self._y_buffer):
+        for x, y in zip(self._x_buffer, self._y_buffer, strict=False):
             xi = min(int((x - x_min) / x_width), self.n_bins - 1)
             yi = min(int((y - y_min) / y_width), self.n_bins - 1)
             joint[xi][yi] += 1
@@ -281,7 +280,7 @@ class OptimalSamplingAnalyzer:
 
     def __init__(self, max_samples: int = 1000):
         self.max_samples = max_samples
-        self._buffer: List[float] = []
+        self._buffer: list[float] = []
 
     def add_sample(self, value: float) -> None:
         """Add a sample."""
@@ -289,7 +288,7 @@ class OptimalSamplingAnalyzer:
         if len(self._buffer) > self.max_samples:
             self._buffer = self._buffer[-self.max_samples :]
 
-    def estimate_nyquist_frequency(self) -> Optional[float]:
+    def estimate_nyquist_frequency(self) -> float | None:
         """
         Estimate the Nyquist frequency for this signal.
 

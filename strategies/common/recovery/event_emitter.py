@@ -12,7 +12,8 @@ from __future__ import annotations
 
 import logging
 import time
-from typing import TYPE_CHECKING, Callable
+from collections.abc import Callable
+from typing import TYPE_CHECKING
 
 from strategies.common.recovery.events import (
     IndicatorsReadyEvent,

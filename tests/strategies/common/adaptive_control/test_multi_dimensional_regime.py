@@ -18,7 +18,6 @@ Test categories:
 """
 
 import math
-from dataclasses import dataclass
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -30,7 +29,6 @@ from strategies.common.adaptive_control.multi_dimensional_regime import (
     MultiDimensionalResult,
     create_multi_regime_detector,
 )
-
 
 # ============================================================================
 # Fixtures
@@ -592,7 +590,7 @@ class TestHelperMethods:
     def test_is_regime_stable_true(self, detector):
         """Should return True if all regimes same."""
         # All updates result in UNKNOWN (first few updates)
-        for i in range(15):
+        for _i in range(15):
             detector.update(price=100.0)  # Constant price
 
         # Check stability - should be True if all same regime
@@ -720,12 +718,11 @@ class TestIntegrationScenarios:
 
     def test_mean_reverting_market_detection(self, detector):
         """Test detection of mean-reverting market conditions."""
-        import math
 
         # Simulate mean reversion (oscillation around 100)
         for i in range(50):
             price = 100.0 + 2.0 * math.sin(i * 0.3)  # Oscillate +/- 2
-            result = detector.update(
+            detector.update(
                 price=price,
                 bid=price - 0.02,
                 ask=price + 0.02,
@@ -743,10 +740,10 @@ class TestIntegrationScenarios:
         random.seed(42)
 
         price = 100.0
-        for i in range(50):
+        for _i in range(50):
             # Large random moves
             price += random.uniform(-3.0, 3.0)
-            result = detector.update(
+            detector.update(
                 price=price,
                 bid=price - 0.5,
                 ask=price + 0.5,
@@ -865,7 +862,7 @@ class TestEdgeCases:
 
     def test_constant_price(self, detector):
         """Test with constant price (no movement)."""
-        for i in range(30):
+        for _i in range(30):
             result = detector.update(price=100.0)
 
         # With constant price, variance ratio approaches 1.0

@@ -4,6 +4,7 @@ Defines paths, symbols, and processing settings for the conversion pipeline.
 """
 
 from pathlib import Path
+
 from pydantic import BaseModel, Field
 
 

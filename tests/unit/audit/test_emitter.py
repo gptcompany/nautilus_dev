@@ -12,7 +12,6 @@ import json
 import time
 from unittest.mock import MagicMock
 
-
 from strategies.common.audit.config import AuditConfig
 from strategies.common.audit.emitter import AuditEventEmitter
 from strategies.common.audit.events import (

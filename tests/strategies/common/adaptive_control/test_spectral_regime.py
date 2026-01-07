@@ -132,7 +132,7 @@ class TestSpectralRegimeDetector:
         assert detector._cached_analysis is not None
 
         # Update should invalidate cache after interval
-        for i in range(3):
+        for _i in range(3):
             detector.update(0.01)
 
         assert detector._cached_analysis is None
@@ -385,8 +385,7 @@ class TestEdgeCases:
         detector = SpectralRegimeDetector(window_size=128, min_samples=64)
         detector.update_batch(mr_returns)
 
-        analysis1 = detector.analyze()
-        regime1 = analysis1.regime
+        detector.analyze()
 
         # Add trending data
         trend = np.linspace(0, 0.1, 64)

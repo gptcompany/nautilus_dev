@@ -8,14 +8,13 @@ import pytest
 # Skip entire module if Hyperliquid adapter not available
 pytest.importorskip("nautilus_trader.adapters.hyperliquid")
 
-from nautilus_trader.adapters.hyperliquid import HYPERLIQUID
-from nautilus_trader.adapters.hyperliquid import HyperliquidDataClientConfig
+from nautilus_trader.adapters.hyperliquid import HYPERLIQUID, HyperliquidDataClientConfig
 from nautilus_trader.config import TradingNodeConfig
 
 from configs.hyperliquid.data_client import (
-    create_hyperliquid_data_client,
-    create_data_only_trading_node,
     DEFAULT_INSTRUMENTS,
+    create_data_only_trading_node,
+    create_hyperliquid_data_client,
 )
 
 

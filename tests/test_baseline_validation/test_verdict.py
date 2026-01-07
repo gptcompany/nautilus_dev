@@ -16,7 +16,7 @@ class TestVerdictDetermination:
 
     def test_go_when_adaptive_beats_fixed_with_edge(self) -> None:
         """Test GO verdict when adaptive beats fixed by sharpe_edge threshold."""
-        from scripts.baseline_validation.verdict import determine_verdict, Verdict
+        from scripts.baseline_validation.verdict import Verdict, determine_verdict
 
         # Adaptive Sharpe = 1.5, Fixed Sharpe = 1.2
         # Edge = 1.5 - 1.2 = 0.3 > 0.2 threshold
@@ -32,7 +32,7 @@ class TestVerdictDetermination:
 
     def test_stop_when_fixed_wins(self) -> None:
         """Test STOP verdict when fixed beats adaptive."""
-        from scripts.baseline_validation.verdict import determine_verdict, Verdict
+        from scripts.baseline_validation.verdict import Verdict, determine_verdict
 
         # Fixed Sharpe = 1.3, Adaptive Sharpe = 1.0
         verdict = determine_verdict(
@@ -47,7 +47,7 @@ class TestVerdictDetermination:
 
     def test_wait_when_edge_insufficient(self) -> None:
         """Test WAIT verdict when edge is below threshold."""
-        from scripts.baseline_validation.verdict import determine_verdict, Verdict
+        from scripts.baseline_validation.verdict import Verdict, determine_verdict
 
         # Adaptive Sharpe = 1.3, Fixed Sharpe = 1.2
         # Edge = 0.1 < 0.2 threshold
@@ -63,7 +63,7 @@ class TestVerdictDetermination:
 
     def test_wait_when_adaptive_has_worse_drawdown(self) -> None:
         """Test WAIT verdict when adaptive has worse drawdown despite better Sharpe."""
-        from scripts.baseline_validation.verdict import determine_verdict, Verdict
+        from scripts.baseline_validation.verdict import Verdict, determine_verdict
 
         # Adaptive wins Sharpe but has much worse drawdown
         verdict = determine_verdict(
@@ -128,7 +128,7 @@ class TestRecommendationGeneration:
 
     def test_go_recommendation_includes_deploy(self) -> None:
         """Test GO recommendation mentions deployment."""
-        from scripts.baseline_validation.verdict import generate_recommendation, Verdict
+        from scripts.baseline_validation.verdict import Verdict, generate_recommendation
 
         recommendation = generate_recommendation(
             verdict=Verdict.GO,
@@ -141,7 +141,7 @@ class TestRecommendationGeneration:
 
     def test_stop_recommendation_mentions_fixed(self) -> None:
         """Test STOP recommendation mentions using fixed sizing."""
-        from scripts.baseline_validation.verdict import generate_recommendation, Verdict
+        from scripts.baseline_validation.verdict import Verdict, generate_recommendation
 
         recommendation = generate_recommendation(
             verdict=Verdict.STOP,
@@ -154,7 +154,7 @@ class TestRecommendationGeneration:
 
     def test_wait_recommendation_suggests_investigation(self) -> None:
         """Test WAIT recommendation suggests further investigation."""
-        from scripts.baseline_validation.verdict import generate_recommendation, Verdict
+        from scripts.baseline_validation.verdict import Verdict, generate_recommendation
 
         recommendation = generate_recommendation(
             verdict=Verdict.WAIT,
@@ -174,7 +174,7 @@ class TestVerdictEdgeCases:
 
     def test_identical_sharpes(self) -> None:
         """Test verdict when Sharpes are identical."""
-        from scripts.baseline_validation.verdict import determine_verdict, Verdict
+        from scripts.baseline_validation.verdict import Verdict, determine_verdict
 
         verdict = determine_verdict(
             adaptive_sharpe=1.2,
@@ -189,7 +189,7 @@ class TestVerdictEdgeCases:
 
     def test_negative_sharpes(self) -> None:
         """Test verdict with negative Sharpe ratios."""
-        from scripts.baseline_validation.verdict import determine_verdict, Verdict
+        from scripts.baseline_validation.verdict import Verdict, determine_verdict
 
         # Both losing, but fixed loses less
         verdict = determine_verdict(
@@ -204,7 +204,7 @@ class TestVerdictEdgeCases:
 
     def test_zero_sharpes(self) -> None:
         """Test verdict with zero Sharpe ratios."""
-        from scripts.baseline_validation.verdict import determine_verdict, Verdict
+        from scripts.baseline_validation.verdict import Verdict, determine_verdict
 
         verdict = determine_verdict(
             adaptive_sharpe=0.0,

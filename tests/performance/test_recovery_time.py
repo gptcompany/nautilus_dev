@@ -17,12 +17,11 @@ from unittest.mock import MagicMock, PropertyMock, patch
 import pytest
 
 from strategies.common.recovery.config import RecoveryConfig
-from strategies.common.recovery.models import RecoveryState, RecoveryStatus
+from strategies.common.recovery.models import RecoveryStatus
 from strategies.common.recovery.recoverable_strategy import (
     RecoverableStrategy,
     RecoverableStrategyConfig,
 )
-
 
 # NFR-001 target: Position recovery < 5 seconds (p95)
 POSITION_RECOVERY_TARGET_SECS = 5.0

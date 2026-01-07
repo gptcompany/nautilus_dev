@@ -25,7 +25,6 @@ from strategies.common.adaptive_control.flow_physics import (
     WaveEquationAnalyzer,
 )
 
-
 # =============================================================================
 # FlowState Tests
 # =============================================================================
@@ -738,7 +737,7 @@ class TestInformationDiffusionUpdate:
         diffusion.inject_information(1.0)
 
         # After n updates: level = 1.0 * (0.95)^n
-        for i in range(5):
+        for _i in range(5):
             level = diffusion.update()
 
         expected = 1.0 * (0.95**5)
@@ -879,7 +878,7 @@ class TestWaveEquationAnalyzerIntegration:
         displacement = analyzer.get_displacement()
         velocity = analyzer.get_velocity()
         acceleration = analyzer.get_acceleration()
-        standing_wave = analyzer.detect_standing_wave(window=50)
+        analyzer.detect_standing_wave(window=50)
         prediction = analyzer.predict_wave_behavior()
 
         assert isinstance(displacement, float)

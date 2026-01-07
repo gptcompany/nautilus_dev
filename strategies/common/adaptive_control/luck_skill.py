@@ -26,7 +26,7 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass
-from typing import List, Optional
+
 from scipy import stats
 
 
@@ -131,7 +131,7 @@ class LuckQuantifier:
         self,
         sharpe: float,
         n_trials: int,
-        expected_max_sharpe: Optional[float] = None,
+        expected_max_sharpe: float | None = None,
     ) -> float:
         """
         Deflate Sharpe ratio for multiple testing.
@@ -247,8 +247,8 @@ class LuckQuantifier:
 
     def probability_of_backtest_overfitting(
         self,
-        is_returns: List[float],
-        oos_returns: List[float],
+        is_returns: list[float],
+        oos_returns: list[float],
         n_combinations: int = 100,
     ) -> float:
         """
@@ -285,7 +285,7 @@ class LuckQuantifier:
 
         return pbo
 
-    def _calculate_sharpe(self, returns: List[float]) -> float:
+    def _calculate_sharpe(self, returns: list[float]) -> float:
         """Calculate Sharpe ratio from returns."""
         if len(returns) < 2:
             return 0.0
@@ -318,15 +318,15 @@ class TrackRecordAnalyzer:
         self.n_trials = n_strategies_tested
         self.luck = LuckQuantifier()
 
-        self._returns: List[float] = []
-        self._equity_curve: List[float] = [1.0]
+        self._returns: list[float] = []
+        self._equity_curve: list[float] = [1.0]
 
     def add_return(self, daily_return: float) -> None:
         """Add a daily return observation."""
         self._returns.append(daily_return)
         self._equity_curve.append(self._equity_curve[-1] * (1 + daily_return))
 
-    def get_assessment(self) -> Optional[SkillAssessment]:
+    def get_assessment(self) -> SkillAssessment | None:
         """Get current skill assessment."""
         if len(self._returns) < 20:
             return None

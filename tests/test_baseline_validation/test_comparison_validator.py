@@ -10,7 +10,6 @@ TDD: Tests written first to define expected behavior.
 
 from __future__ import annotations
 
-
 import pytest
 
 
@@ -100,7 +99,7 @@ class TestComparisonValidatorExecution:
 
         result = validator.run_mock()
 
-        for name, contender_result in result.contender_results.items():
+        for _name, contender_result in result.contender_results.items():
             assert hasattr(contender_result, "avg_sharpe")
             assert hasattr(contender_result, "max_drawdown")
             assert hasattr(contender_result, "window_sharpes")

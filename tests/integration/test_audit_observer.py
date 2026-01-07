@@ -7,8 +7,7 @@ and emit them to the audit trail.
 import tempfile
 from unittest.mock import MagicMock, patch
 
-
-from strategies.common.audit import AuditEventEmitter, AuditConfig
+from strategies.common.audit import AuditConfig, AuditEventEmitter
 from strategies.common.audit.observer import AuditObserver, AuditObserverConfig
 
 

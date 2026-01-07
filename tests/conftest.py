@@ -14,6 +14,7 @@ project_root = Path(__file__).parent.parent
 if str(project_root) not in sys.path:
     sys.path.insert(0, str(project_root))
 
+from datetime import UTC
 from typing import TYPE_CHECKING
 from unittest.mock import MagicMock
 
@@ -335,9 +336,9 @@ def mock_clock():
     """Create a mock clock for testing."""
     clock = MagicMock()
     clock.timestamp_ns.return_value = 1704153600000000000
-    from datetime import datetime, timezone
+    from datetime import datetime
 
-    clock.utc_now.return_value = datetime(2024, 1, 2, 0, 0, 0, tzinfo=timezone.utc)
+    clock.utc_now.return_value = datetime(2024, 1, 2, 0, 0, 0, tzinfo=UTC)
     return clock
 
 

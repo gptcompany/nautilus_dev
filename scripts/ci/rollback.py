@@ -30,7 +30,6 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any
 
-
 # Default checkpoint directory
 CHECKPOINT_DIR = Path.home() / ".ci_checkpoints"
 RETENTION_HOURS = 24

@@ -13,17 +13,16 @@ from __future__ import annotations
 
 import pytest
 
-from strategies.common.orderflow.vpin import (
-    ToxicityLevel,
-    VPINBucket,
-    VPINIndicator,
-)
 from strategies.common.orderflow.config import VPINConfig
 from strategies.common.orderflow.trade_classifier import (
     TradeClassification,
     TradeSide,
 )
-
+from strategies.common.orderflow.vpin import (
+    ToxicityLevel,
+    VPINBucket,
+    VPINIndicator,
+)
 
 # ==============================================================================
 # Fixtures

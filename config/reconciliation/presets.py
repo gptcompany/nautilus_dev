@@ -12,7 +12,6 @@ from typing import TYPE_CHECKING
 
 from config.reconciliation.config import ReconciliationConfig
 
-
 if TYPE_CHECKING:
     pass
 

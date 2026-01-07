@@ -28,7 +28,8 @@ logger = logging.getLogger(__name__)
 
 def create_trading_node_config():
     """Create TradingNode configuration with Redis cache."""
-    from nautilus_trader.config import TradingNodeConfig, LiveExecEngineConfig
+    from nautilus_trader.config import LiveExecEngineConfig, TradingNodeConfig
+
     from config.cache import create_redis_cache_config
 
     return TradingNodeConfig(
@@ -43,6 +44,7 @@ def create_trading_node_config():
 def main():
     """Run TradingNode with graceful shutdown."""
     from nautilus_trader.live.node import TradingNode
+
     from config.shutdown import GracefulShutdownHandler, ShutdownConfig
 
     # Create node

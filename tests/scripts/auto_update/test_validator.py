@@ -5,13 +5,11 @@
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
-
 from scripts.auto_update.validator import (
     parse_test_results,
     run_pytest,
     validate_update,
 )
-
 
 # =============================================================================
 # T045: Test run_pytest

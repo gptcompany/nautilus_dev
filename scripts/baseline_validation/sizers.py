@@ -22,8 +22,8 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING, Protocol, runtime_checkable
 
 if TYPE_CHECKING:
-    from strategies.common.adaptive_control.sops_sizing import SOPSGillerSizer
     from strategies.common.adaptive_control.particle_portfolio import ThompsonSelector
+    from strategies.common.adaptive_control.sops_sizing import SOPSGillerSizer
 
 
 @dataclass
@@ -314,16 +314,16 @@ class AdaptiveSizer:
         self._name = "SOPS+Giller+Thompson"
 
         # Lazy initialization to avoid import at module load
-        self._sops_sizer: "SOPSGillerSizer | None" = None
-        self._thompson: "ThompsonSelector | None" = None
+        self._sops_sizer: SOPSGillerSizer | None = None
+        self._thompson: ThompsonSelector | None = None
 
     def _ensure_initialized(self) -> None:
         """Lazily initialize SOPS and Thompson components."""
         if self._sops_sizer is None:
-            from strategies.common.adaptive_control.sops_sizing import SOPSGillerSizer
             from strategies.common.adaptive_control.particle_portfolio import (
                 ThompsonSelector,
             )
+            from strategies.common.adaptive_control.sops_sizing import SOPSGillerSizer
 
             self._sops_sizer = SOPSGillerSizer(
                 k_base=self._sops_k_base,

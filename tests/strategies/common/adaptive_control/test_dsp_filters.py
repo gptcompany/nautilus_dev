@@ -524,7 +524,7 @@ class TestDSPRegimeDetector:
 
         # Upward trend
         price = 100.0
-        for i in range(50):
+        for _i in range(50):
             prev = price
             price += 1.0
             result = detector.update(price=price, prev_price=prev)

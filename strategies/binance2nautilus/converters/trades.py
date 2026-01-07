@@ -4,11 +4,10 @@ Converts individual trade execution data using chunked processing for
 memory efficiency with large datasets (500M+ records).
 """
 
+from collections.abc import Generator
 from pathlib import Path
-from typing import Generator
 
 import pandas as pd
-
 from nautilus_trader.model.data import TradeTick
 
 from ..config import ConverterConfig

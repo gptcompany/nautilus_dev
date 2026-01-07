@@ -21,7 +21,6 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass
-from typing import List, Optional, Tuple
 
 # The Golden Ratio - φ (phi)
 # Found in: DNA, galaxies, plants, markets, music, architecture
@@ -136,8 +135,8 @@ class LogarithmicSpiral:
     def get_harmonic_levels(
         self,
         price: float,
-        angles: List[float] = None,
-    ) -> List[float]:
+        angles: list[float] = None,
+    ) -> list[float]:
         """
         Get harmonic price levels from current price.
 
@@ -186,7 +185,7 @@ class FibonacciAnalyzer:
         # Returns key Fibonacci price levels
     """
 
-    def __init__(self, ratios: List[float] = None):
+    def __init__(self, ratios: list[float] = None):
         """
         Args:
             ratios: Custom Fibonacci ratios (default: standard set)
@@ -290,7 +289,7 @@ class FractalDimensionEstimator:
         hurst = fde.estimate_hurst(returns)
     """
 
-    def estimate_hurst(self, returns: List[float], min_lag: int = 2) -> float:
+    def estimate_hurst(self, returns: list[float], min_lag: int = 2) -> float:
         """
         Estimate Hurst exponent using R/S analysis.
 
@@ -359,7 +358,7 @@ class FractalDimensionEstimator:
         # Clamp to valid range
         return max(0.0, min(1.0, slope))
 
-    def get_fractal_dimension(self, returns: List[float]) -> float:
+    def get_fractal_dimension(self, returns: list[float]) -> float:
         """
         Get fractal dimension from Hurst exponent.
 
@@ -410,10 +409,10 @@ class NaturalCycleDetector:
 
     def detect_dominant_cycle(
         self,
-        data: List[float],
+        data: list[float],
         min_period: int = 5,
         max_period: int = 100,
-    ) -> Optional[CycleInfo]:
+    ) -> CycleInfo | None:
         """
         Detect the dominant cycle using autocorrelation.
 
@@ -470,7 +469,7 @@ class NaturalCycleDetector:
         self,
         detected_period: float,
         tolerance: float = 0.1,
-    ) -> Optional[str]:
+    ) -> str | None:
         """
         Check if detected cycle aligns with known natural cycles.
 
@@ -529,7 +528,7 @@ class UniversalLawsAnalyzer:
         current_price: float,
         swing_high: float,
         swing_low: float,
-        price_history: List[float],
+        price_history: list[float],
     ) -> dict:
         """
         Complete analysis using universal laws.
@@ -580,7 +579,7 @@ class UniversalLawsAnalyzer:
         swing_high: float,
         swing_low: float,
         n_levels: int = 5,
-    ) -> Tuple[List[float], List[float]]:
+    ) -> tuple[list[float], list[float]]:
         """
         Get combined support and resistance levels.
 

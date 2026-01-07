@@ -15,8 +15,7 @@ from __future__ import annotations
 
 import math
 import random
-from typing import Any
-from unittest.mock import MagicMock, Mock, patch
+from unittest.mock import MagicMock, patch
 
 import numpy as np
 import pytest
@@ -30,7 +29,6 @@ from strategies.common.adaptive_control.particle_portfolio import (
     StrategyStats,
     ThompsonSelector,
 )
-
 
 # =============================================================================
 # FIXTURES
@@ -447,7 +445,7 @@ class TestParticlePortfolioUpdate:
             portfolio.update({"momentum": 10.0, "mean_rev": -10.0, "trend": 0.0})
 
         # Check if resampling event was emitted
-        resampling_calls = [
+        [
             call
             for call in mock_audit_emitter.emit_system.call_args_list
             if "SYS_RESAMPLING" in str(call)
@@ -1360,7 +1358,7 @@ class TestIntegration:
         portfolio = ParticlePortfolio(strategies=strategies, n_particles=50)
 
         # Simulate 100 periods
-        for i in range(100):
+        for _i in range(100):
             returns = {
                 "momentum": random.gauss(0.01, 0.02),
                 "mean_rev": random.gauss(0.005, 0.01),
@@ -1472,8 +1470,8 @@ class TestEdgeCases:
 
         # Many sequential updates with large returns
         for _ in range(100):
-            returns = {s: 0.5 for s in strategies}  # Large positive returns
-            state = portfolio.update(returns)
+            returns = dict.fromkeys(strategies, 0.5)  # Large positive returns
+            portfolio.update(returns)
 
         # Check no overflow
         for p in portfolio.particles:

@@ -20,8 +20,8 @@ class TestMarkdownReportGeneration:
         """Test that report generator produces markdown output."""
         from scripts.baseline_validation.report import generate_markdown_report
         from scripts.baseline_validation.report_models import (
-            ValidationReport,
             ContenderSummary,
+            ValidationReport,
             Verdict,
         )
 
@@ -64,8 +64,8 @@ class TestMarkdownReportGeneration:
         """Test that markdown contains comparison table."""
         from scripts.baseline_validation.report import generate_markdown_report
         from scripts.baseline_validation.report_models import (
-            ValidationReport,
             ContenderSummary,
+            ValidationReport,
             Verdict,
         )
 
@@ -182,13 +182,14 @@ class TestJSONExport:
 
     def test_exports_to_json(self) -> None:
         """Test report can be exported to JSON."""
+        import json
+
         from scripts.baseline_validation.report import export_to_json
         from scripts.baseline_validation.report_models import (
-            ValidationReport,
             ContenderSummary,
+            ValidationReport,
             Verdict,
         )
-        import json
 
         report = ValidationReport(
             run_id="test-003",
@@ -230,8 +231,8 @@ class TestJSONExport:
         """Test that JSON export is deterministic."""
         from scripts.baseline_validation.report import export_to_json
         from scripts.baseline_validation.report_models import (
-            ValidationReport,
             ContenderSummary,
+            ValidationReport,
             Verdict,
         )
 

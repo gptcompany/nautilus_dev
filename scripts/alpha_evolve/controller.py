@@ -12,17 +12,19 @@ from __future__ import annotations
 import logging
 import random
 import time
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
-from typing import TYPE_CHECKING, Callable
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from monitoring.client import MetricsClient
     from scripts.alpha_evolve.config import EvolutionConfig
     from scripts.alpha_evolve.evaluator import StrategyEvaluator
-    from scripts.alpha_evolve.mutator import Mutator, MutationResponse
+    from scripts.alpha_evolve.mutator import MutationResponse, Mutator
     from scripts.alpha_evolve.store import Program, ProgramStore
+    from scripts.alpha_evolve.walk_forward import WalkForwardConfig, WalkForwardResult
 
 logger = logging.getLogger("alpha_evolve.controller")
 
@@ -440,8 +442,9 @@ class EvolutionController:
         Raises:
             ValueError: If seed not found
         """
-        from scripts.alpha_evolve.templates import MomentumEvolveStrategy
         import inspect
+
+        from scripts.alpha_evolve.templates import MomentumEvolveStrategy
 
         # Map seed names to strategy classes
         seeds = {
@@ -748,10 +751,10 @@ class EvolutionController:
         seed_strategy: str,
         experiment: str,
         iterations: int,
-        walk_forward_config: "WalkForwardConfig",
+        walk_forward_config: WalkForwardConfig,
         stop_condition: StopCondition | None = None,
         on_progress: Callable[[ProgressEvent], None] | None = None,
-    ) -> tuple[EvolutionResult, "WalkForwardResult | None"]:
+    ) -> tuple[EvolutionResult, WalkForwardResult | None]:
         """
         Run evolution with walk-forward validation on best strategy.
 

@@ -129,7 +129,7 @@ class BaselineStrategy:
 
     def __init__(
         self,
-        sizer: "ContenderSizer",
+        sizer: ContenderSizer,
         fast_ema_period: int = 10,
         slow_ema_period: int = 20,
         signal_normalize_window: int = 20,
@@ -161,7 +161,7 @@ class BaselineStrategy:
         self._price_count = 0
 
     @property
-    def sizer(self) -> "ContenderSizer":
+    def sizer(self) -> ContenderSizer:
         """The ContenderSizer for position calculation."""
         return self._sizer
 
@@ -279,7 +279,7 @@ class BaselineStrategy:
 
 
 def create_baseline_strategy(
-    sizer: "ContenderSizer",
+    sizer: ContenderSizer,
     fast_period: int = 10,
     slow_period: int = 20,
 ) -> BaselineStrategy:

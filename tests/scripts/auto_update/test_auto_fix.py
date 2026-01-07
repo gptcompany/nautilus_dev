@@ -221,7 +221,7 @@ class TestApplyMethodRename:
         test_file.write_text("""old_method_extended = 1
 self.old_method()
 """)
-        result = apply_method_rename(
+        apply_method_rename(
             file_path=test_file,
             old_name="old_method",
             new_name="new_method",

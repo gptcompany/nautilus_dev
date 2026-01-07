@@ -291,7 +291,7 @@ class AppendOnlyWriter:
                 self._current_date = None
                 _log.debug("Closed audit log")
 
-    def __enter__(self) -> "AppendOnlyWriter":
+    def __enter__(self) -> AppendOnlyWriter:
         """Context manager entry."""
         return self
 

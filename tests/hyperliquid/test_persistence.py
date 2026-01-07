@@ -12,14 +12,14 @@ import pytest
 pytest.importorskip("nautilus_trader.adapters.hyperliquid")
 
 from nautilus_trader.adapters.hyperliquid import HYPERLIQUID
-from nautilus_trader.config import TradingNodeConfig, StreamingConfig
+from nautilus_trader.config import StreamingConfig, TradingNodeConfig
 
+from configs.hyperliquid.data_client import DEFAULT_INSTRUMENTS
 from configs.hyperliquid.persistence import (
+    DEFAULT_CATALOG_PATH,
     create_persistence_config,
     create_recording_trading_node,
-    DEFAULT_CATALOG_PATH,
 )
-from configs.hyperliquid.data_client import DEFAULT_INSTRUMENTS
 
 
 class TestCreatePersistenceConfig:

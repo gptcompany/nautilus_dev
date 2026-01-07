@@ -158,7 +158,7 @@ class TestMultipleCustomCharts:
         custom_charts = ["rolling_volatility", "custom_metric_1", "custom_metric_2"]
 
         # Verify charts appear in registration order
-        for i, chart in enumerate(custom_charts):
+        for _i, chart in enumerate(custom_charts):
             assert isinstance(chart, str)
 
 

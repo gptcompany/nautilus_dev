@@ -144,7 +144,7 @@ class ResearchQuery:
             result = conn.execute(query, params or [])
             columns = [desc[0] for desc in result.description] if result.description else []
             rows = result.fetchall()
-            data = [dict(zip(columns, row)) for row in rows]
+            data = [dict(zip(columns, row, strict=False)) for row in rows]
             return QueryResult(engine="duckdb", data=data, columns=columns, query=query)
         except Exception as e:
             return QueryResult(engine="duckdb", data=[], error=str(e), query=query)

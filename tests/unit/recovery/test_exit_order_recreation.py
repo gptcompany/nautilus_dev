@@ -10,7 +10,6 @@ Tests:
 from unittest.mock import MagicMock
 
 import pytest
-
 from nautilus_trader.model.enums import OrderType
 
 

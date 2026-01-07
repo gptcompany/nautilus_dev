@@ -21,8 +21,8 @@ class TestValidationReport:
     def test_validation_report_creation(self) -> None:
         """Test ValidationReport can be created."""
         from scripts.baseline_validation.report_models import (
-            ValidationReport,
             ContenderSummary,
+            ValidationReport,
             Verdict,
         )
 
@@ -62,8 +62,8 @@ class TestValidationReport:
     def test_validation_report_serialization(self) -> None:
         """Test ValidationReport can be serialized to dict."""
         from scripts.baseline_validation.report_models import (
-            ValidationReport,
             ContenderSummary,
+            ValidationReport,
             Verdict,
         )
 
@@ -155,7 +155,7 @@ class TestVerdictDetails:
 
     def test_verdict_details_creation(self) -> None:
         """Test VerdictDetails can be created."""
-        from scripts.baseline_validation.report_models import VerdictDetails, Verdict
+        from scripts.baseline_validation.report_models import Verdict, VerdictDetails
 
         details = VerdictDetails(
             verdict=Verdict.GO,
@@ -171,7 +171,7 @@ class TestVerdictDetails:
 
     def test_verdict_details_significance(self) -> None:
         """Test significance calculation."""
-        from scripts.baseline_validation.report_models import VerdictDetails, Verdict
+        from scripts.baseline_validation.report_models import Verdict, VerdictDetails
 
         # p_value < 0.05 should be significant
         details = VerdictDetails(

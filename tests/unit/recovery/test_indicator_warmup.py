@@ -8,7 +8,7 @@ Tests:
 - Warmup state tracking (bars_processed, duration)
 """
 
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from unittest.mock import MagicMock
 
 import pytest
@@ -24,14 +24,14 @@ class TestRequestWarmupData:
     def test_request_warmup_calculates_correct_start_time(self, mock_clock, recovery_config):
         """Test that warmup start time is calculated correctly."""
         # Fixed time: 2024-01-02 00:00:00 UTC
-        mock_clock.utc_now.return_value = datetime(2024, 1, 2, 0, 0, 0, tzinfo=timezone.utc)
+        mock_clock.utc_now.return_value = datetime(2024, 1, 2, 0, 0, 0, tzinfo=UTC)
         lookback_days = recovery_config.warmup_lookback_days  # 2 days
 
         # Simulate _request_warmup_data calculation
         start_time = mock_clock.utc_now() - timedelta(days=lookback_days)
 
         # Expected: 2023-12-31 00:00:00 UTC
-        expected = datetime(2023, 12, 31, 0, 0, 0, tzinfo=timezone.utc)
+        expected = datetime(2023, 12, 31, 0, 0, 0, tzinfo=UTC)
         assert start_time == expected
 
     def test_request_warmup_uses_config_lookback_days(self):
@@ -77,7 +77,7 @@ class TestOnHistoricalData:
         )
 
         assert hasattr(RecoverableStrategy, "on_historical_data")
-        assert callable(getattr(RecoverableStrategy, "on_historical_data"))
+        assert callable(RecoverableStrategy.on_historical_data)
 
     def test_on_historical_data_processes_single_bar(self):
         """Test processing a single historical bar."""
@@ -171,7 +171,7 @@ class TestWarmupDataReceived:
         def on_warmup_data_received(bars):
             nonlocal warmup_bars_processed
             sorted_bars = sorted(bars, key=lambda b: b.ts_event)
-            for bar in sorted_bars:
+            for _bar in sorted_bars:
                 # Process bar
                 warmup_bars_processed += 1
 
@@ -368,7 +368,7 @@ class TestWarmupIntegration:
         sorted_bars = sorted(bars, key=lambda b: b.ts_event)
 
         # Step 3: Process bars
-        for bar in sorted_bars:
+        for _bar in sorted_bars:
             warmup_bars_processed += 1
 
         # Step 4: Complete warmup

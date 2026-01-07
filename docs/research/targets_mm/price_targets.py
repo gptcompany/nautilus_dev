@@ -17,11 +17,10 @@ Metodi implementati:
 Autore: Estratto da ricerca metodologica
 """
 
+from dataclasses import dataclass
+
 import numpy as np
 import pandas as pd
-from dataclasses import dataclass
-from typing import Dict, List, Tuple, Optional
-from collections import defaultdict
 
 
 @dataclass
@@ -84,7 +83,7 @@ class PriceTargetCalculator:
 
     def pnf_target(
         self, box_size: float = None, reversal: int = 3, direction: str = "up"
-    ) -> Dict[str, float]:
+    ) -> dict[str, float]:
         """
         Calcola target P&F senza costruire il grafico
 
@@ -196,8 +195,8 @@ class PriceTargetCalculator:
         atr: float = None,
         period: int = 14,
         direction: str = "up",
-        multipliers: List[float] = [1.0, 1.5, 2.0, 3.0],
-    ) -> Dict[str, float]:
+        multipliers: list[float] = None,
+    ) -> dict[str, float]:
         """
         Target basati su multipli di ATR
 
@@ -208,6 +207,8 @@ class PriceTargetCalculator:
             direction: 'up' o 'down'
             multipliers: Lista di moltiplicatori ATR
         """
+        if multipliers is None:
+            multipliers = [1.0, 1.5, 2.0, 3.0]
         if atr is None:
             atr = self.calculate_atr(period)
 
@@ -226,7 +227,7 @@ class PriceTargetCalculator:
 
     def atr_probability_targets(
         self, entry_price: float, atr: float, direction: str = "up"
-    ) -> Dict[str, Dict]:
+    ) -> dict[str, dict]:
         """
         Target ATR con probabilità associate (distribuzione normale)
 
@@ -258,8 +259,8 @@ class PriceTargetCalculator:
         point_a: float,
         point_b: float,
         point_c: float,
-        extensions: List[float] = [1.0, 1.272, 1.618],
-    ) -> Dict[str, float]:
+        extensions: list[float] = None,
+    ) -> dict[str, float]:
         """
         Measured Move / AB=CD Pattern
 
@@ -271,6 +272,8 @@ class PriceTargetCalculator:
             point_c: Fine ritracciamento
             extensions: Lista di estensioni da calcolare
         """
+        if extensions is None:
+            extensions = [1.0, 1.272, 1.618]
         move = point_b - point_a  # Può essere positivo o negativo
 
         targets = {
@@ -291,7 +294,7 @@ class PriceTargetCalculator:
 
     def fibonacci_extensions(
         self, swing_low: float, swing_high: float, retracement_end: float, direction: str = "up"
-    ) -> Dict[str, float]:
+    ) -> dict[str, float]:
         """
         Fibonacci Extensions (3 punti)
 
@@ -319,7 +322,7 @@ class PriceTargetCalculator:
 
         return targets
 
-    def fibonacci_simple(self, start_price: float, end_price: float) -> Dict[str, float]:
+    def fibonacci_simple(self, start_price: float, end_price: float) -> dict[str, float]:
         """
         Fibonacci retracement e extension semplici (2 punti)
         """
@@ -346,11 +349,13 @@ class PriceTargetCalculator:
         entry_price: float,
         std: float = None,
         period: int = 20,
-        multipliers: List[float] = [1, 2, 2.5, 3, 4],
-    ) -> Dict[str, Dict]:
+        multipliers: list[float] = None,
+    ) -> dict[str, dict]:
         """
         Standard Deviation Projection (ICT/SMC style)
         """
+        if multipliers is None:
+            multipliers = [1, 2, 2.5, 3, 4]
         if std is None:
             std = self.calculate_std(period)
 
@@ -366,7 +371,7 @@ class PriceTargetCalculator:
 
     def std_channel_targets(
         self, manipulation_high: float, manipulation_low: float, direction: str = "up"
-    ) -> Dict[str, float]:
+    ) -> dict[str, float]:
         """
         Standard Deviation da "manipulation leg" (ICT)
 
@@ -392,7 +397,7 @@ class PriceTargetCalculator:
 
     def range_based_targets(
         self, entry_price: float, period: int = 20, direction: str = "up"
-    ) -> Dict[str, float]:
+    ) -> dict[str, float]:
         """
         Target basati sul range medio
         """
@@ -422,7 +427,7 @@ class PriceTargetCalculator:
 
     # ========== METODO 7: COMPOSITE / CONFLUENZA ==========
 
-    def find_confluences(self, targets: Dict[str, float], tolerance: float = 0.02) -> List[Dict]:
+    def find_confluences(self, targets: dict[str, float], tolerance: float = 0.02) -> list[dict]:
         """
         Trova confluenze tra diversi target
 
@@ -486,7 +491,7 @@ class PriceTargetCalculator:
         retracement_end: float,
         atr: float = None,
         direction: str = "up",
-    ) -> Dict:
+    ) -> dict:
         """
         Analisi composita con tutti i metodi
 
@@ -534,7 +539,7 @@ class PriceTargetCalculator:
 
 def calculate_target_quick(
     entry: float, swing_high: float, swing_low: float, atr: float, direction: str = "up"
-) -> Dict:
+) -> dict:
     """
     Calcolo rapido di target senza DataFrame
 
@@ -621,11 +626,11 @@ if __name__ == "__main__":
         num_columns=15, box_size=2.0, reversal=3, base_price=50.0, direction="up"
     )
 
-    print(f"\nInput:")
-    print(f"  Colonne: 15")
-    print(f"  Box Size: $2")
-    print(f"  Reversal: 3")
-    print(f"  Base (minimo): $50")
+    print("\nInput:")
+    print("  Colonne: 15")
+    print("  Box Size: $2")
+    print("  Reversal: 3")
+    print("  Base (minimo): $50")
     print(f"\nFormula: 50 + (15 × 2 × 3) = ${pnf_target:.2f}")
 
     # Fibonacci

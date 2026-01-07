@@ -15,7 +15,7 @@ Example cron entry (daily at 3 AM):
 
 import argparse
 import logging
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 import httpx
 
@@ -88,7 +88,7 @@ def get_partitions(client: httpx.Client, table: str) -> list[dict]:
 
     partitions = []
     for row in data:
-        partition = dict(zip([c["name"] for c in columns], row))
+        partition = dict(zip([c["name"] for c in columns], row, strict=False))
         partitions.append(partition)
 
     return partitions
@@ -120,7 +120,7 @@ def drop_old_partitions(
         try:
             # Try to parse partition name as date
             partition_date = datetime.strptime(partition_name, "%Y-%m-%d")
-            partition_date = partition_date.replace(tzinfo=timezone.utc)
+            partition_date = partition_date.replace(tzinfo=UTC)
 
             if partition_date < cutoff_date:
                 if dry_run:
@@ -161,7 +161,7 @@ def cleanup_table(
     Returns:
         Number of partitions dropped.
     """
-    cutoff_date = datetime.now(timezone.utc) - timedelta(days=retention_days)
+    cutoff_date = datetime.now(UTC) - timedelta(days=retention_days)
     logger.info(f"Cleaning {table}: retention={retention_days}d, cutoff={cutoff_date}")
 
     return drop_old_partitions(client, table, cutoff_date, dry_run)

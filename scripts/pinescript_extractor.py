@@ -17,10 +17,10 @@ Requirements:
     - playwright (pip install playwright && playwright install chromium)
 """
 
-import sys
-import json
 import asyncio
+import json
 import re
+import sys
 
 try:
     from playwright.async_api import async_playwright

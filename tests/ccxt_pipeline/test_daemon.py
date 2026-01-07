@@ -4,7 +4,7 @@ Tests scheduling, graceful shutdown, and stability for continuous data collectio
 """
 
 import asyncio
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
@@ -40,7 +40,7 @@ class TestDaemonScheduling:
             runner._setup_scheduled_jobs()
 
             # Verify OI job was scheduled
-            calls = [c for c in mock_scheduler.add_job.call_args_list]
+            calls = list(mock_scheduler.add_job.call_args_list)
             assert len(calls) >= 1  # At least OI job
 
     @pytest.mark.asyncio
@@ -63,8 +63,8 @@ class TestDaemonScheduling:
     @pytest.mark.asyncio
     async def test_daemon_stores_fetched_data(self) -> None:
         """Test daemon stores fetched data to ParquetStore."""
-        from scripts.ccxt_pipeline.scheduler.daemon import DaemonRunner
         from scripts.ccxt_pipeline.models import OpenInterest, Venue
+        from scripts.ccxt_pipeline.scheduler.daemon import DaemonRunner
 
         runner = DaemonRunner()
 
@@ -73,7 +73,7 @@ class TestDaemonScheduling:
 
         # Create mock OI data
         oi = OpenInterest(
-            timestamp=datetime.now(timezone.utc),
+            timestamp=datetime.now(UTC),
             symbol="BTCUSDT-PERP",
             venue=Venue.BINANCE,
             open_interest=100000.0,
@@ -120,8 +120,8 @@ class TestGracefulShutdown:
     @pytest.mark.asyncio
     async def test_daemon_flushes_pending_writes(self) -> None:
         """Test daemon flushes pending writes before stopping."""
-        from scripts.ccxt_pipeline.scheduler.daemon import DaemonRunner
         from scripts.ccxt_pipeline.models import OpenInterest, Venue
+        from scripts.ccxt_pipeline.scheduler.daemon import DaemonRunner
 
         runner = DaemonRunner()
 
@@ -130,7 +130,7 @@ class TestGracefulShutdown:
 
         # Add pending data
         oi = OpenInterest(
-            timestamp=datetime.now(timezone.utc),
+            timestamp=datetime.now(UTC),
             symbol="BTCUSDT-PERP",
             venue=Venue.BINANCE,
             open_interest=100000.0,

@@ -5,10 +5,10 @@ Redis Performance Benchmark (Spec 018 - T014)
 Benchmarks read/write latency and stress tests with 10K+ keys.
 """
 
-import sys
 import os
-import time
 import statistics
+import sys
+import time
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -71,7 +71,7 @@ def stress_test_keys(r, num_keys: int = 10000) -> dict:
     read_duration = time.perf_counter() - start
 
     # Cleanup
-    print(f"   Cleaning up...")
+    print("   Cleaning up...")
     pipe = r.pipeline()
     for i in range(num_keys):
         pipe.delete(f"benchmark:stress:{i}")
@@ -90,8 +90,8 @@ def main():
     host = os.getenv("REDIS_HOST", "localhost")
     port = int(os.getenv("REDIS_PORT", "6379"))
 
-    print(f"Redis Performance Benchmark")
-    print(f"=" * 50)
+    print("Redis Performance Benchmark")
+    print("=" * 50)
 
     if not check_redis_health(host, port):
         print(f"✗ Redis not available at {host}:{port}")
@@ -106,12 +106,12 @@ def main():
         print("\n1. Latency Benchmark (1000 ops)...")
         latency = benchmark_latency(r, 1000)
 
-        print(f"\n   Write Latency:")
+        print("\n   Write Latency:")
         print(f"     Average: {latency['write_avg_ms']:.3f} ms")
         print(f"     P95:     {latency['write_p95_ms']:.3f} ms")
         print(f"     P99:     {latency['write_p99_ms']:.3f} ms")
 
-        print(f"\n   Read Latency:")
+        print("\n   Read Latency:")
         print(f"     Average: {latency['read_avg_ms']:.3f} ms")
         print(f"     P95:     {latency['read_p95_ms']:.3f} ms")
         print(f"     P99:     {latency['read_p99_ms']:.3f} ms")
@@ -120,7 +120,7 @@ def main():
         write_pass = latency["write_p95_ms"] < 1.0
         read_pass = latency["read_p95_ms"] < 1.0
 
-        print(f"\n   NFR-001 Check (< 1ms p95):")
+        print("\n   NFR-001 Check (< 1ms p95):")
         print(f"     Write: {'✓ PASS' if write_pass else '✗ FAIL'}")
         print(f"     Read:  {'✓ PASS' if read_pass else '✗ FAIL'}")
 
@@ -128,7 +128,7 @@ def main():
         print("\n2. Stress Test (10K+ keys)...")
         stress = stress_test_keys(r, 10000)
 
-        print(f"\n   Results:")
+        print("\n   Results:")
         print(f"     Keys:       {stress['num_keys']:,}")
         print(
             f"     Write:      {stress['write_total_s']:.2f}s ({stress['write_ops_per_s']:,.0f} ops/s)"

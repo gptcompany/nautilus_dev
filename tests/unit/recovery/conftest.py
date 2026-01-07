@@ -6,7 +6,7 @@ without requiring NautilusTrader adapter dependencies.
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from decimal import Decimal
 from unittest.mock import MagicMock
 
@@ -41,7 +41,7 @@ def mock_clock():
     """
     clock = MagicMock()
     clock.timestamp_ns.return_value = 1704153600000000000
-    clock.utc_now.return_value = datetime(2024, 1, 2, 0, 0, 0, tzinfo=timezone.utc)
+    clock.utc_now.return_value = datetime(2024, 1, 2, 0, 0, 0, tzinfo=UTC)
     return clock
 
 

@@ -9,7 +9,6 @@ Tests:
 import json
 import time
 
-
 from strategies.common.audit.events import (
     AuditEvent,
     AuditEventType,

@@ -33,26 +33,14 @@ __version__ = "0.1.0"
 __author__ = "NautilusTrader Team"
 
 # Core sizers
-from scripts.baseline_validation.sizers import (
-    ContenderSizer,
-    FixedFractionalSizer,
-    BuyAndHoldSizer,
-    AdaptiveSizer,
-    create_sizer,
-)
+# Strategy
+from scripts.baseline_validation.baseline_strategy import BaselineStrategy
 
-# Registry
-from scripts.baseline_validation.registry import (
-    ContenderRegistry,
-    get_default_contenders,
-)
-
-# Configuration
-from scripts.baseline_validation.config_models import (
-    BaselineValidationConfig,
-    ValidationConfig,
-    SuccessCriteriaConfig,
-    ContenderConfig,
+# Metrics
+from scripts.baseline_validation.comparison_metrics import (
+    ComparisonResult,
+    ContenderMetrics,
+    MultiContenderComparison,
 )
 
 # Validation
@@ -62,36 +50,47 @@ from scripts.baseline_validation.comparison_validator import (
     ValidationRun,
 )
 
-# Metrics
-from scripts.baseline_validation.comparison_metrics import (
-    MultiContenderComparison,
-    ComparisonResult,
-    ContenderMetrics,
+# Configuration
+from scripts.baseline_validation.config_models import (
+    BaselineValidationConfig,
+    ContenderConfig,
+    SuccessCriteriaConfig,
+    ValidationConfig,
 )
 
-# Verdict
-from scripts.baseline_validation.verdict import (
-    determine_verdict,
-    calculate_confidence,
-    generate_recommendation,
+# Registry
+from scripts.baseline_validation.registry import (
+    ContenderRegistry,
+    get_default_contenders,
 )
-from scripts.baseline_validation.report_models import Verdict
 
 # Reports
 from scripts.baseline_validation.report import (
     create_report_from_validation_run,
-    generate_markdown_report,
-    format_comparison_table,
     export_to_json,
+    format_comparison_table,
+    generate_markdown_report,
 )
 from scripts.baseline_validation.report_models import (
-    ValidationReport,
     ContenderSummary,
+    ValidationReport,
+    Verdict,
     VerdictDetails,
 )
+from scripts.baseline_validation.sizers import (
+    AdaptiveSizer,
+    BuyAndHoldSizer,
+    ContenderSizer,
+    FixedFractionalSizer,
+    create_sizer,
+)
 
-# Strategy
-from scripts.baseline_validation.baseline_strategy import BaselineStrategy
+# Verdict
+from scripts.baseline_validation.verdict import (
+    calculate_confidence,
+    determine_verdict,
+    generate_recommendation,
+)
 
 __all__ = [
     # Core sizers

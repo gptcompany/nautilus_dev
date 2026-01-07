@@ -22,7 +22,6 @@ import logging
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING
 
-
 from strategies.common.position_sizing.config import IntegratedSizingConfig
 
 if TYPE_CHECKING:

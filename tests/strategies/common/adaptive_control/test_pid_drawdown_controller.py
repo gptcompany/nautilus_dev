@@ -15,13 +15,14 @@ Production trading system - tests must be comprehensive and rigorous.
 """
 
 import math
+
 import pytest
+
 from strategies.common.adaptive_control.pid_drawdown import (
     PIDDrawdownController,
     PIDState,
     SimpleDrawdownScaler,
 )
-
 
 # ==============================================================================
 # Fixtures
@@ -90,7 +91,7 @@ class TestPIDInitialization:
     def test_default_initialization(self):
         """PID should initialize with default parameters."""
         pid = PIDDrawdownController()
-        
+
         assert pid.target_drawdown == 0.02
         assert pid.Kp == 2.0
         assert pid.Ki == 0.1
@@ -113,7 +114,7 @@ class TestPIDInitialization:
             max_output=0.9,
             integral_limit=1.0,
         )
-        
+
         assert pid.target_drawdown == 0.05
         assert pid.Kp == 3.0
         assert pid.Ki == 0.2
@@ -125,7 +126,7 @@ class TestPIDInitialization:
     def test_initial_state(self, default_pid):
         """Initial state should be clean."""
         state = default_pid.get_state()
-        
+
         assert state.error == 0.0
         assert state.integral == 0.0
         assert state.derivative == 0.0
@@ -143,14 +144,14 @@ class TestPIDUpdateCycle:
     def test_at_target_returns_high_multiplier(self, default_pid):
         """When at target drawdown, multiplier should be close to 1.0."""
         multiplier = default_pid.update(current_drawdown=0.02)
-        
+
         # At target (error=0), PID output=0, multiplier=1/(1+0)=1.0
         assert multiplier == 1.0
 
     def test_below_target_returns_high_multiplier(self, default_pid):
         """Below target drawdown should return multiplier >= 1.0 (clamped)."""
         multiplier = default_pid.update(current_drawdown=0.01)
-        
+
         # Below target (negative error), output should be high
         assert multiplier > 0.5
         assert multiplier <= 1.0  # Clamped to max_output
@@ -158,7 +159,7 @@ class TestPIDUpdateCycle:
     def test_above_target_reduces_multiplier(self, default_pid):
         """Above target drawdown should reduce multiplier."""
         multiplier = default_pid.update(current_drawdown=0.05)
-        
+
         # Above target (positive error), output should be reduced
         assert multiplier < 1.0
         assert multiplier >= 0.0
@@ -168,10 +169,10 @@ class TestPIDUpdateCycle:
         # Small error
         mult_small = default_pid.update(current_drawdown=0.025)
         default_pid.reset()
-        
+
         # Large error
         mult_large = default_pid.update(current_drawdown=0.08)
-        
+
         # Larger error should give lower multiplier
         assert mult_large < mult_small
 
@@ -182,11 +183,11 @@ class TestPIDUpdateCycle:
         for _ in range(10):
             mult = default_pid.update(current_drawdown=0.03)
             multipliers.append(mult)
-        
+
         # Check integral is accumulating
         state = default_pid.get_state()
         assert state.integral > 0.0
-        
+
         # Multiplier should decrease over time with persistent error
         assert multipliers[-1] <= multipliers[0]
 
@@ -194,16 +195,16 @@ class TestPIDUpdateCycle:
         """Derivative term should respond to rate of error change."""
         # Start with small drawdown
         default_pid.update(current_drawdown=0.02)
-        
+
         # Rapid increase in drawdown
         mult_rapid = default_pid.update(current_drawdown=0.06)
-        
+
         # The derivative term should have kicked in
         # Reset and test slow increase
         default_pid.reset()
         default_pid.update(current_drawdown=0.02)
         mult_slow = default_pid.update(current_drawdown=0.025)
-        
+
         # Rapid change should produce lower multiplier
         assert mult_rapid < mult_slow
 
@@ -211,7 +212,7 @@ class TestPIDUpdateCycle:
         """First update should have zero derivative term."""
         # First update - no previous error
         multiplier = default_pid.update(current_drawdown=0.05)
-        
+
         # Should still work, just no D term
         assert 0.0 <= multiplier <= 1.0
         assert default_pid._step_count == 1
@@ -221,12 +222,12 @@ class TestPIDUpdateCycle:
         # Test with dt=0.5
         default_pid.update(current_drawdown=0.03, dt=0.5)
         state_half = default_pid.get_state()
-        
+
         # Reset and test with dt=2.0
         default_pid.reset()
         default_pid.update(current_drawdown=0.03, dt=2.0)
         state_double = default_pid.get_state()
-        
+
         # Larger dt should accumulate more integral
         assert state_double.integral > state_half.integral
 
@@ -243,7 +244,7 @@ class TestOutputClamping:
         """Output should never exceed max_output."""
         # Test various extreme drawdowns
         test_drawdowns = [0.0, 0.001, 0.01, 0.015]
-        
+
         for dd in test_drawdowns:
             multiplier = default_pid.update(current_drawdown=dd)
             assert multiplier <= 1.0, f"Exceeded max at dd={dd}"
@@ -252,7 +253,7 @@ class TestOutputClamping:
         """Output should never go below min_output."""
         # Test extreme high drawdowns
         test_drawdowns = [0.05, 0.10, 0.20, 0.50]
-        
+
         for dd in test_drawdowns:
             multiplier = default_pid.update(current_drawdown=dd)
             assert multiplier >= 0.0, f"Below min at dd={dd}"
@@ -264,11 +265,11 @@ class TestOutputClamping:
             min_output=0.2,
             max_output=0.8,
         )
-        
+
         # Test below target (should clamp to max)
         mult_low = pid.update(current_drawdown=0.0)
         assert mult_low <= 0.8
-        
+
         # Test way above target (should clamp to min)
         mult_high = pid.update(current_drawdown=0.5)
         assert mult_high >= 0.2
@@ -280,7 +281,7 @@ class TestOutputClamping:
             min_output=0.0,
             max_output=0.0,
         )
-        
+
         multiplier = pid.update(current_drawdown=0.0)
         assert multiplier == 0.0
 
@@ -298,7 +299,7 @@ class TestAntiWindup:
         # Generate persistent large error to saturate integral
         for _ in range(100):
             default_pid.update(current_drawdown=0.10)
-        
+
         state = default_pid.get_state()
         assert abs(state.integral) <= default_pid.integral_limit
 
@@ -307,7 +308,7 @@ class TestAntiWindup:
         # Persistent high drawdown
         for _ in range(50):
             default_pid.update(current_drawdown=0.08)
-        
+
         state = default_pid.get_state()
         assert state.integral <= 0.5  # integral_limit
 
@@ -316,7 +317,7 @@ class TestAntiWindup:
         # Persistent low drawdown (negative error)
         for _ in range(50):
             default_pid.update(current_drawdown=0.0)
-        
+
         state = default_pid.get_state()
         assert state.integral >= -0.5  # -integral_limit
 
@@ -324,15 +325,15 @@ class TestAntiWindup:
         """Larger integral_limit should allow more accumulation."""
         pid_small = PIDDrawdownController(integral_limit=0.1)
         pid_large = PIDDrawdownController(integral_limit=2.0)
-        
+
         # Same persistent error
         for _ in range(30):
             pid_small.update(current_drawdown=0.05)
             pid_large.update(current_drawdown=0.05)
-        
+
         state_small = pid_small.get_state()
         state_large = pid_large.get_state()
-        
+
         assert abs(state_large.integral) > abs(state_small.integral)
 
 
@@ -349,26 +350,26 @@ class TestReset:
         # Accumulate some integral
         for _ in range(10):
             default_pid.update(current_drawdown=0.05)
-        
+
         default_pid.reset()
         state = default_pid.get_state()
-        
+
         assert state.integral == 0.0
 
     def test_reset_clears_previous_error(self, default_pid):
         """Reset should clear previous error."""
         default_pid.update(current_drawdown=0.05)
         default_pid.reset()
-        
+
         assert default_pid._prev_error is None
 
     def test_reset_clears_step_count(self, default_pid):
         """Reset should clear step count."""
         for _ in range(5):
             default_pid.update(current_drawdown=0.03)
-        
+
         default_pid.reset()
-        
+
         assert default_pid._step_count == 0
 
     def test_update_after_reset_works(self, default_pid):
@@ -376,11 +377,11 @@ class TestReset:
         # Run for a while
         for _ in range(10):
             default_pid.update(current_drawdown=0.05)
-        
+
         # Reset and update again
         default_pid.reset()
         multiplier = default_pid.update(current_drawdown=0.03)
-        
+
         # Should work normally
         assert 0.0 <= multiplier <= 1.0
         assert default_pid._step_count == 1
@@ -397,7 +398,7 @@ class TestEdgeCases:
     def test_zero_drawdown(self, default_pid):
         """Zero drawdown should give high multiplier."""
         multiplier = default_pid.update(current_drawdown=0.0)
-        
+
         # Below target, should be high
         assert multiplier > 0.5
         assert multiplier <= 1.0
@@ -405,7 +406,7 @@ class TestEdgeCases:
     def test_extreme_drawdown(self, default_pid):
         """Extreme drawdown should give low multiplier."""
         multiplier = default_pid.update(current_drawdown=0.99)
-        
+
         # Way above target, should be very low
         assert multiplier < 0.5
         assert multiplier >= 0.0
@@ -414,7 +415,7 @@ class TestEdgeCases:
         """Negative drawdown (profit) should be handled gracefully."""
         # This represents being above peak equity
         multiplier = default_pid.update(current_drawdown=-0.05)
-        
+
         # Should return valid multiplier
         assert 0.0 <= multiplier <= 1.0
 
@@ -422,10 +423,10 @@ class TestEdgeCases:
         """Rapid drawdown increase should trigger response."""
         # Start low
         default_pid.update(current_drawdown=0.01)
-        
+
         # Jump to high
         multiplier = default_pid.update(current_drawdown=0.10)
-        
+
         # Should respond by reducing (sigmoid mapping moderates response)
         # With error=0.08, P=0.16, D will add more, but sigmoid keeps it moderate
         # After one step, multiplier will be around 0.82-0.86
@@ -436,60 +437,60 @@ class TestEdgeCases:
         """Rapid drawdown decrease should ease restrictions."""
         # Start high
         default_pid.update(current_drawdown=0.10)
-        
+
         # Drop rapidly
         for dd in [0.08, 0.05, 0.03, 0.02]:
             multiplier = default_pid.update(current_drawdown=dd)
-        
+
         # Should increase multiplier (though may lag due to integral)
         assert multiplier >= 0.0
 
     def test_oscillating_drawdown(self, default_pid):
         """Oscillating drawdown should be handled smoothly."""
         multipliers = []
-        
+
         # Oscillate around target
         for i in range(20):
             dd = 0.02 + 0.01 * math.sin(i * 0.5)
             mult = default_pid.update(current_drawdown=dd)
             multipliers.append(mult)
-        
+
         # All multipliers should be valid
         assert all(0.0 <= m <= 1.0 for m in multipliers)
-        
+
         # Should not have wild swings
-        max_change = max(abs(multipliers[i+1] - multipliers[i]) 
+        max_change = max(abs(multipliers[i+1] - multipliers[i])
                         for i in range(len(multipliers)-1))
         assert max_change < 0.5  # Reasonable smoothness
 
     def test_steady_state_at_target(self, default_pid):
         """Steady state at target should maintain ~1.0 multiplier."""
         multipliers = []
-        
+
         # Stay at target
         for _ in range(20):
             mult = default_pid.update(current_drawdown=0.02)
             multipliers.append(mult)
-        
+
         # Should stay near 1.0 (integral won't accumulate)
         assert all(m >= 0.9 for m in multipliers[-5:])
 
     def test_very_small_timestep(self, default_pid):
         """Very small timestep should still work."""
         multiplier = default_pid.update(current_drawdown=0.03, dt=0.001)
-        
+
         assert 0.0 <= multiplier <= 1.0
 
     def test_very_large_timestep(self, default_pid):
         """Very large timestep should still work."""
         multiplier = default_pid.update(current_drawdown=0.03, dt=100.0)
-        
+
         assert 0.0 <= multiplier <= 1.0
 
     def test_zero_timestep(self, default_pid):
         """Zero timestep should be handled gracefully."""
         multiplier = default_pid.update(current_drawdown=0.03, dt=0.0)
-        
+
         # Should work, just no integral accumulation
         assert 0.0 <= multiplier <= 1.0
 
@@ -509,7 +510,7 @@ class TestSetpointTracking:
         for _ in range(50):
             mult = default_pid.update(current_drawdown=0.05)
             multipliers.append(mult)
-        
+
         # Should be reducing position size consistently
         # (Lower multipliers over time due to integral term)
         assert multipliers[-1] <= multipliers[0]
@@ -518,11 +519,11 @@ class TestSetpointTracking:
         """Different target drawdowns should produce different responses."""
         pid_low = PIDDrawdownController(target_drawdown=0.01)
         pid_high = PIDDrawdownController(target_drawdown=0.05)
-        
+
         # Same current drawdown
         mult_low = pid_low.update(current_drawdown=0.03)
         mult_high = pid_high.update(current_drawdown=0.03)
-        
+
         # For 3% drawdown:
         # - pid_low sees 2% error (0.03 - 0.01)
         # - pid_high sees -2% error (0.03 - 0.05)
@@ -536,7 +537,7 @@ class TestSetpointTracking:
         for dd in [0.01, 0.02, 0.03, 0.04, 0.03, 0.02]:
             mult = default_pid.update(current_drawdown=dd)
             results.append((dd, mult))
-        
+
         # All should be valid
         assert all(0.0 <= r[1] <= 1.0 for r in results)
 
@@ -553,7 +554,7 @@ class TestPIDTuning:
         """Aggressive tuning should respond quickly."""
         # Quick response to error
         mult1 = aggressive_pid.update(current_drawdown=0.05)
-        
+
         # Should respond, but sigmoid still moderates the response
         # Need sustained error or extreme values for very low multipliers
         assert mult1 < 1.0
@@ -563,41 +564,41 @@ class TestPIDTuning:
         """Conservative tuning should respond slowly."""
         # Slow response to error
         mult1 = conservative_pid.update(current_drawdown=0.05)
-        
+
         # Should respond more gently
         assert mult1 > 0.5
 
     def test_p_only_controller(self):
         """P-only controller (Ki=0, Kd=0) should work."""
         pid = PIDDrawdownController(Kp=2.0, Ki=0.0, Kd=0.0)
-        
+
         multiplier = pid.update(current_drawdown=0.04)
-        
+
         assert 0.0 <= multiplier <= 1.0
 
     def test_pi_controller(self):
         """PI controller (Kd=0) should work."""
         pid = PIDDrawdownController(Kp=2.0, Ki=0.1, Kd=0.0)
-        
+
         for _ in range(10):
             multiplier = pid.update(current_drawdown=0.04)
-        
+
         assert 0.0 <= multiplier <= 1.0
 
     def test_pd_controller(self):
         """PD controller (Ki=0) should work."""
         pid = PIDDrawdownController(Kp=2.0, Ki=0.0, Kd=0.5)
-        
+
         multiplier = pid.update(current_drawdown=0.04)
-        
+
         assert 0.0 <= multiplier <= 1.0
 
     def test_zero_gains_returns_mid_value(self):
         """All zero gains should return reasonable value."""
         pid = PIDDrawdownController(Kp=0.0, Ki=0.0, Kd=0.0)
-        
+
         multiplier = pid.update(current_drawdown=0.05)
-        
+
         # With zero PID output, multiplier = 1/(1+0) = 1.0
         assert multiplier == 1.0
 
@@ -614,7 +615,7 @@ class TestStateReporting:
         """get_state should return valid PIDState."""
         default_pid.update(current_drawdown=0.03)
         state = default_pid.get_state()
-        
+
         assert isinstance(state, PIDState)
         assert hasattr(state, 'error')
         assert hasattr(state, 'integral')
@@ -626,7 +627,7 @@ class TestStateReporting:
         """State should reflect current error."""
         default_pid.update(current_drawdown=0.05)
         state = default_pid.get_state()
-        
+
         expected_error = 0.05 - 0.02  # current - target
         assert abs(state.error - expected_error) < 1e-9
 
@@ -634,7 +635,7 @@ class TestStateReporting:
         """State should reflect accumulated integral."""
         for _ in range(5):
             default_pid.update(current_drawdown=0.04)
-        
+
         state = default_pid.get_state()
         assert state.integral > 0.0
 
@@ -642,10 +643,10 @@ class TestStateReporting:
         """State timestamp should increment with steps."""
         default_pid.update(current_drawdown=0.03)
         state1 = default_pid.get_state()
-        
+
         default_pid.update(current_drawdown=0.03)
         state2 = default_pid.get_state()
-        
+
         assert state2.timestamp > state1.timestamp
 
 
@@ -697,10 +698,10 @@ class TestSimpleDrawdownScaler:
         """Test multiple points in range."""
         drawdowns = [0.03, 0.05, 0.07, 0.09]
         multipliers = [simple_scaler.get_multiplier(dd) for dd in drawdowns]
-        
+
         # Should be monotonically decreasing
         assert multipliers == sorted(multipliers, reverse=True)
-        
+
         # All should be in valid range
         assert all(0.0 <= m <= 1.0 for m in multipliers)
 
@@ -717,7 +718,7 @@ class TestPIDvsSimple:
         """Both should reduce multiplier at high drawdown."""
         pid_mult = default_pid.update(current_drawdown=0.08)
         simple_mult = simple_scaler.get_multiplier(current_drawdown=0.08)
-        
+
         # Both should reduce from 1.0
         assert pid_mult < 1.0
         assert simple_mult < 1.0
@@ -727,11 +728,11 @@ class TestPIDvsSimple:
         # Multiple high drawdown updates
         for _ in range(10):
             default_pid.update(current_drawdown=0.05)
-        
+
         # Simple scaler gives same result every time
         simple_mult1 = simple_scaler.get_multiplier(current_drawdown=0.05)
         simple_mult2 = simple_scaler.get_multiplier(current_drawdown=0.05)
-        
+
         assert simple_mult1 == simple_mult2  # No memory
         # PID integral should have accumulated
         assert default_pid._integral != 0.0
@@ -740,19 +741,19 @@ class TestPIDvsSimple:
         """PID should provide smoother response to oscillations."""
         pid_mults = []
         simple_mults = []
-        
+
         # Oscillating drawdown
         for i in range(20):
             dd = 0.04 + 0.02 * math.sin(i * 0.5)
             pid_mults.append(default_pid.update(current_drawdown=dd))
             simple_mults.append(simple_scaler.get_multiplier(current_drawdown=dd))
-        
+
         # Calculate variance of changes
-        pid_changes = [abs(pid_mults[i+1] - pid_mults[i]) 
+        pid_changes = [abs(pid_mults[i+1] - pid_mults[i])
                       for i in range(len(pid_mults)-1)]
-        simple_changes = [abs(simple_mults[i+1] - simple_mults[i]) 
+        simple_changes = [abs(simple_mults[i+1] - simple_mults[i])
                          for i in range(len(simple_mults)-1)]
-        
+
         # PID derivative term should help smooth oscillations
         # (This test may fail if tuning is aggressive)
         assert len(pid_changes) > 0
@@ -772,7 +773,7 @@ class TestProductionScenarios:
         # Small drawdowns around target
         drawdowns = [0.015, 0.02, 0.018, 0.022, 0.019, 0.021, 0.02]
         multipliers = [default_pid.update(dd) for dd in drawdowns]
-        
+
         # All should allow near-full trading
         assert all(m > 0.8 for m in multipliers)
 
@@ -781,11 +782,11 @@ class TestProductionScenarios:
         # Start normal
         for _ in range(10):
             default_pid.update(current_drawdown=0.02)
-        
+
         # Sudden drawdown
         drawdowns = [0.03, 0.05, 0.07, 0.09]
         multipliers = [default_pid.update(dd) for dd in drawdowns]
-        
+
         # Should progressively reduce (sigmoid response is gradual)
         # Integral needs time to accumulate for stronger response
         assert multipliers[0] > multipliers[-1]
@@ -795,28 +796,28 @@ class TestProductionScenarios:
         # Drawdown phase
         for _ in range(10):
             default_pid.update(current_drawdown=0.08)
-        
+
         mult_bottom = default_pid.update(current_drawdown=0.08)
-        
+
         # Recovery phase
         recovery = [0.07, 0.05, 0.04, 0.03, 0.025]
         for dd in recovery:
             mult_recovery = default_pid.update(current_drawdown=dd)
-        
+
         # Should gradually increase (though may lag due to integral)
         assert mult_recovery >= mult_bottom
 
     def test_multiple_cycles(self, default_pid):
         """Test multiple drawdown/recovery cycles."""
-        for cycle in range(3):
+        for _cycle in range(3):
             # Drawdown
             for dd in [0.03, 0.05, 0.06]:
                 default_pid.update(current_drawdown=dd)
-            
+
             # Recovery
             for dd in [0.05, 0.03, 0.02]:
                 default_pid.update(current_drawdown=dd)
-        
+
         # Controller should still be functional
         final_mult = default_pid.update(current_drawdown=0.02)
         assert 0.0 <= final_mult <= 1.0
@@ -827,7 +828,7 @@ class TestProductionScenarios:
         for i in range(20):
             dd = 0.02 + 0.05 * math.sin(i * 1.0)  # Fast oscillation
             mult = default_pid.update(current_drawdown=abs(dd))
-        
+
         # Should remain stable
         assert 0.0 <= mult <= 1.0
 
@@ -839,7 +840,7 @@ class TestProductionScenarios:
             dd = 0.02 + (i * 0.001)  # Slowly increasing
             mult = default_pid.update(current_drawdown=dd)
             multipliers.append(mult)
-        
+
         # Should gradually reduce multiplier
         assert multipliers[-1] < multipliers[0]
         # Should never go negative or exceed bounds
@@ -852,7 +853,7 @@ class TestProductionScenarios:
         for _ in range(50):
             mult = default_pid.update(current_drawdown=0.10)
             multipliers.append(mult)
-        
+
         # After many steps, integral accumulation should drive multiplier lower
         assert multipliers[-1] < multipliers[0]
         # Integral should be at the limit
@@ -871,7 +872,7 @@ class TestNumericalStability:
     def test_no_nan_or_inf(self, default_pid):
         """Should never produce NaN or Inf."""
         test_cases = [0.0, 0.001, 0.01, 0.05, 0.1, 0.5, 0.99, 1.0]
-        
+
         for dd in test_cases:
             mult = default_pid.update(current_drawdown=dd)
             assert math.isfinite(mult), f"Non-finite at dd={dd}"
@@ -893,7 +894,7 @@ class TestNumericalStability:
         for i in range(1000):
             dd = 0.02 + 0.01 * math.sin(i * 0.1)
             mult = default_pid.update(current_drawdown=dd)
-            
+
             assert math.isfinite(mult)
             assert 0.0 <= mult <= 1.0
 
@@ -903,11 +904,11 @@ class TestNumericalStability:
             min_output=0.0,
             max_output=1.0,
         )
-        
+
         # Should hit exact boundaries
         mult_max = pid.update(current_drawdown=0.0)
         mult_min = pid.update(current_drawdown=1.0)
-        
+
         assert 0.0 <= mult_max <= 1.0
         assert 0.0 <= mult_min <= 1.0
 

@@ -19,10 +19,9 @@ from pathlib import Path
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-import pandas as pd
-import numpy as np
-from datetime import datetime
 from typing import NamedTuple
+
+import pandas as pd
 
 
 class PredictionResult(NamedTuple):
@@ -94,8 +93,8 @@ def validate_ofi_accuracy(
     Returns:
         Dictionary with accuracy metrics
     """
-    from strategies.common.orderflow.hawkes_ofi import HawkesOFI
     from strategies.common.orderflow.config import HawkesConfig
+    from strategies.common.orderflow.hawkes_ofi import HawkesOFI
     from strategies.common.orderflow.trade_classifier import TradeClassification, TradeSide
 
     print(f"Loading data from: {data_path}")
@@ -126,7 +125,6 @@ def validate_ofi_accuracy(
 
     results = []
     current_window_start = df["timestamp_ms"].iloc[0]
-    window_trades = []
     last_window_ofi = 0.0
     last_window_price = df["price"].iloc[0]
     window_count = 0
@@ -134,7 +132,7 @@ def validate_ofi_accuracy(
     # Track OFI values per window for prediction
     print("\nProcessing trades...")
 
-    for idx, row in df.iterrows():
+    for _idx, row in df.iterrows():
         timestamp_ms = row["timestamp_ms"]
         price = float(row["price"])
         quantity = float(row["quantity"])
@@ -301,7 +299,7 @@ def main():
     print("=" * 70)
     print("T045: Validate OFI Prediction Accuracy")
     print("=" * 70)
-    print(f"\nConfiguration:")
+    print("\nConfiguration:")
     print(f"  Data path: {args.data_path}")
     print(f"  Window size: {args.window_ms}ms")
     print(f"  Max trades: {args.max_trades:,}")
@@ -323,18 +321,18 @@ def main():
         print(f"ERROR: {results['error']}")
         return 1
 
-    print(f"\nData Summary:")
+    print("\nData Summary:")
     print(f"  Total trades processed: {results['total_trades']:,}")
     print(f"  Total windows: {results['total_windows']:,}")
     print(f"  Total predictions: {results['total_predictions']:,}")
 
-    print(f"\nAccuracy Metrics:")
+    print("\nAccuracy Metrics:")
     print(f"  Overall accuracy: {results['accuracy_pct']:.2f}%")
     print(
         f"  Correct predictions: {results['correct_predictions']:,} / {results['total_predictions']:,}"
     )
 
-    print(f"\nDirection Breakdown:")
+    print("\nDirection Breakdown:")
     print(
         f"  UP predictions: {results['up_predictions']:,} (accuracy: {results['up_accuracy'] * 100:.2f}%)"
     )
@@ -342,11 +340,11 @@ def main():
         f"  DOWN predictions: {results['down_predictions']:,} (accuracy: {results['down_accuracy'] * 100:.2f}%)"
     )
 
-    print(f"\nOFI Strength Analysis:")
+    print("\nOFI Strength Analysis:")
     for quartile, acc in results["ofi_quartile_accuracy"].items():
         print(f"  {quartile}: {acc * 100:.2f}%")
 
-    print(f"\n" + "=" * 70)
+    print("\n" + "=" * 70)
     print(f"PASS THRESHOLD: {results['pass_threshold'] * 100:.0f}%")
     print(f"ACTUAL ACCURACY: {results['accuracy_pct']:.2f}%")
 

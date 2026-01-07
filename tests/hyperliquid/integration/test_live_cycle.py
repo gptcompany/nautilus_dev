@@ -18,10 +18,9 @@ import pytest
 pytest.importorskip("nautilus_trader.adapters.hyperliquid")
 
 from configs.hyperliquid.testnet import create_testnet_trading_node
-from strategies.hyperliquid.config import HyperliquidStrategyConfig
-from strategies.hyperliquid.base_strategy import HyperliquidBaseStrategy
 from risk import RiskConfig
-
+from strategies.hyperliquid.base_strategy import HyperliquidBaseStrategy
+from strategies.hyperliquid.config import HyperliquidStrategyConfig
 
 # Skip all tests if testnet credentials not available
 pytestmark = pytest.mark.skipif(

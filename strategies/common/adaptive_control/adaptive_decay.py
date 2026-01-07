@@ -126,7 +126,7 @@ class AdaptiveDecayCalculator:
         context = VolatilityContext(variance_ratio=variance_ratio)
         return self.calculate(context)
 
-    def calculate_from_detector(self, detector: "IIRRegimeDetector") -> float:
+    def calculate_from_detector(self, detector: IIRRegimeDetector) -> float:
         """Calculate decay directly from IIRRegimeDetector.
 
         Args:

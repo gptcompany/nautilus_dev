@@ -14,8 +14,7 @@ Example:
     >>> exec_config = create_hyperliquid_exec_client(testnet=True)
 """
 
-from nautilus_trader.adapters.hyperliquid import HYPERLIQUID
-from nautilus_trader.adapters.hyperliquid import HyperliquidExecClientConfig
+from nautilus_trader.adapters.hyperliquid import HYPERLIQUID, HyperliquidExecClientConfig
 from nautilus_trader.config import InstrumentProviderConfig
 
 from configs.hyperliquid.data_client import DEFAULT_INSTRUMENTS

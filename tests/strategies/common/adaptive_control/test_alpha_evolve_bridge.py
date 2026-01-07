@@ -990,7 +990,7 @@ class TestAdaptiveSurvivalSystemProcess:
         system = AdaptiveSurvivalSystem()
         system.register_strategy("test")
 
-        result = system.process(price=100.0, current_drawdown=0.02)
+        system.process(price=100.0, current_drawdown=0.02)
 
         assert system._bar_count == 1
 
@@ -1029,7 +1029,7 @@ class TestAdaptiveSurvivalSystemProcess:
         system.register_strategy("test")
 
         # Should not raise
-        result = system.process(price=100.0, current_drawdown=0.02)
+        system.process(price=100.0, current_drawdown=0.02)
 
         failing_callback.assert_called_once()
         success_callback.assert_called_once()
@@ -1117,7 +1117,7 @@ class TestIntegration:
 
         # Process bars
         for i in range(10):
-            result = system.process(
+            system.process(
                 price=100 + i,
                 current_drawdown=0.01 * i,
             )

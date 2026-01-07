@@ -6,8 +6,9 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
+from datetime import UTC, datetime
+
 import pytest
-from datetime import datetime, timezone
 from pydantic import ValidationError
 
 
@@ -19,7 +20,7 @@ class TestDaemonMetrics:
         from monitoring.models import DaemonMetrics
 
         metrics = DaemonMetrics(
-            timestamp=datetime.now(timezone.utc),
+            timestamp=datetime.now(UTC),
             host="prod-server-01",
             env="prod",
             fetch_count=100,
@@ -37,7 +38,7 @@ class TestDaemonMetrics:
 
         with pytest.raises(ValidationError):
             DaemonMetrics(
-                timestamp=datetime.now(timezone.utc),
+                timestamp=datetime.now(UTC),
                 host="server",
                 env="invalid_env",  # Invalid
                 fetch_count=0,
@@ -53,7 +54,7 @@ class TestDaemonMetrics:
 
         with pytest.raises(ValidationError):
             DaemonMetrics(
-                timestamp=datetime.now(timezone.utc),
+                timestamp=datetime.now(UTC),
                 host="server",
                 env="prod",
                 fetch_count=-1,  # Invalid
@@ -69,7 +70,7 @@ class TestDaemonMetrics:
 
         with pytest.raises(ValidationError):
             DaemonMetrics(
-                timestamp=datetime.now(timezone.utc),
+                timestamp=datetime.now(UTC),
                 host="server",
                 env="prod",
                 fetch_count=0,
@@ -85,7 +86,7 @@ class TestDaemonMetrics:
 
         with pytest.raises(ValidationError):
             DaemonMetrics(
-                timestamp=datetime.now(timezone.utc),
+                timestamp=datetime.now(UTC),
                 host="",  # Invalid
                 env="prod",
                 fetch_count=0,
@@ -100,7 +101,7 @@ class TestDaemonMetrics:
         from monitoring.models import DaemonMetrics
 
         metrics = DaemonMetrics(
-            timestamp=datetime.now(timezone.utc),
+            timestamp=datetime.now(UTC),
             host="server",
             env="prod",
             fetch_count=0,
@@ -115,7 +116,7 @@ class TestDaemonMetrics:
         """Model should convert to ILP line protocol format."""
         from monitoring.models import DaemonMetrics
 
-        ts = datetime(2025, 12, 26, 12, 0, 0, tzinfo=timezone.utc)
+        ts = datetime(2025, 12, 26, 12, 0, 0, tzinfo=UTC)
         metrics = DaemonMetrics(
             timestamp=ts,
             host="prod-01",
@@ -140,7 +141,7 @@ class TestExchangeStatus:
         from monitoring.models import ExchangeStatus
 
         status = ExchangeStatus(
-            timestamp=datetime.now(timezone.utc),
+            timestamp=datetime.now(UTC),
             exchange="binance",
             host="server",
             env="prod",
@@ -157,7 +158,7 @@ class TestExchangeStatus:
 
         with pytest.raises(ValidationError):
             ExchangeStatus(
-                timestamp=datetime.now(timezone.utc),
+                timestamp=datetime.now(UTC),
                 exchange="invalid_exchange",  # Invalid
                 host="server",
                 env="prod",
@@ -172,7 +173,7 @@ class TestExchangeStatus:
 
         with pytest.raises(ValidationError):
             ExchangeStatus(
-                timestamp=datetime.now(timezone.utc),
+                timestamp=datetime.now(UTC),
                 exchange="binance",
                 host="server",
                 env="prod",
@@ -187,7 +188,7 @@ class TestExchangeStatus:
 
         with pytest.raises(ValidationError):
             ExchangeStatus(
-                timestamp=datetime.now(timezone.utc),
+                timestamp=datetime.now(UTC),
                 exchange="binance",
                 host="server",
                 env="prod",
@@ -201,7 +202,7 @@ class TestExchangeStatus:
         from monitoring.models import ExchangeStatus
 
         status = ExchangeStatus(
-            timestamp=datetime.now(timezone.utc),
+            timestamp=datetime.now(UTC),
             exchange="bybit",
             host="server",
             env="prod",
@@ -216,7 +217,7 @@ class TestExchangeStatus:
         """Model should convert to ILP line protocol format."""
         from monitoring.models import ExchangeStatus
 
-        ts = datetime(2025, 12, 26, 12, 0, 0, tzinfo=timezone.utc)
+        ts = datetime(2025, 12, 26, 12, 0, 0, tzinfo=UTC)
         status = ExchangeStatus(
             timestamp=ts,
             exchange="binance",
@@ -240,7 +241,7 @@ class TestPipelineMetrics:
         from monitoring.models import PipelineMetrics
 
         metrics = PipelineMetrics(
-            timestamp=datetime.now(timezone.utc),
+            timestamp=datetime.now(UTC),
             exchange="binance",
             symbol="BTC/USDT:USDT",
             data_type="oi",
@@ -259,7 +260,7 @@ class TestPipelineMetrics:
 
         with pytest.raises(ValidationError):
             PipelineMetrics(
-                timestamp=datetime.now(timezone.utc),
+                timestamp=datetime.now(UTC),
                 exchange="binance",
                 symbol="BTC/USDT:USDT",
                 data_type="invalid_type",  # Invalid
@@ -276,7 +277,7 @@ class TestPipelineMetrics:
 
         with pytest.raises(ValidationError):
             PipelineMetrics(
-                timestamp=datetime.now(timezone.utc),
+                timestamp=datetime.now(UTC),
                 exchange="binance",
                 symbol="BTC/USDT:USDT",
                 data_type="oi",
@@ -293,7 +294,7 @@ class TestPipelineMetrics:
 
         # Valid: gap_detected=True with duration
         metrics = PipelineMetrics(
-            timestamp=datetime.now(timezone.utc),
+            timestamp=datetime.now(UTC),
             exchange="binance",
             symbol="BTC/USDT:USDT",
             data_type="oi",
@@ -311,7 +312,7 @@ class TestPipelineMetrics:
         """Model should convert to ILP line protocol format."""
         from monitoring.models import PipelineMetrics
 
-        ts = datetime(2025, 12, 26, 12, 0, 0, tzinfo=timezone.utc)
+        ts = datetime(2025, 12, 26, 12, 0, 0, tzinfo=UTC)
         metrics = PipelineMetrics(
             timestamp=ts,
             exchange="binance",

@@ -11,7 +11,6 @@ from scripts.auto_update.updater import (
     update_pyproject_version,
 )
 
-
 # =============================================================================
 # T031: Test update_pyproject_version
 # =============================================================================

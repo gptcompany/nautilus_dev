@@ -8,7 +8,6 @@ Tests:
 
 import json
 
-
 from strategies.common.adaptive_control.meta_controller import (
     MetaController,
     SystemState,

@@ -79,7 +79,7 @@ class VanillaMomentumStrategy(Strategy):
         self.register_indicator_for_bars(self.config.bar_type, self.fast_ema)
         self.register_indicator_for_bars(self.config.bar_type, self.slow_ema)
 
-    def on_bar(self, bar: "Bar") -> None:
+    def on_bar(self, bar: Bar) -> None:
         """Handle bar - NO equity tracking."""
         if not self.indicators_initialized():
             return

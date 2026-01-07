@@ -520,7 +520,7 @@ class StrategyEvaluator:
                     timeout=self.timeout_seconds,
                 )
             return result
-        except asyncio.TimeoutError:
+        except TimeoutError:
             return EvaluationResult(
                 success=False,
                 error=f"Evaluation timeout exceeded ({self.timeout_seconds}s)",

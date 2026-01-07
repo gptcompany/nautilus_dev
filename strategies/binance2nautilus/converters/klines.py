@@ -7,7 +7,6 @@ NautilusTrader Bar objects using V1 BarDataWrangler.
 from pathlib import Path
 
 import pandas as pd
-
 from nautilus_trader.model.data import Bar, BarType
 
 from ..config import ConverterConfig
@@ -15,7 +14,6 @@ from ..instruments import get_instrument
 from ..state import ConversionState
 from ..wrangler_factory import get_bar_wrangler
 from .base import BaseConverter
-
 
 # Map timeframe strings to BarType specification parts
 TIMEFRAME_MAP = {

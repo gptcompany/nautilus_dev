@@ -160,7 +160,7 @@ def convert_funding_rates(
     config: ConverterConfig | None = None,
     state: ConversionState | None = None,
     skip_processed: bool = True,
-) -> tuple[list["FundingRateUpdate"], int]:
+) -> tuple[list[FundingRateUpdate], int]:
     """Convert all funding rate files for a symbol.
 
     Args:

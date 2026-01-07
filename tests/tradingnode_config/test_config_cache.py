@@ -6,7 +6,6 @@ TDD: RED phase - tests written before implementation.
 
 from __future__ import annotations
 
-
 from config.cache import build_cache_config
 from config.models import RedisConfig
 

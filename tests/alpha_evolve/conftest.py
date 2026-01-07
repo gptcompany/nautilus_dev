@@ -1,11 +1,10 @@
 """Shared fixtures for Alpha-Evolve tests."""
 
 import tempfile
+from collections.abc import Generator
 from pathlib import Path
-from typing import Generator
 
 import pytest
-
 
 # === SAMPLE STRATEGY FIXTURES ===
 

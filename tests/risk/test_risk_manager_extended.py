@@ -9,8 +9,9 @@ Focus on untested methods and edge cases:
 5. Edge cases: zero positions, limit breaches, rapid updates, error handling
 """
 
+from datetime import UTC
 from decimal import Decimal
-from unittest.mock import MagicMock, Mock, patch
+from unittest.mock import MagicMock
 
 import pytest
 from nautilus_trader.model.enums import OrderSide, PositionSide
@@ -83,9 +84,9 @@ def mock_strategy(instrument_id: InstrumentId) -> MagicMock:
 
     # Mock clock for daily tracker
     mock_clock = MagicMock()
-    from datetime import datetime, timezone
+    from datetime import datetime
 
-    mock_clock.utc_now.return_value = datetime(2024, 1, 1, 0, 0, 0, tzinfo=timezone.utc)
+    mock_clock.utc_now.return_value = datetime(2024, 1, 1, 0, 0, 0, tzinfo=UTC)
     strategy.clock = mock_clock
 
     return strategy

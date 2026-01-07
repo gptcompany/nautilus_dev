@@ -24,7 +24,8 @@ from __future__ import annotations
 
 import math
 import random
-from typing import TYPE_CHECKING, Sequence
+from collections.abc import Sequence
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from scripts.alpha_evolve.walk_forward.models import WindowResult

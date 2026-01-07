@@ -7,7 +7,7 @@ Part of spec-010: Alpha-Evolve Grafana Dashboard
 from __future__ import annotations
 
 import logging
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import TYPE_CHECKING, Literal
 
 if TYPE_CHECKING:
@@ -62,7 +62,7 @@ class EvolutionMetricsPublisher:
             return False
 
         metrics = EvolutionMetrics(
-            timestamp=datetime.now(timezone.utc),
+            timestamp=datetime.now(UTC),
             program_id=program.id,
             experiment=program.experiment,
             generation=program.generation,
@@ -125,7 +125,7 @@ class EvolutionMetricsPublisher:
         # NOTE: generation=0 used for failures (Pydantic constraint ge=0)
         # Failures are distinguished by mutation_outcome field instead
         metrics = EvolutionMetrics(
-            timestamp=datetime.now(timezone.utc),
+            timestamp=datetime.now(UTC),
             program_id="failed-mutation",
             experiment=experiment,
             generation=0,  # Use 0 (Pydantic ge=0 constraint); outcome indicates failure

@@ -146,7 +146,7 @@ class ComparisonValidator:
 
     def __init__(
         self,
-        config: "BaselineValidationConfig",
+        config: BaselineValidationConfig,
         registry: ContenderRegistry | None = None,
     ):
         """Initialize ComparisonValidator.
@@ -159,12 +159,12 @@ class ComparisonValidator:
         self._registry = registry or ContenderRegistry.from_config(config.contenders)
 
     @property
-    def config(self) -> "BaselineValidationConfig":
+    def config(self) -> BaselineValidationConfig:
         """Validation configuration."""
         return self._config
 
     @property
-    def contenders(self) -> dict[str, "ContenderSizer"]:
+    def contenders(self) -> dict[str, ContenderSizer]:
         """Registered contenders."""
         return dict(self._registry.all())
 

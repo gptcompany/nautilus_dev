@@ -3,7 +3,7 @@
 TDD Approach: Tests written FIRST before implementation.
 """
 
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from unittest.mock import MagicMock
 
@@ -54,7 +54,7 @@ class MockClock:
     """Mock clock for testing."""
 
     def __init__(self, timestamp: datetime | None = None):
-        self._timestamp = timestamp or datetime.now(timezone.utc)
+        self._timestamp = timestamp or datetime.now(UTC)
 
     def utc_now(self) -> datetime:
         return self._timestamp
@@ -463,8 +463,8 @@ class TestDayStartPropertyUpdatesOnReset:
         """day_start is updated to current time on reset."""
         from risk.daily_pnl_tracker import DailyPnLTracker
 
-        old_time = datetime(2024, 1, 1, 12, 0, 0, tzinfo=timezone.utc)
-        new_time = datetime(2024, 1, 2, 0, 0, 0, tzinfo=timezone.utc)
+        old_time = datetime(2024, 1, 1, 12, 0, 0, tzinfo=UTC)
+        new_time = datetime(2024, 1, 2, 0, 0, 0, tzinfo=UTC)
 
         clock = MockClock(timestamp=old_time)
         strategy = MockStrategy(clock=clock)
@@ -497,7 +497,7 @@ class TestPerStrategyLimitsIndependent:
             per_strategy=True,
         )
         strategy = MockStrategy()
-        tracker = DailyPnLTracker(config=config, strategy=strategy)
+        DailyPnLTracker(config=config, strategy=strategy)
 
         # This test validates the per_strategy flag is respected
         # Full implementation would track by strategy_id

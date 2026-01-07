@@ -27,7 +27,6 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass
-from typing import List, Optional
 
 
 @dataclass
@@ -88,10 +87,10 @@ class MarketFlowAnalyzer:
         self.pressure_window = pressure_window
         self.viscosity = viscosity
 
-        self._price_buffer: List[float] = []
-        self._volume_buffer: List[float] = []
-        self._imbalance_buffer: List[float] = []
-        self._last_state: Optional[FlowState] = None
+        self._price_buffer: list[float] = []
+        self._volume_buffer: list[float] = []
+        self._imbalance_buffer: list[float] = []
+        self._last_state: FlowState | None = None
 
     def update(
         self,
@@ -174,7 +173,7 @@ class MarketFlowAnalyzer:
         self._last_state = state
         return state
 
-    def _calculate_std(self, values: List[float]) -> float:
+    def _calculate_std(self, values: list[float]) -> float:
         """Calculate standard deviation."""
         if len(values) < 2:
             return 0.0
@@ -231,8 +230,8 @@ class WaveEquationAnalyzer:
             wave_speed: How fast price changes propagate
         """
         self.wave_speed = wave_speed
-        self._price_buffer: List[float] = []
-        self._equilibrium: Optional[float] = None
+        self._price_buffer: list[float] = []
+        self._equilibrium: float | None = None
 
     def update(self, price: float) -> None:
         """Add new price observation."""
@@ -279,7 +278,7 @@ class WaveEquationAnalyzer:
         v2 = self._price_buffer[-1] - self._price_buffer[-2]
         return v2 - v1
 
-    def detect_standing_wave(self, window: int = 50) -> Optional[float]:
+    def detect_standing_wave(self, window: int = 50) -> float | None:
         """
         Detect standing wave pattern (consolidation).
 

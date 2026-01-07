@@ -7,11 +7,10 @@ Handles writing instruments and data to the catalog with proper ordering:
 Note: FundingRateUpdate requires Arrow serialization registration.
 """
 
+from collections.abc import Sequence
 from pathlib import Path
-from typing import Sequence
 
 import pyarrow as pa
-
 from nautilus_trader.model.data import Bar, FundingRateUpdate, TradeTick
 from nautilus_trader.model.instruments import Instrument
 from nautilus_trader.persistence.catalog import ParquetDataCatalog

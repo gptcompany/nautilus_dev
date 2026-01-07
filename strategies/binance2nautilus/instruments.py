@@ -8,12 +8,10 @@ from datetime import datetime
 from decimal import Decimal
 
 import pytz
-
 from nautilus_trader.core.datetime import dt_to_unix_nanos
 from nautilus_trader.model.identifiers import InstrumentId, Symbol, Venue
 from nautilus_trader.model.instruments import CryptoPerpetual
 from nautilus_trader.model.objects import Currency, Money, Price, Quantity
-
 
 # Standard currencies
 BTC = Currency.from_str("BTC")
