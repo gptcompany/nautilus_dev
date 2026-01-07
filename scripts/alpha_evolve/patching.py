@@ -9,7 +9,7 @@ Provides functionality to:
 
 import ast
 import re
-from typing import Any
+from typing import Any, cast
 
 # Regex pattern for EVOLVE-BLOCK markers
 # Matches:

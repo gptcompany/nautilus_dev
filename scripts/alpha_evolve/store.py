@@ -359,7 +359,7 @@ class ProgramStore:
 
         # Fitness-weighted selection (using calmar, ensuring non-negative weights)
         programs = [self._row_to_program(row) for row in rows]
-        weights = [max(0, p.metrics.calmar_ratio) for p in programs]
+        weights = [max(0, p.metrics.calmar_ratio) if p.metrics else 0 for p in programs]
 
         # If all weights are 0, fall back to uniform random
         if sum(weights) == 0:
@@ -398,7 +398,7 @@ class ProgramStore:
             List of programs from given ID to root seed
         """
         lineage = []
-        current_id = prog_id
+        current_id: str | None = prog_id
 
         while current_id:
             program = self.get(current_id)
@@ -427,7 +427,8 @@ class ProgramStore:
                 )
             else:
                 cursor = conn.execute("SELECT COUNT(*) FROM programs")
-            return cursor.fetchone()[0]
+            result = cursor.fetchone()
+            return cast(int, result[0]) if result else 0
 
     def prune(self) -> int:
         """

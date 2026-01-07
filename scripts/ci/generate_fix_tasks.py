@@ -24,8 +24,8 @@ def load_impact_report(file_path: Path) -> dict[str, Any]:
 
     # Handle nested structure
     if "impact_report" in data:
-        return data["impact_report"]
-    return data
+        return cast(dict[str, Any], data["impact_report"])
+    return cast(dict[str, Any], data)
 
 
 def severity_to_priority(severity: str) -> str:

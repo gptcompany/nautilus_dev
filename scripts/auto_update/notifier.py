@@ -11,7 +11,7 @@ from email.mime.text import MIMEText
 from typing import Any
 
 try:
-    import requests
+    import requests  # type: ignore[import-untyped]
 
     REQUESTS_AVAILABLE = True
 except ImportError:

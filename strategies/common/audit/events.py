@@ -92,7 +92,7 @@ class AuditEvent(BaseModel):
     trader_id: str = Field(default="TRADER-001", description="Trader identifier")
     sequence: int = Field(default=0, description="Monotonic sequence number")
 
-    @computed_field
+    @computed_field  # type: ignore[prop-decorator]
     @property
     def checksum(self) -> str:
         """Compute SHA-256 checksum of event (Layer 1 integrity).

@@ -15,7 +15,7 @@ def setup_logging(level: str | None = None) -> logging.Logger:
         Configured logger instance.
     """
     log_level = level or os.getenv("CCXT_LOG_LEVEL", "INFO")
-    numeric_level = getattr(logging, log_level.upper(), logging.INFO)
+    numeric_level = getattr(logging, log_level.upper() if log_level else "INFO", logging.INFO)
 
     logger = logging.getLogger("ccxt_pipeline")
     logger.setLevel(numeric_level)

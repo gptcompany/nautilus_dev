@@ -161,7 +161,8 @@ def generate_tearsheet(
     TearsheetWarning
         If edge cases detected (zero trades, open positions, etc.)
     """
-    return _get_core().generate_tearsheet(engine, output_path, config, **kwargs)
+    result = _get_core().generate_tearsheet(engine, output_path, config, **kwargs)
+    return str(result)
 
 
 def create_comparison_tearsheet(
@@ -195,9 +196,10 @@ def create_comparison_tearsheet(
     str
         Path to generated HTML file.
     """
-    return _get_comparison().create_comparison_tearsheet(
+    result = _get_comparison().create_comparison_tearsheet(
         engines, strategy_names, output_path, config, normalize_equity, colors
     )
+    return str(result)
 
 
 def register_nautilus_dev_theme() -> None:
@@ -232,7 +234,8 @@ def check_edge_cases(engine: BacktestEngine) -> list:
     list[TearsheetWarning]
         List of detected edge case warnings.
     """
-    return _get_edge_cases().check_edge_cases(engine)
+    result = _get_edge_cases().check_edge_cases(engine)
+    return list(result)
 
 
 # Re-export classes

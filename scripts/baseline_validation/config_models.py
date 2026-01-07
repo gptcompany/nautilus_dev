@@ -257,7 +257,7 @@ class BaselineValidationConfig(BaseModel):
         Returns:
             Validated BaselineValidationConfig.
         """
-        import yaml
+        import yaml  # type: ignore[import-untyped]
 
         with open(path) as f:
             data = yaml.safe_load(f)
