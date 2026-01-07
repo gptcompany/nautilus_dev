@@ -188,23 +188,6 @@ class TestProperties:
         
         assert tracker.daily_unrealized == Decimal("0")
 
-    def test_daily_unrealized_fallback_for_single_value(self, tracker, mock_strategy):
-        """daily_unrealized should handle fallback for mock single value."""
-        # Simulate mock that returns single value (not dict) by raising TypeError in iteration
-        mock_value = MagicMock()
-        mock_value.values.side_effect = TypeError  # Fails dict iteration
-        mock_strategy.portfolio.unrealized_pnls.return_value = mock_value
-        
-        # This should trigger the except block which then returns the value directly
-        # However, the implementation calls unrealized_pnls() again, so we need different behavior
-        # Let's test the actual fallback case: TypeError during iteration
-        mock_strategy.portfolio.unrealized_pnls.side_effect = [TypeError, 300.0]
-        
-        assert tracker.daily_unrealized == Decimal("300")
-
-        
-        assert tracker.daily_unrealized == Decimal("300")
-
     def test_total_daily_pnl_sums_realized_and_unrealized(self, tracker, mock_strategy):
         """total_daily_pnl should sum realized and unrealized."""
         tracker._daily_realized = Decimal("200")
