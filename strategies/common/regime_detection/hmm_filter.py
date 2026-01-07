@@ -207,6 +207,5 @@ class HMMRegimeFilter:
         features_scaled = self._scaler.transform(features)
         _, posteriors = self.model.score_samples(features_scaled)
         result = posteriors[0]
-        from typing import cast
 
-        return cast(NDArray[np.floating], result)
+        return result  # type: ignore[return-value]

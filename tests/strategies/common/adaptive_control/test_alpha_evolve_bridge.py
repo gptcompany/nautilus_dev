@@ -55,16 +55,16 @@ class MockMetaController:
     """Mock MetaController for testing."""
 
     def __init__(self, **kwargs):
-        self._strategy_performances: dict[str, list[float]] = {}
+        self._strategy_performance: dict[str, list[float]] = {}
         self._current_state = MockSystemState.VENTRAL
         self._current_harmony = MockMarketHarmony.CONSONANT
 
     def register_strategy(self, name: str, regime_affinity=None, callback=None):
-        self._strategy_performances[name] = []
+        self._strategy_performance[name] = []
 
     def record_strategy_pnl(self, name: str, pnl: float):
-        if name in self._strategy_performances:
-            self._strategy_performances[name].append(pnl)
+        if name in self._strategy_performance:
+            self._strategy_performance[name].append(pnl)
 
     def update(
         self,
@@ -943,7 +943,7 @@ class TestAdaptiveSurvivalSystemRegisterStrategy:
         system = AdaptiveSurvivalSystem()
         system.register_strategy("test_strategy")
 
-        assert "test_strategy" in system.meta._strategy_performances
+        assert "test_strategy" in system.meta._strategy_performance
 
 
 class TestAdaptiveSurvivalSystemOnEvolutionNeeded:
@@ -979,7 +979,7 @@ class TestAdaptiveSurvivalSystemUpdateStrategyPerformance:
         system.register_strategy("test_strategy")
         system.update_strategy_performance("test_strategy", 100.0)
 
-        assert 100.0 in system.meta._strategy_performances["test_strategy"]
+        assert 100.0 in system.meta._strategy_performance["test_strategy"]
 
 
 class TestAdaptiveSurvivalSystemProcess:

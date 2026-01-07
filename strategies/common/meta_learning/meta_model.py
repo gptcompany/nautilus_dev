@@ -204,9 +204,8 @@ class MetaModel:
         else:
             # Edge case: only one class in training (should not happen after validation)
             result = np.full(n_samples, self._config.default_confidence, dtype=np.float64)
-        from typing import cast
 
-        return cast(NDArray[np.floating], result)
+        return result  # type: ignore[return-value]
 
     def predict(
         self,

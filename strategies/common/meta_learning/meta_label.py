@@ -60,9 +60,7 @@ class MetaLabelGenerator:
 
         meta_labels = (matches & non_zero_signals).astype(np.int64)
 
-        from typing import cast
-
-        return cast(NDArray[np.signedinteger], meta_labels)
+        return meta_labels  # type: ignore[return-value]
 
     def generate_with_mask(
         self,

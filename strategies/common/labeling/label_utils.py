@@ -44,10 +44,9 @@ def get_vertical_barriers(
     barriers_raw = indices + max_holding_bars
 
     # Cap at last valid index
-    from typing import cast
 
     result = np.minimum(barriers_raw, n - 1).astype(np.int64)
-    return cast(NDArray[np.signedinteger], result)
+    return result  # type: ignore[return-value]
 
 
 def get_horizontal_barriers(
