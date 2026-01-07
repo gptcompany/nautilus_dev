@@ -274,7 +274,7 @@ class MetaPortfolio:
     def register_system(
         self,
         name: str,
-        initial_weight: float = None,
+        initial_weight: float | None = None,
     ) -> None:
         """
         Register a trading system.

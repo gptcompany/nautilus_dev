@@ -7,7 +7,7 @@ All instruments use the format: {SYMBOL}-PERP.BINANCE
 from datetime import datetime
 from decimal import Decimal
 
-import pytz
+import pytz  # type: ignore[import-untyped]
 from nautilus_trader.core.datetime import dt_to_unix_nanos
 from nautilus_trader.model.identifiers import InstrumentId, Symbol, Venue
 from nautilus_trader.model.instruments import CryptoPerpetual

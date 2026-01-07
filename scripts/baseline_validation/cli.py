@@ -18,7 +18,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 import click
-import yaml
+import yaml  # type: ignore[import-untyped]
 
 from scripts.baseline_validation.comparison_validator import ComparisonValidator
 from scripts.baseline_validation.config_models import BaselineValidationConfig

@@ -2,8 +2,8 @@
 
 import logging
 import time
-from datetime import timedelta
-from typing import Protocol
+from datetime import datetime, timedelta
+from typing import Any, Protocol
 
 from scripts.alpha_evolve.walk_forward.config import WalkForwardConfig
 from scripts.alpha_evolve.walk_forward.metrics import (
@@ -27,9 +27,9 @@ class StrategyEvaluator(Protocol):
     async def evaluate(
         self,
         strategy_code: str,
-        start_date: ...,
-        end_date: ...,
-        **kwargs,
+        start_date: datetime,
+        end_date: datetime,
+        **kwargs: Any,
     ) -> WindowMetrics:
         """Evaluate strategy on a date range and return metrics."""
         ...

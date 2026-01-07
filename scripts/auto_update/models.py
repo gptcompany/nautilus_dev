@@ -9,7 +9,7 @@ from __future__ import annotations
 from datetime import datetime
 from enum import Enum
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
@@ -103,12 +103,12 @@ class ChangelogData(BaseModel):
     @property
     def bug_list(self) -> list[dict[str, Any]]:
         """Extract bug list from open_issues."""
-        return self.open_issues.get("bug_list", [])
+        return cast(list[dict[str, Any]], self.open_issues.get("bug_list", []))
 
     @property
     def feature_list(self) -> list[dict[str, Any]]:
         """Extract feature list from open_issues."""
-        return self.open_issues.get("feature_list", [])
+        return cast(list[dict[str, Any]], self.open_issues.get("feature_list", []))
 
 
 # =============================================================================

@@ -14,7 +14,7 @@ import argparse
 import json
 from datetime import datetime
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 
 def load_impact_report(file_path: Path) -> dict[str, Any]:

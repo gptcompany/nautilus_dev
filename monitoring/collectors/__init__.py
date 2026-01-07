@@ -3,12 +3,12 @@
 # Base interface and implementations for daemon, exchange, pipeline, trading collectors
 
 from abc import ABC, abstractmethod
-from typing import TypeVar
+from typing import Generic, TypeVar
 
 T = TypeVar("T")
 
 
-class BaseCollector[T](ABC):
+class BaseCollector(ABC, Generic[T]):
     """Base class for metrics collectors.
 
     Collectors poll data sources and emit metrics to QuestDB via MetricsClient.

@@ -271,7 +271,7 @@ class AuditQuery:
 
         events = self.query_time_range(start_time, end_time, limit=100000)
 
-        results = {
+        results: dict = {
             "total_events": len(events),
             "valid_checksums": 0,
             "invalid_checksums": 0,
@@ -286,7 +286,10 @@ class AuditQuery:
         for event in events:
             stored_checksum = event.get("checksum")
             if not stored_checksum:
-                results["missing_checksums"] += 1
+                missing_count = results["missing_checksums"]
+                results["missing_checksums"] = (
+                    int(missing_count) + 1 if isinstance(missing_count, int) else 1
+                )
                 continue
 
             # Recompute checksum - must match the format used by AuditEvent.checksum
@@ -309,17 +312,25 @@ class AuditQuery:
             computed = hashlib.sha256(payload.encode()).hexdigest()[:16]
 
             if computed == stored_checksum:
-                results["valid_checksums"] += 1
-            else:
-                results["invalid_checksums"] += 1
-                results["corrupted_events"].append(
-                    {
-                        "ts_event": event.get("ts_event"),
-                        "event_type": event.get("event_type"),
-                        "stored_checksum": stored_checksum,
-                        "computed_checksum": computed,
-                    }
+                valid_count = results["valid_checksums"]
+                results["valid_checksums"] = (
+                    int(valid_count) + 1 if isinstance(valid_count, int) else 1
                 )
+            else:
+                invalid_count = results["invalid_checksums"]
+                results["invalid_checksums"] = (
+                    int(invalid_count) + 1 if isinstance(invalid_count, int) else 1
+                )
+                corrupted_events = results["corrupted_events"]
+                if isinstance(corrupted_events, list):
+                    corrupted_events.append(
+                        {
+                            "ts_event": event.get("ts_event"),
+                            "event_type": event.get("event_type"),
+                            "stored_checksum": stored_checksum,
+                            "computed_checksum": computed,
+                        }
+                    )
 
         return results
 
