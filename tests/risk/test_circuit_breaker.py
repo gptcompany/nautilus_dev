@@ -783,11 +783,9 @@ class TestEdgeCases:
 
 # =============================================================================
 # Integration Tests
-        circuit_breaker.update(equity=Decimal("91000"))  # 9% from new peak = 9% DD
-        assert circuit_breaker.state == CircuitBreakerState.WARNING
-        assert circuit_breaker.position_size_multiplier() == Decimal("0.5")
-        assert circuit_breaker.state == CircuitBreakerState.WARNING
-        assert circuit_breaker.position_size_multiplier() == Decimal("0.5")
+# =============================================================================
+
+
 class TestCircuitBreakerIntegration:
     """Test realistic trading scenarios."""
 
@@ -805,7 +803,7 @@ class TestCircuitBreakerIntegration:
         assert circuit_breaker.position_size_multiplier() == Decimal("0.5")
         
         # Another bad trade (REDUCING)
-        circuit_breaker.update(equity=Decimal("86000"))
+        circuit_breaker.update(equity=Decimal("85850"))  # 15% from 101k peak
         assert circuit_breaker.state == CircuitBreakerState.REDUCING
         assert circuit_breaker.can_open_position() is False
         
