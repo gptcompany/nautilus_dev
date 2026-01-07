@@ -490,9 +490,9 @@ class TestParticlePortfolioCSRC:
             lambda_penalty=1.0,
         )
 
-        # Patch calculate_covariance_penalty to track calls
+        # Patch calculate_covariance_penalty at source module (imported locally in update)
         with patch(
-            "strategies.common.adaptive_control.particle_portfolio.calculate_covariance_penalty"
+            "strategies.common.adaptive_control.correlation_tracker.calculate_covariance_penalty"
         ) as mock_penalty:
             mock_penalty.return_value = 0.1
             portfolio.update({"momentum": 0.01, "mean_rev": 0.01, "trend": 0.01})
@@ -555,7 +555,7 @@ class TestParticlePortfolioCSRC:
         )
 
         with patch(
-            "strategies.common.adaptive_control.particle_portfolio.calculate_covariance_penalty"
+            "strategies.common.adaptive_control.correlation_tracker.calculate_covariance_penalty"
         ) as mock_penalty:
             portfolio.update({"momentum": 0.01, "mean_rev": 0.01, "trend": 0.01})
 
