@@ -91,9 +91,7 @@ class TestParquetStore:
         last_ts = parquet_store.get_last_timestamp(OpenInterest, "NONEXISTENT", "BINANCE")
         assert last_ts is None
 
-    def test_write_multiple_records_same_date(
-        self, parquet_store: ParquetStore
-    ) -> None:
+    def test_write_multiple_records_same_date(self, parquet_store: ParquetStore) -> None:
         """Test writing multiple records for the same date."""
         base_time = datetime(2025, 1, 15, 12, 0, 0, tzinfo=timezone.utc)
         records = [

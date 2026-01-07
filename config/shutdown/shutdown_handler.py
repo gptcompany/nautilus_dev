@@ -111,9 +111,7 @@ class GracefulShutdownHandler:
         # Use lock to prevent race condition on concurrent shutdown calls
         async with self._shutdown_lock:
             if self._shutdown_requested:
-                self._logger.warning(
-                    "Shutdown already in progress, ignoring duplicate request"
-                )
+                self._logger.warning("Shutdown already in progress, ignoring duplicate request")
                 return
 
             self._shutdown_requested = True
@@ -207,9 +205,7 @@ class GracefulShutdownHandler:
                         self.node.cancel_order(order)
                         self._orders_cancelled += 1
                 except Exception as e:
-                    self._logger.error(
-                        f"Failed to cancel order {order.client_order_id}: {e}"
-                    )
+                    self._logger.error(f"Failed to cancel order {order.client_order_id}: {e}")
 
             # Wait for cancellations to process
             if self._orders_cancelled > 0:
@@ -223,9 +219,7 @@ class GracefulShutdownHandler:
         """Verify all open positions have stop-loss orders."""
         try:
             if not hasattr(self.node, "cache"):
-                self._logger.warning(
-                    "No cache available, skipping stop-loss verification"
-                )
+                self._logger.warning("No cache available, skipping stop-loss verification")
                 return
 
             from nautilus_trader.model.enums import OrderType
@@ -249,14 +243,10 @@ class GracefulShutdownHandler:
                     )
 
             if self._positions_unprotected == 0 and len(positions) > 0:
-                self._logger.info(
-                    f"All {len(positions)} positions have stop-loss protection"
-                )
+                self._logger.info(f"All {len(positions)} positions have stop-loss protection")
 
         except ImportError:
-            self._logger.warning(
-                "OrderType not available, skipping stop-loss verification"
-            )
+            self._logger.warning("OrderType not available, skipping stop-loss verification")
         except Exception as e:
             self._logger.error(f"Error during stop-loss verification: {e}")
 
@@ -292,9 +282,7 @@ class GracefulShutdownHandler:
         self._logger.exception(f"Unhandled exception: {exc}")
         try:
             loop = asyncio.get_running_loop()
-            task = loop.create_task(
-                self.shutdown(reason=ShutdownReason.EXCEPTION.value)
-            )
+            task = loop.create_task(self.shutdown(reason=ShutdownReason.EXCEPTION.value))
             # Add callback to log any exceptions from the shutdown task
             task.add_done_callback(self._shutdown_task_done)
         except RuntimeError:

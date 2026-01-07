@@ -143,21 +143,15 @@ def parse_alpha_debug_output(content: str) -> AlphaDebugReport:
             while i < len(lines) and not lines[i].strip().startswith("="):
                 score_line = lines[i].strip()
 
-                bugs_found_match = re.search(
-                    r"Bugs\s*found[:\s]+(\d+)", score_line, re.I
-                )
+                bugs_found_match = re.search(r"Bugs\s*found[:\s]+(\d+)", score_line, re.I)
                 if bugs_found_match:
                     pass  # Already tracking individually
 
-                bugs_fixed_match = re.search(
-                    r"Bugs\s*fixed[:\s]+(\d+)", score_line, re.I
-                )
+                bugs_fixed_match = re.search(r"Bugs\s*fixed[:\s]+(\d+)", score_line, re.I)
                 if bugs_fixed_match:
                     report.bugs_fixed = int(bugs_fixed_match.group(1))
 
-                confidence_match = re.search(
-                    r"Confidence[:\s]+(\d+(?:\.\d+)?)", score_line, re.I
-                )
+                confidence_match = re.search(r"Confidence[:\s]+(\d+(?:\.\d+)?)", score_line, re.I)
                 if confidence_match:
                     report.final_confidence = float(confidence_match.group(1))
 
@@ -261,9 +255,7 @@ def determine_severity(description: str, default: str) -> str:
     return default
 
 
-def extract_location(
-    description: str, lines: list[str], current_idx: int
-) -> tuple[str, int]:
+def extract_location(description: str, lines: list[str], current_idx: int) -> tuple[str, int]:
     """Try to extract file path and line number from context."""
     # Check description for file:line pattern
     file_match = re.search(r"([a-zA-Z0-9_/.-]+\.py)(?::(\d+))?", description)
@@ -275,14 +267,10 @@ def extract_location(
         idx = current_idx + offset
         if 0 <= idx < len(lines):
             line = lines[idx]
-            file_match = re.search(
-                r"File[:\s]+[`'\"]?([a-zA-Z0-9_/.-]+\.py)[`'\"]?", line
-            )
+            file_match = re.search(r"File[:\s]+[`'\"]?([a-zA-Z0-9_/.-]+\.py)[`'\"]?", line)
             if file_match:
                 line_match = re.search(r"line\s+(\d+)", line, re.I)
-                return file_match.group(1), int(
-                    line_match.group(1) if line_match else 0
-                )
+                return file_match.group(1), int(line_match.group(1) if line_match else 0)
 
     return "", 0
 
@@ -348,7 +336,9 @@ def generate_tasks_md(report: AlphaDebugReport) -> str:
         category_label = category_to_label(bug.category)
         status = "[X]" if bug.fix_applied else "[ ]"
 
-        task_line = f"- {status} T{i:03d} [US1] {priority} [{category_label}] Fix: {bug.description}"
+        task_line = (
+            f"- {status} T{i:03d} [US1] {priority} [{category_label}] Fix: {bug.description}"
+        )
         lines.append(task_line)
 
         if bug.file_path:
@@ -385,9 +375,7 @@ def generate_tasks_md(report: AlphaDebugReport) -> str:
     return "\n".join(lines)
 
 
-def create_github_issue(
-    bug: BugFinding, spec_dir: str, dry_run: bool = False
-) -> int | None:
+def create_github_issue(bug: BugFinding, spec_dir: str, dry_run: bool = False) -> int | None:
     """Create a GitHub issue for a bug finding."""
     title = f"BUG-{bug.id}: {bug.description[:60]}..."
 

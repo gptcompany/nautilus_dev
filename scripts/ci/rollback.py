@@ -101,17 +101,13 @@ def get_git_sha() -> str:
 
 def get_git_branch() -> str:
     """Get current git branch."""
-    code, stdout, _ = run_command(
-        ["git", "rev-parse", "--abbrev-ref", "HEAD"], check=False
-    )
+    code, stdout, _ = run_command(["git", "rev-parse", "--abbrev-ref", "HEAD"], check=False)
     return stdout if code == 0 else "unknown"
 
 
 def get_changed_files() -> list[str]:
     """Get list of changed files."""
-    code, stdout, _ = run_command(
-        ["git", "diff", "--name-only", "HEAD~1", "HEAD"], check=False
-    )
+    code, stdout, _ = run_command(["git", "diff", "--name-only", "HEAD~1", "HEAD"], check=False)
     if code == 0 and stdout:
         return stdout.split("\n")
     return []
@@ -318,9 +314,7 @@ def delete_checkpoint(checkpoint_id: str) -> bool:
 
 def main() -> None:
     """Main entry point."""
-    parser = argparse.ArgumentParser(
-        description="Checkpoint and rollback management for CI/CD"
-    )
+    parser = argparse.ArgumentParser(description="Checkpoint and rollback management for CI/CD")
     subparsers = parser.add_subparsers(dest="command", help="Command to run")
 
     # Create command
@@ -406,9 +400,7 @@ def main() -> None:
         print(f"Found {len(checkpoints)} checkpoint(s):\n")
         for cp in checkpoints:
             age = datetime.now() - datetime.fromisoformat(cp.timestamp)
-            age_str = (
-                f"{age.seconds // 3600}h ago" if age.days == 0 else f"{age.days}d ago"
-            )
+            age_str = f"{age.seconds // 3600}h ago" if age.days == 0 else f"{age.days}d ago"
 
             print(f"  {cp.id}  [{cp.name}]")
             print(f"    Stage: {cp.stage} | Branch: {cp.branch} | {age_str}")

@@ -13,7 +13,6 @@ from __future__ import annotations
 from datetime import datetime
 
 
-
 class TestMarkdownReportGeneration:
     """Tests for Markdown report generation."""
 

@@ -240,8 +240,7 @@ class VPINIndicator:
         while remaining_volume > 0:
             # Calculate how much volume this bucket can still accept
             space_in_bucket = (
-                self._current_bucket.volume_target
-                - self._current_bucket.accumulated_volume
+                self._current_bucket.volume_target - self._current_bucket.accumulated_volume
             )
 
             # Determine volume to add to current bucket

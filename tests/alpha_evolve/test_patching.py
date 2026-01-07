@@ -22,9 +22,7 @@ class TestApplyPatch:
         """T008: Surgical block replacement via diff['blocks']."""
         from scripts.alpha_evolve.patching import apply_patch
 
-        diff = {
-            "blocks": {"entry_logic": "if bar.close > self.ema.value:\n    self.sell()"}
-        }
+        diff = {"blocks": {"entry_logic": "if bar.close > self.ema.value:\n    self.sell()"}}
 
         result = apply_patch(sample_strategy_single_block, diff)
 
@@ -37,9 +35,7 @@ class TestApplyPatch:
         assert "self.sell()" in result
         assert "bar.close > self.ema.value" in result
 
-    def test_apply_patch_preserves_indentation(
-        self, sample_strategy_nested_indentation: str
-    ):
+    def test_apply_patch_preserves_indentation(self, sample_strategy_nested_indentation: str):
         """T009: Indentation preserved when replacing blocks."""
         from scripts.alpha_evolve.patching import apply_patch
 

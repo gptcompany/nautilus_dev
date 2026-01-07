@@ -539,9 +539,7 @@ class TestEdgeCases:
         )
 
         # Record memory after initialization
-        initial_size = sys.getsizeof(tracker._ema_cov) + sys.getsizeof(
-            tracker._ema_means
-        )
+        initial_size = sys.getsizeof(tracker._ema_cov) + sys.getsizeof(tracker._ema_means)
 
         # Feed 2000 samples (more than 1000)
         np.random.seed(42)
@@ -558,9 +556,7 @@ class TestEdgeCases:
         final_size = sys.getsizeof(tracker._ema_cov) + sys.getsizeof(tracker._ema_means)
 
         # EMA doesn't store history, so size should be same
-        assert final_size == initial_size, (
-            f"Memory grew: {initial_size} -> {final_size}"
-        )
+        assert final_size == initial_size, f"Memory grew: {initial_size} -> {final_size}"
 
         # n_samples should still be tracked correctly
         assert tracker.n_samples == 2000

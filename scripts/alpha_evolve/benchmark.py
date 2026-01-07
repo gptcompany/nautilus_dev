@@ -252,9 +252,7 @@ async def run_evolution_benchmark(
 
 
 @click.command()
-@click.option(
-    "--iterations", default=5, type=int, help="Number of iterations to benchmark"
-)
+@click.option("--iterations", default=5, type=int, help="Number of iterations to benchmark")
 @click.option("--quick", is_flag=True, help="Quick benchmark (CLI only, no evolution)")
 def main(iterations: int, quick: bool) -> None:
     """Run Alpha-Evolve success criteria benchmarks."""

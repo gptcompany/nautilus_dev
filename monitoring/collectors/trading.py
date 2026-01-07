@@ -181,9 +181,7 @@ class TradingCollector(BaseCollector[TradingMetrics]):
 
         return metrics_list
 
-    def calculate_orders_per_minute(
-        self, strategy_id: str, current_orders: int
-    ) -> float:
+    def calculate_orders_per_minute(self, strategy_id: str, current_orders: int) -> float:
         """Calculate orders per minute rate for a strategy.
 
         Args:
@@ -196,10 +194,7 @@ class TradingCollector(BaseCollector[TradingMetrics]):
         now = datetime.now(timezone.utc)
 
         # Check if this is the first collection for this strategy
-        if (
-            strategy_id not in self._last_orders
-            or strategy_id not in self._last_collection_times
-        ):
+        if strategy_id not in self._last_orders or strategy_id not in self._last_collection_times:
             self._last_orders[strategy_id] = current_orders
             self._last_collection_times[strategy_id] = now
             return 0.0
@@ -231,9 +226,7 @@ class TradingCollector(BaseCollector[TradingMetrics]):
 
         self._running = True
         self._task = asyncio.create_task(self._collection_loop())
-        logger.info(
-            f"TradingCollector started (interval={self.config.trading_collect_interval}s)"
-        )
+        logger.info(f"TradingCollector started (interval={self.config.trading_collect_interval}s)")
 
     async def stop(self) -> None:
         """Stop collection and cleanup resources."""

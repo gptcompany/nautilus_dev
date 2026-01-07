@@ -175,9 +175,7 @@ class RecoveryStateManager:
         Returns:
             The updated recovery state.
         """
-        return self.update_state(
-            positions_recovered=self._state.positions_recovered + count
-        )
+        return self.update_state(positions_recovered=self._state.positions_recovered + count)
 
     def set_indicators_warmed(self, warmed: bool = True) -> RecoveryState:
         """Set indicators warmed status.

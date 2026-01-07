@@ -128,9 +128,7 @@ class TestOrderflowManagerInit:
         assert manager is not None
         assert manager._config == default_config
 
-    def test_init_creates_vpin_when_enabled(
-        self, default_config: OrderflowConfig
-    ) -> None:
+    def test_init_creates_vpin_when_enabled(self, default_config: OrderflowConfig) -> None:
         """T034.2: OrderflowManager should create VPIN indicator when enabled."""
         from strategies.common.orderflow.orderflow_manager import OrderflowManager
 
@@ -138,9 +136,7 @@ class TestOrderflowManagerInit:
 
         assert manager._vpin is not None
 
-    def test_init_creates_hawkes_when_enabled(
-        self, default_config: OrderflowConfig
-    ) -> None:
+    def test_init_creates_hawkes_when_enabled(self, default_config: OrderflowConfig) -> None:
         """T034.3: OrderflowManager should create Hawkes indicator when enabled."""
         from strategies.common.orderflow.orderflow_manager import OrderflowManager
 
@@ -148,9 +144,7 @@ class TestOrderflowManagerInit:
 
         assert manager._hawkes is not None
 
-    def test_init_skips_vpin_when_disabled(
-        self, hawkes_only_config: OrderflowConfig
-    ) -> None:
+    def test_init_skips_vpin_when_disabled(self, hawkes_only_config: OrderflowConfig) -> None:
         """T034.4: OrderflowManager should not create VPIN when disabled."""
         from strategies.common.orderflow.orderflow_manager import OrderflowManager
 
@@ -158,9 +152,7 @@ class TestOrderflowManagerInit:
 
         assert manager._vpin is None
 
-    def test_init_skips_hawkes_when_disabled(
-        self, vpin_only_config: OrderflowConfig
-    ) -> None:
+    def test_init_skips_hawkes_when_disabled(self, vpin_only_config: OrderflowConfig) -> None:
         """T034.5: OrderflowManager should not create Hawkes when disabled."""
         from strategies.common.orderflow.orderflow_manager import OrderflowManager
 
@@ -189,9 +181,7 @@ class TestOrderflowManagerHandleBar:
             manager.handle_bar(bar)
 
         # VPIN should have received the update (at least current bucket should exist)
-        assert (
-            manager._vpin._current_bucket is not None or len(manager._vpin._buckets) > 0
-        )
+        assert manager._vpin._current_bucket is not None or len(manager._vpin._buckets) > 0
 
     def test_handle_bar_updates_hawkes(self, default_config: OrderflowConfig) -> None:
         """T034.7: handle_bar should update Hawkes indicator."""
@@ -209,13 +199,9 @@ class TestOrderflowManagerHandleBar:
             manager.handle_bar(bar)
 
         # Hawkes should have received the update (check internal state)
-        assert (
-            len(manager._hawkes._buy_times) > 0 or len(manager._hawkes._sell_times) > 0
-        )
+        assert len(manager._hawkes._buy_times) > 0 or len(manager._hawkes._sell_times) > 0
 
-    def test_handle_bar_updates_both_indicators(
-        self, default_config: OrderflowConfig
-    ) -> None:
+    def test_handle_bar_updates_both_indicators(self, default_config: OrderflowConfig) -> None:
         """T034.8: handle_bar should update both VPIN and Hawkes."""
         from strategies.common.orderflow.orderflow_manager import OrderflowManager
 
@@ -232,9 +218,7 @@ class TestOrderflowManagerHandleBar:
 
         # Both should have been updated
         assert len(manager._vpin._buckets) > 0
-        assert (
-            len(manager._hawkes._buy_times) > 0 or len(manager._hawkes._sell_times) > 0
-        )
+        assert len(manager._hawkes._buy_times) > 0 or len(manager._hawkes._sell_times) > 0
 
     def test_handle_bar_only_vpin_when_hawkes_disabled(
         self, vpin_only_config: OrderflowConfig
@@ -254,9 +238,7 @@ class TestOrderflowManagerHandleBar:
             manager.handle_bar(bar)
 
         # VPIN should be updated
-        assert (
-            manager._vpin._current_bucket is not None or len(manager._vpin._buckets) > 0
-        )
+        assert manager._vpin._current_bucket is not None or len(manager._vpin._buckets) > 0
         # Hawkes should be None
         assert manager._hawkes is None
 
@@ -278,9 +260,7 @@ class TestOrderflowManagerHandleBar:
             manager.handle_bar(bar)
 
         # Hawkes should be updated
-        assert (
-            len(manager._hawkes._buy_times) > 0 or len(manager._hawkes._sell_times) > 0
-        )
+        assert len(manager._hawkes._buy_times) > 0 or len(manager._hawkes._sell_times) > 0
         # VPIN should be None
         assert manager._vpin is None
 
@@ -288,9 +268,7 @@ class TestOrderflowManagerHandleBar:
 class TestOrderflowManagerProperties:
     """Tests for OrderflowManager property accessors (T034)."""
 
-    def test_toxicity_returns_vpin_toxicity(
-        self, default_config: OrderflowConfig
-    ) -> None:
+    def test_toxicity_returns_vpin_toxicity(self, default_config: OrderflowConfig) -> None:
         """T034.11: toxicity property should return VPINResult.toxicity."""
         from strategies.common.orderflow.orderflow_manager import OrderflowManager
 
@@ -327,9 +305,7 @@ class TestOrderflowManagerProperties:
         assert isinstance(manager.ofi, float)
         assert -1.0 <= manager.ofi <= 1.0
 
-    def test_ofi_with_disabled_hawkes_returns_zero(
-        self, vpin_only_config: OrderflowConfig
-    ) -> None:
+    def test_ofi_with_disabled_hawkes_returns_zero(self, vpin_only_config: OrderflowConfig) -> None:
         """T034.15: ofi should return 0.0 when Hawkes disabled."""
         from strategies.common.orderflow.orderflow_manager import OrderflowManager
 
@@ -345,9 +321,7 @@ class TestOrderflowManagerProperties:
 
         assert manager.is_valid is False
 
-    def test_is_valid_true_after_sufficient_data(
-        self, vpin_only_config: OrderflowConfig
-    ) -> None:
+    def test_is_valid_true_after_sufficient_data(self, vpin_only_config: OrderflowConfig) -> None:
         """T034.17: is_valid should be True after enough data (VPIN only)."""
         from strategies.common.orderflow.orderflow_manager import OrderflowManager
 
@@ -441,9 +415,7 @@ class TestOrderflowManagerReset:
 class TestOrderflowManagerGetResult:
     """Tests for OrderflowManager.get_result() method (T034)."""
 
-    def test_get_result_returns_orderflow_result(
-        self, default_config: OrderflowConfig
-    ) -> None:
+    def test_get_result_returns_orderflow_result(self, default_config: OrderflowConfig) -> None:
         """T034.21: get_result should return OrderflowResult dataclass."""
         from strategies.common.orderflow.orderflow_manager import (
             OrderflowManager,
@@ -468,9 +440,7 @@ class TestOrderflowManagerGetResult:
         assert hasattr(result, "ofi")
         assert hasattr(result, "is_valid")
 
-    def test_get_result_values_match_properties(
-        self, default_config: OrderflowConfig
-    ) -> None:
+    def test_get_result_values_match_properties(self, default_config: OrderflowConfig) -> None:
         """T034.23: OrderflowResult values should match manager properties."""
         from strategies.common.orderflow.orderflow_manager import OrderflowManager
 
@@ -501,9 +471,7 @@ class TestOrderflowManagerGetResult:
 class TestOrderflowManagerGillerIntegration:
     """Tests for OrderflowManager integration with GillerSizer (T035)."""
 
-    def test_toxicity_compatible_with_giller_sizer(
-        self, default_config: OrderflowConfig
-    ) -> None:
+    def test_toxicity_compatible_with_giller_sizer(self, default_config: OrderflowConfig) -> None:
         """T035.1: OrderflowManager.toxicity should work with GillerSizer."""
         from strategies.common.orderflow.orderflow_manager import OrderflowManager
         from strategies.common.position_sizing.giller_sizing import GillerSizer
@@ -522,9 +490,7 @@ class TestOrderflowManagerGillerIntegration:
         assert isinstance(size, float)
         assert size > 0.0
 
-    def test_vpin_value_as_toxicity_parameter(
-        self, default_config: OrderflowConfig
-    ) -> None:
+    def test_vpin_value_as_toxicity_parameter(self, default_config: OrderflowConfig) -> None:
         """T035.2: vpin_value should be usable as GillerSizer toxicity param."""
         from strategies.common.orderflow.orderflow_manager import OrderflowManager
         from strategies.common.position_sizing.config import GillerConfig
@@ -537,9 +503,7 @@ class TestOrderflowManagerGillerIntegration:
 
         assert 0.0 <= toxicity <= 1.0
 
-    def test_high_toxicity_reduces_position_size(
-        self, default_config: OrderflowConfig
-    ) -> None:
+    def test_high_toxicity_reduces_position_size(self, default_config: OrderflowConfig) -> None:
         """T035.3: High VPIN should result in smaller position size."""
         from strategies.common.orderflow.orderflow_manager import OrderflowManager
         from strategies.common.position_sizing.giller_sizing import GillerSizer
@@ -590,9 +554,7 @@ class TestOrderflowManagerGillerIntegration:
         # (unless both are at min_size)
         assert size_high_toxicity <= size_low_toxicity
 
-    def test_orderflow_manager_workflow_with_giller(
-        self, default_config: OrderflowConfig
-    ) -> None:
+    def test_orderflow_manager_workflow_with_giller(self, default_config: OrderflowConfig) -> None:
         """T035.4: Complete workflow: OrderflowManager -> GillerSizer."""
         from strategies.common.orderflow.orderflow_manager import OrderflowManager
         from strategies.common.position_sizing.giller_sizing import GillerSizer
@@ -685,9 +647,7 @@ class TestOrderflowManagerIntegration:
         assert none_manager._vpin is None
         assert none_manager._hawkes is None
 
-    def test_combined_vpin_hawkes_workflow(
-        self, default_config: OrderflowConfig
-    ) -> None:
+    def test_combined_vpin_hawkes_workflow(self, default_config: OrderflowConfig) -> None:
         """Test workflow with both VPIN and Hawkes enabled."""
         from strategies.common.orderflow.orderflow_manager import OrderflowManager
 

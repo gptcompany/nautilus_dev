@@ -305,9 +305,7 @@ def get_version_stats() -> dict[str, Any]:
             "total_events": total_events,
             "unique_entities": unique_entities,
             "events_by_type": {r[0]: r[1] for r in events_by_type},
-            "most_modified": [
-                {"entity_id": r[0], "version_count": r[1]} for r in most_modified
-            ],
+            "most_modified": [{"entity_id": r[0], "version_count": r[1]} for r in most_modified],
             "timeline": [{"date": str(r[0]), "events": r[1]} for r in timeline],
         }
     finally:
@@ -342,9 +340,7 @@ def main():
 
     # history command
     history_parser = subparsers.add_parser("history", help="Get entity history")
-    history_parser.add_argument(
-        "entity_type", help="Entity type (paper, formula, strategy)"
-    )
+    history_parser.add_argument("entity_type", help="Entity type (paper, formula, strategy)")
     history_parser.add_argument("entity_id", help="Entity ID")
 
     # state command

@@ -56,9 +56,7 @@ def cli(ctx: click.Context, source_dir: Path | None, output_dir: Path | None) ->
 @cli.command()
 @click.argument("symbol", type=str)
 @click.argument("data_type", type=click.Choice(["klines", "trades", "funding"]))
-@click.option(
-    "--timeframe", "-t", default="1m", help="Timeframe for klines (1m, 5m, 15m)"
-)
+@click.option("--timeframe", "-t", default="1m", help="Timeframe for klines (1m, 5m, 15m)")
 @click.option("--start-date", type=str, default=None, help="Start date (YYYY-MM-DD)")
 @click.option("--end-date", type=str, default=None, help="End date (YYYY-MM-DD)")
 @click.option("--chunk-size", type=int, default=100_000, help="Rows per chunk")
@@ -91,9 +89,7 @@ def convert(
     # Validate symbol
     if symbol not in list_supported_symbols():
         click.echo(f"Error: Unsupported symbol: {symbol}", err=True)
-        click.echo(
-            f"Supported symbols: {', '.join(list_supported_symbols())}", err=True
-        )
+        click.echo(f"Supported symbols: {', '.join(list_supported_symbols())}", err=True)
         sys.exit(2)
 
     # Load state
@@ -333,9 +329,7 @@ def update(ctx: click.Context, symbol: str | None, force: bool) -> None:
 @cli.command("validate")
 @click.argument("catalog_path", type=click.Path(exists=True, path_type=Path))
 @click.option("--quick", is_flag=True, help="Skip full data integrity check")
-@click.option(
-    "--backtest-test", is_flag=True, help="Run BacktestEngine compatibility test"
-)
+@click.option("--backtest-test", is_flag=True, help="Run BacktestEngine compatibility test")
 @click.option("--json-output", "json_out", is_flag=True, help="Output as JSON")
 @click.pass_context
 def validate_cmd(
@@ -455,9 +449,7 @@ def status(ctx: click.Context, json_out: bool) -> None:
 @click.argument("symbol", type=str)
 @click.option("--start-date", type=str, default=None, help="Start date (YYYY-MM-DD)")
 @click.option("--end-date", type=str, default=None, help="End date (YYYY-MM-DD)")
-@click.option(
-    "--chunk-size", type=int, default=50_000, help="Rows per chunk (default 50k)"
-)
+@click.option("--chunk-size", type=int, default=50_000, help="Rows per chunk (default 50k)")
 @click.option("--dry-run", is_flag=True, help="Simulate without writing")
 @click.option("--verbose", "-v", is_flag=True, help="Verbose output")
 @click.pass_context
@@ -489,9 +481,7 @@ def aggtrades(
     # Validate symbol
     if symbol not in list_supported_symbols():
         click.echo(f"Error: Unsupported symbol: {symbol}", err=True)
-        click.echo(
-            f"Supported symbols: {', '.join(list_supported_symbols())}", err=True
-        )
+        click.echo(f"Supported symbols: {', '.join(list_supported_symbols())}", err=True)
         sys.exit(2)
 
     # Parse dates

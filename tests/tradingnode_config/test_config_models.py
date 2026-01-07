@@ -203,9 +203,7 @@ class TestBybitCredentials:
 class TestTradingNodeSettings:
     """Tests for TradingNodeSettings model."""
 
-    def test_valid_settings_binance_only(
-        self, valid_trading_node_settings: TradingNodeSettings
-    ):
+    def test_valid_settings_binance_only(self, valid_trading_node_settings: TradingNodeSettings):
         """Valid settings with Binance only should be accepted."""
         assert valid_trading_node_settings.binance is not None
         assert valid_trading_node_settings.bybit is None
@@ -217,9 +215,7 @@ class TestTradingNodeSettings:
         assert valid_trading_node_settings_both_exchanges.binance is not None
         assert valid_trading_node_settings_both_exchanges.bybit is not None
 
-    def test_at_least_one_exchange_required(
-        self, valid_config_environment: ConfigEnvironment
-    ):
+    def test_at_least_one_exchange_required(self, valid_config_environment: ConfigEnvironment):
         """At least one exchange must be configured."""
         with pytest.raises(ValidationError) as exc_info:
             TradingNodeSettings(

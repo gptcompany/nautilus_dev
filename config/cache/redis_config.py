@@ -66,9 +66,7 @@ def validate_redis_config(
     # Validate encoding
     valid_encodings = ("msgpack", "json")
     if encoding not in valid_encodings:
-        raise RedisConfigError(
-            f"encoding must be one of {valid_encodings}, got: {encoding}"
-        )
+        raise RedisConfigError(f"encoding must be one of {valid_encodings}, got: {encoding}")
 
 
 def create_redis_cache_config(
@@ -107,13 +105,9 @@ def create_redis_cache_config(
     # Load from environment with overrides (explicit None check for port=0 case)
     _host = host if host is not None else os.getenv("REDIS_HOST", "localhost")
     _port = (
-        port
-        if port is not None
-        else _safe_int(os.getenv("REDIS_PORT", "6379"), "REDIS_PORT", 6379)
+        port if port is not None else _safe_int(os.getenv("REDIS_PORT", "6379"), "REDIS_PORT", 6379)
     )
-    _password = (
-        password if password is not None else (os.getenv("REDIS_PASSWORD") or None)
-    )
+    _password = password if password is not None else (os.getenv("REDIS_PASSWORD") or None)
     _ssl = ssl if ssl is not None else os.getenv("REDIS_SSL", "false").lower() == "true"
     _timeout = (
         timeout
@@ -166,9 +160,7 @@ def create_debug_cache_config(
 
     _host = host if host is not None else os.getenv("REDIS_HOST", "localhost")
     _port = (
-        port
-        if port is not None
-        else _safe_int(os.getenv("REDIS_PORT", "6379"), "REDIS_PORT", 6379)
+        port if port is not None else _safe_int(os.getenv("REDIS_PORT", "6379"), "REDIS_PORT", 6379)
     )
 
     validate_redis_config(_host, _port, "json")

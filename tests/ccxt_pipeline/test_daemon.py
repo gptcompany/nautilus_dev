@@ -228,9 +228,7 @@ class TestDaemonStability:
         runner = DaemonRunner()
 
         mock_orchestrator = AsyncMock()
-        mock_orchestrator.fetch_open_interest = AsyncMock(
-            side_effect=Exception("Test error")
-        )
+        mock_orchestrator.fetch_open_interest = AsyncMock(side_effect=Exception("Test error"))
         runner._orchestrator = mock_orchestrator
 
         # Should not raise
@@ -261,9 +259,7 @@ class TestDaemonStability:
         runner = DaemonRunner()
 
         mock_orchestrator = AsyncMock()
-        mock_orchestrator.fetch_open_interest = AsyncMock(
-            side_effect=Exception("Test error")
-        )
+        mock_orchestrator.fetch_open_interest = AsyncMock(side_effect=Exception("Test error"))
         runner._orchestrator = mock_orchestrator
 
         assert runner.stats.error_count == 0

@@ -122,9 +122,7 @@ class AdaptiveKEstimator:
         if self._vol_ema is None:
             self._vol_ema = abs_return
         else:
-            self._vol_ema = (
-                self.vol_alpha * abs_return + (1 - self.vol_alpha) * self._vol_ema
-            )
+            self._vol_ema = self.vol_alpha * abs_return + (1 - self.vol_alpha) * self._vol_ema
 
         # Calculate baseline volatility (median absolute return)
         if len(self._returns_buffer) >= 10:
@@ -311,9 +309,7 @@ class TapeSpeed:
                     self._lambda = instant_lambda
                 else:
                     # EMA smoothing
-                    self._lambda = (
-                        self.alpha * instant_lambda + (1 - self.alpha) * self._lambda
-                    )
+                    self._lambda = self.alpha * instant_lambda + (1 - self.alpha) * self._lambda
 
                 # Update baseline buffer
                 self._lambda_buffer.append(self._lambda)
@@ -334,9 +330,7 @@ class TapeSpeed:
         """Get current tape speed state."""
         lam = self._lambda if self._lambda is not None else self.baseline_lambda
         baseline = (
-            self._lambda_baseline
-            if self._lambda_baseline is not None
-            else self.baseline_lambda
+            self._lambda_baseline if self._lambda_baseline is not None else self.baseline_lambda
         )
 
         # Normalized speed (ratio to baseline)

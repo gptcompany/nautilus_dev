@@ -166,9 +166,7 @@ class TradingNodeConfigFactory:
         )
 
     @classmethod
-    def _build_exec_engine_config(
-        cls, settings: TradingNodeSettings
-    ) -> LiveExecEngineConfig:
+    def _build_exec_engine_config(cls, settings: TradingNodeSettings) -> LiveExecEngineConfig:
         """Build LiveExecEngineConfig with reconciliation settings."""
         return LiveExecEngineConfig(
             # Reconciliation
@@ -208,9 +206,7 @@ class TradingNodeConfigFactory:
         )
 
     @classmethod
-    def _build_risk_engine_config(
-        cls, settings: TradingNodeSettings
-    ) -> LiveRiskEngineConfig:
+    def _build_risk_engine_config(cls, settings: TradingNodeSettings) -> LiveRiskEngineConfig:
         """Build LiveRiskEngineConfig with rate limits."""
         return LiveRiskEngineConfig(
             bypass=False,
@@ -266,9 +262,7 @@ class TradingNodeConfigFactory:
             )
 
         if settings.bybit:
-            product_types = [
-                cls._BYBIT_PRODUCT_TYPES[pt] for pt in settings.bybit.product_types
-            ]
+            product_types = [cls._BYBIT_PRODUCT_TYPES[pt] for pt in settings.bybit.product_types]
             clients["BYBIT"] = BybitLiveDataClientConfig(
                 product_types=product_types,
                 testnet=settings.bybit.testnet,
@@ -299,9 +293,7 @@ class TradingNodeConfigFactory:
             )
 
         if settings.bybit:
-            product_types = [
-                cls._BYBIT_PRODUCT_TYPES[pt] for pt in settings.bybit.product_types
-            ]
+            product_types = [cls._BYBIT_PRODUCT_TYPES[pt] for pt in settings.bybit.product_types]
             clients["BYBIT"] = BybitLiveExecClientConfig(
                 product_types=product_types,
                 testnet=settings.bybit.testnet,

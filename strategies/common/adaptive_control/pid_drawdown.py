@@ -103,9 +103,7 @@ class PIDDrawdownController:
 
         # Integral term with anti-windup
         self._integral += error * dt
-        self._integral = max(
-            -self.integral_limit, min(self.integral_limit, self._integral)
-        )
+        self._integral = max(-self.integral_limit, min(self.integral_limit, self._integral))
         I = self.Ki * self._integral
 
         # Derivative term

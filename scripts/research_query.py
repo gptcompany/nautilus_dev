@@ -104,9 +104,7 @@ class ResearchQuery:
     # Direct Query Methods
     # =====================
 
-    def query(
-        self, engine: str, query: str, params: dict | list | None = None
-    ) -> QueryResult:
+    def query(self, engine: str, query: str, params: dict | list | None = None) -> QueryResult:
         """
         Execute a direct query on specified engine.
 
@@ -126,9 +124,7 @@ class ResearchQuery:
                 duckdb_params = []
             return self._query_duckdb(query, duckdb_params)
         else:
-            return QueryResult(
-                engine=engine, data=[], error=f"Unknown engine: {engine}"
-            )
+            return QueryResult(engine=engine, data=[], error=f"Unknown engine: {engine}")
 
     def _query_neo4j(self, query: str, params: dict | None = None) -> QueryResult:
         """Execute Cypher query."""
@@ -146,9 +142,7 @@ class ResearchQuery:
         try:
             conn = self._get_duckdb()
             result = conn.execute(query, params or [])
-            columns = (
-                [desc[0] for desc in result.description] if result.description else []
-            )
+            columns = [desc[0] for desc in result.description] if result.description else []
             rows = result.fetchall()
             data = [dict(zip(columns, row)) for row in rows]
             return QueryResult(engine="duckdb", data=data, columns=columns, query=query)
@@ -261,9 +255,7 @@ class ResearchQuery:
             WHERE b.sharpe_ratio IS NOT NULL
         """)
 
-    def get_top_strategies(
-        self, min_sharpe: float = 1.0, limit: int = 10
-    ) -> QueryResult:
+    def get_top_strategies(self, min_sharpe: float = 1.0, limit: int = 10) -> QueryResult:
         """Get top strategies by Sharpe ratio."""
         return self._query_duckdb(
             """

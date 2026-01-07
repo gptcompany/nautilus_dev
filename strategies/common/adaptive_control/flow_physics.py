@@ -151,8 +151,7 @@ class MarketFlowAnalyzer:
         # Turbulence (volatility)
         if len(self._price_buffer) >= 2:
             returns = [
-                (self._price_buffer[i] - self._price_buffer[i - 1])
-                / self._price_buffer[i - 1]
+                (self._price_buffer[i] - self._price_buffer[i - 1]) / self._price_buffer[i - 1]
                 for i in range(1, len(self._price_buffer))
             ]
             turbulence = self._calculate_std(returns)
@@ -162,9 +161,7 @@ class MarketFlowAnalyzer:
         # Reynolds number analog
         # High Re = turbulent, Low Re = laminar
         # Re = (flow_rate * characteristic_length) / viscosity
-        reynolds = (
-            abs(flow_rate * pressure) / self.viscosity if self.viscosity > 0 else 0
-        )
+        reynolds = abs(flow_rate * pressure) / self.viscosity if self.viscosity > 0 else 0
 
         state = FlowState(
             pressure=pressure,

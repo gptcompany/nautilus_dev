@@ -43,12 +43,8 @@ class TestBalanceChangeTracking:
         """Test computing positive delta when balance increased."""
         from strategies.common.recovery.provider import PositionRecoveryProvider
 
-        cached_balance = create_mock_account_balance(
-            currency="USDT", total=Decimal("10000.00")
-        )
-        exchange_balance = create_mock_account_balance(
-            currency="USDT", total=Decimal("12000.00")
-        )
+        cached_balance = create_mock_account_balance(currency="USDT", total=Decimal("10000.00"))
+        exchange_balance = create_mock_account_balance(currency="USDT", total=Decimal("12000.00"))
 
         provider = PositionRecoveryProvider(cache=mock_cache)
         delta = provider.compute_balance_delta(
@@ -67,12 +63,8 @@ class TestBalanceChangeTracking:
         """Test computing negative delta when balance decreased."""
         from strategies.common.recovery.provider import PositionRecoveryProvider
 
-        cached_balance = create_mock_account_balance(
-            currency="USDT", total=Decimal("10000.00")
-        )
-        exchange_balance = create_mock_account_balance(
-            currency="USDT", total=Decimal("8000.00")
-        )
+        cached_balance = create_mock_account_balance(currency="USDT", total=Decimal("10000.00"))
+        exchange_balance = create_mock_account_balance(currency="USDT", total=Decimal("8000.00"))
 
         provider = PositionRecoveryProvider(cache=mock_cache)
         delta = provider.compute_balance_delta(
@@ -88,12 +80,8 @@ class TestBalanceChangeTracking:
         """Test computing zero delta when balance unchanged."""
         from strategies.common.recovery.provider import PositionRecoveryProvider
 
-        cached_balance = create_mock_account_balance(
-            currency="USDT", total=Decimal("10000.00")
-        )
-        exchange_balance = create_mock_account_balance(
-            currency="USDT", total=Decimal("10000.00")
-        )
+        cached_balance = create_mock_account_balance(currency="USDT", total=Decimal("10000.00"))
+        exchange_balance = create_mock_account_balance(currency="USDT", total=Decimal("10000.00"))
 
         provider = PositionRecoveryProvider(cache=mock_cache)
         delta = provider.compute_balance_delta(
@@ -135,9 +123,7 @@ class TestBalanceChangeTracking:
         """Test computing delta for new currency (no cached balance)."""
         from strategies.common.recovery.provider import PositionRecoveryProvider
 
-        exchange_balance = create_mock_account_balance(
-            currency="BTC", total=Decimal("0.5")
-        )
+        exchange_balance = create_mock_account_balance(currency="BTC", total=Decimal("0.5"))
 
         provider = PositionRecoveryProvider(cache=mock_cache)
         delta = provider.compute_balance_delta(
@@ -156,9 +142,7 @@ class TestBalanceChangeTracking:
         """Test computing delta for removed currency (no exchange balance)."""
         from strategies.common.recovery.provider import PositionRecoveryProvider
 
-        cached_balance = create_mock_account_balance(
-            currency="BTC", total=Decimal("0.5")
-        )
+        cached_balance = create_mock_account_balance(currency="BTC", total=Decimal("0.5"))
 
         provider = PositionRecoveryProvider(cache=mock_cache)
         delta = provider.compute_balance_delta(
@@ -183,22 +167,21 @@ class TestBalanceChangeHistory:
         from strategies.common.recovery.provider import PositionRecoveryProvider
 
         cached_balances = [
-            create_mock_account_balance(
-                currency="USDT", total=Decimal("10000.00")
-            ),
-            create_mock_account_balance(
-                currency="BTC", total=Decimal("1.0")
-            ),
+            create_mock_account_balance(currency="USDT", total=Decimal("10000.00")),
+            create_mock_account_balance(currency="BTC", total=Decimal("1.0")),
         ]
         exchange_balances = [
             create_mock_account_balance(
-                currency="USDT", total=Decimal("12000.00")  # Changed
+                currency="USDT",
+                total=Decimal("12000.00"),  # Changed
             ),
             create_mock_account_balance(
-                currency="BTC", total=Decimal("0.5")  # Changed
+                currency="BTC",
+                total=Decimal("0.5"),  # Changed
             ),
             create_mock_account_balance(
-                currency="ETH", total=Decimal("10.0")  # New
+                currency="ETH",
+                total=Decimal("10.0"),  # New
             ),
         ]
 
@@ -218,19 +201,17 @@ class TestBalanceChangeHistory:
         from strategies.common.recovery.provider import PositionRecoveryProvider
 
         cached_balances = [
-            create_mock_account_balance(
-                currency="USDT", total=Decimal("10000.00")
-            ),
-            create_mock_account_balance(
-                currency="BTC", total=Decimal("1.0")
-            ),
+            create_mock_account_balance(currency="USDT", total=Decimal("10000.00")),
+            create_mock_account_balance(currency="BTC", total=Decimal("1.0")),
         ]
         exchange_balances = [
             create_mock_account_balance(
-                currency="USDT", total=Decimal("10000.00")  # Same
+                currency="USDT",
+                total=Decimal("10000.00"),  # Same
             ),
             create_mock_account_balance(
-                currency="BTC", total=Decimal("0.5")  # Changed
+                currency="BTC",
+                total=Decimal("0.5"),  # Changed
             ),
         ]
 
@@ -294,9 +275,7 @@ class TestBalanceChangeSignificance:
 
         assert provider.is_significant_change(delta, threshold_percent=10.0) is True
 
-    def test_is_significant_change_removed_currency_always_significant(
-        self, mock_cache
-    ):
+    def test_is_significant_change_removed_currency_always_significant(self, mock_cache):
         """Test that removed currencies are always considered significant."""
         from strategies.common.recovery.provider import PositionRecoveryProvider
 
@@ -316,9 +295,7 @@ class TestBalanceChangeSignificance:
 class TestBalanceChangeLogging:
     """Tests for logging balance changes."""
 
-    def test_log_balance_changes_logs_warning_for_significant(
-        self, mock_cache, mock_logger
-    ):
+    def test_log_balance_changes_logs_warning_for_significant(self, mock_cache, mock_logger):
         """Test that significant changes are logged as warnings."""
         from strategies.common.recovery.provider import PositionRecoveryProvider
 
@@ -341,9 +318,7 @@ class TestBalanceChangeLogging:
         call_args = str(mock_logger.warning.call_args)
         assert "USDT" in call_args or "1500" in call_args
 
-    def test_log_balance_changes_logs_info_for_insignificant(
-        self, mock_cache, mock_logger
-    ):
+    def test_log_balance_changes_logs_info_for_insignificant(self, mock_cache, mock_logger):
         """Test that insignificant changes are logged as info."""
         from strategies.common.recovery.provider import PositionRecoveryProvider
 

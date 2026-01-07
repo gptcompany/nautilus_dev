@@ -79,9 +79,7 @@ class WalkForwardSplitter:
 
         # Minimum samples needed for one complete split
         min_required = (
-            self._config.train_window
-            + self._config.embargo_size
-            + self._config.test_window
+            self._config.train_window + self._config.embargo_size + self._config.test_window
         )
 
         if n_samples < min_required:

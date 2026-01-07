@@ -76,9 +76,7 @@ class TestSyntheticEventGeneration:
         assert event.price == Decimal("42100.00")
         assert event.is_synthetic is True
 
-    def test_generate_synthetic_events_for_position(
-        self, mock_cache, position_snapshot
-    ):
+    def test_generate_synthetic_events_for_position(self, mock_cache, position_snapshot):
         """Test generating all synthetic events for a position."""
         from strategies.common.recovery.event_replay import EventReplayManager
 

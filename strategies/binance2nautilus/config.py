@@ -40,9 +40,7 @@ class ConverterConfig(BaseModel):
 
     # NautilusTrader environment
     nautilus_env: Path = Field(
-        default=Path(
-            "/media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env"
-        ),
+        default=Path("/media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env"),
         description="Path to NautilusTrader virtual environment",
     )
 

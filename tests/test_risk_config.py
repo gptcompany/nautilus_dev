@@ -180,10 +180,7 @@ class TestRiskConfigSerialization:
             max_position_size={"BTC/USDT.BINANCE": Decimal("0.5")},
         )
         json_str = config.model_dump_json()
-        assert (
-            '"stop_loss_pct":"0.02"' in json_str
-            or '"stop_loss_pct": "0.02"' in json_str
-        )
+        assert '"stop_loss_pct":"0.02"' in json_str or '"stop_loss_pct": "0.02"' in json_str
 
     def test_model_dump_dict(self) -> None:
         """Config should dump to dict."""

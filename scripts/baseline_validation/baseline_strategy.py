@@ -144,8 +144,7 @@ class BaselineStrategy:
         """
         if fast_ema_period >= slow_ema_period:
             raise ValueError(
-                f"fast_ema_period ({fast_ema_period}) must be < "
-                f"slow_ema_period ({slow_ema_period})"
+                f"fast_ema_period ({fast_ema_period}) must be < slow_ema_period ({slow_ema_period})"
             )
 
         self._sizer = sizer

@@ -144,9 +144,7 @@ class TestCalculateConfidence:
         )
         assert score >= 85  # VERY_HIGH
 
-    def test_confidence_with_critical_change(
-        self, sample_breaking_change_critical: BreakingChange
-    ):
+    def test_confidence_with_critical_change(self, sample_breaking_change_critical: BreakingChange):
         """Test low confidence with CRITICAL breaking change."""
         score = calculate_confidence(
             breaking_changes=[sample_breaking_change_critical],
@@ -155,9 +153,7 @@ class TestCalculateConfidence:
         )
         assert score < 40  # LOW
 
-    def test_confidence_with_many_affected_files(
-        self, sample_breaking_change_high: BreakingChange
-    ):
+    def test_confidence_with_many_affected_files(self, sample_breaking_change_high: BreakingChange):
         """Test lower confidence with many affected files."""
         affected = [
             AffectedFile(
@@ -175,9 +171,7 @@ class TestCalculateConfidence:
         # Many files affected should lower confidence
         assert score < 70
 
-    def test_confidence_fresh_release(
-        self, sample_breaking_change_medium: BreakingChange
-    ):
+    def test_confidence_fresh_release(self, sample_breaking_change_medium: BreakingChange):
         """Test lower confidence for very fresh releases."""
         score = calculate_confidence(
             breaking_changes=[sample_breaking_change_medium],

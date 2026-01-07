@@ -220,15 +220,11 @@ class TestHawkesInitialState:
         """Test that new indicator has is_fitted = False."""
         assert hawkes_indicator.is_fitted is False
 
-    def test_hawkes_initial_state_buy_intensity(
-        self, hawkes_indicator: HawkesOFI
-    ) -> None:
+    def test_hawkes_initial_state_buy_intensity(self, hawkes_indicator: HawkesOFI) -> None:
         """Test that new indicator has buy_intensity = 0.0."""
         assert hawkes_indicator.buy_intensity == pytest.approx(0.0, abs=1e-10)
 
-    def test_hawkes_initial_state_sell_intensity(
-        self, hawkes_indicator: HawkesOFI
-    ) -> None:
+    def test_hawkes_initial_state_sell_intensity(self, hawkes_indicator: HawkesOFI) -> None:
         """Test that new indicator has sell_intensity = 0.0."""
         assert hawkes_indicator.sell_intensity == pytest.approx(0.0, abs=1e-10)
 
@@ -263,9 +259,7 @@ class TestHawkesUpdate:
         # First event should be at t=0 (relative time)
         assert fixed_hawkes_indicator._sell_times[0] == pytest.approx(0.0, abs=1e-6)
 
-    def test_hawkes_update_unknown_event(
-        self, fixed_hawkes_indicator: HawkesOFI
-    ) -> None:
+    def test_hawkes_update_unknown_event(self, fixed_hawkes_indicator: HawkesOFI) -> None:
         """Test that unknown trade side is ignored."""
         classification = make_classification(
             side=TradeSide.UNKNOWN,
@@ -277,9 +271,7 @@ class TestHawkesUpdate:
         assert len(fixed_hawkes_indicator._buy_times) == 0
         assert len(fixed_hawkes_indicator._sell_times) == 0
 
-    def test_hawkes_update_multiple_events(
-        self, fixed_hawkes_indicator: HawkesOFI
-    ) -> None:
+    def test_hawkes_update_multiple_events(self, fixed_hawkes_indicator: HawkesOFI) -> None:
         """Test multiple events are stored correctly."""
         for i in range(5):
             buy_classification = make_classification(
@@ -302,9 +294,7 @@ class TestHawkesUpdate:
 class TestHawkesBufferSize:
     """Tests for buffer size limits (T024)."""
 
-    def test_hawkes_buffer_respects_lookback_ticks(
-        self, small_buffer_config: HawkesConfig
-    ) -> None:
+    def test_hawkes_buffer_respects_lookback_ticks(self, small_buffer_config: HawkesConfig) -> None:
         """Test that buffer respects lookback_ticks limit."""
         indicator = HawkesOFI(config=small_buffer_config)
 
@@ -319,9 +309,7 @@ class TestHawkesBufferSize:
         # Buffer should be capped at lookback_ticks
         assert len(indicator._buy_times) <= small_buffer_config.lookback_ticks
 
-    def test_hawkes_buffer_oldest_removed_first(
-        self, small_buffer_config: HawkesConfig
-    ) -> None:
+    def test_hawkes_buffer_oldest_removed_first(self, small_buffer_config: HawkesConfig) -> None:
         """Test that oldest events are removed first (FIFO)."""
         indicator = HawkesOFI(config=small_buffer_config)
 
@@ -356,9 +344,7 @@ class TestHawkesRefit:
         # Should be fitted after refit_interval events
         assert indicator.is_fitted is True
 
-    def test_hawkes_fixed_params_still_refits(
-        self, fixed_params_config: HawkesConfig
-    ) -> None:
+    def test_hawkes_fixed_params_still_refits(self, fixed_params_config: HawkesConfig) -> None:
         """Test that use_fixed_params=True still refits (using fixed values)."""
         indicator = HawkesOFI(config=fixed_params_config)
 
@@ -377,9 +363,7 @@ class TestHawkesRefit:
 class TestHawkesIntensity:
     """Tests for intensity calculation (T024)."""
 
-    def test_hawkes_intensity_after_events(
-        self, fixed_hawkes_indicator: HawkesOFI
-    ) -> None:
+    def test_hawkes_intensity_after_events(self, fixed_hawkes_indicator: HawkesOFI) -> None:
         """Test that intensity > 0 for recent events after update."""
         # Add some recent events
         for i in range(10):
@@ -396,9 +380,7 @@ class TestHawkesIntensity:
 class TestHawkesResult:
     """Tests for HawkesOFI.get_result() method (T024)."""
 
-    def test_hawkes_get_result_structure(
-        self, fixed_hawkes_indicator: HawkesOFI
-    ) -> None:
+    def test_hawkes_get_result_structure(self, fixed_hawkes_indicator: HawkesOFI) -> None:
         """Test that get_result returns proper HawkesResult structure."""
         result = fixed_hawkes_indicator.get_result()
 
@@ -423,9 +405,7 @@ class TestHawkesResult:
 
         # Values should match properties
         assert result.ofi == pytest.approx(fixed_hawkes_indicator.ofi, rel=0.01)
-        assert result.buy_intensity == pytest.approx(
-            fixed_hawkes_indicator.buy_intensity, rel=0.01
-        )
+        assert result.buy_intensity == pytest.approx(fixed_hawkes_indicator.buy_intensity, rel=0.01)
         assert result.sell_intensity == pytest.approx(
             fixed_hawkes_indicator.sell_intensity, rel=0.01
         )
@@ -527,9 +507,7 @@ class TestHawkesReset:
 class TestHawkesOFIBounds:
     """Tests for OFI value bounds (T025)."""
 
-    def test_hawkes_ofi_bounded_minus_one_to_one(
-        self, fixed_hawkes_indicator: HawkesOFI
-    ) -> None:
+    def test_hawkes_ofi_bounded_minus_one_to_one(self, fixed_hawkes_indicator: HawkesOFI) -> None:
         """Test that OFI is always in [-1.0, 1.0] range."""
         # Add various events
         for i in range(100):
@@ -541,9 +519,7 @@ class TestHawkesOFIBounds:
 
         assert -1.0 <= fixed_hawkes_indicator.ofi <= 1.0
 
-    def test_hawkes_ofi_extreme_buy_imbalance(
-        self, fixed_hawkes_indicator: HawkesOFI
-    ) -> None:
+    def test_hawkes_ofi_extreme_buy_imbalance(self, fixed_hawkes_indicator: HawkesOFI) -> None:
         """Test OFI with extreme buy imbalance."""
         # Add only buy events
         for i in range(100):
@@ -559,9 +535,7 @@ class TestHawkesOFIBounds:
         # Should approach 1.0 (all buys)
         assert fixed_hawkes_indicator.ofi > 0.5
 
-    def test_hawkes_ofi_extreme_sell_imbalance(
-        self, fixed_hawkes_indicator: HawkesOFI
-    ) -> None:
+    def test_hawkes_ofi_extreme_sell_imbalance(self, fixed_hawkes_indicator: HawkesOFI) -> None:
         """Test OFI with extreme sell imbalance."""
         # Add only sell events
         for i in range(100):
@@ -581,23 +555,17 @@ class TestHawkesOFIBounds:
 class TestHawkesBranchingRatio:
     """Tests for branching ratio calculation (T025)."""
 
-    def test_hawkes_branching_ratio_less_than_one(
-        self, fixed_hawkes_indicator: HawkesOFI
-    ) -> None:
+    def test_hawkes_branching_ratio_less_than_one(self, fixed_hawkes_indicator: HawkesOFI) -> None:
         """Test that branching ratio < 1 for stationarity."""
         # With fixed params: alpha=0.5, beta=1.0 -> eta = 0.5
         result = fixed_hawkes_indicator.get_result()
         assert result.branching_ratio < 1.0
 
-    def test_hawkes_branching_ratio_matches_config(
-        self, fixed_params_config: HawkesConfig
-    ) -> None:
+    def test_hawkes_branching_ratio_matches_config(self, fixed_params_config: HawkesConfig) -> None:
         """Test that branching ratio matches alpha/beta from config."""
         indicator = HawkesOFI(config=fixed_params_config)
 
-        expected_eta = (
-            fixed_params_config.fixed_excitation / fixed_params_config.decay_rate
-        )
+        expected_eta = fixed_params_config.fixed_excitation / fixed_params_config.decay_rate
 
         result = indicator.get_result()
         assert result.branching_ratio == pytest.approx(expected_eta, rel=0.01)
@@ -611,9 +579,7 @@ class TestHawkesBranchingRatio:
 class TestHawkesIntegration:
     """Integration tests for HawkesOFI with real-world scenarios."""
 
-    def test_hawkes_realistic_trading_scenario(
-        self, default_config: HawkesConfig
-    ) -> None:
+    def test_hawkes_realistic_trading_scenario(self, default_config: HawkesConfig) -> None:
         """Test HawkesOFI in realistic trading scenario."""
         indicator = HawkesOFI(config=default_config)
 

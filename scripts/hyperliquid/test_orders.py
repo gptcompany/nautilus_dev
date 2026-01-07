@@ -57,9 +57,7 @@ class OrderTestStrategy(Strategy):
         self.side = OrderSide.BUY if side.upper() == "BUY" else OrderSide.SELL
         self.size = Decimal(str(size))
         self.price = Price.from_str(str(price)) if price else None
-        self.trigger_price = (
-            Price.from_str(str(trigger_price)) if trigger_price else None
-        )
+        self.trigger_price = Price.from_str(str(trigger_price)) if trigger_price else None
         self.reduce_only = reduce_only
 
         self.order_submitted = False
@@ -105,9 +103,7 @@ class OrderTestStrategy(Strategy):
             self.order_result = f"ERROR: {e}"
             self.stop()
 
-    def _submit_market_order(
-        self, instrument_id: InstrumentId, quantity: Quantity
-    ) -> None:
+    def _submit_market_order(self, instrument_id: InstrumentId, quantity: Quantity) -> None:
         """Submit a MARKET order."""
         order = self.order_factory.market(
             instrument_id=instrument_id,
@@ -117,9 +113,7 @@ class OrderTestStrategy(Strategy):
         self.submit_order(order)
         self.log.info(f"MARKET order submitted: {order.client_order_id}")
 
-    def _submit_limit_order(
-        self, instrument_id: InstrumentId, quantity: Quantity
-    ) -> None:
+    def _submit_limit_order(self, instrument_id: InstrumentId, quantity: Quantity) -> None:
         """Submit a LIMIT order."""
         if self.price is None:
             raise ValueError("Limit order requires --price")
@@ -135,9 +129,7 @@ class OrderTestStrategy(Strategy):
         self.submit_order(order)
         self.log.info(f"LIMIT order submitted: {order.client_order_id} @ {self.price}")
 
-    def _submit_stop_market_order(
-        self, instrument_id: InstrumentId, quantity: Quantity
-    ) -> None:
+    def _submit_stop_market_order(self, instrument_id: InstrumentId, quantity: Quantity) -> None:
         """Submit a STOP_MARKET order."""
         if self.trigger_price is None:
             raise ValueError("Stop market order requires --trigger")
@@ -155,9 +147,7 @@ class OrderTestStrategy(Strategy):
             f"trigger={self.trigger_price} reduce_only={self.reduce_only}"
         )
 
-    def _submit_stop_limit_order(
-        self, instrument_id: InstrumentId, quantity: Quantity
-    ) -> None:
+    def _submit_stop_limit_order(self, instrument_id: InstrumentId, quantity: Quantity) -> None:
         """Submit a STOP_LIMIT order."""
         if self.trigger_price is None:
             raise ValueError("Stop limit order requires --trigger")
@@ -198,9 +188,7 @@ class OrderTestStrategy(Strategy):
             self.stop()
 
         elif isinstance(event, OrderRejected):
-            self.log.error(
-                f"Order REJECTED: {event.client_order_id} reason={event.reason}"
-            )
+            self.log.error(f"Order REJECTED: {event.client_order_id} reason={event.reason}")
             self.order_result = f"REJECTED: {event.reason}"
             self.stop()
 
@@ -211,9 +199,7 @@ class OrderTestStrategy(Strategy):
 
 def main():
     """Run order test script."""
-    parser = argparse.ArgumentParser(
-        description="Test order execution on Hyperliquid testnet"
-    )
+    parser = argparse.ArgumentParser(description="Test order execution on Hyperliquid testnet")
     parser.add_argument(
         "--order-type",
         type=str,

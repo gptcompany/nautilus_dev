@@ -323,9 +323,7 @@ class StrategyEvaluator:
             return 0.0 if cagr <= 0 else float("inf")
         return cagr / abs(max_drawdown)
 
-    def _extract_metrics(
-        self, engine: BacktestEngine, config: BacktestConfig
-    ) -> FitnessMetrics:
+    def _extract_metrics(self, engine: BacktestEngine, config: BacktestConfig) -> FitnessMetrics:
         """
         Extract fitness metrics from completed backtest.
 

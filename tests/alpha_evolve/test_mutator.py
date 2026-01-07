@@ -67,9 +67,7 @@ def llm_mutator() -> LLMMutator:
 class TestMutationRequestCreation:
     """T032: Test MutationRequest creation."""
 
-    def test_mutation_request_valid(
-        self, sample_parent_code: str, sample_metrics: FitnessMetrics
-    ):
+    def test_mutation_request_valid(self, sample_parent_code: str, sample_metrics: FitnessMetrics):
         """Valid mutation request passes validation."""
         request = MutationRequest(
             parent_code=sample_parent_code,
@@ -94,9 +92,7 @@ class TestMutationRequestCreation:
 
         assert request.guidance == "Focus on reducing drawdown"
 
-    def test_mutation_request_invalid_retry_count_negative(
-        self, sample_parent_code: str
-    ):
+    def test_mutation_request_invalid_retry_count_negative(self, sample_parent_code: str):
         """Negative retry count raises error."""
         with pytest.raises(ValueError, match="retry_count must be >= 0"):
             MutationRequest(
@@ -105,9 +101,7 @@ class TestMutationRequestCreation:
                 retry_count=-1,
             )
 
-    def test_mutation_request_invalid_retry_count_too_high(
-        self, sample_parent_code: str
-    ):
+    def test_mutation_request_invalid_retry_count_too_high(self, sample_parent_code: str):
         """Retry count > 3 raises error."""
         with pytest.raises(ValueError, match="retry_count must be <= 3"):
             MutationRequest(

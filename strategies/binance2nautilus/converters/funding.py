@@ -97,18 +97,12 @@ class FundingRateConverter(BaseConverter):
 
             logger = logging.getLogger(__name__)
             skipped = len(df) - len(df_valid)
-            logger.warning(
-                f"Skipped {skipped} records with timestamps beyond year 2500"
-            )
+            logger.warning(f"Skipped {skipped} records with timestamps beyond year 2500")
 
         return pd.DataFrame(
             {
-                "ts_event": (df_valid["calc_time"] * 1_000_000).astype(
-                    "int64"
-                ),  # ms -> ns
-                "funding_interval_hours": df_valid["funding_interval_hours"].astype(
-                    "int64"
-                ),
+                "ts_event": (df_valid["calc_time"] * 1_000_000).astype("int64"),  # ms -> ns
+                "funding_interval_hours": df_valid["funding_interval_hours"].astype("int64"),
                 "funding_rate": df_valid["last_funding_rate"].astype("float64"),
             }
         )

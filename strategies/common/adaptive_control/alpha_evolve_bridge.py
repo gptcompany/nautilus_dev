@@ -159,10 +159,7 @@ class AlphaEvolveBridge:
             EvolutionRequest if triggered, None otherwise
         """
         # Check cooldown
-        if (
-            current_bar - self._last_evolution_bar
-            < self.config.min_bars_between_evolution
-        ):
+        if current_bar - self._last_evolution_bar < self.config.min_bars_between_evolution:
             return None
 
         # Check pending requests limit
@@ -187,9 +184,7 @@ class AlphaEvolveBridge:
             trigger=trigger,
             timestamp=datetime.utcnow(),
             current_state=state,
-            underperforming_strategies=underperformers[
-                : self.config.max_strategies_to_evolve
-            ],
+            underperforming_strategies=underperformers[: self.config.max_strategies_to_evolve],
             market_conditions=self._extract_market_conditions(state),
             priority=self._calculate_priority(trigger, state),
         )

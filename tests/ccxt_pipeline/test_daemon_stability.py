@@ -72,9 +72,7 @@ class TestDaemonStabilityAutomated:
 
         mock_bybit = AsyncMock()
         mock_bybit.venue = Venue.BYBIT
-        mock_bybit.fetch_open_interest = AsyncMock(
-            side_effect=lambda s: create_oi(Venue.BYBIT, s)
-        )
+        mock_bybit.fetch_open_interest = AsyncMock(side_effect=lambda s: create_oi(Venue.BYBIT, s))
         mock_bybit.fetch_funding_rate = AsyncMock(
             side_effect=lambda s: create_funding(Venue.BYBIT, s)
         )
@@ -90,9 +88,7 @@ class TestDaemonStabilityAutomated:
         """Test daemon runs for 30 seconds without crashing."""
         from scripts.ccxt_pipeline.scheduler.daemon import DaemonRunner
 
-        with patch(
-            "scripts.ccxt_pipeline.scheduler.daemon.get_all_fetchers"
-        ) as mock_get:
+        with patch("scripts.ccxt_pipeline.scheduler.daemon.get_all_fetchers") as mock_get:
             mock_get.return_value = mock_fetchers
 
             runner = DaemonRunner(
@@ -130,9 +126,7 @@ class TestDaemonStabilityAutomated:
         """Test scheduled OI and funding fetches execute correctly."""
         from scripts.ccxt_pipeline.scheduler.daemon import DaemonRunner
 
-        with patch(
-            "scripts.ccxt_pipeline.scheduler.daemon.get_all_fetchers"
-        ) as mock_get:
+        with patch("scripts.ccxt_pipeline.scheduler.daemon.get_all_fetchers") as mock_get:
             mock_get.return_value = mock_fetchers
 
             runner = DaemonRunner(
@@ -166,9 +160,7 @@ class TestDaemonStabilityAutomated:
         """Test daemon memory usage doesn't grow unbounded."""
         from scripts.ccxt_pipeline.scheduler.daemon import DaemonRunner
 
-        with patch(
-            "scripts.ccxt_pipeline.scheduler.daemon.get_all_fetchers"
-        ) as mock_get:
+        with patch("scripts.ccxt_pipeline.scheduler.daemon.get_all_fetchers") as mock_get:
             mock_get.return_value = mock_fetchers
 
             runner = DaemonRunner(
@@ -198,9 +190,7 @@ class TestDaemonStabilityAutomated:
             top_stats = final_snapshot.compare_to(initial_snapshot, "lineno")
 
             # Calculate total memory growth
-            total_growth = sum(
-                stat.size_diff for stat in top_stats if stat.size_diff > 0
-            )
+            total_growth = sum(stat.size_diff for stat in top_stats if stat.size_diff > 0)
 
             # Allow up to 50MB growth (generous for test environment)
             max_allowed_growth = 50 * 1024 * 1024  # 50MB
@@ -219,9 +209,7 @@ class TestDaemonStabilityAutomated:
         """Test daemon shuts down within 10 seconds."""
         from scripts.ccxt_pipeline.scheduler.daemon import DaemonRunner
 
-        with patch(
-            "scripts.ccxt_pipeline.scheduler.daemon.get_all_fetchers"
-        ) as mock_get:
+        with patch("scripts.ccxt_pipeline.scheduler.daemon.get_all_fetchers") as mock_get:
             mock_get.return_value = mock_fetchers
 
             runner = DaemonRunner(
@@ -279,9 +267,7 @@ class TestDaemonStabilityAutomated:
         mock_fetcher.connect = AsyncMock()
         mock_fetcher.close = AsyncMock()
 
-        with patch(
-            "scripts.ccxt_pipeline.scheduler.daemon.get_all_fetchers"
-        ) as mock_get:
+        with patch("scripts.ccxt_pipeline.scheduler.daemon.get_all_fetchers") as mock_get:
             mock_get.return_value = [mock_fetcher]
 
             runner = DaemonRunner(
@@ -316,9 +302,7 @@ class TestDaemonStabilityAutomated:
         from scripts.ccxt_pipeline.scheduler.daemon import DaemonRunner
         from scripts.ccxt_pipeline.storage.parquet_store import ParquetStore
 
-        with patch(
-            "scripts.ccxt_pipeline.scheduler.daemon.get_all_fetchers"
-        ) as mock_get:
+        with patch("scripts.ccxt_pipeline.scheduler.daemon.get_all_fetchers") as mock_get:
             mock_get.return_value = mock_fetchers
 
             runner = DaemonRunner(
@@ -356,9 +340,7 @@ class TestDaemonStabilityAutomated:
         """Test daemon handles concurrent OI and funding fetches correctly."""
         from scripts.ccxt_pipeline.scheduler.daemon import DaemonRunner
 
-        with patch(
-            "scripts.ccxt_pipeline.scheduler.daemon.get_all_fetchers"
-        ) as mock_get:
+        with patch("scripts.ccxt_pipeline.scheduler.daemon.get_all_fetchers") as mock_get:
             mock_get.return_value = mock_fetchers
 
             runner = DaemonRunner(
@@ -390,9 +372,7 @@ class TestDaemonStabilityAutomated:
         """Test daemon status reports accurate information."""
         from scripts.ccxt_pipeline.scheduler.daemon import DaemonRunner
 
-        with patch(
-            "scripts.ccxt_pipeline.scheduler.daemon.get_all_fetchers"
-        ) as mock_get:
+        with patch("scripts.ccxt_pipeline.scheduler.daemon.get_all_fetchers") as mock_get:
             mock_get.return_value = mock_fetchers
 
             runner = DaemonRunner(

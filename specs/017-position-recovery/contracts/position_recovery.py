@@ -25,8 +25,10 @@ PositionId = str
 
 # --- Enums ---
 
+
 class RecoveryPhase(str, Enum):
     """Phases of the recovery process."""
+
     CACHE_LOADING = "cache_loading"
     RECONCILING = "reconciling"
     DISCREPANCY_DETECTED = "discrepancy_detected"
@@ -37,6 +39,7 @@ class RecoveryPhase(str, Enum):
 
 class ReconciliationStatus(str, Enum):
     """Outcome of reconciliation."""
+
     SUCCESS = "success"
     PARTIAL = "partial"  # Some discrepancies unresolved
     FAILED = "failed"
@@ -44,12 +47,14 @@ class ReconciliationStatus(str, Enum):
 
 class ResolutionType(str, Enum):
     """How a discrepancy was resolved."""
+
     SYNTHETIC_FILL = "synthetic_fill"
     MANUAL = "manual"
     IGNORED = "ignored"
 
 
 # --- Configuration Contracts ---
+
 
 class RecoveryConfig(BaseModel):
     """Configuration for strategy recovery behavior."""
@@ -82,6 +87,7 @@ class RecoveryConfig(BaseModel):
 
 # --- Data Contracts ---
 
+
 class PositionDiscrepancy(BaseModel):
     """Details of a position mismatch between cache and exchange."""
 
@@ -106,6 +112,7 @@ class ReconciliationReport(BaseModel):
 
 
 # --- Interface Contracts ---
+
 
 class RecoverableStrategy(Protocol):
     """Protocol for strategies that support recovery."""
@@ -182,19 +189,23 @@ class PositionRestorer(ABC):
 
 # --- Recovery Events (for messaging) ---
 
+
 class RecoveryEvent(BaseModel):
     """Base class for recovery-related events."""
+
     timestamp_ns: int
     strategy_id: StrategyId
 
 
 class RecoveryStartedEvent(RecoveryEvent):
     """Emitted when recovery process begins."""
+
     phase: RecoveryPhase = RecoveryPhase.CACHE_LOADING
 
 
 class RecoveryProgressEvent(RecoveryEvent):
     """Emitted during recovery process."""
+
     phase: RecoveryPhase
     positions_loaded: int = 0
     positions_reconciled: int = 0
@@ -203,6 +214,7 @@ class RecoveryProgressEvent(RecoveryEvent):
 
 class RecoveryCompletedEvent(RecoveryEvent):
     """Emitted when recovery process completes."""
+
     phase: RecoveryPhase = RecoveryPhase.READY
     total_positions: int
     discrepancies_resolved: int

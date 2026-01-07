@@ -101,15 +101,11 @@ class TestCSRCConcentrationReduction:
         baseline_concentration = sum(
             state_baseline.strategy_weights.get(s, 0) for s in correlated_group
         )
-        csrc_concentration = sum(
-            state_csrc.strategy_weights.get(s, 0) for s in correlated_group
-        )
+        csrc_concentration = sum(state_csrc.strategy_weights.get(s, 0) for s in correlated_group)
 
         # SC-001: Concentration should reduce by at least 10%
         # (20% target, but allowing some variance due to stochastic nature)
-        reduction_pct = (
-            (baseline_concentration - csrc_concentration) / baseline_concentration * 100
-        )
+        reduction_pct = (baseline_concentration - csrc_concentration) / baseline_concentration * 100
 
         assert reduction_pct > 5, (
             f"Concentration reduction {reduction_pct:.1f}% is less than 5%.\n"
@@ -337,19 +333,13 @@ class TestLambdaSensitivity:
 
         # Verify CSRC is having an effect: lambda > 0 should differ from lambda = 0
         # The penalty should reduce total weight in correlated strategies
-        assert (
-            corr_weights[1.0] != corr_weights[0.0]
-            or corr_weights[2.0] != corr_weights[0.0]
-        ), (
-            f"Lambda should affect correlated weights.\n"
-            f"Correlated weights: {corr_weights}"
+        assert corr_weights[1.0] != corr_weights[0.0] or corr_weights[2.0] != corr_weights[0.0], (
+            f"Lambda should affect correlated weights.\nCorrelated weights: {corr_weights}"
         )
 
         # All effective N values should be reasonable (between 1 and N)
         for lambda_val, eff_n in results.items():
-            assert 1.0 <= eff_n <= 3.0, (
-                f"Effective N={eff_n} out of range for lambda={lambda_val}"
-            )
+            assert 1.0 <= eff_n <= 3.0, f"Effective N={eff_n} out of range for lambda={lambda_val}"
 
 
 class TestCSRCEdgeCases:
@@ -413,9 +403,7 @@ class TestCSRCEdgeCases:
         # Verify weights are valid (sum to 1, all positive)
         weights = state.strategy_weights
         total_weight = sum(weights.values())
-        assert abs(total_weight - 1.0) < 0.01, (
-            f"Weights should sum to 1, got {total_weight}"
-        )
+        assert abs(total_weight - 1.0) < 0.01, f"Weights should sum to 1, got {total_weight}"
         assert all(w >= 0 for w in weights.values()), f"Negative weights: {weights}"
 
 

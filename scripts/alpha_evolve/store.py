@@ -91,15 +91,9 @@ class ProgramStore:
                     FOREIGN KEY (parent_id) REFERENCES programs(id)
                 )
             """)
-            conn.execute(
-                "CREATE INDEX IF NOT EXISTS idx_calmar ON programs(calmar DESC)"
-            )
-            conn.execute(
-                "CREATE INDEX IF NOT EXISTS idx_sharpe ON programs(sharpe DESC)"
-            )
-            conn.execute(
-                "CREATE INDEX IF NOT EXISTS idx_experiment ON programs(experiment)"
-            )
+            conn.execute("CREATE INDEX IF NOT EXISTS idx_calmar ON programs(calmar DESC)")
+            conn.execute("CREATE INDEX IF NOT EXISTS idx_sharpe ON programs(sharpe DESC)")
+            conn.execute("CREATE INDEX IF NOT EXISTS idx_experiment ON programs(experiment)")
             conn.commit()
 
     def insert(
@@ -300,9 +294,7 @@ class ProgramStore:
             else:  # exploit
                 return self._sample_exploit(conn, experiment)
 
-    def _sample_elite(
-        self, conn: sqlite3.Connection, experiment: str | None
-    ) -> Program | None:
+    def _sample_elite(self, conn: sqlite3.Connection, experiment: str | None) -> Program | None:
         """Sample from top 10% by calmar."""
         # Get count of evaluated programs
         if experiment:
@@ -314,9 +306,7 @@ class ProgramStore:
                 (experiment,),
             )
         else:
-            cursor = conn.execute(
-                "SELECT COUNT(*) FROM programs WHERE calmar IS NOT NULL"
-            )
+            cursor = conn.execute("SELECT COUNT(*) FROM programs WHERE calmar IS NOT NULL")
         count = cursor.fetchone()[0]
         if count == 0:
             return None
@@ -350,9 +340,7 @@ class ProgramStore:
             return None
         return self._row_to_program(random.choice(rows))
 
-    def _sample_exploit(
-        self, conn: sqlite3.Connection, experiment: str | None
-    ) -> Program | None:
+    def _sample_exploit(self, conn: sqlite3.Connection, experiment: str | None) -> Program | None:
         """Sample with fitness-weighted probability."""
         if experiment:
             cursor = conn.execute(
@@ -379,9 +367,7 @@ class ProgramStore:
 
         return random.choices(programs, weights=weights)[0]
 
-    def _sample_explore(
-        self, conn: sqlite3.Connection, experiment: str | None
-    ) -> Program | None:
+    def _sample_explore(self, conn: sqlite3.Connection, experiment: str | None) -> Program | None:
         """Sample uniformly at random."""
         if experiment:
             cursor = conn.execute(
@@ -473,9 +459,7 @@ class ProgramStore:
             # Delete
             if to_delete:
                 placeholders = ",".join("?" * len(to_delete))
-                conn.execute(
-                    f"DELETE FROM programs WHERE id IN ({placeholders})", to_delete
-                )
+                conn.execute(f"DELETE FROM programs WHERE id IN ({placeholders})", to_delete)
                 conn.commit()
 
             return len(to_delete)

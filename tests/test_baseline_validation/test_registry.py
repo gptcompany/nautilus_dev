@@ -240,6 +240,4 @@ class TestGetDefaultContenders:
         contenders = get_default_contenders()
 
         for name, sizer in contenders.items():
-            assert isinstance(sizer, ContenderSizer), (
-                f"{name} should implement ContenderSizer"
-            )
+            assert isinstance(sizer, ContenderSizer), f"{name} should implement ContenderSizer"

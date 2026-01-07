@@ -164,9 +164,7 @@ class TestFullPipeline:
 
         for train_idx, test_idx in splitter.split(n):
             # All train indices must be before test indices
-            assert np.max(train_idx) < np.min(test_idx), (
-                "Training data must precede test data"
-            )
+            assert np.max(train_idx) < np.min(test_idx), "Training data must precede test data"
 
             # Embargo check: min gap between train and test
             gap = np.min(test_idx) - np.max(train_idx)

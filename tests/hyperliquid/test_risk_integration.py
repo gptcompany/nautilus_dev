@@ -81,9 +81,7 @@ class TestHyperliquidStrategyConfig:
 
         assert risk_with_limits.max_position_size is not None
         assert "BTC-USD-PERP.HYPERLIQUID" in risk_with_limits.max_position_size
-        assert risk_with_limits.max_position_size[
-            "BTC-USD-PERP.HYPERLIQUID"
-        ] == Decimal("0.5")
+        assert risk_with_limits.max_position_size["BTC-USD-PERP.HYPERLIQUID"] == Decimal("0.5")
 
 
 class TestHyperliquidBaseStrategy:
@@ -95,9 +93,7 @@ class TestHyperliquidBaseStrategy:
         strategy = HyperliquidBaseStrategy(config=config)
 
         assert strategy.strategy_config == config
-        assert strategy.instrument_id == InstrumentId.from_str(
-            "BTC-USD-PERP.HYPERLIQUID"
-        )
+        assert strategy.instrument_id == InstrumentId.from_str("BTC-USD-PERP.HYPERLIQUID")
         assert strategy.risk_manager is not None
 
     def test_risk_manager_has_config(self):
@@ -111,9 +107,7 @@ class TestHyperliquidBaseStrategy:
 
         assert strategy.risk_manager.config.stop_loss_pct == Decimal("0.05")
         assert strategy.risk_manager.config.max_position_size is not None
-        assert (
-            "ETH-USD-PERP.HYPERLIQUID" in strategy.risk_manager.config.max_position_size
-        )
+        assert "ETH-USD-PERP.HYPERLIQUID" in strategy.risk_manager.config.max_position_size
 
     def test_validate_order_size_within_limits(self):
         """Order size within limits returns True."""

@@ -6,9 +6,7 @@ from pathlib import Path
 class TestPatchInsertSampleCycle:
     """T050: Test patch -> insert -> sample cycle."""
 
-    def test_patch_insert_sample_cycle(
-        self, temp_db_path: Path, sample_strategy_single_block: str
-    ):
+    def test_patch_insert_sample_cycle(self, temp_db_path: Path, sample_strategy_single_block: str):
         """Full cycle: patch strategy, insert to store, sample for next mutation."""
         from scripts.alpha_evolve.patching import apply_patch, validate_syntax
         from scripts.alpha_evolve.store import FitnessMetrics, ProgramStore
@@ -19,9 +17,7 @@ class TestPatchInsertSampleCycle:
         seed_id = store.insert(sample_strategy_single_block)
 
         # 2. Simulate mutation: patch the strategy
-        diff = {
-            "blocks": {"entry_logic": "if self.ema.value < bar.close:\n    self.sell()"}
-        }
+        diff = {"blocks": {"entry_logic": "if self.ema.value < bar.close:\n    self.sell()"}}
         mutated_code = apply_patch(sample_strategy_single_block, diff)
 
         # 3. Validate patched code

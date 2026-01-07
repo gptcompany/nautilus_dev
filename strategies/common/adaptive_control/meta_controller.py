@@ -214,8 +214,7 @@ class MetaController:
             callback: Optional callback to set strategy weight
         """
         self._strategies[name] = {
-            "affinity": regime_affinity
-            or {"trending": 0.7, "normal": 0.7, "mean_reverting": 0.7},
+            "affinity": regime_affinity or {"trending": 0.7, "normal": 0.7, "mean_reverting": 0.7},
             "callback": callback,
             "current_weight": 1.0,
         }

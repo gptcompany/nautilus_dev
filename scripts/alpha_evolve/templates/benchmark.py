@@ -155,9 +155,7 @@ def generate_bars(engine: BacktestEngine, num_bars: int) -> None:
     bars = None
     if num_bars > 10000:
         try:
-            bars = provider.read_csv_bars(
-                "tests/test_data/binance/btcusdt-1min-2024.csv"
-            )
+            bars = provider.read_csv_bars("tests/test_data/binance/btcusdt-1min-2024.csv")
         except (FileNotFoundError, OSError) as e:
             print(f"  Warning: Could not read CSV bars: {e}")
             print("  Falling back to synthetic bar generation...")
@@ -339,9 +337,7 @@ def run_benchmark(num_bars: int = 10000, num_runs: int = 3) -> dict:
 
     # Handle division by zero (theoretically possible if execution is instant)
     if avg_no_eq <= 0:
-        print(
-            "\nError: Baseline timing is zero or negative, unable to calculate overhead"
-        )
+        print("\nError: Baseline timing is zero or negative, unable to calculate overhead")
         overhead = 0.0
     else:
         overhead = ((avg_with_eq - avg_no_eq) / avg_no_eq) * 100
@@ -367,13 +363,9 @@ def run_benchmark(num_bars: int = 10000, num_runs: int = 3) -> dict:
     print(f"{'=' * 60}")
 
     if overhead < 5.0:
-        print(
-            f"\n[PASS] Equity tracking overhead ({overhead:.2f}%) is below 5% threshold"
-        )
+        print(f"\n[PASS] Equity tracking overhead ({overhead:.2f}%) is below 5% threshold")
     else:
-        print(
-            f"\n[FAIL] Equity tracking overhead ({overhead:.2f}%) exceeds 5% threshold"
-        )
+        print(f"\n[FAIL] Equity tracking overhead ({overhead:.2f}%) exceeds 5% threshold")
 
     return results
 

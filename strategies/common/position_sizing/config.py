@@ -65,12 +65,8 @@ class IntegratedSizingConfig(BaseModel):
         ... )
     """
 
-    giller_exponent: float = Field(
-        default=0.5, gt=0.0, le=1.0, description="Sub-linear exponent"
-    )
-    fractional_kelly: float = Field(
-        default=0.5, gt=0.0, le=1.0, description="Kelly fraction"
-    )
+    giller_exponent: float = Field(default=0.5, gt=0.0, le=1.0, description="Sub-linear exponent")
+    fractional_kelly: float = Field(default=0.5, gt=0.0, le=1.0, description="Kelly fraction")
     min_size: float = Field(default=0.01, ge=0.0, description="Minimum position size")
     max_size: float = Field(default=1.0, gt=0.0, description="Maximum position size")
     default_meta_confidence: float = Field(
@@ -79,9 +75,7 @@ class IntegratedSizingConfig(BaseModel):
     default_regime_weight: float = Field(
         default=0.8, ge=0.0, le=1.5, description="Default regime weight"
     )
-    default_toxicity: float = Field(
-        default=0.0, ge=0.0, le=1.0, description="Default toxicity"
-    )
+    default_toxicity: float = Field(default=0.0, ge=0.0, le=1.0, description="Default toxicity")
 
     model_config = {"frozen": True}
 

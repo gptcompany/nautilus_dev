@@ -423,7 +423,5 @@ class DigitalRootAnalyzer:
             "distribution": distribution,
             "vortex_ratio": vortex_count / len(roots) if roots else 0,
             "trinity_ratio": trinity_count / len(roots) if roots else 0,
-            "most_common": max(distribution, key=distribution.get)
-            if distribution
-            else None,
+            "most_common": max(distribution, key=distribution.get) if distribution else None,
         }

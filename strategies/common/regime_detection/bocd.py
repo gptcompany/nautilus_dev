@@ -341,9 +341,7 @@ class BOCD(BaseBOCD):
             mu_new = (kappa_old[:copy_len] * mu_old[:copy_len] + x) / kappa_new
             alpha_new = alpha_old[:copy_len] + 0.5
             delta = x - mu_old[:copy_len]
-            beta_new = (
-                beta_old[:copy_len] + 0.5 * kappa_old[:copy_len] * delta**2 / kappa_new
-            )
+            beta_new = beta_old[:copy_len] + 0.5 * kappa_old[:copy_len] * delta**2 / kappa_new
 
             # Ensure beta stays positive
             beta_new = np.maximum(beta_new, 1e-10)

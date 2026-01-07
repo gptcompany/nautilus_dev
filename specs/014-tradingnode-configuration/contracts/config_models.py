@@ -40,9 +40,7 @@ class RedisConfig(BaseModel):
     host: str = Field(default="localhost", description="Redis host")
     port: int = Field(default=6379, ge=1, le=65535, description="Redis port")
     password: str | None = Field(default=None, description="Redis password")
-    timeout: float = Field(
-        default=2.0, ge=0.1, le=30.0, description="Connection timeout"
-    )
+    timeout: float = Field(default=2.0, ge=0.1, le=30.0, description="Connection timeout")
 
 
 class LoggingSettings(BaseModel):
@@ -64,12 +62,8 @@ class LoggingSettings(BaseModel):
         default="json",
         description="Log file format",
     )
-    max_size_mb: int = Field(
-        default=100, ge=10, le=1000, description="Max log file size"
-    )
-    max_backup_count: int = Field(
-        default=10, ge=1, le=100, description="Max backup files"
-    )
+    max_size_mb: int = Field(default=100, ge=10, le=1000, description="Max log file size")
+    max_backup_count: int = Field(default=10, ge=1, le=100, description="Max backup files")
 
 
 class StreamingSettings(BaseModel):
@@ -195,9 +189,7 @@ class TradingNodeSettings(BaseModel):
 
         # Streaming
         streaming = StreamingSettings(
-            catalog_path=os.environ.get(
-                "NAUTILUS_CATALOG_PATH", "/data/nautilus/catalog"
-            ),
+            catalog_path=os.environ.get("NAUTILUS_CATALOG_PATH", "/data/nautilus/catalog"),
             flush_interval_ms=int(os.environ.get("NAUTILUS_FLUSH_INTERVAL_MS", "2000")),
         )
 

@@ -262,10 +262,7 @@ class MetricsOrchestrator:
             if key in data and data[key]:
                 # Escape special chars in label values (Prometheus format)
                 value = (
-                    str(data[key])
-                    .replace("\\", "\\\\")
-                    .replace('"', '\\"')
-                    .replace("\n", "\\n")
+                    str(data[key]).replace("\\", "\\\\").replace('"', '\\"').replace("\n", "\\n")
                 )
                 labels.append(f'{key}="{value}"')
         return ",".join(labels)

@@ -102,10 +102,7 @@ class RiskManager:
                 return False
 
         # Check position limits
-        if (
-            self._config.max_position_size is None
-            and self._config.max_total_exposure is None
-        ):
+        if self._config.max_position_size is None and self._config.max_total_exposure is None:
             return True
 
         instrument_id_str = str(order.instrument_id)
@@ -242,9 +239,7 @@ class RiskManager:
 
     def _create_stop_order(self, position: "Position", stop_price: Price) -> "Order":
         """Create stop order with reduce_only=True."""
-        order_side = (
-            OrderSide.SELL if position.side == PositionSide.LONG else OrderSide.BUY
-        )
+        order_side = OrderSide.SELL if position.side == PositionSide.LONG else OrderSide.BUY
         quantity = position.quantity
 
         if self._config.stop_loss_type == StopLossType.LIMIT:

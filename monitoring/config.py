@@ -28,9 +28,7 @@ class MonitoringConfig(BaseSettings):
     questdb_ilp_port: int = Field(default=9009, description="QuestDB ILP port")
 
     # Environment
-    env: Environment = Field(
-        default="dev", description="Environment: prod, staging, dev"
-    )
+    env: Environment = Field(default="dev", description="Environment: prod, staging, dev")
     host: str = Field(default="localhost", description="This host's identifier")
 
     # Collection intervals (seconds)
@@ -48,9 +46,7 @@ class MonitoringConfig(BaseSettings):
     )
 
     # Batching
-    batch_size: int = Field(
-        default=500, ge=1, le=10000, description="Batch size before flush"
-    )
+    batch_size: int = Field(default=500, ge=1, le=10000, description="Batch size before flush")
     flush_interval: float = Field(
         default=5.0, ge=0.1, description="Max time between flushes (seconds)"
     )

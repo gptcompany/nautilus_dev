@@ -237,11 +237,7 @@ class MetaLearningExampleStrategy(Strategy):
         y_train = meta_labels[train_idx]
 
         # Train if enough samples
-        if (
-            len(y_train) >= 100
-            and np.sum(y_train == 1) >= 10
-            and np.sum(y_train == 0) >= 10
-        ):
+        if len(y_train) >= 100 and np.sum(y_train == 1) >= 10 and np.sum(y_train == 0) >= 10:
             self._meta_model.fit(X_train, y_train)
             logger.info(
                 "Meta-model trained on %d samples (accuracy: %.2f)",
@@ -336,8 +332,7 @@ class MetaLearningExampleStrategy(Strategy):
     def on_stop(self) -> None:
         """Handle strategy shutdown."""
         logger.info(
-            "MetaLearningExampleStrategy stopped. "
-            "Processed %d bars, meta-model trained.",
+            "MetaLearningExampleStrategy stopped. Processed %d bars, meta-model trained.",
             len(self._prices),
         )
 

@@ -99,6 +99,7 @@ def main():
 
     try:
         import redis
+
         r = redis.Redis(host=host, port=port, decode_responses=True)
 
         # Latency benchmark
@@ -116,8 +117,8 @@ def main():
         print(f"     P99:     {latency['read_p99_ms']:.3f} ms")
 
         # Check against NFR-001: < 1ms p95
-        write_pass = latency['write_p95_ms'] < 1.0
-        read_pass = latency['read_p95_ms'] < 1.0
+        write_pass = latency["write_p95_ms"] < 1.0
+        read_pass = latency["read_p95_ms"] < 1.0
 
         print(f"\n   NFR-001 Check (< 1ms p95):")
         print(f"     Write: {'✓ PASS' if write_pass else '✗ FAIL'}")
@@ -129,10 +130,14 @@ def main():
 
         print(f"\n   Results:")
         print(f"     Keys:       {stress['num_keys']:,}")
-        print(f"     Write:      {stress['write_total_s']:.2f}s ({stress['write_ops_per_s']:,.0f} ops/s)")
-        print(f"     Read:       {stress['read_total_s']:.2f}s ({stress['read_ops_per_s']:,.0f} ops/s)")
+        print(
+            f"     Write:      {stress['write_total_s']:.2f}s ({stress['write_ops_per_s']:,.0f} ops/s)"
+        )
+        print(
+            f"     Read:       {stress['read_total_s']:.2f}s ({stress['read_ops_per_s']:,.0f} ops/s)"
+        )
 
-        stress_pass = stress['num_keys'] >= 10000
+        stress_pass = stress["num_keys"] >= 10000
         print(f"\n   NFR-001 Check (10K+ keys): {'✓ PASS' if stress_pass else '✗ FAIL'}")
 
         # Summary

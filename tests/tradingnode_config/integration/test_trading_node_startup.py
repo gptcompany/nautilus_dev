@@ -39,9 +39,7 @@ def minimal_settings():
 class TestTradingNodeStartup:
     """Integration tests for TradingNode initialization."""
 
-    def test_factory_creates_valid_trading_node_config(
-        self, minimal_settings: TradingNodeSettings
-    ):
+    def test_factory_creates_valid_trading_node_config(self, minimal_settings: TradingNodeSettings):
         """Factory should create a config that can be used with TradingNode."""
         config = TradingNodeConfigFactory.from_settings(minimal_settings)
 
@@ -68,9 +66,7 @@ class TestTradingNodeStartup:
         binance_data = config.data_clients.get("BINANCE")
         assert binance_data.testnet is True
 
-    def test_config_includes_reconciliation_settings(
-        self, minimal_settings: TradingNodeSettings
-    ):
+    def test_config_includes_reconciliation_settings(self, minimal_settings: TradingNodeSettings):
         """Config should have proper reconciliation settings."""
         config = TradingNodeConfigFactory.from_settings(minimal_settings)
 
@@ -78,9 +74,7 @@ class TestTradingNodeStartup:
         assert config.exec_engine.reconciliation_lookback_mins >= 60
         assert config.exec_engine.reconciliation_startup_delay_secs >= 10.0
 
-    def test_config_includes_safety_settings(
-        self, minimal_settings: TradingNodeSettings
-    ):
+    def test_config_includes_safety_settings(self, minimal_settings: TradingNodeSettings):
         """Config should have safety settings enabled."""
         config = TradingNodeConfigFactory.from_settings(minimal_settings)
 

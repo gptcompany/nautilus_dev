@@ -547,26 +547,18 @@ class UniversalLawsAnalyzer:
         returns = []
         for i in range(1, len(price_history)):
             if price_history[i - 1] > 0:
-                returns.append(
-                    (price_history[i] - price_history[i - 1]) / price_history[i - 1]
-                )
+                returns.append((price_history[i] - price_history[i - 1]) / price_history[i - 1])
 
         result = {
             # Spiral analysis (Gann Square of 9)
             "spiral_position": self.spiral.price_to_spiral(current_price),
             "spiral_harmonics": self.spiral.get_harmonic_levels(current_price),
             # Fibonacci levels
-            "fibonacci_retracements": self.fibonacci.get_retracement_levels(
-                swing_high, swing_low
-            ),
-            "fibonacci_extensions": self.fibonacci.get_extension_levels(
-                swing_high, swing_low
-            ),
+            "fibonacci_retracements": self.fibonacci.get_retracement_levels(swing_high, swing_low),
+            "fibonacci_extensions": self.fibonacci.get_extension_levels(swing_high, swing_low),
             # Fractal analysis
             "hurst_exponent": self.fractal.estimate_hurst(returns) if returns else 0.5,
-            "fractal_dimension": self.fractal.get_fractal_dimension(returns)
-            if returns
-            else 1.5,
+            "fractal_dimension": self.fractal.get_fractal_dimension(returns) if returns else 1.5,
             # Cycle analysis
             "dominant_cycle": self.cycles.detect_dominant_cycle(price_history),
         }

@@ -83,9 +83,7 @@ def create_mock_position(
     position.side = side
     position.avg_px_open = float(entry_price)
     position.quantity = Quantity.from_str(quantity)
-    position.signed_qty = (
-        float(quantity) if side == PositionSide.LONG else -float(quantity)
-    )
+    position.signed_qty = float(quantity) if side == PositionSide.LONG else -float(quantity)
     return position
 
 

@@ -66,9 +66,7 @@ def generate_tasks(
 
     # Sort by severity (critical first)
     severity_order = {"critical": 0, "high": 1, "medium": 2, "low": 3}
-    breaking_changes.sort(
-        key=lambda x: severity_order.get(x.get("severity", "medium").lower(), 2)
-    )
+    breaking_changes.sort(key=lambda x: severity_order.get(x.get("severity", "medium").lower(), 2))
 
     for change in breaking_changes:
         severity = change.get("severity", "medium")
@@ -82,8 +80,7 @@ def generate_tasks(
         # Determine if this needs algorithmic fix (mark with [E])
         evolve_marker = ""
         if any(
-            kw in description.lower()
-            for kw in ["algorithm", "calculation", "formula", "logic"]
+            kw in description.lower() for kw in ["algorithm", "calculation", "formula", "logic"]
         ):
             evolve_marker = "[E]"
 
@@ -159,9 +156,7 @@ def format_tasks_md(
 
     for task in tasks:
         markers = task["markers"]
-        task_line = (
-            f"- [ ] {task['id']} {task['story']} {markers} {task['description']}"
-        )
+        task_line = f"- [ ] {task['id']} {task['story']} {markers} {task['description']}"
         lines.append(task_line)
 
         # Add file references as sub-items

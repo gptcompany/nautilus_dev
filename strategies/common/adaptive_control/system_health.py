@@ -110,9 +110,7 @@ class SystemHealthMonitor:
         self._current_equity = equity
         self._peak_equity = max(self._peak_equity, equity)
 
-    def on_state_change(
-        self, callback: Callable[[HealthState, HealthState], None]
-    ) -> None:
+    def on_state_change(self, callback: Callable[[HealthState, HealthState], None]) -> None:
         """Register callback for state transitions."""
         self._on_state_change.append(callback)
 

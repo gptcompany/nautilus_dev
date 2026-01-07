@@ -80,9 +80,7 @@ class EvolutionMetricsPublisher:
 
         success = await self._client.write(metrics)
         if success:
-            logger.debug(
-                f"Published metrics for {program.id[:8]} (gen={program.generation})"
-            )
+            logger.debug(f"Published metrics for {program.id[:8]} (gen={program.generation})")
         else:
             logger.error(f"Failed to publish metrics for {program.id[:8]}")
 

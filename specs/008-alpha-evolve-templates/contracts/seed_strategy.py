@@ -5,7 +5,6 @@ This file defines the interface contract for the momentum seed strategy.
 Implementation must adhere to this contract.
 """
 
-
 from nautilus_trader.model.data import Bar
 
 from .base_strategy import BaseEvolveConfig, BaseEvolveStrategy

@@ -37,9 +37,7 @@ class WalkForwardConfig(BaseModel):
     data_end: datetime = Field(description="End of data range")
 
     # Window sizes
-    train_months: int = Field(
-        default=6, ge=1, description="Training window size in months"
-    )
+    train_months: int = Field(default=6, ge=1, description="Training window size in months")
     test_months: int = Field(default=3, ge=1, description="Test window size in months")
     step_months: int = Field(default=3, ge=1, description="Rolling step size in months")
 
@@ -56,9 +54,7 @@ class WalkForwardConfig(BaseModel):
     )
 
     # Validation criteria
-    min_windows: int = Field(
-        default=4, ge=2, description="Minimum number of windows required"
-    )
+    min_windows: int = Field(default=4, ge=2, description="Minimum number of windows required")
     min_profitable_windows_pct: float = Field(
         default=0.75,
         gt=0,
@@ -84,9 +80,7 @@ class WalkForwardConfig(BaseModel):
     )
 
     # Reproducibility
-    seed: int | None = Field(
-        default=None, description="Random seed for reproducibility"
-    )
+    seed: int | None = Field(default=None, description="Random seed for reproducibility")
 
     @field_validator("data_end")
     @classmethod

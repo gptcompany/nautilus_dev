@@ -136,9 +136,7 @@ def generate_diagnostic_tasks(
 
     # Add alpha-debug task for complex failures
     if failure_type in ["code_error", "position_error", "indicator_error"]:
-        lines.append(
-            f"- [ ] T{task_id:03d} [US3] [P2] [E] Run alpha-debug for deeper analysis"
-        )
+        lines.append(f"- [ ] T{task_id:03d} [US3] [P2] [E] Run alpha-debug for deeper analysis")
         task_id += 1
 
     lines.extend(
@@ -194,9 +192,7 @@ def generate_diagnostic_tasks(
 
 def main() -> None:
     """Main entry point."""
-    parser = argparse.ArgumentParser(
-        description="Generate diagnostic tasks from failure analysis"
-    )
+    parser = argparse.ArgumentParser(description="Generate diagnostic tasks from failure analysis")
     parser.add_argument(
         "--analysis-file",
         type=Path,

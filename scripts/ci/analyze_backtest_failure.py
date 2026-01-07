@@ -208,9 +208,7 @@ def analyze_log_file(log_path: Path) -> list[ErrorInstance]:
     for i, line in enumerate(lines):
         if re.search(combined_pattern, line, re.IGNORECASE):
             # Extract timestamp if present
-            timestamp_match = re.search(
-                r"(\d{4}-\d{2}-\d{2}[T\s]\d{2}:\d{2}:\d{2})", line
-            )
+            timestamp_match = re.search(r"(\d{4}-\d{2}-\d{2}[T\s]\d{2}:\d{2}:\d{2})", line)
             timestamp = timestamp_match.group(1) if timestamp_match else ""
 
             # Extract file reference if present
@@ -276,9 +274,7 @@ def extract_root_cause(errors: list[ErrorInstance]) -> str:
         if "Traceback" in error.message or "Exception" in error.message:
             # Find the actual error message after traceback
             for ctx_line in reversed(error.context_lines):
-                if re.match(r"\w+Error:", ctx_line) or re.match(
-                    r"\w+Exception:", ctx_line
-                ):
+                if re.match(r"\w+Error:", ctx_line) or re.match(r"\w+Exception:", ctx_line):
                     return ctx_line.strip()
 
         if "Error:" in error.message or "FAILED" in error.message:

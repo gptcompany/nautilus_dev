@@ -92,8 +92,7 @@ class HMMRegimeFilter:
         """
         if len(returns) < self.min_samples:
             raise ValueError(
-                f"Insufficient data: {len(returns)} samples, "
-                f"minimum {self.min_samples} required"
+                f"Insufficient data: {len(returns)} samples, minimum {self.min_samples} required"
             )
 
         # Stack features: [returns, volatility]

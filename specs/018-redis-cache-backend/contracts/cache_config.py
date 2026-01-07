@@ -2,8 +2,10 @@
 
 from pydantic import BaseModel, Field
 
+
 class RedisDatabaseConfig(BaseModel):
     """Redis connection configuration."""
+
     type: str = "redis"
     host: str = "localhost"
     port: int = 6379
@@ -11,8 +13,10 @@ class RedisDatabaseConfig(BaseModel):
     ssl: bool = False
     timeout: int = Field(default=2, ge=1, le=30)
 
+
 class RedisCacheConfig(BaseModel):
     """NautilusTrader cache configuration for Redis."""
+
     database: RedisDatabaseConfig
     encoding: str = Field(default="msgpack", pattern="^(msgpack|json)$")
     timestamps_as_iso8601: bool = False

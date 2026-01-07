@@ -148,18 +148,10 @@ class TestRobustnessScore:
     def test_all_profitable_consistent(self) -> None:
         """All profitable, consistent returns should score high."""
         results = [
-            make_result(
-                window_id=1, train_sharpe=2.0, test_sharpe=1.8, test_return=0.10
-            ),
-            make_result(
-                window_id=2, train_sharpe=2.0, test_sharpe=1.9, test_return=0.11
-            ),
-            make_result(
-                window_id=3, train_sharpe=2.0, test_sharpe=1.7, test_return=0.09
-            ),
-            make_result(
-                window_id=4, train_sharpe=2.0, test_sharpe=2.0, test_return=0.10
-            ),
+            make_result(window_id=1, train_sharpe=2.0, test_sharpe=1.8, test_return=0.10),
+            make_result(window_id=2, train_sharpe=2.0, test_sharpe=1.9, test_return=0.11),
+            make_result(window_id=3, train_sharpe=2.0, test_sharpe=1.7, test_return=0.09),
+            make_result(window_id=4, train_sharpe=2.0, test_sharpe=2.0, test_return=0.10),
         ]
         score = calculate_robustness_score(results)
         # All profitable (40%), good consistency (~27%), good degradation (~25%)
@@ -180,18 +172,10 @@ class TestRobustnessScore:
     def test_high_degradation_penalty(self) -> None:
         """Large train->test degradation should reduce score."""
         results = [
-            make_result(
-                window_id=1, train_sharpe=3.0, test_sharpe=0.5, test_return=0.05
-            ),
-            make_result(
-                window_id=2, train_sharpe=3.0, test_sharpe=0.3, test_return=0.03
-            ),
-            make_result(
-                window_id=3, train_sharpe=3.0, test_sharpe=0.4, test_return=0.04
-            ),
-            make_result(
-                window_id=4, train_sharpe=3.0, test_sharpe=0.2, test_return=0.02
-            ),
+            make_result(window_id=1, train_sharpe=3.0, test_sharpe=0.5, test_return=0.05),
+            make_result(window_id=2, train_sharpe=3.0, test_sharpe=0.3, test_return=0.03),
+            make_result(window_id=3, train_sharpe=3.0, test_sharpe=0.4, test_return=0.04),
+            make_result(window_id=4, train_sharpe=3.0, test_sharpe=0.2, test_return=0.02),
         ]
         score = calculate_robustness_score(results)
         # Degradation ratio ~0.15 on average -> low degradation component
@@ -200,12 +184,8 @@ class TestRobustnessScore:
     def test_zero_train_sharpe_handled(self) -> None:
         """Zero train sharpe should not cause division error."""
         results = [
-            make_result(
-                window_id=1, train_sharpe=0.0, test_sharpe=1.0, test_return=0.10
-            ),
-            make_result(
-                window_id=2, train_sharpe=0.0, test_sharpe=0.5, test_return=0.05
-            ),
+            make_result(window_id=1, train_sharpe=0.0, test_sharpe=1.0, test_return=0.10),
+            make_result(window_id=2, train_sharpe=0.0, test_sharpe=0.5, test_return=0.05),
         ]
         score = calculate_robustness_score(results)
         # Should not raise, should return reasonable score
@@ -214,12 +194,8 @@ class TestRobustnessScore:
     def test_negative_train_sharpe_handled(self) -> None:
         """Negative train sharpe should not cause issues."""
         results = [
-            make_result(
-                window_id=1, train_sharpe=-0.5, test_sharpe=1.0, test_return=0.10
-            ),
-            make_result(
-                window_id=2, train_sharpe=-1.0, test_sharpe=0.5, test_return=0.05
-            ),
+            make_result(window_id=1, train_sharpe=-0.5, test_sharpe=1.0, test_return=0.10),
+            make_result(window_id=2, train_sharpe=-1.0, test_sharpe=0.5, test_return=0.05),
         ]
         score = calculate_robustness_score(results)
         assert 0.0 <= score <= 100.0
@@ -228,9 +204,7 @@ class TestRobustnessScore:
         """Score should always be between 0 and 100."""
         # Best case: all profitable, consistent, no degradation
         best_results = [
-            make_result(
-                window_id=i, train_sharpe=2.0, test_sharpe=2.0, test_return=0.10
-            )
+            make_result(window_id=i, train_sharpe=2.0, test_sharpe=2.0, test_return=0.10)
             for i in range(1, 5)
         ]
         best_score = calculate_robustness_score(best_results)
@@ -238,18 +212,10 @@ class TestRobustnessScore:
 
         # Worst case: all unprofitable, high variance
         worst_results = [
-            make_result(
-                window_id=1, train_sharpe=2.0, test_sharpe=-1.0, test_return=-0.20
-            ),
-            make_result(
-                window_id=2, train_sharpe=2.0, test_sharpe=-0.5, test_return=-0.01
-            ),
-            make_result(
-                window_id=3, train_sharpe=2.0, test_sharpe=-2.0, test_return=-0.30
-            ),
-            make_result(
-                window_id=4, train_sharpe=2.0, test_sharpe=-0.1, test_return=-0.05
-            ),
+            make_result(window_id=1, train_sharpe=2.0, test_sharpe=-1.0, test_return=-0.20),
+            make_result(window_id=2, train_sharpe=2.0, test_sharpe=-0.5, test_return=-0.01),
+            make_result(window_id=3, train_sharpe=2.0, test_sharpe=-2.0, test_return=-0.30),
+            make_result(window_id=4, train_sharpe=2.0, test_sharpe=-0.1, test_return=-0.05),
         ]
         worst_score = calculate_robustness_score(worst_results)
         assert 0.0 <= worst_score <= 100.0
@@ -330,25 +296,15 @@ class TestProbabilityBacktestOverfitting:
 
     def test_consistent_strategy_low_pbo(self) -> None:
         """Consistent train->test should have low PBO."""
-        results = [
-            make_result(window_id=i, train_sharpe=2.0, test_sharpe=1.9)
-            for i in range(1, 9)
-        ]
-        pbo = estimate_probability_backtest_overfitting(
-            results, n_permutations=500, seed=42
-        )
+        results = [make_result(window_id=i, train_sharpe=2.0, test_sharpe=1.9) for i in range(1, 9)]
+        pbo = estimate_probability_backtest_overfitting(results, n_permutations=500, seed=42)
         # Low overfitting expected
         assert pbo < 0.7
 
     def test_overfit_strategy_high_pbo(self) -> None:
         """Strategy with much better train than test should have higher PBO."""
-        results = [
-            make_result(window_id=i, train_sharpe=3.0, test_sharpe=0.5)
-            for i in range(1, 9)
-        ]
-        pbo = estimate_probability_backtest_overfitting(
-            results, n_permutations=500, seed=42
-        )
+        results = [make_result(window_id=i, train_sharpe=3.0, test_sharpe=0.5) for i in range(1, 9)]
+        pbo = estimate_probability_backtest_overfitting(results, n_permutations=500, seed=42)
         # Higher overfitting expected when train >> test consistently
         # Note: PBO measures if IS < OOS which inverts the interpretation
         assert 0.0 <= pbo <= 1.0
@@ -357,12 +313,8 @@ class TestProbabilityBacktestOverfitting:
         """Same seed should produce same result."""
         results = [make_result(window_id=i) for i in range(1, 5)]
 
-        pbo1 = estimate_probability_backtest_overfitting(
-            results, n_permutations=100, seed=123
-        )
-        pbo2 = estimate_probability_backtest_overfitting(
-            results, n_permutations=100, seed=123
-        )
+        pbo1 = estimate_probability_backtest_overfitting(results, n_permutations=100, seed=123)
+        pbo2 = estimate_probability_backtest_overfitting(results, n_permutations=100, seed=123)
 
         assert pbo1 == pbo2
 
@@ -370,12 +322,8 @@ class TestProbabilityBacktestOverfitting:
         """Different seeds may produce different results."""
         results = [make_result(window_id=i) for i in range(1, 10)]
 
-        pbo1 = estimate_probability_backtest_overfitting(
-            results, n_permutations=100, seed=111
-        )
-        pbo2 = estimate_probability_backtest_overfitting(
-            results, n_permutations=100, seed=222
-        )
+        pbo1 = estimate_probability_backtest_overfitting(results, n_permutations=100, seed=111)
+        pbo2 = estimate_probability_backtest_overfitting(results, n_permutations=100, seed=222)
 
         # May differ (not guaranteed but highly likely)
         # Just check both are valid
@@ -432,12 +380,8 @@ class TestCombinatorialPaths:
     def test_variation_in_paths(self) -> None:
         """Different permutations create variation (unless all same)."""
         # With identical values, no variation
-        identical_results = [
-            make_result(window_id=i, test_sharpe=1.5) for i in range(1, 5)
-        ]
-        paths = simulate_combinatorial_paths(
-            identical_results, n_permutations=100, seed=42
-        )
+        identical_results = [make_result(window_id=i, test_sharpe=1.5) for i in range(1, 5)]
+        paths = simulate_combinatorial_paths(identical_results, n_permutations=100, seed=42)
         # All paths have same average when inputs identical
         assert all(abs(p - paths[0]) < 1e-10 for p in paths)
 
@@ -491,13 +435,9 @@ class TestMetricsIntegration:
 
         # Calculate all metrics
         robustness = calculate_robustness_score(results)
-        avg_test_sharpe = sum(r.test_metrics.sharpe_ratio for r in results) / len(
-            results
-        )
+        avg_test_sharpe = sum(r.test_metrics.sharpe_ratio for r in results) / len(results)
         dsr = calculate_deflated_sharpe_ratio(avg_test_sharpe, n_trials=50)
-        pbo = estimate_probability_backtest_overfitting(
-            results, n_permutations=200, seed=42
-        )
+        pbo = estimate_probability_backtest_overfitting(results, n_permutations=200, seed=42)
         paths = simulate_combinatorial_paths(results, n_permutations=100, seed=42)
 
         # All should be reasonable

@@ -129,9 +129,7 @@ class TestCreateTearsheetBasic:
         with tempfile.TemporaryDirectory() as tmpdir:
             output_path = os.path.join(tmpdir, "test.html")
 
-            with patch(
-                "strategies.common.tearsheet.core._create_tearsheet_native"
-            ) as mock_create:
+            with patch("strategies.common.tearsheet.core._create_tearsheet_native") as mock_create:
                 mock_create.return_value = None
                 result = generate_tearsheet(mock_engine, output_path=output_path)
 
@@ -148,9 +146,7 @@ class TestCreateTearsheetBasic:
         with tempfile.TemporaryDirectory() as tmpdir:
             output_path = os.path.join(tmpdir, "test.html")
 
-            with patch(
-                "strategies.common.tearsheet.core._create_tearsheet_native"
-            ) as mock_create:
+            with patch("strategies.common.tearsheet.core._create_tearsheet_native") as mock_create:
                 mock_create.return_value = None
                 generate_tearsheet(mock_engine, output_path=output_path, config=config)
 
@@ -168,9 +164,7 @@ class TestTearsheetFileCreated:
         with tempfile.TemporaryDirectory() as tmpdir:
             output_path = os.path.join(tmpdir, "custom_name.html")
 
-            with patch(
-                "strategies.common.tearsheet.core._create_tearsheet_native"
-            ) as mock_create:
+            with patch("strategies.common.tearsheet.core._create_tearsheet_native") as mock_create:
                 # Simulate file creation
                 def create_file(*args, **kwargs):
                     Path(output_path).write_text("<html></html>")
@@ -341,9 +335,7 @@ class TestRegisterCustomChart:
         from strategies.common.tearsheet import register_custom_charts
 
         # This should not raise
-        with patch(
-            "strategies.common.tearsheet.custom_charts._register_chart"
-        ) as mock_reg:
+        with patch("strategies.common.tearsheet.custom_charts._register_chart") as mock_reg:
             register_custom_charts()
             # Verify registration was attempted
             assert mock_reg.call_count >= 0  # May not be called if already registered

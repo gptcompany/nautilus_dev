@@ -204,9 +204,7 @@ class AuditQuery:
             limit=50000,  # Higher limit for forensics
         )
 
-        logger.info(
-            f"Reconstructed {len(events)} events around incident at {incident_time}"
-        )
+        logger.info(f"Reconstructed {len(events)} events around incident at {incident_time}")
         return events
 
     def get_parameter_history(

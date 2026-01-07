@@ -149,9 +149,7 @@ def calculate_sharpe_difference(
 
     if abs(sharpe_b) < 1e-10:
         # Avoid division by zero
-        pct_diff = (
-            float("inf") if sharpe_a > 0 else float("-inf") if sharpe_a < 0 else 0.0
-        )
+        pct_diff = float("inf") if sharpe_a > 0 else float("-inf") if sharpe_a < 0 else 0.0
     else:
         pct_diff = (sharpe_a - sharpe_b) / abs(sharpe_b) * 100
 
@@ -349,9 +347,7 @@ def compare_contenders(
     avg_dd_b = sum(drawdowns_b) / n if drawdowns_b else 0.0
 
     # Calculate metrics
-    sharpe_diff, sharpe_diff_pct = calculate_sharpe_difference(
-        avg_sharpe_a, avg_sharpe_b
-    )
+    sharpe_diff, sharpe_diff_pct = calculate_sharpe_difference(avg_sharpe_a, avg_sharpe_b)
     win_loss = calculate_win_loss_ratio(returns_a, returns_b)
     t_stat, p_value = calculate_t_statistic(returns_a, returns_b)
 

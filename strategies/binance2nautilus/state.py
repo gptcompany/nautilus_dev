@@ -99,11 +99,7 @@ class ConversionState:
         available_files: list[str],
     ) -> list[str]:
         """Get list of files that haven't been processed yet."""
-        return [
-            f
-            for f in available_files
-            if not self.is_file_processed(symbol, data_type, f)
-        ]
+        return [f for f in available_files if not self.is_file_processed(symbol, data_type, f)]
 
     def to_dict(self) -> dict:
         """Convert to dictionary for JSON serialization."""

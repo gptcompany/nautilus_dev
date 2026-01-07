@@ -28,9 +28,7 @@ class TestBinanceCredentialsModel:
         """Default US should be False."""
         assert valid_binance_credentials.us is False
 
-    def test_testnet_from_credentials(
-        self, valid_binance_credentials: BinanceCredentials
-    ):
+    def test_testnet_from_credentials(self, valid_binance_credentials: BinanceCredentials):
         """Testnet should be set from credentials."""
         assert valid_binance_credentials.testnet is True
 
@@ -81,9 +79,7 @@ class TestBybitCredentialsModel:
 class TestBinanceDataClientConfig:
     """Tests for Binance data client config builder (T029)."""
 
-    def test_returns_data_client_config(
-        self, valid_binance_credentials: BinanceCredentials
-    ):
+    def test_returns_data_client_config(self, valid_binance_credentials: BinanceCredentials):
         """Builder should return a valid data client config."""
         config = build_binance_data_client_config(valid_binance_credentials)
         assert config is not None
@@ -113,9 +109,7 @@ class TestBinanceDataClientConfig:
 class TestBinanceExecClientConfig:
     """Tests for Binance exec client config builder (Spec 015 FR-001)."""
 
-    def test_returns_exec_client_config(
-        self, valid_binance_credentials: BinanceCredentials
-    ):
+    def test_returns_exec_client_config(self, valid_binance_credentials: BinanceCredentials):
         """Builder should return a valid exec client config."""
         config = build_binance_exec_client_config(valid_binance_credentials)
         assert config is not None
@@ -142,14 +136,10 @@ class TestBinanceExecClientConfig:
 
     def test_custom_max_retries(self, valid_binance_credentials: BinanceCredentials):
         """Config should accept custom max_retries."""
-        config = build_binance_exec_client_config(
-            valid_binance_credentials, max_retries=5
-        )
+        config = build_binance_exec_client_config(valid_binance_credentials, max_retries=5)
         assert config.max_retries == 5
 
-    def test_retry_delay_initial_ms(
-        self, valid_binance_credentials: BinanceCredentials
-    ):
+    def test_retry_delay_initial_ms(self, valid_binance_credentials: BinanceCredentials):
         """Config should have 500ms initial retry delay by default."""
         config = build_binance_exec_client_config(valid_binance_credentials)
         assert config.retry_delay_initial_ms == 500
@@ -192,9 +182,7 @@ class TestBinanceExecClientConfig:
         assert config.futures_margin_types is not None
         assert config.futures_margin_types["BTCUSDT"] == BinanceFuturesMarginType.CROSS
 
-    def test_futures_margin_types_isolated(
-        self, valid_binance_credentials: BinanceCredentials
-    ):
+    def test_futures_margin_types_isolated(self, valid_binance_credentials: BinanceCredentials):
         """Config should support ISOLATED margin type."""
         from nautilus_trader.adapters.binance.futures.enums import (
             BinanceFuturesMarginType,
@@ -204,13 +192,9 @@ class TestBinanceExecClientConfig:
             valid_binance_credentials,
             futures_margin_types={"ETHUSDT": "ISOLATED"},
         )
-        assert (
-            config.futures_margin_types["ETHUSDT"] == BinanceFuturesMarginType.ISOLATED
-        )
+        assert config.futures_margin_types["ETHUSDT"] == BinanceFuturesMarginType.ISOLATED
 
-    def test_none_futures_config_by_default(
-        self, valid_binance_credentials: BinanceCredentials
-    ):
+    def test_none_futures_config_by_default(self, valid_binance_credentials: BinanceCredentials):
         """Futures config should be None by default."""
         config = build_binance_exec_client_config(valid_binance_credentials)
         assert config.futures_leverages is None
@@ -220,9 +204,7 @@ class TestBinanceExecClientConfig:
 class TestBybitDataClientConfig:
     """Tests for Bybit data client config builder (T030)."""
 
-    def test_returns_data_client_config(
-        self, valid_bybit_credentials: BybitCredentials
-    ):
+    def test_returns_data_client_config(self, valid_bybit_credentials: BybitCredentials):
         """Builder should return a valid data client config."""
         config = build_bybit_data_client_config(valid_bybit_credentials)
         assert config is not None
@@ -246,9 +228,7 @@ class TestBybitDataClientConfig:
 class TestBybitExecClientConfig:
     """Tests for Bybit exec client config builder (T030)."""
 
-    def test_returns_exec_client_config(
-        self, valid_bybit_credentials: BybitCredentials
-    ):
+    def test_returns_exec_client_config(self, valid_bybit_credentials: BybitCredentials):
         """Builder should return a valid exec client config."""
         config = build_bybit_exec_client_config(valid_bybit_credentials)
         assert config is not None

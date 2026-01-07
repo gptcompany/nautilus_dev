@@ -125,27 +125,21 @@ class TestStateTransitions:
         """Circuit breaker should start in ACTIVE state."""
         assert circuit_breaker.state == CircuitBreakerState.ACTIVE
 
-    def test_transition_to_warning_at_10_percent(
-        self, circuit_breaker: CircuitBreaker
-    ) -> None:
+    def test_transition_to_warning_at_10_percent(self, circuit_breaker: CircuitBreaker) -> None:
         """Should transition to WARNING at 10% drawdown."""
         circuit_breaker.set_initial_equity(Decimal("100000"))
         circuit_breaker.update(equity=Decimal("90000"))  # 10% drawdown
 
         assert circuit_breaker.state == CircuitBreakerState.WARNING
 
-    def test_transition_to_reducing_at_15_percent(
-        self, circuit_breaker: CircuitBreaker
-    ) -> None:
+    def test_transition_to_reducing_at_15_percent(self, circuit_breaker: CircuitBreaker) -> None:
         """Should transition to REDUCING at 15% drawdown."""
         circuit_breaker.set_initial_equity(Decimal("100000"))
         circuit_breaker.update(equity=Decimal("85000"))  # 15% drawdown
 
         assert circuit_breaker.state == CircuitBreakerState.REDUCING
 
-    def test_transition_to_halted_at_20_percent(
-        self, circuit_breaker: CircuitBreaker
-    ) -> None:
+    def test_transition_to_halted_at_20_percent(self, circuit_breaker: CircuitBreaker) -> None:
         """Should transition to HALTED at 20% drawdown."""
         circuit_breaker.set_initial_equity(Decimal("100000"))
         circuit_breaker.update(equity=Decimal("80000"))  # 20% drawdown
@@ -179,9 +173,7 @@ class TestStateTransitions:
 class TestRecoveryTransitions:
     """T008: Unit test for recovery transitions."""
 
-    def test_recovery_from_warning_to_active(
-        self, circuit_breaker: CircuitBreaker
-    ) -> None:
+    def test_recovery_from_warning_to_active(self, circuit_breaker: CircuitBreaker) -> None:
         """Should recover from WARNING to ACTIVE when below recovery threshold."""
         circuit_breaker.set_initial_equity(Decimal("100000"))
 
@@ -193,9 +185,7 @@ class TestRecoveryTransitions:
         circuit_breaker.update(equity=Decimal("96000"))  # 4% drawdown
         assert circuit_breaker.state == CircuitBreakerState.ACTIVE
 
-    def test_recovery_from_reducing_to_active(
-        self, circuit_breaker: CircuitBreaker
-    ) -> None:
+    def test_recovery_from_reducing_to_active(self, circuit_breaker: CircuitBreaker) -> None:
         """Should recover from REDUCING to ACTIVE when below recovery threshold."""
         circuit_breaker.set_initial_equity(Decimal("100000"))
 
@@ -207,9 +197,7 @@ class TestRecoveryTransitions:
         circuit_breaker.update(equity=Decimal("96000"))  # 4% drawdown
         assert circuit_breaker.state == CircuitBreakerState.ACTIVE
 
-    def test_halted_requires_manual_reset(
-        self, circuit_breaker: CircuitBreaker
-    ) -> None:
+    def test_halted_requires_manual_reset(self, circuit_breaker: CircuitBreaker) -> None:
         """HALTED state should NOT auto-recover when auto_recovery=False."""
         circuit_breaker.set_initial_equity(Decimal("100000"))
 
@@ -258,9 +246,7 @@ class TestCanOpenPosition:
         assert circuit_breaker.state == CircuitBreakerState.WARNING
         assert circuit_breaker.can_open_position() is True
 
-    def test_cannot_open_in_reducing_state(
-        self, circuit_breaker: CircuitBreaker
-    ) -> None:
+    def test_cannot_open_in_reducing_state(self, circuit_breaker: CircuitBreaker) -> None:
         """Should NOT allow positions in REDUCING state."""
         circuit_breaker.set_initial_equity(Decimal("100000"))
         circuit_breaker.update(equity=Decimal("85000"))  # 15% drawdown
@@ -290,9 +276,7 @@ class TestPositionSizeMultiplier:
 
         assert circuit_breaker.position_size_multiplier() == Decimal("1.0")
 
-    def test_reduced_size_in_warning_state(
-        self, circuit_breaker: CircuitBreaker
-    ) -> None:
+    def test_reduced_size_in_warning_state(self, circuit_breaker: CircuitBreaker) -> None:
         """Should return 0.5 (50%) in WARNING state."""
         circuit_breaker.set_initial_equity(Decimal("100000"))
         circuit_breaker.update(equity=Decimal("90000"))  # 10% drawdown
@@ -313,9 +297,7 @@ class TestPositionSizeMultiplier:
 
         assert circuit_breaker.position_size_multiplier() == Decimal("0.0")
 
-    def test_custom_warning_multiplier(
-        self, default_config: CircuitBreakerConfig
-    ) -> None:
+    def test_custom_warning_multiplier(self, default_config: CircuitBreakerConfig) -> None:
         """Should respect custom warning_size_multiplier."""
         config = CircuitBreakerConfig(
             level1_drawdown_pct=Decimal("0.10"),
@@ -394,9 +376,7 @@ class TestEdgeCases:
 
         assert circuit_breaker.state == CircuitBreakerState.HALTED
 
-    def test_recovery_oscillation_near_threshold(
-        self, circuit_breaker: CircuitBreaker
-    ) -> None:
+    def test_recovery_oscillation_near_threshold(self, circuit_breaker: CircuitBreaker) -> None:
         """Should handle oscillation near threshold (hysteresis test)."""
         circuit_breaker.set_initial_equity(Decimal("100000"))
 
@@ -471,9 +451,7 @@ class TestProperties:
 class TestCircuitBreakerActorInitialization:
     """T016: Unit test for CircuitBreakerActor initialization."""
 
-    def test_actor_initializes_with_config(
-        self, default_config: CircuitBreakerConfig
-    ) -> None:
+    def test_actor_initializes_with_config(self, default_config: CircuitBreakerConfig) -> None:
         """Actor should initialize with config and circuit breaker."""
         from risk.circuit_breaker_actor import CircuitBreakerActor
 
@@ -482,9 +460,7 @@ class TestCircuitBreakerActorInitialization:
         assert actor.circuit_breaker is not None
         assert actor.circuit_breaker.config == default_config
 
-    def test_actor_starts_in_active_state(
-        self, default_config: CircuitBreakerConfig
-    ) -> None:
+    def test_actor_starts_in_active_state(self, default_config: CircuitBreakerConfig) -> None:
         """Actor should start with circuit breaker in ACTIVE state."""
         from risk.circuit_breaker_actor import CircuitBreakerActor
 
@@ -496,9 +472,7 @@ class TestCircuitBreakerActorInitialization:
 class TestCircuitBreakerActorAccountHandler:
     """T017: Unit test for on_account_state handler."""
 
-    def test_updates_equity_on_account_state(
-        self, default_config: CircuitBreakerConfig
-    ) -> None:
+    def test_updates_equity_on_account_state(self, default_config: CircuitBreakerConfig) -> None:
         """Should update circuit breaker equity when account state received."""
         from unittest.mock import MagicMock
 
@@ -518,9 +492,7 @@ class TestCircuitBreakerActorAccountHandler:
         assert actor.circuit_breaker.current_equity == Decimal("90000")
         assert actor.circuit_breaker.state == CircuitBreakerState.WARNING
 
-    def test_transitions_state_on_drawdown(
-        self, default_config: CircuitBreakerConfig
-    ) -> None:
+    def test_transitions_state_on_drawdown(self, default_config: CircuitBreakerConfig) -> None:
         """Should transition state based on drawdown from account updates."""
         from unittest.mock import MagicMock
 
@@ -543,9 +515,7 @@ class TestCircuitBreakerActorAccountHandler:
 class TestCircuitBreakerActorTimerCheck:
     """T018: Unit test for periodic timer check."""
 
-    def test_timer_check_updates_state(
-        self, default_config: CircuitBreakerConfig
-    ) -> None:
+    def test_timer_check_updates_state(self, default_config: CircuitBreakerConfig) -> None:
         """Periodic timer check should update circuit breaker state."""
         from risk.circuit_breaker_actor import CircuitBreakerActor
 

@@ -61,9 +61,7 @@ class TestBuildLoggingConfig:
 class TestBuildRiskEngineConfig:
     """Tests for build_risk_engine_config function."""
 
-    def test_returns_risk_engine_config(
-        self, valid_trading_node_settings: TradingNodeSettings
-    ):
+    def test_returns_risk_engine_config(self, valid_trading_node_settings: TradingNodeSettings):
         """build_risk_engine_config should return a LiveRiskEngineConfig."""
         config = build_risk_engine_config(valid_trading_node_settings)
         assert config is not None
@@ -76,18 +74,13 @@ class TestBuildRiskEngineConfig:
     def test_uses_rate_limits(self, valid_trading_node_settings: TradingNodeSettings):
         """Config should use rate limits from settings."""
         config = build_risk_engine_config(valid_trading_node_settings)
-        assert (
-            config.max_order_submit_rate
-            == valid_trading_node_settings.max_order_submit_rate
-        )
+        assert config.max_order_submit_rate == valid_trading_node_settings.max_order_submit_rate
 
 
 class TestBuildStreamingConfig:
     """Tests for build_streaming_config function."""
 
-    def test_returns_streaming_config(
-        self, valid_streaming_settings: StreamingSettings
-    ):
+    def test_returns_streaming_config(self, valid_streaming_settings: StreamingSettings):
         """build_streaming_config should return a StreamingConfig."""
         config = build_streaming_config(valid_streaming_settings)
         assert config is not None

@@ -65,12 +65,8 @@ class TestFetchOIAllExchanges:
             patch.object(fetchers[1], "_exchange", create=True) as mock_bybit,
             patch.object(fetchers[2], "_exchange", create=True) as mock_hyperliquid,
         ):
-            mock_binance.fetch_open_interest = AsyncMock(
-                return_value=mock_oi_responses["binance"]
-            )
-            mock_bybit.fetch_open_interest = AsyncMock(
-                return_value=mock_oi_responses["bybit"]
-            )
+            mock_binance.fetch_open_interest = AsyncMock(return_value=mock_oi_responses["binance"])
+            mock_bybit.fetch_open_interest = AsyncMock(return_value=mock_oi_responses["bybit"])
             mock_hyperliquid.fetch_open_interest = AsyncMock(
                 return_value=mock_oi_responses["hyperliquid"]
             )
@@ -123,9 +119,7 @@ class TestFetchOIAllExchanges:
             patch.object(fetchers[1], "_exchange", create=True) as mock_bybit,
         ):
             mock_binance.fetch_open_interest = AsyncMock(return_value=success_response)
-            mock_bybit.fetch_open_interest = AsyncMock(
-                side_effect=Exception("Rate limit exceeded")
-            )
+            mock_bybit.fetch_open_interest = AsyncMock(side_effect=Exception("Rate limit exceeded"))
 
             orchestrator._connected = True
             results = await orchestrator.fetch_open_interest("BTCUSDT-PERP")
@@ -249,12 +243,8 @@ class TestFetchAndStore:
             patch.object(fetchers[0], "_exchange", create=True) as mock_binance,
             patch.object(fetchers[1], "_exchange", create=True) as mock_bybit,
         ):
-            mock_binance.fetch_open_interest = AsyncMock(
-                return_value=mock_responses["binance"]
-            )
-            mock_bybit.fetch_open_interest = AsyncMock(
-                return_value=mock_responses["bybit"]
-            )
+            mock_binance.fetch_open_interest = AsyncMock(return_value=mock_responses["binance"])
+            mock_bybit.fetch_open_interest = AsyncMock(return_value=mock_responses["bybit"])
 
             orchestrator._connected = True
             results = await orchestrator.fetch_open_interest("BTCUSDT-PERP")
@@ -395,12 +385,8 @@ class TestFundingRateStorage:
             patch.object(fetchers[0], "_exchange", create=True) as mock_binance,
             patch.object(fetchers[1], "_exchange", create=True) as mock_bybit,
         ):
-            mock_binance.fetch_funding_rate = AsyncMock(
-                return_value=mock_responses["binance"]
-            )
-            mock_bybit.fetch_funding_rate = AsyncMock(
-                return_value=mock_responses["bybit"]
-            )
+            mock_binance.fetch_funding_rate = AsyncMock(return_value=mock_responses["binance"])
+            mock_bybit.fetch_funding_rate = AsyncMock(return_value=mock_responses["bybit"])
 
             orchestrator._connected = True
             results = await orchestrator.fetch_funding_rate("BTCUSDT-PERP")
@@ -445,16 +431,12 @@ class TestFundingRateStorage:
         fetcher._exchange = AsyncMock()
 
         with patch.object(fetcher, "_exchange", create=True) as mock_exchange:
-            mock_exchange.fetch_funding_rate_history = AsyncMock(
-                side_effect=[mock_history, []]
-            )
+            mock_exchange.fetch_funding_rate_history = AsyncMock(side_effect=[mock_history, []])
 
             start = datetime.fromtimestamp(base_ts / 1000, tz=timezone.utc)
             end = datetime.now(timezone.utc)
 
-            results = await fetcher.fetch_funding_rate_history(
-                "BTCUSDT-PERP", start, end
-            )
+            results = await fetcher.fetch_funding_rate_history("BTCUSDT-PERP", start, end)
 
             assert len(results) == 3
 

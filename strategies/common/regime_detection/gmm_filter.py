@@ -87,8 +87,7 @@ class GMMVolatilityFilter:
         """
         if len(volatility) < self.min_samples:
             raise ValueError(
-                f"Insufficient data: {len(volatility)} samples, "
-                f"minimum {self.min_samples} required"
+                f"Insufficient data: {len(volatility)} samples, minimum {self.min_samples} required"
             )
 
         # Reshape to 2D for sklearn

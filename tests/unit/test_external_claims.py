@@ -6,7 +6,6 @@ Tests cover:
 - T028: claim_all/instrument_ids mutual exclusion
 """
 
-
 import pytest
 
 from config.reconciliation.external_claims import ExternalOrderClaimConfig

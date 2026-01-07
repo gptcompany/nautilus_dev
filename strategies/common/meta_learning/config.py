@@ -31,26 +31,14 @@ class MetaModelConfig(BaseModel):
         ... )
     """
 
-    n_estimators: int = Field(
-        default=100, ge=10, le=1000, description="Number of trees"
-    )
-    max_depth: int | None = Field(
-        default=5, ge=1, le=20, description="Maximum tree depth"
-    )
-    min_samples_split: int = Field(
-        default=10, ge=2, description="Minimum samples to split"
-    )
-    min_samples_leaf: int = Field(
-        default=5, ge=1, description="Minimum samples per leaf"
-    )
+    n_estimators: int = Field(default=100, ge=10, le=1000, description="Number of trees")
+    max_depth: int | None = Field(default=5, ge=1, le=20, description="Maximum tree depth")
+    min_samples_split: int = Field(default=10, ge=2, description="Minimum samples to split")
+    min_samples_leaf: int = Field(default=5, ge=1, description="Minimum samples per leaf")
     random_state: int = Field(default=42, description="Random seed")
     n_jobs: int = Field(default=-1, description="Parallel jobs (-1 = all cores)")
-    default_confidence: float = Field(
-        default=0.5, ge=0.0, le=1.0, description="Default confidence"
-    )
-    min_training_samples: int = Field(
-        default=100, ge=20, description="Minimum training samples"
-    )
+    default_confidence: float = Field(default=0.5, ge=0.0, le=1.0, description="Default confidence")
+    min_training_samples: int = Field(default=100, ge=20, description="Minimum training samples")
 
     model_config = {"frozen": True}
 
@@ -76,12 +64,8 @@ class WalkForwardConfig(BaseModel):
         ... )
     """
 
-    train_window: int = Field(
-        default=252, ge=50, le=1000, description="Training window (bars)"
-    )
-    test_window: int = Field(
-        default=63, ge=10, le=252, description="Test window (bars)"
-    )
+    train_window: int = Field(default=252, ge=50, le=1000, description="Training window (bars)")
+    test_window: int = Field(default=63, ge=10, le=252, description="Test window (bars)")
     step_size: int = Field(default=21, ge=1, le=63, description="Step size (bars)")
     embargo_size: int = Field(default=5, ge=0, le=20, description="Embargo gap (bars)")
 

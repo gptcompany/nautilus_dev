@@ -83,10 +83,7 @@ class TestPositionReconciliation:
 
         assert len(reconciled) == 0
         assert len(discrepancies) == 1
-        assert (
-            "missing" in discrepancies[0].lower()
-            or "closed" in discrepancies[0].lower()
-        )
+        assert "missing" in discrepancies[0].lower() or "closed" in discrepancies[0].lower()
 
     def test_reconcile_position_missing_in_cache(self, mock_cache):
         """Test reconciliation detects position missing in cache (external position)."""

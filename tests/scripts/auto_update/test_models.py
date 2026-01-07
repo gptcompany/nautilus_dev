@@ -153,9 +153,7 @@ class TestBreakingChange:
         assert bc.affected_pattern == ""
         assert bc.migration_guide is None
 
-    def test_breaking_change_critical(
-        self, sample_breaking_change_critical: BreakingChange
-    ):
+    def test_breaking_change_critical(self, sample_breaking_change_critical: BreakingChange):
         """Test critical breaking change."""
         assert sample_breaking_change_critical.severity == Severity.CRITICAL
         assert sample_breaking_change_critical.migration_guide is None
@@ -171,16 +169,12 @@ class TestAffectedFile:
 
     def test_create_affected_file(self, sample_affected_file: AffectedFile):
         """Test creating AffectedFile from fixture."""
-        assert sample_affected_file.path == Path(
-            "strategies/production/btc_momentum.py"
-        )
+        assert sample_affected_file.path == Path("strategies/production/btc_momentum.py")
         assert sample_affected_file.line_numbers == [45, 78]
         assert sample_affected_file.can_auto_fix is True
         assert sample_affected_file.fix_type == "method_rename"
 
-    def test_affected_file_not_fixable(
-        self, sample_breaking_change_critical: BreakingChange
-    ):
+    def test_affected_file_not_fixable(self, sample_breaking_change_critical: BreakingChange):
         """Test AffectedFile that cannot be auto-fixed."""
         af = AffectedFile(
             path=Path("strategies/core.py"),
@@ -361,9 +355,7 @@ class TestAutoUpdateConfig:
     def test_default_config(self):
         """Test default configuration values."""
         config = AutoUpdateConfig()
-        assert config.changelog_path == Path(
-            "docs/nautilus/nautilus-trader-changelog.json"
-        )
+        assert config.changelog_path == Path("docs/nautilus/nautilus-trader-changelog.json")
         assert len(config.source_dirs) == 3
         assert config.auto_merge_threshold == 85
         assert config.delayed_merge_threshold == 65

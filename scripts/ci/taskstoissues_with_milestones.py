@@ -82,11 +82,7 @@ def parse_tasks_file(file_path: Path) -> tuple[list[UserStory], list[Task]]:
             description = ""
             for j in range(i, min(i + 5, len(lines))):
                 next_line = lines[j].strip()
-                if (
-                    next_line
-                    and not next_line.startswith("#")
-                    and not next_line.startswith("-")
-                ):
+                if next_line and not next_line.startswith("#") and not next_line.startswith("-"):
                     description = next_line
                     break
 
@@ -200,9 +196,7 @@ def get_existing_issues() -> dict[str, int]:
     return issues
 
 
-def create_milestone(
-    story: UserStory, spec_dir: str, dry_run: bool = False
-) -> int | None:
+def create_milestone(story: UserStory, spec_dir: str, dry_run: bool = False) -> int | None:
     """Create a GitHub milestone for a user story."""
     title = f"{story.id}: {story.title}"
     description = f"{story.description}\n\nSpec: {spec_dir}"

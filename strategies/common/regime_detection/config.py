@@ -56,16 +56,12 @@ class BOCDConfig(BaseModel):
         ... )
     """
 
-    hazard_rate: float = Field(
-        default=0.004, gt=0.0, lt=1.0, description="P(changepoint) per step"
-    )
+    hazard_rate: float = Field(default=0.004, gt=0.0, lt=1.0, description="P(changepoint) per step")
     mu0: float = Field(default=0.0, description="Prior mean")
     kappa0: float = Field(default=1.0, gt=0.0, description="Prior precision weight")
     alpha0: float = Field(default=1.0, gt=0.0, description="Prior shape (df/2)")
     beta0: float = Field(default=1.0, gt=0.0, description="Prior scale")
-    max_run_length: int = Field(
-        default=500, ge=100, description="Maximum tracked run length"
-    )
+    max_run_length: int = Field(default=500, ge=100, description="Maximum tracked run length")
     detection_threshold: float = Field(
         default=0.8, ge=0.0, le=1.0, description="Changepoint detection threshold"
     )

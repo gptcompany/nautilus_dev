@@ -111,9 +111,7 @@ class BaseConverter(ABC):
             return all_files
 
         all_filenames = [f.name for f in all_files]
-        pending_filenames = self.state.get_pending_files(
-            self.symbol, self.data_type, all_filenames
-        )
+        pending_filenames = self.state.get_pending_files(self.symbol, self.data_type, all_filenames)
         return [f for f in all_files if f.name in pending_filenames]
 
     def process_file(self, file_path: Path) -> list[Any]:

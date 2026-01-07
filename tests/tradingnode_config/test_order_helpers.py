@@ -101,9 +101,7 @@ class TestCreateMarketOrder:
 
     def test_creates_market_order(self, order_factory, instrument_id, quantity):
         """Should create a valid market order."""
-        order = create_market_order(
-            order_factory, instrument_id, OrderSide.BUY, quantity
-        )
+        order = create_market_order(order_factory, instrument_id, OrderSide.BUY, quantity)
         assert order is not None
         assert order.instrument_id == instrument_id
         assert order.side == OrderSide.BUY
@@ -111,23 +109,17 @@ class TestCreateMarketOrder:
 
     def test_buy_side(self, order_factory, instrument_id, quantity):
         """Should create buy order."""
-        order = create_market_order(
-            order_factory, instrument_id, OrderSide.BUY, quantity
-        )
+        order = create_market_order(order_factory, instrument_id, OrderSide.BUY, quantity)
         assert order.side == OrderSide.BUY
 
     def test_sell_side(self, order_factory, instrument_id, quantity):
         """Should create sell order."""
-        order = create_market_order(
-            order_factory, instrument_id, OrderSide.SELL, quantity
-        )
+        order = create_market_order(order_factory, instrument_id, OrderSide.SELL, quantity)
         assert order.side == OrderSide.SELL
 
     def test_reduce_only_default_false(self, order_factory, instrument_id, quantity):
         """Should default reduce_only to False."""
-        order = create_market_order(
-            order_factory, instrument_id, OrderSide.BUY, quantity
-        )
+        order = create_market_order(order_factory, instrument_id, OrderSide.BUY, quantity)
         assert order.is_reduce_only is False
 
     def test_reduce_only_true(self, order_factory, instrument_id, quantity):
@@ -150,20 +142,14 @@ class TestCreateLimitOrder:
 
     def test_creates_limit_order(self, order_factory, instrument_id, quantity, price):
         """Should create a valid limit order."""
-        order = create_limit_order(
-            order_factory, instrument_id, OrderSide.BUY, quantity, price
-        )
+        order = create_limit_order(order_factory, instrument_id, OrderSide.BUY, quantity, price)
         assert order is not None
         assert order.instrument_id == instrument_id
         assert order.price == price
 
-    def test_post_only_default_false(
-        self, order_factory, instrument_id, quantity, price
-    ):
+    def test_post_only_default_false(self, order_factory, instrument_id, quantity, price):
         """Should default post_only to False."""
-        order = create_limit_order(
-            order_factory, instrument_id, OrderSide.BUY, quantity, price
-        )
+        order = create_limit_order(order_factory, instrument_id, OrderSide.BUY, quantity, price)
         assert order.is_post_only is False
 
     def test_post_only_true(self, order_factory, instrument_id, quantity, price):
@@ -178,13 +164,9 @@ class TestCreateLimitOrder:
         )
         assert order.is_post_only is True
 
-    def test_time_in_force_default_gtc(
-        self, order_factory, instrument_id, quantity, price
-    ):
+    def test_time_in_force_default_gtc(self, order_factory, instrument_id, quantity, price):
         """Should default time_in_force to GTC."""
-        order = create_limit_order(
-            order_factory, instrument_id, OrderSide.BUY, quantity, price
-        )
+        order = create_limit_order(order_factory, instrument_id, OrderSide.BUY, quantity, price)
         assert order.time_in_force == TimeInForce.GTC
 
     def test_custom_time_in_force(self, order_factory, instrument_id, quantity, price):
@@ -203,9 +185,7 @@ class TestCreateLimitOrder:
 class TestCreateStopMarketOrder:
     """Tests for create_stop_market_order function (Algo Order API)."""
 
-    def test_creates_stop_market_order(
-        self, order_factory, instrument_id, quantity, trigger_price
-    ):
+    def test_creates_stop_market_order(self, order_factory, instrument_id, quantity, trigger_price):
         """Should create a valid stop-market order."""
         order = create_stop_market_order(
             order_factory, instrument_id, OrderSide.SELL, quantity, trigger_price
@@ -223,9 +203,7 @@ class TestCreateStopMarketOrder:
         )
         assert order.trigger_type == TriggerType.LAST_PRICE
 
-    def test_custom_trigger_type(
-        self, order_factory, instrument_id, quantity, trigger_price
-    ):
+    def test_custom_trigger_type(self, order_factory, instrument_id, quantity, trigger_price):
         """Should accept custom trigger_type."""
         order = create_stop_market_order(
             order_factory,
@@ -237,9 +215,7 @@ class TestCreateStopMarketOrder:
         )
         assert order.trigger_type == TriggerType.MARK_PRICE
 
-    def test_reduce_only_for_stop_loss(
-        self, order_factory, instrument_id, quantity, trigger_price
-    ):
+    def test_reduce_only_for_stop_loss(self, order_factory, instrument_id, quantity, trigger_price):
         """Stop-loss should support reduce_only."""
         order = create_stop_market_order(
             order_factory,
@@ -266,9 +242,7 @@ class TestCreateStopLimitOrder:
         assert order.price == price
         assert order.trigger_price == trigger_price
 
-    def test_post_only(
-        self, order_factory, instrument_id, quantity, price, trigger_price
-    ):
+    def test_post_only(self, order_factory, instrument_id, quantity, price, trigger_price):
         """Should support post_only for maker orders."""
         order = create_stop_limit_order(
             order_factory,

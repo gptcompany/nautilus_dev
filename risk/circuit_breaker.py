@@ -188,9 +188,7 @@ class CircuitBreaker:
         if self._config.auto_recovery:
             raise ValueError("Cannot manually reset when auto_recovery is enabled")
         if self._state != CircuitBreakerState.HALTED:
-            raise ValueError(
-                f"Cannot reset from state {self._state.value}, only from HALTED"
-            )
+            raise ValueError(f"Cannot reset from state {self._state.value}, only from HALTED")
         self._state = CircuitBreakerState.ACTIVE
         self._last_check = datetime.now(timezone.utc)
 
@@ -231,10 +229,7 @@ class CircuitBreaker:
             self._state = CircuitBreakerState.WARNING
         elif self._state == CircuitBreakerState.HALTED:
             # Recovery from HALTED requires manual reset OR auto_recovery
-            if (
-                self._config.auto_recovery
-                and drawdown <= self._config.recovery_drawdown_pct
-            ):
+            if self._config.auto_recovery and drawdown <= self._config.recovery_drawdown_pct:
                 self._state = CircuitBreakerState.ACTIVE
             # else: stay HALTED until manual reset()
         else:

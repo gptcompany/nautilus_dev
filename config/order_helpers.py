@@ -82,9 +82,7 @@ def validate_order_params(
         If any parameter is invalid.
     """
     if not isinstance(instrument_id, InstrumentId):
-        raise ValueError(
-            f"instrument_id must be InstrumentId, got {type(instrument_id)}"
-        )
+        raise ValueError(f"instrument_id must be InstrumentId, got {type(instrument_id)}")
 
     if not isinstance(side, OrderSide):
         raise ValueError(f"side must be OrderSide, got {type(side)}")
@@ -337,9 +335,7 @@ def create_stop_limit_order(
     ...     Price.from_str("40000"),   # Trigger price
     ... )
     """
-    validate_order_params(
-        instrument_id, side, quantity, price=price, trigger_price=trigger_price
-    )
+    validate_order_params(instrument_id, side, quantity, price=price, trigger_price=trigger_price)
 
     return order_factory.stop_limit(
         instrument_id=instrument_id,

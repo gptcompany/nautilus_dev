@@ -417,9 +417,7 @@ class TestProgressEventEmission:
         assert ProgressEventType.EVOLUTION_COMPLETE in event_types
 
     @pytest.mark.asyncio
-    async def test_progress_events_have_correct_structure(
-        self, controller: EvolutionController
-    ):
+    async def test_progress_events_have_correct_structure(self, controller: EvolutionController):
         """Progress events have expected fields."""
         events: list[ProgressEvent] = []
 

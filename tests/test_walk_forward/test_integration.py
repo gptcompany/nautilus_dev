@@ -151,9 +151,7 @@ class TestEdgeCases:
 
         # Verify no gap between train and test
         for window_result in result.windows:
-            gap = (
-                window_result.window.test_start - window_result.window.train_end
-            ).days
+            gap = (window_result.window.test_start - window_result.window.train_end).days
             assert gap == 0
 
     @pytest.mark.asyncio
@@ -175,9 +173,7 @@ class TestEdgeCases:
 
         # Verify embargo applied
         for window_result in result.windows:
-            gap = (
-                window_result.window.test_start - window_result.window.train_end
-            ).days
+            gap = (window_result.window.test_start - window_result.window.train_end).days
             assert gap == 30
 
 

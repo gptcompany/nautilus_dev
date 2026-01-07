@@ -31,6 +31,7 @@ def main():
     # Test with redis-py if available
     try:
         import redis
+
         r = redis.Redis(host=host, port=port, decode_responses=True)
 
         # Write test position

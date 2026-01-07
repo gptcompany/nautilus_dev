@@ -108,15 +108,9 @@ class TestBalanceLoading:
         from strategies.common.recovery.provider import PositionRecoveryProvider
 
         mock_balances = [
-            create_mock_account_balance(
-                currency="USDT", total=Decimal("10000.00")
-            ),
-            create_mock_account_balance(
-                currency="BTC", total=Decimal("1.5")
-            ),
-            create_mock_account_balance(
-                currency="ETH", total=Decimal("25.0")
-            ),
+            create_mock_account_balance(currency="USDT", total=Decimal("10000.00")),
+            create_mock_account_balance(currency="BTC", total=Decimal("1.5")),
+            create_mock_account_balance(currency="ETH", total=Decimal("25.0")),
         ]
         mock_account = create_mock_account(balances=mock_balances)
         mock_cache.account.return_value = mock_account
@@ -183,12 +177,8 @@ class TestBalanceReconciliation:
         """Test reconciliation when balances match."""
         from strategies.common.recovery.provider import PositionRecoveryProvider
 
-        cached_balance = create_mock_account_balance(
-            currency="USDT", total=Decimal("10000.00")
-        )
-        exchange_balance = create_mock_account_balance(
-            currency="USDT", total=Decimal("10000.00")
-        )
+        cached_balance = create_mock_account_balance(currency="USDT", total=Decimal("10000.00"))
+        exchange_balance = create_mock_account_balance(currency="USDT", total=Decimal("10000.00"))
 
         provider = PositionRecoveryProvider(cache=mock_cache)
         reconciled, changes = provider.reconcile_balances(
@@ -203,12 +193,8 @@ class TestBalanceReconciliation:
         """Test reconciliation detects total balance mismatch."""
         from strategies.common.recovery.provider import PositionRecoveryProvider
 
-        cached_balance = create_mock_account_balance(
-            currency="USDT", total=Decimal("10000.00")
-        )
-        exchange_balance = create_mock_account_balance(
-            currency="USDT", total=Decimal("9500.00")
-        )
+        cached_balance = create_mock_account_balance(currency="USDT", total=Decimal("10000.00"))
+        exchange_balance = create_mock_account_balance(currency="USDT", total=Decimal("9500.00"))
 
         provider = PositionRecoveryProvider(cache=mock_cache)
         reconciled, changes = provider.reconcile_balances(
@@ -250,16 +236,10 @@ class TestBalanceReconciliation:
         """Test reconciliation detects new currency on exchange."""
         from strategies.common.recovery.provider import PositionRecoveryProvider
 
-        cached_balance = create_mock_account_balance(
-            currency="USDT", total=Decimal("10000.00")
-        )
+        cached_balance = create_mock_account_balance(currency="USDT", total=Decimal("10000.00"))
         exchange_balances = [
-            create_mock_account_balance(
-                currency="USDT", total=Decimal("10000.00")
-            ),
-            create_mock_account_balance(
-                currency="BTC", total=Decimal("0.5")
-            ),
+            create_mock_account_balance(currency="USDT", total=Decimal("10000.00")),
+            create_mock_account_balance(currency="BTC", total=Decimal("0.5")),
         ]
 
         provider = PositionRecoveryProvider(cache=mock_cache)
@@ -278,16 +258,10 @@ class TestBalanceReconciliation:
         from strategies.common.recovery.provider import PositionRecoveryProvider
 
         cached_balances = [
-            create_mock_account_balance(
-                currency="USDT", total=Decimal("10000.00")
-            ),
-            create_mock_account_balance(
-                currency="BTC", total=Decimal("0.5")
-            ),
+            create_mock_account_balance(currency="USDT", total=Decimal("10000.00")),
+            create_mock_account_balance(currency="BTC", total=Decimal("0.5")),
         ]
-        exchange_balance = create_mock_account_balance(
-            currency="USDT", total=Decimal("10000.00")
-        )
+        exchange_balance = create_mock_account_balance(currency="USDT", total=Decimal("10000.00"))
 
         provider = PositionRecoveryProvider(cache=mock_cache)
         reconciled, changes = provider.reconcile_balances(
@@ -304,9 +278,7 @@ class TestBalanceReconciliation:
         """Test reconciliation when cached balances are empty."""
         from strategies.common.recovery.provider import PositionRecoveryProvider
 
-        exchange_balance = create_mock_account_balance(
-            currency="USDT", total=Decimal("10000.00")
-        )
+        exchange_balance = create_mock_account_balance(currency="USDT", total=Decimal("10000.00"))
 
         provider = PositionRecoveryProvider(cache=mock_cache)
         reconciled, changes = provider.reconcile_balances(
@@ -321,9 +293,7 @@ class TestBalanceReconciliation:
         """Test reconciliation when exchange has no balances."""
         from strategies.common.recovery.provider import PositionRecoveryProvider
 
-        cached_balance = create_mock_account_balance(
-            currency="USDT", total=Decimal("10000.00")
-        )
+        cached_balance = create_mock_account_balance(currency="USDT", total=Decimal("10000.00"))
 
         provider = PositionRecoveryProvider(cache=mock_cache)
         reconciled, changes = provider.reconcile_balances(
@@ -338,11 +308,10 @@ class TestBalanceReconciliation:
         """Test that exchange balances are returned as reconciled."""
         from strategies.common.recovery.provider import PositionRecoveryProvider
 
-        cached_balance = create_mock_account_balance(
-            currency="USDT", total=Decimal("10000.00")
-        )
+        cached_balance = create_mock_account_balance(currency="USDT", total=Decimal("10000.00"))
         exchange_balance = create_mock_account_balance(
-            currency="USDT", total=Decimal("15000.00")  # Different!
+            currency="USDT",
+            total=Decimal("15000.00"),  # Different!
         )
 
         provider = PositionRecoveryProvider(cache=mock_cache)
@@ -360,19 +329,17 @@ class TestBalanceReconciliation:
         from strategies.common.recovery.provider import PositionRecoveryProvider
 
         cached_balances = [
-            create_mock_account_balance(
-                currency="USDT", total=Decimal("10000.00")
-            ),
-            create_mock_account_balance(
-                currency="BTC", total=Decimal("1.0")
-            ),
+            create_mock_account_balance(currency="USDT", total=Decimal("10000.00")),
+            create_mock_account_balance(currency="BTC", total=Decimal("1.0")),
         ]
         exchange_balances = [
             create_mock_account_balance(
-                currency="USDT", total=Decimal("10000.00")  # Same
+                currency="USDT",
+                total=Decimal("10000.00"),  # Same
             ),
             create_mock_account_balance(
-                currency="BTC", total=Decimal("0.5")  # Changed!
+                currency="BTC",
+                total=Decimal("0.5"),  # Changed!
             ),
         ]
 

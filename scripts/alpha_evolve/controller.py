@@ -68,10 +68,7 @@ class StopCondition:
             raise ValueError("target_fitness must be >= 0 if set")
         if self.max_time_seconds is not None and self.max_time_seconds < 1:
             raise ValueError("max_time_seconds must be >= 1 if set")
-        if (
-            self.no_improvement_generations is not None
-            and self.no_improvement_generations < 1
-        ):
+        if self.no_improvement_generations is not None and self.no_improvement_generations < 1:
             raise ValueError("no_improvement_generations must be >= 1 if set")
 
 
@@ -452,9 +449,7 @@ class EvolutionController:
         }
 
         if seed_name not in seeds:
-            raise ValueError(
-                f"Unknown seed strategy: {seed_name}. Available: {list(seeds.keys())}"
-            )
+            raise ValueError(f"Unknown seed strategy: {seed_name}. Available: {list(seeds.keys())}")
 
         # Get source code
         strategy_class = seeds[seed_name]
@@ -578,16 +573,12 @@ class EvolutionController:
             # Publish mutation failure to dashboard (spec-010)
             if self._metrics_publisher:
                 outcome = (
-                    "syntax_error"
-                    if "syntax" in str(response.error).lower()
-                    else "runtime_error"
+                    "syntax_error" if "syntax" in str(response.error).lower() else "runtime_error"
                 )
                 await self._metrics_publisher.publish_mutation_failure(
                     experiment=experiment,
                     outcome=outcome,
-                    latency_ms=response.latency_ms
-                    if hasattr(response, "latency_ms")
-                    else 0.0,
+                    latency_ms=response.latency_ms if hasattr(response, "latency_ms") else 0.0,
                 )
             return
 
@@ -657,9 +648,7 @@ class EvolutionController:
             self._best_fitness = metrics.calmar_ratio
             self._best_strategy_id = child_id
             self._generations_without_improvement = 0
-            logger.info(
-                f"New best: calmar={metrics.calmar_ratio:.4f} (was {old_best:.4f})"
-            )
+            logger.info(f"New best: calmar={metrics.calmar_ratio:.4f} (was {old_best:.4f})")
         else:
             self._generations_without_improvement += 1
 
@@ -668,9 +657,7 @@ class EvolutionController:
         if pruned > 0:
             logger.debug(f"Pruned {pruned} strategies")
 
-    def _check_stop_conditions(
-        self, condition: StopCondition
-    ) -> tuple[bool, str | None]:
+    def _check_stop_conditions(self, condition: StopCondition) -> tuple[bool, str | None]:
         """
         Check if any stop condition is met.
 
@@ -683,10 +670,7 @@ class EvolutionController:
         # 1. Max iterations (checked by loop)
 
         # 2. Target fitness
-        if (
-            condition.target_fitness is not None
-            and self._best_fitness >= condition.target_fitness
-        ):
+        if condition.target_fitness is not None and self._best_fitness >= condition.target_fitness:
             return True, f"Target fitness reached: {self._best_fitness:.4f}"
 
         # 3. Max time
@@ -697,10 +681,7 @@ class EvolutionController:
 
         # 4. Stagnation
         if condition.no_improvement_generations is not None:
-            if (
-                self._generations_without_improvement
-                >= condition.no_improvement_generations
-            ):
+            if self._generations_without_improvement >= condition.no_improvement_generations:
                 return (
                     True,
                     f"No improvement for {self._generations_without_improvement} generations",
@@ -827,9 +808,7 @@ class EvolutionController:
         validator = WalkForwardValidator(walk_forward_config, self.evaluator)
 
         try:
-            validation_result = await validator.validate(
-                evolution_result.best_strategy.code
-            )
+            validation_result = await validator.validate(evolution_result.best_strategy.code)
         except Exception as e:
             logger.error(f"Walk-forward validation failed: {e}")
             return evolution_result, None

@@ -481,6 +481,5 @@ def create_sizer(
         )
     else:
         raise ValueError(
-            f"Unknown contender_type: {contender_type}. "
-            f"Must be one of: adaptive, fixed, buyhold"
+            f"Unknown contender_type: {contender_type}. Must be one of: adaptive, fixed, buyhold"
         )

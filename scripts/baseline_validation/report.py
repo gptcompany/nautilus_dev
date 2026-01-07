@@ -208,9 +208,7 @@ def format_comparison_table(
     contenders = list(summaries.keys())
 
     # Find winner (highest avg_sharpe)
-    winner = (
-        max(contenders, key=lambda c: summaries[c].avg_sharpe) if contenders else ""
-    )
+    winner = max(contenders, key=lambda c: summaries[c].avg_sharpe) if contenders else ""
 
     # Build header
     header = "| Metric |"

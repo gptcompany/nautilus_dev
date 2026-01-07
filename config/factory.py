@@ -166,9 +166,7 @@ class TradingNodeConfigFactory:
         )
 
     @classmethod
-    def _build_exec_engine_config(
-        cls, settings: TradingNodeSettings
-    ) -> LiveExecEngineConfig:
+    def _build_exec_engine_config(cls, settings: TradingNodeSettings) -> LiveExecEngineConfig:
         """Build LiveExecEngineConfig with reconciliation settings."""
         return LiveExecEngineConfig(
             # Reconciliation
@@ -208,9 +206,7 @@ class TradingNodeConfigFactory:
         )
 
     @classmethod
-    def _build_risk_engine_config(
-        cls, settings: TradingNodeSettings
-    ) -> LiveRiskEngineConfig:
+    def _build_risk_engine_config(cls, settings: TradingNodeSettings) -> LiveRiskEngineConfig:
         """Build LiveRiskEngineConfig with rate limits."""
         return LiveRiskEngineConfig(
             bypass=False,
@@ -226,9 +222,7 @@ class TradingNodeConfigFactory:
             log_level_file=settings.logging.log_level_file,
             log_directory=settings.logging.log_directory,
             log_file_format=(
-                settings.logging.log_format
-                if settings.logging.log_format != "text"
-                else None
+                settings.logging.log_format if settings.logging.log_format != "text" else None
             ),
             log_file_max_size=settings.logging.max_size_mb * 1024 * 1024,
             log_file_max_backup_count=settings.logging.max_backup_count,
@@ -268,9 +262,7 @@ class TradingNodeConfigFactory:
             )
 
         if settings.bybit:
-            product_types = [
-                cls._BYBIT_PRODUCT_TYPES[pt] for pt in settings.bybit.product_types
-            ]
+            product_types = [cls._BYBIT_PRODUCT_TYPES[pt] for pt in settings.bybit.product_types]
             clients["BYBIT"] = BybitDataClientConfig(
                 product_types=product_types,
                 testnet=settings.bybit.testnet,
@@ -301,9 +293,7 @@ class TradingNodeConfigFactory:
             )
 
         if settings.bybit:
-            product_types = [
-                cls._BYBIT_PRODUCT_TYPES[pt] for pt in settings.bybit.product_types
-            ]
+            product_types = [cls._BYBIT_PRODUCT_TYPES[pt] for pt in settings.bybit.product_types]
             clients["BYBIT"] = BybitExecClientConfig(
                 product_types=product_types,
                 testnet=settings.bybit.testnet,

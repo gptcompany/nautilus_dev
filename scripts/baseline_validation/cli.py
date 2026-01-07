@@ -46,9 +46,7 @@ def cli() -> None:
 @cli.command()
 @click.option("--config", "-c", type=click.Path(exists=True), help="YAML config file")
 @click.option("--mock", is_flag=True, help="Use mock data instead of real backtest")
-@click.option(
-    "--seed", "-s", type=int, default=42, help="Random seed for reproducibility"
-)
+@click.option("--seed", "-s", type=int, default=42, help="Random seed for reproducibility")
 @click.option("--output", "-o", type=click.Path(), help="Output file for results")
 @click.option(
     "--format",

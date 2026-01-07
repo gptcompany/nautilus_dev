@@ -49,9 +49,7 @@ def _make_funding_rate_decoder():
         results = []
         for row in table.to_pylist():
             fr = FundingRateUpdate(
-                instrument_id=InstrumentId.from_str(
-                    row.get("instrument_id", "UNKNOWN")
-                ),
+                instrument_id=InstrumentId.from_str(row.get("instrument_id", "UNKNOWN")),
                 rate=Decimal(str(row["rate"])),
                 ts_event=row["ts_event"],
                 ts_init=row["ts_init"],

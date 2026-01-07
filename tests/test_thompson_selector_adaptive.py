@@ -112,9 +112,7 @@ class TestThompsonSelectorAdaptiveDecay:
         decay = selector.current_decay
         assert decay <= 0.97, f"Expected decay <= 0.97 for high volatility, got {decay}"
 
-    def test_update_uses_adaptive_decay(
-        self, high_volatility_detector: IIRRegimeDetector
-    ) -> None:
+    def test_update_uses_adaptive_decay(self, high_volatility_detector: IIRRegimeDetector) -> None:
         """Test: update() method uses adaptive decay when detector available."""
         selector = ThompsonSelector(
             strategies=["strat_a", "strat_b"],

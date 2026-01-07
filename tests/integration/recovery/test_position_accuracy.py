@@ -143,15 +143,9 @@ class TestPositionSizeAccuracy:
 
         strategy = PositionAccuracyStrategy(strategy_config)
 
-        with patch.object(
-            type(strategy), "cache", new_callable=PropertyMock
-        ) as cache_prop:
-            with patch.object(
-                type(strategy), "clock", new_callable=PropertyMock
-            ) as clock_prop:
-                with patch.object(
-                    type(strategy), "log", new_callable=PropertyMock
-                ) as log_prop:
+        with patch.object(type(strategy), "cache", new_callable=PropertyMock) as cache_prop:
+            with patch.object(type(strategy), "clock", new_callable=PropertyMock) as clock_prop:
+                with patch.object(type(strategy), "log", new_callable=PropertyMock) as log_prop:
                     cache_prop.return_value = mock_cache
                     clock_prop.return_value = mock_clock
                     log_prop.return_value = MagicMock()
@@ -164,8 +158,7 @@ class TestPositionSizeAccuracy:
         assert len(strategy.recovered_position_data) == 1
         recovered = strategy.recovered_position_data[0]
         assert recovered["quantity"] == original_quantity, (
-            f"Quantity mismatch: expected {original_quantity}, "
-            f"got {recovered['quantity']}"
+            f"Quantity mismatch: expected {original_quantity}, got {recovered['quantity']}"
         )
 
     def test_position_avg_price_exact_match(
@@ -190,15 +183,9 @@ class TestPositionSizeAccuracy:
 
         strategy = PositionAccuracyStrategy(strategy_config)
 
-        with patch.object(
-            type(strategy), "cache", new_callable=PropertyMock
-        ) as cache_prop:
-            with patch.object(
-                type(strategy), "clock", new_callable=PropertyMock
-            ) as clock_prop:
-                with patch.object(
-                    type(strategy), "log", new_callable=PropertyMock
-                ) as log_prop:
+        with patch.object(type(strategy), "cache", new_callable=PropertyMock) as cache_prop:
+            with patch.object(type(strategy), "clock", new_callable=PropertyMock) as clock_prop:
+                with patch.object(type(strategy), "log", new_callable=PropertyMock) as log_prop:
                     cache_prop.return_value = mock_cache
                     clock_prop.return_value = mock_clock
                     log_prop.return_value = MagicMock()
@@ -231,15 +218,9 @@ class TestPositionSizeAccuracy:
 
         strategy = PositionAccuracyStrategy(strategy_config)
 
-        with patch.object(
-            type(strategy), "cache", new_callable=PropertyMock
-        ) as cache_prop:
-            with patch.object(
-                type(strategy), "clock", new_callable=PropertyMock
-            ) as clock_prop:
-                with patch.object(
-                    type(strategy), "log", new_callable=PropertyMock
-                ) as log_prop:
+        with patch.object(type(strategy), "cache", new_callable=PropertyMock) as cache_prop:
+            with patch.object(type(strategy), "clock", new_callable=PropertyMock) as clock_prop:
+                with patch.object(type(strategy), "log", new_callable=PropertyMock) as log_prop:
                     cache_prop.return_value = mock_cache
                     clock_prop.return_value = mock_clock
                     log_prop.return_value = MagicMock()
@@ -272,15 +253,9 @@ class TestPositionSizeAccuracy:
 
         strategy = PositionAccuracyStrategy(strategy_config)
 
-        with patch.object(
-            type(strategy), "cache", new_callable=PropertyMock
-        ) as cache_prop:
-            with patch.object(
-                type(strategy), "clock", new_callable=PropertyMock
-            ) as clock_prop:
-                with patch.object(
-                    type(strategy), "log", new_callable=PropertyMock
-                ) as log_prop:
+        with patch.object(type(strategy), "cache", new_callable=PropertyMock) as cache_prop:
+            with patch.object(type(strategy), "clock", new_callable=PropertyMock) as clock_prop:
+                with patch.object(type(strategy), "log", new_callable=PropertyMock) as log_prop:
                     cache_prop.return_value = mock_cache
                     clock_prop.return_value = mock_clock
                     log_prop.return_value = MagicMock()
@@ -318,15 +293,9 @@ class TestPositionSizeAccuracy:
 
         strategy = PositionAccuracyStrategy(strategy_config)
 
-        with patch.object(
-            type(strategy), "cache", new_callable=PropertyMock
-        ) as cache_prop:
-            with patch.object(
-                type(strategy), "clock", new_callable=PropertyMock
-            ) as clock_prop:
-                with patch.object(
-                    type(strategy), "log", new_callable=PropertyMock
-                ) as log_prop:
+        with patch.object(type(strategy), "cache", new_callable=PropertyMock) as cache_prop:
+            with patch.object(type(strategy), "clock", new_callable=PropertyMock) as clock_prop:
+                with patch.object(type(strategy), "log", new_callable=PropertyMock) as log_prop:
                     cache_prop.return_value = mock_cache
                     clock_prop.return_value = mock_clock
                     log_prop.return_value = MagicMock()
@@ -338,9 +307,7 @@ class TestPositionSizeAccuracy:
         # NFR-002 Verification: All positions accurate
         assert len(strategy.recovered_position_data) == 3
 
-        for i, (expected_side, expected_qty, expected_avg_px) in enumerate(
-            position_data
-        ):
+        for i, (expected_side, expected_qty, expected_avg_px) in enumerate(position_data):
             recovered = strategy.recovered_position_data[i]
             assert recovered["side"] == expected_side
             assert recovered["quantity"] == expected_qty
@@ -368,15 +335,9 @@ class TestPositionSizeAccuracy:
 
         strategy = PositionAccuracyStrategy(strategy_config)
 
-        with patch.object(
-            type(strategy), "cache", new_callable=PropertyMock
-        ) as cache_prop:
-            with patch.object(
-                type(strategy), "clock", new_callable=PropertyMock
-            ) as clock_prop:
-                with patch.object(
-                    type(strategy), "log", new_callable=PropertyMock
-                ) as log_prop:
+        with patch.object(type(strategy), "cache", new_callable=PropertyMock) as cache_prop:
+            with patch.object(type(strategy), "clock", new_callable=PropertyMock) as clock_prop:
+                with patch.object(type(strategy), "log", new_callable=PropertyMock) as log_prop:
                     cache_prop.return_value = mock_cache
                     clock_prop.return_value = mock_clock
                     log_prop.return_value = MagicMock()
@@ -411,15 +372,9 @@ class TestPositionSizeAccuracy:
 
         strategy = PositionAccuracyStrategy(strategy_config)
 
-        with patch.object(
-            type(strategy), "cache", new_callable=PropertyMock
-        ) as cache_prop:
-            with patch.object(
-                type(strategy), "clock", new_callable=PropertyMock
-            ) as clock_prop:
-                with patch.object(
-                    type(strategy), "log", new_callable=PropertyMock
-                ) as log_prop:
+        with patch.object(type(strategy), "cache", new_callable=PropertyMock) as cache_prop:
+            with patch.object(type(strategy), "clock", new_callable=PropertyMock) as clock_prop:
+                with patch.object(type(strategy), "log", new_callable=PropertyMock) as log_prop:
                     cache_prop.return_value = mock_cache
                     clock_prop.return_value = mock_clock
                     log_prop.return_value = MagicMock()
@@ -453,15 +408,9 @@ class TestPositionSizeAccuracy:
 
         strategy = PositionAccuracyStrategy(strategy_config)
 
-        with patch.object(
-            type(strategy), "cache", new_callable=PropertyMock
-        ) as cache_prop:
-            with patch.object(
-                type(strategy), "clock", new_callable=PropertyMock
-            ) as clock_prop:
-                with patch.object(
-                    type(strategy), "log", new_callable=PropertyMock
-                ) as log_prop:
+        with patch.object(type(strategy), "cache", new_callable=PropertyMock) as cache_prop:
+            with patch.object(type(strategy), "clock", new_callable=PropertyMock) as clock_prop:
+                with patch.object(type(strategy), "log", new_callable=PropertyMock) as log_prop:
                     cache_prop.return_value = mock_cache
                     clock_prop.return_value = mock_clock
                     log_prop.return_value = MagicMock()
@@ -548,9 +497,7 @@ class TestPositionSnapshotAccuracy:
 
     def test_position_snapshot_timestamp_ordering(self):
         """Test that ts_last_updated cannot be before ts_opened."""
-        with pytest.raises(
-            ValueError, match="ts_last_updated cannot be before ts_opened"
-        ):
+        with pytest.raises(ValueError, match="ts_last_updated cannot be before ts_opened"):
             PositionSnapshot(
                 instrument_id="BTCUSDT-PERP.BINANCE",
                 side="LONG",

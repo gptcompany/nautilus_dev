@@ -74,9 +74,7 @@ def setup_signal_handlers(node: TradingNode) -> None:
 
     def signal_handler(signum, frame):
         signame = signal.Signals(signum).name
-        print(
-            f"\n[{datetime.now()}] Received {signame}, initiating graceful shutdown..."
-        )
+        print(f"\n[{datetime.now()}] Received {signame}, initiating graceful shutdown...")
 
         try:
             node.stop()
@@ -92,9 +90,7 @@ def setup_signal_handlers(node: TradingNode) -> None:
 
 def main():
     """Run the live trading launcher."""
-    parser = argparse.ArgumentParser(
-        description="Launch production Hyperliquid trading node"
-    )
+    parser = argparse.ArgumentParser(description="Launch production Hyperliquid trading node")
     parser.add_argument(
         "--testnet",
         action="store_true",
@@ -152,9 +148,7 @@ def main():
     print(f"  Mode: {'TESTNET' if args.testnet else 'MAINNET (PRODUCTION!)'}")
     print(f"  Trader ID: {args.trader_id}")
     print(f"  Instruments: {args.instruments or 'DEFAULT'}")
-    print(
-        f"  Redis: {'disabled' if args.no_redis else f'{args.redis_host}:{args.redis_port}'}"
-    )
+    print(f"  Redis: {'disabled' if args.no_redis else f'{args.redis_host}:{args.redis_port}'}")
     print(f"  Reconciliation: {'disabled' if args.no_reconciliation else 'enabled'}")
     print(f"  Log level: {args.log_level}")
 

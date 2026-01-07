@@ -146,9 +146,7 @@ def emit_event(
     try:
         init_tables(db)
 
-        event_type_str = (
-            event_type.value if isinstance(event_type, EventType) else event_type
-        )
+        event_type_str = event_type.value if isinstance(event_type, EventType) else event_type
         data = data or {}
         data_json = json.dumps(data)
         checksum = compute_checksum(event_type_str, entity_id or "", data)
@@ -175,9 +173,7 @@ def emit_event(
         db.close()
 
 
-def get_unprocessed_events(
-    db: duckdb.DuckDBPyConnection, limit: int = BATCH_SIZE
-) -> list[dict]:
+def get_unprocessed_events(db: duckdb.DuckDBPyConnection, limit: int = BATCH_SIZE) -> list[dict]:
     """Get events not yet synced to Neo4j, respecting retry limits."""
     result = db.execute(
         """
@@ -225,9 +221,7 @@ def increment_retry(db: duckdb.DuckDBPyConnection, event_id: int) -> int:
         "UPDATE events SET retry_count = retry_count + 1 WHERE event_id = ?",
         [event_id],
     )
-    result = db.execute(
-        "SELECT retry_count FROM events WHERE event_id = ?", [event_id]
-    ).fetchone()
+    result = db.execute("SELECT retry_count FROM events WHERE event_id = ?", [event_id]).fetchone()
     return result[0] if result else 0
 
 
@@ -489,9 +483,7 @@ def run_daemon() -> None:
             pending_count = len(events)
 
             if events:
-                print(
-                    f"[{datetime.now().strftime('%H:%M:%S')}] Processing {len(events)} events..."
-                )
+                print(f"[{datetime.now().strftime('%H:%M:%S')}] Processing {len(events)} events...")
 
                 processed_ids = []
                 for event in events:
@@ -521,13 +513,9 @@ def run_daemon() -> None:
                 if processed_ids:
                     mark_processed(db, processed_ids)
                     total_processed += len(processed_ids)
-                    print(
-                        f"  Synced {len(processed_ids)}/{len(events)} events to Neo4j\n"
-                    )
+                    print(f"  Synced {len(processed_ids)}/{len(events)} events to Neo4j\n")
 
-                update_health(
-                    "running", total_processed, pending_count - len(processed_ids)
-                )
+                update_health("running", total_processed, pending_count - len(processed_ids))
             else:
                 update_health("idle", total_processed, 0)
 
@@ -697,9 +685,7 @@ def main():
 
     # replay command
     replay_parser = subparsers.add_parser("replay", help="Replay events")
-    replay_parser.add_argument(
-        "--from-event", type=int, default=0, help="Start from event ID"
-    )
+    replay_parser.add_argument("--from-event", type=int, default=0, help="Start from event ID")
 
     # dlq command
     dlq_parser = subparsers.add_parser("dlq", help="Dead letter queue operations")

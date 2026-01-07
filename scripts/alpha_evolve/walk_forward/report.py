@@ -40,22 +40,16 @@ def generate_report(result: WalkForwardResult) -> str:
         or result.probability_backtest_overfitting is not None
     ):
         lines.append("## Advanced Overfitting Metrics\n")
-        lines.append(
-            "*Based on Lopez de Prado (2018) - Advances in Financial Machine Learning*\n"
-        )
+        lines.append("*Based on Lopez de Prado (2018) - Advances in Financial Machine Learning*\n")
 
         if result.deflated_sharpe_ratio is not None:
-            lines.append(
-                f"**Deflated Sharpe Ratio (DSR)**: {result.deflated_sharpe_ratio:.3f}"
-            )
+            lines.append(f"**Deflated Sharpe Ratio (DSR)**: {result.deflated_sharpe_ratio:.3f}")
             lines.append("  - Adjusted for multiple testing (Ch. 14)")
 
         if result.probability_backtest_overfitting is not None:
             pbo = result.probability_backtest_overfitting
             pbo_status = "⚠️ HIGH RISK" if pbo > 0.5 else "✓ Low risk"
-            lines.append(
-                f"**Probability of Backtest Overfitting (PBO)**: {pbo:.1%} {pbo_status}"
-            )
+            lines.append(f"**Probability of Backtest Overfitting (PBO)**: {pbo:.1%} {pbo_status}")
             lines.append("  - Probability best strategy is false positive (Ch. 11)\n")
 
     # Key metrics summary
@@ -64,9 +58,7 @@ def generate_report(result: WalkForwardResult) -> str:
     lines.append("|--------|-------|-----------|--------|")
 
     # Robustness score
-    rob_status = (
-        "✓" if result.robustness_score >= result.config.min_robustness_score else "✗"
-    )
+    rob_status = "✓" if result.robustness_score >= result.config.min_robustness_score else "✗"
     lines.append(
         f"| Robustness Score | {result.robustness_score:.1f} | "
         f"≥ {result.config.min_robustness_score:.1f} | {rob_status} |"
@@ -74,9 +66,7 @@ def generate_report(result: WalkForwardResult) -> str:
 
     # Profitable windows
     prof_status = (
-        "✓"
-        if result.profitable_windows_pct >= result.config.min_profitable_windows_pct
-        else "✗"
+        "✓" if result.profitable_windows_pct >= result.config.min_profitable_windows_pct else "✗"
     )
     lines.append(
         f"| Profitable Windows | {result.profitable_windows_pct:.1%} | "
@@ -84,9 +74,7 @@ def generate_report(result: WalkForwardResult) -> str:
     )
 
     # Worst drawdown
-    dd_status = (
-        "✓" if result.worst_drawdown <= result.config.max_drawdown_threshold else "✗"
-    )
+    dd_status = "✓" if result.worst_drawdown <= result.config.max_drawdown_threshold else "✗"
     lines.append(
         f"| Worst Drawdown | {result.worst_drawdown:.1%} | "
         f"≤ {result.config.max_drawdown_threshold:.1%} | {dd_status} |"
@@ -107,9 +95,7 @@ def generate_report(result: WalkForwardResult) -> str:
 
     for w in result.windows:
         period = f"{w.window.test_start.strftime('%Y-%m')} to {w.window.test_end.strftime('%Y-%m')}"
-        degradation_pct = (
-            f"{w.degradation_ratio:.0%}" if w.degradation_ratio <= 2 else ">200%"
-        )
+        degradation_pct = f"{w.degradation_ratio:.0%}" if w.degradation_ratio <= 2 else ">200%"
         lines.append(
             f"| {w.window.window_id} | {period} | "
             f"{w.train_metrics.sharpe_ratio:.2f} | "

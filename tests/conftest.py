@@ -509,12 +509,8 @@ def pytest_configure(config):
         "integration: mark test as integration test (may require external resources)",
     )
     config.addinivalue_line("markers", "slow: mark test as slow running")
-    config.addinivalue_line(
-        "markers", "visualization: mark test as requiring visualization extra"
-    )
-    config.addinivalue_line(
-        "markers", "recovery: mark test as recovery module test (Spec 017)"
-    )
+    config.addinivalue_line("markers", "visualization: mark test as requiring visualization extra")
+    config.addinivalue_line("markers", "recovery: mark test as recovery module test (Spec 017)")
     config.addinivalue_line(
         "markers", "meta_learning: mark test as meta-learning pipeline test (Spec 026)"
     )

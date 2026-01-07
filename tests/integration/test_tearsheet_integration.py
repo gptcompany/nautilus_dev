@@ -19,9 +19,7 @@ if TYPE_CHECKING:
 try:
     import importlib.util
 
-    HAS_VISUALIZATION = (
-        importlib.util.find_spec("nautilus_trader.analysis.tearsheet") is not None
-    )
+    HAS_VISUALIZATION = importlib.util.find_spec("nautilus_trader.analysis.tearsheet") is not None
 except ImportError:
     HAS_VISUALIZATION = False
 

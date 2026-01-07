@@ -220,9 +220,7 @@ class TestVPINIndicator:
         assert vpin_indicator.is_valid is False
         # There should be a current bucket with partial volume
         assert vpin_indicator._current_bucket is not None
-        assert vpin_indicator._current_bucket.accumulated_volume == pytest.approx(
-            50.0, abs=1e-10
-        )
+        assert vpin_indicator._current_bucket.accumulated_volume == pytest.approx(50.0, abs=1e-10)
 
     def test_vpin_bucket_completion(self, small_bucket_config: VPINConfig) -> None:
         """T014.3: Filling a bucket should add it to history."""
@@ -430,9 +428,7 @@ class TestVPINEdgeCases:
         assert indicator.is_valid is False
         assert len(indicator._buckets) == 0
 
-    def test_vpin_bucket_overflow_carried_to_next(
-        self, small_bucket_config: VPINConfig
-    ) -> None:
+    def test_vpin_bucket_overflow_carried_to_next(self, small_bucket_config: VPINConfig) -> None:
         """T015.3: Overflow volume should be carried to next bucket."""
         indicator = VPINIndicator(config=small_bucket_config)
 
@@ -450,9 +446,7 @@ class TestVPINEdgeCases:
 
         # Current bucket should have overflow
         assert indicator._current_bucket is not None
-        assert indicator._current_bucket.accumulated_volume == pytest.approx(
-            50.0, abs=1e-10
-        )
+        assert indicator._current_bucket.accumulated_volume == pytest.approx(50.0, abs=1e-10)
 
     def test_vpin_very_small_volume(self, small_bucket_config: VPINConfig) -> None:
         """T015.4: Very small volumes should accumulate correctly."""
@@ -518,9 +512,7 @@ class TestVPINEdgeCases:
         assert indicator.value == pytest.approx(0.7, abs=0.01)
         assert indicator.toxicity_level == ToxicityLevel.HIGH
 
-    def test_vpin_toxicity_level_before_valid(
-        self, vpin_indicator: VPINIndicator
-    ) -> None:
+    def test_vpin_toxicity_level_before_valid(self, vpin_indicator: VPINIndicator) -> None:
         """T015.7: Toxicity level should be LOW before valid (VPIN=0)."""
         assert vpin_indicator.is_valid is False
         # VPIN=0.0 returns LOW toxicity

@@ -21,14 +21,10 @@ from strategies.common.recovery.models import RecoveryState, RecoveryStatus
 class TestRequestWarmupData:
     """Tests for _request_warmup_data method."""
 
-    def test_request_warmup_calculates_correct_start_time(
-        self, mock_clock, recovery_config
-    ):
+    def test_request_warmup_calculates_correct_start_time(self, mock_clock, recovery_config):
         """Test that warmup start time is calculated correctly."""
         # Fixed time: 2024-01-02 00:00:00 UTC
-        mock_clock.utc_now.return_value = datetime(
-            2024, 1, 2, 0, 0, 0, tzinfo=timezone.utc
-        )
+        mock_clock.utc_now.return_value = datetime(2024, 1, 2, 0, 0, 0, tzinfo=timezone.utc)
         lookback_days = recovery_config.warmup_lookback_days  # 2 days
 
         # Simulate _request_warmup_data calculation
@@ -108,9 +104,7 @@ class TestOnHistoricalData:
         # Create bars with different timestamps
         for i in range(5):
             mock_bar = MagicMock()
-            mock_bar.ts_event = 1704067200000000000 + (
-                i * 60_000_000_000
-            )  # 1 min apart
+            mock_bar.ts_event = 1704067200000000000 + (i * 60_000_000_000)  # 1 min apart
             on_historical_data(mock_bar)
 
         assert len(bars_processed) == 5
@@ -182,10 +176,7 @@ class TestWarmupDataReceived:
                 warmup_bars_processed += 1
 
         # Create 10 mock bars
-        bars = [
-            MagicMock(ts_event=1704067200000000000 + i * 60_000_000_000)
-            for i in range(10)
-        ]
+        bars = [MagicMock(ts_event=1704067200000000000 + i * 60_000_000_000) for i in range(10)]
         on_warmup_data_received(bars)
 
         assert warmup_bars_processed == 10
@@ -373,10 +364,7 @@ class TestWarmupIntegration:
         mock_logger.info("Requesting warmup data")
 
         # Step 2: Receive bars (simulated callback)
-        bars = [
-            MagicMock(ts_event=1704067200000000000 + i * 60_000_000_000)
-            for i in range(50)
-        ]
+        bars = [MagicMock(ts_event=1704067200000000000 + i * 60_000_000_000) for i in range(50)]
         sorted_bars = sorted(bars, key=lambda b: b.ts_event)
 
         # Step 3: Process bars

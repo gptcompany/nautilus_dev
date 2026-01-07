@@ -151,9 +151,7 @@ class TestHMMPredict:
         latencies = []
         for i in range(100):
             start = time.perf_counter()
-            _ = hmm_filter.predict(
-                returns[i % len(returns)], volatility[i % len(volatility)]
-            )
+            _ = hmm_filter.predict(returns[i % len(returns)], volatility[i % len(volatility)])
             latencies.append((time.perf_counter() - start) * 1000)  # ms
 
         avg_latency = np.mean(latencies)

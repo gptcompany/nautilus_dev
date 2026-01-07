@@ -207,9 +207,7 @@ class PositionRecoveryProvider:
             seen: set[str] = set()
             for iid in cached_ids:
                 if iid in seen:
-                    self._log.warning(
-                        "Duplicate instrument_id in cached positions: %s", iid
-                    )
+                    self._log.warning("Duplicate instrument_id in cached positions: %s", iid)
                 seen.add(iid)
 
         exchange_ids = [pos.instrument_id.value for pos in exchange]
@@ -217,18 +215,12 @@ class PositionRecoveryProvider:
             seen = set()
             for iid in exchange_ids:
                 if iid in seen:
-                    self._log.warning(
-                        "Duplicate instrument_id in exchange positions: %s", iid
-                    )
+                    self._log.warning("Duplicate instrument_id in exchange positions: %s", iid)
                 seen.add(iid)
 
         # Build lookup maps for O(1) access - O(n) + O(m)
-        cached_map: dict[str, Position] = {
-            pos.instrument_id.value: pos for pos in cached
-        }
-        exchange_map: dict[str, Position] = {
-            pos.instrument_id.value: pos for pos in exchange
-        }
+        cached_map: dict[str, Position] = {pos.instrument_id.value: pos for pos in cached}
+        exchange_map: dict[str, Position] = {pos.instrument_id.value: pos for pos in exchange}
 
         # Process exchange positions (source of truth) - O(m)
         for instrument_id, ex_pos in exchange_map.items():
@@ -278,10 +270,7 @@ class PositionRecoveryProvider:
         # Find positions closed on exchange (in cache but not on exchange) - O(n)
         for instrument_id in cached_map:
             if instrument_id not in exchange_map:
-                msg = (
-                    f"Position closed on exchange: {instrument_id} "
-                    f"(missing from exchange)"
-                )
+                msg = f"Position closed on exchange: {instrument_id} (missing from exchange)"
                 discrepancies.append(msg)
                 self._log.warning(msg)
 
@@ -418,12 +407,8 @@ class PositionRecoveryProvider:
         changes: list[str] = []
 
         # Build lookup maps for O(1) access
-        cached_map: dict[str, Any] = {
-            bal.currency.code: bal for bal in cached
-        }
-        exchange_map: dict[str, Any] = {
-            bal.currency.code: bal for bal in exchange
-        }
+        cached_map: dict[str, Any] = {bal.currency.code: bal for bal in cached}
+        exchange_map: dict[str, Any] = {bal.currency.code: bal for bal in exchange}
 
         # Process exchange balances (source of truth)
         for currency, ex_bal in exchange_map.items():
@@ -474,10 +459,7 @@ class PositionRecoveryProvider:
         for currency in cached_map:
             if currency not in exchange_map:
                 cached_total = cached_map[currency].total.as_decimal()
-                msg = (
-                    f"Balance removed from exchange: {currency} "
-                    f"(was {cached_total})"
-                )
+                msg = f"Balance removed from exchange: {currency} (was {cached_total})"
                 changes.append(msg)
                 self._log.warning(msg)
 
@@ -519,18 +501,10 @@ class PositionRecoveryProvider:
             - is_removed: True if currency was removed (not on exchange)
         """
         # Extract values or defaults
-        cached_total = (
-            cached.total.as_decimal() if cached is not None else Decimal("0")
-        )
-        cached_locked = (
-            cached.locked.as_decimal() if cached is not None else Decimal("0")
-        )
-        exchange_total = (
-            exchange.total.as_decimal() if exchange is not None else Decimal("0")
-        )
-        exchange_locked = (
-            exchange.locked.as_decimal() if exchange is not None else Decimal("0")
-        )
+        cached_total = cached.total.as_decimal() if cached is not None else Decimal("0")
+        cached_locked = cached.locked.as_decimal() if cached is not None else Decimal("0")
+        exchange_total = exchange.total.as_decimal() if exchange is not None else Decimal("0")
+        exchange_locked = exchange.locked.as_decimal() if exchange is not None else Decimal("0")
 
         total_change = exchange_total - cached_total
         locked_change = exchange_locked - cached_locked
@@ -571,12 +545,8 @@ class PositionRecoveryProvider:
             List of delta dictionaries for changed currencies.
         """
         # Build lookup maps
-        cached_map: dict[str, Any] = {
-            bal.currency.code: bal for bal in cached
-        }
-        exchange_map: dict[str, Any] = {
-            bal.currency.code: bal for bal in exchange
-        }
+        cached_map: dict[str, Any] = {bal.currency.code: bal for bal in cached}
+        exchange_map: dict[str, Any] = {bal.currency.code: bal for bal in exchange}
 
         all_currencies = set(cached_map.keys()) | set(exchange_map.keys())
         deltas: list[dict[str, Any]] = []

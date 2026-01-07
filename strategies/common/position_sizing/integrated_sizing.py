@@ -121,14 +121,10 @@ class IntegratedSizer:
 
         # Apply defaults for missing values
         meta_conf = (
-            meta_confidence
-            if meta_confidence is not None
-            else self._config.default_meta_confidence
+            meta_confidence if meta_confidence is not None else self._config.default_meta_confidence
         )
         regime_wt = (
-            regime_weight
-            if regime_weight is not None
-            else self._config.default_regime_weight
+            regime_weight if regime_weight is not None else self._config.default_regime_weight
         )
         tox = toxicity if toxicity is not None else self._config.default_toxicity
 
@@ -141,11 +137,7 @@ class IntegratedSizer:
 
         # Compute raw size (unsigned)
         raw_size = (
-            signal_factor
-            * meta_conf
-            * regime_wt
-            * toxicity_penalty
-            * self._config.fractional_kelly
+            signal_factor * meta_conf * regime_wt * toxicity_penalty * self._config.fractional_kelly
         )
 
         # Apply clamping

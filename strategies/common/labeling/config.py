@@ -29,15 +29,9 @@ class TripleBarrierConfig(BaseModel):
         ... )
     """
 
-    pt_multiplier: float = Field(
-        default=2.0, gt=0.0, description="Take-profit ATR multiplier"
-    )
-    sl_multiplier: float = Field(
-        default=1.0, gt=0.0, description="Stop-loss ATR multiplier"
-    )
-    max_holding_bars: int = Field(
-        default=10, ge=1, description="Maximum holding period in bars"
-    )
+    pt_multiplier: float = Field(default=2.0, gt=0.0, description="Take-profit ATR multiplier")
+    sl_multiplier: float = Field(default=1.0, gt=0.0, description="Stop-loss ATR multiplier")
+    max_holding_bars: int = Field(default=10, ge=1, description="Maximum holding period in bars")
     atr_period: int = Field(default=14, ge=2, description="ATR calculation period")
     min_return: float = Field(
         default=0.0, ge=0.0, description="Minimum return for non-zero timeout label"

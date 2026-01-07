@@ -80,17 +80,13 @@ class RiskConfig(BaseModel):
 
     @field_validator("max_position_size")
     @classmethod
-    def validate_max_position_size(
-        cls, v: dict[str, Decimal] | None
-    ) -> dict[str, Decimal] | None:
+    def validate_max_position_size(cls, v: dict[str, Decimal] | None) -> dict[str, Decimal] | None:
         """Ensure all position sizes are positive."""
         if v is None:
             return None
         for instrument_id, size in v.items():
             if size <= 0:
-                raise ValueError(
-                    f"max_position_size[{instrument_id}] must be positive, got {size}"
-                )
+                raise ValueError(f"max_position_size[{instrument_id}] must be positive, got {size}")
         return v
 
     @model_validator(mode="after")

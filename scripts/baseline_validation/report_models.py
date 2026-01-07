@@ -42,9 +42,7 @@ class ContenderSummary(BaseModel):
     avg_sharpe: float = Field(..., description="Average Sharpe ratio across windows")
     std_sharpe: float = Field(..., ge=0, description="Std dev of Sharpe across windows")
     max_drawdown: float = Field(..., ge=0, le=1, description="Maximum drawdown (0-1)")
-    win_rate: float = Field(
-        ..., ge=0, le=1, description="Fraction of profitable windows"
-    )
+    win_rate: float = Field(..., ge=0, le=1, description="Fraction of profitable windows")
     total_trades: int = Field(..., ge=0, description="Total trades across all windows")
 
     @field_validator("win_rate")
@@ -80,9 +78,7 @@ class VerdictDetails(BaseModel):
     drawdown_comparison: str = Field(..., description="Drawdown comparison text")
     t_statistic: float = Field(..., description="T-statistic for Sharpe difference")
     p_value: float = Field(..., ge=0, le=1, description="P-value for significance test")
-    is_significant: bool = Field(
-        ..., description="Whether result is statistically significant"
-    )
+    is_significant: bool = Field(..., description="Whether result is statistically significant")
 
 
 class ValidationReport(BaseModel):

@@ -147,9 +147,7 @@ class ParticlePortfolio:
         self._lambda_penalty = lambda_penalty
 
         # Strategy indices for penalty calculation
-        self._strategy_indices: Dict[str, int] = {
-            s: i for i, s in enumerate(strategies)
-        }
+        self._strategy_indices: Dict[str, int] = {s: i for i, s in enumerate(strategies)}
 
         # Initialize particles with random weights
         self.particles: List[Particle] = []
@@ -187,8 +185,7 @@ class ParticlePortfolio:
         for particle in self.particles:
             # Calculate portfolio return for this particle
             portfolio_return = sum(
-                particle.weights.get(s, 0) * strategy_returns.get(s, 0)
-                for s in self.strategies
+                particle.weights.get(s, 0) * strategy_returns.get(s, 0) for s in self.strategies
             )
 
             # Likelihood: higher return = higher weight
@@ -283,15 +280,11 @@ class ParticlePortfolio:
         # Audit: Log consensus signal
         if self._audit_emitter:
             # Calculate overall consensus confidence
-            avg_uncertainty = (
-                sum(uncertainty.values()) / len(uncertainty) if uncertainty else 0.5
-            )
+            avg_uncertainty = sum(uncertainty.values()) / len(uncertainty) if uncertainty else 0.5
             confidence = max(0.0, 1.0 - avg_uncertainty)
 
             # Find dominant strategy for signal attribution
-            dominant_strategy = (
-                max(consensus, key=consensus.get) if consensus else "unknown"
-            )
+            dominant_strategy = max(consensus, key=consensus.get) if consensus else "unknown"
             signal_value = consensus.get(dominant_strategy, 0.0)
 
             self._audit_emitter.emit_signal(
@@ -542,9 +535,7 @@ class ThompsonSelector:
             Current decay factor.
         """
         if self._decay_calculator is not None and self._regime_detector is not None:
-            decay = self._decay_calculator.calculate_from_detector(
-                self._regime_detector
-            )
+            decay = self._decay_calculator.calculate_from_detector(self._regime_detector)
             if emit_audit:
                 self._emit_decay_event(decay)
             return decay

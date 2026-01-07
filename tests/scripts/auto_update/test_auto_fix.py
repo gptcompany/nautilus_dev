@@ -112,9 +112,7 @@ def use_indicator():
     def test_apply_import_rename_no_match(self, tmp_path: Path):
         """Test when pattern doesn't match."""
         test_file = tmp_path / "test_strategy.py"
-        test_file.write_text(
-            """from nautilus_trader.indicators import DifferentIndicator"""
-        )
+        test_file.write_text("""from nautilus_trader.indicators import DifferentIndicator""")
 
         result = apply_import_rename(
             file_path=test_file,

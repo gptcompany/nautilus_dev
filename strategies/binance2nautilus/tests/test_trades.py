@@ -63,9 +63,7 @@ class TestTradesConverter:
         assert converter.data_type == "trades"
         assert str(converter.instrument.id) == "BTCUSDT-PERP.BINANCE"
 
-    def test_parse_csv(
-        self, sample_trades_csv: Path, config_with_temp_dir: ConverterConfig
-    ):
+    def test_parse_csv(self, sample_trades_csv: Path, config_with_temp_dir: ConverterConfig):
         """CSV parsing should return DataFrame with correct columns."""
         converter = TradesConverter(
             symbol="BTCUSDT",

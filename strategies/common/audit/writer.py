@@ -217,9 +217,7 @@ class AppendOnlyWriter:
             event_type = getattr(event, "event_type", None)
             if event_type is not None:
                 event_type_str = (
-                    str(event_type.value)
-                    if hasattr(event_type, "value")
-                    else str(event_type)
+                    str(event_type.value) if hasattr(event_type, "value") else str(event_type)
                 )
                 if not event_type_str.startswith("trade."):
                     return False

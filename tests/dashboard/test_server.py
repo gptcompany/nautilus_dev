@@ -102,9 +102,7 @@ class TestHistoryOIEndpoint:
 
     def test_oi_validates_date_range(self, client):
         """OI endpoint validates from < to."""
-        response = client.get(
-            "/api/history/oi?symbol=BTCUSDT-PERP&from=2025-01-31&to=2025-01-01"
-        )
+        response = client.get("/api/history/oi?symbol=BTCUSDT-PERP&from=2025-01-31&to=2025-01-01")
         # Returns error response (not 422, but error in body)
         data = response.json()
         assert "error" in data or response.status_code == 200

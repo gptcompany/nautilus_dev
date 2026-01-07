@@ -84,9 +84,7 @@ class TestCLIStatusJSON:
         # Create empty store
         ProgramStore(temp_db_path)
 
-        result = cli_runner.invoke(
-            evolve, ["--db", str(temp_db_path), "status", "nonexistent"]
-        )
+        result = cli_runner.invoke(evolve, ["--db", str(temp_db_path), "status", "nonexistent"])
 
         assert result.exit_code != 0
         assert "not found" in result.output.lower()
@@ -99,17 +97,13 @@ class TestCLIBestTopK:
         self, cli_runner: CliRunner, temp_db: ProgramStore, temp_db_path: Path
     ):
         """Best command shows top strategies."""
-        result = cli_runner.invoke(
-            evolve, ["--db", str(temp_db_path), "best", "test_exp"]
-        )
+        result = cli_runner.invoke(evolve, ["--db", str(temp_db_path), "best", "test_exp"])
 
         assert result.exit_code == 0
         assert "Top" in result.output
         assert "Calmar" in result.output
 
-    def test_cli_best_top_k(
-        self, cli_runner: CliRunner, temp_db: ProgramStore, temp_db_path: Path
-    ):
+    def test_cli_best_top_k(self, cli_runner: CliRunner, temp_db: ProgramStore, temp_db_path: Path):
         """Best command respects --top-k option."""
         result = cli_runner.invoke(
             evolve, ["--db", str(temp_db_path), "best", "test_exp", "-k", "3"]
@@ -119,9 +113,7 @@ class TestCLIBestTopK:
         # Should show only 3 strategies
         assert "Top 3" in result.output
 
-    def test_cli_best_json(
-        self, cli_runner: CliRunner, temp_db: ProgramStore, temp_db_path: Path
-    ):
+    def test_cli_best_json(self, cli_runner: CliRunner, temp_db: ProgramStore, temp_db_path: Path):
         """Best command outputs valid JSON."""
         result = cli_runner.invoke(
             evolve, ["--db", str(temp_db_path), "best", "test_exp", "--json", "-k", "2"]
@@ -164,9 +156,7 @@ class TestCLIExportStrategy:
         """Export command handles missing strategy."""
         ProgramStore(temp_db_path)
 
-        result = cli_runner.invoke(
-            evolve, ["--db", str(temp_db_path), "export", "nonexistent"]
-        )
+        result = cli_runner.invoke(evolve, ["--db", str(temp_db_path), "export", "nonexistent"])
 
         assert result.exit_code != 0
         assert "not found" in result.output.lower()
@@ -185,13 +175,9 @@ class TestCLIListExperiments:
         assert "Experiments" in result.output
         assert "test_exp" in result.output
 
-    def test_cli_list_json(
-        self, cli_runner: CliRunner, temp_db: ProgramStore, temp_db_path: Path
-    ):
+    def test_cli_list_json(self, cli_runner: CliRunner, temp_db: ProgramStore, temp_db_path: Path):
         """List command outputs valid JSON."""
-        result = cli_runner.invoke(
-            evolve, ["--db", str(temp_db_path), "list", "--json"]
-        )
+        result = cli_runner.invoke(evolve, ["--db", str(temp_db_path), "list", "--json"])
 
         assert result.exit_code == 0
         data = json.loads(result.output)
@@ -226,9 +212,7 @@ class TestCLIResumeCommand:
         """Resume command handles missing experiment."""
         ProgramStore(temp_db_path)
 
-        result = cli_runner.invoke(
-            evolve, ["--db", str(temp_db_path), "resume", "nonexistent"]
-        )
+        result = cli_runner.invoke(evolve, ["--db", str(temp_db_path), "resume", "nonexistent"])
 
         assert result.exit_code != 0
         assert "not found" in result.output.lower()

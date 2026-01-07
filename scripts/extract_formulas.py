@@ -184,9 +184,7 @@ def extract_latex_formulas(markdown_content: str) -> list[Formula]:
     return formulas
 
 
-def classify_formula(
-    latex: str, display_mode: bool, line_num: int, context: str
-) -> Formula:
+def classify_formula(latex: str, display_mode: bool, line_num: int, context: str) -> Formula:
     """Classify a formula by domain and known type."""
     known_type = None
     domain = "general"
@@ -246,9 +244,7 @@ def formulas_to_dict(formulas: list[Formula], source_file: str) -> dict:
 
 
 def main():
-    parser = argparse.ArgumentParser(
-        description="Extract formulas from MinerU markdown"
-    )
+    parser = argparse.ArgumentParser(description="Extract formulas from MinerU markdown")
     parser.add_argument("markdown_file", help="Path to markdown file")
     parser.add_argument(
         "--output",
@@ -282,9 +278,7 @@ def main():
         print(f"Total formulas: {len(formulas)}")
         print(f"  Trading: {len([f for f in formulas if f.domain == 'trading'])}")
         print(f"  Statistics: {len([f for f in formulas if f.domain == 'statistics'])}")
-        print(
-            f"  Optimization: {len([f for f in formulas if f.domain == 'optimization'])}"
-        )
+        print(f"  Optimization: {len([f for f in formulas if f.domain == 'optimization'])}")
         print(f"  General: {len([f for f in formulas if f.domain == 'general'])}")
         print("\nKnown formulas detected:")
         for f in formulas:

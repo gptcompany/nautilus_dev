@@ -139,9 +139,7 @@ def generate_embeddings() -> tuple[int, int]:
         db.close()
 
 
-def search_papers(
-    query: str, top_k: int = 10, min_similarity: float = 0.3
-) -> list[dict[str, Any]]:
+def search_papers(query: str, top_k: int = 10, min_similarity: float = 0.3) -> list[dict[str, Any]]:
     """
     Search papers using semantic similarity.
 
@@ -184,16 +182,12 @@ def search_papers(
         if paper_norm == 0:
             continue
 
-        similarity = np.dot(query_embedding, paper_embedding) / (
-            query_norm * paper_norm
-        )
+        similarity = np.dot(query_embedding, paper_embedding) / (query_norm * paper_norm)
 
         if similarity >= min_similarity:
             truncated_abstract = None
             if abstract:
-                truncated_abstract = (
-                    abstract[:200] + "..." if len(abstract) > 200 else abstract
-                )
+                truncated_abstract = abstract[:200] + "..." if len(abstract) > 200 else abstract
             results.append(
                 {
                     "paper_id": paper_id,
@@ -202,8 +196,7 @@ def search_papers(
                     "methodology_type": methodology,
                     "similarity": float(similarity),
                     "relevance_score": relevance,
-                    "combined_score": float(similarity) * 0.7
-                    + (relevance or 0) / 10 * 0.3,
+                    "combined_score": float(similarity) * 0.7 + (relevance or 0) / 10 * 0.3,
                 }
             )
 
@@ -266,9 +259,7 @@ def get_similar_papers(paper_id: str, top_k: int = 5) -> list[dict[str, Any]]:
         if paper_norm == 0:
             continue
 
-        similarity = np.dot(target_embedding, paper_embedding) / (
-            target_norm * paper_norm
-        )
+        similarity = np.dot(target_embedding, paper_embedding) / (target_norm * paper_norm)
 
         results.append(
             {
@@ -313,9 +304,7 @@ def rerank_search_results(
             paper_embedding = model.encode(text, convert_to_numpy=True)
             paper_norm = np.linalg.norm(paper_embedding)
             if paper_norm > 0:
-                similarity = np.dot(query_embedding, paper_embedding) / (
-                    query_norm * paper_norm
-                )
+                similarity = np.dot(query_embedding, paper_embedding) / (query_norm * paper_norm)
                 paper["similarity"] = float(similarity)
                 relevance = paper.get("relevance_score", 5) / 10
                 paper["combined_score"] = similarity * weight_similarity + relevance * (
@@ -337,9 +326,7 @@ def show_stats():
     db = duckdb.connect(str(DUCKDB_PATH), read_only=True)
     try:
         total = db.execute("SELECT COUNT(*) FROM papers").fetchone()[0]
-        with_embedding = db.execute("SELECT COUNT(*) FROM paper_embeddings").fetchone()[
-            0
-        ]
+        with_embedding = db.execute("SELECT COUNT(*) FROM paper_embeddings").fetchone()[0]
 
         print("=== Embedding Statistics ===\n")
         print(f"Total papers:      {total}")
@@ -366,9 +353,7 @@ def main():
     search_parser = subparsers.add_parser("search", help="Semantic search")
     search_parser.add_argument("query", help="Search query")
     search_parser.add_argument("--top", type=int, default=10, help="Top K results")
-    search_parser.add_argument(
-        "--min-sim", type=float, default=0.3, help="Minimum similarity"
-    )
+    search_parser.add_argument("--min-sim", type=float, default=0.3, help="Minimum similarity")
 
     # similar command
     similar_parser = subparsers.add_parser("similar", help="Find similar papers")

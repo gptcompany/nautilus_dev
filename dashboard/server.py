@@ -99,9 +99,7 @@ class ConnectionManager:
 
     async def subscribe(self, websocket: WebSocket, symbols: list[str]) -> list[str]:
         """Subscribe to symbols. Returns list of valid subscribed symbols."""
-        valid_symbols = [
-            s for s in symbols if s in {si.symbol for si in SUPPORTED_SYMBOLS}
-        ]
+        valid_symbols = [s for s in symbols if s in {si.symbol for si in SUPPORTED_SYMBOLS}]
         async with self._lock:
             if websocket in self.active_connections:
                 self.active_connections[websocket].update(valid_symbols)
@@ -118,9 +116,7 @@ class ConnectionManager:
         async with self._lock:
             return list(self.active_connections.get(websocket, set()))
 
-    async def broadcast(
-        self, message: dict[str, Any], symbol: str | None = None
-    ) -> None:
+    async def broadcast(self, message: dict[str, Any], symbol: str | None = None) -> None:
         """Broadcast message to all connections (optionally filtered by symbol)."""
         async with self._lock:
             connections = list(self.active_connections.items())
@@ -184,9 +180,7 @@ async def on_funding_update(
         symbol=symbol,
         venue=venue,
         funding_rate=funding_rate,
-        next_funding_time=int(next_funding_time.timestamp() * 1000)
-        if next_funding_time
-        else None,
+        next_funding_time=int(next_funding_time.timestamp() * 1000) if next_funding_time else None,
         predicted_rate=predicted_rate,
     )
     await manager.broadcast(msg.model_dump(), symbol=symbol)
@@ -315,15 +309,11 @@ async def websocket_endpoint(websocket: WebSocket):
                     await websocket.send_json(pong.model_dump())
 
                 else:
-                    error = ErrorMessage(
-                        code="INVALID_ACTION", message=f"Unknown action: {action}"
-                    )
+                    error = ErrorMessage(code="INVALID_ACTION", message=f"Unknown action: {action}")
                     await websocket.send_json(error.model_dump())
 
             except json.JSONDecodeError:
-                error = ErrorMessage(
-                    code="INVALID_JSON", message="Invalid JSON message"
-                )
+                error = ErrorMessage(code="INVALID_JSON", message="Invalid JSON message")
                 await websocket.send_json(error.model_dump())
 
     except WebSocketDisconnect:
@@ -374,9 +364,7 @@ async def get_history_oi(
             from_dt = datetime.fromisoformat(from_date)
             to_dt = datetime.fromisoformat(to_date)
         except ValueError as e:
-            return ErrorResponse(
-                error="INVALID_DATE_FORMAT", message=f"Invalid date format: {e}"
-            )
+            return ErrorResponse(error="INVALID_DATE_FORMAT", message=f"Invalid date format: {e}")
 
         if from_dt > to_dt:
             return ErrorResponse(
@@ -392,9 +380,7 @@ async def get_history_oi(
         # Query Parquet files
         oi_path = CATALOG_PATH / "open_interest"
         if not oi_path.exists():
-            return ErrorResponse(
-                error="CATALOG_NOT_FOUND", message="OI catalog not available"
-            )
+            return ErrorResponse(error="CATALOG_NOT_FOUND", message="OI catalog not available")
 
         # B71: Use try/finally to ensure connection is closed
         con = duckdb.connect()
@@ -466,9 +452,7 @@ async def get_history_funding(
             from_dt = datetime.fromisoformat(from_date)
             to_dt = datetime.fromisoformat(to_date)
         except ValueError as e:
-            return ErrorResponse(
-                error="INVALID_DATE_FORMAT", message=f"Invalid date format: {e}"
-            )
+            return ErrorResponse(error="INVALID_DATE_FORMAT", message=f"Invalid date format: {e}")
 
         if from_dt > to_dt:
             return ErrorResponse(
@@ -483,9 +467,7 @@ async def get_history_funding(
 
         funding_path = CATALOG_PATH / "funding_rate"
         if not funding_path.exists():
-            return ErrorResponse(
-                error="CATALOG_NOT_FOUND", message="Funding catalog not available"
-            )
+            return ErrorResponse(error="CATALOG_NOT_FOUND", message="Funding catalog not available")
 
         con = duckdb.connect()
         query = f"""
@@ -530,9 +512,7 @@ async def get_history_funding(
         )
 
     except FileNotFoundError:
-        return ErrorResponse(
-            error="NO_DATA", message=f"No funding data found for {symbol}"
-        )
+        return ErrorResponse(error="NO_DATA", message=f"No funding data found for {symbol}")
     except Exception as e:
         logger.exception("Error fetching funding history")
         return ErrorResponse(error="INTERNAL_ERROR", message=str(e))
@@ -559,9 +539,7 @@ async def get_history_liquidations(
             from_dt = datetime.fromisoformat(from_date)
             to_dt = datetime.fromisoformat(to_date)
         except ValueError as e:
-            return ErrorResponse(
-                error="INVALID_DATE_FORMAT", message=f"Invalid date format: {e}"
-            )
+            return ErrorResponse(error="INVALID_DATE_FORMAT", message=f"Invalid date format: {e}")
 
         if from_dt > to_dt:
             return ErrorResponse(
@@ -576,9 +554,7 @@ async def get_history_liquidations(
 
         # Validate side parameter
         if side and side not in ("LONG", "SHORT"):
-            return ErrorResponse(
-                error="INVALID_SIDE", message="Side must be LONG or SHORT"
-            )
+            return ErrorResponse(error="INVALID_SIDE", message="Side must be LONG or SHORT")
 
         liq_path = CATALOG_PATH / "liquidation"
         if not liq_path.exists():
@@ -641,9 +617,7 @@ async def get_history_liquidations(
         )
 
     except FileNotFoundError:
-        return ErrorResponse(
-            error="NO_DATA", message=f"No liquidation data found for {symbol}"
-        )
+        return ErrorResponse(error="NO_DATA", message=f"No liquidation data found for {symbol}")
     except Exception as e:
         logger.exception("Error fetching liquidation history")
         return ErrorResponse(error="INTERNAL_ERROR", message=str(e))
@@ -659,9 +633,7 @@ async def get_history_liquidations(
 # Serve static files
 dashboard_path = Path(__file__).parent
 if (dashboard_path / "styles").exists():
-    app.mount(
-        "/styles", StaticFiles(directory=dashboard_path / "styles"), name="styles"
-    )
+    app.mount("/styles", StaticFiles(directory=dashboard_path / "styles"), name="styles")
 if (dashboard_path / "src").exists():
     app.mount("/src", StaticFiles(directory=dashboard_path / "src"), name="src")
 

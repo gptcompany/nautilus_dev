@@ -385,10 +385,7 @@ class WienerFilter:
             return noisy_signal
 
         # Simple Wiener-like filter (first-order IIR approximation)
-        output = (
-            self._filter_coeff * noisy_signal
-            + (1 - self._filter_coeff) * self._prev_output
-        )
+        output = self._filter_coeff * noisy_signal + (1 - self._filter_coeff) * self._prev_output
         self._prev_output = output
 
         return output
@@ -457,9 +454,7 @@ class InformationBasedRiskManager:
 
         # Update SNR estimate (exponential smoothing)
         alpha = 0.1
-        self._snr_estimate = (
-            alpha * instantaneous_snr + (1 - alpha) * self._snr_estimate
-        )
+        self._snr_estimate = alpha * instantaneous_snr + (1 - alpha) * self._snr_estimate
         self._wiener.update_snr(self._snr_estimate)
 
         # Calculate risk multiplier

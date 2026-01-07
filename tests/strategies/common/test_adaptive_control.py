@@ -93,9 +93,7 @@ class TestDSPFilters:
         estimates = [kf.update(m) for m in measurements]
 
         # Final estimate should be close to true value
-        assert abs(estimates[-1] - true_value) < 2.0, (
-            "Kalman should estimate true value"
-        )
+        assert abs(estimates[-1] - true_value) < 2.0, "Kalman should estimate true value"
 
     def test_iir_regime_detector_trending(self):
         """IIR regime should detect trending market."""
@@ -108,9 +106,7 @@ class TestDSPFilters:
             regime = detector.update(ret)
 
         # After enough samples, should classify regime
-        assert regime in ["trending", "normal", "mean_reverting", "unknown"], (
-            f"Got {regime}"
-        )
+        assert regime in ["trending", "normal", "mean_reverting", "unknown"], f"Got {regime}"
 
 
 class TestMetaController:

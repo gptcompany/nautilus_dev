@@ -80,11 +80,7 @@ async def extract_pinescript(url: str) -> dict:
                         content_type = response.headers.get("content-type", "")
                         if "json" in content_type or "text" in content_type:
                             body = await response.text()
-                            if (
-                                "//@version" in body
-                                or "indicator(" in body
-                                or "strategy(" in body
-                            ):
+                            if "//@version" in body or "indicator(" in body or "strategy(" in body:
                                 # Parse JSON response
                                 try:
                                     data = json.loads(body)
@@ -198,9 +194,7 @@ async def extract_pinescript(url: str) -> dict:
 def main():
     """CLI entry point."""
     if len(sys.argv) < 2:
-        print(
-            "Usage: python pinescript_extractor.py <tradingview_url>", file=sys.stderr
-        )
+        print("Usage: python pinescript_extractor.py <tradingview_url>", file=sys.stderr)
         print(
             "Example: python pinescript_extractor.py https://www.tradingview.com/script/tMtleB1G-Liqudation-HeatMap-BigBeluga/",
             file=sys.stderr,

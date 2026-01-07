@@ -177,9 +177,7 @@ class TestRegimeResult:
 class TestRegimeManagerIntegration:
     """Integration tests with real-like data."""
 
-    def test_regime_manager_detects_trending_regime(
-        self, default_config: RegimeConfig
-    ) -> None:
+    def test_regime_manager_detects_trending_regime(self, default_config: RegimeConfig) -> None:
         """Test that manager detects trending regime in upward data."""
         np.random.seed(42)
 

@@ -146,9 +146,7 @@ class DataStreamStrategy(Strategy):
 
 def main():
     """Run the data streaming script."""
-    parser = argparse.ArgumentParser(
-        description="Stream live market data from Hyperliquid"
-    )
+    parser = argparse.ArgumentParser(description="Stream live market data from Hyperliquid")
     parser.add_argument(
         "--testnet",
         action="store_true",

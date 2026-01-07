@@ -375,9 +375,7 @@ def test_concurrent_write_performance(audit_dir):
     print("\nConcurrent Write Results:")
     print(f"  Total time: {overall_elapsed:.2f}s")
     print(f"  Total events: {num_threads * events_per_thread:,}")
-    print(
-        f"  Overall rate: {(num_threads * events_per_thread) / overall_elapsed:.0f} events/s"
-    )
+    print(f"  Overall rate: {(num_threads * events_per_thread) / overall_elapsed:.0f} events/s")
 
     print("\n  Per-thread results:")
     for result in sorted(results, key=lambda r: r["thread_id"]):

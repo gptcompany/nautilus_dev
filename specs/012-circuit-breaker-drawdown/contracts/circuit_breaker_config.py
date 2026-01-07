@@ -94,16 +94,11 @@ class CircuitBreakerConfig(BaseModel):
     @model_validator(mode="after")
     def validate_threshold_ordering(self) -> "CircuitBreakerConfig":
         """Validate that thresholds are in ascending order."""
-        if not (
-            self.level1_drawdown_pct
-            < self.level2_drawdown_pct
-            < self.level3_drawdown_pct
-        ):
+        if not (self.level1_drawdown_pct < self.level2_drawdown_pct < self.level3_drawdown_pct):
             raise ValueError("Thresholds must be ordered: level1 < level2 < level3")
         if self.recovery_drawdown_pct >= self.level1_drawdown_pct:
             raise ValueError(
-                "recovery_drawdown_pct must be less than level1_drawdown_pct "
-                "(hysteresis)"
+                "recovery_drawdown_pct must be less than level1_drawdown_pct (hysteresis)"
             )
         return self
 

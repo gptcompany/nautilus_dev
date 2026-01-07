@@ -58,9 +58,7 @@ class TestWindowGeneration:
         windows = validator._generate_windows()
 
         for i, window in enumerate(windows):
-            assert window.window_id == i + 1, (
-                f"Expected window_id {i + 1}, got {window.window_id}"
-            )
+            assert window.window_id == i + 1, f"Expected window_id {i + 1}, got {window.window_id}"
 
     def test_embargo_period_applied(self) -> None:
         """Test embargo_before_days creates gap between train_end and test_start."""

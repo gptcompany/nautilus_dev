@@ -120,9 +120,7 @@ class TestnetValidationStrategy(HyperliquidBaseStrategy):
                 reduce_only=True,
             )
             self.submit_order(order)
-            self.log.info(
-                f"Submitted MARKET SELL (reduce_only): {order.client_order_id}"
-            )
+            self.log.info(f"Submitted MARKET SELL (reduce_only): {order.client_order_id}")
         except Exception as e:
             self.log.error(f"Failed to close position: {e}")
             self._fail_validation(f"Position close failed: {e}")
@@ -175,15 +173,11 @@ class TestnetValidationStrategy(HyperliquidBaseStrategy):
         # Check if RiskManager created stop-loss
         if self.risk_manager.active_stops:
             self.stop_loss_active = True
-            self.log.info(
-                f"✓ Stop-loss active: {len(self.risk_manager.active_stops)} stop orders"
-            )
+            self.log.info(f"✓ Stop-loss active: {len(self.risk_manager.active_stops)} stop orders")
             # Now close the position
             self._close_test_position()
         else:
-            self.log.warning(
-                "⚠ No stop-loss orders found - RiskManager may not have triggered"
-            )
+            self.log.warning("⚠ No stop-loss orders found - RiskManager may not have triggered")
             # Continue with closing anyway
             self._close_test_position()
 
@@ -216,9 +210,7 @@ class TestnetValidationStrategy(HyperliquidBaseStrategy):
 
 def main():
     """Run testnet validation."""
-    parser = argparse.ArgumentParser(
-        description="Validate Hyperliquid integration on testnet"
-    )
+    parser = argparse.ArgumentParser(description="Validate Hyperliquid integration on testnet")
     parser.add_argument(
         "--instrument",
         type=str,

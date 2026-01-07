@@ -51,9 +51,7 @@ class TestGillerSqrtScaling:
         size = giller_sizer.calculate(signal=9.0)
         assert size == pytest.approx(3.0, rel=0.01)
 
-    def test_giller_sqrt_scaling_negative_signal(
-        self, giller_sizer: GillerSizer
-    ) -> None:
+    def test_giller_sqrt_scaling_negative_signal(self, giller_sizer: GillerSizer) -> None:
         """Test that negative signals produce negative sizes (same magnitude)."""
         size = giller_sizer.calculate(signal=-4.0)
         assert size == pytest.approx(-2.0, rel=0.01)
@@ -115,9 +113,7 @@ class TestGillerEdgeCases:
         size = giller_sizer.calculate(signal=0.0)
         assert size == 0.0
 
-    def test_giller_edge_cases_very_small_signal(
-        self, giller_sizer: GillerSizer
-    ) -> None:
+    def test_giller_edge_cases_very_small_signal(self, giller_sizer: GillerSizer) -> None:
         """Test that very small signals produce minimum size."""
         size = giller_sizer.calculate(signal=0.001)
         # sqrt(0.001) = 0.0316..., below min_size
@@ -144,16 +140,12 @@ class TestGillerMinMaxLimits:
         size = giller_sizer.calculate(signal=0.001)
         assert size == pytest.approx(0.1, rel=0.01)
 
-    def test_giller_negative_respects_max_limit(
-        self, giller_sizer: GillerSizer
-    ) -> None:
+    def test_giller_negative_respects_max_limit(self, giller_sizer: GillerSizer) -> None:
         """Test that large negative signals are clamped to -max_size."""
         size = giller_sizer.calculate(signal=-100.0)
         assert size == pytest.approx(-5.0, rel=0.01)
 
-    def test_giller_negative_respects_min_limit(
-        self, giller_sizer: GillerSizer
-    ) -> None:
+    def test_giller_negative_respects_min_limit(self, giller_sizer: GillerSizer) -> None:
         """Test that small negative signals are clamped to -min_size."""
         size = giller_sizer.calculate(signal=-0.001)
         assert size == pytest.approx(-0.1, rel=0.01)

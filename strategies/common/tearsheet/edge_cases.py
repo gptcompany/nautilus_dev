@@ -255,9 +255,7 @@ def check_high_frequency(
         trades_per_day = total_trades / max(days, 1)
 
         if trades_per_day >= trades_per_day_threshold:
-            _logger.info(
-                f"High-frequency trading detected: {trades_per_day:.0f} trades/day"
-            )
+            _logger.info(f"High-frequency trading detected: {trades_per_day:.0f} trades/day")
             return TearsheetWarning(
                 edge_case=EdgeCaseType.HIGH_FREQUENCY,
                 severity=EdgeCaseSeverity.INFO,

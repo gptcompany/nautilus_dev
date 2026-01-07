@@ -209,9 +209,7 @@ class TestValidateUpdate:
         assert result["dry_run"] is True
 
     @patch("scripts.auto_update.validator.run_pytest")
-    def test_validate_update_tests_pass(
-        self, mock_run_pytest: MagicMock, tmp_path: Path
-    ):
+    def test_validate_update_tests_pass(self, mock_run_pytest: MagicMock, tmp_path: Path):
         """Test validation when all tests pass."""
         mock_run_pytest.return_value = {
             "success": True,
@@ -228,9 +226,7 @@ class TestValidateUpdate:
         assert result["test_result"].passed is True
 
     @patch("scripts.auto_update.validator.run_pytest")
-    def test_validate_update_tests_fail(
-        self, mock_run_pytest: MagicMock, tmp_path: Path
-    ):
+    def test_validate_update_tests_fail(self, mock_run_pytest: MagicMock, tmp_path: Path):
         """Test validation when tests fail."""
         mock_run_pytest.return_value = {
             "success": False,
@@ -247,9 +243,7 @@ class TestValidateUpdate:
         assert result["test_result"].passed is False
 
     @patch("scripts.auto_update.validator.run_pytest")
-    def test_validate_update_with_custom_paths(
-        self, mock_run_pytest: MagicMock, tmp_path: Path
-    ):
+    def test_validate_update_with_custom_paths(self, mock_run_pytest: MagicMock, tmp_path: Path):
         """Test validation with custom test paths."""
         mock_run_pytest.return_value = {
             "success": True,
@@ -269,9 +263,7 @@ class TestValidateUpdate:
         assert call_args[1]["test_paths"] == ["tests/unit/", "tests/integration/"]
 
     @patch("scripts.auto_update.validator.run_pytest")
-    def test_validate_update_blocks_on_failure(
-        self, mock_run_pytest: MagicMock, tmp_path: Path
-    ):
+    def test_validate_update_blocks_on_failure(self, mock_run_pytest: MagicMock, tmp_path: Path):
         """Test that validation blocks merge on failure."""
         mock_run_pytest.return_value = {
             "success": False,
@@ -286,6 +278,4 @@ class TestValidateUpdate:
         )
         assert result["success"] is False
         assert result["can_merge"] is False
-        assert (
-            "blocking" in result.get("reason", "").lower() or result["success"] is False
-        )
+        assert "blocking" in result.get("reason", "").lower() or result["success"] is False

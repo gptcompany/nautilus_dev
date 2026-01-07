@@ -90,9 +90,7 @@ class TradesConverter(BaseConverter):
         tick_df = pd.DataFrame(
             {
                 "price": df["price"].values.astype("float64"),
-                "quantity": df["qty"].values.astype(
-                    "float64"
-                ),  # V1 requires 'quantity'
+                "quantity": df["qty"].values.astype("float64"),  # V1 requires 'quantity'
                 "buyer_maker": df["is_buyer_maker"].values,  # bool
                 "trade_id": df["id"].astype(str).values,
             },
@@ -164,9 +162,7 @@ def convert_trades(
     total_ticks = 0
     file_count = 0
 
-    files = (
-        converter.get_pending_files() if skip_processed else converter.discover_files()
-    )
+    files = converter.get_pending_files() if skip_processed else converter.discover_files()
 
     for file_path in files:
         file_ticks = 0

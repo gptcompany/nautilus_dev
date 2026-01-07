@@ -100,9 +100,7 @@ class RecoverableStrategy(Strategy):
 
         # Recovery configuration (use defaults if not provided)
         self.recovery_config = config.recovery or RecoveryConfig(
-            trader_id=str(self.trader_id)
-            if hasattr(self, "trader_id")
-            else "TRADER-001"
+            trader_id=str(self.trader_id) if hasattr(self, "trader_id") else "TRADER-001"
         )
 
         # Recovery state tracking
@@ -189,8 +187,7 @@ class RecoverableStrategy(Strategy):
                 self._handle_recovered_position(position)
 
         self.log.info(
-            f"Position detection complete: "
-            f"found {len(self._recovered_positions)} open positions"
+            f"Position detection complete: found {len(self._recovered_positions)} open positions"
         )
 
     def _handle_recovered_position(self, position: Position) -> None:
@@ -422,10 +419,7 @@ class RecoverableStrategy(Strategy):
         Returns:
             True if warmup is complete and recovery succeeded.
         """
-        return (
-            self._warmup_complete
-            and self.recovery_state.status == RecoveryStatus.COMPLETED
-        )
+        return self._warmup_complete and self.recovery_state.status == RecoveryStatus.COMPLETED
 
     @property
     def recovered_positions_count(self) -> int:

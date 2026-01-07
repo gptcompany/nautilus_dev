@@ -202,9 +202,7 @@ class HawkesOFI:
             self._first_timestamp = classification.timestamp_ns
 
         # Convert timestamp to relative seconds since first event
-        relative_time_s = (
-            classification.timestamp_ns - self._first_timestamp
-        ) / 1_000_000_000.0
+        relative_time_s = (classification.timestamp_ns - self._first_timestamp) / 1_000_000_000.0
 
         # Add to appropriate time buffer based on side
         if classification.side == TradeSide.BUY:
@@ -224,12 +222,8 @@ class HawkesOFI:
         self._state.ticks_since_fit += 1
 
         # Update intensities using exponential kernel
-        self._state.buy_intensity = self._calculate_intensity(
-            self._buy_times, relative_time_s
-        )
-        self._state.sell_intensity = self._calculate_intensity(
-            self._sell_times, relative_time_s
-        )
+        self._state.buy_intensity = self._calculate_intensity(self._buy_times, relative_time_s)
+        self._state.sell_intensity = self._calculate_intensity(self._sell_times, relative_time_s)
 
         # Check if refit is needed (based on interval)
         if self._state.ticks_since_fit >= self._config.refit_interval:
@@ -288,9 +282,7 @@ class HawkesOFI:
             self._config.fixed_excitation,
         )
         self._state.decay = self._config.decay_rate
-        self._state.branching_ratio = (
-            self._config.fixed_excitation / self._config.decay_rate
-        )
+        self._state.branching_ratio = self._config.fixed_excitation / self._config.decay_rate
 
         # Calculate current intensities
         if self._buy_times or self._sell_times:
@@ -301,12 +293,8 @@ class HawkesOFI:
             if self._sell_times:
                 latest_time = max(latest_time, self._sell_times[-1])
 
-            self._state.buy_intensity = self._calculate_intensity(
-                self._buy_times, latest_time
-            )
-            self._state.sell_intensity = self._calculate_intensity(
-                self._sell_times, latest_time
-            )
+            self._state.buy_intensity = self._calculate_intensity(self._buy_times, latest_time)
+            self._state.sell_intensity = self._calculate_intensity(self._sell_times, latest_time)
 
         # Mark as fitted
         self._is_fitted = True

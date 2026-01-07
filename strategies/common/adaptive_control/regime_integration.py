@@ -135,9 +135,7 @@ class EnhancedRegimeManager:
         spectral_analysis = self.spectral.analyze()
 
         # Calculate agreement
-        agreement = self._calculate_agreement(
-            hmm_result.regime, spectral_analysis.regime
-        )
+        agreement = self._calculate_agreement(hmm_result.regime, spectral_analysis.regime)
 
         # Calculate combined weight
         combined = self._combine_regimes(hmm_result, spectral_analysis, agreement)
@@ -179,9 +177,7 @@ class EnhancedRegimeManager:
         spectral_reverting = spectral_regime == MarketRegime.MEAN_REVERTING
 
         # Full agreement
-        if (hmm_trending and spectral_trending) or (
-            hmm_reverting and spectral_reverting
-        ):
+        if (hmm_trending and spectral_trending) or (hmm_reverting and spectral_reverting):
             return 1.0
 
         # Partial agreement (one neutral/normal)
@@ -232,9 +228,7 @@ class EnhancedRegimeManager:
             MarketRegime.UNKNOWN: 0.3,
         }
         spectral_base = spectral_weights.get(spectral_analysis.regime, 0.5)
-        spectral_component = (
-            spectral_base * self.spectral_weight * spectral_analysis.confidence
-        )
+        spectral_component = spectral_base * self.spectral_weight * spectral_analysis.confidence
 
         combined_weight = hmm_component + spectral_component
 

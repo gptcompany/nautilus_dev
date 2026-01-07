@@ -71,26 +71,20 @@ class TestExtractBreakingChanges:
         assert len(changes) == 2
         assert all(isinstance(c, BreakingChange) for c in changes)
 
-    def test_extract_breaking_changes_severity(
-        self, sample_changelog_data: ChangelogData
-    ):
+    def test_extract_breaking_changes_severity(self, sample_changelog_data: ChangelogData):
         """Test breaking changes have severity assigned."""
         changes = extract_breaking_changes(sample_changelog_data)
         # on_tick removal is HIGH severity (method removal)
         on_tick_change = next(c for c in changes if "on_tick" in c.description)
         assert on_tick_change.severity in [Severity.HIGH, Severity.MEDIUM]
 
-    def test_extract_breaking_changes_patterns(
-        self, sample_changelog_data: ChangelogData
-    ):
+    def test_extract_breaking_changes_patterns(self, sample_changelog_data: ChangelogData):
         """Test breaking changes have grep patterns."""
         changes = extract_breaking_changes(sample_changelog_data)
         for change in changes:
             assert change.affected_pattern != "" or change.severity == Severity.LOW
 
-    def test_extract_breaking_changes_empty(
-        self, sample_changelog_no_breaking: ChangelogData
-    ):
+    def test_extract_breaking_changes_empty(self, sample_changelog_no_breaking: ChangelogData):
         """Test extracting from changelog with no breaking changes."""
         changes = extract_breaking_changes(sample_changelog_no_breaking)
         assert changes == []
@@ -154,17 +148,11 @@ class TestDetectUpdateAvailable:
     def test_version_comparison_semver(self):
         """Test semver-like version comparison."""
         # Patch version bump
-        assert (
-            detect_update_available("1.221.0", "v1.221.1")["update_available"] is True
-        )
+        assert detect_update_available("1.221.0", "v1.221.1")["update_available"] is True
         # Minor version bump
-        assert (
-            detect_update_available("1.221.5", "v1.222.0")["update_available"] is True
-        )
+        assert detect_update_available("1.221.5", "v1.222.0")["update_available"] is True
         # Major version bump
-        assert (
-            detect_update_available("1.999.999", "v2.0.0")["update_available"] is True
-        )
+        assert detect_update_available("1.999.999", "v2.0.0")["update_available"] is True
 
 
 # =============================================================================

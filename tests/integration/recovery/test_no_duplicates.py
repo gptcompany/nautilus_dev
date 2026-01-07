@@ -157,15 +157,9 @@ class TestNoDuplicateOrders:
 
         strategy = OrderTrackingStrategy(strategy_config)
 
-        with patch.object(
-            type(strategy), "cache", new_callable=PropertyMock
-        ) as cache_prop:
-            with patch.object(
-                type(strategy), "clock", new_callable=PropertyMock
-            ) as clock_prop:
-                with patch.object(
-                    type(strategy), "log", new_callable=PropertyMock
-                ) as log_prop:
+        with patch.object(type(strategy), "cache", new_callable=PropertyMock) as cache_prop:
+            with patch.object(type(strategy), "clock", new_callable=PropertyMock) as clock_prop:
+                with patch.object(type(strategy), "log", new_callable=PropertyMock) as log_prop:
                     cache_prop.return_value = mock_cache
                     clock_prop.return_value = mock_clock
                     log_mock = MagicMock()
@@ -204,15 +198,9 @@ class TestNoDuplicateOrders:
 
         strategy = OrderTrackingStrategy(strategy_config)
 
-        with patch.object(
-            type(strategy), "cache", new_callable=PropertyMock
-        ) as cache_prop:
-            with patch.object(
-                type(strategy), "clock", new_callable=PropertyMock
-            ) as clock_prop:
-                with patch.object(
-                    type(strategy), "log", new_callable=PropertyMock
-                ) as log_prop:
+        with patch.object(type(strategy), "cache", new_callable=PropertyMock) as cache_prop:
+            with patch.object(type(strategy), "clock", new_callable=PropertyMock) as clock_prop:
+                with patch.object(type(strategy), "log", new_callable=PropertyMock) as log_prop:
                     cache_prop.return_value = mock_cache
                     clock_prop.return_value = mock_clock
                     log_mock = MagicMock()
@@ -247,15 +235,9 @@ class TestNoDuplicateOrders:
 
         strategy = OrderTrackingStrategy(strategy_config)
 
-        with patch.object(
-            type(strategy), "cache", new_callable=PropertyMock
-        ) as cache_prop:
-            with patch.object(
-                type(strategy), "clock", new_callable=PropertyMock
-            ) as clock_prop:
-                with patch.object(
-                    type(strategy), "log", new_callable=PropertyMock
-                ) as log_prop:
+        with patch.object(type(strategy), "cache", new_callable=PropertyMock) as cache_prop:
+            with patch.object(type(strategy), "clock", new_callable=PropertyMock) as clock_prop:
+                with patch.object(type(strategy), "log", new_callable=PropertyMock) as log_prop:
                     cache_prop.return_value = mock_cache
                     clock_prop.return_value = mock_clock
                     log_mock = MagicMock()
@@ -294,15 +276,9 @@ class TestNoDuplicateOrders:
 
         strategy = OrderTrackingStrategy(strategy_config)
 
-        with patch.object(
-            type(strategy), "cache", new_callable=PropertyMock
-        ) as cache_prop:
-            with patch.object(
-                type(strategy), "clock", new_callable=PropertyMock
-            ) as clock_prop:
-                with patch.object(
-                    type(strategy), "log", new_callable=PropertyMock
-                ) as log_prop:
+        with patch.object(type(strategy), "cache", new_callable=PropertyMock) as cache_prop:
+            with patch.object(type(strategy), "clock", new_callable=PropertyMock) as clock_prop:
+                with patch.object(type(strategy), "log", new_callable=PropertyMock) as log_prop:
                     cache_prop.return_value = mock_cache
                     clock_prop.return_value = mock_clock
                     log_mock = MagicMock()
@@ -336,15 +312,9 @@ class TestNoDuplicateOrders:
 
         strategy = OrderTrackingStrategy(strategy_config)
 
-        with patch.object(
-            type(strategy), "cache", new_callable=PropertyMock
-        ) as cache_prop:
-            with patch.object(
-                type(strategy), "clock", new_callable=PropertyMock
-            ) as clock_prop:
-                with patch.object(
-                    type(strategy), "log", new_callable=PropertyMock
-                ) as log_prop:
+        with patch.object(type(strategy), "cache", new_callable=PropertyMock) as cache_prop:
+            with patch.object(type(strategy), "clock", new_callable=PropertyMock) as clock_prop:
+                with patch.object(type(strategy), "log", new_callable=PropertyMock) as log_prop:
                     cache_prop.return_value = mock_cache
                     clock_prop.return_value = mock_clock
                     log_mock = MagicMock()
@@ -396,15 +366,9 @@ class TestNoDuplicateOrders:
 
         strategy = OrderTrackingStrategy(config)
 
-        with patch.object(
-            type(strategy), "cache", new_callable=PropertyMock
-        ) as cache_prop:
-            with patch.object(
-                type(strategy), "clock", new_callable=PropertyMock
-            ) as clock_prop:
-                with patch.object(
-                    type(strategy), "log", new_callable=PropertyMock
-                ) as log_prop:
+        with patch.object(type(strategy), "cache", new_callable=PropertyMock) as cache_prop:
+            with patch.object(type(strategy), "clock", new_callable=PropertyMock) as clock_prop:
+                with patch.object(type(strategy), "log", new_callable=PropertyMock) as log_prop:
                     cache_prop.return_value = mock_cache
                     clock_prop.return_value = mock_clock
                     log_prop.return_value = MagicMock()

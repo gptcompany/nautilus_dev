@@ -82,9 +82,7 @@ class WalkForwardValidator:
         logger.info(f"Generated {len(windows)} walk-forward windows")
 
         if len(windows) < self.config.min_windows:
-            logger.warning(
-                f"Insufficient windows: {len(windows)} < {self.config.min_windows}"
-            )
+            logger.warning(f"Insufficient windows: {len(windows)} < {self.config.min_windows}")
 
         # Evaluate each window
         window_results: list[WindowResult] = []
@@ -118,8 +116,7 @@ class WalkForwardValidator:
 
         # Calculate advanced metrics
         avg_sharpe = (
-            sum(w.test_metrics.sharpe_ratio for w in window_results)
-            / len(window_results)
+            sum(w.test_metrics.sharpe_ratio for w in window_results) / len(window_results)
             if window_results
             else 0.0
         )
@@ -127,9 +124,7 @@ class WalkForwardValidator:
             sharpe=avg_sharpe,
             n_trials=len(window_results),
         )
-        pbo = estimate_probability_backtest_overfitting(
-            window_results, seed=self.config.seed
-        )
+        pbo = estimate_probability_backtest_overfitting(window_results, seed=self.config.seed)
 
         # Check pass/fail criteria
         passed = self._check_criteria(window_results, robustness_score)
@@ -264,9 +259,7 @@ class WalkForwardValidator:
 
         # Criterion 4: Majority with adequate Sharpe (more than 50%)
         sharpe_ok = sum(
-            1
-            for w in window_results
-            if w.test_metrics.sharpe_ratio >= self.config.min_test_sharpe
+            1 for w in window_results if w.test_metrics.sharpe_ratio >= self.config.min_test_sharpe
         )
         # Use float division to correctly handle odd window counts
         if sharpe_ok <= len(window_results) / 2:

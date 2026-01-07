@@ -39,6 +39,7 @@ def main():
 
     # Test with redis-cli if available
     import subprocess
+
     try:
         result = subprocess.run(
             ["redis-cli", "-h", host, "-p", str(port), "ping"],

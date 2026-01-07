@@ -128,8 +128,7 @@ def get_preset_description(preset: ReconciliationPreset) -> str:
             "For low-latency environments with stable connections."
         ),
         ReconciliationPreset.DISABLED: (
-            "Reconciliation completely disabled. "
-            "For testing only - NOT recommended for production."
+            "Reconciliation completely disabled. For testing only - NOT recommended for production."
         ),
     }
     return descriptions[preset]

@@ -173,9 +173,7 @@ class MultiDimensionalRegimeDetector:
         if self._last_price is not None and self._last_price > 0:
             ret = (price - self._last_price) / self._last_price
             iir_regime = self._iir.update(ret)
-            iir_conf = min(
-                1.0, abs(self._iir.variance_ratio - 1.0)
-            )  # Confidence from deviation
+            iir_conf = min(1.0, abs(self._iir.variance_ratio - 1.0))  # Confidence from deviation
 
             dimensions.append(
                 DimensionResult(

@@ -227,9 +227,7 @@ class MetricsClient:
         """
         try:
             client = self._get_client()
-            response = await client.get(
-                f"{self._base_url}/exec", params={"query": "SELECT 1"}
-            )
+            response = await client.get(f"{self._base_url}/exec", params={"query": "SELECT 1"})
             return response.status_code == 200
         except Exception:
             return False

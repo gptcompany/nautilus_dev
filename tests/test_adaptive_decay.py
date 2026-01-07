@@ -63,9 +63,7 @@ class TestAdaptiveDecayCalculator:
         """Create calculator instance for tests."""
         return AdaptiveDecayCalculator()
 
-    def test_low_volatility_high_decay(
-        self, calculator: AdaptiveDecayCalculator
-    ) -> None:
+    def test_low_volatility_high_decay(self, calculator: AdaptiveDecayCalculator) -> None:
         """Test: Low volatility (variance_ratio < 0.7) -> decay = 0.99.
 
         When market is stable (mean-reverting), we want slow forgetting
@@ -75,9 +73,7 @@ class TestAdaptiveDecayCalculator:
         decay = calculator.calculate(context)
         assert decay == 0.99
 
-    def test_high_volatility_low_decay(
-        self, calculator: AdaptiveDecayCalculator
-    ) -> None:
+    def test_high_volatility_low_decay(self, calculator: AdaptiveDecayCalculator) -> None:
         """Test: High volatility (variance_ratio > 1.5) -> decay = 0.95.
 
         When market is volatile/trending, we want faster forgetting
@@ -87,9 +83,7 @@ class TestAdaptiveDecayCalculator:
         decay = calculator.calculate(context)
         assert decay == 0.95
 
-    def test_normal_volatility_interpolated(
-        self, calculator: AdaptiveDecayCalculator
-    ) -> None:
+    def test_normal_volatility_interpolated(self, calculator: AdaptiveDecayCalculator) -> None:
         """Test: Normal volatility -> interpolated decay.
 
         Midpoint variance_ratio=1.1 should give midpoint decay=0.97.
@@ -128,9 +122,7 @@ class TestAdaptiveDecayCalculator:
         decay = calculator.calculate(context)
         assert decay == 0.99
 
-    def test_calculate_from_ratio_convenience(
-        self, calculator: AdaptiveDecayCalculator
-    ) -> None:
+    def test_calculate_from_ratio_convenience(self, calculator: AdaptiveDecayCalculator) -> None:
         """Test: calculate_from_ratio() convenience method works correctly."""
         # Low volatility
         assert calculator.calculate_from_ratio(0.5) == 0.99
@@ -149,9 +141,7 @@ class TestAdaptiveDecayCalculator:
             decay = calculator.calculate_from_ratio(vr)
             assert 0.95 <= decay <= 0.99, f"Decay {decay} out of range for vr={vr}"
 
-    def test_monotonically_decreasing(
-        self, calculator: AdaptiveDecayCalculator
-    ) -> None:
+    def test_monotonically_decreasing(self, calculator: AdaptiveDecayCalculator) -> None:
         """Test: Higher variance_ratio -> lower decay (monotonically decreasing)."""
         ratios = [0.5, 0.7, 1.0, 1.1, 1.5, 2.0]
         decays = [calculator.calculate_from_ratio(vr) for vr in ratios]

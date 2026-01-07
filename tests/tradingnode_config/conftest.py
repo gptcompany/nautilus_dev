@@ -165,9 +165,7 @@ def clean_env():
     original = os.environ.copy()
     # Remove any nautilus/exchange env vars
     keys_to_remove = [
-        k
-        for k in os.environ
-        if k.startswith(("NAUTILUS_", "REDIS_", "BINANCE_", "BYBIT_"))
+        k for k in os.environ if k.startswith(("NAUTILUS_", "REDIS_", "BINANCE_", "BYBIT_"))
     ]
     for key in keys_to_remove:
         del os.environ[key]

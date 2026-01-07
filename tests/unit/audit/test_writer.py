@@ -310,9 +310,7 @@ class TestCrashRecovery:
         # Simulate partial write (truncated JSON)
         with open(log_file, "w") as f:
             f.write(complete_event.model_dump_json() + "\n")
-            f.write(
-                '{"event_type": "param.state_change", "source": "partial'
-            )  # Truncated
+            f.write('{"event_type": "param.state_change", "source": "partial')  # Truncated
 
         # Count valid lines
         valid_count = 0

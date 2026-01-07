@@ -208,9 +208,7 @@ class RegimeManager:
         volatility_cluster = self.gmm_filter.predict(current_volatility)
 
         # Get confidence from state probabilities
-        hmm_probs = self.hmm_filter.get_state_probabilities(
-            current_return, current_volatility
-        )
+        hmm_probs = self.hmm_filter.get_state_probabilities(current_return, current_volatility)
         confidence = float(np.max(hmm_probs))
 
         # Calculate regime weight

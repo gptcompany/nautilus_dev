@@ -180,11 +180,7 @@ class DailyPnLTracker:
         positions = self._strategy.cache.positions_open()
         for position in positions:
             try:
-                order_side = (
-                    OrderSide.SELL
-                    if position.side == PositionSide.LONG
-                    else OrderSide.BUY
-                )
+                order_side = OrderSide.SELL if position.side == PositionSide.LONG else OrderSide.BUY
                 close_order = self._strategy.order_factory.market(
                     instrument_id=position.instrument_id,
                     order_side=order_side,

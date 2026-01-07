@@ -356,12 +356,8 @@ def estimate_probability_backtest_overfitting(
         group_b_indices = indices[mid:] if mid < n else [indices[-1]]
 
         # Calculate average degradation for each group
-        avg_deg_a = sum(degradation_ratios[i] for i in group_a_indices) / len(
-            group_a_indices
-        )
-        avg_deg_b = sum(degradation_ratios[i] for i in group_b_indices) / len(
-            group_b_indices
-        )
+        avg_deg_a = sum(degradation_ratios[i] for i in group_a_indices) / len(group_a_indices)
+        avg_deg_b = sum(degradation_ratios[i] for i in group_b_indices) / len(group_b_indices)
 
         # Overfitting detected if either group shows significant degradation
         # This captures strategies that overfit to specific market regimes

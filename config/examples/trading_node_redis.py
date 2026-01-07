@@ -14,9 +14,7 @@ from nautilus_trader.config import (
 import sys
 import os
 
-sys.path.insert(
-    0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-)
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 from config.cache.redis_config import create_redis_cache_config
 
 

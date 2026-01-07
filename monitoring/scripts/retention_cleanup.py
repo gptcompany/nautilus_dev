@@ -124,9 +124,7 @@ def drop_old_partitions(
 
             if partition_date < cutoff_date:
                 if dry_run:
-                    logger.info(
-                        f"[DRY-RUN] Would drop partition {table}.{partition_name}"
-                    )
+                    logger.info(f"[DRY-RUN] Would drop partition {table}.{partition_name}")
                 else:
                     # QuestDB uses ALTER TABLE to drop partitions
                     drop_query = (
@@ -138,9 +136,7 @@ def drop_old_partitions(
                         logger.info(f"Dropped partition {table}.{partition_name}")
                         dropped += 1
                     else:
-                        logger.error(
-                            f"Failed to drop partition {table}.{partition_name}"
-                        )
+                        logger.error(f"Failed to drop partition {table}.{partition_name}")
         except ValueError:
             # Skip non-date partition names (e.g., default partition)
             continue

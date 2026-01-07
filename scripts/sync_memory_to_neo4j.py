@@ -181,9 +181,7 @@ def main():
             print(f"\nSynced {synced_rels} relations")
 
             # Show final counts
-            result = session.run(
-                "MATCH (n) RETURN labels(n)[0] as label, count(n) as count"
-            )
+            result = session.run("MATCH (n) RETURN labels(n)[0] as label, count(n) as count")
             print("\nNeo4j node counts:")
             for record in result:
                 print(f"  {record['label']}: {record['count']}")

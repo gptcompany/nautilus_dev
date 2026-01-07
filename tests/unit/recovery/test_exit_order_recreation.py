@@ -59,9 +59,7 @@ class TestSetupExitOrders:
         has_stop = any(is_stop_order(order) for order in open_orders)
 
         if has_stop:
-            mock_logger.info(
-                f"Stop-loss already exists for {mock_position.instrument_id}"
-            )
+            mock_logger.info(f"Stop-loss already exists for {mock_position.instrument_id}")
 
         assert has_stop is True
         mock_logger.info.assert_called()
@@ -252,9 +250,7 @@ class TestStopOrderDetection:
 class TestExitOrderRecreationIntegration:
     """Integration tests for exit order recreation flow."""
 
-    def test_recovered_position_with_stop_flow(
-        self, mock_cache, mock_logger, mock_btc_position
-    ):
+    def test_recovered_position_with_stop_flow(self, mock_cache, mock_logger, mock_btc_position):
         """Test full flow: recovered position with existing stop."""
         from nautilus_trader.model.identifiers import InstrumentId
 
@@ -272,9 +268,7 @@ class TestExitOrderRecreationIntegration:
             has_stop = any(is_stop_order(order) for order in open_orders)
 
             if has_stop:
-                mock_logger.info(
-                    f"Stop-loss already exists for {position.instrument_id}"
-                )
+                mock_logger.info(f"Stop-loss already exists for {position.instrument_id}")
                 return True
             else:
                 mock_logger.warning(
@@ -290,9 +284,7 @@ class TestExitOrderRecreationIntegration:
         assert result is True
         mock_logger.info.assert_called()
 
-    def test_recovered_position_without_stop_flow(
-        self, mock_cache, mock_logger, mock_btc_position
-    ):
+    def test_recovered_position_without_stop_flow(self, mock_cache, mock_logger, mock_btc_position):
         """Test full flow: recovered position without existing stop."""
         from nautilus_trader.model.identifiers import InstrumentId
 
@@ -307,9 +299,7 @@ class TestExitOrderRecreationIntegration:
             has_stop = any(is_stop_order(order) for order in open_orders)
 
             if has_stop:
-                mock_logger.info(
-                    f"Stop-loss already exists for {position.instrument_id}"
-                )
+                mock_logger.info(f"Stop-loss already exists for {position.instrument_id}")
                 return True
             else:
                 mock_logger.warning(

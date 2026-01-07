@@ -69,9 +69,7 @@ class TestMetaModel:
 
         assert model.is_fitted
 
-    def test_predict_proba_returns_probabilities(
-        self, sample_meta_features, meta_model_config
-    ):
+    def test_predict_proba_returns_probabilities(self, sample_meta_features, meta_model_config):
         """Test that predict_proba returns values in [0, 1]."""
         from strategies.common.meta_learning.meta_model import MetaModel
 
@@ -104,14 +102,10 @@ class TestMetaModel:
         probs = model.predict_proba(sample_meta_features)
 
         # Should return default confidence for all samples
-        expected = np.full(
-            len(sample_meta_features), meta_model_config.default_confidence
-        )
+        expected = np.full(len(sample_meta_features), meta_model_config.default_confidence)
         np.testing.assert_array_equal(probs, expected)
 
-    def test_feature_importances_available_after_fit(
-        self, sample_meta_features, meta_model_config
-    ):
+    def test_feature_importances_available_after_fit(self, sample_meta_features, meta_model_config):
         """Test that feature importances are available after training."""
         from strategies.common.meta_learning.meta_model import MetaModel
 

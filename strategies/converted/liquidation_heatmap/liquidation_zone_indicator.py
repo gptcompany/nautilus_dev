@@ -111,10 +111,7 @@ class LiquidationZoneIndicator(Indicator):
 
     @property
     def initialized(self) -> bool:
-        return (
-            self._atr.initialized
-            and len(self._bar_history) >= self.pivot_lookback * 2 + 1
-        )
+        return self._atr.initialized and len(self._bar_history) >= self.pivot_lookback * 2 + 1
 
     @property
     def zones(self) -> list[LiquidationZone]:
@@ -163,11 +160,7 @@ class LiquidationZoneIndicator(Indicator):
         self._bar_count += 1
 
         # Get volume (or use candle range as proxy)
-        volume = (
-            float(bar.volume)
-            if float(bar.volume) > 0
-            else float(bar.high - bar.low) * 100
-        )
+        volume = float(bar.volume) if float(bar.volume) > 0 else float(bar.high - bar.low) * 100
         self._volume_history.append(volume)
 
         if not self.initialized:

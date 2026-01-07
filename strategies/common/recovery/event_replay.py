@@ -162,8 +162,7 @@ class EventReplayManager:
             events = [
                 e
                 for e in events
-                if hasattr(e, "instrument_id")
-                and e.instrument_id.value == instrument_id
+                if hasattr(e, "instrument_id") and e.instrument_id.value == instrument_id
             ]
 
         # Filter by time range

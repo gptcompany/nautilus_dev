@@ -137,9 +137,7 @@ class TestRecommendationGeneration:
             sharpe_edge=0.3,
         )
 
-        assert (
-            "deploy" in recommendation.lower() or "adaptive" in recommendation.lower()
-        )
+        assert "deploy" in recommendation.lower() or "adaptive" in recommendation.lower()
 
     def test_stop_recommendation_mentions_fixed(self) -> None:
         """Test STOP recommendation mentions using fixed sizing."""

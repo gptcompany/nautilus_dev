@@ -186,17 +186,13 @@ class TestBinanceFetcherHistory:
         ]
 
         with patch.object(fetcher, "_exchange", create=True) as mock_exchange:
-            mock_exchange.fetch_open_interest_history = AsyncMock(
-                side_effect=[page1, page2, []]
-            )
+            mock_exchange.fetch_open_interest_history = AsyncMock(side_effect=[page1, page2, []])
             fetcher._connected = True
 
             start = datetime.fromtimestamp(base_ts / 1000, tz=timezone.utc)
             end = datetime.fromtimestamp((base_ts + 3600000) / 1000, tz=timezone.utc)
 
-            results = await fetcher.fetch_open_interest_history(
-                "BTCUSDT-PERP", start, end
-            )
+            results = await fetcher.fetch_open_interest_history("BTCUSDT-PERP", start, end)
 
             assert len(results) == 8
             assert all(isinstance(r, OpenInterest) for r in results)
@@ -204,9 +200,7 @@ class TestBinanceFetcherHistory:
             assert all(r.symbol == "BTCUSDT-PERP" for r in results)
 
     @pytest.mark.asyncio
-    async def test_pagination_handles_empty_response(
-        self, fetcher: BinanceFetcher
-    ) -> None:
+    async def test_pagination_handles_empty_response(self, fetcher: BinanceFetcher) -> None:
         """Test pagination stops on empty response (T036)."""
         with patch.object(fetcher, "_exchange", create=True) as mock_exchange:
             mock_exchange.fetch_open_interest_history = AsyncMock(return_value=[])
@@ -215,9 +209,7 @@ class TestBinanceFetcherHistory:
             start = datetime(2024, 1, 15, tzinfo=timezone.utc)
             end = datetime(2024, 1, 16, tzinfo=timezone.utc)
 
-            results = await fetcher.fetch_open_interest_history(
-                "BTCUSDT-PERP", start, end
-            )
+            results = await fetcher.fetch_open_interest_history("BTCUSDT-PERP", start, end)
 
             assert results == []
             mock_exchange.fetch_open_interest_history.assert_called_once()
@@ -246,9 +238,7 @@ class TestBinanceFetcherHistory:
             # Only want 3 hours of data
             end = datetime.fromtimestamp((base_ts + 10800000) / 1000, tz=timezone.utc)
 
-            results = await fetcher.fetch_open_interest_history(
-                "BTCUSDT-PERP", start, end
-            )
+            results = await fetcher.fetch_open_interest_history("BTCUSDT-PERP", start, end)
 
             # Should only include records within the date range
             assert len(results) == 4  # 0h, 1h, 2h, 3h
@@ -263,18 +253,14 @@ class TestBybitFetcherHistory:
         return BybitFetcher()
 
     @pytest.mark.asyncio
-    async def test_fetch_oi_history_with_lower_limit(
-        self, fetcher: BybitFetcher
-    ) -> None:
+    async def test_fetch_oi_history_with_lower_limit(self, fetcher: BybitFetcher) -> None:
         """Test Bybit uses lower pagination limit (200 vs 500)."""
         # Verify the limit constant
         assert fetcher.OI_HISTORY_LIMIT == 200
         assert fetcher.FUNDING_HISTORY_LIMIT == 200
 
     @pytest.mark.asyncio
-    async def test_fetch_oi_history_handles_api_error(
-        self, fetcher: BybitFetcher
-    ) -> None:
+    async def test_fetch_oi_history_handles_api_error(self, fetcher: BybitFetcher) -> None:
         """Test Bybit history handles API errors gracefully."""
         with patch.object(fetcher, "_exchange", create=True) as mock_exchange:
             mock_exchange.fetch_open_interest_history = AsyncMock(
@@ -286,9 +272,7 @@ class TestBybitFetcherHistory:
             end = datetime(2024, 1, 16, tzinfo=timezone.utc)
 
             # Should not raise, returns empty list on error
-            results = await fetcher.fetch_open_interest_history(
-                "BTCUSDT-PERP", start, end
-            )
+            results = await fetcher.fetch_open_interest_history("BTCUSDT-PERP", start, end)
 
             assert results == []
 
@@ -358,9 +342,7 @@ class TestFetchFundingRate:
             assert result.funding_rate == -0.00015
 
     @pytest.mark.asyncio
-    async def test_fetch_funding_hyperliquid(
-        self, hyperliquid_fetcher: HyperliquidFetcher
-    ) -> None:
+    async def test_fetch_funding_hyperliquid(self, hyperliquid_fetcher: HyperliquidFetcher) -> None:
         """Test fetching current funding rate from Hyperliquid (T043)."""
         from scripts.ccxt_pipeline.models import FundingRate
 
@@ -371,9 +353,7 @@ class TestFetchFundingRate:
             "timestamp": 1705320000000,
         }
 
-        with patch.object(
-            hyperliquid_fetcher, "_exchange", create=True
-        ) as mock_exchange:
+        with patch.object(hyperliquid_fetcher, "_exchange", create=True) as mock_exchange:
             mock_exchange.fetch_funding_rate = AsyncMock(return_value=mock_response)
             hyperliquid_fetcher._connected = True
 
@@ -402,17 +382,13 @@ class TestFetchFundingRate:
         ]
 
         with patch.object(binance_fetcher, "_exchange", create=True) as mock_exchange:
-            mock_exchange.fetch_funding_rate_history = AsyncMock(
-                side_effect=[records, []]
-            )
+            mock_exchange.fetch_funding_rate_history = AsyncMock(side_effect=[records, []])
             binance_fetcher._connected = True
 
             start = datetime.fromtimestamp(base_ts / 1000, tz=timezone.utc)
             end = datetime.fromtimestamp((base_ts + 86400000) / 1000, tz=timezone.utc)
 
-            results = await binance_fetcher.fetch_funding_rate_history(
-                "BTCUSDT-PERP", start, end
-            )
+            results = await binance_fetcher.fetch_funding_rate_history("BTCUSDT-PERP", start, end)
 
             assert len(results) == 3
             assert all(isinstance(r, FundingRate) for r in results)
@@ -438,9 +414,7 @@ class TestStreamLiquidations:
         return HyperliquidFetcher()
 
     @pytest.mark.asyncio
-    async def test_stream_liquidations_binance(
-        self, binance_fetcher: BinanceFetcher
-    ) -> None:
+    async def test_stream_liquidations_binance(self, binance_fetcher: BinanceFetcher) -> None:
         """Test streaming liquidations from Binance via WebSocket (T050)."""
         from scripts.ccxt_pipeline.models import Liquidation, Side
 
@@ -534,9 +508,7 @@ class TestStreamLiquidations:
         def callback(liq: Liquidation) -> None:
             received_liquidations.append(liq)
 
-        with patch.object(
-            hyperliquid_fetcher, "_exchange", create=True
-        ) as mock_exchange:
+        with patch.object(hyperliquid_fetcher, "_exchange", create=True) as mock_exchange:
             # Hyperliquid uses fetch_liquidations (polling) instead of watch
             mock_exchange.fetch_liquidations = AsyncMock(
                 side_effect=[mock_liquidations, asyncio.CancelledError()]
@@ -559,9 +531,7 @@ class TestWebSocketReconnect:
         return BinanceFetcher()
 
     @pytest.mark.asyncio
-    async def test_websocket_reconnect_on_error(
-        self, binance_fetcher: BinanceFetcher
-    ) -> None:
+    async def test_websocket_reconnect_on_error(self, binance_fetcher: BinanceFetcher) -> None:
         """Test WebSocket reconnects on connection error (T051)."""
         from scripts.ccxt_pipeline.models import Liquidation
 
@@ -598,9 +568,7 @@ class TestWebSocketReconnect:
             assert len(received_liquidations) == 1
 
     @pytest.mark.asyncio
-    async def test_exponential_backoff_delays(
-        self, binance_fetcher: BinanceFetcher
-    ) -> None:
+    async def test_exponential_backoff_delays(self, binance_fetcher: BinanceFetcher) -> None:
         """Test exponential backoff uses correct delays (T051)."""
         from scripts.ccxt_pipeline.utils.reconnect import ExponentialBackoff
 

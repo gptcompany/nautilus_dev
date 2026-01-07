@@ -140,9 +140,7 @@ class DaemonCollector(BaseCollector[DaemonMetrics]):
 
         self._running = True
         self._task = asyncio.create_task(self._collection_loop())
-        logger.info(
-            f"DaemonCollector started (interval={self.config.daemon_collect_interval}s)"
-        )
+        logger.info(f"DaemonCollector started (interval={self.config.daemon_collect_interval}s)")
 
     async def stop(self) -> None:
         """Stop collection and cleanup resources."""

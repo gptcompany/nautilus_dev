@@ -60,9 +60,7 @@ class TestKlinesConverter:
         with pytest.raises(ValueError, match="Unsupported timeframe"):
             KlinesConverter(symbol="BTCUSDT", timeframe="invalid")
 
-    def test_parse_csv(
-        self, sample_klines_csv: Path, config_with_temp_dir: ConverterConfig
-    ):
+    def test_parse_csv(self, sample_klines_csv: Path, config_with_temp_dir: ConverterConfig):
         """CSV parsing should return DataFrame with correct columns."""
         converter = KlinesConverter(
             symbol="BTCUSDT",

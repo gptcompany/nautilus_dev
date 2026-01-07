@@ -100,18 +100,12 @@ class HyperliquidBaseStrategy(Strategy):
         # Log position events for debugging
         if isinstance(event, PositionOpened):
             self.log.info(
-                f"Position OPENED: {event.position_id} "
-                f"side={event.entry} qty={event.quantity}"
+                f"Position OPENED: {event.position_id} side={event.entry} qty={event.quantity}"
             )
         elif isinstance(event, PositionClosed):
-            self.log.info(
-                f"Position CLOSED: {event.position_id} "
-                f"realized_pnl={event.realized_pnl}"
-            )
+            self.log.info(f"Position CLOSED: {event.position_id} realized_pnl={event.realized_pnl}")
         elif isinstance(event, PositionChanged):
-            self.log.debug(
-                f"Position CHANGED: {event.position_id} qty={event.quantity}"
-            )
+            self.log.debug(f"Position CHANGED: {event.position_id} qty={event.quantity}")
 
     def on_quote_tick(self, tick: QuoteTick) -> None:
         """Handle incoming quote ticks.

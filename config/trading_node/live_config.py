@@ -90,9 +90,7 @@ class LiveTradingNodeConfig(BaseModel):
         exec_config = recon_config.to_live_exec_engine_config()
 
         # Add safety settings
-        exec_config["graceful_shutdown_on_exception"] = (
-            self.graceful_shutdown_on_exception
-        )
+        exec_config["graceful_shutdown_on_exception"] = self.graceful_shutdown_on_exception
 
         self._log_exec_config(exec_config)
         return exec_config

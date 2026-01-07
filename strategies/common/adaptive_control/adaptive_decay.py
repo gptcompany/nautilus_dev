@@ -69,9 +69,7 @@ class VolatilityContext:
             return 1.0
         else:
             # Linear interpolation
-            return (self.variance_ratio - low_threshold) / (
-                high_threshold - low_threshold
-            )
+            return (self.variance_ratio - low_threshold) / (high_threshold - low_threshold)
 
 
 class AdaptiveDecayCalculator:

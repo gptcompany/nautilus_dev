@@ -148,18 +148,14 @@ class WalkForwardResult:
         """Average Sharpe ratio across test periods."""
         if not self.windows:
             return 0.0
-        return sum(w.test_metrics.sharpe_ratio for w in self.windows) / len(
-            self.windows
-        )
+        return sum(w.test_metrics.sharpe_ratio for w in self.windows) / len(self.windows)
 
     @property
     def avg_test_return(self) -> float:
         """Average return across test periods."""
         if not self.windows:
             return 0.0
-        return sum(w.test_metrics.total_return for w in self.windows) / len(
-            self.windows
-        )
+        return sum(w.test_metrics.total_return for w in self.windows) / len(self.windows)
 
     @property
     def worst_drawdown(self) -> float:

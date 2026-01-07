@@ -120,14 +120,10 @@ class TestTickRuleClassifier:
         assert result.side == TradeSide.SELL
         assert result.method == "tick_rule"
 
-    def test_tick_rule_zero_tick_uses_previous(
-        self, tick_classifier: TickRuleClassifier
-    ):
+    def test_tick_rule_zero_tick_uses_previous(self, tick_classifier: TickRuleClassifier):
         """Zero tick should use previous classification."""
         # First uptick → BUY
-        tick_classifier.classify(
-            price=100.0, volume=10.0, timestamp_ns=1000, prev_price=99.0
-        )
+        tick_classifier.classify(price=100.0, volume=10.0, timestamp_ns=1000, prev_price=99.0)
         # Zero tick → should still be BUY
         result = tick_classifier.classify(
             price=100.0,
@@ -147,9 +143,7 @@ class TestTickRuleClassifier:
         )
         assert result.side == TradeSide.UNKNOWN
 
-    def test_tick_rule_no_prev_price_first_call(
-        self, tick_classifier: TickRuleClassifier
-    ):
+    def test_tick_rule_no_prev_price_first_call(self, tick_classifier: TickRuleClassifier):
         """First call without prev_price should be UNKNOWN."""
         result = tick_classifier.classify(
             price=100.0,
@@ -158,9 +152,7 @@ class TestTickRuleClassifier:
         )
         assert result.side == TradeSide.UNKNOWN
 
-    def test_tick_rule_tracks_internal_prev_price(
-        self, tick_classifier: TickRuleClassifier
-    ):
+    def test_tick_rule_tracks_internal_prev_price(self, tick_classifier: TickRuleClassifier):
         """Classifier should track previous price internally."""
         # First call with no prev_price
         tick_classifier.classify(price=100.0, volume=10.0, timestamp_ns=1000)
@@ -243,9 +235,7 @@ class TestBVCClassifier:
 class TestCloseVsOpenClassifier:
     """Tests for CloseVsOpenClassifier."""
 
-    def test_close_vs_open_bullish(
-        self, close_vs_open_classifier: CloseVsOpenClassifier
-    ):
+    def test_close_vs_open_bullish(self, close_vs_open_classifier: CloseVsOpenClassifier):
         """Close > Open should classify as BUY."""
         result = close_vs_open_classifier.classify(
             price=105.0,  # close
@@ -256,9 +246,7 @@ class TestCloseVsOpenClassifier:
         assert result.side == TradeSide.BUY
         assert result.method == "close_vs_open"
 
-    def test_close_vs_open_bearish(
-        self, close_vs_open_classifier: CloseVsOpenClassifier
-    ):
+    def test_close_vs_open_bearish(self, close_vs_open_classifier: CloseVsOpenClassifier):
         """Close < Open should classify as SELL."""
         result = close_vs_open_classifier.classify(
             price=95.0,  # close
@@ -278,9 +266,7 @@ class TestCloseVsOpenClassifier:
         )
         assert result.side == TradeSide.UNKNOWN
 
-    def test_close_vs_open_missing_open(
-        self, close_vs_open_classifier: CloseVsOpenClassifier
-    ):
+    def test_close_vs_open_missing_open(self, close_vs_open_classifier: CloseVsOpenClassifier):
         """Missing open_price should return UNKNOWN."""
         result = close_vs_open_classifier.classify(
             price=100.0,

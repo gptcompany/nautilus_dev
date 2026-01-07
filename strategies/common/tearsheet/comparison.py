@@ -333,13 +333,11 @@ class ComparisonConfig:
         count = len(self.strategy_names)
         if count < self.MIN_STRATEGIES:
             raise ValueError(
-                f"ComparisonConfig requires at least {self.MIN_STRATEGIES} strategies, "
-                f"got {count}"
+                f"ComparisonConfig requires at least {self.MIN_STRATEGIES} strategies, got {count}"
             )
         if count > self.MAX_STRATEGIES:
             raise ValueError(
-                f"ComparisonConfig supports at most {self.MAX_STRATEGIES} strategies, "
-                f"got {count}"
+                f"ComparisonConfig supports at most {self.MAX_STRATEGIES} strategies, got {count}"
             )
 
     def _validate_colors(self) -> None:
@@ -440,10 +438,7 @@ def render_comparison_equity(
                 name=metrics.name,
                 line={"color": colors[i % len(colors)], "width": 2},
                 hovertemplate=(
-                    f"<b>{metrics.name}</b><br>"
-                    "Date: %{x}<br>"
-                    "Value: %{y:.4f}<br>"
-                    "<extra></extra>"
+                    f"<b>{metrics.name}</b><br>Date: %{{x}}<br>Value: %{{y:.4f}}<br><extra></extra>"
                 ),
             )
         )
@@ -646,9 +641,9 @@ def render_comparison_stats_table(
                 cells={
                     "values": cell_values,
                     # Alternating row colors based on actual number of metrics
-                    "fill_color": [
-                        ["#f9fafb", "#ffffff"] * ((len(metric_labels) + 1) // 2)
-                    ][: len(metric_labels)],
+                    "fill_color": [["#f9fafb", "#ffffff"] * ((len(metric_labels) + 1) // 2)][
+                        : len(metric_labels)
+                    ],
                     "align": ["left"] + ["center"] * len(metrics_list),
                     "font": {"size": 11},
                     "height": 25,
@@ -757,8 +752,7 @@ def create_comparison_tearsheet(
 
     # Extract metrics from all engines
     metrics_list = [
-        StrategyMetrics.from_engine(engine, name)
-        for engine, name in zip(engines, strategy_names)
+        StrategyMetrics.from_engine(engine, name) for engine, name in zip(engines, strategy_names)
     ]
 
     # Create subplots layout
@@ -779,11 +773,7 @@ def create_comparison_tearsheet(
 
     # Add equity curves
     for i, metrics in enumerate(metrics_list):
-        equity = (
-            metrics.normalized_equity
-            if normalize_equity
-            else metrics.cumulative_returns
-        )
+        equity = metrics.normalized_equity if normalize_equity else metrics.cumulative_returns
         if not equity.empty:
             fig.add_trace(
                 go.Scatter(

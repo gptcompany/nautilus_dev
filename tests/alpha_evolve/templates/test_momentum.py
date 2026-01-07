@@ -122,9 +122,7 @@ class TestEvolveBlockExtractable:
         """Strategy should have _on_bar_evolved method."""
         assert hasattr(MomentumEvolveStrategy, "_on_bar_evolved")
 
-    def test_evolve_block_extractable_from_source(
-        self, momentum_strategy_code: str
-    ) -> None:
+    def test_evolve_block_extractable_from_source(self, momentum_strategy_code: str) -> None:
         """EVOLVE-BLOCK should be extractable from strategy source code."""
         blocks = extract_blocks(momentum_strategy_code)
 
@@ -174,9 +172,7 @@ class TestConfigValidationEdgeCases:
         with pytest.raises(ValueError, match="fast_period must be >= 2"):
             MomentumEvolveConfig(
                 instrument_id=InstrumentId.from_str("BTCUSDT-PERP.BINANCE"),
-                bar_type=BarType.from_str(
-                    "BTCUSDT-PERP.BINANCE-1-MINUTE-LAST-EXTERNAL"
-                ),
+                bar_type=BarType.from_str("BTCUSDT-PERP.BINANCE-1-MINUTE-LAST-EXTERNAL"),
                 trade_size=Decimal("0.1"),
                 fast_period=1,
                 slow_period=30,
@@ -187,9 +183,7 @@ class TestConfigValidationEdgeCases:
         with pytest.raises(ValueError, match="fast_period.*must be < slow_period"):
             MomentumEvolveConfig(
                 instrument_id=InstrumentId.from_str("BTCUSDT-PERP.BINANCE"),
-                bar_type=BarType.from_str(
-                    "BTCUSDT-PERP.BINANCE-1-MINUTE-LAST-EXTERNAL"
-                ),
+                bar_type=BarType.from_str("BTCUSDT-PERP.BINANCE-1-MINUTE-LAST-EXTERNAL"),
                 trade_size=Decimal("0.1"),
                 fast_period=30,
                 slow_period=10,
@@ -200,9 +194,7 @@ class TestConfigValidationEdgeCases:
         with pytest.raises(ValueError, match="fast_period.*must be < slow_period"):
             MomentumEvolveConfig(
                 instrument_id=InstrumentId.from_str("BTCUSDT-PERP.BINANCE"),
-                bar_type=BarType.from_str(
-                    "BTCUSDT-PERP.BINANCE-1-MINUTE-LAST-EXTERNAL"
-                ),
+                bar_type=BarType.from_str("BTCUSDT-PERP.BINANCE-1-MINUTE-LAST-EXTERNAL"),
                 trade_size=Decimal("0.1"),
                 fast_period=20,
                 slow_period=20,
@@ -213,9 +205,7 @@ class TestConfigValidationEdgeCases:
         with pytest.raises(ValueError, match="trade_size must be positive"):
             MomentumEvolveConfig(
                 instrument_id=InstrumentId.from_str("BTCUSDT-PERP.BINANCE"),
-                bar_type=BarType.from_str(
-                    "BTCUSDT-PERP.BINANCE-1-MINUTE-LAST-EXTERNAL"
-                ),
+                bar_type=BarType.from_str("BTCUSDT-PERP.BINANCE-1-MINUTE-LAST-EXTERNAL"),
                 trade_size=Decimal("0"),
             )
 
@@ -224,8 +214,6 @@ class TestConfigValidationEdgeCases:
         with pytest.raises(ValueError, match="trade_size must be positive"):
             MomentumEvolveConfig(
                 instrument_id=InstrumentId.from_str("BTCUSDT-PERP.BINANCE"),
-                bar_type=BarType.from_str(
-                    "BTCUSDT-PERP.BINANCE-1-MINUTE-LAST-EXTERNAL"
-                ),
+                bar_type=BarType.from_str("BTCUSDT-PERP.BINANCE-1-MINUTE-LAST-EXTERNAL"),
                 trade_size=Decimal("-0.1"),
             )

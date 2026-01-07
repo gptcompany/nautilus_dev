@@ -146,9 +146,7 @@ class PositionSnapshot(BaseModel):
         """Validate position side is valid."""
         valid_sides = {"LONG", "SHORT", "FLAT"}
         if v.upper() not in valid_sides:
-            raise ValueError(
-                f"Invalid position side: {v}. Must be one of {valid_sides}"
-            )
+            raise ValueError(f"Invalid position side: {v}. Must be one of {valid_sides}")
         return v.upper()
 
     @field_validator("ts_last_updated")

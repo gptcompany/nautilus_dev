@@ -64,20 +64,14 @@ class ExchangeStatus(BaseModel):
     """
 
     timestamp: datetime = Field(..., description="UTC timestamp")
-    exchange: Literal["binance", "bybit", "okx", "dydx"] = Field(
-        ..., description="Exchange"
-    )
+    exchange: Literal["binance", "bybit", "okx", "dydx"] = Field(..., description="Exchange")
     host: str = Field(..., min_length=1, max_length=255, description="Hostname")
     env: Literal["prod", "staging", "dev"] = Field(..., description="Environment")
     connected: bool = Field(..., description="WebSocket connected")
     latency_ms: float = Field(..., ge=0, le=10000, description="Round-trip latency ms")
     reconnect_count: int = Field(..., ge=0, description="Cumulative reconnections")
-    last_message_at: datetime | None = Field(
-        default=None, description="Last message received"
-    )
-    disconnected_at: datetime | None = Field(
-        default=None, description="Last disconnect time"
-    )
+    last_message_at: datetime | None = Field(default=None, description="Last message received")
+    disconnected_at: datetime | None = Field(default=None, description="Last disconnect time")
 
     def to_ilp_line(self) -> str:
         """Convert to InfluxDB Line Protocol format."""
@@ -108,13 +102,9 @@ class PipelineMetrics(BaseModel):
     """
 
     timestamp: datetime = Field(..., description="UTC timestamp")
-    exchange: Literal["binance", "bybit", "okx", "dydx"] = Field(
-        ..., description="Exchange"
-    )
+    exchange: Literal["binance", "bybit", "okx", "dydx"] = Field(..., description="Exchange")
     symbol: str = Field(..., min_length=1, description="Symbol e.g. BTC/USDT:USDT")
-    data_type: Literal["oi", "funding", "liquidation"] = Field(
-        ..., description="Data type"
-    )
+    data_type: Literal["oi", "funding", "liquidation"] = Field(..., description="Data type")
     host: str = Field(..., min_length=1, max_length=255, description="Hostname")
     env: Literal["prod", "staging", "dev"] = Field(..., description="Environment")
     records_count: int = Field(..., ge=0, description="Records in interval")
@@ -167,12 +157,10 @@ class EvolutionMetrics(BaseModel):
     win_rate: float | None = Field(default=None, ge=0, le=1, description="Win rate 0-1")
 
     # Mutation tracking
-    mutation_outcome: Literal[
-        "success", "syntax_error", "runtime_error", "timeout", "seed"
-    ] = Field(..., description="Mutation result category")
-    mutation_latency_ms: float = Field(
-        default=0.0, ge=0, description="Mutation API latency"
+    mutation_outcome: Literal["success", "syntax_error", "runtime_error", "timeout", "seed"] = (
+        Field(..., description="Mutation result category")
     )
+    mutation_latency_ms: float = Field(default=0.0, ge=0, description="Mutation API latency")
 
     def to_ilp_line(self) -> str:
         """Convert to InfluxDB Line Protocol format for QuestDB HTTP ILP."""
@@ -239,7 +227,9 @@ class TradingMetrics(BaseModel):
         """Convert to InfluxDB Line Protocol format."""
         escaped_strategy = self.strategy.replace(" ", "\\ ").replace(",", "\\,")
         escaped_symbol = self.symbol.replace(" ", "\\ ").replace(",", "\\,")
-        tags = f"strategy={escaped_strategy},symbol={escaped_symbol},venue={self.venue},env={self.env}"
+        tags = (
+            f"strategy={escaped_strategy},symbol={escaped_symbol},venue={self.venue},env={self.env}"
+        )
 
         fields = [
             f"pnl={self.pnl}",
@@ -270,9 +260,7 @@ class CircuitBreakerMetrics(BaseModel):
     state: Literal["active", "warning", "reducing", "halted"] = Field(
         ..., description="Circuit breaker state"
     )
-    current_drawdown: float = Field(
-        ..., ge=0, description="Current drawdown as decimal"
-    )
+    current_drawdown: float = Field(..., ge=0, description="Current drawdown as decimal")
     peak_equity: float = Field(..., ge=0, description="High water mark")
     current_equity: float = Field(..., description="Current equity value")
     env: Literal["prod", "staging", "dev"] = Field(..., description="Environment")

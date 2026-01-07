@@ -77,9 +77,7 @@ def mock_clock():
     start_ns = int(time.time() * 1e9)
     clock.timestamp_ns.return_value = start_ns
     clock.utc_now.return_value = MagicMock()
-    clock.utc_now.return_value.__sub__ = MagicMock(
-        return_value=MagicMock()
-    )
+    clock.utc_now.return_value.__sub__ = MagicMock(return_value=MagicMock())
     return clock
 
 
@@ -122,9 +120,7 @@ class TestPositionRecoveryTime:
     ):
         """Test that recovering a single position completes under 5 seconds."""
         # Setup
-        mock_position = create_mock_position(
-            "BTCUSDT-PERP.BINANCE", Decimal("1.5")
-        )
+        mock_position = create_mock_position("BTCUSDT-PERP.BINANCE", Decimal("1.5"))
         mock_cache.instrument.return_value = mock_instrument
         mock_cache.positions.return_value = [mock_position]
 
@@ -133,15 +129,9 @@ class TestPositionRecoveryTime:
         # Measure recovery time
         start_time = time.perf_counter()
 
-        with patch.object(
-            type(strategy), "cache", new_callable=PropertyMock
-        ) as cache_prop:
-            with patch.object(
-                type(strategy), "clock", new_callable=PropertyMock
-            ) as clock_prop:
-                with patch.object(
-                    type(strategy), "log", new_callable=PropertyMock
-                ) as log_prop:
+        with patch.object(type(strategy), "cache", new_callable=PropertyMock) as cache_prop:
+            with patch.object(type(strategy), "clock", new_callable=PropertyMock) as clock_prop:
+                with patch.object(type(strategy), "log", new_callable=PropertyMock) as log_prop:
                     cache_prop.return_value = mock_cache
                     clock_prop.return_value = mock_clock
                     log_prop.return_value = MagicMock()
@@ -169,10 +159,7 @@ class TestPositionRecoveryTime:
         """Test recovering 10 positions completes under 5 seconds."""
         # Setup 10 positions
         positions = [
-            create_mock_position(
-                "BTCUSDT-PERP.BINANCE", Decimal(str(i + 1))
-            )
-            for i in range(10)
+            create_mock_position("BTCUSDT-PERP.BINANCE", Decimal(str(i + 1))) for i in range(10)
         ]
         mock_cache.instrument.return_value = mock_instrument
         mock_cache.positions.return_value = positions
@@ -182,15 +169,9 @@ class TestPositionRecoveryTime:
         # Measure recovery time
         start_time = time.perf_counter()
 
-        with patch.object(
-            type(strategy), "cache", new_callable=PropertyMock
-        ) as cache_prop:
-            with patch.object(
-                type(strategy), "clock", new_callable=PropertyMock
-            ) as clock_prop:
-                with patch.object(
-                    type(strategy), "log", new_callable=PropertyMock
-                ) as log_prop:
+        with patch.object(type(strategy), "cache", new_callable=PropertyMock) as cache_prop:
+            with patch.object(type(strategy), "clock", new_callable=PropertyMock) as clock_prop:
+                with patch.object(type(strategy), "log", new_callable=PropertyMock) as log_prop:
                     cache_prop.return_value = mock_cache
                     clock_prop.return_value = mock_clock
                     log_prop.return_value = MagicMock()
@@ -217,9 +198,7 @@ class TestPositionRecoveryTime:
     ):
         """Test that state transitions during recovery are fast."""
         # Setup
-        mock_position = create_mock_position(
-            "BTCUSDT-PERP.BINANCE", Decimal("1.0")
-        )
+        mock_position = create_mock_position("BTCUSDT-PERP.BINANCE", Decimal("1.0"))
         mock_cache.instrument.return_value = mock_instrument
         mock_cache.positions.return_value = [mock_position]
 
@@ -228,19 +207,11 @@ class TestPositionRecoveryTime:
         state_transitions = []
 
         def track_state(*args, **kwargs):
-            state_transitions.append(
-                (time.perf_counter(), strategy.recovery_state.status)
-            )
+            state_transitions.append((time.perf_counter(), strategy.recovery_state.status))
 
-        with patch.object(
-            type(strategy), "cache", new_callable=PropertyMock
-        ) as cache_prop:
-            with patch.object(
-                type(strategy), "clock", new_callable=PropertyMock
-            ) as clock_prop:
-                with patch.object(
-                    type(strategy), "log", new_callable=PropertyMock
-                ) as log_prop:
+        with patch.object(type(strategy), "cache", new_callable=PropertyMock) as cache_prop:
+            with patch.object(type(strategy), "clock", new_callable=PropertyMock) as clock_prop:
+                with patch.object(type(strategy), "log", new_callable=PropertyMock) as log_prop:
                     cache_prop.return_value = mock_cache
                     clock_prop.return_value = mock_clock
                     log_mock = MagicMock()
@@ -277,15 +248,9 @@ class TestPositionRecoveryTime:
         # Measure recovery time
         start_time = time.perf_counter()
 
-        with patch.object(
-            type(strategy), "cache", new_callable=PropertyMock
-        ) as cache_prop:
-            with patch.object(
-                type(strategy), "clock", new_callable=PropertyMock
-            ) as clock_prop:
-                with patch.object(
-                    type(strategy), "log", new_callable=PropertyMock
-                ) as log_prop:
+        with patch.object(type(strategy), "cache", new_callable=PropertyMock) as cache_prop:
+            with patch.object(type(strategy), "clock", new_callable=PropertyMock) as clock_prop:
+                with patch.object(type(strategy), "log", new_callable=PropertyMock) as log_prop:
                     cache_prop.return_value = mock_cache
                     clock_prop.return_value = mock_clock
                     log_prop.return_value = MagicMock()
@@ -297,9 +262,7 @@ class TestPositionRecoveryTime:
         elapsed_time = time.perf_counter() - start_time
 
         # With no positions, recovery should be very fast (<1s)
-        assert elapsed_time < 1.0, (
-            f"Empty recovery took {elapsed_time:.3f}s, expected <1s"
-        )
+        assert elapsed_time < 1.0, f"Empty recovery took {elapsed_time:.3f}s, expected <1s"
         assert strategy.recovered_positions_count == 0
 
     @pytest.mark.parametrize("num_positions", [1, 5, 10, 20])
@@ -314,9 +277,7 @@ class TestPositionRecoveryTime:
         """Test that recovery time scales reasonably with position count."""
         # Setup positions
         positions = [
-            create_mock_position(
-                "BTCUSDT-PERP.BINANCE", Decimal(str(i + 1))
-            )
+            create_mock_position("BTCUSDT-PERP.BINANCE", Decimal(str(i + 1)))
             for i in range(num_positions)
         ]
         mock_cache.instrument.return_value = mock_instrument
@@ -327,15 +288,9 @@ class TestPositionRecoveryTime:
         # Measure recovery time
         start_time = time.perf_counter()
 
-        with patch.object(
-            type(strategy), "cache", new_callable=PropertyMock
-        ) as cache_prop:
-            with patch.object(
-                type(strategy), "clock", new_callable=PropertyMock
-            ) as clock_prop:
-                with patch.object(
-                    type(strategy), "log", new_callable=PropertyMock
-                ) as log_prop:
+        with patch.object(type(strategy), "cache", new_callable=PropertyMock) as cache_prop:
+            with patch.object(type(strategy), "clock", new_callable=PropertyMock) as clock_prop:
+                with patch.object(type(strategy), "log", new_callable=PropertyMock) as log_prop:
                     cache_prop.return_value = mock_cache
                     clock_prop.return_value = mock_clock
                     log_prop.return_value = MagicMock()

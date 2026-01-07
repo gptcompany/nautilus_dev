@@ -178,9 +178,7 @@ def sync_to_duckdb(papers: list, formulas: list, strategies: list):
                     strategy.get("exit_logic"),
                     strategy.get("position_sizing"),
                     strategy.get("risk_management"),
-                    strategy.get(
-                        "formula_ids", []
-                    ),  # Using formula_ids as indicators proxy
+                    strategy.get("formula_ids", []),  # Using formula_ids as indicators proxy
                     strategy.get("sharpe_ratio"),
                     strategy.get("max_drawdown"),
                     strategy.get("win_rate"),

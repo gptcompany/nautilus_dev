@@ -132,9 +132,7 @@ class TestDailyRealizedAccumulates:
         tracker = DailyPnLTracker(config=default_config, strategy=mock_strategy)
         assert tracker.daily_realized == Decimal("0")
 
-    def test_realized_accumulates_on_position_closed(
-        self, default_config, mock_strategy
-    ):
+    def test_realized_accumulates_on_position_closed(self, default_config, mock_strategy):
         """Realized PnL accumulates from PositionClosed events."""
         from risk.daily_pnl_tracker import DailyPnLTracker
 

@@ -7,7 +7,6 @@ for automatic stop-loss and position limit enforcement.
 This is a reference implementation for T037.
 """
 
-
 from nautilus_trader.config import StrategyConfig
 from nautilus_trader.model.data import Bar, BarType
 from nautilus_trader.model.enums import OrderSide
@@ -86,9 +85,7 @@ class RiskManagedStrategy(Strategy):
     def on_start(self) -> None:
         """Subscribe to data on strategy start."""
         self.subscribe_bars(self.bar_type)
-        self.log.info(
-            f"Started with stop_loss_pct={self.risk_manager.config.stop_loss_pct}"
-        )
+        self.log.info(f"Started with stop_loss_pct={self.risk_manager.config.stop_loss_pct}")
 
     def on_bar(self, bar: Bar) -> None:
         """
@@ -125,9 +122,9 @@ class RiskManagedStrategy(Strategy):
 
     def _has_position(self) -> bool:
         """Check if we have an open position."""
-        return self.portfolio.is_net_long(
+        return self.portfolio.is_net_long(self.instrument_id) or self.portfolio.is_net_short(
             self.instrument_id
-        ) or self.portfolio.is_net_short(self.instrument_id)
+        )
 
     def _enter_long(self) -> None:
         """Submit a market buy order with position limit validation."""

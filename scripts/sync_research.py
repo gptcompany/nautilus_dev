@@ -76,9 +76,7 @@ def extract_strategies(memory: dict[str, Any], prefix: str) -> list[dict[str, An
 
     # Validate entities is a list
     if not isinstance(entities, list):
-        print(
-            f"WARNING: 'entities' is not a list (got {type(entities).__name__}), skipping"
-        )
+        print(f"WARNING: 'entities' is not a list (got {type(entities).__name__}), skipping")
         return []
 
     strategies = []

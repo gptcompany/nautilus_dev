@@ -238,9 +238,7 @@ class AggTradesConverter(BaseConverter):
             # Convert types
             chunk_df["price"] = pd.to_numeric(chunk_df["price"], errors="coerce")
             chunk_df["quantity"] = pd.to_numeric(chunk_df["quantity"], errors="coerce")
-            chunk_df["transact_time"] = pd.to_numeric(
-                chunk_df["transact_time"], errors="coerce"
-            )
+            chunk_df["transact_time"] = pd.to_numeric(chunk_df["transact_time"], errors="coerce")
             chunk_df["is_buyer_maker"] = chunk_df["is_buyer_maker"].apply(
                 lambda x: x if isinstance(x, bool) else str(x).lower() == "true"
             )

@@ -299,9 +299,7 @@ class TestEvaluateTimeout:
             time.sleep(1)  # Will exceed 0s timeout
             return EvaluationResult(success=True)
 
-        with patch.object(
-            short_timeout_evaluator, "evaluate_sync", side_effect=slow_evaluate
-        ):
+        with patch.object(short_timeout_evaluator, "evaluate_sync", side_effect=slow_evaluate):
             request = EvaluationRequest(strategy_code=sample_valid_strategy_code)
             result = await short_timeout_evaluator.evaluate(request)
 
@@ -651,9 +649,7 @@ class TestConcurrentSlotFreedOnFailure:
             with patch.object(
                 evaluator,
                 "evaluate_sync",
-                return_value=EvaluationResult(
-                    success=True, metrics=None, duration_ms=0
-                ),
+                return_value=EvaluationResult(success=True, metrics=None, duration_ms=0),
             ):
                 result2 = await evaluator.evaluate(request)
                 assert result2.success is True

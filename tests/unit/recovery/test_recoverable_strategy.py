@@ -139,9 +139,7 @@ class TestRecoverableStrategyOnStart:
         mock_cache.instrument.assert_called_with(instrument_id)
         assert mock_strategy.instrument is not None
 
-    def test_on_start_stops_if_instrument_not_found(
-        self, mock_strategy, mock_cache, mock_logger
-    ):
+    def test_on_start_stops_if_instrument_not_found(self, mock_strategy, mock_cache, mock_logger):
         """Test that on_start stops strategy if instrument not in cache."""
         from nautilus_trader.model.identifiers import InstrumentId
 
@@ -159,9 +157,7 @@ class TestRecoverableStrategyOnStart:
         mock_logger.error.assert_called()
         mock_strategy.stop.assert_called_once()
 
-    def test_on_start_updates_recovery_state_to_in_progress(
-        self, mock_strategy, mock_clock
-    ):
+    def test_on_start_updates_recovery_state_to_in_progress(self, mock_strategy, mock_clock):
         """Test that on_start updates recovery state to IN_PROGRESS."""
         # Simulate on_start behavior
         mock_strategy.recovery_state = RecoveryState(
@@ -225,9 +221,7 @@ class TestPositionRecoveryHooks:
         assert on_position_recovered_called is True
         assert recovered_position == mock_btc_position
 
-    def test_handle_multiple_recovered_positions(
-        self, mock_btc_position, mock_eth_position
-    ):
+    def test_handle_multiple_recovered_positions(self, mock_btc_position, mock_eth_position):
         """Test handling multiple recovered positions updates count correctly."""
         recovered_positions = []
         positions_recovered_count = 0

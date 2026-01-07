@@ -27,6 +27,7 @@ def main():
 
     try:
         import redis
+
         r = redis.Redis(host=host, port=port, decode_responses=True)
 
         # Simulate position state

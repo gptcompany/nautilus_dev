@@ -179,8 +179,7 @@ class TestWindowResultProperties:
         for window_result in result.windows:
             # degradation = test_sharpe / train_sharpe
             expected = (
-                window_result.test_metrics.sharpe_ratio
-                / window_result.train_metrics.sharpe_ratio
+                window_result.test_metrics.sharpe_ratio / window_result.train_metrics.sharpe_ratio
             )
             assert abs(window_result.degradation_ratio - expected) < 0.01
 

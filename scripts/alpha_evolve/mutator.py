@@ -133,9 +133,7 @@ class LLMMutator:
                         f"Syntax error in mutation (attempt {attempt + 1}): {validation_error}"
                     )
                     # Update prompt with error context for retry
-                    prompt = self._build_retry_prompt(
-                        request, mutated_block, validation_error
-                    )
+                    prompt = self._build_retry_prompt(request, mutated_block, validation_error)
                     if attempt < self.max_retries - 1:
                         await asyncio.sleep(self.retry_delay)
                     continue
@@ -152,9 +150,7 @@ class LLMMutator:
                     logger.warning(
                         f"Full code syntax error (attempt {attempt + 1}): {full_validation}"
                     )
-                    prompt = self._build_retry_prompt(
-                        request, mutated_block, full_validation
-                    )
+                    prompt = self._build_retry_prompt(request, mutated_block, full_validation)
                     if attempt < self.max_retries - 1:
                         await asyncio.sleep(self.retry_delay)
                     continue

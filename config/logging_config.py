@@ -38,9 +38,7 @@ def build_logging_config(
         log_level=settings.log_level,
         log_level_file=settings.log_level_file,
         log_directory=settings.log_directory,
-        log_file_format=(
-            settings.log_format if settings.log_format != "text" else None
-        ),
+        log_file_format=(settings.log_format if settings.log_format != "text" else None),
         log_file_max_size=settings.max_size_mb * 1024 * 1024,
         log_file_max_backup_count=settings.max_backup_count,
         log_colors=True,

@@ -202,14 +202,10 @@ class OnlineCorrelationMatrix:
         self.epsilon = epsilon
 
         # Strategy name -> index mapping for O(1) lookup
-        self._strategy_indices: Dict[str, int] = {
-            s: i for i, s in enumerate(strategies)
-        }
+        self._strategy_indices: Dict[str, int] = {s: i for i, s in enumerate(strategies)}
 
         # Welford statistics per strategy (for individual variance tracking)
-        self._stats: List[OnlineStats] = [
-            OnlineStats() for _ in range(self.n_strategies)
-        ]
+        self._stats: List[OnlineStats] = [OnlineStats() for _ in range(self.n_strategies)]
 
         # EMA-based running statistics (NumPy for efficiency)
         self._ema_means: np.ndarray = np.zeros(self.n_strategies, dtype=np.float64)
@@ -240,9 +236,7 @@ class OnlineCorrelationMatrix:
         self._n_samples += 1
 
         # Convert returns dict to array (use 0.0 for missing strategies)
-        ret_array = np.array(
-            [returns.get(s, 0.0) for s in self.strategies], dtype=np.float64
-        )
+        ret_array = np.array([returns.get(s, 0.0) for s in self.strategies], dtype=np.float64)
 
         # Update individual strategy statistics using Welford's algorithm
         # Explicit loop for algorithm clarity (still fast for N < 50)
@@ -257,9 +251,7 @@ class OnlineCorrelationMatrix:
             self._ema_cov = np.outer(deviations, deviations)
         else:
             # EMA update: new = decay * old + (1-decay) * current
-            self._ema_means = (
-                self.decay * self._ema_means + (1 - self.decay) * ret_array
-            )
+            self._ema_means = self.decay * self._ema_means + (1 - self.decay) * ret_array
             deviations = ret_array - self._ema_means
             self._ema_cov = self.decay * self._ema_cov + (1 - self.decay) * np.outer(
                 deviations, deviations
@@ -407,9 +399,7 @@ class OnlineCorrelationMatrix:
         corr_matrix = self.get_correlation_matrix()
         return float(corr_matrix[i, j])
 
-    def get_metrics(
-        self, weights: Optional[Dict[str, float]] = None
-    ) -> CorrelationMetrics:
+    def get_metrics(self, weights: Optional[Dict[str, float]] = None) -> CorrelationMetrics:
         """
         Get correlation metrics for portfolio observability.
 

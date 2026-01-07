@@ -147,9 +147,7 @@ def check_extreme_volatility(
         )
 
     # Count extreme values
-    extreme_count = sum(
-        1 for r in returns if abs(r - mean_ret) > threshold_std * std_ret
-    )
+    extreme_count = sum(1 for r in returns if abs(r - mean_ret) > threshold_std * std_ret)
 
     if extreme_count > 0:
         pct = extreme_count / len(returns) * 100

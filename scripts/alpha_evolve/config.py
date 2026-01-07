@@ -35,9 +35,7 @@ class EvolutionConfig(BaseSettings):
 
     # Selection Ratios
     elite_ratio: float = Field(0.1, ge=0.0, le=1.0, description="Elite selection")
-    exploration_ratio: float = Field(
-        0.2, ge=0.0, le=1.0, description="Random selection"
-    )
+    exploration_ratio: float = Field(0.2, ge=0.0, le=1.0, description="Random selection")
 
     # Execution
     max_concurrent: int = Field(2, ge=1, description="Parallel evaluations")

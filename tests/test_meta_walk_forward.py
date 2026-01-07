@@ -29,9 +29,7 @@ class TestWalkForwardSplitter:
             + walk_forward_config.embargo_size
             + walk_forward_config.test_window
         )
-        expected_splits = (
-            n_samples - total_per_split
-        ) // walk_forward_config.step_size + 1
+        expected_splits = (n_samples - total_per_split) // walk_forward_config.step_size + 1
 
         assert len(splits) >= expected_splits - 1
         assert len(splits) > 0

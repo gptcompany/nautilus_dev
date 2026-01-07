@@ -175,8 +175,7 @@ class ParquetConverter:
                         logger.debug(f"Deleted old partition: {day_dir}")
 
         logger.info(
-            f"Retention applied: deleted {deleted} partitions older than "
-            f"{self.retention_days} days"
+            f"Retention applied: deleted {deleted} partitions older than {self.retention_days} days"
         )
         return deleted
 

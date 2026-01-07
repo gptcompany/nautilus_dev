@@ -140,8 +140,7 @@ class MetaModel:
         unique_labels = np.unique(valid_meta_labels)
         if len(unique_labels) < 2:
             logger.warning(
-                "Only one class present in meta-labels. "
-                "Model will return default confidence."
+                "Only one class present in meta-labels. Model will return default confidence."
             )
             self._is_fitted = False
             return

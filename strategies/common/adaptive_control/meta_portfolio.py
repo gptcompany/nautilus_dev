@@ -450,9 +450,7 @@ class MetaPortfolio:
 
             # Blend current weight with Thompson probability
             target = prob
-            state.weight = (
-                1 - self.adaptation_rate
-            ) * state.weight + self.adaptation_rate * target
+            state.weight = (1 - self.adaptation_rate) * state.weight + self.adaptation_rate * target
 
             # Enforce bounds
             state.weight = max(self.min_weight, min(self.max_weight, state.weight))
@@ -473,8 +471,7 @@ class MetaPortfolio:
         return {
             "total_pnl": self._total_pnl,
             "peak_equity": self._peak_equity,
-            "drawdown": (self._peak_equity - self._total_pnl)
-            / max(1, self._peak_equity),
+            "drawdown": (self._peak_equity - self._total_pnl) / max(1, self._peak_equity),
             "active_systems": len(active),
             "inactive_systems": len(inactive),
             "weights": self._get_current_weights(),

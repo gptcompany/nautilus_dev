@@ -202,9 +202,7 @@ class TestRunValidate:
         assert result in (0, 1)
 
     @pytest.mark.asyncio
-    async def test_validate_json_output(
-        self, temp_strategy: Path, tmp_path: Path
-    ) -> None:
+    async def test_validate_json_output(self, temp_strategy: Path, tmp_path: Path) -> None:
         """Test JSON output format."""
         output_file = tmp_path / "output.json"
         parser = create_parser()
@@ -231,9 +229,7 @@ class TestRunValidate:
         assert '"summary"' in content or '"windows"' in content
 
     @pytest.mark.asyncio
-    async def test_validate_markdown_output(
-        self, temp_strategy: Path, tmp_path: Path
-    ) -> None:
+    async def test_validate_markdown_output(self, temp_strategy: Path, tmp_path: Path) -> None:
         """Test Markdown output format."""
         output_file = tmp_path / "output.md"
         parser = create_parser()

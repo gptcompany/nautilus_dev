@@ -50,9 +50,7 @@ class FundingUpdate(BaseModel):
     symbol: str
     venue: str
     funding_rate: float = Field(..., description="Rate as decimal (0.0001 = 0.01%)")
-    next_funding_time: int | None = Field(
-        None, description="Next funding timestamp (ms)"
-    )
+    next_funding_time: int | None = Field(None, description="Next funding timestamp (ms)")
     predicted_rate: float | None = None
 
 

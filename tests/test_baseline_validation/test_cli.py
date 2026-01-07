@@ -15,7 +15,6 @@ import tempfile
 from pathlib import Path
 
 
-
 class TestCLIRun:
     """Tests for the run command."""
 

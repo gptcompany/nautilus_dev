@@ -147,15 +147,9 @@ class TestStrategyRecovery:
         strategy = ConcreteRecoverableStrategy(strategy_config)
 
         # Patch the properties at class level
-        with patch.object(
-            type(strategy), "cache", new_callable=PropertyMock
-        ) as cache_prop:
-            with patch.object(
-                type(strategy), "clock", new_callable=PropertyMock
-            ) as clock_prop:
-                with patch.object(
-                    type(strategy), "log", new_callable=PropertyMock
-                ) as log_prop:
+        with patch.object(type(strategy), "cache", new_callable=PropertyMock) as cache_prop:
+            with patch.object(type(strategy), "clock", new_callable=PropertyMock) as clock_prop:
+                with patch.object(type(strategy), "log", new_callable=PropertyMock) as log_prop:
                     cache_prop.return_value = mock_cache
                     clock_prop.return_value = mock_clock
                     log_prop.return_value = MagicMock()
@@ -186,15 +180,9 @@ class TestStrategyRecovery:
         strategy = ConcreteRecoverableStrategy(strategy_config)
         request_bars_mock = MagicMock()
 
-        with patch.object(
-            type(strategy), "cache", new_callable=PropertyMock
-        ) as cache_prop:
-            with patch.object(
-                type(strategy), "clock", new_callable=PropertyMock
-            ) as clock_prop:
-                with patch.object(
-                    type(strategy), "log", new_callable=PropertyMock
-                ) as log_prop:
+        with patch.object(type(strategy), "cache", new_callable=PropertyMock) as cache_prop:
+            with patch.object(type(strategy), "clock", new_callable=PropertyMock) as clock_prop:
+                with patch.object(type(strategy), "log", new_callable=PropertyMock) as log_prop:
                     cache_prop.return_value = mock_cache
                     clock_prop.return_value = mock_clock
                     log_prop.return_value = MagicMock()
@@ -234,15 +222,9 @@ class TestStrategyRecovery:
             bar.ts_event = 1704067200000000000 + (i * 60_000_000_000)  # 1 min apart
             bars.append(bar)
 
-        with patch.object(
-            type(strategy), "cache", new_callable=PropertyMock
-        ) as cache_prop:
-            with patch.object(
-                type(strategy), "clock", new_callable=PropertyMock
-            ) as clock_prop:
-                with patch.object(
-                    type(strategy), "log", new_callable=PropertyMock
-                ) as log_prop:
+        with patch.object(type(strategy), "cache", new_callable=PropertyMock) as cache_prop:
+            with patch.object(type(strategy), "clock", new_callable=PropertyMock) as clock_prop:
+                with patch.object(type(strategy), "log", new_callable=PropertyMock) as log_prop:
                     cache_prop.return_value = mock_cache
                     clock_prop.return_value = mock_clock
                     log_prop.return_value = MagicMock()
@@ -276,15 +258,9 @@ class TestStrategyRecovery:
 
         strategy = ConcreteRecoverableStrategy(strategy_config)
 
-        with patch.object(
-            type(strategy), "cache", new_callable=PropertyMock
-        ) as cache_prop:
-            with patch.object(
-                type(strategy), "clock", new_callable=PropertyMock
-            ) as clock_prop:
-                with patch.object(
-                    type(strategy), "log", new_callable=PropertyMock
-                ) as log_prop:
+        with patch.object(type(strategy), "cache", new_callable=PropertyMock) as cache_prop:
+            with patch.object(type(strategy), "clock", new_callable=PropertyMock) as clock_prop:
+                with patch.object(type(strategy), "log", new_callable=PropertyMock) as log_prop:
                     cache_prop.return_value = mock_cache
                     clock_prop.return_value = mock_clock
                     log_prop.return_value = MagicMock()
@@ -299,9 +275,7 @@ class TestStrategyRecovery:
                     assert not strategy.is_ready
 
                     # Simulate warmup completion
-                    strategy._on_warmup_data_received(
-                        [MagicMock(ts_event=1704067200000000000)]
-                    )
+                    strategy._on_warmup_data_received([MagicMock(ts_event=1704067200000000000)])
 
                     # After warmup complete
                     assert not strategy.is_warming_up
@@ -322,15 +296,9 @@ class TestStrategyRecovery:
 
         strategy = ConcreteRecoverableStrategy(strategy_config)
 
-        with patch.object(
-            type(strategy), "cache", new_callable=PropertyMock
-        ) as cache_prop:
-            with patch.object(
-                type(strategy), "clock", new_callable=PropertyMock
-            ) as clock_prop:
-                with patch.object(
-                    type(strategy), "log", new_callable=PropertyMock
-                ) as log_prop:
+        with patch.object(type(strategy), "cache", new_callable=PropertyMock) as cache_prop:
+            with patch.object(type(strategy), "clock", new_callable=PropertyMock) as clock_prop:
+                with patch.object(type(strategy), "log", new_callable=PropertyMock) as log_prop:
                     cache_prop.return_value = mock_cache
                     clock_prop.return_value = mock_clock
                     log_prop.return_value = MagicMock()
@@ -364,15 +332,9 @@ class TestStrategyRecovery:
         # Initial state (before on_start)
         assert strategy.recovery_state.status == RecoveryStatus.PENDING
 
-        with patch.object(
-            type(strategy), "cache", new_callable=PropertyMock
-        ) as cache_prop:
-            with patch.object(
-                type(strategy), "clock", new_callable=PropertyMock
-            ) as clock_prop:
-                with patch.object(
-                    type(strategy), "log", new_callable=PropertyMock
-                ) as log_prop:
+        with patch.object(type(strategy), "cache", new_callable=PropertyMock) as cache_prop:
+            with patch.object(type(strategy), "clock", new_callable=PropertyMock) as clock_prop:
+                with patch.object(type(strategy), "log", new_callable=PropertyMock) as log_prop:
                     cache_prop.return_value = mock_cache
                     clock_prop.return_value = mock_clock
                     log_prop.return_value = MagicMock()
@@ -388,9 +350,7 @@ class TestStrategyRecovery:
                     assert not strategy.recovery_state.indicators_warmed
 
                     # After warmup complete
-                    strategy._on_warmup_data_received(
-                        [MagicMock(ts_event=1704067200000000000)]
-                    )
+                    strategy._on_warmup_data_received([MagicMock(ts_event=1704067200000000000)])
 
                     # Final state
                     assert strategy.recovery_state.status == RecoveryStatus.COMPLETED
@@ -412,15 +372,9 @@ class TestStrategyRecovery:
 
         strategy = ConcreteRecoverableStrategy(strategy_config)
 
-        with patch.object(
-            type(strategy), "cache", new_callable=PropertyMock
-        ) as cache_prop:
-            with patch.object(
-                type(strategy), "clock", new_callable=PropertyMock
-            ) as clock_prop:
-                with patch.object(
-                    type(strategy), "log", new_callable=PropertyMock
-                ) as log_prop:
+        with patch.object(type(strategy), "cache", new_callable=PropertyMock) as cache_prop:
+            with patch.object(type(strategy), "clock", new_callable=PropertyMock) as clock_prop:
+                with patch.object(type(strategy), "log", new_callable=PropertyMock) as log_prop:
                     cache_prop.return_value = mock_cache
                     clock_prop.return_value = mock_clock
                     log_prop.return_value = MagicMock()
@@ -453,15 +407,9 @@ class TestStrategyRecovery:
 
         strategy = ConcreteRecoverableStrategy(strategy_config_disabled)
 
-        with patch.object(
-            type(strategy), "cache", new_callable=PropertyMock
-        ) as cache_prop:
-            with patch.object(
-                type(strategy), "clock", new_callable=PropertyMock
-            ) as clock_prop:
-                with patch.object(
-                    type(strategy), "log", new_callable=PropertyMock
-                ) as log_prop:
+        with patch.object(type(strategy), "cache", new_callable=PropertyMock) as cache_prop:
+            with patch.object(type(strategy), "clock", new_callable=PropertyMock) as clock_prop:
+                with patch.object(type(strategy), "log", new_callable=PropertyMock) as log_prop:
                     cache_prop.return_value = mock_cache
                     clock_prop.return_value = mock_clock
                     log_prop.return_value = MagicMock()
@@ -501,15 +449,9 @@ class TestStrategyRecovery:
 
         strategy = ConcreteRecoverableStrategy(strategy_config)
 
-        with patch.object(
-            type(strategy), "cache", new_callable=PropertyMock
-        ) as cache_prop:
-            with patch.object(
-                type(strategy), "clock", new_callable=PropertyMock
-            ) as clock_prop:
-                with patch.object(
-                    type(strategy), "log", new_callable=PropertyMock
-                ) as log_prop:
+        with patch.object(type(strategy), "cache", new_callable=PropertyMock) as cache_prop:
+            with patch.object(type(strategy), "clock", new_callable=PropertyMock) as clock_prop:
+                with patch.object(type(strategy), "log", new_callable=PropertyMock) as log_prop:
                     cache_prop.return_value = mock_cache
                     clock_prop.return_value = mock_clock
                     log_prop.return_value = MagicMock()
@@ -543,15 +485,9 @@ class TestStrategyRecovery:
 
         strategy = ConcreteRecoverableStrategy(strategy_config)
 
-        with patch.object(
-            type(strategy), "cache", new_callable=PropertyMock
-        ) as cache_prop:
-            with patch.object(
-                type(strategy), "clock", new_callable=PropertyMock
-            ) as clock_prop:
-                with patch.object(
-                    type(strategy), "log", new_callable=PropertyMock
-                ) as log_prop:
+        with patch.object(type(strategy), "cache", new_callable=PropertyMock) as cache_prop:
+            with patch.object(type(strategy), "clock", new_callable=PropertyMock) as clock_prop:
+                with patch.object(type(strategy), "log", new_callable=PropertyMock) as log_prop:
                     cache_prop.return_value = mock_cache
                     clock_prop.return_value = mock_clock
                     log_prop.return_value = MagicMock()
@@ -578,15 +514,9 @@ class TestStrategyRecovery:
         strategy = ConcreteRecoverableStrategy(strategy_config)
         stop_mock = MagicMock()
 
-        with patch.object(
-            type(strategy), "cache", new_callable=PropertyMock
-        ) as cache_prop:
-            with patch.object(
-                type(strategy), "clock", new_callable=PropertyMock
-            ) as clock_prop:
-                with patch.object(
-                    type(strategy), "log", new_callable=PropertyMock
-                ) as log_prop:
+        with patch.object(type(strategy), "cache", new_callable=PropertyMock) as cache_prop:
+            with patch.object(type(strategy), "clock", new_callable=PropertyMock) as clock_prop:
+                with patch.object(type(strategy), "log", new_callable=PropertyMock) as log_prop:
                     cache_prop.return_value = mock_cache
                     clock_prop.return_value = mock_clock
                     log_prop.return_value = MagicMock()
@@ -619,15 +549,9 @@ class TestStrategyRecovery:
             bar.ts_event = ts
             bars.append(bar)
 
-        with patch.object(
-            type(strategy), "cache", new_callable=PropertyMock
-        ) as cache_prop:
-            with patch.object(
-                type(strategy), "clock", new_callable=PropertyMock
-            ) as clock_prop:
-                with patch.object(
-                    type(strategy), "log", new_callable=PropertyMock
-                ) as log_prop:
+        with patch.object(type(strategy), "cache", new_callable=PropertyMock) as cache_prop:
+            with patch.object(type(strategy), "clock", new_callable=PropertyMock) as clock_prop:
+                with patch.object(type(strategy), "log", new_callable=PropertyMock) as log_prop:
                     cache_prop.return_value = mock_cache
                     clock_prop.return_value = mock_clock
                     log_prop.return_value = MagicMock()
@@ -641,7 +565,5 @@ class TestStrategyRecovery:
                     strategy._on_warmup_data_received(bars)
 
                     # Verify bars were processed in sorted order (oldest first)
-                    processed_timestamps = [
-                        b.ts_event for b in strategy.historical_data_calls
-                    ]
+                    processed_timestamps = [b.ts_event for b in strategy.historical_data_calls]
                     assert processed_timestamps == sorted(timestamps)

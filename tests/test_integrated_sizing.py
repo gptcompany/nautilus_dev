@@ -113,13 +113,9 @@ class TestEdgeCases:
         )
 
         # High toxicity should result in much smaller position
-        assert abs(result_high_toxicity.final_size) < abs(
-            result_low_toxicity.final_size
-        )
+        assert abs(result_high_toxicity.final_size) < abs(result_low_toxicity.final_size)
         # With toxicity=0.9, size should be ~11% of low toxicity
-        ratio = abs(result_high_toxicity.final_size) / abs(
-            result_low_toxicity.final_size
-        )
+        ratio = abs(result_high_toxicity.final_size) / abs(result_low_toxicity.final_size)
         assert ratio < 0.15
 
     def test_low_confidence_reduces_size(self, integrated_sizing_config):

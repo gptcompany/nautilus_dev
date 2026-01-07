@@ -66,9 +66,7 @@ def evolve(ctx: click.Context, config_path: Path | None, db_path: Path) -> None:
 @evolve.command()
 @click.option("--seed", required=True, help='Seed strategy name (e.g., "momentum")')
 @click.option("--iterations", default=50, type=int, help="Number of iterations")
-@click.option(
-    "--experiment", default=None, help="Experiment name (auto-generated if not set)"
-)
+@click.option("--experiment", default=None, help="Experiment name (auto-generated if not set)")
 @click.option("--target-fitness", type=float, help="Stop when fitness >= target")
 @click.option("--timeout", type=int, help="Max runtime in seconds")
 @click.option("-v", "--verbose", is_flag=True, help="Verbose output")
@@ -275,9 +273,7 @@ def status(
 
 @evolve.command()
 @click.argument("experiment", required=False)
-@click.option(
-    "-k", "--top-k", default=10, type=int, help="Number of strategies to show"
-)
+@click.option("-k", "--top-k", default=10, type=int, help="Number of strategies to show")
 @click.option("--metric", default="calmar", help="Sort metric: calmar|sharpe|cagr")
 @click.option("--json", "as_json", is_flag=True, help="Output as JSON")
 @click.option("--with-code", is_flag=True, help="Include strategy code")
@@ -325,9 +321,7 @@ def best(
     else:
         click.echo(f"Top {len(strategies)} Strategies (by {metric})")
         click.echo("=" * 70)
-        click.echo(
-            f"{'Rank':<5} {'ID':<10} {'Gen':<5} {'Calmar':<10} {'Sharpe':<10} {'MaxDD':<10}"
-        )
+        click.echo(f"{'Rank':<5} {'ID':<10} {'Gen':<5} {'Calmar':<10} {'Sharpe':<10} {'MaxDD':<10}")
         click.echo("-" * 70)
         for i, s in enumerate(strategies, 1):
             m = s.metrics
@@ -343,9 +337,7 @@ def best(
 
 @evolve.command()
 @click.argument("strategy_id")
-@click.option(
-    "-o", "--output", type=click.Path(path_type=Path), help="Output file path"
-)
+@click.option("-o", "--output", type=click.Path(path_type=Path), help="Output file path")
 @click.option("--with-lineage", is_flag=True, help="Include parent chain as comments")
 @click.pass_context
 def export(
@@ -386,9 +378,7 @@ def export(
 
     if strategy.metrics:
         m = strategy.metrics
-        header_lines.append(
-            f"Fitness: Calmar={m.calmar_ratio:.4f}, Sharpe={m.sharpe_ratio:.4f}"
-        )
+        header_lines.append(f"Fitness: Calmar={m.calmar_ratio:.4f}, Sharpe={m.sharpe_ratio:.4f}")
 
     if with_lineage:
         lineage = store.get_lineage(strategy.id)
@@ -463,9 +453,7 @@ def resume(ctx: click.Context, experiment: str, iterations: int | None) -> None:
     click.echo(f"Resume functionality: would resume {experiment}")
     if iterations:
         click.echo(f"  Additional iterations: {iterations}")
-    click.echo(
-        "Note: Resume requires controller state persistence (not yet implemented)"
-    )
+    click.echo("Note: Resume requires controller state persistence (not yet implemented)")
 
 
 def _list_experiments(store: ProgramStore, as_json: bool) -> None:

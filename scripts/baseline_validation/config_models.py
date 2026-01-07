@@ -240,9 +240,7 @@ class BaselineValidationConfig(BaseModel):
 
     validation: ValidationConfig
     contenders: dict[str, ContenderConfig]
-    success_criteria: SuccessCriteriaConfig = Field(
-        default_factory=SuccessCriteriaConfig
-    )
+    success_criteria: SuccessCriteriaConfig = Field(default_factory=SuccessCriteriaConfig)
     output: OutputConfig = Field(default_factory=OutputConfig)
     seed: int | None = Field(
         default=42,

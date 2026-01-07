@@ -52,9 +52,7 @@ def two_cluster_volatility() -> np.ndarray:
 class TestGMMFit:
     """Tests for GMM fitting behavior."""
 
-    def test_gmm_fit_identifies_three_clusters(
-        self, synthetic_volatility_data: np.ndarray
-    ) -> None:
+    def test_gmm_fit_identifies_three_clusters(self, synthetic_volatility_data: np.ndarray) -> None:
         """Test that GMM identifies 3 volatility clusters."""
         gmm_filter = GMMVolatilityFilter(n_clusters=3)
         gmm_filter.fit(synthetic_volatility_data)
@@ -67,9 +65,7 @@ class TestGMMFit:
         means = sorted(gmm_filter.cluster_means)
         assert means[0] < means[1] < means[2]
 
-    def test_gmm_fit_with_two_clusters(
-        self, two_cluster_volatility: np.ndarray
-    ) -> None:
+    def test_gmm_fit_with_two_clusters(self, two_cluster_volatility: np.ndarray) -> None:
         """Test that GMM works with 2 clusters."""
         gmm_filter = GMMVolatilityFilter(n_clusters=2)
         gmm_filter.fit(two_cluster_volatility)
@@ -179,28 +175,13 @@ class TestVolatilityClusterMapping:
         """Test mapping for 3 clusters."""
         cluster_means = [0.005, 0.015, 0.030]  # low, medium, high
 
-        assert (
-            VolatilityCluster.from_gmm_cluster(0, cluster_means)
-            == VolatilityCluster.LOW
-        )
-        assert (
-            VolatilityCluster.from_gmm_cluster(1, cluster_means)
-            == VolatilityCluster.MEDIUM
-        )
-        assert (
-            VolatilityCluster.from_gmm_cluster(2, cluster_means)
-            == VolatilityCluster.HIGH
-        )
+        assert VolatilityCluster.from_gmm_cluster(0, cluster_means) == VolatilityCluster.LOW
+        assert VolatilityCluster.from_gmm_cluster(1, cluster_means) == VolatilityCluster.MEDIUM
+        assert VolatilityCluster.from_gmm_cluster(2, cluster_means) == VolatilityCluster.HIGH
 
     def test_volatility_cluster_from_gmm_cluster_two_clusters(self) -> None:
         """Test mapping for 2 clusters."""
         cluster_means = [0.005, 0.030]  # low, high
 
-        assert (
-            VolatilityCluster.from_gmm_cluster(0, cluster_means)
-            == VolatilityCluster.LOW
-        )
-        assert (
-            VolatilityCluster.from_gmm_cluster(1, cluster_means)
-            == VolatilityCluster.HIGH
-        )
+        assert VolatilityCluster.from_gmm_cluster(0, cluster_means) == VolatilityCluster.LOW
+        assert VolatilityCluster.from_gmm_cluster(1, cluster_means) == VolatilityCluster.HIGH

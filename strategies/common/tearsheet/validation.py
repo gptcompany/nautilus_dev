@@ -53,9 +53,7 @@ def validate_equity_curve(engine: "BacktestEngine") -> tuple[bool, str]:
         extreme_threshold = 0.5  # 50% daily return is suspicious
         extreme_count = (returns.abs() > extreme_threshold).sum()
         if extreme_count > 0:
-            _logger.warning(
-                f"Returns contains {extreme_count} extreme values (>50% daily)"
-            )
+            _logger.warning(f"Returns contains {extreme_count} extreme values (>50% daily)")
 
         return True, f"Valid equity curve with {len(returns)} data points"
 

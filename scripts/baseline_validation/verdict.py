@@ -106,9 +106,7 @@ def calculate_confidence(
     if window_sharpes:
         mean = sum(window_sharpes) / len(window_sharpes)
         if len(window_sharpes) > 1:
-            variance = sum((s - mean) ** 2 for s in window_sharpes) / (
-                len(window_sharpes) - 1
-            )
+            variance = sum((s - mean) ** 2 for s in window_sharpes) / (len(window_sharpes) - 1)
             std = variance**0.5
             # Lower std relative to mean = higher consistency
             cv = abs(std / mean) if mean != 0 else 1.0

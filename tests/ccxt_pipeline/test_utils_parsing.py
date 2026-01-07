@@ -1,6 +1,5 @@
 """Unit tests for parsing utilities."""
 
-
 from scripts.ccxt_pipeline.utils.parsing import safe_float, safe_int, safe_str
 
 

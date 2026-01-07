@@ -125,13 +125,9 @@ def build_binance_exec_client_config(
             if lev <= 0:
                 raise ValueError(f"Leverage must be positive, got {lev} for {symbol}")
             if lev > 125:
-                raise ValueError(
-                    f"Leverage {lev} exceeds Binance max of 125x for {symbol}"
-                )
+                raise ValueError(f"Leverage {lev} exceeds Binance max of 125x for {symbol}")
 
-        leverages = {
-            BinanceSymbol(symbol): lev for symbol, lev in futures_leverages.items()
-        }
+        leverages = {BinanceSymbol(symbol): lev for symbol, lev in futures_leverages.items()}
 
     # Convert futures_margin_types to BinanceSymbol keys with enum values
     margin_types = None

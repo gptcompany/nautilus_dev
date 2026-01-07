@@ -30,9 +30,7 @@ class AuditConfig:
         ... )
     """
 
-    base_path: Union[Path, str] = field(
-        default_factory=lambda: Path("./data/audit/hot")
-    )
+    base_path: Union[Path, str] = field(default_factory=lambda: Path("./data/audit/hot"))
     sync_writes: bool = False
     rotate_daily: bool = True
     retention_days: int = 90
