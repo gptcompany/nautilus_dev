@@ -15,7 +15,7 @@ from nautilus_trader.model.events import PositionClosed
 from risk.daily_loss_config import DailyLossConfig
 
 if TYPE_CHECKING:
-    from nautilus_trader.model.events import Event
+    from nautilus_trader.core.message import Event
     from nautilus_trader.trading.strategy import Strategy
 
 logger = logging.getLogger(__name__)

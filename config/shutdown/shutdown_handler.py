@@ -177,7 +177,7 @@ class GracefulShutdownHandler:
     async def _halt_trading(self) -> None:
         """Halt trading to prevent new orders."""
         try:
-            from nautilus_trader.trading.trader import TradingState
+            from nautilus_trader.model.enums import TradingState
 
             if hasattr(self.node, "trader") and self.node.trader is not None:
                 self.node.trader.trading_state = TradingState.HALTED

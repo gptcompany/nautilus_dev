@@ -19,7 +19,7 @@ from nautilus_trader.model.objects import Price
 from risk.config import RiskConfig, StopLossType
 
 if TYPE_CHECKING:
-    from nautilus_trader.model.events import Event
+    from nautilus_trader.core.message import Event
     from nautilus_trader.model.orders import Order
     from nautilus_trader.model.position import Position
     from nautilus_trader.trading.strategy import Strategy

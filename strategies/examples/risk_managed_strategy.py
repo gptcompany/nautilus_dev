@@ -10,8 +10,8 @@ This is a reference implementation for T037.
 from nautilus_trader.config import StrategyConfig
 from nautilus_trader.model.data import Bar, BarType
 from nautilus_trader.model.enums import OrderSide
+from nautilus_trader.core.message import Event
 from nautilus_trader.model.events import (
-    Event,
     OrderFilled,
     PositionClosed,
     PositionOpened,
