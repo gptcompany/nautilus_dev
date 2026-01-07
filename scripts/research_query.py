@@ -116,9 +116,15 @@ class ResearchQuery:
             params: Query parameters (dict for Neo4j, list for DuckDB)
         """
         if engine == "neo4j":
-            return self._query_neo4j(query, params if isinstance(params, dict) else {})
+            neo4j_params = params if isinstance(params, dict) else {}
+            return self._query_neo4j(query, neo4j_params)
         elif engine == "duckdb":
-            return self._query_duckdb(query, params if isinstance(params, list) else [])
+            # Accept list or tuple for DuckDB params
+            if isinstance(params, (list, tuple)):
+                duckdb_params = list(params)
+            else:
+                duckdb_params = []
+            return self._query_duckdb(query, duckdb_params)
         else:
             return QueryResult(
                 engine=engine, data=[], error=f"Unknown engine: {engine}"
@@ -330,7 +336,7 @@ class ResearchQuery:
         if methodology:
             conditions.append("methodology_type = ?")
             params.append(methodology)
-        if min_relevance:
+        if min_relevance is not None:
             conditions.append("relevance_score >= ?")
             params.append(min_relevance)
 

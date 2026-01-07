@@ -50,23 +50,24 @@ def get_model():
 def init_embedding_table():
     """Create separate embeddings table to avoid FK issues."""
     db = duckdb.connect(str(DUCKDB_PATH))
+    try:
+        db.execute("""
+            CREATE TABLE IF NOT EXISTS paper_embeddings (
+                paper_id VARCHAR PRIMARY KEY,
+                embedding FLOAT[] NOT NULL,
+                model_name VARCHAR DEFAULT 'all-MiniLM-L6-v2',
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        """)
 
-    db.execute("""
-        CREATE TABLE IF NOT EXISTS paper_embeddings (
-            paper_id VARCHAR PRIMARY KEY,
-            embedding FLOAT[] NOT NULL,
-            model_name VARCHAR DEFAULT 'all-MiniLM-L6-v2',
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-    """)
+        db.execute("""
+            CREATE INDEX IF NOT EXISTS idx_embeddings_paper
+            ON paper_embeddings (paper_id)
+        """)
 
-    db.execute("""
-        CREATE INDEX IF NOT EXISTS idx_embeddings_paper
-        ON paper_embeddings (paper_id)
-    """)
-
-    print("Embeddings table ready")
-    db.close()
+        print("Embeddings table ready")
+    finally:
+        db.close()
 
 
 def generate_paper_text(paper: dict) -> str:
@@ -188,13 +189,16 @@ def search_papers(
         )
 
         if similarity >= min_similarity:
+            truncated_abstract = None
+            if abstract:
+                truncated_abstract = (
+                    abstract[:200] + "..." if len(abstract) > 200 else abstract
+                )
             results.append(
                 {
                     "paper_id": paper_id,
                     "title": title,
-                    "abstract": abstract[:200] + "..."
-                    if abstract and len(abstract) > 200
-                    else abstract,
+                    "abstract": truncated_abstract,
                     "methodology_type": methodology,
                     "similarity": float(similarity),
                     "relevance_score": relevance,
@@ -331,23 +335,24 @@ def rerank_search_results(
 def show_stats():
     """Show embedding statistics."""
     db = duckdb.connect(str(DUCKDB_PATH), read_only=True)
+    try:
+        total = db.execute("SELECT COUNT(*) FROM papers").fetchone()[0]
+        with_embedding = db.execute("SELECT COUNT(*) FROM paper_embeddings").fetchone()[
+            0
+        ]
 
-    total = db.execute("SELECT COUNT(*) FROM papers").fetchone()[0]
-    with_embedding = db.execute("SELECT COUNT(*) FROM paper_embeddings").fetchone()[0]
-
-    print("=== Embedding Statistics ===\n")
-    print(f"Total papers:      {total}")
-    print(f"With embeddings:   {with_embedding}")
-    print(f"Missing:           {total - with_embedding}")
-    print(
-        f"Coverage:          {with_embedding / total * 100:.1f}%"
-        if total > 0
-        else "N/A"
-    )
-    print(f"\nModel: {MODEL_NAME}")
-    print(f"Dimensions: {EMBEDDING_DIM}")
-
-    db.close()
+        print("=== Embedding Statistics ===\n")
+        print(f"Total papers:      {total}")
+        print(f"With embeddings:   {with_embedding}")
+        print(f"Missing:           {total - with_embedding}")
+        if total > 0:
+            print(f"Coverage:          {with_embedding / total * 100:.1f}%")
+        else:
+            print("Coverage:          N/A")
+        print(f"\nModel: {MODEL_NAME}")
+        print(f"Dimensions: {EMBEDDING_DIM}")
+    finally:
+        db.close()
 
 
 def main():

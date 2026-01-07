@@ -93,106 +93,107 @@ def fetch_strategies(neo4j_session) -> list[dict]:
 def sync_to_duckdb(papers: list, formulas: list, strategies: list):
     """Insert/update records in DuckDB."""
     db = duckdb.connect(str(DUCKDB_PATH))
+    try:
+        # Sync papers
+        for paper in papers:
+            if not paper.get("paper_id"):
+                continue
+            db.execute(
+                """
+                INSERT INTO papers
+                (paper_id, title, authors, abstract, arxiv_id, doi, source,
+                 methodology_type, relevance_score, pdf_path, parsed_content_path, updated_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+                ON CONFLICT (paper_id) DO UPDATE SET
+                    title = EXCLUDED.title,
+                    updated_at = CURRENT_TIMESTAMP
+            """,
+                [
+                    paper["paper_id"],
+                    paper.get("title"),
+                    paper.get("authors", []),
+                    paper.get("abstract"),
+                    paper.get("arxiv_id"),
+                    paper.get("doi"),
+                    paper.get("source"),
+                    paper.get("methodology_type"),
+                    paper.get("relevance_score"),
+                    paper.get("pdf_path"),
+                    paper.get("parsed_content_path"),
+                ],
+            )
 
-    # Sync papers
-    for paper in papers:
-        if not paper.get("paper_id"):
-            continue
-        db.execute(
-            """
-            INSERT INTO papers
-            (paper_id, title, authors, abstract, arxiv_id, doi, source,
-             methodology_type, relevance_score, pdf_path, parsed_content_path, updated_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
-            ON CONFLICT (paper_id) DO UPDATE SET
-                title = EXCLUDED.title,
-                updated_at = CURRENT_TIMESTAMP
-        """,
-            [
-                paper["paper_id"],
-                paper.get("title"),
-                paper.get("authors", []),
-                paper.get("abstract"),
-                paper.get("arxiv_id"),
-                paper.get("doi"),
-                paper.get("source"),
-                paper.get("methodology_type"),
-                paper.get("relevance_score"),
-                paper.get("pdf_path"),
-                paper.get("parsed_content_path"),
-            ],
-        )
+        # Sync formulas
+        for formula in formulas:
+            if not formula.get("formula_id"):
+                continue
+            db.execute(
+                """
+                INSERT INTO formulas
+                (formula_id, paper_id, latex, description, formula_type,
+                 validation_status, wolfram_verified, wolfram_result,
+                 equation_number, context)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ON CONFLICT (formula_id) DO UPDATE SET
+                    latex = EXCLUDED.latex,
+                    validation_status = EXCLUDED.validation_status
+            """,
+                [
+                    formula["formula_id"],
+                    formula.get("paper_id"),
+                    formula.get("latex"),
+                    formula.get("description"),
+                    formula.get("formula_type"),
+                    formula.get("validation_status"),
+                    formula.get("wolfram_verified"),
+                    formula.get("wolfram_result"),
+                    formula.get("equation_number"),
+                    formula.get("context"),
+                ],
+            )
 
-    # Sync formulas
-    for formula in formulas:
-        if not formula.get("formula_id"):
-            continue
-        db.execute(
-            """
-            INSERT INTO formulas
-            (formula_id, paper_id, latex, description, formula_type,
-             validation_status, wolfram_verified, wolfram_result,
-             equation_number, context)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            ON CONFLICT (formula_id) DO UPDATE SET
-                latex = EXCLUDED.latex,
-                validation_status = EXCLUDED.validation_status
-        """,
-            [
-                formula["formula_id"],
-                formula.get("paper_id"),
-                formula.get("latex"),
-                formula.get("description"),
-                formula.get("formula_type"),
-                formula.get("validation_status"),
-                formula.get("wolfram_verified"),
-                formula.get("wolfram_result"),
-                formula.get("equation_number"),
-                formula.get("context"),
-            ],
-        )
+        # Sync strategies
+        for strategy in strategies:
+            if not strategy.get("strategy_id"):
+                continue
+            db.execute(
+                """
+                INSERT INTO strategies
+                (strategy_id, name, paper_id, methodology_type, entry_logic,
+                 exit_logic, position_sizing, risk_management, indicators,
+                 sharpe_ratio, max_drawdown, win_rate, profit_factor,
+                 implementation_status, implementation_path, spec_path, updated_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+                ON CONFLICT (strategy_id) DO UPDATE SET
+                    name = EXCLUDED.name,
+                    implementation_status = EXCLUDED.implementation_status,
+                    updated_at = CURRENT_TIMESTAMP
+            """,
+                [
+                    strategy["strategy_id"],
+                    strategy.get("name"),
+                    strategy.get("paper_id"),
+                    strategy.get("methodology_type"),
+                    strategy.get("entry_logic"),
+                    strategy.get("exit_logic"),
+                    strategy.get("position_sizing"),
+                    strategy.get("risk_management"),
+                    strategy.get(
+                        "formula_ids", []
+                    ),  # Using formula_ids as indicators proxy
+                    strategy.get("sharpe_ratio"),
+                    strategy.get("max_drawdown"),
+                    strategy.get("win_rate"),
+                    strategy.get("profit_factor"),
+                    strategy.get("implementation_status"),
+                    strategy.get("implementation_path"),
+                    strategy.get("spec_path"),
+                ],
+            )
 
-    # Sync strategies
-    for strategy in strategies:
-        if not strategy.get("strategy_id"):
-            continue
-        db.execute(
-            """
-            INSERT INTO strategies
-            (strategy_id, name, paper_id, methodology_type, entry_logic,
-             exit_logic, position_sizing, risk_management, indicators,
-             sharpe_ratio, max_drawdown, win_rate, profit_factor,
-             implementation_status, implementation_path, spec_path, updated_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
-            ON CONFLICT (strategy_id) DO UPDATE SET
-                name = EXCLUDED.name,
-                implementation_status = EXCLUDED.implementation_status,
-                updated_at = CURRENT_TIMESTAMP
-        """,
-            [
-                strategy["strategy_id"],
-                strategy.get("name"),
-                strategy.get("paper_id"),
-                strategy.get("methodology_type"),
-                strategy.get("entry_logic"),
-                strategy.get("exit_logic"),
-                strategy.get("position_sizing"),
-                strategy.get("risk_management"),
-                strategy.get(
-                    "formula_ids", []
-                ),  # Using formula_ids as indicators proxy
-                strategy.get("sharpe_ratio"),
-                strategy.get("max_drawdown"),
-                strategy.get("win_rate"),
-                strategy.get("profit_factor"),
-                strategy.get("implementation_status"),
-                strategy.get("implementation_path"),
-                strategy.get("spec_path"),
-            ],
-        )
-
-    db.close()
-    return len(papers), len(formulas), len(strategies)
+        return len(papers), len(formulas), len(strategies)
+    finally:
+        db.close()
 
 
 def export_to_parquet():
@@ -200,9 +201,15 @@ def export_to_parquet():
     PARQUET_DIR.mkdir(parents=True, exist_ok=True)
     db = duckdb.connect(str(DUCKDB_PATH))
     try:
+        # Whitelist of allowed table names to prevent SQL injection
+        ALLOWED_TABLES = {"papers", "formulas", "strategies", "code_entities"}
         tables = ["papers", "formulas", "strategies", "code_entities"]
         for table in tables:
+            if table not in ALLOWED_TABLES:
+                print(f"  Skipping unknown table: {table}")
+                continue
             path = PARQUET_DIR / f"{table}.parquet"
+            # Use parameterized path to avoid injection via path
             db.execute(f"COPY {table} TO '{path}' (FORMAT PARQUET)")
             print(f"  Exported {table} to {path}")
     finally:

@@ -27,13 +27,19 @@ def load_memory_json() -> dict:
         print(f"Warning: {MEMORY_JSON_PATH} not found")
         return {"entities": [], "relations": []}
 
-    with open(MEMORY_JSON_PATH) as f:
-        return json.load(f)
+    try:
+        with open(MEMORY_JSON_PATH) as f:
+            return json.load(f)
+    except json.JSONDecodeError as e:
+        print(f"Error: Failed to parse {MEMORY_JSON_PATH}: {e}")
+        return {"entities": [], "relations": []}
 
 
 def sync_entity_to_neo4j(tx, entity: dict):
     """Sync a single entity to Neo4j based on its type."""
     name = entity.get("name", "")
+    if not name or not name.strip():
+        return None  # Skip entities without valid names
     entity_type = entity.get("entityType", "Entity")
     observations = entity.get("observations", [])
 
@@ -91,6 +97,11 @@ def sync_relation_to_neo4j(tx, relation: dict):
     """Sync a relation to Neo4j."""
     from_entity = relation.get("from", "")
     to_entity = relation.get("to", "")
+
+    # Skip invalid relations with empty from/to
+    if not from_entity or not to_entity:
+        return None
+
     rel_type = relation.get("relationType", "RELATED_TO").upper().replace(" ", "_")
 
     # Whitelist of allowed relationship types to prevent Cypher injection
@@ -107,13 +118,9 @@ def sync_relation_to_neo4j(tx, relation: dict):
         "HAS_INDICATOR",
     }
 
-    # Validate relationship type
+    # Validate relationship type - ONLY allow whitelisted types
     if rel_type not in ALLOWED_REL_TYPES:
-        # Sanitize: only allow alphanumeric and underscore
-        import re
-
-        if not re.match(r"^[A-Z_]+$", rel_type) or len(rel_type) > 50:
-            rel_type = "RELATED_TO"  # Safe default
+        rel_type = "RELATED_TO"  # Safe default - whitelist only
 
     query = (
         """
