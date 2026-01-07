@@ -43,7 +43,7 @@ class EquityPoint:
     equity: float
 
 
-class BaseEvolveConfig(StrategyConfig, frozen=True):
+class BaseEvolveConfig(StrategyConfig, frozen=True):  # type: ignore[call-arg]
     """
     Configuration for evolvable strategy base class.
 

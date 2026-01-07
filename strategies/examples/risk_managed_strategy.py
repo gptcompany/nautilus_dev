@@ -8,9 +8,9 @@ This is a reference implementation for T037.
 """
 
 from nautilus_trader.config import StrategyConfig
+from nautilus_trader.core.message import Event
 from nautilus_trader.model.data import Bar, BarType
 from nautilus_trader.model.enums import OrderSide
-from nautilus_trader.core.message import Event
 from nautilus_trader.model.events import (
     OrderFilled,
     PositionClosed,
@@ -23,7 +23,7 @@ from nautilus_trader.trading.strategy import Strategy
 from risk import RiskConfig, RiskManager
 
 
-class RiskManagedStrategyConfig(StrategyConfig, frozen=True):
+class RiskManagedStrategyConfig(StrategyConfig, frozen=True):  # type: ignore[call-arg]
     """
     Configuration for RiskManagedStrategy.
 

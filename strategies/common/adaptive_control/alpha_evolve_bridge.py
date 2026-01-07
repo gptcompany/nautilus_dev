@@ -37,7 +37,7 @@ from typing import TYPE_CHECKING
 from .meta_controller import MarketHarmony, MetaController, MetaState
 
 if TYPE_CHECKING:
-    from strategies.common.audit.events import AuditEventEmitter
+    from strategies.common.audit.emitter import AuditEventEmitter
 
 logger = logging.getLogger(__name__)
 

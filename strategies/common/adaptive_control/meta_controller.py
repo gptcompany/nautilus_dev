@@ -29,7 +29,7 @@ from enum import Enum
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from strategies.common.audit.events import AuditEventEmitter
+    from strategies.common.audit.emitter import AuditEventEmitter
 
 
 logger = logging.getLogger(__name__)

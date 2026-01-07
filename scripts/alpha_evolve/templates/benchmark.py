@@ -45,7 +45,7 @@ if TYPE_CHECKING:
 # =============================================================================
 
 
-class VanillaMomentumConfig(BaseEvolveConfig, frozen=True):
+class VanillaMomentumConfig(BaseEvolveConfig, frozen=True):  # type: ignore[call-arg]
     """Configuration for vanilla momentum strategy (no equity tracking)."""
 
     fast_period: int = 10

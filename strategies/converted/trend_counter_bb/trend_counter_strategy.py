@@ -30,7 +30,7 @@ if TYPE_CHECKING:
     from nautilus_trader.model.data import Bar
 
 
-class TrendCounterBBConfig(StrategyConfig, frozen=True):
+class TrendCounterBBConfig(StrategyConfig, frozen=True):  # type: ignore[call-arg]
     """
     Configuration for TrendCounterBB strategy.
 

@@ -25,7 +25,7 @@ if TYPE_CHECKING:
     from nautilus_trader.model.data import Bar
 
 
-class MomentumEvolveConfig(BaseEvolveConfig, frozen=True):
+class MomentumEvolveConfig(BaseEvolveConfig, frozen=True):  # type: ignore[call-arg]
     """
     Configuration for momentum seed strategy.
 

@@ -23,7 +23,7 @@ from nautilus_trader.trading.strategy import Strategy
 from .liquidation_zone_indicator import LiquidationZone, LiquidationZoneIndicator
 
 
-class LiquidationHeatMapConfig(StrategyConfig, frozen=True):
+class LiquidationHeatMapConfig(StrategyConfig, frozen=True):  # type: ignore[call-arg]
     """Configuration for LiquidationHeatMap strategy."""
 
     instrument_id: str

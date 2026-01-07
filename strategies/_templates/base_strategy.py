@@ -15,7 +15,7 @@ from nautilus_trader.model.position import Position
 from nautilus_trader.trading.strategy import Strategy
 
 
-class BaseStrategyConfig(StrategyConfig, frozen=True):
+class BaseStrategyConfig(StrategyConfig, frozen=True):  # type: ignore[call-arg]
     """Base configuration for all strategies."""
 
     instrument_id: str

@@ -47,7 +47,7 @@ if TYPE_CHECKING:
     from nautilus_trader.model.orders import Order
 
 
-class RecoverableStrategyConfig(StrategyConfig, frozen=True):
+class RecoverableStrategyConfig(StrategyConfig, frozen=True):  # type: ignore[call-arg]
     """Configuration for RecoverableStrategy.
 
     Attributes:
