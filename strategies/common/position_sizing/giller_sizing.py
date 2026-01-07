@@ -72,6 +72,11 @@ class GillerSizer:
         # Apply base size, regime weight, and toxicity penalty
         size = scaled * self.config.base_size * regime_weight * (1.0 - toxicity)
 
+        # If raw size is zero (e.g., regime_weight=0 or toxicity=1), return 0
+        # This means "don't trade" takes precedence over min_size
+        if size == 0.0:
+            return 0.0
+
         # Apply min/max limits (on absolute value)
         if size < self.config.min_size:
             size = self.config.min_size
