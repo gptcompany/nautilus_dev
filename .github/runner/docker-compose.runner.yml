@@ -2,9 +2,9 @@
 # Access to local services: Neo4j, QuestDB, Redis, DuckDB
 #
 # Usage:
-#   export GITHUB_RUNNER_TOKEN="your-token"
-#   export GITHUB_REPOSITORY="owner/repo"
 #   docker-compose -f docker-compose.runner.yml up -d
+#
+# Configuration is in .env file (auto-loaded)
 #
 # Get runner token: Settings > Actions > Runners > New self-hosted runner
 
