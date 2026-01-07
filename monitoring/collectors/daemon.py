@@ -91,7 +91,7 @@ class DaemonCollector(BaseCollector[DaemonMetrics]):
             # Import deferred to avoid circular imports
             from scripts.ccxt_pipeline.daemon_runner import DaemonRunner
 
-            return DaemonRunner.get_status()
+            return cast(dict, DaemonRunner.get_status())
         except ImportError:
             logger.warning("DaemonRunner not available, using mock status")
             return self._mock_status()

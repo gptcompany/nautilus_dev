@@ -337,4 +337,5 @@ def create_classifier(
             f"Invalid classification method: '{method}'. Valid methods: {valid_methods}"
         )
 
-    return classifiers[method]()
+    classifier_cls = classifiers[method]
+    return cast(TickRuleClassifier | BVCClassifier | CloseVsOpenClassifier, classifier_cls())

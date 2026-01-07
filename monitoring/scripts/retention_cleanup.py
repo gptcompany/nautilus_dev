@@ -16,6 +16,7 @@ Example cron entry (daily at 3 AM):
 import argparse
 import logging
 from datetime import UTC, datetime, timedelta
+from typing import cast
 
 import httpx
 
@@ -60,7 +61,7 @@ def execute_query(client: httpx.Client, query: str) -> dict | None:
     try:
         response = client.get("/exec", params={"query": query})
         response.raise_for_status()
-        return response.json()
+        return cast(dict | None, response.json())
     except Exception as e:
         logger.error(f"Query failed: {e}")
         return None

@@ -89,7 +89,7 @@ class ExchangeCollector(BaseCollector[ExchangeStatus]):
         try:
             from scripts.ccxt_pipeline.daemon_runner import DaemonRunner
 
-            return DaemonRunner.get_exchange_status()
+            return cast(dict, DaemonRunner.get_exchange_status())
         except (ImportError, AttributeError):
             logger.warning("Exchange status not available, using mock status")
             return self._mock_status()

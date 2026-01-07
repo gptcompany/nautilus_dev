@@ -7,7 +7,7 @@ Tracks daily realized + unrealized PnL and enforces daily loss limits.
 import logging
 from datetime import datetime
 from decimal import Decimal
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 from nautilus_trader.model.enums import OrderSide, PositionSide
 from nautilus_trader.model.events import PositionClosed
@@ -247,4 +247,4 @@ class DailyPnLTracker:
 
     def _get_day_start(self) -> datetime:
         """Get start of current trading day based on reset_time_utc."""
-        return self._strategy.clock.utc_now()
+        return cast(datetime, self._strategy.clock.utc_now())

@@ -202,7 +202,7 @@ class LuckQuantifier:
         min_years = var_adjustment * (z / sharpe) ** 2
 
         # Convert to months
-        return min_years * 12
+        return float(min_years * 12)
 
     def probability_of_luck(
         self,
@@ -243,7 +243,7 @@ class LuckQuantifier:
         # (conservative but simple)
         p_adjusted = min(1.0, p_value * n_trials)
 
-        return p_adjusted
+        return float(p_adjusted)
 
     def probability_of_backtest_overfitting(
         self,
@@ -337,7 +337,7 @@ class TrackRecordAnalyzer:
         return self.luck.assess(
             sharpe=sharpe,
             n_trials=self.n_trials,
-            track_record_months=months,
+            track_record_months=int(months),
             skewness=self._calculate_skewness(),
             kurtosis=self._calculate_kurtosis(),
         )

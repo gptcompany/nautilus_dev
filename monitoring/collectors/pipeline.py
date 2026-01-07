@@ -7,6 +7,7 @@ import logging
 import socket
 from collections.abc import Callable
 from datetime import UTC, datetime
+from typing import cast
 
 from monitoring.collectors import BaseCollector
 from monitoring.config import MonitoringConfig
@@ -90,7 +91,7 @@ class PipelineCollector(BaseCollector[PipelineMetrics]):
         try:
             from scripts.ccxt_pipeline.daemon_runner import DaemonRunner
 
-            return DaemonRunner.get_pipeline_stats()
+            return cast(dict, DaemonRunner.get_pipeline_stats())
         except (ImportError, AttributeError):
             logger.warning("Pipeline stats not available, using mock stats")
             return self._mock_stats()

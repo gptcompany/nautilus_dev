@@ -42,7 +42,7 @@ def apply_patch(parent_code: str, diff: dict[str, Any]) -> str:
     """
     # Full code replacement
     if "code" in diff:
-        return diff["code"]
+        return cast(str, diff["code"])
 
     # Surgical block replacement
     if "blocks" not in diff:
