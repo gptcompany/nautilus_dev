@@ -35,7 +35,15 @@ on:
 env:
   PYTHON_VERSION: '3.12'
   UV_CACHE_DIR: /tmp/.uv-cache
-  COVERAGE_THRESHOLD: 40  # Lower for initial CI setup, increase as we add more tests
+  # ============================================================================
+  # ENTERPRISE PRODUCTION SYSTEM - HANDLES REAL MONEY - NO COMPROMISES
+  # ============================================================================
+  # 90% coverage MANDATORY for CRITICAL modules:
+  # - risk/ (circuit breakers, PnL tracking, position limits)
+  # - recovery/ (session recovery - CRITICAL for live trading)
+  # - position_sizing/ (money management)
+  # - adaptive_control/ (safety parameters)
+  COVERAGE_THRESHOLD: 90
   ALPHA_DEBUG_MAX_ROUNDS: 3
   ALPHA_DEBUG_COOLDOWN_SECS: 600
 
@@ -164,14 +172,21 @@ jobs:
         id: tests
         run: |
           set +e
+          # ENTERPRISE: 80% coverage REQUIRED for CRITICAL modules only
+          # risk/ - Risk management (circuit breakers, PnL tracking, position limits)
+          # strategies/common/recovery/ - Session recovery (CRITICAL for live trading)
+          # strategies/common/position_sizing/ - Position sizing logic
+          # strategies/common/adaptive_control/ - Adaptive control parameters
           uv run pytest tests/ \
             -v --tb=short \
             --ignore=tests/integration \
-            --cov=strategies --cov=scripts \
+            --cov=risk \
+            --cov=strategies/common/recovery \
+            --cov=strategies/common/position_sizing \
+            --cov=strategies/common/adaptive_control \
             --cov-report=json:coverage.json \
             --cov-report=term-missing \
             --cov-fail-under=${{ env.COVERAGE_THRESHOLD }} \
-            -x \
             2>&1 | tee test_output.txt
           EXIT_CODE=${PIPESTATUS[0]}
           set -e

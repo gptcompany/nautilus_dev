@@ -1,5 +1,18 @@
 # CLAUDE.md
 
+> **PRODUCTION TRADING SYSTEM - HANDLES REAL MONEY**
+>
+> This system trades with REAL CAPITAL. Every code change can result in FINANCIAL LOSS.
+>
+> **NON-NEGOTIABLE RULES:**
+> 1. **90% test coverage** for critical modules (risk/, recovery/, position_sizing/)
+> 2. **NO shortcuts** - if unsure, ASK before implementing
+> 3. **NO untested code** in production paths
+> 4. **ALL safety limits are FIXED** - never make them adaptive
+> 5. **Knight Capital lost $440M in 45 minutes** from a code bug - RESPECT THE RISK
+
+---
+
 ## Project Overview
 **NautilusTrader Documentation Hub** - High-performance algo trading (Python frontend + Rust core).
 
