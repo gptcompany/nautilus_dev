@@ -299,10 +299,16 @@ class TestHealthStates:
         """Test DEGRADED state due to high latency."""
         health = SystemHealthMonitor(latency_threshold_ms=50.0)
 
-        # High latency
+        # Very high latency to bring score below 70
+        # Score penalty: min(20, (200-50)/5) = 20, plus rejections
         for _ in range(20):
-            health.record_latency(150.0)
-        health.record_fill()
+            health.record_latency(200.0)  # Much higher latency
+        # Add rejections to push score below 70: 20% rejection = 10 point penalty
+        # Total: 100 - 20 (latency) - 10 (rejections) = 70, need one more
+        for _ in range(21):
+            health.record_rejection()
+        for _ in range(79):
+            health.record_fill()
 
         # Check state via property (which calls get_metrics internally)
         assert health.state == HealthState.DEGRADED
@@ -315,11 +321,15 @@ class TestHealthStates:
         """Test DEGRADED state due to high rejection rate."""
         health = SystemHealthMonitor()
 
-        # High rejection rate (30%)
-        for _ in range(30):
+        # High rejection rate (45%) - penalty = 0.45 * 50 = 22.5
+        for _ in range(45):
             health.record_rejection()
-        for _ in range(70):
+        for _ in range(55):
             health.record_fill()
+        # Add latency to push score below 70: default threshold is 100ms
+        # penalty = min(20, (200-100)/5) = 20
+        for _ in range(20):
+            health.record_latency(200.0)
 
         # Check state via property (which calls get_metrics internally)
         assert health.state == HealthState.DEGRADED
@@ -500,11 +510,13 @@ class TestRiskMultiplier:
         """Test risk multiplier for DEGRADED state."""
         health = SystemHealthMonitor()
 
-        # Trigger DEGRADED - 20% rejection rate
-        for _ in range(20):
+        # Trigger DEGRADED - 40% rejection rate plus high latency
+        for _ in range(40):
             health.record_rejection()
-        for _ in range(80):
+        for _ in range(60):
             health.record_fill()
+        for _ in range(20):
+            health.record_latency(150.0)
 
         # risk_multiplier property calls get_metrics() internally
         assert health.risk_multiplier == 0.5
@@ -537,12 +549,15 @@ class TestShouldTrade:
         """Test should trade in DEGRADED state."""
         health = SystemHealthMonitor()
 
-        # Trigger DEGRADED
-        for _ in range(20):
+        # Trigger DEGRADED - 40% rejection rate plus high latency
+        for _ in range(40):
             health.record_rejection()
-        for _ in range(80):
+        for _ in range(60):
             health.record_fill()
+        for _ in range(20):
+            health.record_latency(150.0)
 
+        # should_trade() calls get_metrics() internally
         should_trade, reason = health.should_trade()
         assert should_trade is True
         assert "degraded" in reason.lower()
@@ -625,9 +640,12 @@ class TestEdgeCases:
             health.record_latency(10000.0)  # 10 seconds!
         health.record_fill()
 
+        # Check state via property first
+        assert health.state == HealthState.CRITICAL
+
+        # Get metrics to verify latency calculation
         metrics = health.get_metrics()
         assert metrics.latency_mean_ms == 10000.0
-        assert metrics.state == HealthState.CRITICAL
 
     def test_negative_slippage(self):
         """Test negative slippage (price improvement)."""

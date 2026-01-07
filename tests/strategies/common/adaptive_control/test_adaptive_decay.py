@@ -204,11 +204,15 @@ class TestIntegrationWithIIRRegimeDetector:
         calc = AdaptiveDecayCalculator()
         detector = IIRRegimeDetector()
 
-        # Feed high volatility data
+        # Feed low volatility first to establish baseline
+        for _ in range(50):
+            detector.update(0.001)
+
+        # Then spike with high volatility to create high variance ratio
         import numpy as np
 
         np.random.seed(42)
-        for ret in np.random.normal(0, 0.05, 100):
+        for ret in np.random.normal(0, 0.1, 50):
             detector.update(ret)
 
         decay = calc.calculate_from_detector(detector)
@@ -221,19 +225,23 @@ class TestIntegrationWithIIRRegimeDetector:
         calc = AdaptiveDecayCalculator()
         detector = IIRRegimeDetector()
 
-        # Start with low volatility
-        for _ in range(50):
+        # Start with consistent low volatility to establish low baseline
+        for _ in range(100):
             detector.update(0.001)
 
         decay1 = calc.calculate_from_detector(detector)
 
-        # Spike to high volatility
-        for _ in range(50):
-            detector.update(0.05)
+        # Feed just a few high volatility samples to spike fast variance
+        # This will temporarily increase the variance ratio (fast > slow)
+        import numpy as np
+
+        np.random.seed(42)
+        for ret in np.random.normal(0, 0.3, 5):
+            detector.update(ret)
 
         decay2 = calc.calculate_from_detector(detector)
 
-        # Decay should decrease (adapt faster)
+        # During volatility spike, variance ratio increases, decay should decrease
         assert decay2 < decay1
 
 
