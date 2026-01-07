@@ -1395,3 +1395,841 @@ class TestPerformance:
 
         # 10 save/load cycles should complete in < 0.5 seconds
         assert duration < 0.5
+
+
+# =============================================================================
+# Additional Tests for Coverage (90%+ Target)
+# =============================================================================
+
+
+class TestRecoverableStrategyMethods:
+    """Test RecoverableStrategy internal methods directly.
+
+    Uses PropertyMock to patch Cython attributes correctly.
+    Covers lines: 242, 280, 353, 400
+    """
+
+    @pytest.fixture
+    def strategy_config(self):
+        """RecoverableStrategyConfig for tests."""
+        return RecoverableStrategyConfig(
+            instrument_id="BTCUSDT-PERP.BINANCE",
+            bar_type="BTCUSDT-PERP.BINANCE-1-MINUTE-LAST-EXTERNAL",
+            recovery=RecoveryConfig(
+                trader_id="TRADER-TEST-001",
+                recovery_enabled=True,
+                warmup_lookback_days=2,
+            ),
+        )
+
+    @pytest.fixture
+    def mock_open_position(self):
+        """Mock open position for recovery testing."""
+        pos = MagicMock()
+        pos.instrument_id = MagicMock()
+        pos.instrument_id.value = "BTCUSDT-PERP.BINANCE"
+        pos.side = MagicMock()
+        pos.side.value = "LONG"
+        pos.quantity = MagicMock()
+        pos.quantity.as_decimal = MagicMock(return_value=Decimal("1.5"))
+        pos.avg_px_open = Decimal("42000.00")
+        pos.is_open = True
+        return pos
+
+    def test_is_stop_order_stop_market_type(self, strategy_config):
+        """Test _is_stop_order() returns True for STOP_MARKET (line 280)."""
+        from nautilus_trader.model.enums import OrderType
+
+        strategy = RecoverableStrategy(config=strategy_config)
+        order = MagicMock()
+        order.order_type = OrderType.STOP_MARKET
+
+        assert strategy._is_stop_order(order) is True
+
+    def test_is_stop_order_stop_limit_type(self, strategy_config):
+        """Test _is_stop_order() returns True for STOP_LIMIT (line 280)."""
+        from nautilus_trader.model.enums import OrderType
+
+        strategy = RecoverableStrategy(config=strategy_config)
+        order = MagicMock()
+        order.order_type = OrderType.STOP_LIMIT
+
+        assert strategy._is_stop_order(order) is True
+
+    def test_is_stop_order_limit_type(self, strategy_config):
+        """Test _is_stop_order() returns False for LIMIT order (line 280)."""
+        from nautilus_trader.model.enums import OrderType
+
+        strategy = RecoverableStrategy(config=strategy_config)
+        order = MagicMock()
+        order.order_type = OrderType.LIMIT
+
+        assert strategy._is_stop_order(order) is False
+
+    def test_is_stop_order_market_type(self, strategy_config):
+        """Test _is_stop_order() returns False for MARKET order (line 280)."""
+        from nautilus_trader.model.enums import OrderType
+
+        strategy = RecoverableStrategy(config=strategy_config)
+        order = MagicMock()
+        order.order_type = OrderType.MARKET
+
+        assert strategy._is_stop_order(order) is False
+
+    def test_on_historical_data_hook_noop(self, strategy_config):
+        """Test on_historical_data() is a no-op hook (line 353)."""
+        strategy = RecoverableStrategy(config=strategy_config)
+        mock_bar = MagicMock()
+
+        # Should not raise, just pass
+        result = strategy.on_historical_data(mock_bar)
+        assert result is None
+
+    def test_on_warmup_complete_hook_noop(self, strategy_config):
+        """Test on_warmup_complete() is a no-op hook (line 400)."""
+        strategy = RecoverableStrategy(config=strategy_config)
+
+        # Should not raise, just pass
+        result = strategy.on_warmup_complete()
+        assert result is None
+
+    def test_on_position_recovered_hook_noop(self, strategy_config, mock_open_position):
+        """Test on_position_recovered() is a no-op hook (line 242)."""
+        strategy = RecoverableStrategy(config=strategy_config)
+
+        # Should not raise, just pass
+        result = strategy.on_position_recovered(mock_open_position)
+        assert result is None
+
+
+class TestRecoverableStrategyWithMockedCacheAndClock:
+    """Test RecoverableStrategy methods that require mocked cache.
+
+    Uses PropertyMock to patch Cython attributes correctly.
+    Covers lines: 183-189, 202-225, 259-265
+    """
+
+    @pytest.fixture
+    def strategy_config(self):
+        return RecoverableStrategyConfig(
+            instrument_id="BTCUSDT-PERP.BINANCE",
+            bar_type="BTCUSDT-PERP.BINANCE-1-MINUTE-LAST-EXTERNAL",
+            recovery=RecoveryConfig(
+                trader_id="TRADER-TEST-001",
+                recovery_enabled=True,
+            ),
+        )
+
+    @pytest.fixture
+    def mock_open_position(self):
+        """Mock open position."""
+        pos = MagicMock()
+        pos.instrument_id = MagicMock()
+        pos.instrument_id.value = "BTCUSDT-PERP.BINANCE"
+        pos.side = MagicMock()
+        pos.side.value = "LONG"
+        pos.quantity = MagicMock()
+        pos.quantity.as_decimal = MagicMock(return_value=Decimal("1.5"))
+        pos.avg_px_open = Decimal("42000.00")
+        pos.is_open = True
+        return pos
+
+    def test_handle_recovered_position_updates_state(
+        self, strategy_config, mock_open_position
+    ):
+        """Test _handle_recovered_position updates recovery state (lines 202-210)."""
+        strategy = RecoverableStrategy(config=strategy_config)
+        strategy.recovery_state = RecoveryState(
+            status=RecoveryStatus.IN_PROGRESS,
+            ts_started=1_000_000_000_000,
+        )
+
+        # Mock cache to avoid None access
+        mock_cache = MagicMock()
+        mock_cache.orders_open.return_value = []
+
+        with patch.object(type(strategy), 'cache', new_callable=PropertyMock) as mock_cache_prop:
+            mock_cache_prop.return_value = mock_cache
+            with patch.object(type(strategy), 'log', new_callable=PropertyMock) as mock_log_prop:
+                mock_logger = MagicMock()
+                mock_log_prop.return_value = mock_logger
+
+                strategy._handle_recovered_position(mock_open_position)
+
+        assert len(strategy._recovered_positions) == 1
+        assert strategy.recovery_state.positions_recovered == 1
+
+    def test_handle_recovered_position_logs_details(
+        self, strategy_config, mock_open_position
+    ):
+        """Test _handle_recovered_position logs position details (lines 213-219)."""
+        strategy = RecoverableStrategy(config=strategy_config)
+        strategy.recovery_state = RecoveryState(
+            status=RecoveryStatus.IN_PROGRESS,
+            ts_started=1_000_000_000_000,
+        )
+
+        mock_cache = MagicMock()
+        mock_cache.orders_open.return_value = []
+
+        with patch.object(type(strategy), 'cache', new_callable=PropertyMock) as mock_cache_prop:
+            mock_cache_prop.return_value = mock_cache
+            with patch.object(type(strategy), 'log', new_callable=PropertyMock) as mock_log_prop:
+                mock_logger = MagicMock()
+                mock_log_prop.return_value = mock_logger
+
+                strategy._handle_recovered_position(mock_open_position)
+
+                # Should log recovery details
+                mock_logger.info.assert_called()
+
+    def test_setup_exit_orders_with_existing_stop(
+        self, strategy_config, mock_open_position
+    ):
+        """Test _setup_exit_orders logs when stop already exists (lines 259-263)."""
+        from nautilus_trader.model.enums import OrderType
+
+        strategy = RecoverableStrategy(config=strategy_config)
+
+        mock_stop_order = MagicMock()
+        mock_stop_order.order_type = OrderType.STOP_MARKET
+
+        mock_cache = MagicMock()
+        mock_cache.orders_open.return_value = [mock_stop_order]
+
+        with patch.object(type(strategy), 'cache', new_callable=PropertyMock) as mock_cache_prop:
+            mock_cache_prop.return_value = mock_cache
+            with patch.object(type(strategy), 'log', new_callable=PropertyMock) as mock_log_prop:
+                mock_logger = MagicMock()
+                mock_log_prop.return_value = mock_logger
+
+                strategy._setup_exit_orders(mock_open_position)
+
+                # Should log that stop-loss already exists
+                mock_logger.info.assert_called()
+                info_calls = [str(c) for c in mock_logger.info.call_args_list]
+                assert any("Stop-loss already exists" in c for c in info_calls)
+
+    def test_setup_exit_orders_without_stop(
+        self, strategy_config, mock_open_position
+    ):
+        """Test _setup_exit_orders warns when no stop exists (lines 265-269)."""
+        from nautilus_trader.model.enums import OrderType
+
+        strategy = RecoverableStrategy(config=strategy_config)
+
+        # Limit order is NOT a stop
+        mock_limit_order = MagicMock()
+        mock_limit_order.order_type = OrderType.LIMIT
+
+        mock_cache = MagicMock()
+        mock_cache.orders_open.return_value = [mock_limit_order]
+
+        with patch.object(type(strategy), 'cache', new_callable=PropertyMock) as mock_cache_prop:
+            mock_cache_prop.return_value = mock_cache
+            with patch.object(type(strategy), 'log', new_callable=PropertyMock) as mock_log_prop:
+                mock_logger = MagicMock()
+                mock_log_prop.return_value = mock_logger
+
+                strategy._setup_exit_orders(mock_open_position)
+
+                # Should warn about missing stop-loss
+                mock_logger.warning.assert_called()
+                warning_calls = [str(c) for c in mock_logger.warning.call_args_list]
+                assert any("No stop-loss found" in c for c in warning_calls)
+
+    def test_setup_exit_orders_no_orders(self, strategy_config, mock_open_position):
+        """Test _setup_exit_orders warns when no orders exist."""
+        strategy = RecoverableStrategy(config=strategy_config)
+
+        mock_cache = MagicMock()
+        mock_cache.orders_open.return_value = []  # No orders at all
+
+        with patch.object(type(strategy), 'cache', new_callable=PropertyMock) as mock_cache_prop:
+            mock_cache_prop.return_value = mock_cache
+            with patch.object(type(strategy), 'log', new_callable=PropertyMock) as mock_log_prop:
+                mock_logger = MagicMock()
+                mock_log_prop.return_value = mock_logger
+
+                strategy._setup_exit_orders(mock_open_position)
+
+                # Should warn about missing stop-loss
+                mock_logger.warning.assert_called()
+
+    def test_detect_recovered_positions_open_only(
+        self, strategy_config, mock_open_position
+    ):
+        """Test _detect_recovered_positions only handles open positions (lines 183-189)."""
+        strategy = RecoverableStrategy(config=strategy_config)
+
+        # Create a closed position
+        closed_pos = MagicMock()
+        closed_pos.is_open = False
+
+        mock_cache = MagicMock()
+        mock_cache.positions.return_value = [mock_open_position, closed_pos]
+        mock_cache.orders_open.return_value = []
+
+        with patch.object(type(strategy), 'cache', new_callable=PropertyMock) as mock_cache_prop:
+            mock_cache_prop.return_value = mock_cache
+            with patch.object(type(strategy), 'log', new_callable=PropertyMock) as mock_log_prop:
+                mock_logger = MagicMock()
+                mock_log_prop.return_value = mock_logger
+
+                strategy._detect_recovered_positions()
+
+        # Should only recover the open position
+        assert len(strategy._recovered_positions) == 1
+
+    def test_detect_recovered_positions_logs_count(
+        self, strategy_config, mock_open_position
+    ):
+        """Test _detect_recovered_positions logs position count (lines 189)."""
+        strategy = RecoverableStrategy(config=strategy_config)
+
+        mock_cache = MagicMock()
+        mock_cache.positions.return_value = [mock_open_position]
+        mock_cache.orders_open.return_value = []
+
+        with patch.object(type(strategy), 'cache', new_callable=PropertyMock) as mock_cache_prop:
+            mock_cache_prop.return_value = mock_cache
+            with patch.object(type(strategy), 'log', new_callable=PropertyMock) as mock_log_prop:
+                mock_logger = MagicMock()
+                mock_log_prop.return_value = mock_logger
+
+                strategy._detect_recovered_positions()
+
+                # Should log position count
+                info_calls = [str(c) for c in mock_logger.info.call_args_list]
+                assert any("Position detection complete" in c for c in info_calls)
+
+
+class TestRecoverableStrategyWarmupMethods:
+    """Test warmup-related methods with proper mocking.
+
+    Covers lines: 292-303, 318-338, 361-386
+    """
+
+    @pytest.fixture
+    def strategy_config(self):
+        return RecoverableStrategyConfig(
+            instrument_id="BTCUSDT-PERP.BINANCE",
+            bar_type="BTCUSDT-PERP.BINANCE-1-MINUTE-LAST-EXTERNAL",
+            recovery=RecoveryConfig(
+                trader_id="TRADER-TEST-001",
+                warmup_lookback_days=2,
+            ),
+        )
+
+    def test_on_warmup_data_received_idempotency_guard(self, strategy_config):
+        """Test _on_warmup_data_received is idempotent (lines 318-320)."""
+        strategy = RecoverableStrategy(config=strategy_config)
+        strategy._warmup_complete = True  # Already complete!
+
+        mock_bar = MagicMock()
+        mock_bar.ts_event = 1_000_000_000_000
+
+        with patch.object(type(strategy), 'log', new_callable=PropertyMock) as mock_log_prop:
+            mock_logger = MagicMock()
+            mock_log_prop.return_value = mock_logger
+
+            strategy._on_warmup_data_received([mock_bar])
+
+            # Should warn about duplicate warmup
+            mock_logger.warning.assert_called()
+            warning_calls = [str(c) for c in mock_logger.warning.call_args_list]
+            assert any("after completion" in c for c in warning_calls)
+
+    def test_on_warmup_data_received_empty_bars(self, strategy_config):
+        """Test _on_warmup_data_received handles empty bars (lines 322-325)."""
+        strategy = RecoverableStrategy(config=strategy_config)
+        strategy._warmup_complete = False
+        strategy._warmup_start_ns = 1_000_000_000_000
+        strategy.recovery_state = RecoveryState(
+            status=RecoveryStatus.IN_PROGRESS,
+            ts_started=1_000_000_000_000,
+        )
+
+        with patch.object(type(strategy), 'log', new_callable=PropertyMock) as mock_log_prop:
+            mock_logger = MagicMock()
+            mock_log_prop.return_value = mock_logger
+            with patch.object(type(strategy), 'clock', new_callable=PropertyMock) as mock_clock_prop:
+                mock_clock = MagicMock()
+                mock_clock.timestamp_ns.return_value = 2_000_000_000_000
+                mock_clock_prop.return_value = mock_clock
+
+                strategy._on_warmup_data_received([])
+
+                # Should warn and still complete
+                mock_logger.warning.assert_called()
+                warning_calls = [str(c) for c in mock_logger.warning.call_args_list]
+                assert any("No warmup bars" in c for c in warning_calls)
+                assert strategy._warmup_complete is True
+
+    def test_on_warmup_data_received_processes_bars_sorted(self, strategy_config):
+        """Test _on_warmup_data_received processes bars in timestamp order (lines 327-335)."""
+        strategy = RecoverableStrategy(config=strategy_config)
+        strategy._warmup_complete = False
+        strategy._warmup_start_ns = 1_000_000_000_000
+        strategy.recovery_state = RecoveryState(
+            status=RecoveryStatus.IN_PROGRESS,
+            ts_started=1_000_000_000_000,
+        )
+
+        # Create bars with different timestamps (unsorted)
+        bar1 = MagicMock()
+        bar1.ts_event = 3_000_000_000_000
+        bar2 = MagicMock()
+        bar2.ts_event = 1_000_000_000_000  # Oldest
+        bar3 = MagicMock()
+        bar3.ts_event = 2_000_000_000_000
+
+        processed_timestamps = []
+        original_on_historical = strategy.on_historical_data
+
+        def track_bars(bar):
+            processed_timestamps.append(bar.ts_event)
+            return original_on_historical(bar)
+
+        strategy.on_historical_data = track_bars
+
+        with patch.object(type(strategy), 'log', new_callable=PropertyMock) as mock_log_prop:
+            mock_logger = MagicMock()
+            mock_log_prop.return_value = mock_logger
+            with patch.object(type(strategy), 'clock', new_callable=PropertyMock) as mock_clock_prop:
+                mock_clock = MagicMock()
+                mock_clock.timestamp_ns.return_value = 4_000_000_000_000
+                mock_clock_prop.return_value = mock_clock
+
+                strategy._on_warmup_data_received([bar1, bar2, bar3])
+
+        # Should process oldest first (sorted)
+        assert processed_timestamps == [1_000_000_000_000, 2_000_000_000_000, 3_000_000_000_000]
+        assert strategy._warmup_bars_processed == 3
+
+    def test_on_warmup_data_received_logs_count(self, strategy_config):
+        """Test _on_warmup_data_received logs bar count (line 327)."""
+        strategy = RecoverableStrategy(config=strategy_config)
+        strategy._warmup_complete = False
+        strategy._warmup_start_ns = 1_000_000_000_000
+        strategy.recovery_state = RecoveryState(
+            status=RecoveryStatus.IN_PROGRESS,
+            ts_started=1_000_000_000_000,
+        )
+
+        mock_bar = MagicMock()
+        mock_bar.ts_event = 1_000_000_000_000
+
+        with patch.object(type(strategy), 'log', new_callable=PropertyMock) as mock_log_prop:
+            mock_logger = MagicMock()
+            mock_log_prop.return_value = mock_logger
+            with patch.object(type(strategy), 'clock', new_callable=PropertyMock) as mock_clock_prop:
+                mock_clock = MagicMock()
+                mock_clock.timestamp_ns.return_value = 2_000_000_000_000
+                mock_clock_prop.return_value = mock_clock
+
+                strategy._on_warmup_data_received([mock_bar])
+
+                # Should log bar count
+                info_calls = [str(c) for c in mock_logger.info.call_args_list]
+                assert any("Received" in c and "warmup bars" in c for c in info_calls)
+
+    def test_complete_warmup_sets_flag_and_state(self, strategy_config):
+        """Test _complete_warmup sets all necessary state (lines 361-377)."""
+        strategy = RecoverableStrategy(config=strategy_config)
+        strategy._warmup_complete = False
+        strategy._warmup_start_ns = 1_000_000_000_000
+        strategy._warmup_bars_processed = 50
+        strategy.recovery_state = RecoveryState(
+            status=RecoveryStatus.IN_PROGRESS,
+            positions_recovered=3,
+            ts_started=1_000_000_000_000,
+        )
+
+        with patch.object(type(strategy), 'log', new_callable=PropertyMock) as mock_log_prop:
+            mock_logger = MagicMock()
+            mock_log_prop.return_value = mock_logger
+            with patch.object(type(strategy), 'clock', new_callable=PropertyMock) as mock_clock_prop:
+                mock_clock = MagicMock()
+                mock_clock.timestamp_ns.return_value = 2_000_000_000_000
+                mock_clock_prop.return_value = mock_clock
+
+                strategy._complete_warmup()
+
+        assert strategy._warmup_complete is True
+        assert strategy.recovery_state.status == RecoveryStatus.COMPLETED
+        assert strategy.recovery_state.indicators_warmed is True
+        assert strategy.recovery_state.orders_reconciled is True
+        assert strategy.recovery_state.positions_recovered == 3  # Preserved
+        assert strategy.recovery_state.ts_completed == 2_000_000_000_000
+
+    def test_complete_warmup_logs_duration(self, strategy_config):
+        """Test _complete_warmup logs warmup duration (lines 379-383)."""
+        strategy = RecoverableStrategy(config=strategy_config)
+        strategy._warmup_complete = False
+        strategy._warmup_start_ns = 1_000_000_000_000
+        strategy._warmup_bars_processed = 100
+        strategy.recovery_state = RecoveryState(
+            status=RecoveryStatus.IN_PROGRESS,
+            ts_started=1_000_000_000_000,
+        )
+
+        with patch.object(type(strategy), 'log', new_callable=PropertyMock) as mock_log_prop:
+            mock_logger = MagicMock()
+            mock_log_prop.return_value = mock_logger
+            with patch.object(type(strategy), 'clock', new_callable=PropertyMock) as mock_clock_prop:
+                mock_clock = MagicMock()
+                mock_clock.timestamp_ns.return_value = 2_000_000_000_000
+                mock_clock_prop.return_value = mock_clock
+
+                strategy._complete_warmup()
+
+                # Should log warmup complete with duration
+                info_calls = [str(c) for c in mock_logger.info.call_args_list]
+                assert any("Warmup complete" in c for c in info_calls)
+                assert any("duration_ms" in c for c in info_calls)
+                assert any("bars_processed" in c for c in info_calls)
+
+    def test_complete_warmup_calls_hook(self, strategy_config):
+        """Test _complete_warmup calls on_warmup_complete hook (line 386)."""
+        strategy = RecoverableStrategy(config=strategy_config)
+        strategy._warmup_complete = False
+        strategy._warmup_start_ns = 1_000_000_000_000
+        strategy._warmup_bars_processed = 50
+        strategy.recovery_state = RecoveryState(
+            status=RecoveryStatus.IN_PROGRESS,
+            ts_started=1_000_000_000_000,
+        )
+
+        hook_called = [False]
+        original_hook = strategy.on_warmup_complete
+
+        def hook_wrapper():
+            hook_called[0] = True
+            return original_hook()
+
+        strategy.on_warmup_complete = hook_wrapper
+
+        with patch.object(type(strategy), 'log', new_callable=PropertyMock) as mock_log_prop:
+            mock_logger = MagicMock()
+            mock_log_prop.return_value = mock_logger
+            with patch.object(type(strategy), 'clock', new_callable=PropertyMock) as mock_clock_prop:
+                mock_clock = MagicMock()
+                mock_clock.timestamp_ns.return_value = 2_000_000_000_000
+                mock_clock_prop.return_value = mock_clock
+
+                strategy._complete_warmup()
+
+        assert hook_called[0] is True
+
+    def test_complete_warmup_handles_none_warmup_start(self, strategy_config):
+        """Test _complete_warmup handles None _warmup_start_ns (lines 365-366)."""
+        strategy = RecoverableStrategy(config=strategy_config)
+        strategy._warmup_complete = False
+        strategy._warmup_start_ns = None  # Not set
+        strategy._warmup_bars_processed = 50
+        strategy.recovery_state = RecoveryState(
+            status=RecoveryStatus.IN_PROGRESS,
+            ts_started=1_000_000_000_000,
+        )
+
+        with patch.object(type(strategy), 'log', new_callable=PropertyMock) as mock_log_prop:
+            mock_logger = MagicMock()
+            mock_log_prop.return_value = mock_logger
+            with patch.object(type(strategy), 'clock', new_callable=PropertyMock) as mock_clock_prop:
+                mock_clock = MagicMock()
+                mock_clock.timestamp_ns.return_value = 2_000_000_000_000
+                mock_clock_prop.return_value = mock_clock
+
+                # Should not raise
+                strategy._complete_warmup()
+
+        assert strategy._warmup_complete is True
+
+
+class TestPositionRecoveryProviderBalanceMethods:
+    """Additional tests for PositionRecoveryProvider balance methods.
+
+    Covers lines: 215-219, 346-373, 548-573, 612-628
+    """
+
+    @pytest.fixture
+    def mock_cache(self):
+        return MagicMock()
+
+    def test_reconcile_positions_duplicate_exchange_ids_warning(self, mock_cache):
+        """Test reconcile_positions warns on duplicate exchange instrument_ids (lines 214-219)."""
+        provider = PositionRecoveryProvider(cache=mock_cache)
+
+        # Create duplicate exchange positions
+        pos1 = MagicMock()
+        pos1.instrument_id.value = "BTCUSDT-PERP.BINANCE"
+        pos1.side.value = "LONG"
+        pos1.quantity.as_decimal.return_value = Decimal("1.0")
+
+        pos2 = MagicMock()
+        pos2.instrument_id.value = "BTCUSDT-PERP.BINANCE"  # Duplicate!
+        pos2.side.value = "SHORT"
+        pos2.quantity.as_decimal.return_value = Decimal("2.0")
+
+        # Should not crash, but should log warning
+        reconciled, discrepancies = provider.reconcile_positions(
+            cached=[],
+            exchange=[pos1, pos2],
+        )
+
+        # Should still return reconciled positions (last one wins in dict)
+        assert len(reconciled) >= 1
+
+    def test_get_exchange_balances_no_account(self, mock_cache):
+        """Test get_exchange_balances with no account returns empty (lines 351-353)."""
+        mock_cache.account.return_value = None
+        provider = PositionRecoveryProvider(cache=mock_cache)
+
+        balances = provider.get_exchange_balances(trader_id="TRADER-001")
+        assert len(balances) == 0
+
+    def test_get_exchange_balances_with_account(self, mock_cache):
+        """Test get_exchange_balances returns balances (lines 346-373)."""
+        balance = MagicMock()
+        balance.currency.code = "USDT"
+        balance.total.as_decimal.return_value = Decimal("10000.00")
+        balance.locked.as_decimal.return_value = Decimal("1000.00")
+        balance.free.as_decimal.return_value = Decimal("9000.00")
+
+        account = MagicMock()
+        account.balances.return_value = [balance]
+        mock_cache.account.return_value = account
+
+        provider = PositionRecoveryProvider(cache=mock_cache)
+        balances = provider.get_exchange_balances(trader_id="TRADER-001")
+
+        assert len(balances) == 1
+
+    def test_get_exchange_balances_logs_info(self, mock_cache):
+        """Test get_exchange_balances logs retrieval (lines 357-361)."""
+        balance = MagicMock()
+        balance.currency.code = "USDT"
+        balance.total.as_decimal.return_value = Decimal("10000.00")
+        balance.locked.as_decimal.return_value = Decimal("1000.00")
+        balance.free.as_decimal.return_value = Decimal("9000.00")
+
+        account = MagicMock()
+        account.balances.return_value = [balance]
+        mock_cache.account.return_value = account
+
+        mock_logger = MagicMock()
+        provider = PositionRecoveryProvider(cache=mock_cache, logger=mock_logger)
+
+        provider.get_exchange_balances(trader_id="TRADER-001")
+
+        # Should log retrieval
+        mock_logger.info.assert_called()
+
+    def test_get_balance_changes_only_returns_changed(self, mock_cache):
+        """Test get_balance_changes only returns changed currencies (lines 548-573)."""
+        provider = PositionRecoveryProvider(cache=mock_cache)
+
+        # Same values - no change
+        cached = MagicMock()
+        cached.currency.code = "USDT"
+        cached.total.as_decimal.return_value = Decimal("10000")
+        cached.locked.as_decimal.return_value = Decimal("1000")
+
+        exchange = MagicMock()
+        exchange.currency.code = "USDT"
+        exchange.total.as_decimal.return_value = Decimal("10000")
+        exchange.locked.as_decimal.return_value = Decimal("1000")
+
+        changes = provider.get_balance_changes(
+            cached=[cached],
+            exchange=[exchange],
+        )
+        assert len(changes) == 0
+
+    def test_get_balance_changes_includes_total_changes(self, mock_cache):
+        """Test get_balance_changes includes total balance changes (line 565-566)."""
+        provider = PositionRecoveryProvider(cache=mock_cache)
+
+        cached = MagicMock()
+        cached.currency.code = "USDT"
+        cached.total.as_decimal.return_value = Decimal("10000")
+        cached.locked.as_decimal.return_value = Decimal("1000")
+
+        exchange = MagicMock()
+        exchange.currency.code = "USDT"
+        exchange.total.as_decimal.return_value = Decimal("12000")  # Changed!
+        exchange.locked.as_decimal.return_value = Decimal("1000")
+
+        changes = provider.get_balance_changes(
+            cached=[cached],
+            exchange=[exchange],
+        )
+        assert len(changes) == 1
+        assert changes[0]["total_change"] == Decimal("2000")
+
+    def test_get_balance_changes_includes_locked_changes(self, mock_cache):
+        """Test get_balance_changes includes locked balance changes (line 567)."""
+        provider = PositionRecoveryProvider(cache=mock_cache)
+
+        cached = MagicMock()
+        cached.currency.code = "USDT"
+        cached.total.as_decimal.return_value = Decimal("10000")
+        cached.locked.as_decimal.return_value = Decimal("1000")
+
+        exchange = MagicMock()
+        exchange.currency.code = "USDT"
+        exchange.total.as_decimal.return_value = Decimal("10000")  # Same
+        exchange.locked.as_decimal.return_value = Decimal("2000")  # Changed!
+
+        changes = provider.get_balance_changes(
+            cached=[cached],
+            exchange=[exchange],
+        )
+        assert len(changes) == 1
+        assert changes[0]["locked_change"] == Decimal("1000")
+
+    def test_get_balance_changes_includes_new_currencies(self, mock_cache):
+        """Test get_balance_changes includes new currencies (lines 568-569)."""
+        provider = PositionRecoveryProvider(cache=mock_cache)
+
+        exchange = MagicMock()
+        exchange.currency.code = "BTC"
+        exchange.total.as_decimal.return_value = Decimal("1.5")
+        exchange.locked.as_decimal.return_value = Decimal("0")
+
+        changes = provider.get_balance_changes(
+            cached=[],
+            exchange=[exchange],
+        )
+        assert len(changes) == 1
+        assert changes[0]["is_new"] is True
+
+    def test_get_balance_changes_includes_removed_currencies(self, mock_cache):
+        """Test get_balance_changes includes removed currencies (line 570)."""
+        provider = PositionRecoveryProvider(cache=mock_cache)
+
+        cached = MagicMock()
+        cached.currency.code = "ETH"
+        cached.total.as_decimal.return_value = Decimal("10")
+        cached.locked.as_decimal.return_value = Decimal("0")
+
+        changes = provider.get_balance_changes(
+            cached=[cached],
+            exchange=[],
+        )
+        assert len(changes) == 1
+        assert changes[0]["is_removed"] is True
+
+    def test_log_balance_changes_significant_as_warning(self, mock_cache):
+        """Test log_balance_changes logs significant changes as warnings (lines 612-626)."""
+        mock_logger = MagicMock()
+        provider = PositionRecoveryProvider(cache=mock_cache, logger=mock_logger)
+
+        delta = {
+            "currency": "USDT",
+            "cached_total": Decimal("10000"),
+            "exchange_total": Decimal("15000"),
+            "total_change": Decimal("5000"),
+            "percent_change": 50.0,
+            "is_new": False,
+            "is_removed": False,
+        }
+
+        provider.log_balance_changes([delta], threshold_percent=10.0)
+        mock_logger.warning.assert_called()
+
+    def test_log_balance_changes_non_significant_as_info(self, mock_cache):
+        """Test log_balance_changes logs non-significant changes as info (line 628)."""
+        mock_logger = MagicMock()
+        provider = PositionRecoveryProvider(cache=mock_cache, logger=mock_logger)
+
+        delta = {
+            "currency": "USDT",
+            "cached_total": Decimal("10000"),
+            "exchange_total": Decimal("10500"),
+            "total_change": Decimal("500"),
+            "percent_change": 5.0,
+            "is_new": False,
+            "is_removed": False,
+        }
+
+        provider.log_balance_changes([delta], threshold_percent=10.0)
+        mock_logger.info.assert_called()
+
+    def test_log_balance_changes_new_currency_as_warning(self, mock_cache):
+        """Test log_balance_changes logs new currencies as warnings."""
+        mock_logger = MagicMock()
+        provider = PositionRecoveryProvider(cache=mock_cache, logger=mock_logger)
+
+        delta = {
+            "currency": "BTC",
+            "cached_total": Decimal("0"),
+            "exchange_total": Decimal("1.0"),
+            "total_change": Decimal("1.0"),
+            "percent_change": 100.0,
+            "is_new": True,
+            "is_removed": False,
+        }
+
+        provider.log_balance_changes([delta], threshold_percent=10.0)
+        mock_logger.warning.assert_called()
+
+    def test_log_balance_changes_removed_currency_as_warning(self, mock_cache):
+        """Test log_balance_changes logs removed currencies as warnings."""
+        mock_logger = MagicMock()
+        provider = PositionRecoveryProvider(cache=mock_cache, logger=mock_logger)
+
+        delta = {
+            "currency": "ETH",
+            "cached_total": Decimal("10.0"),
+            "exchange_total": Decimal("0"),
+            "total_change": Decimal("-10.0"),
+            "percent_change": -100.0,
+            "is_new": False,
+            "is_removed": True,
+        }
+
+        provider.log_balance_changes([delta], threshold_percent=10.0)
+        mock_logger.warning.assert_called()
+
+    def test_log_balance_changes_empty_list(self, mock_cache):
+        """Test log_balance_changes handles empty deltas list."""
+        mock_logger = MagicMock()
+        provider = PositionRecoveryProvider(cache=mock_cache, logger=mock_logger)
+
+        provider.log_balance_changes([], threshold_percent=10.0)
+        mock_logger.warning.assert_not_called()
+        mock_logger.info.assert_not_called()
+
+    def test_log_balance_changes_multiple_deltas(self, mock_cache):
+        """Test log_balance_changes handles multiple deltas correctly."""
+        mock_logger = MagicMock()
+        provider = PositionRecoveryProvider(cache=mock_cache, logger=mock_logger)
+
+        deltas = [
+            {
+                "currency": "USDT",
+                "cached_total": Decimal("10000"),
+                "exchange_total": Decimal("15000"),
+                "total_change": Decimal("5000"),
+                "percent_change": 50.0,  # Significant
+                "is_new": False,
+                "is_removed": False,
+            },
+            {
+                "currency": "BTC",
+                "cached_total": Decimal("1.0"),
+                "exchange_total": Decimal("1.01"),
+                "total_change": Decimal("0.01"),
+                "percent_change": 1.0,  # Not significant
+                "is_new": False,
+                "is_removed": False,
+            },
+        ]
+
+        provider.log_balance_changes(deltas, threshold_percent=10.0)
+
+        # First should be warning, second should be info
+        assert mock_logger.warning.call_count == 1
+        assert mock_logger.info.call_count == 1

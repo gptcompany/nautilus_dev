@@ -12,6 +12,7 @@ Focus on:
 import math
 
 import numpy as np
+import pytest
 
 from strategies.common.adaptive_control.dsp_filters import (
     DSPRegimeDetector,
@@ -22,6 +23,31 @@ from strategies.common.adaptive_control.dsp_filters import (
     LMSAdaptiveFilter,
     RecursiveVariance,
 )
+
+
+# Fixtures for regime detection tests
+@pytest.fixture
+def volatile_returns():
+    """Generate volatile (high variance) returns for trending detection."""
+    np.random.seed(42)
+    return np.random.randn(100) * 0.05  # 5% volatility
+
+
+@pytest.fixture
+def low_volatility_returns():
+    """Generate low volatility returns for mean-reversion detection."""
+    np.random.seed(42)
+    return np.random.randn(100) * 0.005  # 0.5% volatility
+
+
+@pytest.fixture
+def trending_returns():
+    """Generate trending returns (persistent direction)."""
+    np.random.seed(42)
+    # Trending returns with momentum
+    base = np.cumsum(np.random.randn(100) * 0.005)
+    returns = np.diff(base, prepend=0) + 0.001  # Positive drift
+    return returns
 
 
 class TestIIRLowPass:
