@@ -1,149 +1,8 @@
 # NautilusTrader - #dev-rust
 
 **Period:** Last 90 days
-**Messages:** 72
-**Last updated:** 2025-12-22 18:01:58
-
----
-
-#### [2025-09-29 06:10:37] @agedvagabond
-
-does anyone else use rust rover?
-
-When i am developing api in nautilus repo, i get this weird situation where i have errors telling me "Method `xx` not found in the current scope for type `xx` [E0599]" 
-
-But everything compiles fine and everything is found. I never had this problem on any other repo, could be an IDE issue since I updated at the same time as starting this project
-
-**Attachments:**
-- [Screenshot_2025-09-29_at_9.08.35_am.png](https://cdn.discordapp.com/attachments/990065045763391498/1422103257156681748/Screenshot_2025-09-29_at_9.08.35_am.png?ex=694a325d&is=6948e0dd&hm=2fe14da29b745c55d916abfdd235ca7854f6c0394b0c796d66214eb1c0dea08c&)
-
----
-
-#### [2025-09-29 06:11:31] @agedvagabond
-
-i am going to focus on projectX rather than rithmic, it is an easier api for my first integration. I will do rithmic after i have my head around the engine.
-
----
-
-#### [2025-09-29 09:18:42] @mlewis11.
-
-totally understandable. I'm just glad to see more non-crypto adapters coming to the platform, I think that could dramatically increase the adoption of Nautilus. IBKR is good for options, but not the fastest for futures so not really benefiting from Nautilus' speed as much as it could.
-
----
-
-#### [2025-09-29 09:44:32] @agedvagabond
-
-ProjectX api won't be great for speed compared to rithmic. They do offer some amount of free hisorical data , plus they have 10 level orderbooks. I thought this would be perfect for me, since its a tiny api. This will be my first time contributing to a project so I am just trying to learn the ropes. Thowing python into the mix makes things interesting 😅
-
----
-
-#### [2025-09-29 09:44:54] @faysou.
-
-I think that there will be adapters for most brokers at some point, things will be easier to understand as well when most of the code will be in rust than in rust, cython and python currently. Also the more code for adapters exist the easier it is to do by analogy, especially with LLM agents.
-
----
-
-#### [2025-09-29 09:45:35] @agedvagabond
-
-I am curious why they havent used dynamics and traits for apis.
-
----
-
-#### [2025-09-29 09:45:46] @faysou.
-
-definitly use LLM agents to help you, augment code is great
-
----
-
-#### [2025-09-29 09:46:23] @agedvagabond
-
-I have GPT5 plus jetbrains Ai ultimate, which is basically autogpt in my ide
-
----
-
-#### [2025-09-29 09:46:39] @faysou.
-
-just go with the flow at the beginning, you can't just arrive and start making fundamental changes. if you become a regular contributor you could at some point.
-
----
-
-#### [2025-09-29 09:50:36] @agedvagabond
-
-Haha yeah. I wouldn't know where to start. My focus is futures trading so once I have a single api where I can use 'prop firms' i will be happy. I just feel like the time has come for me to learn how professional projects work, rather than continuing to spam my own code base without a sense of direction or fixed architecture
-
----
-
-#### [2025-09-29 09:51:36] @faysou.
-
-I actually wanted to do something similar to nautilus for myself before finding its existence, but it's actually much easier to contribute to nautilus than to start from scratch
-
----
-
-#### [2025-09-29 09:53:21] @faysou.
-
-I thought rust with pyo3 bindings would be ideal and that's where the library is being migrated to. Currently it's a mix of rust, cython and python. Still the architecture of the library will mostly be the same in rust so it's worth it to understand the library in cython.
-
----
-
-#### [2025-09-29 09:53:37] @agedvagabond
-
-Yes definitely, I was using quantconnect but their focus is on portfolio management rather than intraday and I only trade intraday. I avoided python, but after making 2 rust engines I understand the appeal of it, being able to hotload strategies, plus all the Ai libraries. I thinks its a worthy trade off.
-
----
-
-#### [2025-09-29 09:55:01] @agedvagabond
-
-Plus Jupyter is legendary
-
----
-
-#### [2025-09-29 09:56:27] @agedvagabond
-
-There is an obvious shortcut with the futures apis, that is to only support brokerage and just use databento for data. But in the interests of learning ill do both on my first api
-
----
-
-#### [2025-09-29 09:57:50] @faysou.
-
-I think over time there will be more adapters, it depends on more people contributing them, the benefit of it is that other people can use it and find bugs, and maybe contribute too
-
----
-
-#### [2025-09-29 12:41:51] @agedvagabond
-
-it appears they have, i guess i wasnt deep enough in 🙂
-
----
-
-#### [2025-10-08 00:47:05] @.epicism.
-
-Hey I'm playing around with NautilusTrader and I'm trying to determine if you can use Nautilus via just Rust. I'm struggling to find an example that shows how this was intended to be done
-
----
-
-#### [2025-10-08 11:24:18] @cjdsellers
-
-Hi <@381479142505316353> 
-Welcome! The goal is pure Rust will be possible for backtesting and live trading (there will always be a Python API for this as well). Currently we’ve achieved pure Rust systems for live data and currently working on live execution. Backtesting is mostly done but requires more wiring up and work.
-
-A good example of current capabilities is the Databento live node example, this might not be what you're after though https://github.com/nautechsystems/nautilus_trader/blob/develop/crates/adapters/databento/bin/node_test.rs
-
-Better examples and tutorials for Rust will arrive when more is possible. I hope that helps!
-
-**Links:**
-- nautilus_trader/crates/adapters/databento/bin/node_test.rs at devel...
-
----
-
-#### [2025-10-08 11:34:28] @.epicism.
-
-Thank you, CJ!
-
----
-
-#### [2025-10-08 12:36:10] @faysou.
-
-Something to realise is that the rust and cython side will mostly have the same structure, so learning about the current structure of the library in cython is useful.
+**Messages:** 63
+**Last updated:** 2026-01-07 01:29:46
 
 ---
 
@@ -158,8 +17,8 @@ Good to know, thank you
 Hi, I noticed the stubs generated for enums have different casing in python vs rust. For example AccountType has UpperCamelCase in rust vs SCREAMING_SNAKE_CASE in python, what is the convention here if I want to contribute with some of my code?
 
 **Attachments:**
-- [image.png](https://cdn.discordapp.com/attachments/990065045763391498/1426145109321318480/image.png?ex=694a6622&is=694914a2&hm=d411f1070b299f0c9305457ddfe2a0a1d93cc4a8f8aec514294388b2654c8587&)
-- [image.png](https://cdn.discordapp.com/attachments/990065045763391498/1426145109732233377/image.png?ex=694a6622&is=694914a2&hm=9d2b0938c668edd09763d83e901a6e3e99cb3d9bdc581bf095cba7aaa2565a26&)
+- [image.png](https://cdn.discordapp.com/attachments/990065045763391498/1426145109321318480/image.png?ex=695ed562&is=695d83e2&hm=34aaba5a0b74ec0077913aed79268ccef42571467330ecfa8015085b0711f672&)
+- [image.png](https://cdn.discordapp.com/attachments/990065045763391498/1426145109732233377/image.png?ex=695ed562&is=695d83e2&hm=f44132519e15e1b5ffe766ac5c1eabe6bd860a83f1fd0582fe8bf4b7ac9c119e&)
 
 ---
 
@@ -541,5 +400,97 @@ https://github.com/Polymarket/rs-clob-client
 #### [2025-12-18 03:44:07] @optionalcoin
 
 Came here to make sure they knew this as well
+
+---
+
+#### [2025-12-25 12:19:40] @javdu10
+
+At the same time there is subscribe/unsubsribe for market available in the websockets
+
+---
+
+#### [2025-12-29 13:35:19] @afterblaze
+
+Hey everyone, happy holidays!
+I'd like to start contributing to Nautilus Trader again, are there any open issues that I can take up? Preferably something simple to start with, as the repo has changed quite a bit since I last saw it.
+
+---
+
+#### [2026-01-01 14:57:07] @mk1ngzz
+
+https://github.com/binance/binance-connector-rust
+
+**Links:**
+- GitHub - binance/binance-connector-rust: Simple Rust connector to B...
+
+---
+
+#### [2026-01-01 16:34:20] @javdu10
+
+Hello Hello, seeing the message above -  if anything, it could be translating some python adapters to rust? For example polymarket has an official rust package - and the current python adapter also use the official python version
+
+---
+
+#### [2026-01-01 16:35:51] @javdu10
+
+Not very novel but could be something - or maybe some indicators and some rough edge around the data and parquet file, not all types are deserialized with rust yet - example IndexPriceUpdate still need a pyarrow translator
+
+---
+
+#### [2026-01-02 14:33:09] @traderdughetto
+
+Hello,
+Would you consider developing Rithmic adapter? 
+This would enable users to backtest and live-trade through prop firms. 
+Since QuantConnect has no plans to support these vendors, it could be a strong differentiator for Nautilus.
+That said, I understand if the focus is on serious retail traders rather than the prop firm market.
+
+happy new year!
+
+---
+
+#### [2026-01-02 16:38:05] @mk1ngzz
+
+might be worth setting up https://cubic.dev or https://coderabbit.ai for automated pr reviews
+
+**Links:**
+- AI code reviews for complex codebases | cubic | Try free now
+- AI Code Reviews | CodeRabbit | Try for Free
+
+---
+
+#### [2026-01-02 16:38:28] @mk1ngzz
+
+free for open source
+
+---
+
+#### [2026-01-03 05:06:30] @exeutiy
+
+lol code rabbit? DIdn't you see what their deaf CEO did recently on x
+
+---
+
+#### [2026-01-03 08:36:27] @mk1ngzz
+
+I don't use X. What'd he do?
+
+---
+
+#### [2026-01-03 08:39:37] @exeutiy
+
+massive crash out over recommendations from a user.
+
+---
+
+#### [2026-01-06 21:34:27] @javdu10
+
+Hello there!
+
+I’m not quite sure what to do with the request_id from a strategy after doing request_data
+
+My custom adapter correctly receives the data then does « msgbus::send_response » with the request_id and the response but I see an error that no handler where found
+
+Is there anything particular apart from the on_data on the Actor ?
 
 ---

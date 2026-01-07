@@ -104,19 +104,21 @@ class ResearchQuery:
     # Direct Query Methods
     # =====================
 
-    def query(self, engine: str, query: str, params: dict | None = None) -> QueryResult:
+    def query(
+        self, engine: str, query: str, params: dict | list | None = None
+    ) -> QueryResult:
         """
         Execute a direct query on specified engine.
 
         Args:
             engine: 'neo4j' or 'duckdb'
             query: Cypher (Neo4j) or SQL (DuckDB) query
-            params: Query parameters
+            params: Query parameters (dict for Neo4j, list for DuckDB)
         """
         if engine == "neo4j":
-            return self._query_neo4j(query, params)
+            return self._query_neo4j(query, params if isinstance(params, dict) else {})
         elif engine == "duckdb":
-            return self._query_duckdb(query, params)
+            return self._query_duckdb(query, params if isinstance(params, list) else [])
         else:
             return QueryResult(
                 engine=engine, data=[], error=f"Unknown engine: {engine}"
@@ -164,14 +166,18 @@ class ResearchQuery:
 
     def get_citation_chain(self, paper_id: str, depth: int = 3) -> QueryResult:
         """Get citation chain for a paper (papers that cite this one and vice versa)."""
+        # Note: Cypher path patterns require literal integers for variable length,
+        # so we must sanitize and interpolate depth directly (validated as int)
+        if not isinstance(depth, int) or depth < 1 or depth > 10:
+            depth = 3  # Safe default, prevent injection
         return self._query_neo4j(
-            """
-            MATCH path = (p:Paper {paper_id: $paper_id})-[:CITES*1..$depth]-(related:Paper)
+            f"""
+            MATCH path = (p:Paper {{paper_id: $paper_id}})-[:CITES*1..{depth}]-(related:Paper)
             RETURN DISTINCT related.paper_id AS paper_id, related.title AS title,
                    length(path) AS distance
             ORDER BY distance
             """,
-            {"paper_id": paper_id, "depth": depth},
+            {"paper_id": paper_id},
         )
 
     def get_related_strategies(self, methodology: str) -> QueryResult:

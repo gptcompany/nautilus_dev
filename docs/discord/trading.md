@@ -1,41 +1,8 @@
 # NautilusTrader - #trading
 
 **Period:** Last 90 days
-**Messages:** 13
-**Last updated:** 2025-12-22 18:01:52
-
----
-
-#### [2025-09-24 04:39:54] @joker06326
-
-<@757548402689966131> I use manage_gtd to push gtc order on bybit, but sometimes the cancel time was an error.
-
-**Attachments:**
-- [message.txt](https://cdn.discordapp.com/attachments/931763076930367608/1420268487250808872/message.txt?ex=694ac5da&is=6949745a&hm=0f9e5c6eb3772509ea6c1faf939ea6664fa18ca1373689da7b3f9d2ac4a50e9a&)
-
----
-
-#### [2025-09-25 01:56:52] @cjdsellers
-
-Hi <@1162973750787051560> thanks for reporting, I'll investigate these logs soon
-
----
-
-#### [2025-10-03 22:27:53] @donaldcuckman
-
-sharing the strategies will only make it harder for everyoneelse and do something fucky to the economy. Though probably a push in the right direction
-
----
-
-#### [2025-10-03 22:28:36] @donaldcuckman
-
-maybe not actually, all the common strategies would just become less profitable
-
----
-
-#### [2025-10-03 22:28:41] @donaldcuckman
-
-for the small fry
+**Messages:** 12
+**Last updated:** 2026-01-07 01:29:42
 
 ---
 
@@ -89,5 +56,34 @@ Got this error - so it seems like I cant add strategies dynamically, right?
 ```
 2025-12-10T15:47:54.318921193Z [ERROR] TEST-001.TEST-001: Cannot add a strategy to a running trader
 ```
+
+---
+
+#### [2025-12-28 02:13:44] @courage521915
+
+<@757548402689966131> Hello, I often encounter the following warning after an order reaches OrderSubmitted. After several retries, the order eventually gets OrderRejected, and many of my orders fail to be placed successfully.
+
+I would like to ask whether this issue could be related to using a VPN, or if there might be other possible causes.
+2025-12-27T01:04:27.578840300Z [WARN] TESTER-001.ExecClient-POLYMARKET: Did not receive OrderStatusReport from request
+courage — 09:37
+This issue is very common in my environment. About half of my orders fail to be successfully placed because of this problem.
+
+---
+
+#### [2025-12-28 07:35:22] @faysou.
+
+You have written the same message several times already. There's no guarantee you will get an answer when you ask something.
+
+---
+
+#### [2025-12-28 10:19:12] @courage521915
+
+Sorry, I'll be more careful from now on.I've really been struggling with this problem for a long time.
+
+---
+
+#### [2025-12-28 10:54:19] @faysou.
+
+I understand, but other people can't always solve a problem that is too specific to what you do. There's no need to send the same message several times, there are not that many messages being sent on this discord server, they are all read. If you want that your issue is not forgotten better to create an issue on GitHub.
 
 ---

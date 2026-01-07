@@ -36,7 +36,7 @@ from typing import Any
 
 # Configuration
 CONFIG = {
-    "source": Path("/media/sam/1TB/academic_research/memory.json"),
+    "source": Path("/media/sam/1TB1/academic_research/memory.json"),
     "target_dir": Path("/media/sam/1TB/nautilus_dev/docs/research"),
     "stale_threshold_hours": 24,
 }

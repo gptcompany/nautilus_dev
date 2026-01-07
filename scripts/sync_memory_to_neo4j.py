@@ -44,6 +44,20 @@ def sync_entity_to_neo4j(tx, entity: dict):
             key, value = obs.split(": ", 1)
             props[key.replace(" ", "_").lower()] = value
 
+    # Whitelist of allowed labels to prevent Cypher injection
+    ALLOWED_LABELS = {
+        "Strategy",
+        "Paper",
+        "Formula",
+        "Concept",
+        "Author",
+        "Entity",
+        "Source",
+        "Code",
+        "Indicator",
+        "Methodology",
+    }
+
     # Determine node label based on entity type or name prefix
     if name.startswith("strategy__"):
         label = "Strategy"
@@ -57,7 +71,11 @@ def sync_entity_to_neo4j(tx, entity: dict):
     elif entity_type == "concept":
         label = "Concept"
     else:
+        # Sanitize label: only allow alphanumeric
         label = entity_type.title().replace("_", "")
+        # Validate against whitelist
+        if label not in ALLOWED_LABELS:
+            label = "Entity"  # Safe default
 
     # Create or update node
     query = f"""
@@ -74,6 +92,28 @@ def sync_relation_to_neo4j(tx, relation: dict):
     from_entity = relation.get("from", "")
     to_entity = relation.get("to", "")
     rel_type = relation.get("relationType", "RELATED_TO").upper().replace(" ", "_")
+
+    # Whitelist of allowed relationship types to prevent Cypher injection
+    ALLOWED_REL_TYPES = {
+        "RELATED_TO",
+        "BASED_ON",
+        "USES",
+        "CONTAINS",
+        "WRITTEN_BY",
+        "CITES",
+        "IMPLEMENTS",
+        "DERIVED_FROM",
+        "HAS_FORMULA",
+        "HAS_INDICATOR",
+    }
+
+    # Validate relationship type
+    if rel_type not in ALLOWED_REL_TYPES:
+        # Sanitize: only allow alphanumeric and underscore
+        import re
+
+        if not re.match(r"^[A-Z_]+$", rel_type) or len(rel_type) > 50:
+            rel_type = "RELATED_TO"  # Safe default
 
     query = (
         """
@@ -96,7 +136,7 @@ def sync_relation_to_neo4j(tx, relation: dict):
 
 
 def main():
-    force = "--force" in sys.argv
+    _force = "--force" in sys.argv  # Reserved for future use
 
     print(f"Loading memory.json from {MEMORY_JSON_PATH}...")
     memory = load_memory_json()

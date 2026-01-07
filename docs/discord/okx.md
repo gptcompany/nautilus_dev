@@ -1,8 +1,8 @@
 # NautilusTrader - #okx
 
 **Period:** Last 90 days
-**Messages:** 18
-**Last updated:** 2025-12-22 18:02:05
+**Messages:** 23
+**Last updated:** 2026-01-07 01:29:55
 
 ---
 
@@ -136,5 +136,67 @@ i'm trying to use `attachAlgoOrds` when sending an order request, but it just fa
 #### [2025-11-10 11:57:55] @mk1ngzz
 
 ok, apparently `attachAlgoOrds` is not supported with the ws api
+
+---
+
+#### [2025-12-24 13:50:47] @vasilvestre_akawaka
+
+Hello, I've tried for hours to simply login to the websocket without success, the REST API works fine
+
+```
+2025-12-24T13:47:41.774032627Z [INFO] OKX-TRADER-001.DataClient-OKX: Connected to public websocket wss://ws.okx.com:8443/ws/v5/public
+2025-12-24T13:47:42.030496615Z [ERROR] OKX-TRADER-001.ExecClient-OKX: Error on '_connect'
+RuntimeError(IO error: Authentication error: API key doesn't exist)
+```
+I'm on region eea which means I had to change the base url for the rest API but I can't find any information about the ws of eea region
+
+---
+
+#### [2025-12-24 14:01:40] @vasilvestre_akawaka
+
+Is it possible that nautilus tracker can't work with eea endpoints ?
+
+https://my.okx.com/docs-v5/en/#overview-account-mode
+
+**Links:**
+- OKX API guide | OKX technical support | OKX
+
+---
+
+#### [2025-12-24 14:08:11] @vasilvestre_akawaka
+
+Here's what happen when I do not specify an url :
+```
+2025-12-24T14:06:50.628817130Z [INFO] OKX-TRADER-001.DataClient-OKX: Connected to public websocket wss://ws.okx.com:8443/ws/v5/public
+2025-12-24T14:06:50.856995606Z [ERROR] OKX-TRADER-001.ExecClient-OKX: Error on '_connect'
+RuntimeError(IO error: Authentication error: API key doesn't   
+2025-12-24T14:06:51.517796951Z [INFO] OKX-TRADER-001.DataClient-OKX: Connected to business websocket wss://ws.okx.com:8443/ws/v5/business
+2025-12-24T14:06:51.517809681Z [INFO] OKX-TRADER-001.DataClient-OKX: OKX API key authenticated
+2025-12-24T14:06:51.520627720Z [INFO] OKX-TRADER-001.DataClient-OKX: Connected
+```
+
+---
+
+#### [2025-12-24 14:10:39] @vasilvestre_akawaka
+
+It only happens with the exec client
+
+---
+
+#### [2025-12-24 14:48:54] @vasilvestre_akawaka
+
+```
+2025-12-24T14:46:34.605754516Z [INFO] OKX-TRADER-001.ExecClient-OKX: Account OKX-master registered in cache
+2025-12-24T14:46:34.605755920Z [INFO] OKX-TRADER-001.ExecClient-OKX: OKX API key authenticated
+2025-12-24T14:46:34.645166273Z [INFO] OKX-TRADER-001.ExecClient-OKX: OKX server time 1766587594632 UNIX (ms)
+2025-12-24T14:46:34.645177045Z [INFO] OKX-TRADER-001.ExecClient-OKX: Nautilus clock time 1766587594645 UNIX (ms)
+2025-12-24T14:46:35.500725764Z [INFO] OKX-TRADER-001.DataClient-OKX: Connected to public websocket wss://ws.okx.com:8443/ws/v5/public
+2025-12-24T14:46:36.345250090Z [INFO] OKX-TRADER-001.DataClient-OKX: Connected to business websocket wss://ws.okx.com:8443/ws/v5/business
+2025-12-24T14:46:36.345264984Z [INFO] OKX-TRADER-001.DataClient-OKX: OKX API key authenticated
+2025-12-24T14:46:36.345546538Z [INFO] OKX-TRADER-001.DataClient-OKX: Connected
+2025-12-24T14:46:45.494744106Z [ERROR] OKX-TRADER-001.ExecClient-OKX: Error on '_connect'
+RuntimeError(Authentication failed: IO error: Authentication error: Authentication timed out) 
+```
+Seems like they rate limited me
 
 ---

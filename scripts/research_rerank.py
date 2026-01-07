@@ -85,56 +85,57 @@ def generate_embeddings() -> tuple[int, int]:
     """Generate embeddings for all papers without embeddings."""
     model = get_model()
     db = duckdb.connect(str(DUCKDB_PATH))
-    init_embedding_table()
+    try:
+        init_embedding_table()
 
-    # Get papers without embeddings (using LEFT JOIN)
-    papers = db.execute("""
-        SELECT p.paper_id, p.title, p.abstract, p.methodology_type
-        FROM papers p
-        LEFT JOIN paper_embeddings pe ON p.paper_id = pe.paper_id
-        WHERE pe.paper_id IS NULL
-    """).fetchall()
+        # Get papers without embeddings (using LEFT JOIN)
+        papers = db.execute("""
+            SELECT p.paper_id, p.title, p.abstract, p.methodology_type
+            FROM papers p
+            LEFT JOIN paper_embeddings pe ON p.paper_id = pe.paper_id
+            WHERE pe.paper_id IS NULL
+        """).fetchall()
 
-    if not papers:
-        print("All papers already have embeddings")
+        if not papers:
+            print("All papers already have embeddings")
+            return 0, 0
+
+        print(f"Generating embeddings for {len(papers)} papers...")
+
+        updated = 0
+        errors = 0
+
+        for paper_id, title, abstract, methodology in papers:
+            try:
+                paper = {
+                    "title": title,
+                    "abstract": abstract,
+                    "methodology_type": methodology,
+                }
+                text = generate_paper_text(paper)
+
+                if not text.strip():
+                    continue
+
+                embedding = model.encode(text, convert_to_numpy=True)
+                embedding_list = embedding.tolist()
+
+                db.execute(
+                    """
+                    INSERT OR REPLACE INTO paper_embeddings (paper_id, embedding, model_name)
+                    VALUES (?, ?, ?)
+                """,
+                    [paper_id, embedding_list, MODEL_NAME],
+                )
+                updated += 1
+                print(f"  ✓ {paper_id}: {title[:50]}...")
+            except Exception as e:
+                errors += 1
+                print(f"  ✗ {paper_id}: {e}")
+
+        return updated, errors
+    finally:
         db.close()
-        return 0, 0
-
-    print(f"Generating embeddings for {len(papers)} papers...")
-
-    updated = 0
-    errors = 0
-
-    for paper_id, title, abstract, methodology in papers:
-        try:
-            paper = {
-                "title": title,
-                "abstract": abstract,
-                "methodology_type": methodology,
-            }
-            text = generate_paper_text(paper)
-
-            if not text.strip():
-                continue
-
-            embedding = model.encode(text, convert_to_numpy=True)
-            embedding_list = embedding.tolist()
-
-            db.execute(
-                """
-                INSERT OR REPLACE INTO paper_embeddings (paper_id, embedding, model_name)
-                VALUES (?, ?, ?)
-            """,
-                [paper_id, embedding_list, MODEL_NAME],
-            )
-            updated += 1
-            print(f"  ✓ {paper_id}: {title[:50]}...")
-        except Exception as e:
-            errors += 1
-            print(f"  ✗ {paper_id}: {e}")
-
-    db.close()
-    return updated, errors
 
 
 def search_papers(
@@ -166,6 +167,11 @@ def search_papers(
     # Calculate similarities
     results = []
     query_norm = np.linalg.norm(query_embedding)
+
+    # Handle edge case where query embedding is zero vector
+    if query_norm == 0:
+        db.close()
+        return []
 
     for paper_id, title, abstract, methodology, embedding, relevance in papers:
         if embedding is None:
@@ -228,6 +234,11 @@ def get_similar_papers(paper_id: str, top_k: int = 5) -> list[dict[str, Any]]:
     target_embedding = np.array(target[0])
     target_norm = np.linalg.norm(target_embedding)
 
+    # Handle edge case where target embedding is zero vector
+    if target_norm == 0:
+        db.close()
+        return []
+
     # Get all other papers
     papers = db.execute(
         """
@@ -287,6 +298,10 @@ def rerank_search_results(
     model = get_model()
     query_embedding = model.encode(query, convert_to_numpy=True)
     query_norm = np.linalg.norm(query_embedding)
+
+    # Handle edge case where query embedding is zero vector
+    if query_norm == 0:
+        return search_results  # Return unchanged if can't compute similarity
 
     for paper in search_results:
         text = generate_paper_text(paper)

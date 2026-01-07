@@ -52,31 +52,32 @@ echo "Started: $(date)" >> "$LOG_FILE"
 echo "" >> "$LOG_FILE"
 
 # Launch in background with nohup (survives logout)
+# Note: Using proper quoting - variables are expanded by parent shell
 nohup bash -c "
     source /media/sam/1TB/academic_research/.venv_mineru/bin/activate
 
-    echo 'Activating MinerU venv...' >> '$LOG_FILE'
+    echo 'Activating MinerU venv...' >> \"${LOG_FILE}\"
 
-    if mineru -p '$PAPER_PATH' -o '$OUTPUT_DIR' -b pipeline -m auto -l en >> '$LOG_FILE' 2>&1; then
-        echo 'completed:$(date +%s):$(date -Iseconds)' > '$STATUS_FILE'
-        echo '' >> '$LOG_FILE'
-        echo 'Parsing completed successfully at $(date)' >> '$LOG_FILE'
+    if mineru -p \"${PAPER_PATH}\" -o \"${OUTPUT_DIR}\" -b pipeline -m auto -l en >> \"${LOG_FILE}\" 2>&1; then
+        echo \"completed:\$(date +%s):\$(date -Iseconds)\" > \"${STATUS_FILE}\"
+        echo '' >> \"${LOG_FILE}\"
+        echo \"Parsing completed successfully at \$(date)\" >> \"${LOG_FILE}\"
 
         # Extract formulas automatically
-        if [ -f '$OUTPUT_DIR/auto/${PAPER_ID}.md' ]; then
+        if [ -f \"${OUTPUT_DIR}/auto/${PAPER_ID}.md\" ]; then
             python /media/sam/1TB/nautilus_dev/scripts/extract_formulas.py \
-                '$OUTPUT_DIR/auto/${PAPER_ID}.md' \
-                --output json > '$OUTPUT_DIR/.formulas.json' 2>/dev/null || true
-            echo 'Formulas extracted to .formulas.json' >> '$LOG_FILE'
+                \"${OUTPUT_DIR}/auto/${PAPER_ID}.md\" \
+                --output json > \"${OUTPUT_DIR}/.formulas.json\" 2>/dev/null || true
+            echo 'Formulas extracted to .formulas.json' >> \"${LOG_FILE}\"
         fi
     else
-        echo 'failed:$(date +%s):$(date -Iseconds)' > '$STATUS_FILE'
-        echo '' >> '$LOG_FILE'
-        echo 'Parsing FAILED at $(date)' >> '$LOG_FILE'
+        echo \"failed:\$(date +%s):\$(date -Iseconds)\" > \"${STATUS_FILE}\"
+        echo '' >> \"${LOG_FILE}\"
+        echo \"Parsing FAILED at \$(date)\" >> \"${LOG_FILE}\"
     fi
 
     # Cleanup PID file
-    rm -f '$PID_FILE'
+    rm -f \"${PID_FILE}\"
 " >> "$LOG_FILE" 2>&1 &
 
 # Save PID

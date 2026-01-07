@@ -87,7 +87,9 @@ else:
 - If `needs_research == True`:
   1. Extract main topic from spec.md (look for Overview/Goals section)
   2. Run `/research {topic}`
-  3. Wait for research.md to be generated
+  3. Wait for research.md to be generated (~30 sec, Steps 1-6)
+     - NOTE: Deep formula analysis (Step 7) runs in BACKGROUND if needed
+     - Pipeline proceeds immediately - formulas enriched later if available
   4. Proceed to Phase 3
 
 - If `needs_research == False`:

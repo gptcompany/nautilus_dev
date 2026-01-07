@@ -8,7 +8,7 @@
 
 ### academic_research Configuration
 
-**Location**: `/media/sam/1TB/academic_research`
+**Location**: `/media/sam/1TB1/academic_research`
 
 #### Current State
 
@@ -161,7 +161,7 @@ Relationship Types:
 
 ### Liquidation Models Report
 
-**Location**: `/media/sam/1TB/academic_research/liquidation_models_summary_report.md`
+**Location**: `/media/sam/1TB1/academic_research/liquidation_models_summary_report.md`
 
 **Contents** (1430 lines):
 - Liquidation price formulas (Binance, OKX) - 99% fidelity
@@ -178,7 +178,7 @@ Relationship Types:
 
 ### Downloaded Papers
 
-**Location**: `/media/sam/1TB/academic_research/papers/`
+**Location**: `/media/sam/1TB1/academic_research/papers/`
 
 ```
 papers/
@@ -270,9 +270,9 @@ papers/
 ## References
 
 ### Internal
-- `/media/sam/1TB/academic_research/CLAUDE.md` - Research system docs
-- `/media/sam/1TB/academic_research/docs/entity_schemas.md` - Entity definitions
-- `/media/sam/1TB/academic_research/docs/workflow_templates.md` - 10 workflow patterns
+- `/media/sam/1TB1/academic_research/CLAUDE.md` - Research system docs
+- `/media/sam/1TB1/academic_research/docs/entity_schemas.md` - Entity definitions
+- `/media/sam/1TB1/academic_research/docs/workflow_templates.md` - 10 workflow patterns
 - `/media/sam/1TB/nautilus_dev/CLAUDE.md` - Trading system docs
 
 ### External

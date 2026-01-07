@@ -1,78 +1,8 @@
 # NautilusTrader - #data
 
 **Period:** Last 90 days
-**Messages:** 91
-**Last updated:** 2025-12-22 18:01:43
-
----
-
-#### [2025-09-26 19:05:11] @baerenstein.
-
-Hi guys, I have been trying to get options trade ticks but it just doesn't seem to find any trades. has anyone tried this before? im using bybit now, will try OKX next.
-
----
-
-#### [2025-09-26 20:44:38] @baerenstein.
-
-Brief update on this issue:
-There exists a connection for each options trade websocket, but it is not streaming anything, its empty. Now the rest api works and is able to retrieve options trade ticks. I will write to their support and see where things go now. Anyhow, do you know whether options trade tick data works with binance or okx? A brief reply would be great <@965894631017578537>
-
----
-
-#### [2025-09-26 22:48:48] @faysou.
-
-I don't work with binance or okx, I don't know.
-
----
-
-#### [2025-09-27 06:56:23] @baerenstein.
-
-do you know of anyone else who has been working with crypto options to whom i could reach out to?
-
----
-
-#### [2025-09-27 08:13:47] @faysou.
-
-No
-
----
-
-#### [2025-09-30 11:23:17] @drose1
-
-Seems like NautilusTrader cannot backtest with any cloud storage (gcs/aws/azure) currently. 
-Each provider has different parameter names in Python (fsspec) vs Rust (object_store).
-
-Not sure if there's a workaround or we need to implement `Protocol-Specific Normalization` .. I have some ideas for this.. but I heard we are also moving the catalog entirely into rust.
-
----
-
-#### [2025-09-30 14:28:10] @faysou.
-
-You can add another parameter to the python catalog to optionally use a different config for data not yet covered in rust.
-
----
-
-#### [2025-10-02 08:08:49] @e23099
-
-Can a catalog be shared between different platforms?
-
-For example, inside a ubuntu 22.04 wsl2, I write TradeBars to a local ParquetDataCatalog on my host machine.  And in my windows host machine, I use the same version of nautilus_trader (1.220.0) to query from that ParquetDataCatalog, and I get a `'tokio-runtime-worker' panicked at crates\serialization\src\arrow\mod.rs:84:46`. 
-
-Is catalog not supposed to be used like this?
-
----
-
-#### [2025-10-07 15:32:14] @mark.el89
-
-Hi guys 
-I’m in research phase of using NT and I think my question is more general to the trading of CFDs and such:
-
-im coming from a freqtrade /Algo and CCXT for crypto trading and got into shock to find that the data is actually not free or not available like as easy as ccxt would provide for CFDs and gold…
-
-Till now (pre installation/testing phase) and I like what I am reading, FT’s main 2 issues is no support for out of ccxt context and the RL env is very basic and 95% different than actual trading env which is not as good as needed and NT seems to have this sorted out ❤️
-
-my question is:
-is my understanding correct that data need to be purchased or am I missing something?
+**Messages:** 85
+**Last updated:** 2026-01-07 01:29:31
 
 ---
 
@@ -473,7 +403,7 @@ the python script just runs a base strategy with streaming activated
 then it tries to load the resultant feather files using pandas' `read_feather` and returns errors
 
 **Attachments:**
-- [single_ticker.zip](https://cdn.discordapp.com/attachments/924504069433876550/1428396544775684106/single_ticker.zip?ex=694aadf2&is=69495c72&hm=fb9d13b3eef2071056bca309fcdc4be6872e9fbdb0cd02f3f5e7eaba583c96c3&)
+- [single_ticker.zip](https://cdn.discordapp.com/attachments/924504069433876550/1428396544775684106/single_ticker.zip?ex=695e7472&is=695d22f2&hm=3bd36b438b618bc5c1a791c274c95d80a302e735d689a234c570ceb6a772fe2e&)
 
 ---
 
@@ -482,7 +412,7 @@ then it tries to load the resultant feather files using pandas' `read_feather` a
 
 
 **Attachments:**
-- [minimal_backtest_example.py](https://cdn.discordapp.com/attachments/924504069433876550/1428396780743295096/minimal_backtest_example.py?ex=694aae2a&is=69495caa&hm=c0e176111682018107b4e0a8b325dbf304da922bdd970c7d40f6d538f68bff23&)
+- [minimal_backtest_example.py](https://cdn.discordapp.com/attachments/924504069433876550/1428396780743295096/minimal_backtest_example.py?ex=695e74aa&is=695d232a&hm=98c8757742c9b051ef9dda4604bdbeead3d06748c29c19ebd476cdc1ad4e34ec&)
 
 ---
 
@@ -512,8 +442,8 @@ Playing around some more with the simple example, the catalog now contains two b
 Feather files are created for each, but `convert_stream_to_data` only manages to create a parquet file for one of them.
 
 **Attachments:**
-- [minimal_backtest_example.py](https://cdn.discordapp.com/attachments/924504069433876550/1428416158729768970/minimal_backtest_example.py?ex=694ac036&is=69496eb6&hm=ca62809f198b7c7bd5737fdb3065ee9fdc539d2bf1a332bd4c69f33e57111c42&)
-- [single_ticker_2.zip](https://cdn.discordapp.com/attachments/924504069433876550/1428416159048532028/single_ticker_2.zip?ex=694ac037&is=69496eb7&hm=85b3bebdee3db49180c1c337bbb7d4026d734416b5490b826f9ffb0014539b6e&)
+- [minimal_backtest_example.py](https://cdn.discordapp.com/attachments/924504069433876550/1428416158729768970/minimal_backtest_example.py?ex=695e86b6&is=695d3536&hm=bc2a1d6cb9705345034db97835a1f5937910581c55a3526dd67bf744c7b05bc6&)
+- [single_ticker_2.zip](https://cdn.discordapp.com/attachments/924504069433876550/1428416159048532028/single_ticker_2.zip?ex=695e86b7&is=695d3537&hm=b8dbc99c4cbaef3b186baeedee5ceafac194ef58d239a5d040de5c40bc7aa39f&)
 
 ---
 
@@ -666,7 +596,7 @@ hi there. I'm trying to work through the Nautilus tutorials but there are a bunc
 
 
 **Attachments:**
-- [image.png](https://cdn.discordapp.com/attachments/924504069433876550/1450706141104570471/image.png?ex=694ac320&is=694971a0&hm=b33ca5750b89be7a533b6c4ac12443d86735e4d4016b4c7a10faa46cecadfc59&)
+- [image.png](https://cdn.discordapp.com/attachments/924504069433876550/1450706141104570471/image.png?ex=695e89a0&is=695d3820&hm=3ae082518e705e4879fab102983c4840d478f064c0aaf99a71e0ae5fe6dbcf19&)
 
 ---
 
@@ -691,5 +621,26 @@ I have historical data in CSV format (e.g. Binance public data or Tardis academi
 I tried using InstrumentProvider, but it seems to only return currently trading symbols, while my CSV may contain delisted or delivered instruments.
 How should I properly create or define an Instrument for CSV-based backtesting?
 Thanks in advance.
+
+---
+
+#### [2025-12-23 00:01:36] @phy77
+
+You should read the documentation... You'll find examples there, e.g. https://nautilustrader.io/docs/latest/getting_started/quickstart
+
+**Links:**
+- Quickstart | NautilusTrader Documentation
+
+---
+
+#### [2025-12-24 23:03:23] @rgauny_74023
+
+how can i utlize the postgresssql for the cache? i see the crate has it implemented but the documentation doesnt exist on it. DatabaseConfig seems to only take redis
+
+---
+
+#### [2026-01-01 04:26:03] @cjdsellers
+
+Hi <@1373804245274595390> postgres isn't currently available for the legacy system, only for the new v2 Rust-based system under active development
 
 ---

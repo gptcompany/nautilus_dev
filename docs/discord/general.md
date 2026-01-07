@@ -1,432 +1,8 @@
 # NautilusTrader - #general
 
 **Period:** Last 90 days
-**Messages:** 171
-**Last updated:** 2025-12-22 18:01:37
-
----
-
-#### [2025-09-24 00:06:40] @cjdsellers
-
-Hi <@1336621765006462976> 
-Welcome, yes and <@224557998284996618> can help you there
-
----
-
-#### [2025-09-24 05:02:24] @gz00000
-
-<@1336621765006462976> Welcome! I've already invited you to the Chinese channel. Let's communicate more. 🙂
-
----
-
-#### [2025-09-24 16:58:30] @lwxwd
-
-thank you so much
-
----
-
-#### [2025-09-24 21:02:43] @shinzoabe
-
-Quick Q, is this project mainly for stocks / crypto and others along the same line predictions, or can we pump data such as for the Euro league, NBA, tennis?
-
----
-
-#### [2025-09-25 01:32:08] @cjdsellers
-
-Hi <@149228888403214337> 
-Welcome, there is a Betfair adapter which might be of interest to you. Nautilus doesn't really make a distinction on these asset classes / market types, as long as the data can be parsed or decoded into the expected data types
-
----
-
-#### [2025-09-25 19:41:34] @0x1nfor_19886
-
-invite me plz~~
-
----
-
-#### [2025-09-26 01:50:58] @ml087870
-
-Hi everyone, I’m currently focusing on day trading SPY and QQQ options. Is anyone else doing the same? Happy to connect and communicate more.
-
----
-
-#### [2025-09-26 02:53:49] @gz00000
-
-Done. Welcome
-
----
-
-#### [2025-09-26 08:08:10] @webstar_web3
-
-邀请我一下，谢谢
-
----
-
-#### [2025-09-26 08:20:11] @gz00000
-
-Done. Welcome 🙂
-
----
-
-#### [2025-09-26 12:14:12] @ml087870
-
-有研究美股日內當沖的 可以加我一下 感謝
-
----
-
-#### [2025-09-26 12:58:23] @emmanuel_genieys
-
-In my dream I also see an MT5 interface... would this be in the pipe line?
-
----
-
-#### [2025-09-27 08:53:23] @mk1ngzz
-
-i'd suggest clickhouse
-
----
-
-#### [2025-09-27 08:56:22] @mk1ngzz
-
-if u want efficient storage for observability data, historical trading data and the ability to replay for backtesting, then i'd suggest that.
-i only recently discovered nautilus while building my own trading bot, so idk if the database adapter supports that
-
----
-
-#### [2025-09-27 08:58:28] @mk1ngzz
-
-just setup the clickhouse client to use async inserts
-
----
-
-#### [2025-09-27 09:01:55] @mk1ngzz
-
-Are you open to PRs?
-
----
-
-#### [2025-09-27 09:24:13] @mk1ngzz
-
-Is it possible to use Rust instead of Python?
-
----
-
-#### [2025-09-27 09:45:34] @cjdsellers
-
-Hi <@223930266207518721> 
-Welcome, we currently have a lot on right now with the Rust port of the core - also see the open-source scope for where the focus is right now
-https://github.com/nautechsystems/nautilus_trader/blob/develop/ROADMAP.md#open-source-scope
-There's an effort to complete live execution capabilities in Rust, at that point you could write trading strategies entirely in Rust
-
----
-
-#### [2025-09-27 09:50:04] @corn15
-
-Invite me please 🙏
-
----
-
-#### [2025-09-27 10:35:22] @gz00000
-
-Done. Welcome !
-
----
-
-#### [2025-09-28 21:35:11] @xcabel
-
-seeking advice on loading offline trained and persisited models for online serving for the use of decision making in some strategy. The use case is that say 
-- I have a sklearnmodel class instance offline trained and stored to predict some instrustment price for the next five minutes. 
-- to do the inference it requires some features data input which can come from some data class say trade tick or quote tick or customized newsdata and etc. This also indicates that the model is dependent on a set of data classes
-- Note that the model instance is static in the sense that it requires no retraining, its parameters, and dependency on data is fix. It also requires no future persistence and should be fully serializable
-- Also the model is strategy agnostic, i.e., it only predicts prices at some lead time that can be used by mulitple strategies.
-
-
-Given the above property, I think 
-- a dataclass to load the model sounds does not make sense as it is static
-- but dataclass to stream and persist the model input and output seems good for traceability
-- but my question is how to integrate the model in the some module in the NT? should that be a customied Actor to load the model and do the say feature preparation, inference and etc subscribing the raw data and pub processed feature and response to a stream?
-
----
-
-#### [2025-09-29 10:00:47] @faysou.
-
-https://github.com/limx0/nautilus_talks/tree/main/20220617
-
-**Links:**
-- nautilus_talks/20220617 at main · limx0/nautilus_talks
-
----
-
-#### [2025-09-29 10:00:51] @faysou.
-
-this should help you
-
----
-
-#### [2025-09-29 10:03:42] @faysou.
-
-I think that an actor is the way to handle what you want to do. Actors have helpers to deal with market data, strategies inherit the Actor class and have helpers for passing orders as well. These helpers deal with sending messages and callback methods (on_bar is a callback for a subscription for example (actually it's handle_bar but it's the same idea))
-
----
-
-#### [2025-09-29 11:36:23] @faysou.
-
-the link above maybe doesn't work as it's using a nautilus version from a few years ago, but you can likely use ideas from it
-
----
-
-#### [2025-09-30 02:01:35] @fudgemin
-
-hey i trade same assets as well. working on automated setup. have many custom features with predictive power. looking to collab with some ml, quant engineers
-
----
-
-#### [2025-09-30 03:25:21] @xcabel
-
-this is really helpful! thanks for the pointer!
-
----
-
-#### [2025-10-01 07:09:15] @xcabel
-
-how to get recent history for a custom data class from cache in backtest setting?
-- I have a custom data class subclassing Data type directly instead of Bar or etc. This data class is not associated with one specific instuctment but more generic such as NewsEventData. I don't have metadata set for it (tho I can add it in backtest dataconfig)
-- I persist the data in catalog and port into backtest eng via backtestdataconfig and catalog
-- in this case, i wonder how in the strategy or generic actor that I can get the recent history as a list of this data class instances from self.cache.*? For now, I hack it by put it in a deque as an actor data field and manually update this deque in on_data().
-
----
-
-#### [2025-10-01 09:39:39] @lisiyuan666
-
-Hi, i've been working on an adapter for schwab recently. It's adapted from the schwab-py library. For now the basic data/execution logic for equities is kind of working, but there are still lots of works for options, futures, etc. Also the logic for reconciliation is pretty much untouched. It would be great if we could develop these together so that there are less bugs and more complete:) I can create a pull request if anyone can help!
-
----
-
-#### [2025-10-02 10:41:57] @tiny.z
-
-<@224557998284996618> Invite me please🙏
-
----
-
-#### [2025-10-03 02:23:34] @rk2774
-
-Hi, appears that JupyterLab was not released with 1.220?
-Trying to download on Windows (command line).. cannot see the package on released packages
-
-`C:\Users\rk> docker pull ghcr.io/nautechsystems/jupyterlab:latest@sha256:d0acd58d4cbfa78c2fa85514f81cfdfb034765686ea10e8dcf308674f10b2740 --platform linux/amd64
-Error response from daemon: manifest unknown`
-
----
-
-#### [2025-10-04 23:52:01] @rk2774
-
-I was able to get it working using (was earlier trying to pull a specific version - not sure how it is done):
-
-`docker pull ghcr.io/nautechsystems/jupyterlab:latest --platform linux/amd64`
-
----
-
-#### [2025-10-05 16:04:50] @drrocky_40374
-
-new to Nautilus and developing an intra-day equities strategy ... i have a basic question that i can't seem to find an answer to or an example. How can i load up some historical data (for example, the past N 1-min bars) in my live strategy? I need to get them to warm up my strategy indicators before it is ready to trade. When I start the strategy, I don't want to have to wait N minutes for the live feed to populate the arrays, but instead look back and get the past historical data. I am also using Interactive Brokers, so if there is a specific example for them even better. Thanks
-
----
-
-#### [2025-10-05 16:31:56] @fudgemin
-
-your essentially asking how to build a strategy. If its your first question, then your likley already on a path to failure. 
-
-i had to seperate my historical from my live. Its not feasible to compute on demand: past n features, for past n timeframes, for n symbols. 
-You can focus on one ticker, and maybe do it all on demand, within reason. However, the goal here would be to never have a 'warm up', You build features at end of day, pass the information to the intraday state. The two actually dont have any dependancy, unless you using windowed features. Which i do, and at that point, your talking about an entire feature system
-
----
-
-#### [2025-10-05 18:02:20] @drrocky_40374
-
-I'm not asking how to build a strategy as such, I actually have the strategy already. I have ran it on a lot of stocks in the Nautilus backtester and now want to paper trade it via my Interactive Brokers account... When running as the backtester it is not a big deal as it is fine to start the backtest and use up the first N=300 minutes because it will then run for however long the backtest is set for and the 300 minutes is small compared to the length of the backtest. But in the live scenario, if I have to use up the first 300 minutes of the day, it will be near market close by the time it is warmed up. Whilst I am debugging and papertrading and testing everything, having to wait like this is a nightmare... What I want/need is to start the live strategy and immediately fetch the previous 300 minutes of data  (idally from IB's historic data fetcher), could be out of hours trading or the previous day's bars and use those 300 data points to warm up the strategy (think some technical indicators, rather than trade some ML model with features). I think this should be quite easy, I feel I am just missing something obvious... I can see there are some classes and methods that should support it, for example RequestBars in https://github.com/nautechsystems/nautilus_trader/blob/431d02203c54df4592d64f5de1e84fac14db50f6/nautilus_trader/data/messages.pyx. Also this example EMA Strategy subscribes to both live data and also requests some historical data to hydrate the indicators at the start: https://nautilustrader.io/docs/latest/concepts/strategies#handler-example. I guess my question is has anyone combined this type of strategy (with a live feed and an initial request to fetch historic data) with Interactive Brokers and got it all connected up and running?
-
-**Links:**
-- NautilusTrader Documentation
-
----
-
-#### [2025-10-05 18:36:26] @faysou.
-
-You should use request_aggregated_bars, also the IB adapter is likely working, use the develop branch for the latest updates
-
----
-
-#### [2025-10-05 18:36:50] @faysou.
-
-Look in actor.pyx and data engine.pyx to understand what's going on. Or ask an AI agent.
-
----
-
-#### [2025-10-05 19:03:30] @drrocky_40374
-
-OK, thanks for the pointers... will dig into it
-
----
-
-#### [2025-10-06 00:02:29] @fudgemin
-
-Anyone interested in collab? Looking to expand network. Self taught. no proffessional exp. I have some really good predictive features, not based on TA, but options data. I target >50%, have strategies. Most are manual parameter sets right now, not optimized by any means. Have done some minor ML with good results. Dont have the time to fully focus on one aspect. Eventually working towards a fully operational fund. Need assistance. Please reach out if interested
-
----
-
-#### [2025-10-06 15:55:43] @.jxcv
-
-Hi all, I have started on an OANDA adapter. Anyone interested in working on it with me?
-
----
-
-#### [2025-10-06 21:48:33] @semihtekten
-
-experienced metatrader expert advisor developer here. is there an ETA for visualization / GUI solution for NT? or is there any documentation that we can benefit, and use NT with? thanks in advance.
-
----
-
-#### [2025-10-06 21:54:35] @mafiosi72
-
-Hi DrRocky,
-
-i am looking at the exact same thing here as well and getting nuts since days trying to find my way through this. Whatever i have tried so far i always winded up in getting 
-
-[WARN] BACKTESTER-001.DemoStrategy: Received <Bar[0]> data for unknown bar type
-
-when requesting for historical data via request_bars().
-Please let me know if you figure out a proper way to do it, or if you want to work together on that one.
-
----
-
-#### [2025-10-07 19:13:50] @drrocky_40374
-
-Hi <@1061003276696440883> yes I did, I have it working now - I'm pulling historical bars and live ticks from Interactive Brokers and hydrating my strategy in live trading. 
-
-To make it work, I looked at what <@965894631017578537> suggested and ended up including a call to the self.request_bars() function in my Strategy on_start handler and then also added the necessary on_historical_data() function in the Strategy to handle the actual historic bars as they come in.
-
----
-
-#### [2025-10-07 20:54:38] @drrocky_40374
-
-actually maybe there are others it might be useful to... this is the code snippet I added to pull in historical data before the live trading kicks in ... see self.request_bars(). if there is historical data, then you also need another function in your Strategy called "on_historical_data()" which processes the incoming historical data. the _warm_up_complete() function is just a callback that gets executed after the historical bars have loaded. Hope that helps and you get your strategy working too
-
-**Attachments:**
-- [image.png](https://cdn.discordapp.com/attachments/924498804835745853/1425224828373434450/image.png?ex=694a58ce&is=6949074e&hm=a1d84d07d577574521de79a6eef9bab40fb83acd4a07088f415bd3ca0f7e9685&)
-
----
-
-#### [2025-10-07 20:59:03] @faysou.
-
-https://github.com/nautechsystems/nautilus_trader/blob/develop/examples/backtest/notebooks/databento_test_request_bars.py
-
----
-
-#### [2025-10-07 20:59:13] @faysou.
-
-you can look here as well
-
----
-
-#### [2025-10-07 21:00:14] @faysou.
-
-and the notebook works out of the box there's some test data inside the repo for it
-
----
-
-#### [2025-10-07 21:06:43] @faysou.
-
-https://github.com/nautechsystems/nautilus_trader/tree/develop/examples/live/databento/notebooks
-https://github.com/nautechsystems/nautilus_trader/tree/develop/examples/live/interactive_brokers/notebooks
-https://github.com/nautechsystems/nautilus_trader/tree/develop/examples/backtest/notebooks
-
-these are notebooks I've worked on for testing features I add. it looks small but there's a lot of work behind, especially for the code being called
-
----
-
-#### [2025-10-07 21:11:29] @faysou.
-
-the complexity of some things is not apparent, but if you try to understand how some things work and look at the source code (not just of the notebooks but how it's done in the code actually), you will learn a lot of stuff
-
----
-
-#### [2025-10-07 21:13:10] @faysou.
-
-best thing is to clone the repo and setup a dev environment, and get familiar with the code (it's not easy but it's easier with some AI agent to ask questions about the code, and adding some debug logs to see what's happening inside cython, cython can't be debugged)
-
----
-
-#### [2025-10-07 21:13:44] @faysou.
-
-but rust can be debugged, so it will actually get easier to understand the rust code base when it will become the main system after the transition from cython to rust
-
----
-
-#### [2025-10-07 21:15:23] @faysou.
-
-for people who read these messages, you can learn a lot of stuff from it. sometimes people complain that examples don't work out of the box, I had the same problem, and these examples I've done work out of the box
-
----
-
-#### [2025-10-07 21:29:54] @drrocky_40374
-
-the examples are very helpful. they are never going to cover everyones needs but they are good starting to point to help learn the code structure and adapt to your specific needs...
-
----
-
-#### [2025-10-08 07:02:12] @faysou.
-
-Exactly, it took me a lot of time to understand how to do basic things, but with examples it's much faster. Still I think the best documentation is the source code and it's available. I can give you a few principal component axis to understand nautilus. You have the data side with the data engine, the actor class and market data clients, and the order side with the execution engine, the strategy class and execution clients. Then you need something to assemble everything, and that's the kernel, backtest node, backtest engine and live node. The storage side is the catalog and the cache. The communication side is the message bus. And the clocks and timers are important too. Also don't forget to read the documentation (the concept pages, not the help about functions, better to look at the code for this), even if you don't understand everything at first.
-
----
-
-#### [2025-10-08 15:11:47] @mafiosi72
-
-Hi <@1421216025650663436> + <@965894631017578537> ,
-thanks for sharing your code and the references to the notebooks, they are indeed helpful.
-BUT: 
-I had similar code like you have shared already available and it was fed by the Backtesting "low-level API"., which means that i had 
-- created a BackTestEngine (bt_engine) and added 
-- the venue () to the engine -> bt_engine.add_venue()
-- the instrument -> bt_engine.add_instrument()
-- the data bars -> bt_engine.add_data()
-- the strategy -> bt_engine.add_startegy()
-and started the engine with bt_engin.run()
-
-No matter what i have tried i was not able to get the history data via request_bars() . 
-
-I just re-wrote my code to use the high-level API instead (via BackTestNode() .... not the BackTestEngine) and voila: The same strategy was working immediately and iw as able to capture the historical bars.
-
-I am not sure what i have done wrong with the low level API but always when i wanted to fetch the historical data via request_bars() i got 
-[WARN] BACKTESTER-001.DemoStrategy: Received <Bar[0]> data for unknown bar type 
-
-while the subscribe_bars() was working very well.
-
-So again, thanks a lot for pointing me in that direction and helping to finding my way to get i working finally!
-
----
-
-#### [2025-10-08 20:18:56] @faysou.
-
-DataCatalogConfig, that's what you need
-
----
-
-#### [2025-10-08 20:20:12] @faysou.
-
-For querying hisorical bars. You don't even need BacktestDataConfigs to subscribe to data with catalogs, the queried data will be added to the backtest data on the fly, I've worked on this a lot a few months ago.
-
----
-
-#### [2025-10-08 20:21:46] @faysou.
-
-It's much easier when you start from a working example
-
----
-
-#### [2025-10-08 20:22:35] @faysou.
-
-There was no example for me to use DataCatalogConfig when I was studying this a year ago. I actually found it by looking at the source code. And did many related improvements after.
+**Messages:** 169
+**Last updated:** 2026-01-07 01:29:25
 
 ---
 
@@ -455,7 +31,7 @@ i'll second that, it works very nicely. probably saved me and my team years of c
 
 
 **Attachments:**
-- [image.png](https://cdn.discordapp.com/attachments/924498804835745853/1426929729432322130/image.png?ex=694a9dde&is=69494c5e&hm=e18ae3fc8babe3ee755a09c387a0b3f512073a6ca6308774ad0400c42cf19802&)
+- [image.png](https://cdn.discordapp.com/attachments/924498804835745853/1426929729432322130/image.png?ex=695e645e&is=695d12de&hm=7fb32b7dee4fbf78eb7a1872396146989c93ef4d39ea37af81a0f2804360c4a6&)
 
 ---
 
@@ -533,7 +109,7 @@ Using Claude or Codex is the way to go here. It will greatly speed up your confi
 
 ---
 
-#### [2025-10-17 19:38:48] @deleted_user_3434563
+#### [2025-10-17 19:38:48] @Deleted User
 
 Hey, also trader since before and new here. How does NautilusTrader compare to VectorBT Pro and AmiBroker? I am looking to develop intraday strategies for microcap shorting. And which data source is recommended for intraday bars that is supported with Nautilus?
 
@@ -551,7 +127,7 @@ It's also relatively recent, so we're lucky it exists
 
 ---
 
-#### [2025-10-18 20:32:21] @deleted_user_3434563
+#### [2025-10-18 20:32:21] @Deleted User
 
 What makes you say Databento is better than Polygon. Have you done any comparision?
 
@@ -625,7 +201,7 @@ Hi guys, i did read through some messages saying postgres as a backend has no ti
 
 
 **Attachments:**
-- [image0.gif](https://cdn.discordapp.com/attachments/924498804835745853/1431707949847412848/image0.gif?ex=694a33af&is=6948e22f&hm=be1b20104857fdca3b35d5e784b50ef5102a07679a8caeac3d11bba31a4c4af6&)
+- [image0.gif](https://cdn.discordapp.com/attachments/924498804835745853/1431707949847412848/image0.gif?ex=695ea2ef&is=695d516f&hm=d3c54d3321c1dfbc67a3e24b4fe31ca5c68140ed23709c25ec7d1fd4136b57ba&)
 
 ---
 
@@ -743,7 +319,7 @@ Hello there! any mcp server for the documentation ?
 
 ---
 
-#### [2025-11-03 19:33:29] @joebiden404
+#### [2025-11-03 19:33:29] @joejoe404
 
 Hi, 
 Anyone tries to run NT inside Google Collab and the Backtester logs aren't shown to stdout? or it Is just me?
@@ -964,7 +540,7 @@ You should start collecting these use cases, and thats what the channel is for. 
 <@391823539034128397> docs can always be clearer and better. That one is documented under [Custom data](https://nautilustrader.io/docs/nightly/concepts/data#custom-data) though
 
 **Attachments:**
-- [image.png](https://cdn.discordapp.com/attachments/924498804835745853/1445290012806610994/image.png?ex=694ad577&is=694983f7&hm=480808cd1e42b47bfe2a002c20f1e23fdc8aee06f394d8864099bf12f19308ae&)
+- [image.png](https://cdn.discordapp.com/attachments/924498804835745853/1445290012806610994/image.png?ex=695e9bf7&is=695d4a77&hm=5955c7dff5e3f9956c96ff5925f74dc770afe84562246fb37633d7b4496c2596&)
 
 ---
 
@@ -1199,5 +775,426 @@ I have a similar use case and have been working to find a good solution. Definit
 
 “Switching over from Quantconnect so I can process big data effectively”
 What do you see as a limitation of QC that Nautilus solves?
+
+---
+
+#### [2025-12-23 21:10:41] @thisisrahul.
+
+I’m planning to build a adapter for Indian market. I went through the developer documentation, is it a must to implement the adapter in rust core? Or can I code in the python layer? I won’t be making raw http calls but would be leveraging my stockbrokers python library
+
+---
+
+#### [2025-12-24 14:55:28] @gsswllnvrknw
+
+Hello! I’m looking for a trading terminal for a lighter. Does anyone know if there is such a product? Something like Tiger Trade, MetaScalp, CScalp
+
+---
+
+#### [2025-12-24 17:41:05] @valeratrades
+
+is there a good way to have actors know full OB data at every step? Say I have a different implementation for full aggregated cross-exchange OB. Sending through the bus would be way too expensive, - am I limited to accessing it outside of the system and syncing state manually?
+
+---
+
+#### [2025-12-24 20:41:23] @gmdavid12
+
+Hi guys, is anyone here using Nautilus for polymarket
+
+---
+
+#### [2025-12-25 09:02:34] @dhanush_tummala
+
+I am
+
+---
+
+#### [2025-12-25 09:11:09] @gmdavid12
+
+I am new here so i dont know much, but is Nautilus good for backtesting, There is a lot of info online but i prefer to hear directly from a user if thats ok
+
+---
+
+#### [2025-12-25 10:04:54] @dhanush_tummala
+
+Yes it is good for backtesting as well as Production deployment, It is well written, well maintained, and well documented. Moreover, it is fast. However, there is a bit of a steep learning curve to get things moving initially.
+
+---
+
+#### [2025-12-28 01:50:05] @.algo3
+
+I have done this.  
+
+I use my brokers (alpaca) snapshot api endpoint to get a bulk snapshot of the bars im interested in.  
+
+I then save daily snapshots of these thousands of equities (the api filters some things like liquid, easy to short/borrow etc), it includes data like volume for my period. 
+
+I use these snapshots as candidate parsing lists for each backtest day, and a live screener with the same logic and api call.  
+
+My backtest script essentially runs a separate backtest for each day and combines the results, this allows me to constrain the minute data in memory to just my 50 different candidates daily from a universe of thousands of equities.
+
+My strategy is intraday but if you are holding for a long time you might be more concerned about suvrivorship bias than I am, but the alpaca endpoint will return inactive symbols.
+
+To be fair, in quantconnect, I had to do something similar because their coarse universe updates only in premarket hours.
+
+---
+
+#### [2025-12-29 06:19:14] @jakob_56860
+
+can we create custom instrument types without needing to go wire it into the rust backend and still have it work (basically trying to implement a custom version of the BinaryOption)
+
+---
+
+#### [2025-12-29 08:32:28] @cjdsellers
+
+Hey <@1357916439453110355> that's non trivial, no easy way other than to implement it everywhere. Was there a specific field you needed on binary options?
+
+---
+
+#### [2025-12-29 20:13:25] @jakob_56860
+
+I want to make it more poly market specific and expose condition_id, token_id, and potentially a few other features as properties of the instrument. definltly understand that this can be done using the info but was just curious
+
+---
+
+#### [2025-12-29 20:13:34] @jakob_56860
+
+thanks for the quick response and information though
+
+---
+
+#### [2025-12-29 20:14:04] @jakob_56860
+
+(also completely understand that how its currently setup the ids are derived from the inst id)
+
+---
+
+#### [2025-12-29 20:57:07] @jakob_56860
+
+ideally actually I would be able to break things down into the Polymarket Markets and then have a series of tokens (the binary options) as insturments within a given market. though as you say this would be very specific to polymarket and thus only really be a custom implmentation
+
+---
+
+#### [2025-12-29 21:49:35] @cjdsellers
+
+Thanks <@1357916439453110355>, there will be improvements to the Polymarket integration over time, so this feedback is valuable for determining what is important for users
+
+---
+
+#### [2026-01-03 09:32:43] @.davidblom
+
+Anyone tried setting up a backtest with options? Not sure if all the features are implemented to simulate selling puts for example.
+
+---
+
+#### [2026-01-03 11:54:35] @megafil_
+
+Hi, having issues with the clock again. If you set a timer during a timer event, the clock becomes non-monotonic. How should this be done in the nautilus paradigm? 
+Essentially it seems that timer events do not play the same role as, e.g., bars or data. LLM suggests to "set the clock time to each popped TimeEvent.ts_event while draining the heap",
+is this doable?
+
+```2020-01-01T00:00:00  received bar at 2020-01-01 00:00:00
+2020-01-01T00:00:00  setting alert ALERT to trigger at 2020-01-01 00:00:02+00:00
+2020-01-01T00:00:02  flush called ALERT.
+2020-01-01T00:00:02  setting alert ALERT to trigger at 2020-01-01 00:00:04+00:00
+2020-01-01T00:01:00  received bar at 2020-01-01 00:01:00
+2020-01-01T00:01:00  alert ALERT already set to trigger at 2020-01-01 00:00:04, skipping set.
+2020-01-01T00:00:04  flush called ALERT.
+2020-01-01T00:00:04  setting alert ALERT to trigger at 2020-01-01 00:00:06+00:00
+2020-01-01T00:02:00  received bar at 2020-01-01 00:02:00
+2020-01-01T00:02:00  alert ALERT already set to trigger at 2020-01-01 00:00:06, skipping set.```
+
+```class Probe(TimerProbeActor):
+    def on_bar(self, bar) -> None:
+        self.log.info(f"received bar at {pd.to_datetime(bar.ts_event)}")
+        self.set_alert()
+    def flush(self, evt=None) -> None:
+        self.log.info(f"flush called {evt}.")
+        self.set_alert()
+    def set_alert(self) -> None:
+        if self._alert_name in self.clock.timer_names:
+            self.log.info(f"alert {self._alert_name} already set to trigger at {pd.to_datetime(self.clock.next_time_ns(self._alert_name))}, skipping set.")
+        else:
+            self.log.info(f"setting alert {self._alert_name} to trigger at {self.clock.utc_now() + self._alert_delay}")
+            self.clock.set_time_alert(
+            name=self._alert_name,
+            alert_time=self.clock.utc_now() + self._alert_delay,
+            override=True,
+            allow_past=True,
+            callback = self.flush
+        )```
+
+---
+
+#### [2026-01-03 13:47:33] @tearsinrain__
+
+hey everyone! happy to be here. been in quant / ai since 2016. currently building out an automated research system for my quant development. digging into nautilus trader right now and it looks like exactly the missing piece ive been searching for!
+
+---
+
+#### [2026-01-03 13:47:51] @tearsinrain__
+
+has anyone made a dashboard type tool yet?
+
+---
+
+#### [2026-01-03 13:49:56] @megafil_
+
+As I am looking into implementing a fix, i am seeing TestClock: heap: BinaryHeap<ScheduledTimeEvent>, // TODO: Deprecated - move to global time event heap,
+this "global time event" is potentially what i need, is this already available and if so, how to use it?
+
+---
+
+#### [2026-01-03 14:06:09] @tearsinrain__
+
+do you have a line number associated with that error / reference to where in the codebase thats being thrown
+
+---
+
+#### [2026-01-03 15:05:42] @bigcheddarr
+
+Cool
+
+---
+
+#### [2026-01-03 15:06:34] @bigcheddarr
+
+For the ai component do u guys hire h100s directly per hour or wat do u do for the ai bit using Claude max plan or any of these things seem restrictive
+
+---
+
+#### [2026-01-03 15:07:09] @tearsinrain__
+
+depends on the use case
+
+---
+
+#### [2026-01-03 15:07:27] @tearsinrain__
+
+my system allows me to plug in whatever model works so for a lot of stuff, smaller and cheaper models do fine
+
+---
+
+#### [2026-01-03 15:07:47] @tearsinrain__
+
+and i can run some pretty powerful stuff locally like gpt oos 120bn and thats good enough for most loads
+
+---
+
+#### [2026-01-03 15:08:25] @tearsinrain__
+
+but frankly, this is less of an issue besides when it comes to cost because when youre generating millions upon millions of tokens in an automated fashion, it really starts to add up
+
+---
+
+#### [2026-01-03 15:09:24] @tearsinrain__
+
+in most cases, renting an h100 or something cheap from a provider like salad is way way way cheaper and you can get literally insane tokens per second. like with a gwen 8bn model which is good for most structured generative workloads (and fine tunable), you can get something like 5000 - 8000 tokens per second
+
+---
+
+#### [2026-01-03 15:10:15] @tearsinrain__
+
+so if i estimate a 20,000,000 token job / 80,000 tps = 2,500s = 41 minutes. less than an hour of compute time. so like $2 on most cloud compute providers for an h100
+
+---
+
+#### [2026-01-03 15:34:04] @megafil_
+
+that would be clock.rs i believe. that string should be easy to find in the code base
+
+---
+
+#### [2026-01-03 15:52:09] @tearsinrain__
+
+thats not really enough context to allow me to do a traceback or anything
+
+---
+
+#### [2026-01-03 16:09:40] @megafil_
+
+i might not have explained myself well enough, the problem is that the clock is not able to process injected alerts in order of ts_event and breaks monotonicity (see log output above with actor example), i was going to modify the event heap and stumbled across this string in the code base with a "TODO" that kind of sounded like what i was trying to achieve, which is to create a global clock to make sure i can simulate just as it would be in live. hope this clarifies it more
+
+---
+
+#### [2026-01-03 22:57:36] @megafil_
+
+ok my fix is not working. what is the point of timers if you cannot backtest them? shouldn't a timer event also advance the internal clock by itself? seems to be an unnecessary restriction to wait for a bar or other external input, just add into sorted queue and advance until next event, of course this would slow down stuff in the backtest but there are other optimizations that could be done to minimize the impact, anyway is there a better forum to discuss this? maybe i could connect with the person in charge of the scheduler
+
+---
+
+#### [2026-01-03 23:02:26] @javdu10
+
+Maybe it has something todo with the timzone ? 
+
+I'm doing this, don't know if it can help you : 
+
+```
+self.clock.set_time_alert(
+            name= str(uuid4()),
+            callback=self.setup_next_thing,
+            alert_time= (datetime.fromtimestamp(self.some_unix_time, timezone.utc) + timedelta(minutes=3, seconds=0)),
+        )
+```
+
+---
+
+#### [2026-01-03 23:02:54] @javdu10
+
+and the backtest timer work as expected
+
+---
+
+#### [2026-01-03 23:05:33] @megafil_
+
+thank you, maybe the issue is that i reuse the timer name? else i am just using the clock.utc time plus some delta which is happening before the next bar event, will try that
+
+---
+
+#### [2026-01-03 23:51:54] @megafil_
+
+ok this wasnt it. i have filed a bug report in case it helps https://github.com/nautechsystems/nautilus_trader/issues/3384
+
+**Links:**
+- TestClock not monotonic: Repeated TimeEvents do not obey monotonici...
+
+---
+
+#### [2026-01-04 01:05:34] @cjdsellers
+
+Hey <@1309590087243141140> 
+Welcome! we're currently working on a live dashboard as a premium product
+
+---
+
+#### [2026-01-04 01:22:56] @megafil_
+
+<@757548402689966131> i think i have a fix which passes my test and also my original problem which is a bit more complicated. it is a smallish change in BacktestEngine,  _process_raw_time_event_handlers (engine.pyx) where events are pushed on a heap and then processed in order of timestamp. would be good if someone with a bit more experience with the scheduler could review
+
+---
+
+#### [2026-01-04 01:24:18] @cjdsellers
+
+Hey <@882228657265979393> thanks for the issue report and explanation. This sounds like something we have looked at before to solve a couple of things so might be a viable direction, will look when I can
+
+---
+
+#### [2026-01-04 02:00:08] @.a11onsy
+
+Hi guys
+
+---
+
+#### [2026-01-04 02:00:13] @.a11onsy
+
+I have a question
+
+---
+
+#### [2026-01-04 02:00:57] @.a11onsy
+
+The whole api_ref doc looks like auto generated: https://github.com/nautechsystems/nautilus_trader/tree/develop/docs/api_reference
+
+**Links:**
+- nautilus_trader/docs/api_reference at develop · nautechsystems/nau...
+
+---
+
+#### [2026-01-04 02:01:07] @.a11onsy
+
+How can I generate the doc locally?
+
+---
+
+#### [2026-01-04 02:01:09] @.a11onsy
+
+Ty
+
+---
+
+#### [2026-01-05 01:35:54] @megafil_
+
+please take a look https://github.com/nautechsystems/nautilus_trader/pull/3390)
+
+---
+
+#### [2026-01-05 04:08:37] @cjdsellers
+
+Hey <@498306535064338444> 
+There's a clue in the make file https://github.com/nautechsystems/nautilus_trader/blob/develop/Makefile#L327
+You might be able to just run `make docs-python`, hope that helps!
+
+**Links:**
+- nautilus_trader/Makefile at develop · nautechsystems/nautilus_trader
+
+---
+
+#### [2026-01-05 04:10:51] @.a11onsy
+
+Ty
+
+---
+
+#### [2026-01-05 04:11:18] @.a11onsy
+
+Helps a lot
+
+---
+
+#### [2026-01-05 17:47:16] @mohammad02639
+
+Hello I hope you are well. I noticed https://nautilustrader.io/docs/nightly/integrations/hyperliquid/ is under active development. Is the documentation on the site the features that can be used right now (I am assuming the additional ones being worked on will be added when finished) ?
+
+**Links:**
+- Hyperliquid | NautilusTrader Documentation
+
+---
+
+#### [2026-01-05 22:02:58] @notceo777
+
+hello can someone helpme to build a simulated exchange for paper trading?
+
+DataEngine
+
+RiskEngine
+
+ExecutionEngine
+
+OrderEmulator
+
+---
+
+#### [2026-01-05 22:05:14] @cjdsellers
+
+Hi <@1274556847902429260> welcome, I think the most efficient approach for this these days is to pose the same question to an LLM. It should quickly be able to iterate on your individual data and use cases as well
+
+---
+
+#### [2026-01-06 02:03:09] @bobbyjohnson_
+
+Gm
+
+---
+
+#### [2026-01-06 02:03:42] @bobbyjohnson_
+
+Anybody using the backrest to track bitcoin monthly candle wicks? Or even daily candle wicks?
+
+---
+
+#### [2026-01-06 02:19:48] @.a11onsy
+
+If possible, kindly ask if we can have a complied version of docs in github repo, thanks for all your guys work!
+
+---
+
+#### [2026-01-06 02:19:50] @.a11onsy
+
+<@757548402689966131>
+
+---
+
+#### [2026-01-06 02:21:05] @.a11onsy
+
+sorry if im asking for too much
 
 ---

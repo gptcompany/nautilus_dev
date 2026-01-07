@@ -2,7 +2,7 @@
 
 ## Overview
 
-Integrate `/media/sam/1TB/academic_research` with nautilus_dev to automatically convert academic trading papers into NautilusTrader strategy specifications, leveraging our evolutionary architecture (alpha-evolve, speckit).
+Integrate `/media/sam/1TB1/academic_research` with nautilus_dev to automatically convert academic trading papers into NautilusTrader strategy specifications, leveraging our evolutionary architecture (alpha-evolve, speckit).
 
 ## Problem Statement
 
@@ -68,6 +68,42 @@ Currently:
 - [ ] Shows differential: "3 new papers since last session"
 - [ ] Links to existing strategies implementing similar concepts
 
+### US6: Persistent Storage Layer - DuckDB + Neo4j (P1) 🆕
+**As a** researcher,
+**I want** papers, formulas, and strategies stored in proper databases,
+**So that** I can query complex relationships and aggregate analytics.
+
+**Acceptance Criteria**:
+- [ ] Neo4j (Docker) stores graph: paper→cites→paper, paper→contains→formula
+- [ ] DuckDB stores analytics: papers.parquet, formulas.parquet, strategies.parquet
+- [ ] Bidirectional sync: Neo4j ↔ DuckDB ↔ memory.json
+- [ ] Cypher queries: "MATCH (p:Paper)-[:CONTAINS]->(f:Formula) WHERE f.name = 'Kelly'"
+- [ ] SQL queries: "SELECT * FROM strategies WHERE sharpe > 1.5"
+
+### US7: MinerU PDF Parsing (P1) 🆕
+**As a** researcher,
+**I want** PDFs parsed with layout-aware extraction,
+**So that** formulas and tables are properly extracted (not broken across lines).
+
+**Acceptance Criteria**:
+- [ ] MinerU installed in /media/sam/1TB/RAG-Anything
+- [ ] `mineru -p paper.pdf -o output/` extracts structured markdown
+- [ ] LaTeX formulas preserved: `$f^* = \frac{bp-q}{b}$`
+- [ ] Tables extracted as markdown tables
+- [ ] Integration with /research command
+
+### US8: Formula Extraction & Validation (P2) 🆕
+**As a** quant,
+**I want** mathematical formulas extracted and validated,
+**So that** I can trust the mathematics before implementing.
+
+**Acceptance Criteria**:
+- [ ] Extract formulas from MinerU output
+- [ ] Create formula__ entities in Neo4j
+- [ ] Validate with WolframAlpha: `mcp__wolframalpha__ask_llm`
+- [ ] Store validation result: valid|invalid|needs_review
+- [ ] Link formula→strategy, formula→paper
+
 ## Technical Design
 
 ### Architecture
@@ -75,7 +111,7 @@ Currently:
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │                    ACADEMIC RESEARCH                             │
-│                 /media/sam/1TB/academic_research                 │
+│                 /media/sam/1TB1/academic_research                 │
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                  │
 │  [semantic-router MCP]  →  [paper-search MCP]  →  [gemini-cli]  │
@@ -221,7 +257,7 @@ tools:
 
 workflow:
   1. RESEARCH PHASE:
-     - Read /media/sam/1TB/academic_research/memory.json
+     - Read /media/sam/1TB1/academic_research/memory.json
      - Query for strategy__ entities matching topic
      - If not found → suggest running research in academic_research first
 
@@ -374,7 +410,7 @@ Run periodically or on-demand.
 import json
 from pathlib import Path
 
-ACADEMIC_MEMORY = Path("/media/sam/1TB/academic_research/memory.json")
+ACADEMIC_MEMORY = Path("/media/sam/1TB1/academic_research/memory.json")
 NAUTILUS_RESEARCH = Path("/media/sam/1TB/nautilus_dev/docs/research/strategies.json")
 
 def sync_strategies():
@@ -434,7 +470,7 @@ nautilus_dev/
 - speckit commands - Spec/plan/tasks generation
 
 ### External Dependencies
-- `/media/sam/1TB/academic_research` - Must be configured and operational
+- `/media/sam/1TB1/academic_research` - Must be configured and operational
 - semantic-router MCP - Query classification
 - paper-search MCP - Paper retrieval
 - gemini-cli MCP - Long paper analysis (2M tokens)

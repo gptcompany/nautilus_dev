@@ -25,7 +25,6 @@ import argparse
 import hashlib
 import json
 import signal
-import sys
 import time
 from datetime import datetime
 from enum import Enum
@@ -144,35 +143,36 @@ def emit_event(
         event_id if created, None if duplicate skipped
     """
     db = duckdb.connect(str(DUCKDB_PATH))
-    init_tables(db)
+    try:
+        init_tables(db)
 
-    event_type_str = (
-        event_type.value if isinstance(event_type, EventType) else event_type
-    )
-    data = data or {}
-    data_json = json.dumps(data)
-    checksum = compute_checksum(event_type_str, entity_id or "", data)
+        event_type_str = (
+            event_type.value if isinstance(event_type, EventType) else event_type
+        )
+        data = data or {}
+        data_json = json.dumps(data)
+        checksum = compute_checksum(event_type_str, entity_id or "", data)
 
-    # Check for duplicate (idempotency)
-    if skip_duplicate:
-        existing = db.execute(
-            "SELECT event_id FROM events WHERE checksum = ?", [checksum]
+        # Check for duplicate (idempotency)
+        if skip_duplicate:
+            existing = db.execute(
+                "SELECT event_id FROM events WHERE checksum = ?", [checksum]
+            ).fetchone()
+            if existing:
+                return None  # Duplicate, skip
+
+        result = db.execute(
+            """
+            INSERT INTO events (event_id, event_type, entity_type, entity_id, data, checksum)
+            VALUES (nextval('events_seq'), ?, ?, ?, ?, ?)
+            RETURNING event_id
+        """,
+            [event_type_str, entity_type, entity_id, data_json, checksum],
         ).fetchone()
-        if existing:
-            db.close()
-            return None  # Duplicate, skip
 
-    result = db.execute(
-        """
-        INSERT INTO events (event_id, event_type, entity_type, entity_id, data, checksum)
-        VALUES (nextval('events_seq'), ?, ?, ?, ?, ?)
-        RETURNING event_id
-    """,
-        [event_type_str, entity_type, entity_id, data_json, checksum],
-    ).fetchone()
-
-    db.close()
-    return result[0]
+        return result[0]
+    finally:
+        db.close()
 
 
 def get_unprocessed_events(
@@ -389,11 +389,29 @@ def sync_event_to_neo4j(event: dict) -> tuple[bool, str]:
                 )
 
             elif event_type == EventType.STRATEGY_UPDATED.value:
+                # Whitelist of allowed property names to prevent Cypher injection
+                ALLOWED_PROPERTIES = {
+                    "name",
+                    "methodology_type",
+                    "entry_logic",
+                    "exit_logic",
+                    "position_sizing",
+                    "risk_management",
+                    "implementation_status",
+                    "implementation_path",
+                    "sharpe_ratio",
+                    "max_drawdown",
+                    "win_rate",
+                    "profit_factor",
+                    "spec_path",
+                }
                 set_parts = []
                 params = {"strategy_id": entity_id}
                 for key, value in data.items():
-                    set_parts.append(f"s.{key} = ${key}")
-                    params[key] = value
+                    # Only allow whitelisted property names (prevent injection)
+                    if key in ALLOWED_PROPERTIES:
+                        set_parts.append(f"s.{key} = ${key}")
+                        params[key] = value
                 if set_parts:
                     session.run(
                         f"""
@@ -450,7 +468,9 @@ def run_daemon() -> None:
     signal.signal(signal.SIGINT, signal_handler)
 
     # Write PID file
-    PID_FILE.write_text(str(sys.platform == "linux" and __import__("os").getpid()))
+    import os
+
+    PID_FILE.write_text(str(os.getpid()))
 
     print(f"Starting research event daemon (polling every {POLL_INTERVAL}s)...")
     print(f"DuckDB: {DUCKDB_PATH}")

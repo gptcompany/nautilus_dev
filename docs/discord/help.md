@@ -1,490 +1,8 @@
 # NautilusTrader - #help
 
 **Period:** Last 90 days
-**Messages:** 285
-**Last updated:** 2025-12-22 18:01:42
-
----
-
-#### [2025-09-23 19:19:07] @kadyrleev
-
-Hello! A quick Q: has macosx_14_0_arm64 support been dropped? Cannot install the latest version using UV - getting error and hint: You're on macOS (`macosx_14_0_arm64`), but `nautilus-trader` (v1.220.0) only has wheels for the following platforms: `manylinux_2_35_aarch64`, `manylinux_2_35_x86_64`, `macosx_15_0_arm64`, `win_amd64`;
-
----
-
-#### [2025-09-23 19:25:57] @kadyrleev
-
-It's still a supported macOS version receiving updates.
-
----
-
-#### [2025-09-23 20:51:50] @ido3936
-
-Hello, 
-
-I am trying to work out whether NT is robust enough to pick up on state after having been stopped. Currently trying out reconciliation. NT version is 1.221.0a20250921. I have `reconciliation=True` and `external_order_claims` set to a single instrument's id. I am running on top of IB paper trading.
-
-In a previous run I had bought some shares of a stock:
-```
-2025-09-23T15:18:02.605317353Z [WARN] IB_LIVE-001.U_spread: Order filled: STOP_MARKET BUY U 2025-09-23 1
-2025-09-23T15:18:02.605524933Z [INFO] IB_LIVE-001.U_spread: <--[EVT] PositionOpened(instrument_id=U.NYSE
-2025-09-23T15:18:02.606139770Z [WARN] IB_LIVE-001.U_spread: POSITION OPENED: STOP_MARKET PRICE: 45.9
-```
-
-I  then stop NT, and restart it. Reconciliation is at work, and the existing position is picked up
-`2025-09-23T15:20:00.073033728Z [INFO] IB_LIVE-001.U_spread: Is in position: Position(LONG 3 U.NYSE, id=U.NYSE-EXTERNAL)`
-
-My strategy then correctly closes the position:
-```2025-09-23T15:20:00.073676424Z [INFO] IB_LIVE-001.U_spread: Market sell order submitted (3 shares)
-2025-09-23T15:20:02.452011084Z [WARN] IB_LIVE-001.U_spread: Order filled: MARKET SELL U 2025-09-23 15:20:00.073133549 
-```
-
-AND THIS IS THE STRANGE PART: I get a PositionOpened event, as NT interprets what has hapened as a new SHORT position:
-`2025-09-23T15:20:02.452206601Z [INFO] IB_LIVE-001.U_spread: <--[EVT] PositionOpened`
-
-
-My questions:
-1. There are quite a few flags and params related to reconciliation - should I be setting them, in prder to avoid this ?
-2. I've also tried using redis to persist the cache , but could not understand its interaction with the reconciliation mechanism so I dropped it. Should I be using it instead of reconciliation? Or on top of it?
-3. Final option: is this a bug in NT?
-
----
-
-#### [2025-09-24 15:06:20] @roma_21514
-
-Hi friends, 
-I need some help.
-
-Instrument: BTCUSDT-PERP.BINANCE
-Catalog: ./catalog → actually /home/ubuntu/nautilus/catalog
-Data: OrderBookDelta (L2 MBP) for 2025-08-01 12:00:00Z–15:00:00Z
-
-Problem
-After downloading/saving the instrument settings to a file, a different price precision is written than what the actual order book data requires.
-
-Download by using function
-async def instrument():
-    http_client = nautilus_pyo3.TardisHttpClient()
-    catalog = ParquetDataCatalog('./catalog')
-
-    symbols = ['BTCUSDT']
-    exchange = 'binance-futures'
-
-    pairs = []
-    for symbol in symbols:
-        instr_tardis = (await http_client.instruments(exchange=exchange, symbol=symbol))[0]
-        pair = CurrencyPair.from_dict(instr_tardis.to_dict())
-        print(f"Received: {pair}")
-        pairs.append(pair)
-
-    catalog.write_data(pairs)
-
-
-Logs:
-INSTRUMENT\_ID: BTCUSDT-PERP.BINANCE
-INSTRUMENT (catalog): CurrencyPair(... instrument\_class=SPOT, price\_precision=2, price\_increment=0.01, size\_precision=3, size\_increment=0.001, lot\_size=1, ...)
-...
-2025-08-01T12:00:41.106159000Z \[ERROR] BACKTESTER-001.BacktestNode: Error running backtest
-RuntimeError(fill\_price.precision=1 did not match instrument price\_prec=2)
-...
-price\_increment (engine): 0.01
-qty\_increment (engine):   0.0
-lot\_size (engine):        1.0
-
-If I dump the instrument dict I see:
-CurrencyPair(id=BTCUSDT-PERP.BINANCE, raw\_symbol=BTCUSDT, asset\_class=CRYPTOCURRENCY, instrument\_class=SPOT, quote\_currency=USDT, is\_inverse=False, price\_precision=2, price\_increment=0.01, size\_precision=3, size\_increment=0.001, multiplier=1, lot\_size=1, margin\_init=0, margin\_maint=0, maker\_fee=0.0002, taker\_fee=0.0004, info={})
-
-Actual prices in OrderBookDelta are multiples of 0.1 (precision=1), while the catalog/engine instrument has price\_precision=2 and price\_increment=0.01. As a result, the backtest fails with a precision validation error when simulating fills.
-
----
-
-#### [2025-09-24 15:06:21] @roma_21514
-
-What I tried
-
-* Checked the instrument via ParquetDataCatalog: it shows price\_precision=2, price\_increment=0.01.
-* Tried passing price\_increment\_override=0.1 into the strategy — doesn’t help (the engine validates against the instrument from the catalog).
-
-When saving instrument settings to a file, the parameters should be consistent with the real data granularity (in my case price\_precision=1, price\_increment=0.1), or the original PERP-class instrument should be correctly preserved instead of SPOT. I could update the file manually, but that would be fragile on overwrite and may surface for other instruments. Right now the file ends up with price\_precision=2, price\_increment=0.01, and even instrument\_class=SPOT, which doesn’t match the data or the \*-PERP identifier.
-
-Could you advise where the substitution/incorrect writing of instrument metadata might be happening during export to the catalog? How can I reliably set price\_precision=1, price\_increment=0.1, size/qty\_increment=0.001, lot\_size≈0.001, and the correct class (PERP) so that both the backtest and engine.cache.instrument(...) read these values? 
-
-If I choose ETHUSDT or BTCUSDC as the instrument, the issue does not occur — those load correctly.
-
----
-
-#### [2025-09-24 16:11:02] @ido3936
-
-continuing https://discord.com/channels/924497682343550976/924499913386102834/1420150693909762069
-
-When I try to use the DB backed cache for persistence - I get these errors when pre-existing positions (aka EXTERNAL) are analyzed by NT:
-Maybe this is the result of the same problem  - Nautilus confuses the closing of a LONG position with the opening of a SHORT one ?
-<@757548402689966131> does this make any sense? Any idea about how to go about it would be appreciated
-
-
-```
-2025-09-24T15:55:03.255048949Z [ERROR] IB_LIVE-001.ExecClient-INTERACTIVE_BROKERS: Error handling position update: invalid `value` less than `QUANTITY_MIN` 0.0, was -9.0
-2025-09-24T15:55:03.258742878Z [ERROR] IB_LIVE-001.ExecClient-INTERACTIVE_BROKERS: Error handling position update: invalid `value` less than `QUANTITY_MIN` 0.0, was -4.0
-2025-09-24T15:55:03.577197295Z [ERROR] IB_LIVE-001.ExecEngine: Unexpected exception in event queue processing: TypeError('Encoding objects of type nautilus_trader.model.objects.Price is unsupported')
-TypeError(Encoding objects of type nautilus_trader.model.objects.Price is unsupported)
-Traceback (most recent call last):
-  File "/home/ido/code/Trading/.venv/lib/python3.12/site-packages/nautilus_trader/live/execution_engine.py", line 523, in _run_evt_queue
-    self._handle_event(event)
-...
-  File "nautilus_trader/execution/engine.pyx", line 1371, in nautilus_trader.execution.engine.ExecutionEngine._apply_event_to_order
-  File "nautilus_trader/cache/cache.pyx", line 2390, in nautilus_trader.cache.cache.Cache.update_order
-  File "nautilus_trader/cache/database.pyx", line 1159, in nautilus_trader.cache.database.CacheDatabaseAdapter.update_order
-  File "nautilus_trader/serialization/serializer.pyx", line 110, in nautilus_trader.serialization.serializer.MsgSpecSerializer.serialize
-```
-
----
-
-#### [2025-09-25 01:34:51] @cjdsellers
-
-Hi <@972768642636853309> 
-We only support the version of macOS the GH `macos-latest` runner images are using (we don't have the capacity to support multiple macOS versions as it would mean an additional 3 CI jobs and 3 wheels produced). I've updated the installation guide to describe this more clearly https://github.com/nautechsystems/nautilus_trader/blob/develop/docs/getting_started/installation.md
-I would expect you could still build from source though - I hope that helps!
-
----
-
-#### [2025-09-25 01:41:40] @cjdsellers
-
-Hi <@1074995464316928071> 
-You already found the `external_order_claims` config, which is the main one which trips people up when restarting without a backing cache and expecting strategies to take control of external orders (this must be specified explicitly with `external_order_claims` as you're doing). I think the issue with the position going SHORT is how Nautilus treats spot-like assets. i.e. it doesn't by default regard holding a spot asset as automatically having a long position, but treats this as a "delta" from a starting state if that makes sense.
-
-We did incorporate spot position reports into Bybit recently which is opt-in and represents any positive wallet balance as a LONG position, or negative wallet balance (borrowing) as a SHORT (care must be taken as Nautilus will then "liquidate" these positions to the quote asset if `close_all_positions()` is then called). There are no plans currently to make this more generic across the platform. I hope that sheds some more light!
-
-- https://nautilustrader.io/docs/nightly/concepts/live#reconciliation
-- https://nautilustrader.io/docs/nightly/concepts/live#execution-reconciliation
-
----
-
-#### [2025-09-25 03:33:48] @aaron_g0130
-
-I need some help on learning nt, if I want to understand the underlying running order and logic of NautilusTrader  (such as the order in which various on_ events are triggered and under what circumstances they are triggered or not), which part of the source code should I focus on
-
----
-
-#### [2025-09-25 11:54:15] @fatcat3531
-
-Hi, do you have plans to make the bitget adapter public?
-
----
-
-#### [2025-09-25 18:24:20] @kadyrleev
-
-No worries at all! Thanks for clarifying this 🙏
-
----
-
-#### [2025-09-26 05:20:08] @ido3936
-
-Thanks <@757548402689966131> , after some hours debugging this I realized that my interpretation of what was going on was wrong: NT was not confusing the closing and opening of positions  - it was simply allowing both to exist simultaneously. 
-So what was happening was that the oms_type for the strategy was not being set explicitly as NETTING. Once I set it during strategy initialization the problem was solved (still others remain but one at a time...)
-Maybe someone will find this useful down the road
-
----
-
-#### [2025-09-26 05:23:21] @cjdsellers
-
-Hey <@1074995464316928071> glad to hear you managed to get to the bottom of that one. Here are some more useful docs if it helps (and describes that config default): https://nautilustrader.io/docs/nightly/concepts/execution#oms-configuration
-
-**Links:**
-- NautilusTrader Documentation
-
----
-
-#### [2025-09-27 14:44:34] @redyarlukas
-
-I'm implementing an option straddle strategy that needs to dynamically discover and subscribe to option instruments during backtesting. The strategy successfully finds option contracts from the catalog, but fails when trying to subscribe to their quote data:
-
-ERROR: Cannot find instrument XLP170224C00052000.OPRA to subscribe for QuoteTick data, No data has been loaded for this instrument
-
-When I understand correctly, the BacktestDataConfig requires pre-specifying all instruments `instrument_ids`. You cannot dynamically subscribe to instruments during a backtest that weren't pre-loaded.
-Whats the recommended approach for strategies that need to dynamically subscribe to instruments (especially options) during backtests? Simply loading all instruments would mean all data must fit into the memory right? So in this case this would not be an option.
-
----
-
-#### [2025-09-28 06:29:57] @herhz
-
-I have a simliar problem. don't know if the solution fits your case. here's how I solved it with `DataCatalogConfig`. I ask chatgpt to write a function to trigger the data engine find the instrument and load it into the cache dynamically. I hope there's a more direct way to achieve this.
-
-https://github.com/nautechsystems/nautilus_trader/blob/490a6297ce5da493dc5268791ebfb614095f9b51/nautilus_trader/data/engine.pyx#L1404
-
-```
-def find(self, instrument_id: InstrumentId) -> Instrument | None:
-    # expects the instrument exists in catalog, issues a request to trigger query
-    params = {}
-    params["update_catalog"] = False
-
-    request_id = UUID4()
-    request = RequestInstrument(
-        instrument_id=instrument_id,
-        start=None,
-        end=self._clock.utc_now(),
-        client_id=None,
-        venue=instrument_id.venue,
-        callback=self._handle_instruments_response,
-        request_id=request_id,
-        ts_init=self._clock.timestamp_ns(),
-        params=params,
-    )
-
-    fut: asyncio.Future = self._loop.create_future()
-    self._pending_requests[request_id] = fut
-
-    self._msgbus.request(endpoint="DataEngine.request", request=request)
-
-    try:
-        result = self._loop.run_until_complete(fut)
-        return result
-    finally:
-        self._pending_requests.pop(request_id, None)
-
-def _handle_instruments_response(self, response: DataResponse) -> None:
-    fut = self._pending_requests.get(response.correlation_id)
-    if not fut:
-        return
-
-    # assuming response contains `instrument`
-    if not fut.done():
-        fut.set_result(response.data)
-
-```
-
-**Links:**
-- nautilus_trader/nautilus_trader/data/engine.pyx at 490a6297ce5da493...
-
----
-
-#### [2025-09-28 07:14:31] @redyarlukas
-
-Thanks for the hint. But if it's that easy, why is it not supported officially? Where is the catch? 
-
-Currently I try to get around with a small chunking_size but loading tens of  thousands of instruments this does not feel right and does not scale (and I still run into memory issues).
-
----
-
-#### [2025-09-28 07:15:48] @redyarlukas
-
-@faysou I think your solution might help me. What did you do?
-
----
-
-#### [2025-09-28 07:28:52] @faysou.
-
-Look in the code and the examples
-
----
-
-#### [2025-09-28 07:34:01] @faysou.
-
-Look for the word duration
-
----
-
-#### [2025-09-29 15:29:49] @redyarlukas
-
-Mh, I am sorry but I think I cannot follow. Could you guide me a bit more into the right direction?
-
----
-
-#### [2025-09-29 15:31:50] @faysou.
-
-The feature is still experimental and undocumented, you will need to look at the source code to see how it works.
-
----
-
-#### [2025-09-29 15:33:49] @redyarlukas
-
-Okay will do, but i dont understand the duration part
-
----
-
-#### [2025-09-29 15:35:30] @faysou.
-
-Search for this string in the repo and you will see where this feature is used.
-
----
-
-#### [2025-09-29 22:25:46] @porciletto
-
-Hi! I’m having an issue with my backtesting (using 1.220.0). Here’s my process:
-
-* At the start of the day, I load the bars of the securities I know will pass the first filter, to avoid loading too much data.
-* I run my logic.
-* When I’m about to submit an order, I inject the next 20 minutes of ticks for that security into the engine (again using engine.add_data()).
-
-Here’s what happens:
-* The first time each security is processed, everything works as expected.
-* The second time (and any subsequent time) in the same run that the same security is processed, it seems as if the very last tick from the first period is still being considered. In my case, that tick ends up triggering an order.
-
-I don’t think this is a bug in Nautilus, but rather the result of me forcing things with the “dynamic injections” I mentioned above. Any suggestions?
-
-I tried using engine.clear_data() at the end of the day to remove the used data, but that just stops the run. I also tried setting the tick capacity of CacheConfig to a very low value, but I’m probably missing something.
-
-That said, if you think this might be a bug, I can work on a minimal reproduction. If you’re interested, I’ve attached a log: search for `44.81` and it should be very clear.
-
-Thanks in advance!
-
-**Attachments:**
-- [LUV3.txt.zip](https://cdn.discordapp.com/attachments/924499913386102834/1422348659734876210/LUV3.txt.zip?ex=694a6e2a&is=69491caa&hm=b85b6c234f08d19b9b13e0b4941fc61d2718c5cffd6d9c2ff567831a287778b9&)
-
----
-
-#### [2025-09-30 03:23:55] @xcabel
-
-sry to dig out one year old thread but do we know what this ClientId is for?
-there are many objects having class/object functions that will take in ClientId. But do we have any pointer to some walkthrough how we should organize them?
-I search the doc but cannot find useful info and the channel it seems to be relevant multiple venue and multiple instrutments?
-
----
-
-#### [2025-10-02 08:26:51] @manofculture5873
-
-could anyone point me to an example of backtesting option strategies?
-
----
-
-#### [2025-10-02 11:00:35] @porciletto
-
-Hi! I’m having an issue with my
-
----
-
-#### [2025-10-04 20:21:35] @haakonflaar
-
-What is the name of the parameter to set a bar offset from start of day (do you have a list of params - I can't seem to find it in the code)? Can I use it to enforce a bar to always be formed from regular trading hours market open (say for 50-minute bars from 9:30 AM ET to 10:20 AM)?
-
----
-
-#### [2025-10-04 20:24:03] @haakonflaar
-
-Also, if I request 50-min bars and enforce a bar to form at 10:20 AM (market open - 9:30-10:20 AM), can I also enforce a bar to be closed at market close even though the full 50-min is not formed yet (in this case the 3:20-4:00 PM 40-min bar)? That is how the "Break at end of day" logic at NinjaTrader works.
-
----
-
-#### [2025-10-04 20:28:53] @faysou.
-
-the timebaraggregator only supports regular bars for now. you can look in aggregation.pyx for more details, also in the data engine.pyx to see how the time bar origin is passed, it's either through a data engine config or through  a params dict
-
----
-
-#### [2025-10-04 20:46:54] @haakonflaar
-
-Hmm, so are you using `time_bars_origin_offset` to set the offset from midnight (00:00 UTC)?
-
----
-
-#### [2025-10-04 20:47:15] @faysou.
-
-yes
-
----
-
-#### [2025-10-04 20:58:32] @haakonflaar
-
-Hmm, I am having trouble setting hours + minutes as offset, but I guess I can fix it by starting the backtest at the desired time. In any case it will cause a problem for when using bars that does not divide by 24 hrs, such as 50-minute bars - on the next day the bar closing time will shift by 10 minutes. Maybe it could be nice with some break at end of day functionality.
-
----
-
-#### [2025-10-04 20:59:43] @faysou.
-
-there's no concept of trading day in nautilus yet. for now nautilus is mostly designed for cryptos, and cryptos are on all the time
-
----
-
-#### [2025-10-04 21:00:32] @faysou.
-
-but yes, best thing to use for now are bar lengths that are periodic daily
-
----
-
-#### [2025-10-04 23:31:39] @xcabel
-
-```
-offset = self.atr.value * self.config.trailing_atr_multiple
-        order: TrailingStopMarketOrder = self.order_factory.trailing_stop_market(
-            instrument_id=self.config.instrument_id,
-            order_side=OrderSide.SELL,
-            quantity=self.instrument.make_qty(self.config.trade_size),
-            # limit_offset=Decimal(f"{offset / 2:.{self.instrument.price_precision}f}"),
-            # price=self.instrument.make_price(last_quote.bid_price.as_double() - offset),
-            trailing_offset=Decimal(f"{offset:.{self.instrument.price_precision}f}"),
-            trailing_offset_type=TrailingOffsetType[self.config.trailing_offset_type],
-            trigger_type=TriggerType[self.config.trigger_type],
-            reduce_only=True,
-            emulation_trigger=TriggerType[self.config.emulation_trigger],
-        )
-
-        self.trailing_stop = order
-        self.submit_order(order, position_id=self.position_id)
-```
-
-I followed the strategy example code to submit a trailing stop market order. but I got an order that my trigger_price is none. I searched around but cannot find similar issue.
-
----
-
-#### [2025-10-05 04:31:19] @rk2774
-
-this is from `cdef class BarSpecification:` in `nautilus_trader\model\data.pxd`
-
-**Attachments:**
-- [image.png](https://cdn.discordapp.com/attachments/924499913386102834/1424252592950870057/image.png?ex=694ac3d7&is=69497257&hm=51c13c350f1981772cb165f5d812fb35fa36f1da416050734dddd00a7bbcd0da&)
-
----
-
-#### [2025-10-05 05:00:36] @cjdsellers
-
-Hey <@950260043637465128> 
-Thanks for the report. We definitely need more information to be able to help:
-- Is this backtest or live?
-- Which adapter and instrument?
-- Which version?
-
----
-
-#### [2025-10-05 08:59:40] @haakonflaar
-
-Right, I have no issue aggregating to say 40 or 50 min bars though (no error is raised). However, controlling first bar of day is trickier.
-
----
-
-#### [2025-10-05 18:28:02] @xcabel
-
-thanks!  it can definitely be my user error. I figured it out myself which is to set the trigger_instrument_id manually by carrying over from instrument_id then it works fine. It can be b/c my strategy subscribe to multiple instrument id data.
-
-1. this is backtest instead of live
-2. im using some features from polymarket adapter and binaryoption instrument
-2.1 im not sure I use the adapter right b/c I also notice that polymarket order side enum in polymarket is not mapped to an integer this was also causing me generic order factory market order initiation failure (but it can be that I should use some polymarket specfic order factory?) I fixed that issue by using generic order side
-3. version=1.220.0
-
----
-
-#### [2025-10-06 01:18:04] @wi11r2492
-
-Does anyone know if I can use MlFinLab https://hudsonthames.org/mlfinlab/  ,along with my databento historical data on Nautilus Trader to build a trading strategy ?
-
-**Links:**
-- MlFinLab - Hudson & Thames
-
----
-
-#### [2025-10-06 18:28:40] @dariohett
-
-Just asked in <#1332664677041442816>  but are there any concerns querying portfolio.net_position(instrument_id) from an actor? I’ve observed a Buy resulting in a negative net_position, but it might be an adapter-specific issue (despite the portfolio correctly finding a positive position on restart)
-
----
-
-#### [2025-10-08 00:56:15] @falls7202
-
-does  "nautilus_trader/adapters/okx " support this feature :  "set leverage"  ?
-
----
-
-#### [2025-10-08 14:15:47] @projectmillen1507
-
-Thank you very much. I did the Dockerized connection and it works. It just a hassle of having to rebuild the portfolio monitor while TWS provides a native one...
+**Messages:** 269
+**Last updated:** 2026-01-07 01:29:30
 
 ---
 
@@ -497,7 +15,7 @@ I'm having a little issue with data loading. I have this code to load historical
 Thanks for the help !
 
 **Attachments:**
-- [message.txt](https://cdn.discordapp.com/attachments/924499913386102834/1425773664720261151/message.txt?ex=694a5db3&is=69490c33&hm=dbb0f89c86697d787ec6344c4335ce476b2db7660255048721e0fe4d9a4fe800&)
+- [message.txt](https://cdn.discordapp.com/attachments/924499913386102834/1425773664720261151/message.txt?ex=695eccf3&is=695d7b73&hm=ea9d67a5a850e5b34dff653ef817978b7c5105958020672e7b9a948b8b2b9738&)
 
 ---
 
@@ -546,9 +64,9 @@ Hope can help future dev with same error 🙂
 Special thanks to <@965894631017578537>, help much appreciated
 
 **Attachments:**
-- [image.png](https://cdn.discordapp.com/attachments/924499913386102834/1425793206624456764/image.png?ex=694a6fe6&is=69491e66&hm=8a0112e57e0f492dc730d84d15d900dd6f455cc5a4c82c725ccf857068ada150&)
-- [image.png](https://cdn.discordapp.com/attachments/924499913386102834/1425793207010328698/image.png?ex=694a6fe6&is=69491e66&hm=290aa5b3218bbe834437efec771c226ec267b8008b88eff7e0ec41c526de9015&)
-- [image.png](https://cdn.discordapp.com/attachments/924499913386102834/1425793207433822299/image.png?ex=694a6fe6&is=69491e66&hm=9848ebb8fbba01fb04a42249674807c95bef32b2fd3d5b373bc62fb2babd2b00&)
+- [image.png](https://cdn.discordapp.com/attachments/924499913386102834/1425793206624456764/image.png?ex=695edf26&is=695d8da6&hm=6bd7a7fe5e27d8f3d3cce3618b97e378f5215c0bcf64b706410201209a1f1d09&)
+- [image.png](https://cdn.discordapp.com/attachments/924499913386102834/1425793207010328698/image.png?ex=695edf26&is=695d8da6&hm=8456f62627882979fccf66b291aa5414764f140d5c1e00087b6a1efb3a54ea44&)
+- [image.png](https://cdn.discordapp.com/attachments/924499913386102834/1425793207433822299/image.png?ex=695edf26&is=695d8da6&hm=779dec61115fa0c0c6b206f5a456fb87da124f6243aee55e40c9d4191dac4659&)
 
 ---
 
@@ -611,7 +129,7 @@ it's a question that often comes up, it's out of scope. https://github.com/naute
 i did it 😄
 
 **Attachments:**
-- [image.png](https://cdn.discordapp.com/attachments/924499913386102834/1426653445313532004/image.png?ex=694a454f&is=6948f3cf&hm=63fec4695522d12a2a824ae29a6a9543aedd72a583db7e1e29a39e9988a47add&)
+- [image.png](https://cdn.discordapp.com/attachments/924499913386102834/1426653445313532004/image.png?ex=695eb48f&is=695d630f&hm=bced450aab339dfffeabc540faf5eb4d7bcfe833b988e85707510119f50655e8&)
 
 ---
 
@@ -794,7 +312,7 @@ Hello ! Is it true that bracket order on BacktestVenue are not working properly 
 
 
 **Attachments:**
-- [logs.rtf](https://cdn.discordapp.com/attachments/924499913386102834/1428392145982717953/logs.rtf?ex=694aa9d9&is=69495859&hm=58b9d0a87382e49cccb218eba3696c06fe82643a17c38060a2f655480093383c&)
+- [logs.rtf](https://cdn.discordapp.com/attachments/924499913386102834/1428392145982717953/logs.rtf?ex=695e7059&is=695d1ed9&hm=9da9265c7999832b10bd9b36843a3a59fe8e2af44b21d0df8f21dee222ef91ee&)
 
 ---
 
@@ -809,7 +327,7 @@ I made some tests and it looks like that on TP (SELL LIMIT when LONG on futures)
 
 
 **Attachments:**
-- [logs.rtf](https://cdn.discordapp.com/attachments/924499913386102834/1428409601749028885/logs.rtf?ex=694aba1b&is=6949689b&hm=f54230ef19026d968041bbb0c0bdd77a3d1256f7a701c186be813007337d9660&)
+- [logs.rtf](https://cdn.discordapp.com/attachments/924499913386102834/1428409601749028885/logs.rtf?ex=695e809b&is=695d2f1b&hm=6fd514adfe4e3dd6e2ac69fd1ef89429edc58bb56822661557bd5f0ab045162f&)
 
 ---
 
@@ -855,7 +373,7 @@ my platform is Python 3.13.9 on Ubuntu
 it seems my ubuntu version is not updated enough for dev version
 
 **Attachments:**
-- [image.png](https://cdn.discordapp.com/attachments/924499913386102834/1430081112419340308/image.png?ex=694a3752&is=6948e5d2&hm=d2be67e820c2440fa189429284e50f6b3f75346286e56e16d522845b05e0c147&)
+- [image.png](https://cdn.discordapp.com/attachments/924499913386102834/1430081112419340308/image.png?ex=695ea692&is=695d5512&hm=9279e19c06c34772c03b243b313f0f5f331b8dbeacb2681dd13affdd47272326&)
 
 ---
 
@@ -894,7 +412,7 @@ There should only be unrealized PnLs if you have open positions at the end of th
 can anyone help me with this error? i'm just running the example using default redis config, but when an order is submitted, this error occurs
 
 **Attachments:**
-- [image.png](https://cdn.discordapp.com/attachments/924499913386102834/1430490527274373182/image.png?ex=694a631e&is=6949119e&hm=4105acdb8d0c5f851394b1155f39beaf6598f06e40df392f898f73d2b3fcd625&)
+- [image.png](https://cdn.discordapp.com/attachments/924499913386102834/1430490527274373182/image.png?ex=695ed25e&is=695d80de&hm=5808841482901e868ed523a254b27c9887b7c1fb7be919e3b7e5524e4b638dee&)
 
 ---
 
@@ -915,7 +433,7 @@ I need to backtest against data from a few years, when loading csv files that ca
 <#924499913386102834> im trying to to create a indian broker adapter, i observed a behaviour for REJECTED status orders , in  reports im not able to see venue_order_id. Is it expected or it should come. this i observed for mass reconciliation at startup.
 
 **Attachments:**
-- [image.png](https://cdn.discordapp.com/attachments/924499913386102834/1430582634265710592/image.png?ex=694ab8e6&is=69496766&hm=02e837bb870df739acda6a6e18892239a5693b479a232ed868dc04477a14e03b&)
+- [image.png](https://cdn.discordapp.com/attachments/924499913386102834/1430582634265710592/image.png?ex=695e7f66&is=695d2de6&hm=c6431a596e097e5204b034a0681ff6061759bf00fc25280649eb99fa6484d7f3&)
 
 ---
 
@@ -1055,7 +573,7 @@ The timer would be simulated, so works the same way backtest and live relative t
 I try to reproduce a simple case with the following code. Where do i find the list of position snapshots done every 86400 Sec (for daily bars) ?  I have added exec_engine_config and quotes. So i am expecting to find somewhere a list of snapshot where i can get unrealized pnl for each bars with open positions. May be with "engine.portfolio.unrealized_pnls(venue)" but it is empty.
 
 **Attachments:**
-- [simple_test_run.py](https://cdn.discordapp.com/attachments/924499913386102834/1431692384483410101/simple_test_run.py?ex=694acdf0&is=69497c70&hm=216bff4e921233103bd7ef7ccd7a4811094d1fe7e7798f83fa6ba585973186a6&)
+- [simple_test_run.py](https://cdn.discordapp.com/attachments/924499913386102834/1431692384483410101/simple_test_run.py?ex=695e9470&is=695d42f0&hm=cfe8fbe41430449afc4c28f38231840e6fce99bbe410aa3666680188017cc781&)
 
 ---
 
@@ -1215,7 +733,7 @@ class OrderSpreadGuardActor(Actor):  # Use Actor, not Strategy
 im tried but its not working, only internal orders events im able to see, for external im able to see only OSR.
 
 **Attachments:**
-- [logs.txt](https://cdn.discordapp.com/attachments/924499913386102834/1433263344059551875/logs.txt?ex=694a9641&is=694944c1&hm=86a28534472f516c5a31cf00cf0ca3ef22f37d5c7b29a409a7183d81009b128a&)
+- [logs.txt](https://cdn.discordapp.com/attachments/924499913386102834/1433263344059551875/logs.txt?ex=695f0581&is=695db401&hm=1c594840f1c5bf682959094bbe05256b9c857cf3cb96cf522ddc7045ee673a0e&)
 
 ---
 
@@ -1242,7 +760,7 @@ Hello there, while looking at the types and docs, I could only find on how to ge
 is looping the only way ?
 
 **Attachments:**
-- [image.png](https://cdn.discordapp.com/attachments/924499913386102834/1433972894240870501/image.png?ex=694a8813&is=69493693&hm=8af2dd45cbe1d2e3cb8373b74d31699617d13d7fea6a3c9d15fb9aff17730f53&)
+- [image.png](https://cdn.discordapp.com/attachments/924499913386102834/1433972894240870501/image.png?ex=695ef753&is=695da5d3&hm=12a3c5fc31dc610f0a603c5d5bbe1dbf3d72d3bed40d0796f9e81434a2f1e8b1&)
 
 ---
 
@@ -1383,7 +901,7 @@ HI <@757548402689966131> I sending friend request, I saw your message before
 
 
 **Attachments:**
-- [image.png](https://cdn.discordapp.com/attachments/924499913386102834/1435202086034870292/image.png?ex=694a639a&is=6949121a&hm=07ce2262fc286b9d2f6491505adc06f80f584deec652c64cf6f438bfaf08fe7f&)
+- [image.png](https://cdn.discordapp.com/attachments/924499913386102834/1435202086034870292/image.png?ex=695ed2da&is=695d815a&hm=798a0198796a81cc4309d1e611a7edff9b67f613f17e3ce738fdf406f69138f9&)
 
 ---
 
@@ -1410,7 +928,7 @@ I m testing now
 
 
 **Attachments:**
-- [image.png](https://cdn.discordapp.com/attachments/924499913386102834/1435212583664615456/image.png?ex=694a6d60&is=69491be0&hm=a94e478b62c17615147bdaa338a48b55f474431ff35035b043706cdfa1309936&)
+- [image.png](https://cdn.discordapp.com/attachments/924499913386102834/1435212583664615456/image.png?ex=695edca0&is=695d8b20&hm=11619b8d83f5219ef578e73e45d5bfe11a1b45479605d4bcf2a2f1b84a26260f&)
 
 ---
 
@@ -1431,7 +949,7 @@ It suddenly closed
 
 
 **Attachments:**
-- [image.png](https://cdn.discordapp.com/attachments/924499913386102834/1435232063019028511/image.png?ex=694a7f85&is=69492e05&hm=13511f7a98f0862a605dee72fd1db54fec9a911d828365a1c00b2dc6085466f1&)
+- [image.png](https://cdn.discordapp.com/attachments/924499913386102834/1435232063019028511/image.png?ex=695eeec5&is=695d9d45&hm=020809b1758dd9c986eaa185d8fd90d1df9dc953ca58f786ee232090980e6f99&)
 
 ---
 
@@ -1443,7 +961,7 @@ KeyError: '__reduce_cython__'
 
 ---
 
-#### [2025-11-04 21:23:55] @joebiden404
+#### [2025-11-04 21:23:55] @joejoe404
 
 Someone got this crash?
 
@@ -1494,7 +1012,7 @@ Thanks for the report. That's an invariant where we expect an undefined price to
 
 ---
 
-#### [2025-11-05 00:01:15] @joebiden404
+#### [2025-11-05 00:01:15] @joejoe404
 
 Yep, so basically:
 Using latest version with Python;
@@ -1507,7 +1025,7 @@ For example
 
 ---
 
-#### [2025-11-05 00:01:17] @joebiden404
+#### [2025-11-05 00:01:17] @joejoe404
 
 ```python
 from pathlib import Path
@@ -1538,7 +1056,7 @@ PANICKED!!!!!
 
 ---
 
-#### [2025-11-05 00:02:12] @joebiden404
+#### [2025-11-05 00:02:12] @joejoe404
 
 not only 
 > catalog.order_book_deltas()[0]
@@ -1547,7 +1065,7 @@ almost every function crushing it 🙁
 
 ---
 
-#### [2025-11-05 00:06:14] @joebiden404
+#### [2025-11-05 00:06:14] @joejoe404
 
 Lmk if you need more info
 
@@ -1558,7 +1076,7 @@ Lmk if you need more info
 I see, you updated this, but it's in nightly version, right?
 
 **Attachments:**
-- [image.png](https://cdn.discordapp.com/attachments/924499913386102834/1435462231717580863/image.png?ex=694aad21&is=69495ba1&hm=7b8c18729f2a49198b546ddf1568ea93e5b6ac9991c0fe4cf2b3626f584dd509&)
+- [image.png](https://cdn.discordapp.com/attachments/924499913386102834/1435462231717580863/image.png?ex=695e73a1&is=695d2221&hm=92c7eec9b66171ee28ddcb1bd6a55c0c3d6db6df0f5e1cb51bc90ee2d2aea64a&)
 
 ---
 
@@ -1621,31 +1139,31 @@ As a next step I would try inspecting your catalog with a parquet file viewer an
 
 ---
 
-#### [2025-11-05 17:29:02] @joebiden404
+#### [2025-11-05 17:29:02] @joejoe404
 
 do you know what I should I look for? Undefined prices?
 
 ---
 
-#### [2025-11-05 17:32:41] @joebiden404
+#### [2025-11-05 17:32:41] @joejoe404
 
 The data gets loaded, then boom...
 
 **Attachments:**
-- [image.png](https://cdn.discordapp.com/attachments/924499913386102834/1435683255675519128/image.png?ex=694ad239&is=694980b9&hm=3829219b8f0e2614d488ba6385bd3a6dc7f08e79b0b871fe8349320435bb8db8&)
+- [image.png](https://cdn.discordapp.com/attachments/924499913386102834/1435683255675519128/image.png?ex=695e98b9&is=695d4739&hm=2a3bceddd0a9b7313cd49bd83a18b461fdd217f31ca8bf14cec6a7f38f3ca089&)
 
 ---
 
-#### [2025-11-05 18:28:19] @joebiden404
+#### [2025-11-05 18:28:19] @joejoe404
 
 breaks here
 
 **Attachments:**
-- [image.png](https://cdn.discordapp.com/attachments/924499913386102834/1435697255490519051/image.png?ex=694a3683&is=6948e503&hm=3e510b2488c4f00e7cbdd27708ce0c0d2a7a9182e7c522cc806ee4d4de846643&)
+- [image.png](https://cdn.discordapp.com/attachments/924499913386102834/1435697255490519051/image.png?ex=695ea5c3&is=695d5443&hm=9687732667010f0e1b98b65493f149c77b778e1f7ba28f8d68f5b5f6c2c60e56&)
 
 ---
 
-#### [2025-11-05 18:32:00] @joebiden404
+#### [2025-11-05 18:32:00] @joejoe404
 
 Got it friends, the issue was on the 29/10 NQ MBO file... just crashed everything... why there is no try-catch statement for this one tho hahaha <@757548402689966131> ?
 
@@ -1669,13 +1187,13 @@ hi, i am new to NautilusTrader and wish to create my own adapter to connect to o
 
 ---
 
-#### [2025-11-07 04:31:14] @joebiden404
+#### [2025-11-07 04:31:14] @joejoe404
 
 Hey, Is there any way I can handle it myself?
 
 ---
 
-#### [2025-11-07 04:32:30] @joebiden404
+#### [2025-11-07 04:32:30] @joejoe404
 
 I meant, on which row/col of the parquet may cause this dramatic fail
 
@@ -1692,7 +1210,7 @@ In the github itself there are few adapters you can take example on under the «
 Does anyone use BacktestNode? I'm always getting the below error. All the examples use BacktestEngine, should I just go for that instead?
 
 **Attachments:**
-- [image.png](https://cdn.discordapp.com/attachments/924499913386102834/1436327744530157608/image.png?ex=694a8773&is=694935f3&hm=bd823552c377e581b352f3db8bab444c15914de72fbdac36d1fcd5df06c80f2e&)
+- [image.png](https://cdn.discordapp.com/attachments/924499913386102834/1436327744530157608/image.png?ex=695ef6b3&is=695da533&hm=31e06b8f16e64adaf1ef2841eff44277eee78907260cbee76c3973bd3203a206&)
 
 ---
 
@@ -1758,7 +1276,7 @@ Does anyone use BacktestNode? I'm always getting the below error. All the exampl
 
 ---
 
-#### [2025-11-07 16:03:33] @joebiden404
+#### [2025-11-07 16:03:33] @joejoe404
 
 This issue is critical for me because I love NT and want to use only it haaa<3 
 
@@ -1797,7 +1315,7 @@ end =  pd.Timestamp("2025-10-28T22:00:00.076602376Z").value
 
 ---
 
-#### [2025-11-07 16:04:55] @joebiden404
+#### [2025-11-07 16:04:55] @joejoe404
 
 <@757548402689966131> I really dont know how to solve this issue, I tried to change this price_undef thingy to something else but it keeps crushing it.
 
@@ -1816,7 +1334,7 @@ Available in [development wheels](https://github.com/nautechsystems/nautilus_tra
 
 ---
 
-#### [2025-11-08 00:26:10] @joebiden404
+#### [2025-11-08 00:26:10] @joejoe404
 
 Thank you sir!
 
@@ -2011,7 +1529,7 @@ it return the same instrument multiple time, is it normal? should i do something
 is it because my bar data is splited in multiple file? (see the image)
 
 **Attachments:**
-- [Screenshot_2025-11-11_at_09.33.53.png](https://cdn.discordapp.com/attachments/924499913386102834/1437737819064766515/Screenshot_2025-11-11_at_09.33.53.png?ex=694a62af&is=6949112f&hm=cf1ca3431ac07cd975352221b0c2ea085c523ae79e3cfe6b2cf66a631ab52f61&)
+- [Screenshot_2025-11-11_at_09.33.53.png](https://cdn.discordapp.com/attachments/924499913386102834/1437737819064766515/Screenshot_2025-11-11_at_09.33.53.png?ex=695ed1ef&is=695d806f&hm=5cf1c356a907e8030e155fec041c5f47593465aa6a38b5f7e72b6aed78913459&)
 
 ---
 
@@ -2125,7 +1643,7 @@ More info:
 Thanks
 
 **Attachments:**
-- [compile-fail.txt](https://cdn.discordapp.com/attachments/924499913386102834/1438481390680408114/compile-fail.txt?ex=694a7431&is=694922b1&hm=35a6d7cf2db37a0833489cf8acb0bf37d4d739387bb1ca31bc042c091afd4ed1&)
+- [compile-fail.txt](https://cdn.discordapp.com/attachments/924499913386102834/1438481390680408114/compile-fail.txt?ex=695ee371&is=695d91f1&hm=a787146afa5d35ec745c7a496f12a8169c132053edd4d5df0ae60ee53cf71130&)
 
 ---
 
@@ -2339,7 +1857,7 @@ Hey <@966200006010863656> I'd suggest looking into the streaming feather writer 
 Thank you in advance..
 
 **Attachments:**
-- [image0.png](https://cdn.discordapp.com/attachments/924499913386102834/1441668289930461375/image0.png?ex=694ad779&is=694985f9&hm=1b82805ae70daf8d628a32431101aa95adff56351e4d3412b83d6b7c6f5857b2&)
+- [image0.png](https://cdn.discordapp.com/attachments/924499913386102834/1441668289930461375/image0.png?ex=695e9df9&is=695d4c79&hm=cf944ee90b691ee390a568e79e8bf04cb9474ddea8549a43cdda07628a5ec197&)
 
 ---
 
@@ -2535,7 +2053,7 @@ I'm currently thinking of spawning a listener thread within the process that rea
 
 ---
 
-#### [2025-11-28 03:36:28] @cauta
+#### [2025-11-28 03:36:28] @mrrothz
 
 hi <@965894631017578537> i created an issue: https://github.com/nautechsystems/nautilus_trader/issues/3233
 i believe this is missing while implementation `replace_existing` in `StreamingConfig`
@@ -2545,7 +2063,7 @@ i believe this is missing while implementation `replace_existing` in `StreamingC
 
 ---
 
-#### [2025-11-28 08:05:40] @cauta
+#### [2025-11-28 08:05:40] @mrrothz
 
 i created a PR for fix this bug: https://github.com/nautechsystems/nautilus_trader/pull/3234
 
@@ -2748,8 +2266,8 @@ Also doing market regime identification for better trade confidence together wit
 But overall I am asking for inspiration or ideas for new angels to look at the data from, would appricate if anyone would share a chunk or their experince in this area, or feedback or even just a sketchy technical paper they want to share 😀 👏
 
 **Attachments:**
-- [Screenshot_2025-12-18_at_14.55.16.png](https://cdn.discordapp.com/attachments/924499913386102834/1451217303021813830/Screenshot_2025-12-18_at_14.55.16.png?ex=694aa4ef&is=6949536f&hm=80390bd67e36748e04c78fb8d4a284f9e46bd70989de9897d885ababf4eb2158&)
-- [Screenshot_2025-12-18_at_15.05.23.png](https://cdn.discordapp.com/attachments/924499913386102834/1451217303365484574/Screenshot_2025-12-18_at_15.05.23.png?ex=694aa4ef&is=6949536f&hm=1e0cde645a3578914ec83600497fd4a03a27662b7ea35e96df5d4d89182dfb0f&)
+- [Screenshot_2025-12-18_at_14.55.16.png](https://cdn.discordapp.com/attachments/924499913386102834/1451217303021813830/Screenshot_2025-12-18_at_14.55.16.png?ex=695e6b6f&is=695d19ef&hm=08b8cb7c51784c56b612eb605e9bf30985b5b610c01da0972fc0616263c44b02&)
+- [Screenshot_2025-12-18_at_15.05.23.png](https://cdn.discordapp.com/attachments/924499913386102834/1451217303365484574/Screenshot_2025-12-18_at_15.05.23.png?ex=695e6b6f&is=695d19ef&hm=5c413f16de2edd218bb48213918e9e542b58ad2b7c050a4f54ebec7193ae6539&)
 
 ---
 
@@ -2821,5 +2339,247 @@ tests/unit_tests/backtest
 /test_matching_engine/TestOrderMatchingEngine.test_trade_execution_fills_better_priced_orders_for_buys 
 
 locally produces a error.... Has the logick changed since then? <@757548402689966131>
+
+---
+
+#### [2025-12-22 22:38:55] @cjdsellers
+
+Hey <@401500931931373569> 
+The test passes on the current `develop` branch. This behavior was fixed by
+ the "transient override" feature added here: https://github.com/nautechsystems/nautilus_trader/commit/7d4a503de
+ - Ensure you have the latest from `develop` (install a recent development wheel)
+ - Confirm `trade_execution=True` is set in `BacktestVenueConfig`
+
+ So for your scenario, the matching logic now correctly fills limit orders that are "better priced"
+ than the trade - a BUY LIMIT at 0.28 WILL fill on a SELLER trade at 0.27
+
+**Links:**
+- Improve trade execution matching with transient override · nautech...
+
+---
+
+#### [2025-12-26 04:52:31] @yb05379
+
+Hi! I’m currently running a backtest using QuoteTick data and trying to implement a TrailingStopMarketOrder with an activation price. But the issue I am having is that the order is submitted successfully, but it never transitions to Active or triggers, even when the market price clearly crosses the activation_price. Has anyone encountered this "failure to activate" issue with Quote data?
+
+---
+
+#### [2025-12-28 02:12:02] @yite7836
+
+Hi team,
+I am currently running the example and facing the problem: https://github.com/nautechsystems/nautilus_trader/blob/develop/examples/live/bybit/bybit_ema_cross.py, for the first run, it looks good.  However, it is looks like it caches something, and lead to some failure after I re-run it, can you give me some suggestion for further study it?
+
+**Attachments:**
+- [fail.log](https://cdn.discordapp.com/attachments/924499913386102834/1454658123221700673/fail.log?ex=695e69b2&is=695d1832&hm=e1b545eb02cb8494db03b6c25f4d73a57177f80be5dad76679ab217967f17c1e&)
+
+---
+
+#### [2025-12-28 07:53:21] @georgey5145
+
+```
+2025-12-28T07:42:31.769776976Z [ERROR] TESTER-001.TradingNode: Error on run
+RuntimeError(cannot recalculate balance when no current balance)
+Traceback (most recent call last):
+  File "/home/ubuntu/venvs/nt_trader/lib/python3.13/site-packages/nautilus_trader/live/node.py", line 298, in run
+    self.kernel.loop.run_until_complete(self.run_async())
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "uvloop/loop.pyx", line 1518, in uvloop.loop.Loop.run_until_complete
+  File "/home/ubuntu/venvs/nt_trader/lib/python3.13/site-packages/nautilus_trader/live/node.py", line 349, in run_async
+    await self.kernel.start_async()
+  File "/home/ubuntu/venvs/nt_trader/lib/python3.13/site-packages/nautilus_trader/system/kernel.py", line 1030, in start_async
+    self._initialize_portfolio()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/home/ubuntu/venvs/nt_trader/lib/python3.13/site-packages/nautilus_trader/system/kernel.py", line 1292, in _initialize_portfolio
+    self._portfolio.initialize_positions()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "nautilus_trader/portfolio/portfolio.pyx", line 324, in nautilus_trader.portfolio.portfolio.Portfolio.initialize_positions
+  File "nautilus_trader/portfolio/portfolio.pyx", line 385, in nautilus_trader.portfolio.portfolio.Portfolio.initialize_positions
+  File "nautilus_trader/accounting/manager.pyx", line 425, in nautilus_trader.accounting.manager.AccountsManager.update_positions
+  File "nautilus_trader/accounting/accounts/margin.pyx", line 377, in nautilus_trader.accounting.accounts.margin.MarginAccount.update_margin_maint
+  File "nautilus_trader/accounting/accounts/margin.pyx", line 476, in 
+nautilus_trader.accounting.accounts.margin.MarginAccount._recalculate_balance
+```
+i encountered this error when i was trying to run node with 2 exec clients BYBIT and IB, but i can run successfully with either one of them, can anyone help me on this?
+
+code here: https://github.com/nautechsystems/nautilus_trader/discussions/3354
+
+**Links:**
+- RuntimeError(cannot recalculate balance when no current balance) ·...
+
+---
+
+#### [2025-12-28 09:32:37] @cjdsellers
+
+Hi <@765636132636590130> 
+Thanks for the report, you were hitting an edge case when the positions currency has no corresponding account balance. This should now be fixed (made more robust) and available in development wheels soon: https://github.com/nautechsystems/nautilus_trader/commit/d13aa0a2bc8be1634762f34b5158daade4ffe768
+
+**Links:**
+- Improve margin account balance recalculation robustness · nautechs...
+
+---
+
+#### [2025-12-29 08:09:04] @georgey5145
+
+thanks for quick reply! i've tested and it works now!
+
+---
+
+#### [2025-12-30 09:05:06] @georgey5145
+
+but there  is another issue, when i tried to retrieve account info using self.portfolio.account(venue) in a strategy, i always got IB account info no matter the venue parameter is IB_VENUE or BYBIT_VENUE when i ran node with both BYBIT and IB settings, i can only get BYBIT account info if i only run node with BYBIT, is this normal?
+
+---
+
+#### [2025-12-31 14:33:48] @heliusdk
+
+Hey just wanted to thank you for the advice, have this in forward testing right now, and its killing it.
+
+After watching what went wrong on a chart a few days, I paired it with some weak stationarity, and sprinkled a little multi timeframe overview on the top, making it less jumpy and less prone to sideways markets.
+
+Probably also a good idea to look into volatility scaling given distributions, but thats for 2026, the image is for roughly 4k trades.
+
+Also thanks for all the hard work in Nautilus to you and the team 😀 
+Happy new year 🎆
+
+**Attachments:**
+- [vwap.jpeg](https://cdn.discordapp.com/attachments/924499913386102834/1455931955987091721/vwap.jpeg?ex=695e6ecc&is=695d1d4c&hm=c25da7ae8a716d74bb374b70ec9cb5338cbd4f2de7c4552ada2da96468b56f2f&)
+
+---
+
+#### [2025-12-31 14:45:20] @faysou.
+
+I like your graphs 🙂 if you can see how to improve the recently introduced visualisation in nautilus it would be great.
+
+---
+
+#### [2026-01-01 23:15:22] @heliusdk
+
+Thanks <@965894631017578537> , I'll look at it next week 🙂
+
+---
+
+#### [2026-01-04 05:55:32] @thisisrahul.
+
+While backtesting, request_bars doesn’t give out any data(doesn’t call on historical data), it works fine while live trading. Is request_bars only to be used for live trading?
+The data present in the catalogue has data older than the backtesting start date so shouldn’t be a problem
+
+---
+
+#### [2026-01-04 15:51:07] @haakonflaar
+
+Are you using the high level or low level API? I am curious of the same thing, but I am using the low level API and naturally only add data equal to the length of the backtest which is why I think request_bars doesn't actually fetch any data (should work if I add data prior to backtest start though, but haven't tried). I believe it should work seamlessly with the high level API though as I believe it fetches data directly from the catalog.
+
+---
+
+#### [2026-01-04 15:55:46] @thisisrahul.
+
+I have tried both, in low level I have added data older than the start time to the engine. Doesn’t work
+In high level, I have provided the path to the catalogue, ensured it contains data older than the start time of the strategy, then passed in manually created start time (older than start of backtest) to request_bars, but it doesn’t work.
+Subscribe bars works as expected
+
+---
+
+#### [2026-01-04 15:57:10] @thisisrahul.
+
+I can’t debug the code as the engine.pyx is in cython
+
+---
+
+#### [2026-01-04 17:43:30] @thisisrahul.
+
+Found the issue. Had to add the DataCatalogConfig to BacktestEngineConfig. Now it’s working
+
+---
+
+#### [2026-01-04 17:44:52] @thisisrahul.
+
+So we have to add the catalogue twice, once in BacktestDataConfig and once in BacktestEngineConfig as mentioned above
+
+---
+
+#### [2026-01-04 20:50:53] @_yourfriend
+
+is it possible to do paper trading with polymarket out of the box or is anything needed?
+
+---
+
+#### [2026-01-05 04:06:35] @cjdsellers
+
+Hey <@645331124335411255> if by paper trading you meant live data with simulated execution (by Nautilus, not a real-time paper trading account with Polymarket) - then yes, it's theoretically possible to set this up - it would just take a bit of work. There will be some time invested into the Polymarket adapter (Rust port) and further tutorials very soon (within Q1)
+
+---
+
+#### [2026-01-05 04:09:19] @_yourfriend
+
+got it, thanks!
+
+---
+
+#### [2026-01-05 19:09:50] @heliusdk
+
+My suggestion and someting I wont mind contributing with would be:
+- Buy and hold comparison per asset on the equity curve, just like my visuals, one thing is profitable, an other is if you actually gain anything.
+- Trade calander just optional
+- Anuallized return distribution
+
+The other things I have added seems niche and not really for everyone, for example my drawdown chart has number of trades as bars below, to display if there is a connection between good/bad dradown and number of trades, e.g a few trades running up a backtest and the rest just being bad.
+
+The trade distribution by time of day, but that also enters a space thats harder to model, because if you have instruments backtested at the same time, and they have different opening hours its just noise and confusion to people.
+
+I dont think any of my more advanced charts would be of value either.
+
+Can anyone provide some feedback if they see a value in getting that information and something I should make a pull request for in Nautilus?
+
+---
+
+#### [2026-01-05 19:11:52] @heliusdk
+
+
+
+**Attachments:**
+- [image.png](https://cdn.discordapp.com/attachments/924499913386102834/1457813874278404106/image.png?ex=695eaff8&is=695d5e78&hm=a29f42b08143e8c183b50296d362ec4faf376435dcd8ee8b9be86450204ee00d&)
+
+---
+
+#### [2026-01-05 19:14:56] @faysou.
+
+Thanks for your reply. I think that given the visualisation feature is modular the more options the better.  If you think something is useful it's likely useful to other people.
+
+---
+
+#### [2026-01-05 19:16:51] @heliusdk
+
+Okay I guess that makes sense 😅 
+I'll make a PR 🙂
+
+---
+
+#### [2026-01-06 06:54:11] @thisisrahul.
+
+Thanks, the visualisation looks really beautiful, if you are at it, is it possible to scale the drawdown chart? It’s hard to read the red line
+
+---
+
+#### [2026-01-06 08:41:01] @faysou.
+
+I think better to let <@1273010294033219642> do something first, then it can be modified if needed.
+
+---
+
+#### [2026-01-06 14:55:02] @acecuffs
+
+hey<@1032691280448323636>
+
+---
+
+#### [2026-01-06 14:55:16] @acecuffs
+
+Hey<@1273010294033219642>
+
+---
+
+#### [2026-01-06 23:33:47] @akatsuki_alpha__42583
+
+Hey all — I'm deploying Nautilus Trader in a Kubernetes cluster and trying to use GCP Memorystore (Redis) over PSC with TLS. The MessageBus Redis connection fails with TLS validation errors (unknown CA / hostname mismatch). It looks like Memorystore’s server cert SAN doesn’t match the PSC endpoint, so strict hostname verification fails even when the CA is trusted. Has anyone successfully connected NT’s MessageBus to Memorystore via PSC? Any pointers would help — thanks!
 
 ---

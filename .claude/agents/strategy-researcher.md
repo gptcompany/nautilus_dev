@@ -1,7 +1,7 @@
 ---
 name: strategy-researcher
 description: "Research academic papers for trading strategies and convert them into NautilusTrader-compatible specifications. Bridge between academic_research knowledge graph and nautilus_dev specs."
-tools: Read, Write, Glob, Grep, WebFetch, WebSearch, mcp__gemini-cli__ask-gemini, mcp__context7__get-library-docs, TodoWrite, Task
+tools: Read, Write, Glob, Grep, WebFetch, WebSearch, mcp__context7__get-library-docs, mcp__paper-search-mcp__*, mcp__wolframalpha__*, TodoWrite, Task
 model: opus
 color: green
 ---
@@ -24,7 +24,7 @@ Invoke this agent when:
 
 ```yaml
 1. Query Memory (if accessible):
-   - Read /media/sam/1TB/academic_research/memory.json
+   - Read /media/sam/1TB1/academic_research/memory.json
    - Search for strategy__ entities matching topic
    - Check for existing source__ papers
    - Track last research timestamp for differential
@@ -93,7 +93,7 @@ Link Existing Strategies:
 
 2. Determine Analysis Method:
    - Paper < 50 pages: Use Claude context (200K tokens)
-   - Paper > 50 pages: Use mcp__gemini-cli__ask-gemini (2M tokens)
+   - Paper > 50 pages: Split into sections and analyze incrementally
 
 3. Extract Trading Methodology:
    - Strategy type classification
@@ -102,6 +102,35 @@ Link Existing Strategies:
    - Position sizing method
    - Risk management rules
    - Indicator descriptions with parameters
+```
+
+### Phase 2.5: Formula Extraction & Validation
+
+```yaml
+1. Detect Mathematical Content:
+   - Scan for LaTeX patterns: $...$, \begin{equation}
+   - Look for trading formulas: Sharpe, Kelly, volatility
+   - Check for statistical models: regression, GARCH
+
+2. Extract Formulas:
+   - Use mcp__paper-search-mcp__read_arxiv_paper for full text
+   - Parse LaTeX equations from content
+   - Extract variable definitions from surrounding context
+
+3. Validate with WolframAlpha:
+   For each formula:
+   - mcp__wolframalpha__ask_llm: "Validate: {latex}"
+   - Check mathematical correctness
+   - Get simplified form if available
+   - Generate numerical example
+
+4. Create formula__ Entities:
+   - id: formula__{domain}_{name}_{year}
+   - latex: Raw LaTeX
+   - description: What it computes
+   - validation_status: valid|invalid|needs_review
+   - wolfram_verified: true|false
+   - source_paper: source__arxiv_{id}
 ```
 
 ### Phase 3: Methodology Extraction
@@ -221,7 +250,7 @@ Entity: strategy__{methodology}_{asset}_{year}
 ### With academic_research
 
 ```yaml
-Memory Path: /media/sam/1TB/academic_research/memory.json
+Memory Path: /media/sam/1TB1/academic_research/memory.json
 Entity Type: strategy__
 Relationship: based_on → source__ (paper entity)
 ```
@@ -308,7 +337,7 @@ Agent:
 
 ```yaml
 # Default paths
-academic_research_path: /media/sam/1TB/academic_research
+academic_research_path: /media/sam/1TB1/academic_research
 nautilus_dev_path: /media/sam/1TB/nautilus_dev
 memory_json: {academic_research_path}/memory.json
 specs_dir: {nautilus_dev_path}/specs

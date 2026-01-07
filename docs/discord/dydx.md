@@ -2,40 +2,7 @@
 
 **Period:** Last 90 days
 **Messages:** 24
-**Last updated:** 2025-12-22 18:02:04
-
----
-
-#### [2025-09-23 18:17:03] @saruman9490
-
-A race between what?
-
----
-
-#### [2025-09-23 18:59:44] @.davidblom
-
-Not sure. Maybe the message counter. But that results in a different error.
-
----
-
-#### [2025-10-02 04:03:09] @saruman9490
-
-Does anyone know how to use the subbacounts on dydx?
-
----
-
-#### [2025-10-08 03:09:16] @saruman9490
-
-Ok su apparently currently access to subaccounts is API-only, so if anyone needs help setting it up let me know.
-
----
-
-#### [2025-10-08 03:09:41] @saruman9490
-
-Meanwhile, I see these duplicate fills in the positions cache. They match in all except event_id. Any ideas?
-
-**Attachments:**
-- [image.png](https://cdn.discordapp.com/attachments/1277067872111300618/1425319211265167432/image.png?ex=694ab0b5&is=69495f35&hm=de9494412bb70b85076a7f13110177412c6861da7727e520005e79d6d3a77496&)
+**Last updated:** 2026-01-07 01:29:53
 
 ---
 
@@ -68,7 +35,7 @@ What do you guys think of dydx as an exchange
 Sorry wrong screenshot, indeed these ones come from different client orders, but the ones I have match in everything execpt event_ts. I wonder if this is a caching thing?
 
 **Attachments:**
-- [image.png](https://cdn.discordapp.com/attachments/1277067872111300618/1426045665515016253/image.png?ex=694ab245&is=694960c5&hm=eed03cae6534e506ed1b4ed6ab1984e35fb03e98f6114a036192571331072cfe&)
+- [image.png](https://cdn.discordapp.com/attachments/1277067872111300618/1426045665515016253/image.png?ex=695e78c5&is=695d2745&hm=1e2f26861a776a78e1870bca5cbdaa11490127ca0e7ad66a6186f49b2d796f7e&)
 
 ---
 
@@ -89,7 +56,7 @@ What I suspect happens is that since there is a single position on DYDX (ie. it 
 Ideas what's the proper way to fix this? I'm thinking of just having distinct position ids once they close
 
 **Attachments:**
-- [message.txt](https://cdn.discordapp.com/attachments/1277067872111300618/1426054314882760794/message.txt?ex=694aba53&is=694968d3&hm=85a69f2a26ebc3814964851c61829a3ecdf907b0a55388cbfcbb7c61c04c3cff&)
+- [message.txt](https://cdn.discordapp.com/attachments/1277067872111300618/1426054314882760794/message.txt?ex=695e80d3&is=695d2f53&hm=8b40ad038e914ef3788303f9814ff05a6fdcf2dcb7f56bdd6a6a352e6f9a8d14&)
 
 ---
 
@@ -122,7 +89,7 @@ Not sure. Do you have an exception trace when the KeyErr is thrown?
 
 
 **Attachments:**
-- [image.png](https://cdn.discordapp.com/attachments/1277067872111300618/1426185331228545166/image.png?ex=694a8b98&is=69493a18&hm=d7e20433259df4c07e2f925c5265447c34a2022ae98a8b103ebd2f5bd2a5c710&)
+- [image.png](https://cdn.discordapp.com/attachments/1277067872111300618/1426185331228545166/image.png?ex=695efad8&is=695da958&hm=fef60a555fabf37a1df3b5aa0f954be127a9b2cbee78d0e626ea81c71aecd954&)
 
 ---
 
@@ -131,7 +98,7 @@ Not sure. Do you have an exception trace when the KeyErr is thrown?
 
 
 **Attachments:**
-- [image.png](https://cdn.discordapp.com/attachments/1277067872111300618/1426185382931730536/image.png?ex=694a8ba4&is=69493a24&hm=af9004a6572d0043074f534d3dd12c4cf707e6440fcaa4c100e06e5c8675b792&)
+- [image.png](https://cdn.discordapp.com/attachments/1277067872111300618/1426185382931730536/image.png?ex=695efae4&is=695da964&hm=256a82b9b38154d9848bc004940632a09d9fd6f54a88c8a5b7383d479d958f10&)
 
 ---
 
@@ -177,5 +144,44 @@ Sorry still need to test, got myself into some major refactoring now unfortunate
 #### [2025-10-19 16:20:02] @saruman9490
 
 I'll keep you posted
+
+---
+
+#### [2026-01-03 20:57:00] @donaldcuckman
+
+Timeline for v4 being workable?
+
+---
+
+#### [2026-01-03 20:58:54] @donaldcuckman
+
+```[ERROR] DYDX-V4-MM-001.DataEngine: Unexpected exception in DataResponse queue processing: TypeError('Cannot convert nautilus_trader.core.nautilus_pyo3.model.Bar to nautilus_trader.core.data.Data')
+TypeError(Cannot convert nautilus_trader.core.nautilus_pyo3.model.Bar to nautilus_trader.core.data.Data)
+Traceback (most recent call last):
+  File "E:\Sync\kalLIQ\.venv\Lib\site-packages\nautilus_trader\live\data_engine.py", line 460, in _run_res_queue
+    self._handle_response(response)
+  File "nautilus_trader/data/engine.pyx", line 2241, in nautilus_trader.data.engine.DataEngine._handle_response
+  File "nautilus_trader/data/engine.pyx", line 2275, in nautilus_trader.data.engine.DataEngine._handle_response```
+
+this is from running the example in github
+
+---
+
+#### [2026-01-04 13:24:46] @dxwil
+
+Hey, currently the v4 adapter does not support funding rate updates. Is this feature planned or what's the status on it?
+
+---
+
+#### [2026-01-05 03:59:08] @cjdsellers
+
+Hey <@177932166859063296> 
+The dYdX v4 adapter is still in `building`status (so not considered usable yet). It will receive some attention over the next couple of weeks though and is getting closer
+
+---
+
+#### [2026-01-05 04:00:06] @cjdsellers
+
+Hi <@574471770720043010> yes, since Nautilus supports funding rates and they are available from dYdX then eventually they will be implemented
 
 ---

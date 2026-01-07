@@ -199,14 +199,14 @@ def export_to_parquet():
     """Export DuckDB tables to Parquet files."""
     PARQUET_DIR.mkdir(parents=True, exist_ok=True)
     db = duckdb.connect(str(DUCKDB_PATH))
-
-    tables = ["papers", "formulas", "strategies", "code_entities"]
-    for table in tables:
-        path = PARQUET_DIR / f"{table}.parquet"
-        db.execute(f"COPY {table} TO '{path}' (FORMAT PARQUET)")
-        print(f"  Exported {table} to {path}")
-
-    db.close()
+    try:
+        tables = ["papers", "formulas", "strategies", "code_entities"]
+        for table in tables:
+            path = PARQUET_DIR / f"{table}.parquet"
+            db.execute(f"COPY {table} TO '{path}' (FORMAT PARQUET)")
+            print(f"  Exported {table} to {path}")
+    finally:
+        db.close()
 
 
 def main():
@@ -239,11 +239,13 @@ def main():
 
     # Show DuckDB stats
     db = duckdb.connect(str(DUCKDB_PATH))
-    print("\nDuckDB table counts:")
-    for table in ["papers", "formulas", "strategies"]:
-        count = db.execute(f"SELECT COUNT(*) FROM {table}").fetchone()[0]
-        print(f"  {table}: {count}")
-    db.close()
+    try:
+        print("\nDuckDB table counts:")
+        for table in ["papers", "formulas", "strategies"]:
+            count = db.execute(f"SELECT COUNT(*) FROM {table}").fetchone()[0]
+            print(f"  {table}: {count}")
+    finally:
+        db.close()
 
     print("\nSync complete!")
 

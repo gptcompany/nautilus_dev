@@ -411,7 +411,7 @@ Bridge between academic research knowledge graph and NautilusTrader strategy dev
 ├─────────────────────────────────────────────────────────────────────────────┤
 │                                                                              │
 │  ┌────────────────────────────────────────────────────────────────────────┐ │
-│  │ ACADEMIC RESEARCH REPO (/media/sam/1TB/academic_research)             │ │
+│  │ ACADEMIC RESEARCH REPO (/media/sam/1TB1/academic_research)             │ │
 │  │                                                                        │ │
 │  │  ┌─────────────────┐    ┌───────────────────┐    ┌─────────────────┐  │ │
 │  │  │ Semantic Router │───▶│ Query Classifier  │───▶│ Paper Search    │  │ │
@@ -595,7 +595,7 @@ Relationships:
 # Syncs strategy__ entities from academic_research → nautilus_dev
 
 CONFIG = {
-    "source": Path("/media/sam/1TB/academic_research/memory.json"),
+    "source": Path("/media/sam/1TB1/academic_research/memory.json"),
     "target": Path("/media/sam/1TB/nautilus_dev/docs/research/strategies.json"),
     "entity_prefix": "strategy__",
     "stale_threshold_hours": 24,
