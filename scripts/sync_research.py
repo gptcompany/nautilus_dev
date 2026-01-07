@@ -63,7 +63,8 @@ def load_memory(path: Path) -> dict[str, Any]:
 
     try:
         with open(path) as f:
-            return json.load(f)
+            data = json.load(f)
+            return cast(dict[str, Any], data)
     except json.JSONDecodeError as e:
         print(f"ERROR: Invalid JSON in {path}: {e}")
         sys.exit(1)
@@ -104,7 +105,8 @@ def load_existing_sync(path: Path) -> dict[str, Any] | None:
 
     try:
         with open(path) as f:
-            return json.load(f)
+            data = json.load(f)
+            return cast(dict[str, Any], data)
     except (json.JSONDecodeError, PermissionError, OSError):
         return None
 
@@ -191,7 +193,8 @@ def sync_entity_type(
     existing = load_existing_sync(target_file)
 
     # Check staleness
-    stale = is_stale(existing, CONFIG["stale_threshold_hours"])
+    threshold_hours = cast(int, CONFIG["stale_threshold_hours"])
+    stale = is_stale(existing, threshold_hours)
 
     if existing:
         synced_at = existing.get("synced_at", "unknown")
@@ -207,7 +210,8 @@ def sync_entity_type(
     print_entity_summary(entities, entity_type)
 
     # Create output
-    output = create_sync_output(entities, CONFIG["source"])
+    source_path = cast(Path, CONFIG["source"])
+    output = create_sync_output(entities, source_path)
 
     if dry_run:
         print(f"[DRY RUN] Would write {len(entities)} to {target_file}")
@@ -262,11 +266,12 @@ def main() -> None:
 
     # Sync each entity type
     success = True
+    target_dir = cast(Path, CONFIG["target_dir"])
     for entity_type in types_to_sync:
         if not sync_entity_type(
             entity_type=entity_type,
             memory=memory,
-            target_dir=CONFIG["target_dir"],
+            target_dir=target_dir,
             force=args.force,
             dry_run=args.dry_run,
         ):

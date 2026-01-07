@@ -7,6 +7,7 @@ import logging
 import socket
 from collections.abc import Callable
 from datetime import UTC, datetime
+from typing import cast
 
 from monitoring.collectors import BaseCollector
 from monitoring.config import MonitoringConfig

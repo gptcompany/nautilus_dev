@@ -56,7 +56,7 @@ def register_custom_charts() -> None:
         _logger.error(f"Failed to register custom charts: {e}")
 
 
-def _register_chart(name: str, chart_func: callable) -> None:
+def _register_chart(name: str, chart_func: Callable[..., Any]) -> None:
     """
     Register a custom chart with NautilusTrader.
 

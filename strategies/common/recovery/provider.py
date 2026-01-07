@@ -594,7 +594,7 @@ class PositionRecoveryProvider:
             return True
 
         # Check if percent change exceeds threshold
-        return abs(delta.get("percent_change", 0.0)) >= threshold_percent
+        return bool(abs(delta.get("percent_change", 0.0)) >= threshold_percent)
 
     def log_balance_changes(
         self,

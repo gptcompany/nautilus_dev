@@ -186,12 +186,12 @@ class MultiDimensionalRegimeDetector:
         # 2. Flow Dimension (if order book data available)
         if all(v is not None for v in [bid, ask, bid_size, ask_size, volume]):
             flow_state = self._flow.update(
-                bid=bid,
-                ask=ask,
-                bid_size=bid_size,
-                ask_size=ask_size,
+                bid=float(bid) if bid is not None else 0.0,
+                ask=float(ask) if ask is not None else 0.0,
+                bid_size=float(bid_size) if bid_size is not None else 0.0,
+                ask_size=float(ask_size) if ask_size is not None else 0.0,
                 last_price=price,
-                volume=volume,
+                volume=float(volume) if volume is not None else 0.0,
             )
             flow_regime = self._flow.get_flow_regime()
 

@@ -190,7 +190,7 @@ class ParquetConverter:
         except ImportError:
             return {"error": "pyarrow not installed"}
 
-        stats = {
+        stats: dict = {
             "total_files": 0,
             "total_rows": 0,
             "total_bytes": 0,
@@ -200,24 +200,26 @@ class ParquetConverter:
         }
 
         for parquet_file in self.cold_path.rglob("*.parquet"):
-            stats["total_files"] += 1
-            stats["total_bytes"] += parquet_file.stat().st_size
+            stats["total_files"] = int(stats["total_files"]) + 1
+            stats["total_bytes"] = int(stats["total_bytes"]) + parquet_file.stat().st_size
 
             # Get row count from metadata
             metadata = pq.read_metadata(parquet_file)
-            stats["total_rows"] += metadata.num_rows
+            stats["total_rows"] = int(stats["total_rows"]) + metadata.num_rows
 
             # Extract date from path
             parts = parquet_file.relative_to(self.cold_path).parts
             if len(parts) >= 3:
                 date_str = "/".join(parts[:3])
-                if date_str not in stats["partitions"]:
-                    stats["partitions"].append(date_str)
+                partitions = stats["partitions"]
+                if isinstance(partitions, list) and date_str not in partitions:
+                    partitions.append(date_str)
 
-        if stats["partitions"]:
-            stats["partitions"].sort()
-            stats["oldest_date"] = stats["partitions"][0]
-            stats["newest_date"] = stats["partitions"][-1]
+        partitions = stats["partitions"]
+        if isinstance(partitions, list) and partitions:
+            partitions.sort()
+            stats["oldest_date"] = partitions[0]
+            stats["newest_date"] = partitions[-1]
 
         return stats
 

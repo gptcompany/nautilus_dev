@@ -406,12 +406,16 @@ def compare_all_contenders(
     # Calculate individual metrics
     contender_metrics = {}
     for name, results in contender_results.items():
+        # Ensure trade_counts is a list of ints
+        trade_counts_raw = results.get("trade_counts", [])
+        trade_counts: list[int] = [int(x) for x in trade_counts_raw] if trade_counts_raw else []
+
         metrics = calculate_contender_metrics(
             name=name,
             sharpe_ratios=results.get("sharpes", []),
             returns=results.get("returns", []),
             drawdowns=results.get("drawdowns", []),
-            trade_counts=results.get("trade_counts", []),
+            trade_counts=trade_counts,
         )
         contender_metrics[name] = metrics
 

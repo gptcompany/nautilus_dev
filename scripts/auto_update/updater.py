@@ -149,7 +149,7 @@ def auto_update(
     Returns:
         Dict with combined results
     """
-    results = {
+    results: dict[str, Any] = {
         "version": version,
         "dry_run": dry_run,
         "steps": [],
