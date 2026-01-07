@@ -65,9 +65,10 @@ jobs:
         uses: astral-sh/setup-uv@v4
         with:
           enable-cache: true
+          cache-dependency-glob: "**/pyproject.toml"
 
       - name: Install dependencies
-        run: uv sync --frozen
+        run: uv sync
 
       - name: Run ruff check
         id: lint
@@ -154,9 +155,10 @@ jobs:
         uses: astral-sh/setup-uv@v4
         with:
           enable-cache: true
+          cache-dependency-glob: "**/pyproject.toml"
 
       - name: Install dependencies
-        run: uv sync --frozen
+        run: uv sync
 
       - name: Run unit tests with coverage
         id: tests
@@ -238,9 +240,10 @@ jobs:
         uses: astral-sh/setup-uv@v4
         with:
           enable-cache: true
+          cache-dependency-glob: "**/pyproject.toml"
 
       - name: Install dependencies
-        run: uv sync --frozen
+        run: uv sync
 
       - name: Verify service connectivity
         run: |
@@ -309,9 +312,10 @@ jobs:
         uses: astral-sh/setup-uv@v4
         with:
           enable-cache: true
+          cache-dependency-glob: "**/pyproject.toml"
 
       - name: Install dependencies
-        run: uv sync --frozen
+        run: uv sync
 
       - name: Run sample strategy backtests
         id: backtest
@@ -396,9 +400,10 @@ jobs:
         uses: astral-sh/setup-uv@v4
         with:
           enable-cache: true
+          cache-dependency-glob: "**/pyproject.toml"
 
       - name: Install dependencies
-        run: uv sync --frozen
+        run: uv sync
 
       - name: Check alpha-debug cooldown
         id: cooldown
