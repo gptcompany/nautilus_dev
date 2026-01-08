@@ -1,0 +1,266 @@
+{
+  "timestamp": "2026-01-08T00:00:29.030Z",
+  "stable_version": "v1.222.0",
+  "nightly_commits": 50,
+  "breaking_changes": [
+    {
+      "title": "Refactor TearsheetConfig.charts to chart objects (drop chart_args) (#3398)",
+      "message": "Refactor TearsheetConfig.charts to chart objects (drop chart_args) (#3398)\n\nBREAKING: `TearsheetConfig.charts` now takes chart objects instead of strings; `chart_args` removed.",
+      "sha": "66a77d3",
+      "date": "2026-01-07T22:12:09Z",
+      "url": "https://github.com/nautechsystems/nautilus_trader/commit/66a77d3db30aa1730642cb48ee2d27ee7e7accf6"
+    },
+    {
+      "title": "Align Rust data commands with Python and fix book flow",
+      "message": "Align Rust data commands with Python and fix book flow\n\n- Add correlation_id field to all Subscribe/Unsubscribe command structs\n- Fix BookUpdater to handle direct OrderBookDeltas/Depth10 from msgbus\n- Forward BookSnapshots subscriptions to client as BookDeltas with link\n- Track direct deltas subscriptions separately from snapshot-forwarded\n- Properly unsubscribe deltas when all snapshot intervals are removed",
+      "sha": "314ef30",
+      "date": "2026-01-04T07:25:14Z",
+      "url": "https://github.com/nautechsystems/nautilus_trader/commit/314ef3021c24d62dbd9e6403af011e30061b023b"
+    }
+  ],
+  "open_issues": {
+    "total": 64,
+    "bugs": 2,
+    "features": 62,
+    "issues_list": [
+      {
+        "number": 3374,
+        "title": "RFC: Alpaca Markets Integration",
+        "state": "open",
+        "labels": [
+          "RFC"
+        ],
+        "created_at": "2026-01-01T15:40:49Z",
+        "updated_at": "2026-01-06T04:53:31Z",
+        "author": "agcrum",
+        "url": "https://github.com/nautechsystems/nautilus_trader/issues/3374",
+        "comments": 2
+      },
+      {
+        "number": 3359,
+        "title": "Allow the instrument universe to be updated dynamically during backtesting",
+        "state": "open",
+        "labels": [
+          "enhancement"
+        ],
+        "created_at": "2025-12-30T07:17:59Z",
+        "updated_at": "2025-12-30T07:18:27Z",
+        "author": "Tverous",
+        "url": "https://github.com/nautechsystems/nautilus_trader/issues/3359",
+        "comments": 0
+      },
+      {
+        "number": 3307,
+        "title": "Add support for ticker name changes, stock splits, and corporate actions in general",
+        "state": "open",
+        "labels": [
+          "enhancement"
+        ],
+        "created_at": "2025-12-16T18:56:20Z",
+        "updated_at": "2025-12-30T22:02:08Z",
+        "author": "dodofarm",
+        "url": "https://github.com/nautechsystems/nautilus_trader/issues/3307",
+        "comments": 1
+      },
+      {
+        "number": 3269,
+        "title": "[Deribit] Initial integration",
+        "state": "open",
+        "labels": [
+          "enhancement",
+          "rust"
+        ],
+        "created_at": "2025-12-04T12:08:25Z",
+        "updated_at": "2025-12-04T12:09:32Z",
+        "author": "cjdsellers",
+        "url": "https://github.com/nautechsystems/nautilus_trader/issues/3269",
+        "comments": 0
+      },
+      {
+        "number": 3180,
+        "title": "RFC: Comparison of Bybit Python vs Rust adapter performance",
+        "state": "open",
+        "labels": [
+          "enhancement",
+          "RFC",
+          "rust",
+          "python",
+          "adapter"
+        ],
+        "created_at": "2025-11-14T08:23:52Z",
+        "updated_at": "2025-11-14T08:25:52Z",
+        "author": "sunlei",
+        "url": "https://github.com/nautechsystems/nautilus_trader/issues/3180",
+        "comments": 0
+      },
+      {
+        "number": 3177,
+        "title": "Support for generating time-indexed (daily/per bar) backtest reports",
+        "state": "open",
+        "labels": [
+          "enhancement"
+        ],
+        "created_at": "2025-11-12T09:24:17Z",
+        "updated_at": "2025-12-28T07:14:32Z",
+        "author": "daydayup789",
+        "url": "https://github.com/nautechsystems/nautilus_trader/issues/3177",
+        "comments": 0
+      },
+      {
+        "number": 3152,
+        "title": "[Hyperliquid] Execution and reconciliation testing",
+        "state": "open",
+        "labels": [
+          "enhancement",
+          "rust"
+        ],
+        "created_at": "2025-11-04T07:23:22Z",
+        "updated_at": "2025-12-30T16:33:56Z",
+        "author": "cjdsellers",
+        "url": "https://github.com/nautechsystems/nautilus_trader/issues/3152",
+        "comments": 1
+      },
+      {
+        "number": 3151,
+        "title": "[dYdX] v4 upgrade and Rust port",
+        "state": "open",
+        "labels": [
+          "enhancement",
+          "rust"
+        ],
+        "created_at": "2025-11-04T07:19:06Z",
+        "updated_at": "2025-12-14T22:54:47Z",
+        "author": "cjdsellers",
+        "url": "https://github.com/nautechsystems/nautilus_trader/issues/3151",
+        "comments": 0
+      },
+      {
+        "number": 3150,
+        "title": "[BitMEX] Trailing stop orders",
+        "state": "open",
+        "labels": [
+          "enhancement"
+        ],
+        "created_at": "2025-11-04T04:47:47Z",
+        "updated_at": "2025-11-04T04:47:47Z",
+        "author": "cjdsellers",
+        "url": "https://github.com/nautechsystems/nautilus_trader/issues/3150",
+        "comments": 0
+      },
+      {
+        "number": 3149,
+        "title": "[BitMEX] Pegged orders (BBO) and advanced execution instructions",
+        "state": "open",
+        "labels": [
+          "enhancement"
+        ],
+        "created_at": "2025-11-04T04:45:40Z",
+        "updated_at": "2025-11-04T04:46:01Z",
+        "author": "cjdsellers",
+        "url": "https://github.com/nautechsystems/nautilus_trader/issues/3149",
+        "comments": 0
+      }
+    ],
+    "bug_list": [
+      {
+        "number": 3104,
+        "title": "[Reconciliation] LiveExecEngine fails to reconcile long-lived Binance Futures positions for HEDGING",
+        "state": "open",
+        "labels": [
+          "bug"
+        ],
+        "created_at": "2025-10-21T09:12:48Z",
+        "updated_at": "2025-10-24T02:31:26Z",
+        "author": "willjay97",
+        "url": "https://github.com/nautechsystems/nautilus_trader/issues/3104",
+        "comments": 2
+      },
+      {
+        "number": 3042,
+        "title": "[Reconciliation] Fails for routing clients when instrument venue differs from client venue",
+        "state": "open",
+        "labels": [
+          "bug",
+          "enhancement"
+        ],
+        "created_at": "2025-10-07T03:10:04Z",
+        "updated_at": "2025-10-14T07:42:30Z",
+        "author": "cjdsellers",
+        "url": "https://github.com/nautechsystems/nautilus_trader/issues/3042",
+        "comments": 1
+      }
+    ],
+    "feature_list": [
+      {
+        "number": 3359,
+        "title": "Allow the instrument universe to be updated dynamically during backtesting",
+        "state": "open",
+        "labels": [
+          "enhancement"
+        ],
+        "created_at": "2025-12-30T07:17:59Z",
+        "updated_at": "2025-12-30T07:18:27Z",
+        "author": "Tverous",
+        "url": "https://github.com/nautechsystems/nautilus_trader/issues/3359",
+        "comments": 0
+      },
+      {
+        "number": 3307,
+        "title": "Add support for ticker name changes, stock splits, and corporate actions in general",
+        "state": "open",
+        "labels": [
+          "enhancement"
+        ],
+        "created_at": "2025-12-16T18:56:20Z",
+        "updated_at": "2025-12-30T22:02:08Z",
+        "author": "dodofarm",
+        "url": "https://github.com/nautechsystems/nautilus_trader/issues/3307",
+        "comments": 1
+      },
+      {
+        "number": 3269,
+        "title": "[Deribit] Initial integration",
+        "state": "open",
+        "labels": [
+          "enhancement",
+          "rust"
+        ],
+        "created_at": "2025-12-04T12:08:25Z",
+        "updated_at": "2025-12-04T12:09:32Z",
+        "author": "cjdsellers",
+        "url": "https://github.com/nautechsystems/nautilus_trader/issues/3269",
+        "comments": 0
+      },
+      {
+        "number": 3180,
+        "title": "RFC: Comparison of Bybit Python vs Rust adapter performance",
+        "state": "open",
+        "labels": [
+          "enhancement",
+          "RFC",
+          "rust",
+          "python",
+          "adapter"
+        ],
+        "created_at": "2025-11-14T08:23:52Z",
+        "updated_at": "2025-11-14T08:25:52Z",
+        "author": "sunlei",
+        "url": "https://github.com/nautechsystems/nautilus_trader/issues/3180",
+        "comments": 0
+      },
+      {
+        "number": 3177,
+        "title": "Support for generating time-indexed (daily/per bar) backtest reports",
+        "state": "open",
+        "labels": [
+          "enhancement"
+        ],
+        "created_at": "2025-11-12T09:24:17Z",
+        "updated_at": "2025-12-28T07:14:32Z",
+        "author": "daydayup789",
+        "url": "https://github.com/nautechsystems/nautilus_trader/issues/3177",
+        "comments": 0
+      }
+    ]
+  }
+}

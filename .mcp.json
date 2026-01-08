@@ -27,6 +27,15 @@
       "description": "Mathematical computation, formula validation, symbolic math (WolframAlpha LLM API)",
       "enabled": true,
       "autoApprove": ["ask_llm", "get_simple_answer", "validate_key"]
+    },
+    "matlab-server": {
+      "command": "node",
+      "args": ["/media/sam/1TB1/mcpservers/matlab-mcp-server/build/index.js"],
+      "env": {
+        "MATLAB_PATH": "/media/sam/3TB-WDC/MATLAB2025/bin/matlab"
+      },
+      "description": "MATLAB execution for matrix operations, signal processing, optimization, and simulations",
+      "enabled": true
     }
   }
 }
