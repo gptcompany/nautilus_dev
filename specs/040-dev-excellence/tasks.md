@@ -214,7 +214,7 @@
 ### 8.3 Progress Persistence
 - [x] Create `.ralph/progress.md` format
 - [x] Auto-update on each iteration
-- [ ] Git commit progress after each loop
+- [x] Git commit progress after each loop
 - [ ] Resume from last progress on restart
 
 ### 8.4 Task Classifier
@@ -231,7 +231,8 @@
 
 ### 8.5 Monitoring Dashboard
 - [ ] Ralph iteration count in Grafana
-- [ ] Token usage tracking
+- [x] Agent spawn tracking (PreToolUse hook → agent_spawns.jsonl)
+- [ ] Token usage per agent (blocked: Issue #10388)
 - [ ] Circuit breaker triggers
 - [ ] Success/failure rates
 
