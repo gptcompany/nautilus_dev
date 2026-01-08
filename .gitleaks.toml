@@ -1,0 +1,62 @@
+# Gitleaks Configuration
+# Detects secrets and credentials in git history
+
+title = "NautilusDev Gitleaks Config"
+
+[extend]
+# Use default rules as base
+useDefault = true
+
+# Custom rules for trading-specific secrets
+[[rules]]
+id = "binance-api-key"
+description = "Binance API Key"
+regex = '''(?i)binance[_-]?api[_-]?key\s*[=:]\s*['"]?([a-zA-Z0-9]{64})['"]?'''
+tags = ["api", "binance", "trading"]
+keywords = ["binance"]
+
+[[rules]]
+id = "binance-secret"
+description = "Binance API Secret"
+regex = '''(?i)binance[_-]?(?:api[_-]?)?secret\s*[=:]\s*['"]?([a-zA-Z0-9]{64})['"]?'''
+tags = ["api", "binance", "trading"]
+keywords = ["binance", "secret"]
+
+[[rules]]
+id = "bybit-api-key"
+description = "Bybit API Key"
+regex = '''(?i)bybit[_-]?api[_-]?key\s*[=:]\s*['"]?([a-zA-Z0-9]{18,})['"]?'''
+tags = ["api", "bybit", "trading"]
+keywords = ["bybit"]
+
+[[rules]]
+id = "telegram-bot-token"
+description = "Telegram Bot Token"
+regex = '''(?i)telegram[_-]?(?:bot[_-]?)?token\s*[=:]\s*['"]?([0-9]{8,10}:[a-zA-Z0-9_-]{35})['"]?'''
+tags = ["telegram", "bot"]
+keywords = ["telegram", "bot"]
+
+[[rules]]
+id = "sentry-dsn"
+description = "Sentry DSN"
+regex = '''https://[a-f0-9]{32}@[a-z0-9]+\.ingest\.sentry\.io/[0-9]+'''
+tags = ["sentry", "monitoring"]
+keywords = ["sentry", "dsn"]
+
+# Allowlist - files that are OK to have "secrets" (test fixtures, examples)
+[allowlist]
+description = "Allowlisted files and patterns"
+paths = [
+    '''\.github/workflows/.*\.yml''',  # Workflow files use ${{ secrets.* }}
+    '''tests/fixtures/.*''',
+    '''docs/examples/.*''',
+    '''.*\.example''',
+    '''.*\.sample''',
+    '''.*\.template''',
+]
+regexes = [
+    '''EXAMPLE_.*''',
+    '''YOUR_.*_HERE''',
+    '''<.*>''',
+    '''\$\{\{.*\}\}''',  # GitHub Actions secrets syntax
+]

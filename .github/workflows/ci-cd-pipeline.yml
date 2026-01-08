@@ -1,14 +1,15 @@
-# NautilusTrader CI/CD Pipeline
-# 5-Stage pre-merge validation with self-hosted runner
+# NautilusTrader CI/CD Pipeline - Rolls Royce Edition
+# 6-Stage pre-merge validation with self-hosted runner
 #
 # Stages:
+#   0. Security Scan (bandit, gitleaks) ..... ~1 min
 #   1. Lint + Types (ruff, mypy) ............ ~2 min
-#   2. Unit Tests + Coverage (80%) .......... ~3 min
+#   2. Unit Tests + Coverage (90%) .......... ~3 min
 #   3. Integration Tests .................... ~5 min
 #   4. Backtest Validation .................. ~5 min
 #   5. Alpha-Debug (if strategy changed) .... ~5 min
 #
-# Total: ~15-20 minutes
+# Total: ~16-21 minutes
 
 name: CI/CD Pipeline
 
@@ -49,11 +50,101 @@ env:
 
 jobs:
   # ===========================================================================
+  # Stage 0: Security Scan (~1 min)
+  # ===========================================================================
+  security-scan:
+    name: "Stage 0: Security"
+    runs-on: [self-hosted, nautilus]
+    timeout-minutes: 10
+
+    outputs:
+      vulnerabilities: ${{ steps.bandit.outputs.vulnerabilities }}
+      secrets_found: ${{ steps.gitleaks.outputs.secrets_found }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full history for gitleaks
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install security tools
+        run: |
+          pip install bandit
+          # Install gitleaks
+          if ! command -v gitleaks &> /dev/null; then
+            curl -sSfL https://github.com/gitleaks/gitleaks/releases/download/v8.18.4/gitleaks_8.18.4_linux_x64.tar.gz | tar xz -C /tmp
+            sudo mv /tmp/gitleaks /usr/local/bin/
+          fi
+
+      - name: Run Bandit SAST
+        id: bandit
+        run: |
+          set +e
+          bandit -r strategies/ scripts/ -ll -ii -f json -o bandit_results.json 2>/dev/null
+          EXIT_CODE=$?
+          set -e
+
+          if [ -f bandit_results.json ]; then
+            VULNS=$(jq '.results | length' bandit_results.json)
+            HIGH_SEVERITY=$(jq '[.results[] | select(.issue_severity == "HIGH")] | length' bandit_results.json)
+
+            echo "vulnerabilities=$VULNS" >> $GITHUB_OUTPUT
+
+            if [ "$HIGH_SEVERITY" -gt 0 ]; then
+              echo "::error::Found $HIGH_SEVERITY HIGH severity security issues"
+              jq '.results[] | select(.issue_severity == "HIGH") | "\(.filename):\(.line_number) - \(.issue_text)"' bandit_results.json
+              exit 1
+            elif [ "$VULNS" -gt 0 ]; then
+              echo "::warning::Found $VULNS low/medium security issues"
+            else
+              echo "Bandit: No security issues found"
+            fi
+          else
+            echo "vulnerabilities=0" >> $GITHUB_OUTPUT
+            echo "Bandit: No issues found"
+          fi
+
+      - name: Run Gitleaks secrets scan
+        id: gitleaks
+        run: |
+          set +e
+          gitleaks detect --source . --config .gitleaks.toml --report-format json --report-path gitleaks_results.json 2>/dev/null
+          EXIT_CODE=$?
+          set -e
+
+          if [ "$EXIT_CODE" -eq 1 ]; then
+            SECRETS=$(jq 'length' gitleaks_results.json 2>/dev/null || echo 0)
+            echo "secrets_found=$SECRETS" >> $GITHUB_OUTPUT
+            echo "::error::Found $SECRETS potential secrets in repository"
+            jq '.[] | "\(.File):\(.StartLine) - \(.Description)"' gitleaks_results.json | head -10
+            exit 1
+          else
+            echo "secrets_found=0" >> $GITHUB_OUTPUT
+            echo "Gitleaks: No secrets found"
+          fi
+
+      - name: Upload security artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-results
+          path: |
+            bandit_results.json
+            gitleaks_results.json
+          retention-days: 30
+
+  # ===========================================================================
   # Stage 1: Lint + Type Check (~2 min)
   # ===========================================================================
   lint-and-types:
     name: "Stage 1: Lint & Types"
     runs-on: [self-hosted, nautilus]
+    needs: security-scan
     timeout-minutes: 10
 
     outputs:
@@ -558,16 +649,24 @@ jobs:
   merge-gate:
     name: "Merge Gate"
     runs-on: [self-hosted, nautilus]
-    needs: [lint-and-types, unit-tests, integration-tests, backtest-validation, alpha-debug]
+    needs: [security-scan, lint-and-types, unit-tests, integration-tests, backtest-validation, alpha-debug]
     if: always()
 
     steps:
       - name: Check all stages passed
         run: |
-          echo "=== CI/CD Pipeline Summary ==="
+          echo "=== CI/CD Pipeline Summary (Rolls Royce Edition) ==="
           echo ""
 
           FAILED=0
+
+          # Stage 0: Security
+          if [ "${{ needs.security-scan.result }}" != "success" ]; then
+            echo "Stage 0 (Security): FAILED"
+            FAILED=$((FAILED + 1))
+          else
+            echo "Stage 0 (Security): PASSED (vulns: ${{ needs.security-scan.outputs.vulnerabilities }}, secrets: ${{ needs.security-scan.outputs.secrets_found }})"
+          fi
 
           # Stage 1: Lint & Types
           if [ "${{ needs.lint-and-types.result }}" != "success" ]; then
