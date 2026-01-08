@@ -80,6 +80,12 @@ jobs:
             curl -sSfL https://github.com/gitleaks/gitleaks/releases/download/v8.18.4/gitleaks_8.18.4_linux_x64.tar.gz | tar xz -C /tmp
             sudo mv /tmp/gitleaks /usr/local/bin/
           fi
+          # Install osv-scanner (Google Open Source Vulnerability scanner)
+          if ! command -v osv-scanner &> /dev/null; then
+            curl -sSfL https://github.com/google/osv-scanner/releases/download/v1.8.5/osv-scanner_linux_amd64 -o /tmp/osv-scanner
+            chmod +x /tmp/osv-scanner
+            sudo mv /tmp/osv-scanner /usr/local/bin/
+          fi
 
       - name: Run Bandit SAST
         id: bandit
@@ -128,6 +134,32 @@ jobs:
             echo "Gitleaks: No secrets found"
           fi
 
+      - name: Run osv-scanner (advisory only)
+        id: osv
+        run: |
+          set +e
+          # Scan lockfiles for known vulnerabilities (non-blocking)
+          osv-scanner --lockfile=uv.lock --format=json > osv_results.json 2>/dev/null
+          EXIT_CODE=$?
+          set -e
+
+          if [ -f osv_results.json ] && [ -s osv_results.json ]; then
+            VULNS=$(jq '.results[].packages | length // 0' osv_results.json 2>/dev/null | awk '{s+=$1} END {print s+0}')
+            echo "osv_vulns=$VULNS" >> $GITHUB_OUTPUT
+
+            if [ "$VULNS" -gt 0 ]; then
+              echo "::warning::osv-scanner found $VULNS vulnerable dependencies (advisory)"
+              jq -r '.results[].packages[]? | "\(.package.name)@\(.package.version): \(.vulnerabilities[].id)"' osv_results.json 2>/dev/null | head -20
+            else
+              echo "osv-scanner: No known vulnerabilities"
+            fi
+          else
+            echo "osv_vulns=0" >> $GITHUB_OUTPUT
+            echo "osv-scanner: No lockfile or no vulnerabilities"
+          fi
+          # Non-blocking: osv findings are advisory only
+          exit 0
+
       - name: Upload security artifacts
         if: always()
         uses: actions/upload-artifact@v4
@@ -136,6 +168,7 @@ jobs:
           path: |
             bandit_results.json
             gitleaks_results.json
+            osv_results.json
           retention-days: 30
 
   # ===========================================================================

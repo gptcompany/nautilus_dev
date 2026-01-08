@@ -1,0 +1,114 @@
+{
+  "annotations": { "list": [] },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [],
+  "liveNow": true,
+  "panels": [
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 },
+      "id": 1,
+      "panels": [],
+      "title": "Latency Overview",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "questdb-questdb-datasource", "uid": "questdb" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 100 },
+              { "color": "red", "value": 500 }
+            ]
+          },
+          "unit": "ms"
+        }
+      },
+      "gridPos": { "h": 6, "w": 6, "x": 0, "y": 1 },
+      "id": 2,
+      "options": { "colorMode": "value", "graphMode": "area", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["mean"], "fields": "", "values": false }, "textMode": "auto" },
+      "targets": [{ "rawSql": "SELECT avg(total_latency_ms) FROM order_latency WHERE timestamp > now() - 1h AND env = 'prod'", "refId": "A" }],
+      "title": "Avg Latency (1h)",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "questdb-questdb-datasource", "uid": "questdb" },
+      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "mappings": [], "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 200 }, { "color": "red", "value": 1000 }] }, "unit": "ms" } },
+      "gridPos": { "h": 6, "w": 6, "x": 6, "y": 1 },
+      "id": 3,
+      "options": { "colorMode": "value", "graphMode": "area", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "auto" },
+      "targets": [{ "rawSql": "SELECT percentile_cont(0.95, total_latency_ms) as p95 FROM order_latency WHERE timestamp > now() - 1h AND env = 'prod'", "refId": "A" }],
+      "title": "P95 Latency",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "questdb-questdb-datasource", "uid": "questdb" },
+      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "mappings": [], "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 500 }, { "color": "red", "value": 2000 }] }, "unit": "ms" } },
+      "gridPos": { "h": 6, "w": 6, "x": 12, "y": 1 },
+      "id": 4,
+      "options": { "colorMode": "value", "graphMode": "area", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "auto" },
+      "targets": [{ "rawSql": "SELECT percentile_cont(0.99, total_latency_ms) as p99 FROM order_latency WHERE timestamp > now() - 1h AND env = 'prod'", "refId": "A" }],
+      "title": "P99 Latency",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "questdb-questdb-datasource", "uid": "questdb" },
+      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "mappings": [], "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "yellow", "value": -5 }, { "color": "green", "value": -1 }] }, "unit": "none" } },
+      "gridPos": { "h": 6, "w": 6, "x": 18, "y": 1 },
+      "id": 5,
+      "options": { "colorMode": "value", "graphMode": "area", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["mean"], "fields": "", "values": false }, "textMode": "auto" },
+      "targets": [{ "rawSql": "SELECT avg(slippage_bps) FROM order_latency WHERE timestamp > now() - 1h AND env = 'prod' AND fill_status = 'FILLED'", "refId": "A" }],
+      "title": "Avg Slippage (bps)",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "questdb-questdb-datasource", "uid": "questdb" },
+      "fieldConfig": { "defaults": { "color": { "mode": "palette-classic" }, "custom": { "axisBorderShow": false, "axisCenteredZero": false, "axisColorMode": "text", "axisLabel": "Latency (ms)", "axisPlacement": "auto", "barAlignment": 0, "drawStyle": "line", "fillOpacity": 10, "gradientMode": "none", "hideFrom": { "legend": false, "tooltip": false, "viz": false }, "lineInterpolation": "smooth", "lineWidth": 2, "pointSize": 5, "scaleDistribution": { "type": "linear" }, "showPoints": "never", "spanNulls": false, "stacking": { "group": "A", "mode": "none" }, "thresholdsStyle": { "mode": "line" } }, "mappings": [], "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "red", "value": 500 }] }, "unit": "ms" } },
+      "gridPos": { "h": 10, "w": 24, "x": 0, "y": 7 },
+      "id": 6,
+      "options": { "legend": { "calcs": ["mean", "max"], "displayMode": "table", "placement": "right", "showLegend": true }, "tooltip": { "mode": "multi", "sort": "desc" } },
+      "targets": [{ "rawSql": "SELECT timestamp, venue, avg(total_latency_ms) as latency FROM order_latency WHERE timestamp > $__timeFrom AND timestamp < $__timeTo AND env = 'prod' SAMPLE BY 1m", "refId": "A" }],
+      "title": "Latency by Venue",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "questdb-questdb-datasource", "uid": "questdb" },
+      "fieldConfig": { "defaults": { "color": { "mode": "palette-classic" }, "custom": { "axisBorderShow": false, "axisCenteredZero": false, "axisColorMode": "text", "axisLabel": "", "axisPlacement": "auto", "fillOpacity": 80, "gradientMode": "none", "hideFrom": { "legend": false, "tooltip": false, "viz": false }, "lineWidth": 1, "scaleDistribution": { "type": "linear" } }, "mappings": [], "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] }, "unit": "ms" } },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 17 },
+      "id": 7,
+      "options": { "bucketCount": 30, "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "single", "sort": "none" } },
+      "targets": [{ "rawSql": "SELECT total_latency_ms FROM order_latency WHERE timestamp > now() - 1h AND env = 'prod'", "refId": "A" }],
+      "title": "Latency Distribution (1h)",
+      "type": "histogram"
+    },
+    {
+      "datasource": { "type": "questdb-questdb-datasource", "uid": "questdb" },
+      "fieldConfig": { "defaults": { "color": { "mode": "continuous-GrYlRd" }, "custom": { "align": "auto", "cellOptions": { "type": "color-text" }, "inspect": false }, "mappings": [], "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "red", "value": 200 }] }, "unit": "ms" } },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 17 },
+      "id": 8,
+      "options": { "cellHeight": "sm", "footer": { "countRows": false, "enablePagination": false, "fields": "", "reducer": ["mean"], "show": true }, "showHeader": true },
+      "targets": [{ "rawSql": "SELECT venue, count() as orders, avg(total_latency_ms) as avg_ms, percentile_cont(0.95, total_latency_ms) as p95_ms, avg(slippage_bps) as slippage FROM order_latency WHERE timestamp > now() - 24h AND env = 'prod' GROUP BY venue", "refId": "A" }],
+      "title": "Latency by Venue (24h)",
+      "type": "table"
+    }
+  ],
+  "refresh": "10s",
+  "schemaVersion": 39,
+  "tags": ["trading", "latency", "performance"],
+  "templating": { "list": [] },
+  "time": { "from": "now-6h", "to": "now" },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Order Latency",
+  "uid": "trading-latency",
+  "version": 1,
+  "weekStart": ""
+}
