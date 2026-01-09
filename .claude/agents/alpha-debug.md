@@ -1,11 +1,11 @@
 ---
 name: alpha-debug
 description: "AlphaEvolve-style iterative bug hunter. Use PROACTIVELY after implementation phases, before commits, or when user requests N rounds of verification. Performs evolutionary debugging cycles: analyze -> hypothesize -> verify -> fix -> repeat. Finds bugs even when tests pass."
-tools: Read, Bash, Glob, Grep, Edit, TodoWrite
+tools: Read, Bash, Glob, Grep, Edit, TodoWrite, mcp__sentry__*
 model: opus
 color: purple
 permissionMode: default
-version: 1.5.0
+version: 1.6.0
 ---
 
 # Alpha Debug - Evolutionary Bug Hunter
@@ -102,6 +102,32 @@ Each round follows this pattern:
 - Event handler not registered
 - Message bus subscription issues
 - Clock/timer misconfiguration
+
+## Sentry Integration
+
+Before local analysis, **always query Sentry** for related errors:
+
+### Query Production Errors
+```
+mcp__sentry__search_errors - Search for errors in specific files
+mcp__sentry__get_issue - Get detailed issue information
+mcp__sentry__invoke_seer - AI-powered root cause analysis
+```
+
+### Debug Workflow with Sentry
+1. **Query Sentry first**: `search_errors` for the module being debugged
+2. **Correlate**: Match Sentry errors with local code changes
+3. **Root cause**: Use `invoke_seer` for complex/recurring issues
+4. **Verify fix**: After fix, monitor Sentry for regression
+
+### Example
+```
+[ANALYZE]
+1. Query Sentry: mcp__sentry__search_errors("metrics_collector.py")
+2. Found: 3 ConnectionRefused errors in last 24h
+3. Correlate with local code: socket connection in _connect()
+4. Root cause: Missing retry logic
+```
 
 ## Commands to Use
 

@@ -2,6 +2,23 @@
 
 > Implement the most concise solution that changes as little code as possible.
 
+## STARTUP CHECKS (MANDATORY - Every Session)
+
+**Before doing ANY work, verify:**
+
+```bash
+python scripts/architecture_drift_detector.py
+```
+
+If drift detected → FIX FIRST before proceeding.
+
+**SSOT**: `config/canonical.yaml` is the single source of truth for:
+- Ports (QuestDB, Grafana, Redis)
+- Versions (NT, Python, containers)
+- Paths (catalog, nightly env)
+
+**Never assume** - always verify from SSOT or installed packages.
+
 ## Agent Delegation (MANDATORY)
 
 | Task | Agent | Why |

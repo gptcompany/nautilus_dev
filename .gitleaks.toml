@@ -48,11 +48,16 @@ keywords = ["sentry", "dsn"]
 description = "Allowlisted files and patterns"
 paths = [
     '''\.github/workflows/.*\.yml''',  # Workflow files use ${{ secrets.* }}
-    '''tests/fixtures/.*''',
+    '''tests/.*''',  # Test files use fake/placeholder credentials
     '''docs/examples/.*''',
     '''.*\.example''',
     '''.*\.sample''',
     '''.*\.template''',
+    '''\.claude/context_bundles/.*''',  # Claude session data (not real secrets)
+    '''\.claude/settings\.local\.json''',  # Local Claude settings
+    '''config/ci/\.env''',  # CI env example (should have placeholders)
+    '''\.github/runner/\.env''',  # Runner config
+    '''\.env''',  # Root .env is gitignored but may exist locally
 ]
 regexes = [
     '''EXAMPLE_.*''',

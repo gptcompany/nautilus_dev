@@ -1,0 +1,184 @@
+# Grafana Alert Rules for Trading System
+# Provisioned automatically - edit with care
+
+apiVersion: 1
+
+groups:
+  - orgId: 1
+    name: trading-alerts
+    folder: Trading
+    interval: 1m
+    rules:
+      # Drawdown Warning (5%)
+      - uid: drawdown-warning
+        title: Drawdown Warning
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 300
+              to: 0
+            datasourceUid: questdb
+            model:
+              rawSql: "SELECT max(drawdown_pct) as value FROM trading_risk WHERE timestamp > dateadd('m', -5, now())"
+              format: table
+          - refId: C
+            relativeTimeRange:
+              from: 300
+              to: 0
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: A
+              conditions:
+                - evaluator:
+                    type: gt
+                    params: [5]
+        noDataState: OK
+        execErrState: Alerting
+        for: 2m
+        annotations:
+          summary: "Drawdown at {{ $values.A }}% - approaching limit"
+          description: "Current drawdown exceeds 5% warning threshold"
+        labels:
+          severity: warning
+          category: risk
+
+      # Drawdown Critical (10%)
+      - uid: drawdown-critical
+        title: Drawdown Critical
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 300
+              to: 0
+            datasourceUid: questdb
+            model:
+              rawSql: "SELECT max(drawdown_pct) as value FROM trading_risk WHERE timestamp > dateadd('m', -5, now())"
+              format: table
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: A
+              conditions:
+                - evaluator:
+                    type: gt
+                    params: [10]
+        noDataState: OK
+        execErrState: Alerting
+        for: 1m
+        annotations:
+          summary: "CRITICAL: Drawdown at {{ $values.A }}%"
+          description: "Drawdown exceeds 10% - consider stopping trading"
+        labels:
+          severity: critical
+          category: risk
+
+      # Error Rate Warning (1%)
+      - uid: error-rate-warning
+        title: Error Rate Warning
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 3600
+              to: 0
+            datasourceUid: questdb
+            model:
+              rawSql: |
+                SELECT
+                  (SELECT count() FROM error_events WHERE timestamp > dateadd('h', -1, now())) * 100.0 /
+                  NULLIF((SELECT count() FROM order_latency WHERE timestamp > dateadd('h', -1, now())), 0) as value
+              format: table
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: A
+              conditions:
+                - evaluator:
+                    type: gt
+                    params: [1]
+        noDataState: OK
+        execErrState: OK
+        for: 5m
+        annotations:
+          summary: "Error rate at {{ $values.A }}%"
+          description: "Error rate exceeds 1% threshold in last hour"
+        labels:
+          severity: warning
+          category: errors
+
+      # Max Position Exceeded
+      - uid: position-max-critical
+        title: Position Size Critical
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 300
+              to: 0
+            datasourceUid: questdb
+            model:
+              rawSql: |
+                SELECT MAX(ABS(notional_value) / NULLIF(account_balance, 0) * 100) as value
+                FROM positions, (SELECT balance as account_balance FROM account_state ORDER BY timestamp DESC LIMIT 1)
+                WHERE quantity != 0
+              format: table
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: A
+              conditions:
+                - evaluator:
+                    type: gt
+                    params: [10]
+        noDataState: OK
+        execErrState: Alerting
+        for: 0s
+        annotations:
+          summary: "CRITICAL: Position size at {{ $values.A }}%"
+          description: "Position exceeds MAX_POSITION_PCT=10% limit"
+        labels:
+          severity: critical
+          category: risk
+
+      # Connection Lost
+      - uid: connection-lost
+        title: Connection Lost
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 300
+              to: 0
+            datasourceUid: questdb
+            model:
+              rawSql: |
+                SELECT CASE
+                  WHEN max(timestamp) < dateadd('m', -2, now()) THEN 0
+                  ELSE 1
+                END as value
+                FROM system_health
+              format: table
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: A
+              conditions:
+                - evaluator:
+                    type: lt
+                    params: [1]
+        noDataState: Alerting
+        execErrState: Alerting
+        for: 0s
+        annotations:
+          summary: "Connection lost - no health data for 2+ minutes"
+          description: "Trading system may be disconnected"
+        labels:
+          severity: critical
+          category: connectivity

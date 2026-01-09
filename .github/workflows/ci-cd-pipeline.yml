@@ -50,9 +50,66 @@ env:
 
 jobs:
   # ===========================================================================
+  # Pre-Stage: Language Detection
+  # ===========================================================================
+  detect-changes:
+    name: "Detect Language Changes"
+    runs-on: [self-hosted, nautilus]
+    timeout-minutes: 2
+
+    outputs:
+      python_changed: ${{ steps.detect.outputs.python }}
+      rust_changed: ${{ steps.detect.outputs.rust }}
+      docs_changed: ${{ steps.detect.outputs.docs }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 20
+
+      - name: Detect changed file types
+        id: detect
+        run: |
+          # Get changed files
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            CHANGED=$(git diff --name-only origin/${{ github.base_ref }}...HEAD 2>/dev/null || echo "")
+          else
+            CHANGED=$(git diff --name-only HEAD~1 2>/dev/null || echo "")
+          fi
+
+          # Detect Python changes
+          if echo "$CHANGED" | grep -qE '\.(py|pyx|pxd)$'; then
+            echo "python=true" >> $GITHUB_OUTPUT
+            echo "Python files changed"
+          else
+            echo "python=false" >> $GITHUB_OUTPUT
+          fi
+
+          # Detect Rust changes
+          if echo "$CHANGED" | grep -qE '\.(rs|toml)$' | grep -v pyproject; then
+            echo "rust=true" >> $GITHUB_OUTPUT
+            echo "Rust files changed"
+          else
+            echo "rust=false" >> $GITHUB_OUTPUT
+          fi
+
+          # Detect docs changes
+          if echo "$CHANGED" | grep -qE '\.(md|rst|txt)$'; then
+            echo "docs=true" >> $GITHUB_OUTPUT
+            echo "Documentation changed"
+          else
+            echo "docs=false" >> $GITHUB_OUTPUT
+          fi
+
+          echo "Changed files:"
+          echo "$CHANGED" | head -20
+
+  # ===========================================================================
   # Stage 0: Security Scan (~1 min)
   # ===========================================================================
   security-scan:
+    needs: detect-changes
     name: "Stage 0: Security"
     runs-on: [self-hosted, nautilus]
     timeout-minutes: 10
@@ -160,6 +217,38 @@ jobs:
           # Non-blocking: osv findings are advisory only
           exit 0
 
+      - name: Architecture drift check
+        id: drift
+        run: |
+          set +e
+          python scripts/architecture_drift_detector.py --json > drift_results.json 2>/dev/null
+          EXIT_CODE=$?
+          set -e
+
+          if [ -f drift_results.json ]; then
+            HAS_DRIFT=$(jq '.has_drift' drift_results.json)
+            HAS_SCHEMA_DRIFT=$(jq '.has_schema_drift' drift_results.json)
+            DOC_DRIFTS=$(jq '.doc_drifts | length' drift_results.json)
+            MISSING_TABLES=$(jq '.missing_tables | length' drift_results.json)
+
+            if [ "$HAS_DRIFT" = "true" ] || [ "$DOC_DRIFTS" -gt 0 ]; then
+              echo "::error::Architecture drift detected - documentation out of sync"
+              jq -r '.drifts[] | "\(.name): documented=\(.documented) actual=\(.actual)"' drift_results.json
+              echo ""
+              echo "Run: python scripts/architecture_drift_detector.py --fix"
+              exit 1
+            fi
+
+            if [ "$MISSING_TABLES" -gt 0 ]; then
+              echo "::warning::Missing QuestDB tables (schema drift) - may need manual creation"
+              jq -r '.missing_tables[]' drift_results.json
+              # Schema drift is warning only (QuestDB may not be running in CI)
+            fi
+
+            echo "Architecture docs in sync"
+          fi
+          exit 0
+
       - name: Upload security artifacts
         if: always()
         uses: actions/upload-artifact@v4
@@ -169,6 +258,7 @@ jobs:
             bandit_results.json
             gitleaks_results.json
             osv_results.json
+            drift_results.json
           retention-days: 30
 
   # ===========================================================================
@@ -677,12 +767,91 @@ jobs:
           echo "Alpha-debug skipped (no strategy changes or cooldown active)"
 
   # ===========================================================================
+  # Stage 6: Rust Tooling (conditional - only when Rust files change)
+  # ===========================================================================
+  rust-tooling:
+    name: "Stage 6: Rust Security"
+    runs-on: [self-hosted, nautilus]
+    needs: [detect-changes, security-scan]
+    if: needs.detect-changes.outputs.rust_changed == 'true'
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
+
+      - name: Install cargo security tools
+        run: |
+          # Install if not present
+          command -v cargo-audit || cargo install cargo-audit
+          command -v cargo-deny || cargo install cargo-deny
+          # cargo-vet requires more setup, skip for now
+
+      - name: Run cargo-audit (vulnerabilities)
+        id: audit
+        run: |
+          set +e
+          cargo audit --json > audit_results.json 2>/dev/null
+          EXIT_CODE=$?
+          set -e
+
+          if [ "$EXIT_CODE" -ne 0 ]; then
+            VULNS=$(jq '.vulnerabilities.count // 0' audit_results.json 2>/dev/null || echo 0)
+            echo "::warning::cargo-audit found $VULNS vulnerabilities"
+            jq -r '.vulnerabilities.list[]? | "\(.advisory.id): \(.advisory.title)"' audit_results.json | head -10
+          else
+            echo "cargo-audit: No vulnerabilities found"
+          fi
+          # Non-blocking for now
+          exit 0
+
+      - name: Run cargo-deny (licenses + deps)
+        id: deny
+        run: |
+          set +e
+          cargo deny check 2>&1 | tee deny_output.txt
+          EXIT_CODE=$?
+          set -e
+
+          if [ "$EXIT_CODE" -ne 0 ]; then
+            echo "::warning::cargo-deny found issues"
+            head -30 deny_output.txt
+          else
+            echo "cargo-deny: All checks passed"
+          fi
+          # Non-blocking for now
+          exit 0
+
+      - name: Run clippy (linting)
+        run: |
+          cargo clippy --all-targets --all-features -- -D warnings 2>&1 | tee clippy_output.txt || {
+            echo "::warning::Clippy found warnings"
+            head -50 clippy_output.txt
+          }
+
+      - name: Upload Rust artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rust-security-results
+          path: |
+            audit_results.json
+            deny_output.txt
+            clippy_output.txt
+          retention-days: 7
+
+  # ===========================================================================
   # Final: Merge Gate
   # ===========================================================================
   merge-gate:
     name: "Merge Gate"
     runs-on: [self-hosted, nautilus]
-    needs: [security-scan, lint-and-types, unit-tests, integration-tests, backtest-validation, alpha-debug]
+    needs: [detect-changes, security-scan, lint-and-types, unit-tests, integration-tests, backtest-validation, alpha-debug, rust-tooling]
     if: always()
 
     steps:
@@ -745,6 +914,18 @@ jobs:
             echo "Stage 5 (Alpha-Debug): PASSED (bugs: ${{ needs.alpha-debug.outputs.bugs_found }}, recommendation: ${{ needs.alpha-debug.outputs.recommendation }})"
           fi
 
+          # Stage 6: Rust Tooling (conditional)
+          if [ "${{ needs.rust-tooling.result }}" == "failure" ]; then
+            echo "Stage 6 (Rust Security): FAILED"
+            FAILED=$((FAILED + 1))
+          elif [ "${{ needs.rust-tooling.result }}" == "skipped" ]; then
+            echo "Stage 6 (Rust Security): SKIPPED (no Rust changes)"
+          else
+            echo "Stage 6 (Rust Security): PASSED"
+          fi
+
+          echo ""
+          echo "Language detection: Python=${{ needs.detect-changes.outputs.python_changed }}, Rust=${{ needs.detect-changes.outputs.rust_changed }}"
           echo ""
 
           if [ "$FAILED" -gt 0 ]; then

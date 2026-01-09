@@ -1,0 +1,310 @@
+{
+  "uid": "claude-metrics",
+  "title": "Claude Code Metrics",
+  "description": "Ralph iterations, agent spawns, and AI development metrics (Spec 040)",
+  "tags": ["claude", "ralph", "agents", "ai"],
+  "timezone": "browser",
+  "refresh": "30s",
+  "time": {
+    "from": "now-24h",
+    "to": "now"
+  },
+  "templating": {
+    "list": [
+      {
+        "name": "session",
+        "type": "query",
+        "datasource": "QuestDB",
+        "query": "SELECT DISTINCT session_id FROM ralph_iterations WHERE timestamp > now() - interval '7d' ORDER BY session_id DESC",
+        "refresh": 1,
+        "multi": false,
+        "includeAll": true,
+        "allValue": "%"
+      }
+    ]
+  },
+  "panels": [
+    {
+      "id": 1,
+      "title": "Ralph Sessions (24h)",
+      "type": "stat",
+      "gridPos": {"x": 0, "y": 0, "w": 4, "h": 4},
+      "datasource": "QuestDB",
+      "targets": [
+        {
+          "rawSql": "SELECT COUNT(DISTINCT session_id) as sessions FROM ralph_iterations WHERE timestamp > now() - interval '24h'",
+          "format": "table"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "thresholds"},
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"color": "blue", "value": null}
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 2,
+      "title": "Total Iterations (24h)",
+      "type": "stat",
+      "gridPos": {"x": 4, "y": 0, "w": 4, "h": 4},
+      "datasource": "QuestDB",
+      "targets": [
+        {
+          "rawSql": "SELECT COUNT(*) as iterations FROM ralph_iterations WHERE timestamp > now() - interval '24h'",
+          "format": "table"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "thresholds"},
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"color": "green", "value": null},
+              {"color": "yellow", "value": 50},
+              {"color": "red", "value": 100}
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 3,
+      "title": "Estimated Cost (24h)",
+      "type": "stat",
+      "gridPos": {"x": 8, "y": 0, "w": 4, "h": 4},
+      "datasource": "QuestDB",
+      "targets": [
+        {
+          "rawSql": "SELECT SUM(estimated_cost_usd) as total_cost FROM ralph_iterations WHERE timestamp > now() - interval '24h'",
+          "format": "table"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "currencyUSD",
+          "decimals": 2,
+          "color": {"mode": "thresholds"},
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"color": "green", "value": null},
+              {"color": "yellow", "value": 20},
+              {"color": "red", "value": 50}
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 4,
+      "title": "CI Pass Rate",
+      "type": "gauge",
+      "gridPos": {"x": 12, "y": 0, "w": 4, "h": 4},
+      "datasource": "QuestDB",
+      "targets": [
+        {
+          "rawSql": "SELECT (SUM(CASE WHEN ci_passed THEN 1 ELSE 0 END) * 100.0 / COUNT(*)) as pass_rate FROM ralph_iterations WHERE timestamp > now() - interval '24h'",
+          "format": "table"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"color": "red", "value": null},
+              {"color": "yellow", "value": 70},
+              {"color": "green", "value": 90}
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 5,
+      "title": "Circuit Breaker Triggers",
+      "type": "stat",
+      "gridPos": {"x": 16, "y": 0, "w": 4, "h": 4},
+      "datasource": "QuestDB",
+      "targets": [
+        {
+          "rawSql": "SELECT COUNT(*) as triggers FROM ralph_iterations WHERE exit_reason IS NOT NULL AND exit_reason != '' AND timestamp > now() - interval '24h'",
+          "format": "table"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "thresholds"},
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"color": "green", "value": null},
+              {"color": "yellow", "value": 3},
+              {"color": "red", "value": 5}
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 6,
+      "title": "Agent Spawns (24h)",
+      "type": "stat",
+      "gridPos": {"x": 20, "y": 0, "w": 4, "h": 4},
+      "datasource": "QuestDB",
+      "targets": [
+        {
+          "rawSql": "SELECT COUNT(*) as spawns FROM agent_spawns WHERE timestamp > now() - interval '24h'",
+          "format": "table"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "thresholds"},
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"color": "blue", "value": null}
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 7,
+      "title": "Ralph Iterations Over Time",
+      "type": "timeseries",
+      "gridPos": {"x": 0, "y": 4, "w": 12, "h": 8},
+      "datasource": "QuestDB",
+      "targets": [
+        {
+          "rawSql": "SELECT timestamp, iteration, session_id FROM ralph_iterations WHERE session_id LIKE '${session}' ORDER BY timestamp",
+          "format": "time_series"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "stepAfter",
+            "fillOpacity": 20
+          }
+        }
+      }
+    },
+    {
+      "id": 8,
+      "title": "Estimated Cost Over Time",
+      "type": "timeseries",
+      "gridPos": {"x": 12, "y": 4, "w": 12, "h": 8},
+      "datasource": "QuestDB",
+      "targets": [
+        {
+          "rawSql": "SELECT timestamp, estimated_cost_usd as cost FROM ralph_iterations WHERE session_id LIKE '${session}' ORDER BY timestamp",
+          "format": "time_series"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "currencyUSD",
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 30
+          }
+        }
+      }
+    },
+    {
+      "id": 9,
+      "title": "Agent Spawns by Type",
+      "type": "piechart",
+      "gridPos": {"x": 0, "y": 12, "w": 8, "h": 8},
+      "datasource": "QuestDB",
+      "targets": [
+        {
+          "rawSql": "SELECT agent_type, COUNT(*) as count FROM agent_spawns WHERE timestamp > now() - interval '24h' GROUP BY agent_type ORDER BY count DESC",
+          "format": "table"
+        }
+      ],
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "right",
+          "values": ["value", "percent"]
+        }
+      }
+    },
+    {
+      "id": 10,
+      "title": "Exit Reasons",
+      "type": "piechart",
+      "gridPos": {"x": 8, "y": 12, "w": 8, "h": 8},
+      "datasource": "QuestDB",
+      "targets": [
+        {
+          "rawSql": "SELECT COALESCE(exit_reason, 'completed') as reason, COUNT(*) as count FROM ralph_iterations WHERE timestamp > now() - interval '7d' GROUP BY exit_reason ORDER BY count DESC",
+          "format": "table"
+        }
+      ],
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "right"
+        }
+      }
+    },
+    {
+      "id": 11,
+      "title": "Agent Success Rate by Type",
+      "type": "barchart",
+      "gridPos": {"x": 16, "y": 12, "w": 8, "h": 8},
+      "datasource": "QuestDB",
+      "targets": [
+        {
+          "rawSql": "SELECT agent_type, (SUM(CASE WHEN success THEN 1 ELSE 0 END) * 100.0 / COUNT(*)) as success_rate FROM agent_spawns WHERE timestamp > now() - interval '7d' GROUP BY agent_type ORDER BY success_rate DESC",
+          "format": "table"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "max": 100
+        }
+      }
+    },
+    {
+      "id": 12,
+      "title": "Recent Ralph Sessions",
+      "type": "table",
+      "gridPos": {"x": 0, "y": 20, "w": 24, "h": 6},
+      "datasource": "QuestDB",
+      "targets": [
+        {
+          "rawSql": "SELECT session_id, MAX(iteration) as max_iteration, MAX(estimated_cost_usd) as total_cost, MAX(exit_reason) as exit_reason, MIN(timestamp) as started, MAX(timestamp) as ended FROM ralph_iterations WHERE timestamp > now() - interval '7d' GROUP BY session_id ORDER BY ended DESC LIMIT 10",
+          "format": "table"
+        }
+      ],
+      "options": {
+        "showHeader": true
+      },
+      "fieldConfig": {
+        "overrides": [
+          {
+            "matcher": {"id": "byName", "options": "total_cost"},
+            "properties": [{"id": "unit", "value": "currencyUSD"}]
+          }
+        ]
+      }
+    }
+  ]
+}

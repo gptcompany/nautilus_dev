@@ -1,0 +1,65 @@
+# Pre-commit hooks for local development
+# Install: pre-commit install
+# Run manually: pre-commit run --all-files
+
+repos:
+  # Code formatting
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.8.6
+    hooks:
+      - id: ruff
+        args: [--fix]
+      - id: ruff-format
+
+  # Security: Bandit SAST
+  - repo: https://github.com/PyCQA/bandit
+    rev: 1.8.0
+    hooks:
+      - id: bandit
+        args: ["-c", "pyproject.toml", "-ll", "-r"]
+        files: ^(strategies|scripts)/.*\.py$
+        exclude: ^tests/
+
+  # Security: Gitleaks secrets scanning
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.21.2
+    hooks:
+      - id: gitleaks
+
+  # Type checking
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.14.1
+    hooks:
+      - id: mypy
+        args: [--config-file=pyproject.toml]
+        additional_dependencies:
+          - types-requests
+          - pandas-stubs
+        files: ^(strategies|scripts)/.*\.py$
+
+  # General checks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-json
+      - id: check-added-large-files
+        args: ['--maxkb=1000']
+      - id: detect-private-key
+      - id: check-merge-conflict
+
+  # Architecture drift detection
+  - repo: local
+    hooks:
+      - id: architecture-drift
+        name: Architecture Drift Detector
+        entry: python scripts/architecture_drift_detector.py
+        language: system
+        files: ^(\.env|docker-compose.*\.yml|pyproject\.toml|docs/ARCHITECTURE\.md)$
+        pass_filenames: false
+
+# CI integration note:
+# These checks also run in GitHub Actions via ci-cd-pipeline.yml
+# Pre-commit provides faster local feedback before pushing

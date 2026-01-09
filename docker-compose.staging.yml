@@ -26,14 +26,16 @@ services:
     environment:
       - NAUTILUS_ENV=staging
       - NAUTILUS_TRADER_ID=TRADER-STAGING
-      # Testnet API keys (from .env.staging)
-      - BINANCE_API_KEY=${BINANCE_TESTNET_API_KEY}
-      - BINANCE_API_SECRET=${BINANCE_TESTNET_API_SECRET}
-      - BYBIT_API_KEY=${BYBIT_TESTNET_API_KEY}
-      - BYBIT_API_SECRET=${BYBIT_TESTNET_API_SECRET}
-      # Testnet endpoints
-      - BINANCE_BASE_URL=https://testnet.binancefuture.com
-      - BYBIT_BASE_URL=https://api-testnet.bybit.com
+      # Hyperliquid Testnet (more reliable than Binance/Bybit testnets)
+      - HYPERLIQUID_TESTNET=true
+      - HYPERLIQUID_TESTNET_PK=${HYPERLIQUID_TESTNET_PK}
+      # Legacy: Binance/Bybit testnets (unreliable, kept for reference)
+      # - BINANCE_API_KEY=${BINANCE_TESTNET_API_KEY}
+      # - BINANCE_API_SECRET=${BINANCE_TESTNET_API_SECRET}
+      # - BYBIT_API_KEY=${BYBIT_TESTNET_API_KEY}
+      # - BYBIT_API_SECRET=${BYBIT_TESTNET_API_SECRET}
+      # - BINANCE_BASE_URL=https://testnet.binancefuture.com
+      # - BYBIT_BASE_URL=https://api-testnet.bybit.com
       # Paper trading
       - PAPER_TRADING=true
       # Database connections (staging instances)

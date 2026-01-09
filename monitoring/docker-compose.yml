@@ -31,7 +31,7 @@ services:
     container_name: nautilus-grafana
     restart: unless-stopped
     ports:
-      - "3000:3000"
+      - "${GRAFANA_PORT:-3001}:3000"
     environment:
       # Security
       - GF_SECURITY_ADMIN_USER=${GRAFANA_ADMIN_USER:-admin}
@@ -41,13 +41,8 @@ services:
       # Alerting (unified alerting enabled)
       - GF_UNIFIED_ALERTING_ENABLED=true
       - GF_ALERTING_ENABLED=false
-      # SMTP for email alerts (optional)
-      - GF_SMTP_ENABLED=${GF_SMTP_ENABLED:-false}
-      - GF_SMTP_HOST=${GF_SMTP_HOST:-}
-      - GF_SMTP_USER=${GF_SMTP_USER:-}
-      - GF_SMTP_PASSWORD=${GF_SMTP_PASSWORD:-}
-      - GF_SMTP_FROM_ADDRESS=${GF_SMTP_FROM_ADDRESS:-grafana@localhost}
-      - GF_SMTP_FROM_NAME=${GF_SMTP_FROM_NAME:-Nautilus Monitoring}
+      # SMTP disabled - using Discord for alerts
+      - GF_SMTP_ENABLED=false
       # Alerting contact point secrets
       - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN:-}
       - TELEGRAM_CHAT_ID=${TELEGRAM_CHAT_ID:-}
