@@ -24,12 +24,14 @@ If drift detected → FIX FIRST before proceeding.
 | Task | Agent | Why |
 |------|-------|-----|
 | Log analysis | backtest-analyzer | Chunked processing, avoids context bloat |
-| Bug hunting | alpha-debug | Iterative rounds, finds edge cases |
-| Test execution | test-runner | Full output capture, clean context |
+| Bug hunting | Ralph Loop | Iterative rounds, circuit breakers |
+| Test execution | Ralph Loop | Tests as exit criteria |
 | NT implementation | nautilus-coder | Native Rust, best practices |
-| Charts/dashboards | nautilus-visualization-renderer | Canvas 2D/WebGL |
-| Grafana edits | alpha-visual | Screenshot validation after EVERY edit |
-| Large docs/research | Task agents | Parallel analysis, own context windows |
+| Math validation | mathematician | WolframAlpha + MATLAB |
+| Doc search | nautilus-docs-specialist | Context7 + Discord search |
+| Data pipeline | nautilus-data-pipeline-operator | Import, validation, catalog |
+| Live trading | nautilus-live-operator | Deployment and monitoring |
+| Multi-approach | alpha-evolve | [E] marker tasks |
 
 **Rule**: NEVER read large documents directly - delegate to agents. Main context = orchestration only.
 

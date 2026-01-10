@@ -548,7 +548,7 @@ Bridge between academic research knowledge graph and NautilusTrader strategy dev
 | Semantic Router | academic_research/semantic_router_mcp/ | Query classification |
 | strategy__ Schema | academic_research/docs/entity_schemas.md | Entity structure |
 | Validation | academic_research/scripts/validate_entity.py | Entity validation |
-| strategy-researcher | nautilus_dev/.claude/agents/strategy-researcher.md | Agent definition |
+| /research command | nautilus_dev/.claude/commands/research.md | Paper analysis workflow |
 | paper-to-strategy | nautilus_dev/.claude/skills/paper-to-strategy/ | Spec generation |
 | Indicator Mapping | nautilus_dev/docs/research/indicator_mapping.md | Paper → NT mapping |
 | Order Mapping | nautilus_dev/docs/research/order_mapping.md | Order type mapping |

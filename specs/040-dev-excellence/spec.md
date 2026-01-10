@@ -80,7 +80,7 @@ Sistema completo di quality assurance, security, monitoring e knowledge manageme
 - [ ] Zero vulnerabilità HIGH/CRITICAL in deps
 - [ ] Zero secrets nel repository
 - [ ] SAST passing su ogni PR
-- [ ] Sentry configurato con alerting
+- [x] Sentry configurato con alerting (2026-01-09: GitHub Actions release tracking)
 
 ### Monitoring
 - [ ] Dashboard PnL operativo

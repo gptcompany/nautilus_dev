@@ -7,7 +7,6 @@ Quick reference for all available Claude Code skills in this project.
 | Skill | Description | Token Savings | Triggers |
 |-------|-------------|---------------|----------|
 | `paper-to-strategy` | Academic paper → NautilusTrader spec | 70% (2500→750) | "convert paper", "paper to strategy" |
-| `pinescript-converter` | PineScript → NautilusTrader Python | ~65% | `/pinescript <url>` |
 | `research-pipeline` | Automated research (semantic + papers) | ~60% | `/research <topic>` |
 
 ## Code Generation
@@ -51,7 +50,6 @@ User: "Create PR for the momentum strategy implementation"
 ├── formula-to-code/SKILL.md
 ├── github-workflow/SKILL.md
 ├── paper-to-strategy/SKILL.md
-├── pinescript-converter/SKILL.md
 ├── pydantic-model-generator/SKILL.md
 ├── pytest-test-generator/SKILL.md
 └── research-pipeline/SKILL.md

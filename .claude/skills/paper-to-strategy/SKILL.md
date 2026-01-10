@@ -158,14 +158,14 @@ Output:
 - Spec: specs/026-pairs-trading/spec.md
 ```
 
-## Integration with Agents
+## Integration with Commands and Agents
 
-### strategy-researcher Agent
+### /research Command
 
-This skill is invoked by the `strategy-researcher` agent during the paper-to-spec workflow:
+This skill integrates with the `/research` command for paper-to-spec workflow:
 
 ```yaml
-Agent: strategy-researcher
+Command: /research
 Uses: paper-to-strategy skill
 Output: Complete spec.md ready for /speckit.plan
 ```

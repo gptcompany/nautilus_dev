@@ -1,15 +1,16 @@
 {
   "mcpServers": {
-    "semantic-router": {
-      "command": "uv",
-      "args": [
-        "run",
-        "--directory",
-        "/media/sam/1TB1/academic_research/semantic_router_mcp",
-        "python3",
-        "/media/sam/1TB1/academic_research/semantic_router_mcp/server.py"
-      ],
-      "description": "Query classification (biomedical/stem_cs/trading_strategy/general)",
+    "context7": {
+      "command": "npx",
+      "args": ["-y", "@upstash/context7-mcp"],
+      "env": {},
+      "description": "Library documentation search (used by nautilus-docs-specialist)",
+      "enabled": true
+    },
+    "serena": {
+      "command": "serena",
+      "args": ["start-mcp-server", "--context", "ide-assistant", "--project", "."],
+      "description": "Codebase navigation and semantic code search",
       "enabled": true
     },
     "paper-search-mcp": {
@@ -32,7 +33,7 @@
       "command": "node",
       "args": ["/media/sam/1TB1/mcpservers/matlab-mcp-server/build/index.js"],
       "env": {
-        "MATLAB_PATH": "/media/sam/3TB-WDC/MATLAB2025/bin/matlab"
+        "MATLAB_PATH": "/media/sam/3TB-WDC/matlab2025/bin/matlab"
       },
       "description": "MATLAB execution for matrix operations, signal processing, optimization, and simulations",
       "enabled": true

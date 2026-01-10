@@ -203,21 +203,58 @@ VALIDATION CHECKLIST:
 4. Check docs/discord/ for community issues:
    - grep -r "{component_name}" docs/discord/
    - Recent bugs or workarounds?
-5. Return VALIDATION REPORT:
-   - ✅ PASS: All components compatible
-   - ⚠️  WARNINGS: List any deprecations or known issues
-   - ❌ FAIL: List incompatible components with alternatives
 
-Be specific - quote plan sections and provide exact class/API names.
+**CRITICAL: WRITE REPORT TO FILE**
+Write your findings to: specs/{spec-id}/validation-plan.md
+
+```markdown
+# NT Compatibility Validation (Plan Phase)
+
+**Date**: {timestamp}
+**Spec**: {spec-id}
+
+## Components Checked
+| Component | Type | NT Version | Status |
+|-----------|------|------------|--------|
+| {class} | Class | v1.222.0 | ✅ OK |
+
+## Verdict: PASS/WARNINGS/FAIL
+
+### Issues Found
+- {issue_1}
+- {issue_2}
+
+### Recommendations
+- {rec_1}
+```
+
+Return: "Validation written to specs/{spec-id}/validation-plan.md" with PASS/WARNINGS/FAIL status.
 """
 )
 ```
 
 **Handle validation results**:
+
+**CRITICAL: READ THE VALIDATION FILE**:
+```python
+# Read validation report from file (not subagent output!)
+validation_file = f"specs/{spec_id}/validation-plan.md"
+validation_content = Read(validation_file)
+
+# Parse verdict
+if "## Verdict: PASS" in validation_content:
+    status = "PASS"
+elif "## Verdict: WARNINGS" in validation_content:
+    status = "WARNINGS"
+else:
+    status = "FAIL"
+```
+
+**Then proceed based on status**:
 - **PASS**: Proceed to Phase 5
-- **WARNINGS**: Log warnings, ask user if they want to proceed or fix
+- **WARNINGS**: Show warnings from file, ask user if they want to proceed or fix
 - **FAIL**:
-  1. Present incompatibilities to user
+  1. Show issues from validation file
   2. Offer to update plan.md with alternatives
   3. Re-run validation after fixes
   4. Max 2 fix iterations, then ask user for manual review
@@ -268,21 +305,66 @@ VALIDATION CHECKLIST:
    - df.iterrows() usage
    - Custom indicator implementations (should use native Rust)
    - Memory-loading large datasets (should use streaming)
-5. Return VALIDATION REPORT:
-   - ✅ PASS: All tasks follow NT best practices
-   - ⚠️  WARNINGS: List any anti-patterns with fixes
-   - ❌ FAIL: List violations requiring task updates
 
-Focus on NautilusTrader-specific issues, not general Python style.
+**CRITICAL: WRITE REPORT TO FILE**
+Write your findings to: specs/{spec-id}/validation-tasks.md
+
+```markdown
+# NT Compatibility Validation (Tasks Phase)
+
+**Date**: {timestamp}
+**Spec**: {spec-id}
+
+## File Paths Checked
+| Path | Valid | Issue |
+|------|-------|-------|
+| strategies/production/{file} | ✅ | - |
+
+## Anti-Patterns Check
+- [ ] df.iterrows() usage: {found/not found}
+- [ ] Custom indicators: {found/not found}
+- [ ] Memory loading: {found/not found}
+
+## Verdict: PASS/WARNINGS/FAIL
+
+### Issues Found
+- {issue_1}
+
+### Recommendations
+- {rec_1}
+```
+
+Return: "Validation written to specs/{spec-id}/validation-tasks.md" with PASS/WARNINGS/FAIL status.
 """
 )
 ```
 
 **Handle validation results**:
+
+**CRITICAL: READ THE VALIDATION FILE**:
+```python
+# Read validation report from file (not subagent output!)
+validation_file = f"specs/{spec_id}/validation-tasks.md"
+validation_content = Read(validation_file)
+
+# Parse verdict
+if "## Verdict: PASS" in validation_content:
+    status = "PASS"
+elif "## Verdict: WARNINGS" in validation_content:
+    status = "WARNINGS"
+else:
+    status = "FAIL"
+
+# Extract issues for reporting
+issues = extract_section(validation_content, "### Issues Found")
+recommendations = extract_section(validation_content, "### Recommendations")
+```
+
+**Then proceed based on status**:
 - **PASS**: Proceed to Phase 8
-- **WARNINGS**: Log warnings, offer to fix in tasks.md
+- **WARNINGS**: Show warnings from file, offer to fix in tasks.md
 - **FAIL**:
-  1. Present violations to user
+  1. Show violations from validation file
   2. Offer to update tasks.md
   3. Re-run validation
   4. Max 2 fix iterations
@@ -327,21 +409,22 @@ Generate comprehensive summary report:
 ## Validation Results
 
 ### NT Compatibility Check 1 (Post-Plan)
-- ✅ All NautilusTrader APIs compatible with nightly
-- ⚠️  1 deprecation warning: {warning}
+**Source**: `specs/{spec-id}/validation-plan.md`
+```
+{Include full content from validation-plan.md}
+```
 
 ### Cross-Artifact Analysis
 - **Requirements Coverage**: 95% (38/40 requirements have tasks)
 - **Critical Issues**: 0
 - **High Issues**: 0
 - **Medium Issues**: 2
-  - M1: Terminology drift between spec and plan ({details})
-  - M2: Missing non-functional test coverage for performance
 
 ### NT Compatibility Check 2 (Post-Tasks)
-- ✅ All file paths follow NT structure
-- ✅ No anti-patterns detected
-- ⚠️  1 optimization suggestion: {suggestion}
+**Source**: `specs/{spec-id}/validation-tasks.md`
+```
+{Include full content from validation-tasks.md}
+```
 
 ## Generated Artifacts
 
@@ -349,6 +432,8 @@ Generate comprehensive summary report:
 - **Research**: `specs/{spec-id}/research.md` (if applicable)
 - **Plan**: `specs/{spec-id}/plan.md`
 - **Tasks**: `specs/{spec-id}/tasks.md`
+- **Validation (Plan)**: `specs/{spec-id}/validation-plan.md`
+- **Validation (Tasks)**: `specs/{spec-id}/validation-tasks.md`
 - **Analysis Report**: (shown above)
 
 ## Next Steps

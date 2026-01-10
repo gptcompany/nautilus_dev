@@ -158,7 +158,7 @@ As a trader, I need to compare multiple strategy backtests side-by-side so that 
 
 ## Dependencies
 
-- NautilusTrader >= 1.221.0
+- NautilusTrader >= 1.222.0
 - Plotly >= 6.3.1
 - Pandas (for data manipulation)
 - Spec 002: Binance historical data for testing

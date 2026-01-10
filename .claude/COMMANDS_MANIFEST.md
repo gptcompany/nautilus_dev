@@ -55,19 +55,21 @@ Quick reference for all available slash commands in this project.
 | `/undo:rollback` | Rollback to checkpoint | Undo changes |
 | `/undo:redo` | Redo after rollback | Redo changes |
 
-## Other Commands
+## Utilities
 
-| Command | Description |
-|---------|-------------|
-| `/research` | Academic research pipeline |
-| `/pinescript` | Convert PineScript to NautilusTrader |
-| `/spec-pipeline` | Automated spec orchestration |
-| `/verify-tasks` | Verify tasks.md consistency |
+| Command | Description | Use Case |
+|---------|-------------|----------|
+| `/optimize` | Refine vague prompts | Before complex implementations |
+| `/research` | Academic research pipeline | Find papers and methodologies |
+| `/pinescript` | Convert PineScript to NautilusTrader | Strategy conversion |
+| `/spec-pipeline` | Automated spec orchestration | Full pipeline automation |
+| `/verify-tasks` | Verify tasks.md consistency | Task validation |
 
 ## Command Locations
 
 ```
 .claude/commands/
+├── optimize.md
 ├── research.md
 ├── pinescript.md
 ├── spec-pipeline.md
@@ -127,4 +129,11 @@ Quick reference for all available slash commands in this project.
 3. /speckit:plan
 4. /tdd:spec-to-test
 5. /tdd:cycle
+```
+
+### Vague Request Clarification
+```
+1. /optimize "vague request"
+2. Review refined prompt
+3. Proceed with refined version or iterate
 ```

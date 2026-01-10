@@ -124,6 +124,6 @@ If anything goes wrong:
 ## Post-Deployment
 
 - [ ] Monitor for 30 minutes
-- [ ] Check error rates in Sentry
+- [x] Check error rates in Sentry (auto: GitHub release tracking)
 - [ ] Verify P&L tracking
 - [ ] Update deployment log

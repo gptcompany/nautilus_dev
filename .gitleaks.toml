@@ -64,4 +64,11 @@ regexes = [
     '''YOUR_.*_HERE''',
     '''<.*>''',
     '''\$\{\{.*\}\}''',  # GitHub Actions secrets syntax
+    '''\$\{[A-Z_]+\}''',  # Environment variable references ${VAR}
+]
+# Old commits with secrets that have since been replaced with env vars
+commits = [
+    "fc059c9e7d0441cd303b4b5d901a6230ce0412be",  # Old Grafana token (now uses ${GRAFANA_SERVICE_ACCOUNT_TOKEN})
+    "124cbb020f179b12a4f0dbcfc8027feb25b61de6",  # Old InfluxDB token (now uses ${INFLUXDB_TOKEN})
+    "40b1f232c7866d713f00d97c7618d4e633746035",  # Journal article access token (not sensitive)
 ]

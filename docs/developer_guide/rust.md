@@ -19,6 +19,10 @@ while zero-cost abstractions and the absence of a garbage collector deliver C-li
 - Use workspace inheritance for shared dependencies (for example `serde = { workspace = true }`).
 - Only pin versions directly for crate-specific dependencies that are not part of the workspace.
 - Group workspace-provided dependencies before crate-only dependencies so the inheritance is easy to audit.
+- Keep related dependencies aligned: `capnp`/`capnpc` (exact), `arrow`/`parquet` (major.minor),
+  `datafusion`/`object_store`, and `dydx-proto`/`prost`/`tonic`. Pre-commit enforces this.
+- Adapter-only dependencies belong in the "Adapter dependencies" section of the workspace
+  `Cargo.toml`. Pre-commit prevents core crates from using them.
 
 ## Feature flag conventions
 
@@ -1042,11 +1046,11 @@ make check-capnp-schemas
 
 This target:
 
-1. Regenerates all schema files.
-2. Verifies no uncommitted changes exist.
-3. Fails if schemas are out of sync.
+1. Skips with a warning if `capnp` is not installed (acceptable for local development).
+2. Fails if regeneration errors occur (e.g., version mismatch).
+3. Regenerates schemas and fails if generated files differ from committed versions.
 
-CI runs this check automatically to catch drift.
+CI runs this check automatically to catch drift (capnp is always installed in CI).
 
 ### Testing with capnp feature
 

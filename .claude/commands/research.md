@@ -15,11 +15,38 @@ Automated research pipeline for trading strategies. Searches academic papers, ex
 
 Execute the following steps automatically:
 
-### Step 1: Query Classification
+### Step 1: RAG Retrieval (Semantic Search Existing Research)
 
-Use `mcp__semantic-router__classify_query` to classify the topic:
-- If `trading_strategy` (confidence > 0.5): Proceed with trading-focused search
-- If other domain: Warn user, ask to proceed or refine query
+**FIRST**, use semantic search to find existing papers on this topic:
+
+```python
+from scripts.research_rerank import search_papers
+from scripts.research_query import ResearchQuery
+
+# Semantic search with embeddings (primary)
+existing = search_papers(
+    query="$ARGUMENTS",
+    top_k=10,
+    min_similarity=0.4
+)
+
+if existing:
+    print(f"Found {len(existing)} existing papers via semantic search:")
+    for paper in existing[:5]:
+        print(f"  [{paper['similarity']:.2f}] {paper['title']}")
+
+# Fallback: Graph search for related strategies
+rq = ResearchQuery()
+strategies = rq.get_related_strategies("$ARGUMENTS")
+if strategies.data:
+    print(f"Found {len(strategies.data)} related strategies in Neo4j")
+```
+
+**Output**:
+- If existing papers found (similarity > 0.5) → Show summary, ask if user wants NEW papers
+- If low similarity or no papers → Proceed to Step 2
+
+**Benefit**: Semantic matching catches synonyms/related concepts, not just keywords.
 
 ### Step 2: Paper Search
 
@@ -193,7 +220,7 @@ docs/research/parsed/{paper_id}/
 
 **Integration with Step 3.5**: If MinerU output exists, use it for better LaTeX extraction instead of API-based reading.
 
-### Step 3: Paper Analysis + Rerank (AUTOMATIC)
+### Step 3: Paper Analysis + Semantic Rerank (AUTOMATIC)
 
 For each paper found, extract:
 ```yaml
@@ -207,16 +234,29 @@ For each paper found, extract:
 - relevance_score: 1-10 rating for the topic
 ```
 
-**RERANK (AUTOMATIC)**: After scoring all papers:
+**SEMANTIC RERANK (MANDATORY)**: Use embeddings for accurate ranking:
 ```python
-# Sort by relevance_score descending
-papers_ranked = sorted(papers, key=lambda p: p['relevance_score'], reverse=True)
+from scripts.research_rerank import rerank_search_results, generate_embeddings
+
+# Rerank using semantic similarity + relevance score
+papers_reranked = rerank_search_results(
+    search_results=papers,
+    query="$ARGUMENTS",
+    weight_similarity=0.7  # 70% embedding similarity, 30% relevance score
+)
 
 # Select top 3 for deep analysis (Step 7)
-top_papers = papers_ranked[:3]
+top_papers = papers_reranked[:3]
 
-# Only papers with relevance >= 7 get downloaded
-papers_to_download = [p for p in papers_ranked if p['relevance_score'] >= 7]
+# Only papers with combined_score >= 0.5 get downloaded
+papers_to_download = [p for p in papers_reranked if p.get('combined_score', 0) >= 0.5]
+```
+
+**After download, generate embeddings for new papers**:
+```python
+# Store embeddings in DuckDB for future semantic search
+updated, errors = generate_embeddings()
+print(f"Embeddings generated: {updated}, errors: {errors}")
 ```
 
 **Dedup check**: Skip papers already in Neo4j (check by arxiv_id or DOI).
@@ -556,11 +596,10 @@ After `/research {topic}`, you can:
 
 ## Requirements
 
-- MCP: `semantic-router` (query classification)
-- MCP: `paper-search-mcp` (paper search)
-- MCP: `wolframalpha` (formula validation)
+- MCP: `paper-search-mcp` (paper search) - **REQUIRED**
+- MCP: `wolframalpha` (formula validation) - **OPTIONAL**
+- Script: `scripts/research_query.py` (RAG retrieval from Neo4j/DuckDB)
 - Script: `scripts/sync_research.py` (entity sync)
-- Agent: `strategy-researcher` (paper analysis)
 
 ## Examples
 

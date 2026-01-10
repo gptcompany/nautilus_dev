@@ -34,6 +34,19 @@ paths:
   catalog: "/media/sam/2TB-NVMe/nautilus_catalog_v1222/"
   nightly_env: "/media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/"
 
+# Ralph Loop Configuration
+ralph:
+  max_iterations: 15           # Max iterations before circuit breaker
+  max_budget_usd: 20.0         # Max estimated cost per session
+  max_consecutive_errors: 3    # Errors before stop
+  max_no_progress: 5           # Iterations without progress before stop
+  max_ci_failures: 3           # CI failures before stop
+  min_iteration_interval_secs: 10  # Rate limit between iterations
+  max_iterations_per_hour: 100 # Rate limit per hour
+  estimated_cost_per_iteration: 2.0  # Cost estimate for budget tracking
+  state_path: "~/.claude/ralph/state.json"
+  progress_path: "~/.claude/ralph/progress.md"
+
 # QuestDB Tables (expected schema)
 questdb_tables:
   - trading_pnl

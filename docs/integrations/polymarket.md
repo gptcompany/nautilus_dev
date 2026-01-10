@@ -427,6 +427,46 @@ NautilusTrader automatically manages WebSocket connections to handle this limita
 If you need to subscribe to a large number of instruments (e.g., 5000+), the adapter will automatically distribute these subscriptions across multiple WebSocket connections, with each connection handling up to 500 instruments.
 :::
 
+## Rate limiting
+
+Polymarket enforces rate limits via Cloudflare throttling. When limits are exceeded, the API returns
+HTTP 429 responses and requests are throttled rather than immediately rejected.
+
+### REST limits
+
+| Endpoint Type        | Limit              | Notes                                       |
+|----------------------|--------------------|---------------------------------------------|
+| Public endpoints     | 100 req/min per IP | Unauthenticated market data requests.       |
+| Authenticated reads  | 300 req/min per key| Authenticated data queries.                 |
+| Trading endpoints    | 60 orders/min      | Order placement and cancellation.           |
+| Order endpoint       | 3000 req/10 min    | Rolling or fixed window (unconfirmed).      |
+
+### WebSocket limits
+
+- **Subscriptions per connection**: 500 instruments maximum (handled automatically by the adapter).
+- **Connections**: 20 subscriptions per connection for some endpoints.
+
+:::warning
+Exceeding Polymarket rate limits returns HTTP 429 and may result in temporary blocking.
+:::
+
+### Data loader rate limiting
+
+The `PolymarketDataLoader` includes built-in rate limiting when using the default HTTP client.
+Requests are automatically throttled to 100 requests per minute, matching Polymarket's
+public endpoint limit.
+
+When fetching large date ranges across multiple markets:
+
+- Multiple loaders sharing the same `http_client` instance will coordinate rate limiting automatically.
+- For higher throughput with authenticated requests, pass a custom `http_client` with adjusted quotas.
+- The loader does not implement automatic retry on 429 errors, so implement backoff if needed.
+
+:::info
+For the latest rate limit details, see the official Polymarket documentation:
+<https://docs.polymarket.com/quickstart/introduction/rate-limits>
+:::
+
 ## Limitations and considerations
 
 The following limitations are currently known:

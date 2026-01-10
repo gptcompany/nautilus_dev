@@ -187,19 +187,19 @@ python scripts/architecture_drift_detector.py --fix
 | nautilus-docs-specialist | Doc search (delegate FIRST) |
 | nautilus-data-pipeline-operator | Data pipeline management |
 | nautilus-live-operator | Live trading operations |
-| nautilus-visualization-renderer | Charts & dashboards |
 | backtest-analyzer | Log analysis (chunked) |
 | alpha-evolve | Multi-implementation generator ([E] marker) |
-| alpha-visual | Visual validation with screenshots |
-| strategy-researcher | Paper→spec conversion |
-| grafana-expert | Dashboard creation and validation |
+| mathematician | Formula validation and conversion |
 
-### Deprecated Agents (Use Ralph Loop Instead)
-| Agent | Replacement |
-|-------|-------------|
-| ~~test-runner~~ | Ralph exit criteria (tests must pass) |
-| ~~tdd-guard~~ | Ralph exit criteria + /tdd:* skills |
-| ~~alpha-debug~~ | Ralph loop with circuit breakers |
+### Archived Agents (2026-01-09)
+Moved to `.backup_agents/` for token optimization:
+- `nautilus-visualization-renderer` → Use browser tools directly
+- `alpha-visual` → Use screenshot tools directly
+- `strategy-researcher` → Use /research command
+- `grafana-expert` → Use Grafana API directly
+- `grafana-visual-validator` → Merged functionality
+- `adaptive-control-architect` → Legacy, rarely used
+- `pinescript-converter` → Use /pinescript command
 
 | Skill | Savings |
 |-------|---------|
@@ -211,7 +211,7 @@ python scripts/architecture_drift_detector.py --fix
 
 **Pre-Planning**: ALWAYS delegate to `nautilus-docs-specialist` first (Discord + Context7)
 
-**Search Workflow**: Discord (bugs) → Context7 (API) → backtest-analyzer (logs) → alpha-debug (code)
+**Search Workflow**: Discord (bugs) → Context7 (API) → backtest-analyzer (logs) → Ralph Loop (code)
 
 ---
 

@@ -31,7 +31,7 @@
 
 ### 1.5 Sentry MCP Integration
 - [x] Add Sentry MCP server to Claude Code
-- [x] Update agents with Sentry tools (alpha-debug, nautilus-live-operator, test-runner)
+- [x] Update agents with Sentry tools (nautilus-coder, nautilus-live-operator, backtest-analyzer)
 - [ ] Authenticate via OAuth (restart Claude session)
 
 ## Phase 2: Monitoring Stack (Week 2)
@@ -237,7 +237,7 @@
 - [x] Create `.ralph/progress.md` format
 - [x] Auto-update on each iteration
 - [x] Git commit progress after each loop
-- [ ] Resume from last progress on restart
+- [x] Resume from last progress on restart (2026-01-09: ralph-resume.py hook implemented)
 
 ### 8.4 Task Classifier
 - [x] Create task classification logic
@@ -269,6 +269,49 @@
 - [x] Add deprecation warnings to old agents
 - [x] Update CLAUDE.md with new execution modes
 - [ ] Remove deprecated agents after 30 days (scheduled)
+
+### 8.8 Ralph Enterprise Hardening (2026-01-09)
+> Upgrade Ralph from MVP to enterprise-grade based on audit findings.
+
+#### 8.8.1 Resume from Restart
+- [x] Create `ralph-resume.py` UserPromptSubmit hook (2026-01-09)
+- [x] Detect active state.json on session start (2026-01-09)
+- [x] Offer resume/discard options to user (2026-01-09: RALPH RESUME/DISCARD commands)
+- [x] Restore iteration count and progress context (2026-01-09)
+- [ ] Test resume after crash/restart
+
+#### 8.8.2 SSOT Configuration
+- [x] Add ralph section to `config/canonical.yaml` (2026-01-09)
+- [x] Load MAX_ITERATIONS from SSOT (2026-01-09)
+- [x] Load MAX_BUDGET_USD from SSOT (2026-01-09)
+- [x] Load circuit breaker thresholds from SSOT (2026-01-09)
+- [x] Fallback to defaults if missing (2026-01-09)
+
+#### 8.8.3 Structured Logging
+- [x] Replace print() with logging module (2026-01-09)
+- [x] Add JSON structured log format (2026-01-09: ~/.claude/logs/)
+- [x] Integrate Sentry for error tracking (2026-01-09: emit_sentry_breadcrumb())
+- [x] Add QuestDB metrics emission (2026-01-09: emit_questdb_metric() via ILP)
+- [ ] Update Grafana dashboard with live Ralph metrics
+
+#### 8.8.4 Error Handling
+- [x] Remove all `except: pass` patterns (2026-01-09)
+- [x] Add proper error logging with context (2026-01-09)
+- [x] Add Sentry breadcrumbs for debugging (2026-01-09)
+- [x] Implement graceful degradation (2026-01-09: non-critical failures logged but don't stop loop)
+
+#### 8.8.5 State Management
+- [ ] Add file locking for state.json
+- [x] Add state validation/checksum (2026-01-09)
+- [x] Add automatic backup before mutations (2026-01-09: state.json.bak)
+- [ ] Add state recovery from backup
+
+#### 8.8.6 Testing
+- [x] Create tests/hooks/test_ralph_loop.py (2026-01-09: claude-hooks-shared/tests/hooks/)
+- [x] Test circuit breakers trigger correctly (2026-01-09: mock tests)
+- [x] Test resume from state.json (2026-01-09: mock tests)
+- [x] Test rate limiting (2026-01-09: mock tests)
+- [x] Mock test for verification scenarios (2026-01-09: TestVerificationScenarios class)
 
 ## Verification
 

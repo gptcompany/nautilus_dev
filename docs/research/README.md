@@ -96,7 +96,7 @@ The sync script:
 
 ### In nautilus_dev
 
-- `.claude/agents/strategy-researcher.md` - Agent for paper analysis
+- `.claude/commands/research.md` - /research command for paper analysis
 - `.claude/skills/paper-to-strategy/` - Skill for spec generation
 - `scripts/sync_research.py` - Sync script
 
@@ -115,7 +115,7 @@ The sync script:
 2. Run sync_research.py
    └─> Copies strategy__ entities to strategies.json
 
-3. Use strategy-researcher agent
+3. Use /research command
    └─> Reads strategies.json for existing research
    └─> Generates spec.md using paper-to-strategy skill
 

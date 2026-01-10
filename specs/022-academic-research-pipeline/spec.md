@@ -68,17 +68,29 @@ Currently:
 - [ ] Shows differential: "3 new papers since last session"
 - [ ] Links to existing strategies implementing similar concepts
 
-### US6: Persistent Storage Layer - DuckDB + Neo4j (P1) 🆕
+### US6: Local RAG with Background Processing (P1) 🆕 [UPDATED 2026-01]
 **As a** researcher,
-**I want** papers, formulas, and strategies stored in proper databases,
-**So that** I can query complex relationships and aggregate analytics.
+**I want** papers parsed in background and indexed for semantic search,
+**So that** I can query formulas without blocking research workflow.
 
 **Acceptance Criteria**:
-- [ ] Neo4j (Docker) stores graph: paper→cites→paper, paper→contains→formula
-- [ ] DuckDB stores analytics: papers.parquet, formulas.parquet, strategies.parquet
-- [ ] Bidirectional sync: Neo4j ↔ DuckDB ↔ memory.json
-- [ ] Cypher queries: "MATCH (p:Paper)-[:CONTAINS]->(f:Formula) WHERE f.name = 'Kelly'"
-- [ ] SQL queries: "SELECT * FROM strategies WHERE sharpe > 1.5"
+- [X] Background daemon processes PDFs with MinerU (non-blocking)
+- [X] Local embeddings (bge-base-en-v1.5) for semantic search (NO LLM API)
+- [X] Auto-indexing after parsing completes
+- [X] Query: `query_formulas("Kelly criterion position sizing")`
+- [X] Status: memory.json for knowledge graph (<500 entities)
+
+**Architecture (Simplified 2026-01)**:
+```
+/research → queue_for_parsing() → Background Daemon → MinerU → Auto-Index → RAG Storage
+                      ↓
+              Immediate Response (abstracts)
+```
+
+**What was REMOVED**:
+- Neo4j (TEXT-ONLY, requires LLM API - no benefit over memory.json)
+- DuckDB sync (complexity without value for <500 entities)
+- Bidirectional sync (YAGNI - memory.json + RAG sufficient)
 
 ### US7: MinerU PDF Parsing (P1) 🆕
 **As a** researcher,
@@ -92,17 +104,17 @@ Currently:
 - [ ] Tables extracted as markdown tables
 - [ ] Integration with /research command
 
-### US8: Formula Extraction & Validation (P2) 🆕
+### US8: Formula Extraction & Validation (P2) 🆕 [UPDATED 2026-01]
 **As a** quant,
-**I want** mathematical formulas extracted and validated,
-**So that** I can trust the mathematics before implementing.
+**I want** mathematical formulas extracted and indexed for semantic search,
+**So that** I can query formulas across all papers.
 
 **Acceptance Criteria**:
-- [ ] Extract formulas from MinerU output
-- [ ] Create formula__ entities in Neo4j
-- [ ] Validate with WolframAlpha: `mcp__wolframalpha__ask_llm`
-- [ ] Store validation result: valid|invalid|needs_review
-- [ ] Link formula→strategy, formula→paper
+- [X] Extract formulas from MinerU output
+- [X] Index formulas in RAG storage (bge-base-en-v1.5)
+- [X] Query: `query_formulas("Kelly criterion")` returns formula context
+- [X] Validate with WolframAlpha: `mcp__wolframalpha__ask_llm` (optional)
+- [X] Link formula→paper via doc_id in chunk metadata
 
 ## Technical Design
 

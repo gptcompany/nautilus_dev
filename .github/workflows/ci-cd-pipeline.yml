@@ -36,6 +36,9 @@ on:
 env:
   PYTHON_VERSION: '3.12'
   UV_CACHE_DIR: /tmp/.uv-cache
+  SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+  SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
+  SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
   # ============================================================================
   # ENTERPRISE PRODUCTION SYSTEM - HANDLES REAL MONEY - NO COMPROMISES
   # ============================================================================
@@ -934,3 +937,36 @@ jobs:
           fi
 
           echo "All required stages passed - ready for merge"
+
+  # ===========================================================================
+  # Sentry Release (on main branch push only)
+  # ===========================================================================
+  sentry-release:
+    name: "Sentry Release"
+    runs-on: [self-hosted, nautilus]
+    needs: merge-gate
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full history for commits
+
+      - name: Create Sentry release
+        uses: getsentry/action-release@v1
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+          SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
+        with:
+          environment: production
+          version: ${{ github.sha }}
+          set_commits: auto
+
+      - name: Notify Sentry of deployment
+        if: success()
+        run: |
+          echo "Sentry release created: ${{ github.sha }}"
+          echo "Commits associated with this release"
