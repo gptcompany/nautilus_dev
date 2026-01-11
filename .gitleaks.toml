@@ -98,6 +98,12 @@ paths = [
     '''\.github/runner/\.env''',  # Runner config
     '''\.env''',  # Root .env is gitignored but may exist locally
     '''security/\.env\.example''',  # Security env template
+    '''\.mypy_cache/.*''',  # MyPy cache (hash values, not secrets)
+    '''\.venv/.*''',  # Virtual environment (library crypto constants)
+    '''\.cache/.*''',  # Cache directories
+    '''node_modules/.*''',  # Node modules
+    '''scripts/auto_update/.*''',  # Auto-update scripts (webhook is non-sensitive notification URL)
+    '''specs/bookmarks.*\.json''',  # Bookmarks with journal access tokens (read-only article links)
 ]
 regexes = [
     '''EXAMPLE_.*''',
