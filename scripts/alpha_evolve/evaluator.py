@@ -145,7 +145,7 @@ class StrategyEvaluator:
 
         try:
             # Execute code in module namespace
-            exec(code, module.__dict__)
+            exec(code, module.__dict__)  # nosec B102 - intentional dynamic code execution for evolution
 
             # Extract classes
             strategy_class = getattr(module, class_name)
@@ -336,6 +336,7 @@ class StrategyEvaluator:
         """
         # Lazy imports to avoid circular dependencies
         from strategies.common.adaptive_control import (
+            Exchange,
             TransactionCostModel,
             probabilistic_sharpe_ratio,
         )
@@ -403,9 +404,7 @@ class StrategyEvaluator:
                 trades_per_year = int(trade_count * (252 / max(days, 1)))
 
                 cost_model = TransactionCostModel(
-                    commission_bps=5.0,  # 5 bps commission
-                    base_slippage_bps=2.0,  # 2 bps base slippage
-                    spread_bps=1.0,  # 1 bps spread
+                    exchange=Exchange.BINANCE_FUTURES,  # Use predefined cost profile
                 )
                 net_sharpe = cost_model.adjust_sharpe(
                     gross_sharpe=sharpe,
