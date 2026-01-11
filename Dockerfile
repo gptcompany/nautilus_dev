@@ -1,7 +1,7 @@
 # TradingNode Docker Image (T045)
 # Production-ready container for NautilusTrader live trading
 
-FROM python:3.11-slim
+FROM python:3.14-slim
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
