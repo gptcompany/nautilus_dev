@@ -20,6 +20,7 @@ class MonitoringConfig(BaseSettings):
     model_config = SettingsConfigDict(
         env_prefix="MONITORING_",
         env_file=".env",
+        extra="ignore",  # Allow extra env vars in .env without failing
     )
 
     # QuestDB connection
