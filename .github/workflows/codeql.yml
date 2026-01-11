@@ -56,15 +56,6 @@ jobs:
           category: "/language:python"
           # Upload results to GitHub Security tab
           upload: true
-          # Output SARIF file for review
-          output: codeql-results
-
-      - name: Upload SARIF results
-        uses: github/codeql-action/upload-sarif@v3
-        if: always()
-        with:
-          sarif_file: codeql-results
-          category: python-analysis
 
       - name: Check for critical findings
         if: github.event_name == 'pull_request'
