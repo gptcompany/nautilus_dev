@@ -108,8 +108,8 @@ groups:
         execErrState: Alerting
         for: 10m
         annotations:
-          summary: "Hook {{ $labels.hook_name }} has high latency"
-          description: "Average latency exceeded 500ms for 10 minutes. Current: {{ $values.B }}ms"
+          summary: "Claude hook has high latency"
+          description: "Average latency exceeded 500ms for 10 minutes. Check hook performance."
         labels:
           severity: warning
           category: claude
@@ -160,8 +160,8 @@ groups:
         execErrState: Alerting
         for: 15m
         annotations:
-          summary: "Agent {{ $labels.agent_type }} has low success rate"
-          description: "Success rate dropped below 80%. Current: {{ $values.B }}%"
+          summary: "Claude agent has low success rate"
+          description: "Success rate dropped below 80%. Check agent configuration."
         labels:
           severity: warning
           category: claude
@@ -210,7 +210,7 @@ groups:
         for: 0s
         annotations:
           summary: "Claude daily cost exceeded $50"
-          description: "Daily spending has exceeded $50 threshold. Current: ${{ $values.B }}"
+          description: "Daily spending has exceeded $50 threshold. Review usage in dashboard."
         labels:
           severity: critical
           category: claude
@@ -261,8 +261,8 @@ groups:
         execErrState: Alerting
         for: 10m
         annotations:
-          summary: "Tool {{ $labels.tool_name }} has high failure rate"
-          description: "Failure rate exceeded 20%. Current: {{ $values.B }}%"
+          summary: "Claude tool has high failure rate"
+          description: "Failure rate exceeded 20%. Check tool logs and permissions."
         labels:
           severity: warning
           category: claude
