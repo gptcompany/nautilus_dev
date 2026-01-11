@@ -387,6 +387,13 @@ jobs:
       - name: Install dependencies
         run: uv sync --all-extras
 
+      - name: Install nautilus_trader from nightly
+        run: |
+          # Install nautilus_trader from nightly index (required for test imports)
+          uv pip install nautilus_trader --pre --index-url=https://packages.nautechsystems.io/simple || {
+            echo "::warning::nautilus_trader nightly not available, tests may fail"
+          }
+
       - name: Run unit tests with coverage
         id: tests
         run: |
@@ -478,6 +485,13 @@ jobs:
 
       - name: Install dependencies
         run: uv sync --all-extras
+
+      - name: Install nautilus_trader from nightly
+        run: |
+          # Install nautilus_trader from nightly index (required for integration tests)
+          uv pip install nautilus_trader --pre --index-url=https://packages.nautechsystems.io/simple || {
+            echo "::warning::nautilus_trader nightly not available, tests may fail"
+          }
 
       - name: Verify service connectivity
         run: |
