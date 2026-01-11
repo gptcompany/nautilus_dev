@@ -24,6 +24,7 @@ Usage:
 import argparse
 import hashlib
 import json
+import os
 import signal
 import time
 from datetime import datetime
@@ -42,9 +43,13 @@ MAX_RETRIES = 3
 BACKOFF_BASE = 2  # exponential: 2, 4, 8 seconds
 BATCH_SIZE = 50  # max events per processing cycle
 
-# Neo4j Configuration
-NEO4J_URI = "bolt://localhost:7687"
-NEO4J_AUTH = ("neo4j", "research123")
+# Neo4j Configuration - SECURITY: Credentials from environment
+NEO4J_URI = os.getenv("NEO4J_URI", "bolt://localhost:7687")
+_neo4j_user = os.getenv("NEO4J_USER", "neo4j")
+_neo4j_password = os.getenv("NEO4J_PASSWORD")
+if not _neo4j_password:
+    raise ValueError("NEO4J_PASSWORD environment variable required")
+NEO4J_AUTH = (_neo4j_user, _neo4j_password)
 
 # Global for graceful shutdown
 _shutdown_requested = False

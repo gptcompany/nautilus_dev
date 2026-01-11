@@ -305,6 +305,252 @@
           }
         ]
       }
+    },
+    {
+      "id": 100,
+      "title": "Tool & Hook Metrics",
+      "type": "row",
+      "gridPos": {"x": 0, "y": 26, "w": 24, "h": 1},
+      "collapsed": false
+    },
+    {
+      "id": 101,
+      "title": "Tool Calls (24h)",
+      "type": "stat",
+      "gridPos": {"x": 0, "y": 27, "w": 4, "h": 4},
+      "datasource": "QuestDB",
+      "targets": [
+        {
+          "rawSql": "SELECT count(*) as calls FROM claude_tool_usage WHERE timestamp > now() - interval '24h'",
+          "format": "table"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "thresholds"},
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"color": "blue", "value": null}
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 102,
+      "title": "Tool Success Rate",
+      "type": "gauge",
+      "gridPos": {"x": 4, "y": 27, "w": 4, "h": 4},
+      "datasource": "QuestDB",
+      "targets": [
+        {
+          "rawSql": "SELECT (SUM(CASE WHEN success THEN 1 ELSE 0 END) * 100.0 / COUNT(*)) as rate FROM claude_tool_usage WHERE timestamp > now() - interval '24h'",
+          "format": "table"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"color": "red", "value": null},
+              {"color": "yellow", "value": 80},
+              {"color": "green", "value": 95}
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 103,
+      "title": "Avg Tool Latency",
+      "type": "stat",
+      "gridPos": {"x": 8, "y": 27, "w": 4, "h": 4},
+      "datasource": "QuestDB",
+      "targets": [
+        {
+          "rawSql": "SELECT avg(duration_ms) as latency FROM claude_tool_usage WHERE timestamp > now() - interval '24h'",
+          "format": "table"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms",
+          "color": {"mode": "thresholds"},
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"color": "green", "value": null},
+              {"color": "yellow", "value": 100},
+              {"color": "red", "value": 500}
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 104,
+      "title": "Hook Latency (avg)",
+      "type": "stat",
+      "gridPos": {"x": 12, "y": 27, "w": 4, "h": 4},
+      "datasource": "QuestDB",
+      "targets": [
+        {
+          "rawSql": "SELECT avg(duration_ms) as latency FROM claude_hooks WHERE timestamp > now() - interval '24h'",
+          "format": "table"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms",
+          "color": {"mode": "thresholds"},
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"color": "green", "value": null},
+              {"color": "yellow", "value": 100},
+              {"color": "red", "value": 500}
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 105,
+      "title": "Errors (24h)",
+      "type": "stat",
+      "gridPos": {"x": 16, "y": 27, "w": 4, "h": 4},
+      "datasource": "QuestDB",
+      "targets": [
+        {
+          "rawSql": "SELECT count(*) as errors FROM claude_events WHERE timestamp > now() - interval '24h' AND severity IN ('high', 'critical')",
+          "format": "table"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "thresholds"},
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"color": "green", "value": null},
+              {"color": "yellow", "value": 5},
+              {"color": "red", "value": 10}
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 106,
+      "title": "Context Usage",
+      "type": "gauge",
+      "gridPos": {"x": 20, "y": 27, "w": 4, "h": 4},
+      "datasource": "QuestDB",
+      "targets": [
+        {
+          "rawSql": "SELECT avg(utilization_pct) as usage FROM claude_context WHERE timestamp > now() - interval '1h'",
+          "format": "table"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"color": "green", "value": null},
+              {"color": "yellow", "value": 70},
+              {"color": "red", "value": 90}
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 107,
+      "title": "Tool Usage Over Time",
+      "type": "timeseries",
+      "gridPos": {"x": 0, "y": 31, "w": 12, "h": 8},
+      "datasource": "QuestDB",
+      "targets": [
+        {
+          "rawSql": "SELECT timestamp, count(*) as calls FROM claude_tool_usage WHERE timestamp > now() - interval '24h' SAMPLE BY 1h ALIGN TO CALENDAR",
+          "format": "time_series"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 20
+          }
+        }
+      }
+    },
+    {
+      "id": 108,
+      "title": "Tool Distribution",
+      "type": "piechart",
+      "gridPos": {"x": 12, "y": 31, "w": 12, "h": 8},
+      "datasource": "QuestDB",
+      "targets": [
+        {
+          "rawSql": "SELECT tool_name, count(*) as calls FROM claude_tool_usage WHERE timestamp > now() - interval '24h' GROUP BY tool_name ORDER BY calls DESC LIMIT 10",
+          "format": "table"
+        }
+      ],
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "right",
+          "values": ["value", "percent"]
+        }
+      }
+    },
+    {
+      "id": 109,
+      "title": "Hook Performance",
+      "type": "table",
+      "gridPos": {"x": 0, "y": 39, "w": 12, "h": 6},
+      "datasource": "QuestDB",
+      "targets": [
+        {
+          "rawSql": "SELECT hook_name, count(*) as invocations, avg(duration_ms) as avg_ms, max(duration_ms) as max_ms, (SUM(CASE WHEN NOT success THEN 1 ELSE 0 END)) as failures FROM claude_hooks WHERE timestamp > now() - interval '24h' GROUP BY hook_name ORDER BY avg_ms DESC",
+          "format": "table"
+        }
+      ],
+      "fieldConfig": {
+        "overrides": [
+          {"matcher": {"id": "byName", "options": "avg_ms"}, "properties": [{"id": "unit", "value": "ms"}]},
+          {"matcher": {"id": "byName", "options": "max_ms"}, "properties": [{"id": "unit", "value": "ms"}]}
+        ]
+      }
+    },
+    {
+      "id": 110,
+      "title": "Tool Performance",
+      "type": "table",
+      "gridPos": {"x": 12, "y": 39, "w": 12, "h": 6},
+      "datasource": "QuestDB",
+      "targets": [
+        {
+          "rawSql": "SELECT tool_name, count(*) as calls, avg(duration_ms) as avg_ms, (SUM(CASE WHEN success THEN 1 ELSE 0 END) * 100.0 / COUNT(*)) as success_pct FROM claude_tool_usage WHERE timestamp > now() - interval '24h' GROUP BY tool_name ORDER BY calls DESC",
+          "format": "table"
+        }
+      ],
+      "fieldConfig": {
+        "overrides": [
+          {"matcher": {"id": "byName", "options": "avg_ms"}, "properties": [{"id": "unit", "value": "ms"}]},
+          {"matcher": {"id": "byName", "options": "success_pct"}, "properties": [{"id": "unit", "value": "percent"}]}
+        ]
+      }
     }
   ]
 }

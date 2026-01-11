@@ -2,13 +2,13 @@
   "execution": {
     "workflow_id": "nautilus-monitor",
     "workflow_name": "NautilusTrader Version Monitor",
-    "timestamp": "2026-01-08T00:00:29.030Z",
+    "timestamp": "2026-01-11T00:00:14.013Z",
     "status": "warning"
   },
   "nautilus_state": {
     "stable_version": "v1.222.0",
     "nightly_commits_ahead": 50,
-    "check_date": "2026-01-08"
+    "check_date": "2026-01-11"
   },
   "breaking_changes": [
     {
@@ -17,17 +17,10 @@
       "date": "2026-01-07T22:12:09Z",
       "url": "https://github.com/nautechsystems/nautilus_trader/commit/66a77d3db30aa1730642cb48ee2d27ee7e7accf6",
       "message": "Refactor TearsheetConfig.charts to chart objects (drop chart_args) (#3398)\n\nBREAKING: `TearsheetConfig.charts` now takes chart objects instead of strings; `chart_args` removed."
-    },
-    {
-      "sha": "314ef30",
-      "title": "Align Rust data commands with Python and fix book flow",
-      "date": "2026-01-04T07:25:14Z",
-      "url": "https://github.com/nautechsystems/nautilus_trader/commit/314ef3021c24d62dbd9e6403af011e30061b023b",
-      "message": "Align Rust data commands with Python and fix book flow\n\n- Add correlation_id field to all Subscribe/Unsubscribe command structs\n- Fix BookUpdater to handle direct OrderBookDeltas/Depth10 from msgbus\n- Forward BookSnapshots subscriptions to client as BookDeltas with link\n- Track direct deltas subscriptions separately from snapshot-forwarded\n- Properly unsubscribe deltas when all snapshot intervals are removed"
     }
   ],
   "compatibility_assessment": {
     "status": "review_required",
-    "breaking_count": 2
+    "breaking_count": 1
   }
 }

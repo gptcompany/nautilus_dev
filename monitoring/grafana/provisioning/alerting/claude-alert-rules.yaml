@@ -1,0 +1,268 @@
+# Claude Code Alert Rules
+# Added to existing Grafana alerting system
+# Tables: claude_tool_usage, claude_events, claude_agents, claude_hooks
+
+apiVersion: 1
+
+groups:
+  # ============================================
+  # Claude Code Health Alerts
+  # ============================================
+  - orgId: 1
+    name: claude_code_health
+    folder: Claude Alerts
+    interval: 60s
+    rules:
+      # Warning: High error rate
+      - uid: claude-high-errors
+        title: Claude High Error Rate
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 3600
+              to: 0
+            datasourceUid: P2596F1C8E12435D2
+            model:
+              rawSql: |
+                SELECT count(*) as error_count
+                FROM claude_events
+                WHERE timestamp > now() - interval '1h'
+                AND severity IN ('high', 'critical')
+              format: table
+          - refId: B
+            relativeTimeRange:
+              from: 0
+              to: 0
+            datasourceUid: __expr__
+            model:
+              type: reduce
+              expression: A
+              reducer: last
+          - refId: C
+            relativeTimeRange:
+              from: 0
+              to: 0
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: B
+              conditions:
+                - evaluator:
+                    type: gt
+                    params: [10]
+                  operator:
+                    type: and
+        noDataState: OK
+        execErrState: Alerting
+        for: 5m
+        annotations:
+          summary: "Claude Code high error rate"
+          description: "More than 10 high/critical errors in the last hour. Check hooks and tools."
+        labels:
+          severity: warning
+          category: claude
+
+      # Warning: Hook latency high
+      - uid: claude-hook-latency
+        title: Claude Hook High Latency
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 1800
+              to: 0
+            datasourceUid: P2596F1C8E12435D2
+            model:
+              rawSql: |
+                SELECT hook_name, avg(duration_ms) as avg_latency
+                FROM claude_hooks
+                WHERE timestamp > now() - interval '30m'
+                GROUP BY hook_name
+                HAVING avg(duration_ms) > 500
+              format: table
+          - refId: B
+            relativeTimeRange:
+              from: 0
+              to: 0
+            datasourceUid: __expr__
+            model:
+              type: reduce
+              expression: A
+              reducer: max
+          - refId: C
+            relativeTimeRange:
+              from: 0
+              to: 0
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: B
+              conditions:
+                - evaluator:
+                    type: gt
+                    params: [500]
+                  operator:
+                    type: and
+        noDataState: OK
+        execErrState: Alerting
+        for: 10m
+        annotations:
+          summary: "Hook {{ $labels.hook_name }} has high latency"
+          description: "Average latency exceeded 500ms for 10 minutes. Current: {{ $values.B }}ms"
+        labels:
+          severity: warning
+          category: claude
+
+      # Warning: Agent success rate low
+      - uid: claude-agent-failures
+        title: Claude Agent Low Success Rate
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 3600
+              to: 0
+            datasourceUid: P2596F1C8E12435D2
+            model:
+              rawSql: |
+                SELECT agent_type,
+                       (SUM(CASE WHEN success THEN 1 ELSE 0 END) * 100.0 / COUNT(*)) as success_rate
+                FROM claude_agents
+                WHERE timestamp > now() - interval '1h'
+                GROUP BY agent_type
+                HAVING COUNT(*) >= 5
+              format: table
+          - refId: B
+            relativeTimeRange:
+              from: 0
+              to: 0
+            datasourceUid: __expr__
+            model:
+              type: reduce
+              expression: A
+              reducer: min
+          - refId: C
+            relativeTimeRange:
+              from: 0
+              to: 0
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: B
+              conditions:
+                - evaluator:
+                    type: lt
+                    params: [80]
+                  operator:
+                    type: and
+        noDataState: OK
+        execErrState: Alerting
+        for: 15m
+        annotations:
+          summary: "Agent {{ $labels.agent_type }} has low success rate"
+          description: "Success rate dropped below 80%. Current: {{ $values.B }}%"
+        labels:
+          severity: warning
+          category: claude
+
+      # Critical: Daily cost spike
+      - uid: claude-cost-spike
+        title: Claude Daily Cost Spike
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 86400
+              to: 0
+            datasourceUid: P2596F1C8E12435D2
+            model:
+              rawSql: |
+                SELECT SUM(cost_usd) as daily_cost
+                FROM claude_sessions
+                WHERE timestamp > now() - interval '24h'
+              format: table
+          - refId: B
+            relativeTimeRange:
+              from: 0
+              to: 0
+            datasourceUid: __expr__
+            model:
+              type: reduce
+              expression: A
+              reducer: last
+          - refId: C
+            relativeTimeRange:
+              from: 0
+              to: 0
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: B
+              conditions:
+                - evaluator:
+                    type: gt
+                    params: [50]
+                  operator:
+                    type: and
+        noDataState: OK
+        execErrState: Alerting
+        for: 0s
+        annotations:
+          summary: "Claude daily cost exceeded $50"
+          description: "Daily spending has exceeded $50 threshold. Current: ${{ $values.B }}"
+        labels:
+          severity: critical
+          category: claude
+
+      # Warning: Tool failure rate high
+      - uid: claude-tool-failures
+        title: Claude Tool High Failure Rate
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 3600
+              to: 0
+            datasourceUid: P2596F1C8E12435D2
+            model:
+              rawSql: |
+                SELECT tool_name,
+                       (SUM(CASE WHEN NOT success THEN 1 ELSE 0 END) * 100.0 / COUNT(*)) as failure_rate
+                FROM claude_tool_usage
+                WHERE timestamp > now() - interval '1h'
+                GROUP BY tool_name
+                HAVING COUNT(*) >= 10
+              format: table
+          - refId: B
+            relativeTimeRange:
+              from: 0
+              to: 0
+            datasourceUid: __expr__
+            model:
+              type: reduce
+              expression: A
+              reducer: max
+          - refId: C
+            relativeTimeRange:
+              from: 0
+              to: 0
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: B
+              conditions:
+                - evaluator:
+                    type: gt
+                    params: [20]
+                  operator:
+                    type: and
+        noDataState: OK
+        execErrState: Alerting
+        for: 10m
+        annotations:
+          summary: "Tool {{ $labels.tool_name }} has high failure rate"
+          description: "Failure rate exceeded 20%. Current: {{ $values.B }}%"
+        labels:
+          severity: warning
+          category: claude

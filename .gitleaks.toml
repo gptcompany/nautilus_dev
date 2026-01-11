@@ -43,6 +43,43 @@ regex = '''https://[a-f0-9]{32}@[a-z0-9]+\.ingest\.sentry\.io/[0-9]+'''
 tags = ["sentry", "monitoring"]
 keywords = ["sentry", "dsn"]
 
+# Hyperliquid/Ethereum Private Keys (CRITICAL)
+[[rules]]
+id = "hyperliquid-private-key"
+description = "Hyperliquid/Ethereum Private Key (64 hex chars)"
+regex = '''(?i)(?:private[_-]?key|pk|HYPERLIQUID.*PK)\s*[=:]\s*['"]?(0x)?([a-fA-F0-9]{64})['"]?'''
+tags = ["private-key", "critical", "trading", "hyperliquid"]
+keywords = ["private", "pk", "hyperliquid", "mainnet", "testnet"]
+
+[[rules]]
+id = "ethereum-private-key-raw"
+description = "Raw Ethereum Private Key (0x prefix)"
+regex = '''0x[a-fA-F0-9]{64}'''
+tags = ["private-key", "critical", "ethereum"]
+keywords = ["0x"]
+
+# JWT Hardcoded Defaults (detect insecure patterns)
+[[rules]]
+id = "jwt-secret-hardcoded"
+description = "Hardcoded JWT Secret (insecure default)"
+regex = '''(?i)JWT_SECRET\s*[=:]\s*['"](whale-dashboard|dev-secret|test-secret|change-?me|secret|password)[^'"]*['"]'''
+tags = ["jwt", "auth", "critical", "hardcoded"]
+keywords = ["jwt", "secret"]
+
+[[rules]]
+id = "neo4j-credentials"
+description = "Neo4j Hardcoded Credentials"
+regex = '''(?i)neo4j['"]\s*,\s*['"][^'"]+['"]'''
+tags = ["database", "credentials", "neo4j"]
+keywords = ["neo4j"]
+
+[[rules]]
+id = "discord-webhook"
+description = "Discord Webhook URL"
+regex = '''https://discord\.com/api/webhooks/[0-9]+/[a-zA-Z0-9_-]+'''
+tags = ["discord", "webhook", "notification"]
+keywords = ["discord", "webhook"]
+
 # Allowlist - files that are OK to have "secrets" (test fixtures, examples)
 [allowlist]
 description = "Allowlisted files and patterns"

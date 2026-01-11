@@ -10,6 +10,7 @@ Options:
 """
 
 import json
+import os
 import sys
 from datetime import datetime
 from pathlib import Path
@@ -17,10 +18,14 @@ from typing import cast
 
 from neo4j import GraphDatabase
 
-# Configuration
+# Configuration - SECURITY: Credentials from environment
 MEMORY_JSON_PATH = Path("/media/sam/1TB1/academic_research/memory.json")
-NEO4J_URI = "bolt://localhost:7687"
-NEO4J_AUTH = ("neo4j", "research123")
+NEO4J_URI = os.getenv("NEO4J_URI", "bolt://localhost:7687")
+_neo4j_user = os.getenv("NEO4J_USER", "neo4j")
+_neo4j_password = os.getenv("NEO4J_PASSWORD")
+if not _neo4j_password:
+    raise ValueError("NEO4J_PASSWORD environment variable required")
+NEO4J_AUTH = (_neo4j_user, _neo4j_password)
 
 
 def load_memory_json() -> dict:

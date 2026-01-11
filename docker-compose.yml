@@ -6,7 +6,7 @@ services:
     image: redis:7-alpine
     container_name: nautilus-redis
     ports:
-      - "6379:6379"
+      - "127.0.0.1:6379:6379"  # SECURITY: localhost only
     volumes:
       - redis_data:/data
     command: redis-server --appendonly yes

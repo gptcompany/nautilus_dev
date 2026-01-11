@@ -9,15 +9,20 @@ Options:
     --export-parquet    Also export tables to Parquet files
 """
 
+import os
 import sys
 from pathlib import Path
 
 import duckdb
 from neo4j import GraphDatabase
 
-# Configuration
-NEO4J_URI = "bolt://localhost:7687"
-NEO4J_AUTH = ("neo4j", "research123")
+# Configuration - SECURITY: Credentials from environment
+NEO4J_URI = os.getenv("NEO4J_URI", "bolt://localhost:7687")
+_neo4j_user = os.getenv("NEO4J_USER", "neo4j")
+_neo4j_password = os.getenv("NEO4J_PASSWORD")
+if not _neo4j_password:
+    raise ValueError("NEO4J_PASSWORD environment variable required")
+NEO4J_AUTH = (_neo4j_user, _neo4j_password)
 DUCKDB_PATH = Path("/media/sam/1TB/nautilus_dev/data/research.duckdb")
 PARQUET_DIR = Path("/media/sam/1TB/nautilus_dev/data/parquet")
 

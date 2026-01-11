@@ -1,0 +1,26 @@
+{
+  "execution": {
+    "workflow_id": "nautilus-monitor",
+    "workflow_name": "NautilusTrader Version Monitor",
+    "timestamp": "2026-01-11T00:00:14.013Z",
+    "status": "warning"
+  },
+  "nautilus_state": {
+    "stable_version": "v1.222.0",
+    "nightly_commits_ahead": 50,
+    "check_date": "2026-01-11"
+  },
+  "breaking_changes": [
+    {
+      "sha": "66a77d3",
+      "title": "Refactor TearsheetConfig.charts to chart objects (drop chart_args) (#3398)",
+      "date": "2026-01-07T22:12:09Z",
+      "url": "https://github.com/nautechsystems/nautilus_trader/commit/66a77d3db30aa1730642cb48ee2d27ee7e7accf6",
+      "message": "Refactor TearsheetConfig.charts to chart objects (drop chart_args) (#3398)\n\nBREAKING: `TearsheetConfig.charts` now takes chart objects instead of strings; `chart_args` removed."
+    }
+  ],
+  "compatibility_assessment": {
+    "status": "review_required",
+    "breaking_count": 1
+  }
+}
