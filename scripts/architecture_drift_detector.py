@@ -786,3 +786,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+# Test comment for Opus review - 2026-01-11
