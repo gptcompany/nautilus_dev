@@ -159,63 +159,10 @@ def shared_fitness(strategy, population, sigma_share=0.3):
 
 **Reference**: Goldberg & Richardson (1987) "Genetic Algorithms with Sharing for Multimodal Function Optimization"
 
-### FE-002: Island Model (Parallel Populations)
+### FE-002: Lineage Pruning (Age-Based Selection)
 
-**Current**: Single population evolves sequentially
-
-**Enhancement**: Multiple isolated populations with periodic migration
-
-```python
-class IslandPopulation:
-    def __init__(self, n_islands=4, migration_interval=10):
-        self.islands = [Population() for _ in range(n_islands)]
-        self.migration_interval = migration_interval
-
-    def evolve(self):
-        # Evolve islands independently
-        for island in self.islands:
-            island.evolve_generation()
-
-        # Every N generations, migrate best strategies
-        if self.generation % self.migration_interval == 0:
-            self.migrate_elites()
-```
-
-**Trigger**: When single population gets stuck in local optimum (no improvement for 50+ generations)
-
-**Trade-off**: Requires 4x compute resources, but explores search space better
-
-**Reference**: Whitley et al. (1999) "Island Model Genetic Algorithms and Linearly Separable Problems"
-
-### FE-003: Adaptive Mutation Rates
-
-**Current**: Fixed elite/exploit/explore ratios (10%/70%/20%)
-
-**Enhancement**: Adjust mutation rates based on population diversity
-
-```python
-def adaptive_mutation_rate(population):
-    """
-    Increase exploration when diversity is low.
-    Increase exploitation when diversity is high.
-    """
-    diversity = calculate_diversity(population)  # 0-1 scale
-
-    if diversity < 0.2:  # Low diversity
-        return {'elite': 0.05, 'exploit': 0.50, 'explore': 0.45}
-    elif diversity > 0.7:  # High diversity
-        return {'elite': 0.15, 'exploit': 0.80, 'explore': 0.05}
-    else:
-        return {'elite': 0.10, 'exploit': 0.70, 'explore': 0.20}
-```
-
-**Trigger**: When population diversity metrics show premature convergence or excessive randomness
-
-**Trade-off**: Needs diversity metric implementation, more complex parameter tuning
-
-**Reference**: Eiben et al. (1999) "Parameter Control in Evolutionary Algorithms"
-
-### FE-004: Lineage Pruning (Age-Based Selection)
+> **Note**: FE-002 (Island Model, ROI 0.6) and FE-003 (Adaptive Mutation, duplicate of 009-FE-001)
+> were removed 2026-01-11 during ROI analysis. See `specs/FUTURE_ENHANCEMENTS.md`.
 
 **Current**: Pruning based only on fitness
 

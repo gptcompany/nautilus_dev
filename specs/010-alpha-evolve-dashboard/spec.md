@@ -155,140 +155,39 @@ As a user, I need to track mutation success rate so that I can understand LLM mu
 
 > **Source**: "The Black Book of Financial Hacking" - J.C. Lotter
 > **Philosophy**: Add complexity ONLY if OOS shows problems.
+>
+> **ROI Analysis (2026-01-11)**: Removed 3 FEs with ROI < 1:
+> - FE-001 (Diversity Heatmap): ROI 0.67 - Nice-to-have, not actionable
+> - FE-003 (Fitness Landscape): ROI 0.25 - PCA on strategies not meaningful
+> - FE-004 (Lineage Tree): ROI 0.33 - Nice-to-have, not actionable
 
-### FE-001: Population Diversity Heatmap
+### FE-001: Mutation Success Attribution (CONDITIONAL)
 
-**Current**: Single population statistics gauge
-
-**Enhancement**: Visualize diversity over time with heatmap
-
-```sql
--- Query for diversity heatmap
-SELECT
-    generation,
-    AVG(code_similarity) as avg_similarity,
-    STDDEV(fitness) as fitness_variance,
-    COUNT(DISTINCT lineage_root) as unique_lineages
-FROM
-    population_history
-GROUP BY
-    generation
-ORDER BY
-    generation
-```
-
-**Visualization**: Heatmap with generation on X-axis, diversity metrics on Y-axis
-
-**Trigger**: When evolution converges too quickly (need to diagnose when diversity drops)
-
-**Trade-off**: Requires storing historical population snapshots, larger database
-
-**Reference**: Black Book - "Monitor diversity to detect premature convergence"
-
-### FE-002: Mutation Success Attribution
+**ROI**: 1.5 | **Pillars**: P2 | **Trigger**: Need to debug mutation effectiveness
 
 **Current**: Overall mutation success rate pie chart
 
 **Enhancement**: Track which mutation prompts/strategies produce best results
 
-```python
-# Dashboard panel showing:
-# - Elite mutations: 85% success rate (produce better child)
-# - Exploit mutations: 45% success rate
-# - Explore mutations: 15% success rate
-
-# Bar chart: Mutation prompt → Success rate
-# "Improve entry signals": 60%
-# "Optimize exit timing": 55%
-# "Add regime filter": 40%
-# "Simplify logic": 35%
-```
-
-**Trigger**: When mutation success rate is consistently low (<30%)
-
-**Trade-off**: Requires storing mutation prompts and outcomes, more complex queries
-
 **Reference**: Black Book - "Measure what you manage - track mutation effectiveness"
 
-### FE-003: Fitness Landscape Visualization
+### FE-002: Overfitting Detection (IMPLEMENTED 2026-01-11)
 
-**Current**: Time-series of best fitness
+> **Status**: Implemented in `strategies/common/adaptive_control/luck_skill.py`
+> **ROI**: 10.0 | **Pillars**: P1+P2+P3+P4 (highest ROI of all enhancements!)
 
-**Enhancement**: 2D projection of fitness landscape (PCA/t-SNE)
-
-```python
-# Reduce strategy behavior space to 2D
-# X-axis: PC1 (e.g., trade frequency)
-# Y-axis: PC2 (e.g., holding time)
-# Color: Fitness (red = low, green = high)
-# Size: Generation (larger = newer)
-
-# Shows:
-# - Clusters of similar strategies
-# - Exploration vs exploitation patterns
-# - Local optima (fitness peaks)
-```
-
-**Trigger**: When evolution gets stuck (visualize where population is exploring)
-
-**Trade-off**: Requires dimensionality reduction (PCA/t-SNE), complex computation
-
-**Reference**: Black Book - "Visualize search space to understand convergence"
-
-### FE-004: Lineage Tree Visualization
-
-**Current**: Table of top strategies with parent_id
-
-**Enhancement**: Interactive tree showing strategy lineage
+**Implementation**: `OverfittingDetector` class with real-time train/test ratio monitoring.
 
 ```python
-# D3.js tree visualization:
-# - Root: Seed strategy
-# - Branches: Lineages
-# - Nodes: Individual strategies
-# - Color: Fitness (green = good, red = poor)
-# - Click node → show strategy code diff vs parent
+from strategies.common.adaptive_control import OverfittingDetector
 
-# Shows:
-# - Which lineages are productive
-# - Dead-end branches (no improvement)
-# - Breakthrough mutations (sudden fitness jump)
+detector = OverfittingDetector(warning_threshold=1.5, critical_threshold=2.0)
+alert = detector.check(train_sharpe=2.5, test_sharpe=1.0)
+if alert.is_overfit:
+    print(f"OVERFIT: {alert.message}")
 ```
 
-**Trigger**: When diagnosing why certain lineages dominate hall-of-fame
-
-**Trade-off**: Requires frontend JavaScript (D3.js), more complex dashboard
-
-**Reference**: Black Book - "Track lineage to understand evolution dynamics"
-
-### FE-005: Overfitting Detection
-
-**Current**: Single fitness metric
-
-**Enhancement**: In-sample vs out-of-sample performance tracking
-
-```sql
--- Query for overfitting detection
-SELECT
-    strategy_id,
-    in_sample_sharpe,
-    out_of_sample_sharpe,
-    (in_sample_sharpe - out_of_sample_sharpe) as degradation
-FROM
-    strategy_metrics
-WHERE
-    degradation > 0.5  -- Flag potential overfitting
-ORDER BY
-    degradation DESC
-```
-
-**Panel**: Table showing strategies with largest IS/OOS gaps (overfitting red flags)
-
-**Trigger**: When evolved strategies fail in live trading despite good backtest
-
-**Trade-off**: Requires walk-forward validation during evolution (slower), more storage
-
-**Reference**: Black Book - "Always validate OOS to detect overfitting early"
+See `specs/FUTURE_ENHANCEMENTS.md` for details.
 
 ---
 
