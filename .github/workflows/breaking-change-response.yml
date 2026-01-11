@@ -34,7 +34,7 @@ jobs:
   # ===========================================================================
   analyze-impact:
     name: "Analyze Breaking Changes"
-    runs-on: [self-hosted, nautilus]
+    runs-on: [self-hosted, shared]
     if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
 
     outputs:
@@ -116,7 +116,7 @@ jobs:
   # ===========================================================================
   generate-tasks:
     name: "Generate Fix Tasks"
-    runs-on: [self-hosted, nautilus]
+    runs-on: [self-hosted, shared]
     needs: analyze-impact
     if: needs.analyze-impact.outputs.needs_fix == 'true'
 
@@ -224,7 +224,7 @@ jobs:
   # ===========================================================================
   create-issues:
     name: "Create GitHub Issues"
-    runs-on: [self-hosted, nautilus]
+    runs-on: [self-hosted, shared]
     needs: [analyze-impact, generate-tasks]
     if: needs.generate-tasks.outputs.tasks_created == 'true' && !inputs.dry_run
 
@@ -308,7 +308,7 @@ jobs:
   # ===========================================================================
   dispatch-claude:
     name: "Dispatch Auto-Fix"
-    runs-on: [self-hosted, nautilus]
+    runs-on: [self-hosted, shared]
     needs: [analyze-impact, create-issues]
     if: needs.create-issues.outputs.issues_created > 0 && !inputs.dry_run
 
@@ -367,7 +367,7 @@ jobs:
   # ===========================================================================
   summary:
     name: "Summary"
-    runs-on: [self-hosted, nautilus]
+    runs-on: [self-hosted, shared]
     needs: [analyze-impact, generate-tasks, create-issues, dispatch-claude]
     if: always()
 

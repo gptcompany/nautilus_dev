@@ -21,7 +21,7 @@ jobs:
   # ===========================================================================
   validate-tasks:
     name: "Validate Task Completion"
-    runs-on: [self-hosted, nautilus]
+    runs-on: [self-hosted, shared]
     if: ${{ !github.event.pull_request.draft }}
 
     outputs:
@@ -111,7 +111,7 @@ jobs:
   # ===========================================================================
   validate-issues:
     name: "Validate Issue Links"
-    runs-on: [self-hosted, nautilus]
+    runs-on: [self-hosted, shared]
     needs: validate-tasks
     if: needs.validate-tasks.outputs.gate_passed == 'true' && needs.validate-tasks.outputs.total_tasks > 0
 
@@ -184,7 +184,7 @@ jobs:
   # ===========================================================================
   update-status:
     name: "Update PR Status"
-    runs-on: [self-hosted, nautilus]
+    runs-on: [self-hosted, shared]
     needs: [validate-tasks, validate-issues]
     if: always()
 

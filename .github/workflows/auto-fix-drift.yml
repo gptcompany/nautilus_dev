@@ -27,7 +27,7 @@ env:
 jobs:
   detect-and-fix:
     name: "Detect and Fix Drift"
-    runs-on: [self-hosted, nautilus]
+    runs-on: [self-hosted, shared]
     timeout-minutes: 10
 
     steps:

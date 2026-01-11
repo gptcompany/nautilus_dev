@@ -27,7 +27,7 @@ env:
 jobs:
   benchmarks:
     name: "Run Benchmarks"
-    runs-on: [self-hosted, nautilus]
+    runs-on: [self-hosted, shared]
     timeout-minutes: 30
 
     steps:

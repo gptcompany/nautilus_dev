@@ -57,7 +57,7 @@ jobs:
   # ===========================================================================
   detect-changes:
     name: "Detect Language Changes"
-    runs-on: [self-hosted, nautilus]
+    runs-on: [self-hosted, shared]
     timeout-minutes: 2
 
     outputs:
@@ -114,7 +114,7 @@ jobs:
   security-scan:
     needs: detect-changes
     name: "Stage 0: Security"
-    runs-on: [self-hosted, nautilus]
+    runs-on: [self-hosted, shared]
     timeout-minutes: 10
 
     outputs:
@@ -269,7 +269,7 @@ jobs:
   # ===========================================================================
   lint-and-types:
     name: "Stage 1: Lint & Types"
-    runs-on: [self-hosted, nautilus]
+    runs-on: [self-hosted, shared]
     needs: security-scan
     timeout-minutes: 10
 
@@ -358,7 +358,7 @@ jobs:
   # ===========================================================================
   unit-tests:
     name: "Stage 2: Unit Tests"
-    runs-on: [self-hosted, nautilus]
+    runs-on: [self-hosted, shared]
     needs: lint-and-types
     timeout-minutes: 15
 
@@ -455,7 +455,7 @@ jobs:
   # ===========================================================================
   integration-tests:
     name: "Stage 3: Integration Tests"
-    runs-on: [self-hosted, nautilus]
+    runs-on: [self-hosted, shared]
     needs: unit-tests
     timeout-minutes: 20
 
@@ -523,7 +523,7 @@ jobs:
   # ===========================================================================
   backtest-validation:
     name: "Stage 4: Backtest Validation"
-    runs-on: [self-hosted, nautilus]
+    runs-on: [self-hosted, shared]
     needs: integration-tests
     if: ${{ !inputs.skip_backtest }}
     timeout-minutes: 20
@@ -631,7 +631,7 @@ jobs:
   # ===========================================================================
   alpha-debug:
     name: "Stage 5: Alpha-Debug"
-    runs-on: [self-hosted, nautilus]
+    runs-on: [self-hosted, shared]
     needs: backtest-validation
     if: ${{ !inputs.skip_alpha_debug && github.event_name == 'pull_request' }}
     timeout-minutes: 20
@@ -774,7 +774,7 @@ jobs:
   # ===========================================================================
   rust-tooling:
     name: "Stage 6: Rust Security"
-    runs-on: [self-hosted, nautilus]
+    runs-on: [self-hosted, shared]
     needs: [detect-changes, security-scan]
     if: needs.detect-changes.outputs.rust_changed == 'true'
     timeout-minutes: 15
@@ -853,7 +853,7 @@ jobs:
   # ===========================================================================
   merge-gate:
     name: "Merge Gate"
-    runs-on: [self-hosted, nautilus]
+    runs-on: [self-hosted, shared]
     needs: [detect-changes, security-scan, lint-and-types, unit-tests, integration-tests, backtest-validation, alpha-debug, rust-tooling]
     if: always()
 
@@ -943,7 +943,7 @@ jobs:
   # ===========================================================================
   sentry-release:
     name: "Sentry Release"
-    runs-on: [self-hosted, nautilus]
+    runs-on: [self-hosted, shared]
     needs: merge-gate
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     timeout-minutes: 5

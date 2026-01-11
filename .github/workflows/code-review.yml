@@ -24,7 +24,7 @@ env:
 jobs:
   opus-review:
     name: "Claude Opus Review"
-    runs-on: [self-hosted, nautilus]
+    runs-on: [self-hosted, shared]
     timeout-minutes: 10
 
     steps:

@@ -47,7 +47,7 @@ jobs:
   # ===========================================================================
   tasks-to-issues:
     name: "Sync Tasks → Issues"
-    runs-on: [self-hosted, nautilus]
+    runs-on: [self-hosted, shared]
     if: |
       github.event_name == 'push' ||
       (github.event_name == 'workflow_dispatch' &&
@@ -132,7 +132,7 @@ jobs:
   # ===========================================================================
   issues-to-tasks:
     name: "Sync Issues → Tasks"
-    runs-on: [self-hosted, nautilus]
+    runs-on: [self-hosted, shared]
     if: |
       github.event_name == 'issues' ||
       (github.event_name == 'workflow_dispatch' &&
@@ -236,7 +236,7 @@ jobs:
   # ===========================================================================
   milestone-complete:
     name: "Handle Milestone Completion"
-    runs-on: [self-hosted, nautilus]
+    runs-on: [self-hosted, shared]
     if: github.event_name == 'milestone' && github.event.action == 'closed'
 
     steps:
@@ -281,7 +281,7 @@ jobs:
   # ===========================================================================
   summary:
     name: "Summary"
-    runs-on: [self-hosted, nautilus]
+    runs-on: [self-hosted, shared]
     needs: [tasks-to-issues, issues-to-tasks, milestone-complete]
     if: always()
 
