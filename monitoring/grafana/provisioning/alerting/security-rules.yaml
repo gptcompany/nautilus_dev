@@ -23,7 +23,7 @@ groups:
             relativeTimeRange:
               from: 300
               to: 0
-            datasourceUid: questdb
+            datasourceUid: P2596F1C8E12435D2
             model:
               rawSql: |
                 SELECT count() as failed_logins
@@ -68,7 +68,7 @@ groups:
             relativeTimeRange:
               from: 3600
               to: 0
-            datasourceUid: questdb
+            datasourceUid: P2596F1C8E12435D2
             model:
               rawSql: |
                 SELECT count() as blocked_ips
@@ -113,7 +113,7 @@ groups:
             relativeTimeRange:
               from: 60
               to: 0
-            datasourceUid: questdb
+            datasourceUid: P2596F1C8E12435D2
             model:
               rawSql: |
                 SELECT daily_pnl_pct
@@ -152,7 +152,7 @@ groups:
             relativeTimeRange:
               from: 60
               to: 0
-            datasourceUid: questdb
+            datasourceUid: P2596F1C8E12435D2
             model:
               rawSql: |
                 SELECT position_size_pct
@@ -190,7 +190,7 @@ groups:
             relativeTimeRange:
               from: 60
               to: 0
-            datasourceUid: questdb
+            datasourceUid: P2596F1C8E12435D2
             model:
               rawSql: |
                 SELECT leverage
@@ -228,7 +228,7 @@ groups:
             relativeTimeRange:
               from: 60
               to: 0
-            datasourceUid: questdb
+            datasourceUid: P2596F1C8E12435D2
             model:
               rawSql: |
                 SELECT CASE WHEN trading_halted THEN 1 ELSE 0 END as halted
@@ -258,6 +258,83 @@ groups:
           summary: "Trading has been automatically halted"
           description: "Trading has been halted due to risk limit breach. Manual intervention required to resume."
 
+      - uid: risk-drawdown-warning
+        title: Drawdown Warning (10%)
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 60
+              to: 0
+            datasourceUid: P2596F1C8E12435D2
+            model:
+              rawSql: |
+                SELECT drawdown_pct
+                FROM trading_risk_metrics
+                ORDER BY timestamp DESC
+                LIMIT 1
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              type: reduce
+              expression: A
+              reducer: last
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: B
+              conditions:
+                - evaluator:
+                    type: gt
+                    params: [10]
+        for: 0m
+        labels:
+          severity: warning
+          category: trading
+        annotations:
+          summary: "WARNING: Drawdown approaching kill switch ({{ $values.B }}%)"
+          description: "Peak-to-trough drawdown has exceeded 10%. Kill switch triggers at 15%. Consider reducing exposure."
+
+      - uid: risk-kill-switch-drawdown
+        title: Kill Switch Drawdown (15%)
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 60
+              to: 0
+            datasourceUid: P2596F1C8E12435D2
+            model:
+              rawSql: |
+                SELECT drawdown_pct
+                FROM trading_risk_metrics
+                ORDER BY timestamp DESC
+                LIMIT 1
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              type: reduce
+              expression: A
+              reducer: last
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: B
+              conditions:
+                - evaluator:
+                    type: gt
+                    params: [15]
+        for: 0m
+        labels:
+          severity: critical
+          category: trading
+        annotations:
+          summary: "KILL SWITCH: Drawdown exceeds 15% ({{ $values.B }}%)"
+          description: "Peak-to-trough drawdown has exceeded the 15% kill switch threshold. ALL TRADING MUST STOP IMMEDIATELY. This is a critical risk event - Knight Capital lost $440M in 45 minutes."
+          runbook_url: "https://docs.princyx.xyz/runbooks/kill-switch"
+
   # ============================================================================
   # Order Anomalies
   # ============================================================================
@@ -273,7 +350,7 @@ groups:
             relativeTimeRange:
               from: 3600
               to: 0
-            datasourceUid: questdb
+            datasourceUid: P2596F1C8E12435D2
             model:
               rawSql: |
                 SELECT
@@ -312,7 +389,7 @@ groups:
             relativeTimeRange:
               from: 3600
               to: 0
-            datasourceUid: questdb
+            datasourceUid: P2596F1C8E12435D2
             model:
               rawSql: |
                 SELECT count() as order_count
@@ -356,7 +433,7 @@ groups:
             relativeTimeRange:
               from: 3600
               to: 0
-            datasourceUid: questdb
+            datasourceUid: P2596F1C8E12435D2
             model:
               rawSql: |
                 SELECT count() as invalid_sigs
@@ -394,7 +471,7 @@ groups:
             relativeTimeRange:
               from: 3600
               to: 0
-            datasourceUid: questdb
+            datasourceUid: P2596F1C8E12435D2
             model:
               rawSql: |
                 SELECT count() as failures
@@ -440,7 +517,7 @@ groups:
             relativeTimeRange:
               from: 300
               to: 0
-            datasourceUid: questdb
+            datasourceUid: P2596F1C8E12435D2
             model:
               rawSql: |
                 SELECT count() as rate_limited
@@ -478,7 +555,7 @@ groups:
             relativeTimeRange:
               from: 300
               to: 0
-            datasourceUid: questdb
+            datasourceUid: P2596F1C8E12435D2
             model:
               rawSql: |
                 SELECT
@@ -524,7 +601,7 @@ groups:
             relativeTimeRange:
               from: 3600
               to: 0
-            datasourceUid: questdb
+            datasourceUid: P2596F1C8E12435D2
             model:
               rawSql: |
                 SELECT count() as non_whitelisted
@@ -562,7 +639,7 @@ groups:
             relativeTimeRange:
               from: 3600
               to: 0
-            datasourceUid: questdb
+            datasourceUid: P2596F1C8E12435D2
             model:
               rawSql: |
                 SELECT MAX(amount) as max_withdrawal

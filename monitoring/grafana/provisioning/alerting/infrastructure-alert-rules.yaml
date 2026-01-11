@@ -57,8 +57,8 @@ groups:
         execErrState: Alerting
         for: 2m
         annotations:
-          summary: "Container {{ $labels.name }} is down"
-          description: "Container {{ $labels.name }} has stopped running. Check docker logs and restart if needed."
+          summary: "Container is down"
+          description: "A container has stopped running. Check docker logs and restart if needed."
         labels:
           severity: critical
           category: infrastructure
@@ -105,8 +105,8 @@ groups:
         execErrState: Alerting
         for: 5m
         annotations:
-          summary: "Container {{ $labels.name }} CPU usage high"
-          description: "Container {{ $labels.name }} CPU usage exceeded 80% for 5 minutes."
+          summary: "Container CPU usage high"
+          description: "Container CPU usage exceeded 80% for 5 minutes."
         labels:
           severity: warning
           category: infrastructure
@@ -153,8 +153,8 @@ groups:
         execErrState: Alerting
         for: 5m
         annotations:
-          summary: "Container {{ $labels.name }} memory usage high"
-          description: "Container {{ $labels.name }} memory usage exceeded 2GB."
+          summary: "Container memory usage high"
+          description: "Container memory usage exceeded 2GB."
         labels:
           severity: warning
           category: infrastructure
@@ -209,8 +209,8 @@ groups:
         execErrState: Alerting
         for: 1m
         annotations:
-          summary: "Prometheus target {{ $labels.job }} ({{ $labels.instance }}) is down"
-          description: "Prometheus cannot scrape {{ $labels.job }} at {{ $labels.instance }}. Check if the service is running."
+          summary: "Prometheus target is down"
+          description: "Prometheus cannot scrape a target. Check if the service is running."
         labels:
           severity: critical
           category: infrastructure
@@ -257,8 +257,8 @@ groups:
         execErrState: Alerting
         for: 5m
         annotations:
-          summary: "Prometheus scrape for {{ $labels.job }} is slow"
-          description: "Scrape duration for {{ $labels.job }} exceeded 5 seconds."
+          summary: "Prometheus scrape is slow"
+          description: "Scrape duration exceeded 5 seconds."
         labels:
           severity: warning
           category: infrastructure
@@ -314,7 +314,7 @@ groups:
         for: 5m
         annotations:
           summary: "System CPU usage critical"
-          description: "System CPU usage exceeded 90% for 5 minutes. Current: {{ $values.B }}%"
+          description: "System CPU usage exceeded 90% for 5 minutes."
         labels:
           severity: critical
           category: infrastructure
@@ -362,7 +362,7 @@ groups:
         for: 5m
         annotations:
           summary: "System memory usage critical"
-          description: "System memory usage exceeded 90% for 5 minutes. Current: {{ $values.B }}%"
+          description: "System memory usage exceeded 90% for 5 minutes."
         labels:
           severity: critical
           category: infrastructure
@@ -410,7 +410,7 @@ groups:
         for: 5m
         annotations:
           summary: "Disk space low on /"
-          description: "Disk usage on root partition exceeded 85%. Current: {{ $values.B }}%"
+          description: "Disk usage on root partition exceeded 85%."
         labels:
           severity: warning
           category: infrastructure
@@ -458,7 +458,7 @@ groups:
         for: 2m
         annotations:
           summary: "CRITICAL: Disk space critical on /"
-          description: "Disk usage on root partition exceeded 95%. Immediate action required! Current: {{ $values.B }}%"
+          description: "Disk usage on root partition exceeded 95%. Immediate action required!"
         labels:
           severity: critical
           category: infrastructure
