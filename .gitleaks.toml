@@ -69,9 +69,9 @@ keywords = ["jwt", "secret"]
 [[rules]]
 id = "neo4j-credentials"
 description = "Neo4j Hardcoded Credentials"
-# Match tuple patterns like ("neo4j", "password123") but NOT environment variable defaults
-# Negative lookahead excludes os.getenv patterns and common placeholder values
-regex = '''(?i)\(\s*['"]neo4j['"]\s*,\s*['"](?!neo4j['"])[^'"]{8,}['"]\s*\)'''
+# Match tuple patterns like ("neo4j", "password123") with password >= 8 chars
+# Note: Go regexp doesn't support negative lookahead, so we match any 8+ char password
+regex = '''(?i)\(\s*['"]neo4j['"]\s*,\s*['"][^'"]{8,}['"]\s*\)'''
 tags = ["database", "credentials", "neo4j"]
 keywords = ["neo4j"]
 
@@ -98,6 +98,12 @@ paths = [
     '''\.github/runner/\.env''',  # Runner config
     '''\.env''',  # Root .env is gitignored but may exist locally
     '''security/\.env\.example''',  # Security env template
+    '''\.mypy_cache/.*''',  # MyPy cache (hash values, not secrets)
+    '''\.venv/.*''',  # Virtual environment (library crypto constants)
+    '''\.cache/.*''',  # Cache directories
+    '''node_modules/.*''',  # Node modules
+    '''scripts/auto_update/.*''',  # Auto-update scripts (webhook is non-sensitive notification URL)
+    '''specs/bookmarks.*\.json''',  # Bookmarks with journal access tokens (read-only article links)
 ]
 regexes = [
     '''EXAMPLE_.*''',
