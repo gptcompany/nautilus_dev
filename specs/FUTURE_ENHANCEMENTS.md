@@ -224,9 +224,28 @@ class TransactionCosts:
 
 ## Implementation Locations
 
-| MVP | Location |
-|-----|----------|
-| Overfitting Detection | `strategies/common/adaptive_control/luck_skill.py` |
-| Probabilistic Sharpe | `strategies/common/adaptive_control/luck_skill.py` |
-| Ensemble Selection | `strategies/common/adaptive_control/ensemble_selection.py` |
-| Transaction Costs | `strategies/common/adaptive_control/transaction_costs.py` |
+### Core Implementations
+
+| MVP | Module | Location |
+|-----|--------|----------|
+| Overfitting Detection | `OverfittingDetector` | `strategies/common/adaptive_control/luck_skill.py` |
+| Probabilistic Sharpe | `probabilistic_sharpe_ratio()` | `strategies/common/adaptive_control/luck_skill.py` |
+| Ensemble Selection | `select_ensemble()`, `EnsembleSelector` | `strategies/common/adaptive_control/ensemble_selection.py` |
+| Transaction Costs | `TransactionCostModel`, `CostProfile` | `strategies/common/adaptive_control/transaction_costs.py` |
+
+### Alpha-Evolve Integration Points
+
+| MVP | Integration | Location |
+|-----|-------------|----------|
+| PSR | `FitnessMetrics.psr` calculated during evaluation | `scripts/alpha_evolve/evaluator.py:386-395` |
+| Transaction Costs | `FitnessMetrics.net_sharpe` (adjusted Sharpe) | `scripts/alpha_evolve/evaluator.py:397-416` |
+| Overfitting Detection | `WalkForwardResult.overfit_*_count` | `scripts/alpha_evolve/walk_forward/validator.py:128-149` |
+| All metrics | SQLite persistence with schema migration | `scripts/alpha_evolve/store.py:102-113` |
+
+### Schema Updates
+
+| Model | New Fields |
+|-------|------------|
+| `FitnessMetrics` | `psr`, `net_sharpe` |
+| `WalkForwardResult` | `overfit_critical_count`, `overfit_warning_count` |
+| SQLite `programs` table | `psr REAL`, `net_sharpe REAL` (auto-migrated) |

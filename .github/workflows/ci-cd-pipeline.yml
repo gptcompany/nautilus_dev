@@ -135,17 +135,19 @@ jobs:
       - name: Install security tools
         run: |
           pip install bandit
+          mkdir -p ~/.local/bin
+          export PATH="$HOME/.local/bin:$PATH"
           # Install gitleaks
           if ! command -v gitleaks &> /dev/null; then
             curl -sSfL https://github.com/gitleaks/gitleaks/releases/download/v8.18.4/gitleaks_8.18.4_linux_x64.tar.gz | tar xz -C /tmp
-            sudo mv /tmp/gitleaks /usr/local/bin/
+            mv /tmp/gitleaks ~/.local/bin/
           fi
           # Install osv-scanner (Google Open Source Vulnerability scanner)
           if ! command -v osv-scanner &> /dev/null; then
-            curl -sSfL https://github.com/google/osv-scanner/releases/download/v1.8.5/osv-scanner_linux_amd64 -o /tmp/osv-scanner
-            chmod +x /tmp/osv-scanner
-            sudo mv /tmp/osv-scanner /usr/local/bin/
+            curl -sSfL https://github.com/google/osv-scanner/releases/download/v1.8.5/osv-scanner_linux_amd64 -o ~/.local/bin/osv-scanner
+            chmod +x ~/.local/bin/osv-scanner
           fi
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
 
       - name: Run Bandit SAST
         id: bandit

@@ -76,6 +76,9 @@ class EvolutionMetricsPublisher:
             total_return=program.metrics.total_return,
             trade_count=program.metrics.trade_count,
             win_rate=program.metrics.win_rate,
+            # MVP fields (2026-01-11)
+            psr=program.metrics.psr,
+            net_sharpe=program.metrics.net_sharpe,
             mutation_outcome=mutation_outcome,
             mutation_latency_ms=mutation_latency_ms,
         )

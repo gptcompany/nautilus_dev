@@ -902,6 +902,193 @@
           "showLegend": false
         }
       }
+    },
+    {
+      "id": 12,
+      "title": "Avg PSR",
+      "description": "Average Probabilistic Sharpe Ratio (P(SR > 0))",
+      "type": "gauge",
+      "gridPos": {
+        "x": 0,
+        "y": 16,
+        "w": 4,
+        "h": 4
+      },
+      "datasource": "QuestDB",
+      "targets": [
+        {
+          "refId": "A",
+          "rawSql": "SELECT avg(psr) as avg_psr FROM evolution_metrics WHERE mutation_outcome = 'success' AND psr IS NOT NULL AND timestamp > dateadd('h', -1, now()) LATEST BY program_id",
+          "datasource": {
+            "type": "questdb-questdb-datasource",
+            "uid": "P2596F1C8E12435D2"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "min": 0,
+          "max": 1,
+          "decimals": 1,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 0.5
+              },
+              {
+                "color": "green",
+                "value": 0.8
+              }
+            ]
+          }
+        }
+      },
+      "options": {
+        "orientation": "auto",
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true
+      }
+    },
+    {
+      "id": 13,
+      "title": "Avg Net Sharpe",
+      "description": "Average transaction cost-adjusted Sharpe ratio",
+      "type": "stat",
+      "gridPos": {
+        "x": 4,
+        "y": 16,
+        "w": 4,
+        "h": 4
+      },
+      "datasource": "QuestDB",
+      "targets": [
+        {
+          "refId": "A",
+          "rawSql": "SELECT avg(net_sharpe) as avg_net_sharpe FROM evolution_metrics WHERE mutation_outcome = 'success' AND net_sharpe IS NOT NULL AND timestamp > dateadd('h', -1, now()) LATEST BY program_id",
+          "datasource": {
+            "type": "questdb-questdb-datasource",
+            "uid": "P2596F1C8E12435D2"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "decimals": 3,
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 0
+              },
+              {
+                "color": "green",
+                "value": 1
+              }
+            ]
+          }
+        }
+      },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area"
+      }
+    },
+    {
+      "id": 14,
+      "title": "Sharpe vs Net Sharpe",
+      "description": "Gross Sharpe vs cost-adjusted Sharpe (cost drag)",
+      "type": "timeseries",
+      "gridPos": {
+        "x": 8,
+        "y": 16,
+        "w": 8,
+        "h": 4
+      },
+      "datasource": "QuestDB",
+      "targets": [
+        {
+          "refId": "A",
+          "rawSql": "SELECT timestamp, max(sharpe) as gross_sharpe, max(net_sharpe) as net_sharpe FROM evolution_metrics WHERE mutation_outcome = 'success' AND timestamp > dateadd('d', -7, now())",
+          "datasource": {
+            "type": "questdb-questdb-datasource",
+            "uid": "P2596F1C8E12435D2"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "smooth",
+            "fillOpacity": 10,
+            "lineWidth": 2
+          },
+          "unit": "none",
+          "decimals": 3
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "gross_sharpe"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Gross Sharpe"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "blue",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "net_sharpe"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Net Sharpe (after costs)"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "green",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "legend": {
+          "showLegend": true,
+          "placement": "bottom"
+        }
+      }
     }
   ],
   "schemaVersion": 39,

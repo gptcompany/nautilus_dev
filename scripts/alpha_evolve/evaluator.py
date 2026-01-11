@@ -332,8 +332,13 @@ class StrategyEvaluator:
             config: Backtest configuration (for date range)
 
         Returns:
-            FitnessMetrics with extracted values
+            FitnessMetrics with extracted values including PSR and net_sharpe
         """
+        # Lazy imports to avoid circular dependencies
+        from strategies.common.adaptive_control import (
+            TransactionCostModel,
+            probabilistic_sharpe_ratio,
+        )
 
         # Get analyzer stats
         analyzer = engine.portfolio.analyzer
@@ -355,6 +360,7 @@ class StrategyEvaluator:
         sharpe = stats_returns.get("Sharpe Ratio (252 days)", 0.0)
         if sharpe is None:
             sharpe = 0.0
+        sharpe = float(sharpe)
 
         # Extract max drawdown (convert to positive value)
         max_dd = stats_returns.get("Max Drawdown", 0.0)
@@ -375,14 +381,50 @@ class StrategyEvaluator:
         if win_rate is None:
             win_rate = 0.0
 
+        # === MVP Enhancements (2026-01-11) ===
+
+        # 1. Probabilistic Sharpe Ratio (P1: accounts for non-normality)
+        psr = None
+        try:
+            # Extract daily returns from portfolio
+            returns_series = engine.portfolio.returns()
+            if returns_series is not None and len(returns_series) > 30:
+                returns_list = [float(r) for r in returns_series]
+                psr = probabilistic_sharpe_ratio(returns_list, benchmark_sr=0.0)
+        except Exception:
+            pass  # PSR is optional enhancement
+
+        # 2. Transaction cost-adjusted Sharpe (P2: power law slippage)
+        net_sharpe = None
+        try:
+            if trade_count > 0:
+                # Estimate average notional per trade
+                avg_notional = config.initial_capital / max(trade_count, 1)
+                trades_per_year = int(trade_count * (252 / max(days, 1)))
+
+                cost_model = TransactionCostModel(
+                    commission_bps=5.0,  # 5 bps commission
+                    base_slippage_bps=2.0,  # 2 bps base slippage
+                    spread_bps=1.0,  # 1 bps spread
+                )
+                net_sharpe = cost_model.adjust_sharpe(
+                    gross_sharpe=sharpe,
+                    avg_notional=avg_notional,
+                    trades_per_year=trades_per_year,
+                )
+        except Exception:
+            pass  # Net Sharpe is optional enhancement
+
         return FitnessMetrics(
-            sharpe_ratio=float(sharpe),
+            sharpe_ratio=sharpe,
             calmar_ratio=calmar,
             max_drawdown=max_dd,
             cagr=cagr,
             total_return=total_return,
             trade_count=trade_count,
             win_rate=float(win_rate),
+            psr=psr,
+            net_sharpe=net_sharpe,
         )
 
     def evaluate_sync(self, request: EvaluationRequest) -> EvaluationResult:
