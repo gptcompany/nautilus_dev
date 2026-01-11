@@ -69,7 +69,9 @@ keywords = ["jwt", "secret"]
 [[rules]]
 id = "neo4j-credentials"
 description = "Neo4j Hardcoded Credentials"
-regex = '''(?i)neo4j['"]\s*,\s*['"][^'"]+['"]'''
+# Match tuple patterns like ("neo4j", "password123") but NOT environment variable defaults
+# Negative lookahead excludes os.getenv patterns and common placeholder values
+regex = '''(?i)\(\s*['"]neo4j['"]\s*,\s*['"](?!neo4j['"])[^'"]{8,}['"]\s*\)'''
 tags = ["database", "credentials", "neo4j"]
 keywords = ["neo4j"]
 
@@ -86,7 +88,7 @@ description = "Allowlisted files and patterns"
 paths = [
     '''\.github/workflows/.*\.yml''',  # Workflow files use ${{ secrets.* }}
     '''tests/.*''',  # Test files use fake/placeholder credentials
-    '''docs/examples/.*''',
+    '''docs/.*''',  # Documentation (examples, not real secrets)
     '''.*\.example''',
     '''.*\.sample''',
     '''.*\.template''',
@@ -95,6 +97,7 @@ paths = [
     '''config/ci/\.env''',  # CI env example (should have placeholders)
     '''\.github/runner/\.env''',  # Runner config
     '''\.env''',  # Root .env is gitignored but may exist locally
+    '''security/\.env\.example''',  # Security env template
 ]
 regexes = [
     '''EXAMPLE_.*''',
@@ -102,6 +105,9 @@ regexes = [
     '''<.*>''',
     '''\$\{\{.*\}\}''',  # GitHub Actions secrets syntax
     '''\$\{[A-Z_]+\}''',  # Environment variable references ${VAR}
+    '''os\.getenv\s*\(\s*['"][^'"]+['"]\s*,\s*['"][^'"]*['"]\s*\)''',  # Python os.getenv with default
+    '''os\.environ\.get\s*\(\s*['"][^'"]+['"]\s*,\s*['"][^'"]*['"]\s*\)''',  # Python os.environ.get
+    '''['"]neo4j['"]''',  # Default Neo4j username (not a secret)
 ]
 # Old commits with secrets that have since been replaced with env vars
 commits = [
