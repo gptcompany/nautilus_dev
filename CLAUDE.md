@@ -261,3 +261,20 @@ Empty inputs | Extreme values | Invalid states | Concurrency
 Concise | Skeptical | Direct | Ask questions when unclear
 
 **Remember**: Search docs first. Native Rust. No df.iterrows(). Test via agent.
+
+## Testing Requirements (MANDATORY)
+
+**Ogni implementazione deve includere test:**
+
+1. **Unit Tests**: Test per funzioni/classi individuali
+2. **Integration Tests**: Test per componenti che interagiscono
+3. **E2E Tests (quando applicabile)**:
+   - Testa il flusso completo end-to-end
+   - Usa dati reali quando possibile (non solo mock)
+   - Verifica comportamento in condizioni realistiche
+
+**Prima di considerare un task completato:**
+- [ ] Unit tests passano
+- [ ] Integration tests passano
+- [ ] E2E tests con dati reali (se applicabile)
+- [ ] Coverage adeguata per codice critico
