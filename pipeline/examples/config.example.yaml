@@ -1,0 +1,84 @@
+# Pipeline Configuration Example
+# Copy to config.yaml and customize
+
+# =============================================================================
+# DATA STAGE
+# =============================================================================
+# Source: Either data_path OR catalog_path (not both)
+data_path: ./data/BTCUSDT_1h.parquet
+# catalog_path: ./catalog
+
+# Validation
+min_records: 5000
+symbols:
+  - BTCUSDT
+  - ETHUSDT
+validate_quality: true
+
+# =============================================================================
+# ALPHA STAGE
+# =============================================================================
+model_type: momentum  # momentum | mean_reversion | ml | default
+
+# Quality thresholds
+min_sharpe: 1.0
+max_overfitting: 0.25
+
+# Alpha-Evolve settings (if using AlphaEvolveAdapter)
+evolution_generations: 20
+population_size: 50
+
+# =============================================================================
+# RISK STAGE
+# =============================================================================
+# NOTE: Safety limits below are MAXIMUMS. The framework enforces:
+#   max_leverage <= 3.0
+#   max_position_pct <= 10.0
+#   stop_loss_pct >= 5.0 (inverted - this is minimum)
+#   daily_loss_limit_pct >= 2.0
+#   kill_switch_drawdown >= 15.0
+
+max_leverage: 2.0        # Your desired leverage (must be <= 3.0)
+max_position_pct: 5.0    # Max single position % (must be <= 10.0)
+stop_loss_pct: 3.0       # Stop loss % (can be tighter than 5%)
+
+# =============================================================================
+# MONITORING STAGE
+# =============================================================================
+# Metrics to track
+metrics:
+  - pnl
+  - drawdown
+  - position_count
+  - leverage
+  - win_rate
+
+# Alert thresholds
+alert_drawdown_pct: 8.0
+alert_daily_loss_pct: 2.0
+alert_leverage: 2.5
+
+# Notifications
+discord_webhook: ${DISCORD_WEBHOOK}  # Set via environment variable
+enable_console: true
+
+# Dashboard
+dashboard_enabled: true
+refresh_interval_sec: 60
+
+# =============================================================================
+# PIPELINE SETTINGS
+# =============================================================================
+# Stages to enable (all true by default)
+enable_alpha: true
+enable_risk: true
+enable_monitoring: true
+
+# =============================================================================
+# APPROVAL SETTINGS
+# =============================================================================
+# Directory for file-based approvals
+# approval_dir: ./approvals
+
+# Approval timeout (seconds)
+# approval_timeout: 3600
