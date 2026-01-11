@@ -270,7 +270,7 @@ jobs:
   # Stage 1: Lint + Type Check (~2 min)
   # ===========================================================================
   lint-and-types:
-    name: "Stage 1: Lint & Types"
+    name: "Lint & Types"
     runs-on: [self-hosted, shared]
     needs: security-scan
     timeout-minutes: 10
@@ -359,7 +359,7 @@ jobs:
   # Stage 2: Unit Tests (~3 min)
   # ===========================================================================
   unit-tests:
-    name: "Stage 2: Unit Tests"
+    name: "Unit Tests"
     runs-on: [self-hosted, shared]
     needs: lint-and-types
     timeout-minutes: 15
