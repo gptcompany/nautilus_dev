@@ -1,0 +1,173 @@
+# Docker Compose - Staging Environment
+# Isolated environment for testing before production
+#
+# Usage:
+#   docker-compose -f docker-compose.staging.yml up -d
+#   docker-compose -f docker-compose.staging.yml logs -f
+#   docker-compose -f docker-compose.staging.yml down
+#
+# Features:
+# - Separate ports from production
+# - Testnet exchange connections
+# - Isolated databases
+# - Paper trading mode
+
+version: '3.8'
+
+services:
+  # ===========================================================================
+  # Trading Node (Staging)
+  # ===========================================================================
+  trading-node-staging:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: nautilus-staging
+    environment:
+      - NAUTILUS_ENV=staging
+      - NAUTILUS_TRADER_ID=TRADER-STAGING
+      # Hyperliquid Testnet (more reliable than Binance/Bybit testnets)
+      - HYPERLIQUID_TESTNET=true
+      - HYPERLIQUID_TESTNET_PK=${HYPERLIQUID_TESTNET_PK}
+      # Legacy: Binance/Bybit testnets (unreliable, kept for reference)
+      # - BINANCE_API_KEY=${BINANCE_TESTNET_API_KEY}
+      # - BINANCE_API_SECRET=${BINANCE_TESTNET_API_SECRET}
+      # - BYBIT_API_KEY=${BYBIT_TESTNET_API_KEY}
+      # - BYBIT_API_SECRET=${BYBIT_TESTNET_API_SECRET}
+      # - BINANCE_BASE_URL=https://testnet.binancefuture.com
+      # - BYBIT_BASE_URL=https://api-testnet.bybit.com
+      # Paper trading
+      - PAPER_TRADING=true
+      # Database connections (staging instances)
+      - REDIS_HOST=redis-staging
+      - REDIS_PORT=6379
+      - QUESTDB_HOST=questdb-staging
+      - QUESTDB_ILP_PORT=9009
+      # Logging
+      - LOG_LEVEL=DEBUG
+      - SENTRY_DSN=${SENTRY_DSN_STAGING}
+    volumes:
+      - ./strategies:/app/strategies:ro
+      - ./config:/app/config:ro
+      - ./data/staging:/app/data
+      - ./logs/staging:/app/logs
+    networks:
+      - staging-network
+    depends_on:
+      - redis-staging
+      - questdb-staging
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import nautilus_trader; print('OK')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ===========================================================================
+  # Redis Cache (Staging)
+  # ===========================================================================
+  redis-staging:
+    image: redis:7-alpine
+    container_name: redis-staging
+    command: redis-server --appendonly yes --maxmemory 512mb --maxmemory-policy allkeys-lru
+    ports:
+      - "6380:6379"  # Different port from production
+    volumes:
+      - redis-staging-data:/data
+    networks:
+      - staging-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  # ===========================================================================
+  # QuestDB (Staging)
+  # ===========================================================================
+  questdb-staging:
+    image: questdb/questdb:7.4.2
+    container_name: questdb-staging
+    ports:
+      - "9001:9000"   # Web console (different from prod 9000)
+      - "9010:9009"   # ILP (different from prod 9009)
+      - "8813:8812"   # PostgreSQL wire
+    volumes:
+      - questdb-staging-data:/var/lib/questdb
+      - ./monitoring/schemas:/docker-entrypoint-initdb.d:ro
+    environment:
+      - QDB_LOG_W_STDOUT_LEVEL=INFO
+      - QDB_TELEMETRY_ENABLED=false
+    networks:
+      - staging-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/status"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ===========================================================================
+  # Grafana (Staging)
+  # ===========================================================================
+  grafana-staging:
+    image: grafana/grafana:10.2.3
+    container_name: grafana-staging
+    ports:
+      - "3001:3000"  # Different port from production
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_STAGING_PASSWORD:-staging123}
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_SERVER_ROOT_URL=http://localhost:3001
+      - GF_INSTALL_PLUGINS=questdb-questdb-datasource
+      # Discord alerts (staging channel)
+      - DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL_STAGING}
+    volumes:
+      - grafana-staging-data:/var/lib/grafana
+      - ./config/monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./config/monitoring/grafana/dashboards:/var/lib/grafana/dashboards:ro
+    networks:
+      - staging-network
+    depends_on:
+      - questdb-staging
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ===========================================================================
+  # Neo4j (Staging) - Optional, for strategy knowledge graph
+  # ===========================================================================
+  neo4j-staging:
+    image: neo4j:5.15-community
+    container_name: neo4j-staging
+    ports:
+      - "7475:7474"  # Browser (different from prod)
+      - "7688:7687"  # Bolt
+    environment:
+      - NEO4J_AUTH=neo4j/${NEO4J_STAGING_PASSWORD:-staging123}
+      - NEO4J_PLUGINS=["apoc"]
+      - NEO4J_dbms_memory_heap_initial__size=256m
+      - NEO4J_dbms_memory_heap_max__size=512m
+    volumes:
+      - neo4j-staging-data:/data
+    networks:
+      - staging-network
+    restart: unless-stopped
+    profiles:
+      - full  # Only start with: docker-compose --profile full up
+
+networks:
+  staging-network:
+    driver: bridge
+    name: nautilus-staging
+
+volumes:
+  redis-staging-data:
+  questdb-staging-data:
+  grafana-staging-data:
+  neo4j-staging-data:

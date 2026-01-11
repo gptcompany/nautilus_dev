@@ -216,84 +216,16 @@ class AdaptiveMutationController:
 
 **Reference**: Eiben et al. (1999) "Parameter Control in Evolutionary Algorithms"
 
-### FE-002: Prompt Engineering Evolution
+### FE-002: Ensemble Strategy Selection (IMPLEMENTED 2026-01-11)
 
-**Current**: Static mutation prompts
+> **Status**: Implemented in `strategies/common/adaptive_control/ensemble_selection.py`
+> **ROI**: 7.5 | **Pillars**: P1+P2+P4
+>
+> Note: Original FE-002 (Prompt Engineering Evolution, ROI 0.4) was removed as meta-meta-optimization (YAGNI).
 
-**Enhancement**: Evolve prompts based on mutation success rate
+**Implementation**: `select_ensemble()` function with correlation-based filtering.
 
-```python
-class PromptEvolution:
-    """
-    Meta-learning for mutation prompts.
-
-    Track which prompt styles produce best mutations.
-    """
-    def __init__(self):
-        self.prompt_templates = [
-            "Improve entry signals to reduce false positives",
-            "Optimize exit timing to capture larger moves",
-            "Add regime filter to avoid choppy markets",
-            "Simplify logic to reduce overfitting"
-        ]
-        self.prompt_scores = [0.0] * len(self.prompt_templates)
-
-    def select_prompt(self):
-        # Thompson sampling for prompt selection
-        samples = [np.random.beta(1 + score, 1) for score in self.prompt_scores]
-        return self.prompt_templates[np.argmax(samples)]
-
-    def update_prompt_score(self, prompt_idx, child_fitness, parent_fitness):
-        improvement = child_fitness - parent_fitness
-        # Reward prompt if child improved
-        self.prompt_scores[prompt_idx] += improvement
-```
-
-**Trigger**: When mutation success rate is low (<30% produce better strategies)
-
-**Trade-off**: Requires tracking prompt→outcome, but improves mutation quality over time
-
-**Reference**: Black Book - "Evolve the evolution process itself"
-
-### FE-003: Ensemble Strategy Selection
-
-**Current**: Single best strategy from hall-of-fame
-
-**Enhancement**: Deploy ensemble of top-k strategies with voting
-
-```python
-class EnsembleSelector:
-    """
-    Instead of single best, use ensemble for robustness.
-    """
-    def select_ensemble(self, hall_of_fame, k=5):
-        # Get top-k strategies with low correlation
-        top_strategies = hall_of_fame.top_k(k=20)
-
-        # Calculate pairwise correlation of equity curves
-        correlations = self.calculate_equity_correlation(top_strategies)
-
-        # Select k strategies that maximize diversity
-        ensemble = []
-        ensemble.append(top_strategies[0])  # Best strategy
-
-        for _ in range(k - 1):
-            # Add strategy with lowest avg correlation to ensemble
-            candidates = [s for s in top_strategies if s not in ensemble]
-            best_candidate = min(
-                candidates,
-                key=lambda s: np.mean([correlations[s, e] for e in ensemble])
-            )
-            ensemble.append(best_candidate)
-
-        return ensemble
-```
-
-**Trigger**: When single best strategy has high variance or fails in live trading
-
-**Trade-off**: More complex deployment (multiple strategies), but more robust
-
-**Reference**: Black Book - "Ensembles reduce model risk"
+See `specs/FUTURE_ENHANCEMENTS.md` for details.
 
 ### FE-004: Novelty Search
 

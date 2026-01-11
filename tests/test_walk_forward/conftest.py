@@ -6,11 +6,28 @@ from unittest.mock import AsyncMock
 
 import pytest
 
-from scripts.alpha_evolve.walk_forward.config import WalkForwardConfig
-from scripts.alpha_evolve.walk_forward.models import (
-    Window,
-    WindowMetrics,
-    WindowResult,
+# nautilus_trader is required for these tests but may not be available in CI
+# (wheel compatibility issues with some runner platforms)
+try:
+    from scripts.alpha_evolve.walk_forward.config import WalkForwardConfig
+    from scripts.alpha_evolve.walk_forward.models import (
+        Window,
+        WindowMetrics,
+        WindowResult,
+    )
+
+    NAUTILUS_AVAILABLE = True
+except ImportError:
+    NAUTILUS_AVAILABLE = False
+    # Create placeholder classes for type hints
+    WalkForwardConfig = None  # type: ignore
+    Window = None  # type: ignore
+    WindowMetrics = None  # type: ignore
+    WindowResult = None  # type: ignore
+
+# Skip all tests in this module if nautilus_trader is not available
+pytestmark = pytest.mark.skipif(
+    not NAUTILUS_AVAILABLE, reason="nautilus_trader not available (wheel compatibility issue)"
 )
 
 

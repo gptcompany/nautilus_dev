@@ -128,7 +128,7 @@ def submit_market_order(self, side: OrderSide, quantity: Quantity) -> None:
 
 ### Chinese Character Tokens
 - Some Binance tokens have Chinese names (e.g., '币安人生')
-- Fixed in nightly: `pip install nautilus_trader==1.221.0a20251026`
+- Fixed in nightly: `pip install nautilus_trader==1.222.0a20251026`
 
 ### STOP_MARKET Orders
 - Requires Algo Order API endpoint

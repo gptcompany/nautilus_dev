@@ -1,0 +1,71 @@
+# =============================================================================
+# CANONICAL.YAML - Single Source of Truth (SSOT)
+# =============================================================================
+#
+# This file is the authoritative source for all configuration values.
+# All other files (.env, docker-compose.yml, ARCHITECTURE.md) MUST derive
+# from this file or be flagged as drift.
+#
+# Usage:
+#   python scripts/architecture_drift_detector.py       # Detect drift
+#   python scripts/architecture_drift_detector.py --fix # Sync derived files
+#
+# =============================================================================
+
+# Infrastructure Ports
+ports:
+  questdb_ilp: 9009      # QuestDB ILP (write) protocol
+  questdb_http: 9000     # QuestDB HTTP API / Web Console
+  grafana: 3000          # Grafana dashboards
+  redis: 6379            # Redis cache
+
+# Container Versions (production only - NOT staging)
+versions:
+  grafana: "12.3.1"      # grafana/grafana-oss
+  questdb: "9.2.3"       # questdb/questdb
+
+# NautilusTrader
+nautilus:
+  version: "1.222.0+"    # Nightly build, version varies
+  python: ">=3.12"       # Minimum Python version (NT nightly requires 3.12+)
+
+# Paths
+paths:
+  catalog: "/media/sam/2TB-NVMe/nautilus_catalog_v1222/"
+  nightly_env: "/media/sam/2TB-NVMe/prod/apps/nautilus_nightly/nautilus_nightly_env/"
+
+# Ralph Loop Configuration
+ralph:
+  max_iterations: 15           # Max iterations before circuit breaker
+  max_budget_usd: 20.0         # Max estimated cost per session
+  max_consecutive_errors: 3    # Errors before stop
+  max_no_progress: 5           # Iterations without progress before stop
+  max_ci_failures: 3           # CI failures before stop
+  min_iteration_interval_secs: 10  # Rate limit between iterations
+  max_iterations_per_hour: 100 # Rate limit per hour
+  estimated_cost_per_iteration: 2.0  # Cost estimate for budget tracking
+  state_path: "~/.claude/ralph/state.json"
+  progress_path: "~/.claude/ralph/progress.md"
+
+# QuestDB Tables (expected schema)
+questdb_tables:
+  - trading_pnl
+  - trading_orders
+  - trading_risk
+  - trading_errors
+  - system_health
+  - ralph_iterations
+  - agent_spawns
+
+# Derived Files (where values are propagated)
+derived_files:
+  - .env
+  - monitoring/docker-compose.yml
+  - config/cache/docker-compose.redis.yml
+  - docs/ARCHITECTURE.md
+
+# Metadata
+_meta:
+  updated: "2026-01-08"
+  maintainer: "nautilus_dev"
+  version: "1.0.0"

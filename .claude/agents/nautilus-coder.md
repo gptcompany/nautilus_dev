@@ -1,7 +1,7 @@
 ---
 name: nautilus-coder
 description: NautilusTrader expert. Search Context7 first. Use native Rust/Cython (100x faster). Never df.iterrows().
-tools: Read, Bash, WebFetch, TodoWrite, WebSearch, Task, Agent, mcp__context7__*
+tools: Read, Bash, WebFetch, TodoWrite, WebSearch, Task, Agent, mcp__context7__*, mcp__sentry__*
 model: opus
 color: indigo
 version: 2.0.0

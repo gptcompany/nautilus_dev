@@ -26,16 +26,21 @@ Usage:
     result = rq.query(engine="duckdb", query="SELECT * FROM papers LIMIT 10")
 """
 
+import os
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
 import duckdb
 
-# Configuration
+# Configuration - SECURITY: Credentials from environment
 DUCKDB_PATH = Path("/media/sam/1TB/nautilus_dev/data/research.duckdb")
-NEO4J_URI = "bolt://localhost:7687"
-NEO4J_AUTH = ("neo4j", "research123")
+NEO4J_URI = os.getenv("NEO4J_URI", "bolt://localhost:7687")
+_neo4j_user = os.getenv("NEO4J_USER", "neo4j")
+_neo4j_password = os.getenv("NEO4J_PASSWORD")
+if not _neo4j_password:
+    raise ValueError("NEO4J_PASSWORD environment variable required")
+NEO4J_AUTH = (_neo4j_user, _neo4j_password)
 
 
 @dataclass

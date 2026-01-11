@@ -1,0 +1,128 @@
+# Auto-Fix Architecture Drift
+# Creates a PR to fix documentation drift when detected
+#
+# Triggers:
+#   - Scheduled daily at 06:00 UTC
+#   - Manual dispatch
+#
+# Actions:
+#   - Runs architecture drift detector
+#   - If drift found, runs --fix and creates PR
+
+name: Auto-Fix Drift
+
+on:
+  schedule:
+    - cron: '0 6 * * *'  # Daily at 06:00 UTC
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry run (no PR created)'
+        type: boolean
+        default: false
+
+env:
+  PYTHON_VERSION: '3.12'
+
+jobs:
+  detect-and-fix:
+    name: "Detect and Fix Drift"
+    runs-on: [self-hosted, shared]
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Check for drift
+        id: drift
+        run: |
+          set +e
+          python scripts/architecture_drift_detector.py --json > drift_results.json 2>/dev/null
+          EXIT_CODE=$?
+          set -e
+
+          if [ -f drift_results.json ]; then
+            HAS_DRIFT=$(jq '.has_drift' drift_results.json)
+            DOC_DRIFTS=$(jq '.doc_drifts | length' drift_results.json)
+
+            echo "has_drift=$HAS_DRIFT" >> $GITHUB_OUTPUT
+            echo "doc_drifts=$DOC_DRIFTS" >> $GITHUB_OUTPUT
+
+            if [ "$HAS_DRIFT" = "true" ]; then
+              echo "Config drift detected"
+              jq -r '.drifts[] | "\(.name): \(.documented) -> \(.actual)"' drift_results.json
+            fi
+          else
+            echo "has_drift=false" >> $GITHUB_OUTPUT
+            echo "doc_drifts=0" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Auto-fix drift
+        if: steps.drift.outputs.has_drift == 'true' && !inputs.dry_run
+        run: |
+          python scripts/architecture_drift_detector.py --fix
+
+          # Check if any files changed
+          if git diff --quiet; then
+            echo "No changes after fix"
+            echo "changes=false" >> $GITHUB_ENV
+          else
+            echo "Files changed after fix"
+            echo "changes=true" >> $GITHUB_ENV
+            git diff --stat
+          fi
+
+      - name: Create Pull Request
+        if: env.changes == 'true' && !inputs.dry_run
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "docs: auto-fix architecture drift"
+          title: "docs: Auto-fix architecture drift"
+          body: |
+            ## Summary
+
+            Automated fix for architecture documentation drift detected by `architecture_drift_detector.py`.
+
+            ### Changes
+            - Updated ARCHITECTURE.md with current configuration values
+            - Synchronized documentation with actual environment
+
+            ### Drift Report
+            ```json
+            ${{ steps.drift.outputs.has_drift == 'true' && 'See drift_results.json artifact' || 'No drift' }}
+            ```
+
+            ---
+            🤖 Generated with [Claude Code](https://claude.com/claude-code)
+          branch: auto/fix-drift
+          delete-branch: true
+          labels: |
+            documentation
+            automated
+
+      - name: Upload drift report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: drift-report
+          path: drift_results.json
+          retention-days: 7
+
+      - name: Summary
+        run: |
+          echo "## Drift Detection Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- Config drift: ${{ steps.drift.outputs.has_drift }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Doc drifts: ${{ steps.drift.outputs.doc_drifts }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Changes applied: ${{ env.changes || 'false' }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Dry run: ${{ inputs.dry_run || 'false' }}" >> $GITHUB_STEP_SUMMARY

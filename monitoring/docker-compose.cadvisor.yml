@@ -1,0 +1,45 @@
+# cAdvisor - Container Advisor for Docker metrics
+# Provides container-level resource usage and performance metrics
+#
+# Usage:
+#   docker compose -f docker-compose.cadvisor.yml up -d
+#
+# Metrics endpoint: http://localhost:8484/metrics
+# Web UI: http://localhost:8484/containers/
+
+services:
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:v0.55.1
+    container_name: cadvisor
+    restart: unless-stopped
+    privileged: true
+    ports:
+      - "8484:8080"  # Avoid conflict with mempool-web on 8080
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+      - /dev/disk/:/dev/disk:ro
+    devices:
+      - /dev/kmsg
+    command:
+      - '--housekeeping_interval=15s'
+      - '--docker_only=true'
+      - '--disable_metrics=percpu,sched,tcp,udp,hugetlb,referenced_memory'
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:8080/healthz"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    labels:
+      - "prometheus.scrape=true"
+      - "prometheus.port=8080"
+    networks:
+      - monitoring
+
+networks:
+  monitoring:
+    name: monitoring
+    driver: bridge

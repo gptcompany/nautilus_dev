@@ -1,0 +1,117 @@
+# Gitleaks Configuration
+# Detects secrets and credentials in git history
+
+title = "NautilusDev Gitleaks Config"
+
+[extend]
+# Use default rules as base
+useDefault = true
+
+# Custom rules for trading-specific secrets
+[[rules]]
+id = "binance-api-key"
+description = "Binance API Key"
+regex = '''(?i)binance[_-]?api[_-]?key\s*[=:]\s*['"]?([a-zA-Z0-9]{64})['"]?'''
+tags = ["api", "binance", "trading"]
+keywords = ["binance"]
+
+[[rules]]
+id = "binance-secret"
+description = "Binance API Secret"
+regex = '''(?i)binance[_-]?(?:api[_-]?)?secret\s*[=:]\s*['"]?([a-zA-Z0-9]{64})['"]?'''
+tags = ["api", "binance", "trading"]
+keywords = ["binance", "secret"]
+
+[[rules]]
+id = "bybit-api-key"
+description = "Bybit API Key"
+regex = '''(?i)bybit[_-]?api[_-]?key\s*[=:]\s*['"]?([a-zA-Z0-9]{18,})['"]?'''
+tags = ["api", "bybit", "trading"]
+keywords = ["bybit"]
+
+[[rules]]
+id = "telegram-bot-token"
+description = "Telegram Bot Token"
+regex = '''(?i)telegram[_-]?(?:bot[_-]?)?token\s*[=:]\s*['"]?([0-9]{8,10}:[a-zA-Z0-9_-]{35})['"]?'''
+tags = ["telegram", "bot"]
+keywords = ["telegram", "bot"]
+
+[[rules]]
+id = "sentry-dsn"
+description = "Sentry DSN"
+regex = '''https://[a-f0-9]{32}@[a-z0-9]+\.ingest\.sentry\.io/[0-9]+'''
+tags = ["sentry", "monitoring"]
+keywords = ["sentry", "dsn"]
+
+# Hyperliquid/Ethereum Private Keys (CRITICAL)
+[[rules]]
+id = "hyperliquid-private-key"
+description = "Hyperliquid/Ethereum Private Key (64 hex chars)"
+regex = '''(?i)(?:private[_-]?key|pk|HYPERLIQUID.*PK)\s*[=:]\s*['"]?(0x)?([a-fA-F0-9]{64})['"]?'''
+tags = ["private-key", "critical", "trading", "hyperliquid"]
+keywords = ["private", "pk", "hyperliquid", "mainnet", "testnet"]
+
+[[rules]]
+id = "ethereum-private-key-raw"
+description = "Raw Ethereum Private Key (0x prefix)"
+regex = '''0x[a-fA-F0-9]{64}'''
+tags = ["private-key", "critical", "ethereum"]
+keywords = ["0x"]
+
+# JWT Hardcoded Defaults (detect insecure patterns)
+[[rules]]
+id = "jwt-secret-hardcoded"
+description = "Hardcoded JWT Secret (insecure default)"
+regex = '''(?i)JWT_SECRET\s*[=:]\s*['"](whale-dashboard|dev-secret|test-secret|change-?me|secret|password)[^'"]*['"]'''
+tags = ["jwt", "auth", "critical", "hardcoded"]
+keywords = ["jwt", "secret"]
+
+[[rules]]
+id = "neo4j-credentials"
+description = "Neo4j Hardcoded Credentials"
+# Match tuple patterns like ("neo4j", "password123") but NOT environment variable defaults
+# Negative lookahead excludes os.getenv patterns and common placeholder values
+regex = '''(?i)\(\s*['"]neo4j['"]\s*,\s*['"](?!neo4j['"])[^'"]{8,}['"]\s*\)'''
+tags = ["database", "credentials", "neo4j"]
+keywords = ["neo4j"]
+
+[[rules]]
+id = "discord-webhook"
+description = "Discord Webhook URL"
+regex = '''https://discord\.com/api/webhooks/[0-9]+/[a-zA-Z0-9_-]+'''
+tags = ["discord", "webhook", "notification"]
+keywords = ["discord", "webhook"]
+
+# Allowlist - files that are OK to have "secrets" (test fixtures, examples)
+[allowlist]
+description = "Allowlisted files and patterns"
+paths = [
+    '''\.github/workflows/.*\.yml''',  # Workflow files use ${{ secrets.* }}
+    '''tests/.*''',  # Test files use fake/placeholder credentials
+    '''docs/.*''',  # Documentation (examples, not real secrets)
+    '''.*\.example''',
+    '''.*\.sample''',
+    '''.*\.template''',
+    '''\.claude/context_bundles/.*''',  # Claude session data (not real secrets)
+    '''\.claude/settings\.local\.json''',  # Local Claude settings
+    '''config/ci/\.env''',  # CI env example (should have placeholders)
+    '''\.github/runner/\.env''',  # Runner config
+    '''\.env''',  # Root .env is gitignored but may exist locally
+    '''security/\.env\.example''',  # Security env template
+]
+regexes = [
+    '''EXAMPLE_.*''',
+    '''YOUR_.*_HERE''',
+    '''<.*>''',
+    '''\$\{\{.*\}\}''',  # GitHub Actions secrets syntax
+    '''\$\{[A-Z_]+\}''',  # Environment variable references ${VAR}
+    '''os\.getenv\s*\(\s*['"][^'"]+['"]\s*,\s*['"][^'"]*['"]\s*\)''',  # Python os.getenv with default
+    '''os\.environ\.get\s*\(\s*['"][^'"]+['"]\s*,\s*['"][^'"]*['"]\s*\)''',  # Python os.environ.get
+    '''['"]neo4j['"]''',  # Default Neo4j username (not a secret)
+]
+# Old commits with secrets that have since been replaced with env vars
+commits = [
+    "fc059c9e7d0441cd303b4b5d901a6230ce0412be",  # Old Grafana token (now uses ${GRAFANA_SERVICE_ACCOUNT_TOKEN})
+    "124cbb020f179b12a4f0dbcfc8027feb25b61de6",  # Old InfluxDB token (now uses ${INFLUXDB_TOKEN})
+    "40b1f232c7866d713f00d97c7618d4e633746035",  # Journal article access token (not sensitive)
+]

@@ -1,0 +1,167 @@
+# AI Code Review with Claude Opus
+# Provides second-opinion review on all PRs
+#
+# Review focus:
+#   - Security vulnerabilities
+#   - Logic errors and edge cases
+#   - NautilusTrader best practices
+#   - Trading-specific risks
+
+name: AI Code Review
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - 'strategies/**/*.py'
+      - 'scripts/**/*.py'
+      - 'risk/**/*.py'
+      - 'config/**/*.py'
+
+env:
+  PYTHON_VERSION: '3.12'
+
+jobs:
+  opus-review:
+    name: "Claude Opus Review"
+    runs-on: [self-hosted, shared]
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get changed files
+        id: changes
+        run: |
+          # Get list of changed Python files
+          CHANGED=$(git diff --name-only origin/${{ github.base_ref }}...HEAD -- '*.py' | head -20)
+          echo "files<<EOF" >> $GITHUB_OUTPUT
+          echo "$CHANGED" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+          # Count changes
+          LINES=$(git diff --stat origin/${{ github.base_ref }}...HEAD | tail -1)
+          echo "summary=$LINES" >> $GITHUB_OUTPUT
+
+      - name: Get diff content
+        id: diff
+        run: |
+          # Get the actual diff (limited to 10000 chars for API)
+          DIFF=$(git diff origin/${{ github.base_ref }}...HEAD -- '*.py' | head -500)
+          echo "content<<EOF" >> $GITHUB_OUTPUT
+          echo "$DIFF" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Run Opus Code Review
+        id: review
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          # Skip if no API key configured
+          if [ -z "$ANTHROPIC_API_KEY" ]; then
+            echo "::warning::ANTHROPIC_API_KEY not configured - skipping AI review"
+            echo "review=Skipped: API key not configured" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          # Create review prompt
+          cat > /tmp/review_prompt.txt << 'PROMPT'
+          You are a senior code reviewer for a production trading system.
+          This system handles REAL MONEY - bugs can cause FINANCIAL LOSS.
+
+          Review the following code changes for:
+
+          1. SECURITY VULNERABILITIES
+             - Input validation
+             - API key/secret handling
+             - Injection risks
+             - Error message information leakage
+
+          2. LOGIC ERRORS
+             - Off-by-one errors
+             - Race conditions
+             - Null/None handling
+             - Edge cases not covered
+
+          3. TRADING-SPECIFIC RISKS
+             - Position size calculations
+             - Order validation
+             - Risk limit enforcement
+             - Decimal precision issues
+             - Market hours handling
+
+          4. NAUTILUSTRADER BEST PRACTICES
+             - Proper event handling
+             - Correct use of strategies/indicators
+             - Memory leaks (large data structures)
+             - Async patterns
+
+          For each issue found, provide:
+          - File and line number
+          - Severity (CRITICAL/HIGH/MEDIUM/LOW)
+          - Description
+          - Suggested fix
+
+          Be thorough but concise. Only report actual issues, not style preferences.
+
+          Changed files:
+          ${{ steps.changes.outputs.files }}
+
+          Diff:
+          ${{ steps.diff.outputs.content }}
+          PROMPT
+
+          # Call Claude API
+          RESPONSE=$(curl -s https://api.anthropic.com/v1/messages \
+            -H "Content-Type: application/json" \
+            -H "x-api-key: $ANTHROPIC_API_KEY" \
+            -H "anthropic-version: 2023-06-01" \
+            -d '{
+              "model": "claude-sonnet-4-20250514",
+              "max_tokens": 2000,
+              "messages": [
+                {
+                  "role": "user",
+                  "content": "'"$(cat /tmp/review_prompt.txt | jq -Rs .)"'"
+                }
+              ]
+            }')
+
+          # Extract review content
+          REVIEW=$(echo "$RESPONSE" | jq -r '.content[0].text // "Review failed"')
+
+          # Save to file for artifact
+          echo "$REVIEW" > review_output.txt
+
+          # Set output (truncated for GitHub)
+          echo "review<<EOF" >> $GITHUB_OUTPUT
+          echo "$REVIEW" | head -100 >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Post review comment
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const review = `${{ steps.review.outputs.review }}`;
+
+            // Only post if we have actual review content
+            if (review && review !== 'Skipped: API key not configured' && review.length > 50) {
+              await github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: `## 🤖 AI Code Review (Claude Opus)\n\n${review}\n\n---\n*Automated review - please verify suggestions*`
+              });
+            }
+
+      - name: Upload review artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ai-code-review
+          path: review_output.txt
+          retention-days: 30

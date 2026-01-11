@@ -134,6 +134,9 @@ class WalkForwardResult:
     deflated_sharpe_ratio: float | None = None
     probability_backtest_overfitting: float | None = None
     validation_time_seconds: float = 0.0
+    # MVP enhancement (2026-01-11): OverfittingDetector integration
+    overfit_critical_count: int = 0  # Windows with train/test ratio > 2.0x
+    overfit_warning_count: int = 0  # Windows with train/test ratio > 1.5x
 
     @property
     def profitable_windows_pct(self) -> float:

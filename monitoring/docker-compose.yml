@@ -7,16 +7,16 @@ services:
     container_name: nautilus-questdb
     restart: unless-stopped
     ports:
-      - "9000:9000"   # HTTP API + Web Console
-      - "9009:9009"   # ILP (InfluxDB Line Protocol)
-      - "8812:8812"   # PostgreSQL wire protocol
+      - "127.0.0.1:9000:9000"   # HTTP API + Web Console (localhost only)
+      - "127.0.0.1:9009:9009"   # ILP (localhost only)
+      - "127.0.0.1:8812:8812"   # PostgreSQL wire (localhost only)
     volumes:
       - questdb_data:/var/lib/questdb
       - ./questdb/server.conf:/var/lib/questdb/conf/server.conf:ro
     environment:
       - QDB_CAIRO_COMMIT_MODE=nosync
       - QDB_PG_ENABLED=true
-      - QDB_PG_NET_BIND_TO=0.0.0.0:8812
+      - QDB_PG_NET_BIND_TO=127.0.0.1:8812  # SECURITY: localhost only
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9000/exec?query=SELECT%201"]
       interval: 30s
@@ -26,33 +26,27 @@ services:
     networks:
       - monitoring
 
+  # NOTE: Use existing Grafana on 2TB-NVMe (port 3000)
+  # This compose file only manages QuestDB
+  # Grafana config: /media/sam/2TB-NVMe/prod/config/grafana/
+  # Grafana data: /media/sam/2TB-NVMe/prod/data/grafana/
+
   grafana:
-    image: grafana/grafana:11.0.0
+    image: grafana/grafana:12.3.1
     container_name: nautilus-grafana
     restart: unless-stopped
+    profiles:
+      - full  # Only start with: docker compose --profile full up
     ports:
-      - "3000:3000"
+      - "127.0.0.1:${GRAFANA_PORT:-3000}:3000"  # SECURITY: localhost only
     environment:
-      # Security
-      - GF_SECURITY_ADMIN_USER=${GRAFANA_ADMIN_USER:-admin}
-      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:-admin}
-      # Plugins
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_ADMIN_USER:?Error: GRAFANA_ADMIN_USER required}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:?Error: GRAFANA_ADMIN_PASSWORD required}
       - GF_INSTALL_PLUGINS=questdb-questdb-datasource
-      # Alerting (unified alerting enabled)
       - GF_UNIFIED_ALERTING_ENABLED=true
       - GF_ALERTING_ENABLED=false
-      # SMTP for email alerts (optional)
-      - GF_SMTP_ENABLED=${GF_SMTP_ENABLED:-false}
-      - GF_SMTP_HOST=${GF_SMTP_HOST:-}
-      - GF_SMTP_USER=${GF_SMTP_USER:-}
-      - GF_SMTP_PASSWORD=${GF_SMTP_PASSWORD:-}
-      - GF_SMTP_FROM_ADDRESS=${GF_SMTP_FROM_ADDRESS:-grafana@localhost}
-      - GF_SMTP_FROM_NAME=${GF_SMTP_FROM_NAME:-Nautilus Monitoring}
-      # Alerting contact point secrets
-      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN:-}
-      - TELEGRAM_CHAT_ID=${TELEGRAM_CHAT_ID:-}
+      - GF_SMTP_ENABLED=false
       - DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL:-}
-      - ALERT_EMAIL_ADDRESSES=${ALERT_EMAIL_ADDRESSES:-}
     volumes:
       - grafana_data:/var/lib/grafana
       - ./grafana/provisioning:/etc/grafana/provisioning:ro

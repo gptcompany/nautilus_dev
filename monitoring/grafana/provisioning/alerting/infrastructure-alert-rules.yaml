@@ -1,0 +1,464 @@
+# monitoring/grafana/provisioning/alerting/infrastructure-alert-rules.yaml
+# Infrastructure alerts: containers, services, system resources
+#
+# Uses Prometheus datasource (cAdvisor + node_exporter metrics)
+# Discord notifications via contact-points.yaml
+
+apiVersion: 1
+
+groups:
+  # ============================================
+  # Container Health Alerts (cAdvisor)
+  # ============================================
+  - orgId: 1
+    name: container_health
+    folder: Infrastructure Alerts
+    interval: 1m
+    rules:
+      # Critical: Container stopped (was running, now gone)
+      - uid: container-down
+        title: Container Down
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 300
+              to: 0
+            datasourceUid: dez5wyaa618n4e
+            model:
+              expr: |
+                count(container_last_seen{name!=""}) by (name)
+              instant: true
+              refId: A
+          - refId: B
+            relativeTimeRange:
+              from: 0
+              to: 0
+            datasourceUid: __expr__
+            model:
+              type: reduce
+              expression: A
+              reducer: last
+          - refId: C
+            relativeTimeRange:
+              from: 0
+              to: 0
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: B
+              conditions:
+                - evaluator:
+                    type: lt
+                    params: [1]
+                  operator:
+                    type: and
+        noDataState: Alerting
+        execErrState: Alerting
+        for: 2m
+        annotations:
+          summary: "Container {{ $labels.name }} is down"
+          description: "Container {{ $labels.name }} has stopped running. Check docker logs and restart if needed."
+        labels:
+          severity: critical
+          category: infrastructure
+
+      # Warning: Container high CPU (>80% for 5 minutes)
+      - uid: container-high-cpu
+        title: Container High CPU Usage
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 300
+              to: 0
+            datasourceUid: dez5wyaa618n4e
+            model:
+              expr: |
+                rate(container_cpu_usage_seconds_total{name!=""}[5m]) * 100
+              instant: false
+              refId: A
+          - refId: B
+            relativeTimeRange:
+              from: 0
+              to: 0
+            datasourceUid: __expr__
+            model:
+              type: reduce
+              expression: A
+              reducer: max
+          - refId: C
+            relativeTimeRange:
+              from: 0
+              to: 0
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: B
+              conditions:
+                - evaluator:
+                    type: gt
+                    params: [80]
+                  operator:
+                    type: and
+        noDataState: OK
+        execErrState: Alerting
+        for: 5m
+        annotations:
+          summary: "Container {{ $labels.name }} CPU usage high"
+          description: "Container {{ $labels.name }} CPU usage exceeded 80% for 5 minutes."
+        labels:
+          severity: warning
+          category: infrastructure
+
+      # Critical: Container very high memory (>2GB)
+      - uid: container-high-memory
+        title: Container High Memory Usage
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 300
+              to: 0
+            datasourceUid: dez5wyaa618n4e
+            model:
+              expr: |
+                container_memory_usage_bytes{name!=""} / 1024 / 1024 / 1024
+              instant: true
+              refId: A
+          - refId: B
+            relativeTimeRange:
+              from: 0
+              to: 0
+            datasourceUid: __expr__
+            model:
+              type: reduce
+              expression: A
+              reducer: max
+          - refId: C
+            relativeTimeRange:
+              from: 0
+              to: 0
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: B
+              conditions:
+                - evaluator:
+                    type: gt
+                    params: [2]  # 2GB threshold
+                  operator:
+                    type: and
+        noDataState: OK
+        execErrState: Alerting
+        for: 5m
+        annotations:
+          summary: "Container {{ $labels.name }} memory usage high"
+          description: "Container {{ $labels.name }} memory usage exceeded 2GB."
+        labels:
+          severity: warning
+          category: infrastructure
+
+  # ============================================
+  # Prometheus Target Alerts
+  # ============================================
+  - orgId: 1
+    name: prometheus_targets
+    folder: Infrastructure Alerts
+    interval: 1m
+    rules:
+      # Critical: Prometheus target down
+      - uid: prometheus-target-down
+        title: Prometheus Target Down
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 300
+              to: 0
+            datasourceUid: dez5wyaa618n4e
+            model:
+              expr: |
+                up == 0
+              instant: true
+              refId: A
+          - refId: B
+            relativeTimeRange:
+              from: 0
+              to: 0
+            datasourceUid: __expr__
+            model:
+              type: reduce
+              expression: A
+              reducer: sum
+          - refId: C
+            relativeTimeRange:
+              from: 0
+              to: 0
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: B
+              conditions:
+                - evaluator:
+                    type: gt
+                    params: [0]
+                  operator:
+                    type: and
+        noDataState: OK
+        execErrState: Alerting
+        for: 1m
+        annotations:
+          summary: "Prometheus target {{ $labels.job }} ({{ $labels.instance }}) is down"
+          description: "Prometheus cannot scrape {{ $labels.job }} at {{ $labels.instance }}. Check if the service is running."
+        labels:
+          severity: critical
+          category: infrastructure
+
+      # Warning: Slow scrape (>5 seconds)
+      - uid: prometheus-slow-scrape
+        title: Prometheus Slow Scrape
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 300
+              to: 0
+            datasourceUid: dez5wyaa618n4e
+            model:
+              expr: |
+                scrape_duration_seconds > 5
+              instant: true
+              refId: A
+          - refId: B
+            relativeTimeRange:
+              from: 0
+              to: 0
+            datasourceUid: __expr__
+            model:
+              type: reduce
+              expression: A
+              reducer: sum
+          - refId: C
+            relativeTimeRange:
+              from: 0
+              to: 0
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: B
+              conditions:
+                - evaluator:
+                    type: gt
+                    params: [0]
+                  operator:
+                    type: and
+        noDataState: OK
+        execErrState: Alerting
+        for: 5m
+        annotations:
+          summary: "Prometheus scrape for {{ $labels.job }} is slow"
+          description: "Scrape duration for {{ $labels.job }} exceeded 5 seconds."
+        labels:
+          severity: warning
+          category: infrastructure
+
+  # ============================================
+  # System Resource Alerts (node_exporter)
+  # ============================================
+  - orgId: 1
+    name: system_resources
+    folder: Infrastructure Alerts
+    interval: 60s
+    rules:
+      # Critical: System CPU high (>90%)
+      - uid: system-high-cpu
+        title: System CPU High
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 300
+              to: 0
+            datasourceUid: dez5wyaa618n4e
+            model:
+              expr: |
+                100 - (avg(irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100)
+              instant: true
+              refId: A
+          - refId: B
+            relativeTimeRange:
+              from: 0
+              to: 0
+            datasourceUid: __expr__
+            model:
+              type: reduce
+              expression: A
+              reducer: last
+          - refId: C
+            relativeTimeRange:
+              from: 0
+              to: 0
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: B
+              conditions:
+                - evaluator:
+                    type: gt
+                    params: [90]
+                  operator:
+                    type: and
+        noDataState: OK
+        execErrState: Alerting
+        for: 5m
+        annotations:
+          summary: "System CPU usage critical"
+          description: "System CPU usage exceeded 90% for 5 minutes. Current: {{ $values.B }}%"
+        labels:
+          severity: critical
+          category: infrastructure
+
+      # Critical: System memory high (>90%)
+      - uid: system-high-memory
+        title: System Memory High
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 300
+              to: 0
+            datasourceUid: dez5wyaa618n4e
+            model:
+              expr: |
+                (1 - node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes) * 100
+              instant: true
+              refId: A
+          - refId: B
+            relativeTimeRange:
+              from: 0
+              to: 0
+            datasourceUid: __expr__
+            model:
+              type: reduce
+              expression: A
+              reducer: last
+          - refId: C
+            relativeTimeRange:
+              from: 0
+              to: 0
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: B
+              conditions:
+                - evaluator:
+                    type: gt
+                    params: [90]
+                  operator:
+                    type: and
+        noDataState: OK
+        execErrState: Alerting
+        for: 5m
+        annotations:
+          summary: "System memory usage critical"
+          description: "System memory usage exceeded 90% for 5 minutes. Current: {{ $values.B }}%"
+        labels:
+          severity: critical
+          category: infrastructure
+
+      # Warning: Disk space low (>85%)
+      - uid: system-disk-low
+        title: System Disk Space Low
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 300
+              to: 0
+            datasourceUid: dez5wyaa618n4e
+            model:
+              expr: |
+                (1 - node_filesystem_avail_bytes{mountpoint="/"} / node_filesystem_size_bytes{mountpoint="/"}) * 100
+              instant: true
+              refId: A
+          - refId: B
+            relativeTimeRange:
+              from: 0
+              to: 0
+            datasourceUid: __expr__
+            model:
+              type: reduce
+              expression: A
+              reducer: last
+          - refId: C
+            relativeTimeRange:
+              from: 0
+              to: 0
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: B
+              conditions:
+                - evaluator:
+                    type: gt
+                    params: [85]
+                  operator:
+                    type: and
+        noDataState: OK
+        execErrState: Alerting
+        for: 5m
+        annotations:
+          summary: "Disk space low on /"
+          description: "Disk usage on root partition exceeded 85%. Current: {{ $values.B }}%"
+        labels:
+          severity: warning
+          category: infrastructure
+
+      # Critical: Disk space critical (>95%)
+      - uid: system-disk-critical
+        title: System Disk Space Critical
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 300
+              to: 0
+            datasourceUid: dez5wyaa618n4e
+            model:
+              expr: |
+                (1 - node_filesystem_avail_bytes{mountpoint="/"} / node_filesystem_size_bytes{mountpoint="/"}) * 100
+              instant: true
+              refId: A
+          - refId: B
+            relativeTimeRange:
+              from: 0
+              to: 0
+            datasourceUid: __expr__
+            model:
+              type: reduce
+              expression: A
+              reducer: last
+          - refId: C
+            relativeTimeRange:
+              from: 0
+              to: 0
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: B
+              conditions:
+                - evaluator:
+                    type: gt
+                    params: [95]
+                  operator:
+                    type: and
+        noDataState: OK
+        execErrState: Alerting
+        for: 2m
+        annotations:
+          summary: "CRITICAL: Disk space critical on /"
+          description: "Disk usage on root partition exceeded 95%. Immediate action required! Current: {{ $values.B }}%"
+        labels:
+          severity: critical
+          category: infrastructure

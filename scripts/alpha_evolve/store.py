@@ -28,6 +28,9 @@ class FitnessMetrics:
     total_return: float
     trade_count: int | None = None
     win_rate: float | None = None
+    # MVP enhancements (2026-01-11)
+    psr: float | None = None  # Probabilistic Sharpe Ratio (P1: probability SR > 0)
+    net_sharpe: float | None = None  # Transaction cost-adjusted Sharpe (P2: power law)
 
 
 @dataclass
@@ -95,7 +98,19 @@ class ProgramStore:
             conn.execute("CREATE INDEX IF NOT EXISTS idx_calmar ON programs(calmar DESC)")
             conn.execute("CREATE INDEX IF NOT EXISTS idx_sharpe ON programs(sharpe DESC)")
             conn.execute("CREATE INDEX IF NOT EXISTS idx_experiment ON programs(experiment)")
+
+            # MVP schema migration (2026-01-11): Add psr and net_sharpe columns
+            self._migrate_add_column(conn, "psr", "REAL")
+            self._migrate_add_column(conn, "net_sharpe", "REAL")
+
             conn.commit()
+
+    def _migrate_add_column(self, conn: sqlite3.Connection, column: str, dtype: str) -> None:
+        """Add column to programs table if not exists (safe migration)."""
+        cursor = conn.execute("PRAGMA table_info(programs)")
+        columns = [row[1] for row in cursor.fetchall()]
+        if column not in columns:
+            conn.execute(f"ALTER TABLE programs ADD COLUMN {column} {dtype}")
 
     def insert(
         self,
@@ -134,8 +149,8 @@ class ProgramStore:
                     INSERT INTO programs (
                         id, code, parent_id, generation, experiment,
                         sharpe, calmar, max_dd, cagr, total_return,
-                        trade_count, win_rate, created_at
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        trade_count, win_rate, psr, net_sharpe, created_at
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                     """,
                     (
                         prog_id,
@@ -150,6 +165,8 @@ class ProgramStore:
                         metrics.total_return,
                         metrics.trade_count,
                         metrics.win_rate,
+                        metrics.psr,
+                        metrics.net_sharpe,
                         created_at,
                     ),
                 )
@@ -187,7 +204,9 @@ class ProgramStore:
                     cagr = ?,
                     total_return = ?,
                     trade_count = ?,
-                    win_rate = ?
+                    win_rate = ?,
+                    psr = ?,
+                    net_sharpe = ?
                 WHERE id = ?
                 """,
                 (
@@ -198,6 +217,8 @@ class ProgramStore:
                     metrics.total_return,
                     metrics.trade_count,
                     metrics.win_rate,
+                    metrics.psr,
+                    metrics.net_sharpe,
                     prog_id,
                 ),
             )
@@ -474,6 +495,9 @@ class ProgramStore:
             "cagr": "cagr",
             "max_dd": "max_dd",
             "total_return": "total_return",
+            # MVP metrics (2026-01-11)
+            "psr": "psr",
+            "net_sharpe": "net_sharpe",
         }
         return mapping.get(metric, "calmar")
 
@@ -481,6 +505,8 @@ class ProgramStore:
         """Convert database row to Program object."""
         metrics = None
         if row["calmar"] is not None:
+            # Handle new columns that may not exist in old DBs
+            row_keys = row.keys()
             metrics = FitnessMetrics(
                 sharpe_ratio=row["sharpe"],
                 calmar_ratio=row["calmar"],
@@ -489,6 +515,8 @@ class ProgramStore:
                 total_return=row["total_return"],
                 trade_count=row["trade_count"],
                 win_rate=row["win_rate"],
+                psr=row["psr"] if "psr" in row_keys else None,
+                net_sharpe=row["net_sharpe"] if "net_sharpe" in row_keys else None,
             )
 
         return Program(

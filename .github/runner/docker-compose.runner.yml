@@ -4,11 +4,9 @@
 # Usage:
 #   docker-compose -f docker-compose.runner.yml up -d
 #
-# Configuration is in .env file (auto-loaded)
+# Configuration: symlinked to /media/sam/1TB/claude-hooks-shared/.env
 #
-# Get runner token: Settings > Actions > Runners > New self-hosted runner
-
-version: '3.8'
+# Get runner token: Organization > Settings > Actions > Runners > New self-hosted runner
 
 services:
   github-runner:
@@ -19,11 +17,12 @@ services:
     hostname: nautilus-runner
 
     environment:
-      # GitHub runner configuration
-      - RUNNER_NAME=${RUNNER_NAME:-nautilus-local-runner}
-      - RUNNER_TOKEN=${GITHUB_RUNNER_TOKEN}
-      - RUNNER_REPOSITORY=${GITHUB_REPOSITORY:-}
-      - RUNNER_LABELS=self-hosted,linux,x64,nautilus
+      # GitHub runner configuration (supports org or repo level)
+      - RUNNER_NAME=${RUNNER_NAME:-org-shared-runner}
+      - RUNNER_TOKEN=${RUNNER_TOKEN}
+      - RUNNER_URL=${RUNNER_URL:-}
+      - RUNNER_REPOSITORY=${RUNNER_REPOSITORY:-}
+      - RUNNER_LABELS=${RUNNER_LABELS:-self-hosted,linux,x64,shared}
       - RUNNER_WORKDIR=/home/runner/work
 
       # Local service connections (via host network)

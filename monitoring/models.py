@@ -155,6 +155,9 @@ class EvolutionMetrics(BaseModel):
     total_return: float = Field(..., description="Total return percentage")
     trade_count: int | None = Field(default=None, ge=0, description="Trades executed")
     win_rate: float | None = Field(default=None, ge=0, le=1, description="Win rate 0-1")
+    # MVP enhancements (2026-01-11)
+    psr: float | None = Field(default=None, ge=0, le=1, description="Probabilistic Sharpe Ratio")
+    net_sharpe: float | None = Field(default=None, description="Transaction cost-adjusted Sharpe")
 
     # Mutation tracking
     mutation_outcome: Literal["success", "syntax_error", "runtime_error", "timeout", "seed"] = (
@@ -194,6 +197,13 @@ class EvolutionMetrics(BaseModel):
 
         if self.win_rate is not None:
             fields.append(f"win_rate={self.win_rate}")
+
+        # MVP fields (2026-01-11)
+        if self.psr is not None:
+            fields.append(f"psr={self.psr}")
+
+        if self.net_sharpe is not None:
+            fields.append(f"net_sharpe={self.net_sharpe}")
 
         fields_str = ",".join(fields)
 

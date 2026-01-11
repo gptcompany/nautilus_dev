@@ -1,0 +1,593 @@
+# ============================================================================
+# Security Alert Rules for Grafana
+# ============================================================================
+# These rules monitor security events and trading risk limits.
+# Alerts are sent to Discord and Email contact points.
+# ============================================================================
+
+apiVersion: 1
+
+groups:
+  # ============================================================================
+  # Authentication & Access Security
+  # ============================================================================
+  - name: authentication_security
+    folder: Security
+    interval: 1m
+    rules:
+      - uid: auth-brute-force
+        title: Brute Force Attack Detected
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 300
+              to: 0
+            datasourceUid: questdb
+            model:
+              rawSql: |
+                SELECT count() as failed_logins
+                FROM security_events
+                WHERE event_type = 'login_failed'
+                  AND timestamp > dateadd('m', -5, now())
+          - refId: B
+            relativeTimeRange:
+              from: 300
+              to: 0
+            datasourceUid: __expr__
+            model:
+              type: reduce
+              expression: A
+              reducer: last
+          - refId: C
+            relativeTimeRange:
+              from: 300
+              to: 0
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: B
+              conditions:
+                - evaluator:
+                    type: gt
+                    params: [10]
+        for: 0m
+        labels:
+          severity: critical
+          category: security
+        annotations:
+          summary: "Brute force attack detected - {{ $values.B }} failed logins in 5 minutes"
+          description: "More than 10 failed login attempts detected in the last 5 minutes. This may indicate a brute force attack."
+          runbook_url: "https://docs.princyx.xyz/runbooks/brute-force"
+
+      - uid: auth-suspicious-ip
+        title: Suspicious IP Activity
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 3600
+              to: 0
+            datasourceUid: questdb
+            model:
+              rawSql: |
+                SELECT count() as blocked_ips
+                FROM security_events
+                WHERE event_type = 'ip_blocked'
+                  AND timestamp > dateadd('h', -1, now())
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              type: reduce
+              expression: A
+              reducer: last
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: B
+              conditions:
+                - evaluator:
+                    type: gt
+                    params: [3]
+        for: 0m
+        labels:
+          severity: high
+          category: security
+        annotations:
+          summary: "Multiple IPs blocked - {{ $values.B }} in last hour"
+          description: "More than 3 IPs have been blocked in the last hour. Review the security events log."
+
+  # ============================================================================
+  # Trading Risk Limits
+  # ============================================================================
+  - name: trading_risk_limits
+    folder: Security
+    interval: 30s
+    rules:
+      - uid: risk-daily-loss-limit
+        title: Daily Loss Limit Breach
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 60
+              to: 0
+            datasourceUid: questdb
+            model:
+              rawSql: |
+                SELECT daily_pnl_pct
+                FROM trading_risk_metrics
+                ORDER BY timestamp DESC
+                LIMIT 1
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              type: reduce
+              expression: A
+              reducer: last
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: B
+              conditions:
+                - evaluator:
+                    type: lt
+                    params: [-3]
+        for: 0m
+        labels:
+          severity: critical
+          category: trading
+        annotations:
+          summary: "TRADING HALT: Daily loss exceeds 3% limit ({{ $values.B }}%)"
+          description: "Daily P&L has exceeded the -3% limit. Trading should be automatically halted. Manual review required."
+          runbook_url: "https://docs.princyx.xyz/runbooks/trading-halt"
+
+      - uid: risk-position-size-limit
+        title: Position Size Limit Breach
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 60
+              to: 0
+            datasourceUid: questdb
+            model:
+              rawSql: |
+                SELECT position_size_pct
+                FROM trading_risk_metrics
+                ORDER BY timestamp DESC
+                LIMIT 1
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              type: reduce
+              expression: A
+              reducer: last
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: B
+              conditions:
+                - evaluator:
+                    type: gt
+                    params: [10]
+        for: 0m
+        labels:
+          severity: high
+          category: trading
+        annotations:
+          summary: "Position size exceeds 10% limit ({{ $values.B }}%)"
+          description: "Current position size exceeds the 10% equity limit. Reduce position or increase equity."
+
+      - uid: risk-leverage-limit
+        title: Leverage Limit Breach
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 60
+              to: 0
+            datasourceUid: questdb
+            model:
+              rawSql: |
+                SELECT leverage
+                FROM trading_risk_metrics
+                ORDER BY timestamp DESC
+                LIMIT 1
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              type: reduce
+              expression: A
+              reducer: last
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: B
+              conditions:
+                - evaluator:
+                    type: gt
+                    params: [3]
+        for: 0m
+        labels:
+          severity: high
+          category: trading
+        annotations:
+          summary: "Leverage exceeds 3x limit ({{ $values.B }}x)"
+          description: "Current leverage exceeds the 3x limit. Reduce position size."
+
+      - uid: risk-trading-halted
+        title: Trading Automatically Halted
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 60
+              to: 0
+            datasourceUid: questdb
+            model:
+              rawSql: |
+                SELECT CASE WHEN trading_halted THEN 1 ELSE 0 END as halted
+                FROM trading_risk_metrics
+                ORDER BY timestamp DESC
+                LIMIT 1
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              type: reduce
+              expression: A
+              reducer: last
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: B
+              conditions:
+                - evaluator:
+                    type: gt
+                    params: [0]
+        for: 0m
+        labels:
+          severity: critical
+          category: trading
+        annotations:
+          summary: "Trading has been automatically halted"
+          description: "Trading has been halted due to risk limit breach. Manual intervention required to resume."
+
+  # ============================================================================
+  # Order Anomalies
+  # ============================================================================
+  - name: order_anomalies
+    folder: Security
+    interval: 1m
+    rules:
+      - uid: orders-high-rejection-rate
+        title: High Order Rejection Rate
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 3600
+              to: 0
+            datasourceUid: questdb
+            model:
+              rawSql: |
+                SELECT
+                  (SUM(CASE WHEN status = 'rejected' THEN 1.0 ELSE 0.0 END) / COUNT(*)) * 100 as rejection_rate
+                FROM order_audit_log
+                WHERE timestamp > dateadd('h', -1, now())
+                HAVING COUNT(*) > 10
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              type: reduce
+              expression: A
+              reducer: last
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: B
+              conditions:
+                - evaluator:
+                    type: gt
+                    params: [20]
+        for: 5m
+        labels:
+          severity: medium
+          category: trading
+        annotations:
+          summary: "High order rejection rate - {{ $values.B }}%"
+          description: "More than 20% of orders are being rejected. Check exchange connectivity and order validation."
+
+      - uid: orders-unusual-volume
+        title: Unusual Order Volume
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 3600
+              to: 0
+            datasourceUid: questdb
+            model:
+              rawSql: |
+                SELECT count() as order_count
+                FROM order_audit_log
+                WHERE timestamp > dateadd('h', -1, now())
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              type: reduce
+              expression: A
+              reducer: last
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: B
+              conditions:
+                - evaluator:
+                    type: gt
+                    params: [500]
+        for: 0m
+        labels:
+          severity: medium
+          category: trading
+        annotations:
+          summary: "Unusual order volume - {{ $values.B }} orders in 1 hour"
+          description: "Order volume exceeds normal levels. This may indicate a runaway strategy or anomaly."
+
+  # ============================================================================
+  # ML Model Security
+  # ============================================================================
+  - name: ml_security
+    folder: Security
+    interval: 1m
+    rules:
+      - uid: ml-invalid-signature
+        title: ML Model Invalid Signature
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 3600
+              to: 0
+            datasourceUid: questdb
+            model:
+              rawSql: |
+                SELECT count() as invalid_sigs
+                FROM model_access_log
+                WHERE signature_valid = false
+                  AND timestamp > dateadd('h', -1, now())
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              type: reduce
+              expression: A
+              reducer: last
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: B
+              conditions:
+                - evaluator:
+                    type: gt
+                    params: [0]
+        for: 0m
+        labels:
+          severity: critical
+          category: ml_security
+        annotations:
+          summary: "ML model with invalid signature detected"
+          description: "An ML model failed signature verification. This may indicate model tampering. Do not use this model."
+
+      - uid: ml-load-failure
+        title: ML Model Load Failures
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 3600
+              to: 0
+            datasourceUid: questdb
+            model:
+              rawSql: |
+                SELECT count() as failures
+                FROM model_access_log
+                WHERE action = 'load'
+                  AND success = false
+                  AND timestamp > dateadd('h', -1, now())
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              type: reduce
+              expression: A
+              reducer: last
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: B
+              conditions:
+                - evaluator:
+                    type: gt
+                    params: [3]
+        for: 5m
+        labels:
+          severity: high
+          category: ml_security
+        annotations:
+          summary: "Multiple ML model load failures - {{ $values.B }} in 1 hour"
+          description: "Multiple ML model loads have failed. Check model files and permissions."
+
+  # ============================================================================
+  # API Rate Limiting
+  # ============================================================================
+  - name: api_security
+    folder: Security
+    interval: 1m
+    rules:
+      - uid: api-rate-limit-exceeded
+        title: API Rate Limit Exceeded
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 300
+              to: 0
+            datasourceUid: questdb
+            model:
+              rawSql: |
+                SELECT count() as rate_limited
+                FROM security_events
+                WHERE event_type = 'rate_limited'
+                  AND timestamp > dateadd('m', -5, now())
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              type: reduce
+              expression: A
+              reducer: last
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: B
+              conditions:
+                - evaluator:
+                    type: gt
+                    params: [10]
+        for: 0m
+        labels:
+          severity: medium
+          category: security
+        annotations:
+          summary: "Multiple rate limit events - {{ $values.B }} in 5 minutes"
+          description: "Multiple requests have been rate limited. This may indicate abuse or misconfigured client."
+
+      - uid: api-error-spike
+        title: API Error Rate Spike
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 300
+              to: 0
+            datasourceUid: questdb
+            model:
+              rawSql: |
+                SELECT
+                  (SUM(CASE WHEN status_code >= 500 THEN 1.0 ELSE 0.0 END) / COUNT(*)) * 100 as error_rate
+                FROM api_access_log
+                WHERE timestamp > dateadd('m', -5, now())
+                HAVING COUNT(*) > 10
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              type: reduce
+              expression: A
+              reducer: last
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: B
+              conditions:
+                - evaluator:
+                    type: gt
+                    params: [10]
+        for: 2m
+        labels:
+          severity: high
+          category: api
+        annotations:
+          summary: "API error rate spike - {{ $values.B }}% 5xx errors"
+          description: "API error rate exceeds 10%. Check service health and logs."
+
+  # ============================================================================
+  # Withdrawal Security
+  # ============================================================================
+  - name: withdrawal_security
+    folder: Security
+    interval: 1m
+    rules:
+      - uid: withdrawal-non-whitelisted
+        title: Non-Whitelisted Withdrawal Attempt
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 3600
+              to: 0
+            datasourceUid: questdb
+            model:
+              rawSql: |
+                SELECT count() as non_whitelisted
+                FROM withdrawal_log
+                WHERE is_whitelisted = false
+                  AND timestamp > dateadd('h', -1, now())
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              type: reduce
+              expression: A
+              reducer: last
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: B
+              conditions:
+                - evaluator:
+                    type: gt
+                    params: [0]
+        for: 0m
+        labels:
+          severity: critical
+          category: security
+        annotations:
+          summary: "Withdrawal attempt to non-whitelisted address"
+          description: "A withdrawal was requested to an address not on the whitelist. Review immediately."
+
+      - uid: withdrawal-large-amount
+        title: Large Withdrawal Requested
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 3600
+              to: 0
+            datasourceUid: questdb
+            model:
+              rawSql: |
+                SELECT MAX(amount) as max_withdrawal
+                FROM withdrawal_log
+                WHERE status = 'pending'
+                  AND timestamp > dateadd('h', -1, now())
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              type: reduce
+              expression: A
+              reducer: last
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: B
+              conditions:
+                - evaluator:
+                    type: gt
+                    params: [10000]
+        for: 0m
+        labels:
+          severity: high
+          category: security
+        annotations:
+          summary: "Large withdrawal requested - ${{ $values.B }}"
+          description: "A withdrawal exceeding $10,000 has been requested. Manual approval required."

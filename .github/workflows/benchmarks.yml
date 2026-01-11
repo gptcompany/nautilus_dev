@@ -1,0 +1,115 @@
+# CodSpeed Continuous Benchmarking
+# Tracks performance regressions across PRs
+#
+# Setup required:
+#   1. Sign up at https://codspeed.io
+#   2. Add CODSPEED_TOKEN to repository secrets
+#   3. Create benchmark tests in tests/benchmarks/
+#
+# Triggers on PRs to main (to detect regressions)
+
+name: Benchmarks
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+    paths:
+      - 'strategies/**/*.py'
+      - 'scripts/**/*.py'
+      - 'tests/benchmarks/**'
+  workflow_dispatch:
+
+env:
+  PYTHON_VERSION: '3.12'
+
+jobs:
+  benchmarks:
+    name: "Run Benchmarks"
+    runs-on: [self-hosted, shared]
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          enable-cache: true
+          cache-dependency-glob: "**/pyproject.toml"
+
+      - name: Install dependencies
+        run: |
+          uv sync --all-extras
+          uv pip install pytest-codspeed
+
+      - name: Check for benchmark tests
+        id: check
+        run: |
+          if [ -d "tests/benchmarks" ] && [ -n "$(ls -A tests/benchmarks/*.py 2>/dev/null)" ]; then
+            echo "has_benchmarks=true" >> $GITHUB_OUTPUT
+            echo "Found benchmark tests"
+          else
+            echo "has_benchmarks=false" >> $GITHUB_OUTPUT
+            echo "No benchmark tests found in tests/benchmarks/"
+          fi
+
+      - name: Run benchmarks with CodSpeed
+        if: steps.check.outputs.has_benchmarks == 'true'
+        uses: CodSpeedHQ/action@v3
+        with:
+          token: ${{ secrets.CODSPEED_TOKEN }}
+          run: uv run pytest tests/benchmarks/ --codspeed -v
+
+      - name: Run local benchmarks (no CodSpeed token)
+        if: steps.check.outputs.has_benchmarks == 'true' && env.CODSPEED_TOKEN == ''
+        env:
+          CODSPEED_TOKEN: ${{ secrets.CODSPEED_TOKEN }}
+        run: |
+          echo "::warning::CODSPEED_TOKEN not set - running local benchmarks only"
+          uv run pytest tests/benchmarks/ -v --benchmark-only 2>&1 | tee benchmark_results.txt || true
+
+      - name: Create benchmark directory placeholder
+        if: steps.check.outputs.has_benchmarks == 'false'
+        run: |
+          mkdir -p tests/benchmarks
+          cat > tests/benchmarks/README.md << 'EOF'
+          # Benchmark Tests
+
+          Add performance benchmark tests here using pytest-benchmark or pytest-codspeed.
+
+          ## Example
+
+          ```python
+          import pytest
+
+          def test_strategy_signal_generation(benchmark):
+              """Benchmark signal generation performance."""
+              from strategies.common.signals import generate_signal
+
+              result = benchmark(generate_signal, data=sample_data)
+              assert result is not None
+
+          @pytest.mark.benchmark(group="indicators")
+          def test_ema_calculation(benchmark):
+              """Benchmark EMA indicator performance."""
+              from nautilus_trader.indicators import ExponentialMovingAverage
+
+              ema = ExponentialMovingAverage(period=20)
+              benchmark(ema.update_raw, 100.0)
+          ```
+
+          ## Running Locally
+
+          ```bash
+          uv run pytest tests/benchmarks/ -v --benchmark-only
+          ```
+          EOF
+          echo "Created tests/benchmarks/README.md placeholder"

@@ -125,6 +125,27 @@ class WalkForwardValidator:
         )
         pbo = estimate_probability_backtest_overfitting(window_results, seed=self.config.seed)
 
+        # MVP Enhancement (2026-01-11): OverfittingDetector integration
+        overfit_warnings = 0
+        overfit_criticals = 0
+        try:
+            from strategies.common.adaptive_control import OverfittingDetector
+
+            detector = OverfittingDetector(warning_threshold=1.5, critical_threshold=2.0)
+            for w in window_results:
+                alert = detector.check(
+                    train_sharpe=w.train_metrics.sharpe_ratio,
+                    test_sharpe=w.test_metrics.sharpe_ratio,
+                )
+                if alert.is_overfit:
+                    if alert.severity == "critical":
+                        overfit_criticals += 1
+                    else:
+                        overfit_warnings += 1
+                    logger.debug(f"Window {w.window.window_id}: {alert.message}")
+        except ImportError:
+            pass  # OverfittingDetector is optional enhancement
+
         # Check pass/fail criteria
         passed = self._check_criteria(window_results, robustness_score)
 
@@ -138,6 +159,8 @@ class WalkForwardValidator:
             deflated_sharpe_ratio=deflated_sharpe,
             probability_backtest_overfitting=pbo,
             validation_time_seconds=validation_time,
+            overfit_critical_count=overfit_criticals,
+            overfit_warning_count=overfit_warnings,
         )
 
     def _generate_windows(self) -> list[Window]:

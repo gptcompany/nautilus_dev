@@ -3,7 +3,7 @@
 > **Note**: This file is the canonical source for architecture documentation.
 > When implementing new specs, update THIS file (not CLAUDE.md).
 
-## Current Environment (2025-12-24)
+## Current Environment (2026-01-08)
 
 ### NautilusTrader Nightly v1.222.0 (Active)
 
@@ -548,7 +548,7 @@ Bridge between academic research knowledge graph and NautilusTrader strategy dev
 | Semantic Router | academic_research/semantic_router_mcp/ | Query classification |
 | strategy__ Schema | academic_research/docs/entity_schemas.md | Entity structure |
 | Validation | academic_research/scripts/validate_entity.py | Entity validation |
-| strategy-researcher | nautilus_dev/.claude/agents/strategy-researcher.md | Agent definition |
+| /research command | nautilus_dev/.claude/commands/research.md | Paper analysis workflow |
 | paper-to-strategy | nautilus_dev/.claude/skills/paper-to-strategy/ | Spec generation |
 | Indicator Mapping | nautilus_dev/docs/research/indicator_mapping.md | Paper → NT mapping |
 | Order Mapping | nautilus_dev/docs/research/order_mapping.md | Order type mapping |
@@ -694,6 +694,7 @@ Examples: `momentum_btc_v3/`, `mean_reversion_eth_v1/`, `ema_cross_multi_v2/`
 | spec-019 | Graceful Shutdown | Planned |
 | spec-020 | Walk-Forward Validation | Complete |
 | spec-022 | Academic Research → Trading Strategy Pipeline | Complete |
+| spec-040 | Development Excellence (Observability, Security, CI/CD) | In Progress |
 
 ---
 
@@ -762,11 +763,156 @@ Examples: `momentum_btc_v3/`, `mean_reversion_eth_v1/`, `ema_cross_multi_v2/`
 - [ ] Graceful shutdown
 
 #### Monitoring
-- [x] QuestDB metrics storage
-- [x] Grafana dashboards
-- [x] Alert system (Telegram/Discord)
+- [x] QuestDB metrics storage (ILP protocol, port 9009)
+- [x] Grafana dashboards (port 3000)
+- [x] Alert system (Discord webhooks)
+- [x] Sentry error tracking (sentry_integration.py)
+- [x] MetricsCollector (strategies/common/metrics_collector.py)
 - [ ] Health checks / heartbeat
 - [ ] Performance metrics
+
+---
+
+## Observability Stack (spec-040)
+
+### Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                         OBSERVABILITY STACK                                   │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│  ┌─────────────────────────────────────────────────────────────────────────┐│
+│  │ TRADING NODE                                                            ││
+│  │  ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐     ││
+│  │  │ Strategy        │───▶│ MetricsCollector│───▶│ QuestDB         │     ││
+│  │  │                 │    │ (ILP protocol)  │    │ :9009 (ILP)     │     ││
+│  │  │                 │    │                 │    │ :9000 (HTTP)    │     ││
+│  │  └────────┬────────┘    └─────────────────┘    └────────┬────────┘     ││
+│  │           │                                              │              ││
+│  │           │ errors                                       │ metrics      ││
+│  │           ▼                                              ▼              ││
+│  │  ┌─────────────────┐                          ┌─────────────────┐      ││
+│  │  │ Sentry SDK      │                          │ Grafana         │      ││
+│  │  │ (sentry_        │                          │ :3000           │      ││
+│  │  │  integration.py)│                          │                 │      ││
+│  │  └────────┬────────┘                          └────────┬────────┘      ││
+│  │           │                                            │               ││
+│  └───────────┼────────────────────────────────────────────┼───────────────┘│
+│              │                                            │                │
+│              ▼                                            ▼                │
+│  ┌─────────────────────┐                      ┌─────────────────────┐     │
+│  │ Sentry Cloud        │                      │ Discord Webhook     │     │
+│  │ + Seer AI           │                      │ (alerts)            │     │
+│  └──────────┬──────────┘                      └─────────────────────┘     │
+│             │                                                              │
+│             │ MCP                                                          │
+│             ▼                                                              │
+│  ┌─────────────────────────────────────────────────────────────────────┐  │
+│  │ Claude Code Agents                                                   │  │
+│  │ ├── alpha-debug (mcp__sentry__*)       - Query errors, invoke Seer │  │
+│  │ ├── nautilus-live-operator (mcp__sentry__*) - Pre/post deploy check│  │
+│  │ └── test-runner (mcp__sentry__search_errors) - Correlate failures  │  │
+│  └─────────────────────────────────────────────────────────────────────┘  │
+│                                                                            │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+### Key Components
+
+| Component | Location | Port | Purpose |
+|-----------|----------|------|---------|
+| QuestDB | docker-compose.staging.yml | 9000, 9009 | Time-series metrics |
+| Grafana | docker-compose.staging.yml | 3000 | Dashboards & alerts |
+| MetricsCollector | strategies/common/metrics_collector.py | - | Emit metrics to QuestDB |
+| Sentry SDK | strategies/common/sentry_integration.py | - | Error tracking |
+| Sentry MCP | https://mcp.sentry.dev/mcp | - | Query errors from Claude |
+
+### Metrics Tables (QuestDB)
+
+| Table | Fields | Purpose |
+|-------|--------|---------|
+| `trading_pnl` | strategy_id, realized, unrealized, total | P&L tracking |
+| `order_latency` | strategy_id, instrument_id, latency_ms | Execution performance |
+| `positions` | strategy_id, instrument_id, quantity, side | Position tracking |
+| `error_events` | strategy_id, error_type, severity, message | Error logging |
+| `trading_risk` | strategy_id, drawdown_pct, exposure_pct, leverage | Risk metrics |
+| `system_health` | component, status, latency_ms | Health checks |
+
+### Alert Rules (Grafana)
+
+| Alert | Threshold | Action |
+|-------|-----------|--------|
+| Drawdown Warning | > 5% | Discord notification |
+| Drawdown Critical | > 10% | Discord + immediate |
+| Error Rate | > 1%/hour | Discord notification |
+| Position Size | > 10% account | Discord + immediate |
+| Connection Lost | No data 2min | Discord + immediate |
+
+### Sentry Alert Rules (API)
+
+```bash
+# Create via API automation
+export SENTRY_AUTH_TOKEN="sntrys_..."
+export SENTRY_ORG="your-org"
+python scripts/setup_sentry_alerts.py
+```
+
+| Rule | Trigger | Interval |
+|------|---------|----------|
+| High Error Rate | 10+ errors/hour | 1h |
+| Critical Trading Error | tag: trading.critical | 5min |
+| Risk Limit Breach | "kill switch" in message | 5min |
+| Connection Errors | 5+ connection/15min | 30min |
+
+---
+
+## Architecture Documentation Sync
+
+### Drift Detection
+
+Prevents configuration drift between code and documentation:
+
+```bash
+# Check for drift
+python scripts/architecture_drift_detector.py
+
+# Auto-fix ARCHITECTURE.md
+python scripts/architecture_drift_detector.py --fix
+
+# JSON output for CI
+python scripts/architecture_drift_detector.py --json
+```
+
+### Tracked Configurations
+
+| Config | Sources | Example |
+|--------|---------|---------|
+| QUESTDB_ILP_PORT | .env, monitoring/docker-compose.yml | 9009 |
+| QUESTDB_HTTP_PORT | .env, monitoring/docker-compose.yml | 9000 |
+| GRAFANA_PORT | .env, monitoring/docker-compose.yml | 3000 |
+| REDIS_PORT | .env, config/cache/docker-compose.redis.yml | 6379 |
+| NAUTILUS_VERSION | installed package (nightly) | 1.222.0+ |
+| PYTHON_VERSION | pyproject.toml | >=3.12 |
+| CATALOG_PATH | .env | /media/sam/2TB-NVMe/nautilus_catalog_v1222/ |
+| GRAFANA_VERSION | monitoring/docker-compose.yml | 12.3.1 |
+| QUESTDB_VERSION | monitoring/docker-compose.yml | 9.2.3 |
+
+### Pre-commit Hook
+
+Runs automatically on commits to config files:
+
+```yaml
+# .pre-commit-config.yaml
+- repo: local
+  hooks:
+    - id: architecture-drift
+      name: Architecture Drift Detector
+      entry: python scripts/architecture_drift_detector.py
+      files: ^(\.env|docker-compose.*\.yml|docs/ARCHITECTURE\.md)$
+```
+
+---
 
 ### TradingNode Configuration Template
 

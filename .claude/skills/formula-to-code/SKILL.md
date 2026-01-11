@@ -16,14 +16,19 @@ Accept formula in multiple formats:
 - Text: `f = (b*p - q) / b`
 - Natural language: "Kelly criterion for optimal bet sizing"
 
-### Step 2: Validate with WolframAlpha
+### Step 2: Validate with WolframAlpha + MATLAB
 
 ```
 Use mcp__wolframalpha__ask_llm to:
-1. Verify mathematical validity
+1. Verify mathematical validity (symbolic)
 2. Get simplified form
 3. Identify edge cases (division by zero, etc.)
 4. Check for convergence properties if iterative
+
+For complex formulas, use mcp__matlab-server__execute_matlab_code to:
+5. Run numerical validation (Monte Carlo, 10K iterations)
+6. Test numerical stability (ill-conditioned matrices)
+7. Verify optimization convergence (fmincon)
 ```
 
 ### Step 3: Generate Python Code

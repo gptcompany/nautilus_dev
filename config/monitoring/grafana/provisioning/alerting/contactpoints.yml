@@ -1,0 +1,42 @@
+# Grafana Contact Points Configuration
+# Discord webhook for trading alerts
+#
+# Setup:
+# 1. In Discord: Server Settings > Integrations > Webhooks
+# 2. Create webhook for your alerts channel
+# 3. Copy webhook URL
+# 4. Set DISCORD_WEBHOOK_URL env var
+
+apiVersion: 1
+
+contactPoints:
+  - orgId: 1
+    name: discord-trading
+    receivers:
+      - uid: discord-critical
+        type: discord
+        settings:
+          # Discord webhook URL
+          url: ${DISCORD_WEBHOOK_URL}
+          # Use embeds for rich formatting
+          use_discord_username: true
+          # Message template
+          message: |
+            {{ range .Alerts }}
+            **{{ .Labels.alertname }}**
+            {{ if .Annotations.summary }}{{ .Annotations.summary }}{{ end }}
+            {{ if .Annotations.description }}{{ .Annotations.description }}{{ end }}
+            Severity: `{{ .Labels.severity }}`
+            {{ end }}
+
+  - orgId: 1
+    name: discord-warning
+    receivers:
+      - uid: discord-warnings
+        type: discord
+        settings:
+          url: ${DISCORD_WEBHOOK_URL}
+          use_discord_username: true
+          message: |
+            {{ .Status | toUpper }}: {{ .GroupLabels.alertname }}
+            {{ range .Alerts }}{{ .Annotations.summary }}{{ end }}

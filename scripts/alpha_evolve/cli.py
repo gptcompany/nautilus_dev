@@ -273,7 +273,7 @@ def status(
 @evolve.command()
 @click.argument("experiment", required=False)
 @click.option("-k", "--top-k", default=10, type=int, help="Number of strategies to show")
-@click.option("--metric", default="calmar", help="Sort metric: calmar|sharpe|cagr")
+@click.option("--metric", default="calmar", help="Sort metric: calmar|sharpe|cagr|psr|net_sharpe")
 @click.option("--json", "as_json", is_flag=True, help="Output as JSON")
 @click.option("--with-code", is_flag=True, help="Include strategy code")
 @click.pass_context
@@ -313,22 +313,30 @@ def best(
                 item["sharpe"] = s.metrics.sharpe_ratio
                 item["max_drawdown"] = s.metrics.max_drawdown
                 item["cagr"] = s.metrics.cagr
+                # MVP metrics (2026-01-11)
+                item["psr"] = s.metrics.psr
+                item["net_sharpe"] = s.metrics.net_sharpe
             if with_code:
                 item["code"] = s.code
             data.append(item)
         click.echo(json.dumps(data, indent=2))
     else:
         click.echo(f"Top {len(strategies)} Strategies (by {metric})")
-        click.echo("=" * 70)
-        click.echo(f"{'Rank':<5} {'ID':<10} {'Gen':<5} {'Calmar':<10} {'Sharpe':<10} {'MaxDD':<10}")
-        click.echo("-" * 70)
+        click.echo("=" * 90)
+        click.echo(
+            f"{'Rank':<5} {'ID':<10} {'Gen':<5} {'Calmar':<10} {'Sharpe':<10} "
+            f"{'MaxDD':<10} {'PSR':<8} {'NetSR':<8}"
+        )
+        click.echo("-" * 90)
         for i, s in enumerate(strategies, 1):
             m = s.metrics
             if m:
+                psr_str = f"{m.psr:.1%}" if m.psr is not None else "-"
+                net_str = f"{m.net_sharpe:.3f}" if m.net_sharpe is not None else "-"
                 click.echo(
                     f"{i:<5} {s.id[:8]:<10} {s.generation:<5} "
                     f"{m.calmar_ratio:<10.4f} {m.sharpe_ratio:<10.4f} "
-                    f"{m.max_drawdown:<10.2%}"
+                    f"{m.max_drawdown:<10.2%} {psr_str:<8} {net_str:<8}"
                 )
             else:
                 click.echo(f"{i:<5} {s.id[:8]:<10} {s.generation:<5} (no metrics)")

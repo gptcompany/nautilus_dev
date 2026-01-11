@@ -47,6 +47,13 @@ from .dsp_filters import (
     LMSAdaptiveFilter,
     RecursiveVariance,
 )
+from .ensemble_selection import (
+    EnsembleResult,
+    EnsembleSelector,
+    SelectedStrategy,
+    calculate_returns_correlation,
+    select_ensemble,
+)
 from .flow_physics import (
     FlowState,
     InformationDiffusion,
@@ -63,8 +70,11 @@ from .information_theory import (
 )
 from .luck_skill import (
     LuckQuantifier,
+    OverfitAlert,
+    OverfittingDetector,
     SkillAssessment,
     TrackRecordAnalyzer,
+    probabilistic_sharpe_ratio,
 )
 from .meta_controller import MarketHarmony, MetaController, MetaState, SystemState
 from .meta_portfolio import (
@@ -106,6 +116,14 @@ from .sops_sizing import (
 )
 from .spectral_regime import MarketRegime, SpectralRegimeDetector
 from .system_health import HealthState, SystemHealthMonitor
+from .transaction_costs import (
+    BacktestCostAdjuster,
+    CostProfile,
+    Exchange,
+    TransactionCost,
+    TransactionCostModel,
+    get_recommended_profile,
+)
 
 # NOTE: universal_laws removed (2026-01-05) - PMW validation found no academic evidence
 # for Fibonacci/wave physics in trading. See CLAUDE.md for details.
@@ -196,6 +214,23 @@ __all__ = [
     "LuckQuantifier",
     "TrackRecordAnalyzer",
     "SkillAssessment",
+    # MVP: Probabilistic Sharpe & Overfitting Detection (ROI 10.0 / 7.5)
+    "probabilistic_sharpe_ratio",
+    "OverfittingDetector",
+    "OverfitAlert",
+    # MVP: Ensemble Selection (ROI 7.5)
+    "select_ensemble",
+    "EnsembleSelector",
+    "EnsembleResult",
+    "SelectedStrategy",
+    "calculate_returns_correlation",
+    # MVP: Transaction Cost Modeling (ROI 5.0)
+    "TransactionCostModel",
+    "TransactionCost",
+    "BacktestCostAdjuster",
+    "CostProfile",
+    "Exchange",
+    "get_recommended_profile",
     # SOPS Sizing (Sigmoidal + Giller + TapeSpeed)
     "SOPS",
     "TapeSpeed",

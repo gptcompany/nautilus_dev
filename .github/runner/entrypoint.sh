@@ -21,8 +21,15 @@ if [[ -z "$RUNNER_TOKEN" ]]; then
     exit 1
 fi
 
-if [[ -z "$RUNNER_REPOSITORY" ]]; then
-    log_error "RUNNER_REPOSITORY is required (format: owner/repo)"
+# Support both org-level (RUNNER_URL) and repo-level (RUNNER_REPOSITORY)
+if [[ -n "$RUNNER_URL" ]]; then
+    GITHUB_URL="$RUNNER_URL"
+    log_info "Using organization-level runner"
+elif [[ -n "$RUNNER_REPOSITORY" ]]; then
+    GITHUB_URL="https://github.com/${RUNNER_REPOSITORY}"
+    log_info "Using repository-level runner"
+else
+    log_error "RUNNER_URL or RUNNER_REPOSITORY is required"
     exit 1
 fi
 
@@ -33,7 +40,7 @@ RUNNER_WORKDIR="${RUNNER_WORKDIR:-/home/runner/work}"
 
 log_info "Starting GitHub Actions Runner"
 log_info "Runner Name: $RUNNER_NAME"
-log_info "Repository: $RUNNER_REPOSITORY"
+log_info "GitHub URL: $GITHUB_URL"
 log_info "Labels: $RUNNER_LABELS"
 log_info "Work Directory: $RUNNER_WORKDIR"
 
@@ -42,7 +49,7 @@ if [[ ! -f ".runner" ]]; then
     log_info "Configuring runner..."
 
     ./config.sh \
-        --url "https://github.com/${RUNNER_REPOSITORY}" \
+        --url "${GITHUB_URL}" \
         --token "${RUNNER_TOKEN}" \
         --name "${RUNNER_NAME}" \
         --labels "${RUNNER_LABELS}" \

@@ -1,0 +1,36 @@
+# Grafana Notification Policy
+# Routes alerts based on severity to appropriate contact points
+
+apiVersion: 1
+
+policies:
+  - orgId: 1
+    receiver: discord-trading
+    group_by:
+      - alertname
+      - severity
+    # Wait 30s before sending to group similar alerts
+    group_wait: 30s
+    # Wait 5m before sending another notification for same group
+    group_interval: 5m
+    # Wait 4h before resending if alert is still active
+    repeat_interval: 4h
+
+    routes:
+      # Critical alerts -> Discord immediate
+      - receiver: discord-trading
+        matchers:
+          - severity = critical
+        continue: false
+        group_wait: 10s
+        group_interval: 1m
+        repeat_interval: 30m
+
+      # Warning alerts -> Discord
+      - receiver: discord-warning
+        matchers:
+          - severity = warning
+        continue: false
+        group_wait: 1m
+        group_interval: 10m
+        repeat_interval: 6h

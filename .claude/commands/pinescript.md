@@ -44,5 +44,4 @@ tests/test_{strategy_name}.py     # Test file
 
 ## See Also
 
-- Full documentation: `.claude/skills/pinescript-converter/SKILL.md`
 - Indicator mapping: `docs/research/indicator_mapping.md`

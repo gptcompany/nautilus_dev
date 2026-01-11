@@ -1,7 +1,7 @@
 ---
 name: backtest-analyzer
 description: "Backtest log analyzer using Claude subagents. Iterative analysis of large log files with chunking strategy. Compares strategy performance, identifies edge cases, and generates actionable insights."
-tools: Read, Bash, Glob, Grep, TodoWrite, Task
+tools: Read, Bash, Glob, Grep, TodoWrite, Task, mcp__sentry__*
 model: opus
 color: orange
 version: 1.1.0
@@ -305,13 +305,13 @@ Reason: [explanation]
 - Review strategy code for potential issues
 - Check for common anti-patterns
 
-### After Analysis (alpha-debug)
+### After Analysis (Ralph Loop)
 - Implement fixes for identified issues
 - Verify fixes with targeted tests
 
-### For Visualization (nautilus-visualization-renderer)
+### For Visualization
 - Export findings to JSON
-- Generate visual report
+- Use browser/screenshot tools directly for visual reports
 
 ## Scope Boundaries
 
@@ -323,8 +323,8 @@ Reason: [explanation]
 - Export findings for visualization
 
 **WILL NOT DO**:
-- Modify strategy code (use alpha-debug)
-- Run backtests (use test-runner)
+- Modify strategy code (use Ralph Loop)
+- Run backtests (Ralph handles via exit criteria)
 - Implement fixes (use nautilus-coder)
 - Real-time log monitoring (use nautilus-live-operator)
 

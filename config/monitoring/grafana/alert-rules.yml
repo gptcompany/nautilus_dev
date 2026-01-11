@@ -1,0 +1,142 @@
+# Grafana Alert Rules for Trading System
+# Import via: Alerting > Alert rules > Import
+
+apiVersion: 1
+groups:
+  - orgId: 1
+    name: Trading Alerts
+    folder: Trading
+    interval: 30s
+    rules:
+      # =====================================================================
+      # CRITICAL: Drawdown Alert
+      # =====================================================================
+      - uid: drawdown-critical
+        title: "CRITICAL: Drawdown > 10%"
+        condition: A
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 300
+              to: 0
+            datasourceUid: questdb
+            model:
+              rawSql: "SELECT last(drawdown_pct) as value FROM trading_risk WHERE timestamp > now() - 5m"
+        noDataState: OK
+        execErrState: Alerting
+        for: 1m
+        annotations:
+          summary: "Drawdown has exceeded 10%"
+          description: "Current drawdown: {{ $values.A }}%"
+        labels:
+          severity: critical
+          team: trading
+
+      - uid: drawdown-warning
+        title: "WARNING: Drawdown > 5%"
+        condition: A
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 300
+              to: 0
+            datasourceUid: questdb
+            model:
+              rawSql: "SELECT last(drawdown_pct) as value FROM trading_risk WHERE timestamp > now() - 5m AND drawdown_pct > 5 AND drawdown_pct <= 10"
+        noDataState: OK
+        execErrState: OK
+        for: 2m
+        annotations:
+          summary: "Drawdown warning threshold reached"
+        labels:
+          severity: warning
+
+      # =====================================================================
+      # Error Rate Alert
+      # =====================================================================
+      - uid: error-rate-high
+        title: "High Error Rate"
+        condition: A
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 600
+              to: 0
+            datasourceUid: questdb
+            model:
+              rawSql: "SELECT count() as errors FROM error_events WHERE timestamp > now() - 10m AND severity IN ('ERROR', 'CRITICAL')"
+        noDataState: OK
+        execErrState: OK
+        for: 1m
+        annotations:
+          summary: "High error rate detected"
+          description: "{{ $values.A }} errors in last 10 minutes"
+        labels:
+          severity: warning
+
+      # =====================================================================
+      # System Health Alert
+      # =====================================================================
+      - uid: system-down
+        title: "System Component Down"
+        condition: A
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 300
+              to: 0
+            datasourceUid: questdb
+            model:
+              rawSql: "SELECT count() FROM system_health WHERE timestamp > now() - 5m AND status = 'DOWN'"
+        noDataState: Alerting
+        execErrState: Alerting
+        for: 1m
+        annotations:
+          summary: "System component is DOWN"
+        labels:
+          severity: critical
+
+      # =====================================================================
+      # Position Size Alert
+      # =====================================================================
+      - uid: position-oversized
+        title: "Position Size Warning"
+        condition: A
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 60
+              to: 0
+            datasourceUid: questdb
+            model:
+              rawSql: "SELECT max(position_exposure_pct) FROM trading_risk WHERE timestamp > now() - 1m"
+        noDataState: OK
+        execErrState: OK
+        for: 30s
+        annotations:
+          summary: "Position exposure exceeds limit"
+        labels:
+          severity: warning
+
+      # =====================================================================
+      # Daily Loss Limit
+      # =====================================================================
+      - uid: daily-loss-limit
+        title: "CRITICAL: Daily Loss Limit"
+        condition: A
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 86400
+              to: 0
+            datasourceUid: questdb
+            model:
+              rawSql: "SELECT last(daily_pnl_pct) FROM trading_risk WHERE timestamp > now() - 1d"
+        noDataState: OK
+        execErrState: Alerting
+        for: 30s
+        annotations:
+          summary: "Daily loss limit reached (-2%)"
+          description: "Trading should be halted"
+        labels:
+          severity: critical

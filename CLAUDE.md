@@ -136,7 +136,47 @@ nautilus_dev/
 
 ---
 
-## Agents & Skills
+## Configuration (SSOT)
+
+**Single Source of Truth**: `config/canonical.yaml`
+
+All configuration values are defined in `canonical.yaml`. Derived files must match:
+- `.env` - Environment variables
+- `monitoring/docker-compose.yml` - Container configs
+- `docs/ARCHITECTURE.md` - Documentation
+
+```bash
+# Check for drift
+python scripts/architecture_drift_detector.py
+
+# Auto-fix drift
+python scripts/architecture_drift_detector.py --fix
+```
+
+**Tracked**: Ports (QuestDB, Grafana, Redis) | Versions (NT, Python, containers) | Paths (catalog)
+
+---
+
+## Execution Modes
+
+> **Task Classifier**: Prompts are automatically classified and routed to the appropriate mode.
+> Type `STOP RALPH` to exit loop | `RALPH STATUS` for iteration info.
+
+| Mode | Triggers | Description |
+|------|----------|-------------|
+| **Ralph Loop** | fix, refactor, test coverage, migrate | Autonomous iteration until exit criteria met |
+| **Specialist** | strategy, nautilus, research, dashboard | Domain-specific agent with expertise |
+| **Alpha-Evolve** | design, architect, multiple approaches | N implementations with fitness selection |
+| **Standard** | other | Normal Claude execution |
+
+### Ralph Loop Exit Criteria
+- All tests pass: `uv run pytest tests/ -x`
+- No lint errors: `uv run ruff check .`
+- Circuit breakers: MAX_ITERATIONS=15, MAX_ERRORS=3, MAX_NO_PROGRESS=5
+
+---
+
+## Specialist Agents
 
 > **Context Optimization**: NEVER read large docs/logs directly - delegate to agents.
 > Main context = orchestration only. Agents have their own context windows.
@@ -147,16 +187,19 @@ nautilus_dev/
 | nautilus-docs-specialist | Doc search (delegate FIRST) |
 | nautilus-data-pipeline-operator | Data pipeline management |
 | nautilus-live-operator | Live trading operations |
-| nautilus-visualization-renderer | Charts & dashboards |
 | backtest-analyzer | Log analysis (chunked) |
-| test-runner | Test execution (ALWAYS use) |
-| tdd-guard | TDD enforcement (Red-Green-Refactor) |
-| alpha-debug | Bug hunting (2-10 rounds, auto-triggered) |
 | alpha-evolve | Multi-implementation generator ([E] marker) |
-| alpha-visual | Visual validation with screenshots |
-| strategy-researcher | Paper→spec conversion |
+| mathematician | Formula validation and conversion |
 
-**Alpha-Debug Stop**: MAX_ROUNDS | 2 clean rounds | 95% confidence | Tests failing→human
+### Archived Agents (2026-01-09)
+Moved to `.backup_agents/` for token optimization:
+- `nautilus-visualization-renderer` → Use browser tools directly
+- `alpha-visual` → Use screenshot tools directly
+- `strategy-researcher` → Use /research command
+- `grafana-expert` → Use Grafana API directly
+- `grafana-visual-validator` → Merged functionality
+- `adaptive-control-architect` → Legacy, rarely used
+- `pinescript-converter` → Use /pinescript command
 
 | Skill | Savings |
 |-------|---------|
@@ -168,7 +211,7 @@ nautilus_dev/
 
 **Pre-Planning**: ALWAYS delegate to `nautilus-docs-specialist` first (Discord + Context7)
 
-**Search Workflow**: Discord (bugs) → Context7 (API) → backtest-analyzer (logs) → alpha-debug (code)
+**Search Workflow**: Discord (bugs) → Context7 (API) → backtest-analyzer (logs) → Ralph Loop (code)
 
 ---
 

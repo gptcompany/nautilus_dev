@@ -115,7 +115,7 @@ Use this for understanding feature announcements, Rust port progress, and new in
 2. Ask for strategy file or backtest logs
 3. Use Task tool to spawn appropriate agent:
    - `backtest-analyzer` for log analysis
-   - `alpha-debug` for code bug hunting
+   - Ralph Loop for iterative debugging (type "use ralph mode")
 4. Return actionable feedback from subagent
 ```
 
@@ -205,11 +205,8 @@ Task(
 )
 
 # ✅ CORRECT: Hunt for bugs in strategy code
-Task(
-  subagent_type="alpha-debug",
-  prompt="Analyze strategies/momentum.py for edge cases,
-  off-by-one errors, and potential bugs"
-)
+# Use Ralph Loop instead: type "use ralph mode" or trigger via significant code changes
+# Ralph auto-activates on Stop if >20 lines changed in code files
 
 # ✅ CORRECT: Documentation lookup (always nightly)
 mcp__context7__get-library-docs(

@@ -34,7 +34,7 @@ jobs:
   # ===========================================================================
   check-failure:
     name: "Check Backtest Failure"
-    runs-on: [self-hosted, nautilus]
+    runs-on: [self-hosted, shared]
     if: |
       github.event_name == 'workflow_dispatch' ||
       (github.event.workflow_run.conclusion == 'failure')
@@ -90,7 +90,7 @@ jobs:
   # ===========================================================================
   analyze-failure:
     name: "Analyze Backtest Failure"
-    runs-on: [self-hosted, nautilus]
+    runs-on: [self-hosted, shared]
     needs: check-failure
     if: needs.check-failure.outputs.backtest_failed == 'true'
 
@@ -179,7 +179,7 @@ jobs:
   # ===========================================================================
   generate-tasks:
     name: "Generate Diagnostic Tasks"
-    runs-on: [self-hosted, nautilus]
+    runs-on: [self-hosted, shared]
     needs: [check-failure, analyze-failure]
     if: needs.analyze-failure.outputs.analysis_complete == 'true'
 
@@ -296,7 +296,7 @@ jobs:
   # ===========================================================================
   create-issues:
     name: "Create Investigation Issues"
-    runs-on: [self-hosted, nautilus]
+    runs-on: [self-hosted, shared]
     needs: [check-failure, analyze-failure, generate-tasks]
     if: needs.generate-tasks.outputs.tasks_created == 'true' && !inputs.dry_run
 
@@ -356,7 +356,7 @@ jobs:
   # ===========================================================================
   notify:
     name: "Send Notification"
-    runs-on: [self-hosted, nautilus]
+    runs-on: [self-hosted, shared]
     needs: [check-failure, analyze-failure, generate-tasks, create-issues]
     if: always() && needs.check-failure.outputs.backtest_failed == 'true'
 

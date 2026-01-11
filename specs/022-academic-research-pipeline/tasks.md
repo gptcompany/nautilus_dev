@@ -149,25 +149,27 @@
 
 ---
 
-## Phase 9: User Story 6 - Storage Layer DuckDB + Neo4j (Priority: P1) 🆕
+## Phase 9: User Story 6 - Local RAG Storage (Priority: P1) [UPDATED 2026-01]
 
-**Goal**: Persistent storage with graph traversal and SQL analytics
+**Goal**: Non-blocking PDF parsing with auto-indexing for formula search
 
-**Independent Test**: Cypher query returns papers citing a formula, SQL aggregates strategies by Sharpe
+**Independent Test**: `query_formulas("Kelly criterion")` returns relevant paper chunks
 
-### Implementation for User Story 6
+### Implementation for User Story 6 (Simplified Architecture)
 
-- [X] T043 [US6] Install Neo4j Docker: `docker run -d -p 7474:7474 -p 7687:7687 neo4j:community`
-- [X] T044 [US6] Create Neo4j schema: Paper, Formula, Strategy, Concept nodes
-- [X] T045 [US6] Create Neo4j relationships: CITES, CONTAINS, USES, BASED_ON
-- [X] T046 [US6] Create DuckDB database: /media/sam/1TB/nautilus_dev/data/research.duckdb
-- [X] T047 [US6] Create DuckDB tables: papers, formulas, strategies, backtests, walk_forward_analyses, parameter_sets, indicators
-- [X] T048 [P] [US6] Create sync script: memory.json → Neo4j (scripts/sync_memory_to_neo4j.py)
-- [X] T049 [P] [US6] Create sync script: Neo4j → DuckDB (scripts/sync_neo4j_to_duckdb.py)
-- [X] T050 [US6] Test Cypher: MATCH (p:Paper)-[:CONTAINS]->(f:Formula) RETURN p,f ✅
-- [X] T051 [US6] Test SQL: SELECT * FROM strategies WHERE sharpe_ratio > 1.5 ✅
+- [X] T043 [US6] Create background daemon: `scripts/pdf_processor_daemon.py`
+- [X] T044 [US6] Create daemon control: `scripts/start_pdf_daemon.sh`
+- [X] T045 [US6] Create RAG client with local embeddings: `rag_anything/client.py`
+- [X] T046 [US6] Implement auto-indexing after MinerU parsing completes
+- [X] T047 [US6] Test: queue_for_parsing() returns immediately, daemon processes in background
+- [X] T048 [US6] Test: query_formulas("Kelly criterion") returns indexed chunks
 
-**Checkpoint**: Storage layer operational - graph + analytics queries working
+**DEPRECATED (Neo4j/DuckDB removed 2026-01)**:
+- ~~T043-T051 (original)~~ Neo4j/DuckDB sync removed - YAGNI for <500 entities
+- Reason: Neo4j GraphRAG is TEXT-ONLY, requires LLM API (not multimodal)
+- Replacement: memory.json + rag_storage with bge-base-en-v1.5
+
+**Checkpoint**: RAG storage operational - non-blocking parse + formula query working
 
 ---
 
@@ -196,17 +198,19 @@
 
 **Independent Test**: Extract Kelly Criterion formula, validate with WolframAlpha, create formula__ entity
 
-### Implementation for User Story 8
+### Implementation for User Story 8 [UPDATED 2026-01]
 
-- [X] T058 [US8] Create formula extraction script: scripts/extract_formulas.py
-- [X] T059 [US8] Parse LaTeX from MinerU markdown output
-- [X] T060 [US8] Create formula__ entity schema in Neo4j
-- [X] T061 [US8] Integrate WolframAlpha validation: mcp__wolframalpha__ask_llm
-- [X] T062 [US8] Store validation result: validation_status, wolfram_verified
-- [X] T063 [US8] Create relationships: formula→paper, formula→strategy
-- [X] T064 [US8] Test end-to-end: paper.pdf → extracted formulas → validated → Neo4j
+- [X] T058 [US8] Extract formulas from MinerU markdown output
+- [X] T059 [US8] Index formula chunks in RAG storage (bge-base-en-v1.5)
+- [X] T060 [US8] query_formulas() returns relevant formula chunks
+- [X] T061 [US8] Validate with WolframAlpha (optional): mcp__wolframalpha__ask_llm
+- [X] T062 [US8] Link formula→paper via doc_id in chunk metadata
 
-**Checkpoint**: Formula pipeline complete - PDF → formulas → validated → stored
+**DEPRECATED (Neo4j removed 2026-01)**:
+- ~~T060 (original)~~ formula__ entity in Neo4j → replaced with RAG chunks
+- ~~T063~~ Neo4j relationships → replaced with doc_id metadata
+
+**Checkpoint**: Formula pipeline complete - PDF → formulas → indexed in RAG
 
 ---
 
@@ -316,69 +320,46 @@ Tasks clearly indicate which repository each file belongs to.
 ## Implementation Status
 
 **Phase 1-8 (Original)**: 42/42 tasks (100%) ✅
-**Phase 9 (Storage Layer)**: 9/9 tasks (100%) ✅
+**Phase 9 (Local RAG)**: 6/6 tasks (100%) ✅ [UPDATED 2026-01]
 **Phase 10 (MinerU)**: 6/6 tasks (100%) ✅
-**Phase 11 (Formulas)**: 7/7 tasks (100%) ✅
-**Phase 12 (Event Sourcing)**: 4/4 tasks (100%) ✅
-**Phase 13 (Query Router)**: 4/4 tasks (100%) ✅
-**Phase 14 (Rerank)**: 4/4 tasks (100%) ✅
-**Phase 15 (Versioning)**: 4/4 tasks (100%) ✅
+**Phase 11 (Formulas)**: 5/5 tasks (100%) ✅ [UPDATED 2026-01]
 
-**Total**: 80/80 tasks (100%) 🎉
+**Total (Active)**: 59/59 tasks (100%) 🎉
 
 ### Completed (All Phases)
 - Academic paper search + classification
 - Paper download + standardized naming
-- MinerU PDF parsing (background, non-blocking)
-- Formula extraction + WolframAlpha validation
-- Neo4j + DuckDB storage (**AUTOMATIC via event daemon**)
-- Event sourcing with retry/DLQ/health monitoring
-- Query router (Neo4j for graphs, DuckDB for analytics)
-- Semantic rerank with sentence-transformers
-- Version history via event replay + deduplication
+- MinerU PDF parsing (background daemon, non-blocking)
+- Formula extraction + auto-indexing to RAG
+- Local embeddings (bge-base-en-v1.5) for semantic search
+- Two-phase workflow: abstracts immediate, full RAG later
 
-### Architecture (Implemented)
+### Architecture (Simplified 2026-01)
 
-**GAPS FIXED**:
-1. ✅ Storage sync is AUTOMATIC (event daemon watches + syncs)
-2. ✅ Reranking via embeddings (sentence-transformers)
-3. ✅ Versioning via event log replay
-4. ✅ Deduplication by DOI/arXiv ID/title
-5. ✅ Unified query router for both DBs
-
-**Phase 12: Event Sourcing + Auto Sync** ✅
-- [X] T065 Create event log table in DuckDB (source of truth) - `scripts/research_events.py`
-- [X] T066 Implement event types: paper_discovered, paper_downloaded, formula_extracted (8 types)
-- [X] T067 Create sync daemon with retry/DLQ/health monitoring
-- [X] T068 Update /research command to emit events (auto-sync via daemon)
-
-**Phase 13: Query Router (Ensemble)** ✅
-- [X] T069 Create query router - `scripts/research_query.py`
-- [X] T070 Graph queries → Neo4j (papers_by_formula, citation_chain, related_strategies)
-- [X] T071 SQL/Analytics → DuckDB (strategy_stats, top_strategies, methodology_breakdown)
-- [X] T072 Unified API with QueryResult dataclass + hybrid queries
-
-**Phase 14: Rerank Service** ✅
-- [X] T073 Create paper_embeddings table - `scripts/research_rerank.py`
-- [X] T074 Integrate sentence-transformers (all-MiniLM-L6-v2, 384 dims)
-- [X] T075 Implement cosine similarity search with combined scoring
-- [X] T076 Auto-rerank with rerank_search_results() function
-
-**Phase 15: Versioning** ✅
-- [X] T077 Version history via event replay - `scripts/research_versioning.py`
-- [X] T078 Entity state reconstruction at any point in time
-- [X] T079 Diff/history API (get_version_diff, get_entity_history)
-- [X] T080 Deduplication by DOI/arXiv ID/title (check_duplicate)
-
-**Architecture Target**:
 ```
-Event Log (DuckDB) ─── Source of Truth
-       │
-       ├──► Neo4j (auto-sync) ─── Graph Queries
-       │
-       └──► DuckDB Views ─────── Analytics
+/research → queue_for_parsing() → returns IMMEDIATELY
+                    ↓
+            Background Daemon
+                    ↓
+            MinerU Parsing (1 min/page)
+                    ↓
+            Auto-Index to RAG (bge-base-en-v1.5)
+                    ↓
+            query_formulas() available
 ```
+
+**Storage Stack**:
+- memory.json: Knowledge graph (<500 entities)
+- rag_storage/: Vector index with local embeddings
+- cache/parsed_papers/: MinerU output cache
+
+**DEPRECATED (2026-01)**:
+- ~~Phase 12-15~~: Event sourcing, Query router, Rerank, Versioning
+- ~~Neo4j~~: TEXT-ONLY, requires LLM API (removed)
+- ~~DuckDB sync~~: Complexity without value (removed)
+
+**Reason**: KISS + YAGNI. Local embeddings + memory.json sufficient for <500 entities.
 
 **Repos involved**:
-- /media/sam/1TB/nautilus_dev (scripts, commands)
-- /media/sam/1TB/academic_research (storage, MinerU)
+- /media/sam/1TB/nautilus_dev (specs, docs)
+- /media/sam/1TB1/academic_research (daemon, RAG, MinerU)

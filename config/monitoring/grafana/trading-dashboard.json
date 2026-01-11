@@ -1,0 +1,267 @@
+{
+  "dashboard": {
+    "id": null,
+    "uid": "trading-main",
+    "title": "Trading Dashboard - Rolls Royce",
+    "tags": ["trading", "nautilus", "production"],
+    "timezone": "browser",
+    "schemaVersion": 39,
+    "refresh": "5s",
+    "panels": [
+      {
+        "id": 1,
+        "title": "Total PnL (Real-time)",
+        "type": "stat",
+        "gridPos": {"h": 4, "w": 6, "x": 0, "y": 0},
+        "targets": [
+          {
+            "rawSql": "SELECT last(cumulative_pnl) as pnl FROM trading_pnl WHERE timestamp > now() - 1d",
+            "format": "table"
+          }
+        ],
+        "options": {
+          "colorMode": "value",
+          "graphMode": "area"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "unit": "currencyUSD",
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"color": "red", "value": null},
+                {"color": "red", "value": -1000},
+                {"color": "yellow", "value": 0},
+                {"color": "green", "value": 1000}
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 2,
+        "title": "Current Drawdown %",
+        "type": "gauge",
+        "gridPos": {"h": 4, "w": 6, "x": 6, "y": 0},
+        "targets": [
+          {
+            "rawSql": "SELECT last(drawdown_pct) FROM trading_risk WHERE timestamp > now() - 1h",
+            "format": "table"
+          }
+        ],
+        "options": {
+          "orientation": "auto",
+          "showThresholdLabels": true
+        },
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percent",
+            "min": 0,
+            "max": 20,
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"color": "green", "value": null},
+                {"color": "yellow", "value": 5},
+                {"color": "red", "value": 10},
+                {"color": "dark-red", "value": 15}
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 3,
+        "title": "Risk Score",
+        "type": "gauge",
+        "gridPos": {"h": 4, "w": 6, "x": 12, "y": 0},
+        "targets": [
+          {
+            "rawSql": "SELECT last(risk_score) FROM trading_risk WHERE timestamp > now() - 1h",
+            "format": "table"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "min": 0,
+            "max": 100,
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"color": "green", "value": null},
+                {"color": "yellow", "value": 50},
+                {"color": "red", "value": 70}
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 4,
+        "title": "Open Positions",
+        "type": "stat",
+        "gridPos": {"h": 4, "w": 6, "x": 18, "y": 0},
+        "targets": [
+          {
+            "rawSql": "SELECT count() FROM trading_positions WHERE timestamp > now() - 5m AND side != 'FLAT'",
+            "format": "table"
+          }
+        ]
+      },
+      {
+        "id": 5,
+        "title": "PnL Over Time",
+        "type": "timeseries",
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 4},
+        "targets": [
+          {
+            "rawSql": "SELECT timestamp, strategy_id, cumulative_pnl FROM trading_pnl WHERE timestamp > now() - 24h SAMPLE BY 5m",
+            "format": "time_series"
+          }
+        ],
+        "options": {
+          "legend": {"displayMode": "list", "placement": "bottom"}
+        },
+        "fieldConfig": {
+          "defaults": {
+            "unit": "currencyUSD",
+            "custom": {
+              "drawStyle": "line",
+              "lineWidth": 2,
+              "fillOpacity": 10
+            }
+          }
+        }
+      },
+      {
+        "id": 6,
+        "title": "Drawdown Over Time",
+        "type": "timeseries",
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 4},
+        "targets": [
+          {
+            "rawSql": "SELECT timestamp, strategy_id, drawdown_pct FROM trading_risk WHERE timestamp > now() - 24h SAMPLE BY 5m",
+            "format": "time_series"
+          }
+        ],
+        "options": {
+          "legend": {"displayMode": "list", "placement": "bottom"}
+        },
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percent",
+            "custom": {
+              "drawStyle": "line",
+              "lineWidth": 2,
+              "fillOpacity": 20,
+              "thresholdsStyle": {"mode": "line"}
+            },
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"color": "green", "value": null},
+                {"color": "yellow", "value": 5},
+                {"color": "red", "value": 10}
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 7,
+        "title": "Order Latency (ms)",
+        "type": "timeseries",
+        "gridPos": {"h": 6, "w": 8, "x": 0, "y": 12},
+        "targets": [
+          {
+            "rawSql": "SELECT timestamp, symbol, avg(latency_ms) as latency FROM trading_orders WHERE timestamp > now() - 6h SAMPLE BY 1m",
+            "format": "time_series"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "ms",
+            "custom": {"drawStyle": "bars"}
+          }
+        }
+      },
+      {
+        "id": 8,
+        "title": "Slippage (bps)",
+        "type": "timeseries",
+        "gridPos": {"h": 6, "w": 8, "x": 8, "y": 12},
+        "targets": [
+          {
+            "rawSql": "SELECT timestamp, symbol, avg(slippage_bps) as slippage FROM trading_orders WHERE timestamp > now() - 6h SAMPLE BY 5m",
+            "format": "time_series"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "none",
+            "decimals": 2
+          }
+        }
+      },
+      {
+        "id": 9,
+        "title": "Win Rate",
+        "type": "stat",
+        "gridPos": {"h": 6, "w": 8, "x": 16, "y": 12},
+        "targets": [
+          {
+            "rawSql": "SELECT (sum(win_count) * 100.0 / sum(trade_count)) as winrate FROM trading_pnl WHERE timestamp > now() - 7d",
+            "format": "table"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percent",
+            "decimals": 1
+          }
+        }
+      },
+      {
+        "id": 10,
+        "title": "System Health",
+        "type": "table",
+        "gridPos": {"h": 6, "w": 12, "x": 0, "y": 18},
+        "targets": [
+          {
+            "rawSql": "SELECT component, status, last(latency_ms) as latency, last(error_count) as errors FROM system_health WHERE timestamp > now() - 5m",
+            "format": "table"
+          }
+        ]
+      },
+      {
+        "id": 11,
+        "title": "Recent Errors",
+        "type": "table",
+        "gridPos": {"h": 6, "w": 12, "x": 12, "y": 18},
+        "targets": [
+          {
+            "rawSql": "SELECT timestamp, severity, component, message FROM error_events WHERE timestamp > now() - 1h ORDER BY timestamp DESC LIMIT 20",
+            "format": "table"
+          }
+        ],
+        "fieldConfig": {
+          "overrides": [
+            {
+              "matcher": {"id": "byName", "options": "severity"},
+              "properties": [
+                {
+                  "id": "mappings",
+                  "value": [
+                    {"type": "value", "options": {"CRITICAL": {"color": "red"}}},
+                    {"type": "value", "options": {"ERROR": {"color": "orange"}}},
+                    {"type": "value", "options": {"WARNING": {"color": "yellow"}}}
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      }
+    ]
+  }
+}
