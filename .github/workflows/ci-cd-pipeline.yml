@@ -388,11 +388,15 @@ jobs:
         run: uv sync --all-extras
 
       - name: Install nautilus_trader from nightly
+        id: nautilus
         run: |
           # Install nautilus_trader from nightly index (required for test imports)
-          uv pip install nautilus_trader --pre --index-url=https://packages.nautechsystems.io/simple || {
-            echo "::warning::nautilus_trader nightly not available, tests may fail"
-          }
+          if uv pip install nautilus_trader --pre --index-url=https://packages.nautechsystems.io/simple 2>/dev/null; then
+            echo "nautilus_available=true" >> $GITHUB_OUTPUT
+          else
+            echo "::warning::nautilus_trader nightly not available (wheel compatibility issue) - some tests will be skipped"
+            echo "nautilus_available=false" >> $GITHUB_OUTPUT
+          fi
 
       - name: Run unit tests with coverage
         id: tests
@@ -403,9 +407,17 @@ jobs:
           # strategies/common/recovery/ - Session recovery (CRITICAL for live trading)
           # strategies/common/position_sizing/ - Position sizing logic
           # strategies/common/adaptive_control/ - Adaptive control parameters
+
+          # Build ignore list
+          IGNORE_ARGS="--ignore=tests/integration"
+          if [ "${{ steps.nautilus.outputs.nautilus_available }}" != "true" ]; then
+            IGNORE_ARGS="$IGNORE_ARGS --ignore=tests/test_walk_forward"
+            echo "Skipping tests/test_walk_forward (nautilus_trader not available)"
+          fi
+
           uv run pytest tests/ \
             -v --tb=short \
-            --ignore=tests/integration \
+            $IGNORE_ARGS \
             --cov=risk \
             --cov=strategies/common/recovery \
             --cov=strategies/common/position_sizing \
