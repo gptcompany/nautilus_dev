@@ -8,6 +8,21 @@ Provides:
 - Security utilities
 """
 
+from security.audit_trail import (
+    AuditEvent,
+    AuditEventType,
+    AuditTrail,
+    audit_log,
+    verify_audit_trail,
+)
+from security.fraud_detection import (
+    AlertSeverity,
+    FraudAlert,
+    FraudDetectionConfig,
+    FraudDetector,
+    FraudType,
+    check_fraud,
+)
 from security.ml_security import (
     ModelEncryption,
     ModelIntegrity,
@@ -18,6 +33,12 @@ from security.ml_security import (
     compute_model_hash,
     load_model_secure,
     verify_model_hash,
+)
+from security.rate_limiter import (
+    RateLimitConfig,
+    RateLimiter,
+    RateLimitResult,
+    check_rate_limit,
 )
 from security.secret_manager import (
     SecretManager,
@@ -54,4 +75,22 @@ __all__ = [
     # Secrets Validator
     "SecretValidator",
     "validate_secrets",
+    # Rate Limiter
+    "RateLimitConfig",
+    "RateLimiter",
+    "RateLimitResult",
+    "check_rate_limit",
+    # Audit Trail
+    "AuditEvent",
+    "AuditEventType",
+    "AuditTrail",
+    "audit_log",
+    "verify_audit_trail",
+    # Fraud Detection
+    "AlertSeverity",
+    "FraudAlert",
+    "FraudDetectionConfig",
+    "FraudDetector",
+    "FraudType",
+    "check_fraud",
 ]
