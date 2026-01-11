@@ -56,7 +56,7 @@ groups:
           severity: critical
           category: security
         annotations:
-          summary: "Brute force attack detected - {{ $values.B }} failed logins in 5 minutes"
+          summary: "Brute force attack detected - multiple failed logins in 5 minutes"
           description: "More than 10 failed login attempts detected in the last 5 minutes. This may indicate a brute force attack."
           runbook_url: "https://docs.princyx.xyz/runbooks/brute-force"
 
@@ -95,7 +95,7 @@ groups:
           severity: high
           category: security
         annotations:
-          summary: "Multiple IPs blocked - {{ $values.B }} in last hour"
+          summary: "Multiple IPs blocked in last hour"
           description: "More than 3 IPs have been blocked in the last hour. Review the security events log."
 
   # ============================================================================
@@ -140,7 +140,7 @@ groups:
           severity: critical
           category: trading
         annotations:
-          summary: "TRADING HALT: Daily loss exceeds 3% limit ({{ $values.B }}%)"
+          summary: "TRADING HALT: Daily loss exceeds 3% limit"
           description: "Daily P&L has exceeded the -3% limit. Trading should be automatically halted. Manual review required."
           runbook_url: "https://docs.princyx.xyz/runbooks/trading-halt"
 
@@ -179,7 +179,7 @@ groups:
           severity: high
           category: trading
         annotations:
-          summary: "Position size exceeds 10% limit ({{ $values.B }}%)"
+          summary: "Position size exceeds 10% equity limit"
           description: "Current position size exceeds the 10% equity limit. Reduce position or increase equity."
 
       - uid: risk-leverage-limit
@@ -217,7 +217,7 @@ groups:
           severity: high
           category: trading
         annotations:
-          summary: "Leverage exceeds 3x limit ({{ $values.B }}x)"
+          summary: "Leverage exceeds 3x limit"
           description: "Current leverage exceeds the 3x limit. Reduce position size."
 
       - uid: risk-trading-halted
@@ -293,7 +293,7 @@ groups:
           severity: warning
           category: trading
         annotations:
-          summary: "WARNING: Drawdown approaching kill switch ({{ $values.B }}%)"
+          summary: "WARNING: Drawdown approaching kill switch (>10%)"
           description: "Peak-to-trough drawdown has exceeded 10%. Kill switch triggers at 15%. Consider reducing exposure."
 
       - uid: risk-kill-switch-drawdown
@@ -331,7 +331,7 @@ groups:
           severity: critical
           category: trading
         annotations:
-          summary: "KILL SWITCH: Drawdown exceeds 15% ({{ $values.B }}%)"
+          summary: "KILL SWITCH: Drawdown exceeds 15%"
           description: "Peak-to-trough drawdown has exceeded the 15% kill switch threshold. ALL TRADING MUST STOP IMMEDIATELY. This is a critical risk event - Knight Capital lost $440M in 45 minutes."
           runbook_url: "https://docs.princyx.xyz/runbooks/kill-switch"
 
@@ -378,7 +378,7 @@ groups:
           severity: medium
           category: trading
         annotations:
-          summary: "High order rejection rate - {{ $values.B }}%"
+          summary: "High order rejection rate (>20%)"
           description: "More than 20% of orders are being rejected. Check exchange connectivity and order validation."
 
       - uid: orders-unusual-volume
@@ -415,7 +415,7 @@ groups:
           severity: medium
           category: trading
         annotations:
-          summary: "Unusual order volume - {{ $values.B }} orders in 1 hour"
+          summary: "Unusual order volume (>500 orders in 1 hour)"
           description: "Order volume exceeds normal levels. This may indicate a runaway strategy or anomaly."
 
   # ============================================================================
@@ -499,7 +499,7 @@ groups:
           severity: high
           category: ml_security
         annotations:
-          summary: "Multiple ML model load failures - {{ $values.B }} in 1 hour"
+          summary: "Multiple ML model load failures in 1 hour"
           description: "Multiple ML model loads have failed. Check model files and permissions."
 
   # ============================================================================
@@ -544,7 +544,7 @@ groups:
           severity: medium
           category: security
         annotations:
-          summary: "Multiple rate limit events - {{ $values.B }} in 5 minutes"
+          summary: "Multiple rate limit events in 5 minutes"
           description: "Multiple requests have been rate limited. This may indicate abuse or misconfigured client."
 
       - uid: api-error-spike
@@ -583,7 +583,7 @@ groups:
           severity: high
           category: api
         annotations:
-          summary: "API error rate spike - {{ $values.B }}% 5xx errors"
+          summary: "API error rate spike (>10% 5xx errors)"
           description: "API error rate exceeds 10%. Check service health and logs."
 
   # ============================================================================
@@ -666,5 +666,5 @@ groups:
           severity: high
           category: security
         annotations:
-          summary: "Large withdrawal requested - ${{ $values.B }}"
+          summary: "Large withdrawal requested (>$10,000)"
           description: "A withdrawal exceeding $10,000 has been requested. Manual approval required."
