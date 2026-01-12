@@ -1,0 +1,62 @@
+# Pipeline Profile: ML_LITE
+# Enhanced pipeline with Regime Detection + Giller Sizing
+#
+# Features:
+#   - Everything in BASIC
+#   - HMM Regime Detection (trending/ranging/volatile)
+#   - GMM Volatility Clustering (low/medium/high)
+#   - Giller Sub-linear Position Sizing (signal^0.5)
+#   - Regime-weighted positions
+#
+# Benefits:
+#   - 80% of ML benefit with 20% complexity
+#   - Reduces drawdowns in unfavorable regimes
+#   - Prevents over-betting on strong signals
+#
+# Use for:
+#   - Rule-based strategies that benefit from regime awareness
+#   - Hybrid strategies (rule + ML enhancement)
+#   - Production trading with moderate complexity
+
+profile: ML_LITE
+
+regime:
+  enabled: true
+  hmm_n_regimes: 3         # trending, ranging, volatile
+  gmm_n_clusters: 3        # low, medium, high volatility
+  lookback_bars: 252       # ~1 year for regime estimation
+  refit_interval: 20       # Refit every 20 bars
+
+sizing:
+  method: giller           # Sub-linear sizing
+  giller_exponent: 0.5     # sqrt(signal) scaling
+  max_position_pct: 10.0   # Max 10% per position
+  regime_weight_enabled: true  # Reduce size in unfavorable regimes
+
+walk_forward:
+  enabled: false
+  train_window: 252
+  test_window: 63
+  step_size: 21
+  embargo_size: 5
+  min_windows: 4
+
+triple_barrier:
+  enabled: false
+  take_profit_atr: 2.0
+  stop_loss_atr: 2.0
+  max_holding_bars: 20
+  atr_period: 14
+
+meta_label:
+  enabled: false
+  model_type: random_forest
+  min_confidence: 0.5
+  retrain_interval: 100
+
+custom:
+  # Regime-specific adjustments
+  regime_weights:
+    trending: 1.0
+    ranging: 0.5
+    volatile: 0.3
