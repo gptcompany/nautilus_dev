@@ -729,6 +729,8 @@ To use Binance Future Hedge mode, you need to follow the three items below:
             self.submit_order(order, position_id)
     ```
 
+## Contributing
+
 :::info
 For additional features or to contribute to the Binance adapter, please see our
 [contributing guide](https://github.com/nautechsystems/nautilus_trader/blob/develop/CONTRIBUTING.md).

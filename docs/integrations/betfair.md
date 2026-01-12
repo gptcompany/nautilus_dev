@@ -189,6 +189,8 @@ node.add_exec_client_factory(BETFAIR, BetfairLiveExecClientFactory)
 node.build()
 ```
 
+## Contributing
+
 :::info
 For additional features or to contribute to the Betfair adapter, please see our
 [contributing guide](https://github.com/nautechsystems/nautilus_trader/blob/develop/CONTRIBUTING.md).

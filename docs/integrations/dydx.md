@@ -369,6 +369,8 @@ Order books can be maintained at full depth or top-of-book quotes depending on t
 subscription. The venue does not provide quotes, but the adapter subscribes to order
 book deltas and sends new quotes to the `DataEngine` when there is a top-of-book price or size change.
 
+## Contributing
+
 :::info
 For additional features or to contribute to the dYdX adapter, please see our
 [contributing guide](https://github.com/nautechsystems/nautilus_trader/blob/develop/CONTRIBUTING.md).
