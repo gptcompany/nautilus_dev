@@ -15,7 +15,6 @@ if str(project_root) not in sys.path:
     sys.path.insert(0, str(project_root))
 
 
-
 # Python 3.10 compatibility
 try:
     from datetime import UTC
