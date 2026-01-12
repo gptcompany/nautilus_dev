@@ -16,13 +16,11 @@ if str(project_root) not in sys.path:
 
 
 
-import datetime as dt
-
 # Python 3.10 compatibility
 try:
     from datetime import UTC
 except ImportError:
-    UTC = dt.timezone.utc
+    UTC = UTC
 from typing import TYPE_CHECKING
 from unittest.mock import MagicMock
 
