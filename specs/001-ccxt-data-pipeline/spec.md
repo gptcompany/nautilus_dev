@@ -111,6 +111,24 @@ As a trader, I want the pipeline to run continuously in the background so I can 
 
 ---
 
+### User Story 7 - Tick-by-Tick Trades Collection (Priority: P2)
+
+As a trader using VPIN or other tick-based indicators, I want to collect tick-by-tick trade data from Hyperliquid so I can validate volume toxicity signals and perform microstructure analysis.
+
+**Why this priority**: VPIN requires individual trades (not orderbook or OHLCV). Hyperliquid has no historical trades API, so real-time WebSocket collection is mandatory for building the required trade database.
+
+**Independent Test**: Can be tested by connecting to Hyperliquid WebSocket, collecting trades for 5 minutes, and verifying tick-by-tick data stored with bid/ask classification.
+
+**Acceptance Scenarios**:
+
+1. **Given** the WebSocket collector is started for a symbol, **When** trades occur on Hyperliquid, **Then** each trade is captured with timestamp (nanoseconds), price, quantity, side (buy/sell), and trade_id within 100ms of occurrence.
+2. **Given** no trades API exists, **When** collector runs continuously, **Then** trade history is built incrementally and persisted to Parquet catalog.
+3. **Given** a trade occurs at the bid price, **When** classifier determines side, **Then** trade is classified as SELL (aggressor hit bid); vice-versa for ASK-side trades.
+4. **Given** WebSocket connection drops, **When** reconnection occurs, **Then** collector logs gap period and resumes without duplicate trades.
+5. **Given** trades are collected, **When** VPIN indicator queries for trade data, **Then** indicator receives trades in time-sorted order compatible with volume bucket calculation.
+
+---
+
 ### Edge Cases
 
 - What happens when exchange rate limits are exceeded? → Automatic backoff and retry with clear logging.
@@ -137,12 +155,17 @@ As a trader, I want the pipeline to run continuously in the background so I can 
 - **FR-012**: System MUST handle graceful shutdown preserving data integrity.
 - **FR-013**: System MUST validate all fetched data before storage.
 - **FR-014**: System MUST support concurrent fetching from multiple exchanges.
+- **FR-015**: System MUST collect tick-by-tick trades from Hyperliquid via WebSocket in real-time.
+- **FR-016**: System MUST classify each trade as buyer-aggressor (BUY) or seller-aggressor (SELL) based on price vs bid/ask.
+- **FR-017**: System MUST persist trades with nanosecond timestamps compatible with VPIN bucket calculation.
+- **FR-018**: System MUST handle WebSocket reconnection with gap detection and logging.
 
 ### Key Entities
 
 - **OpenInterest**: Represents the total number of outstanding derivative contracts. Attributes: timestamp, symbol, venue, open_interest (contracts), open_interest_value (USD).
 - **FundingRate**: Represents the periodic payment between longs and shorts. Attributes: timestamp, symbol, venue, funding_rate, next_funding_time.
 - **Liquidation**: Represents a forced position closure. Attributes: timestamp, symbol, venue, side (long/short liquidated), quantity, price, value (USD).
+- **Trade**: Represents a single executed trade (tick). Attributes: timestamp (nanoseconds), symbol, venue, trade_id, price, quantity, side (BUY/SELL aggressor), is_buyer_maker.
 - **Exchange**: Represents a supported trading venue. Attributes: name, supported_data_types, rate_limits, connection_status.
 
 ## Success Criteria *(mandatory)*
@@ -157,6 +180,9 @@ As a trader, I want the pipeline to run continuously in the background so I can 
 - **SC-006**: Daemon mode runs for 24+ hours without crashes or memory leaks.
 - **SC-007**: Graceful shutdown completes within 10 seconds preserving all pending data.
 - **SC-008**: 99% of valid API responses are successfully parsed and stored.
+- **SC-009**: Trades are captured within 100ms of WebSocket message receipt.
+- **SC-010**: Trade side classification accuracy exceeds 95% (validated against exchange data when available).
+- **SC-011**: Trades collector runs continuously for 24+ hours with automatic reconnection on drops.
 
 ## Scope
 
@@ -168,6 +194,7 @@ As a trader, I want the pipeline to run continuously in the background so I can 
 - Open Interest (current and historical)
 - Funding Rates (current and historical)
 - Liquidations (real-time stream where available)
+- Tick-by-tick trades (Hyperliquid WebSocket, for VPIN validation)
 - Local Parquet storage
 - CLI interface
 - Daemon mode with scheduling
