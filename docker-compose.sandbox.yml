@@ -1,0 +1,124 @@
+# Sandbox Infrastructure
+# Usage:
+#   docker-compose -f docker-compose.sandbox.yml --profile malware up
+#   docker-compose -f docker-compose.sandbox.yml --profile security up -d
+#   docker-compose -f docker-compose.sandbox.yml --profile general run docker-sandbox python script.py
+
+services:
+  # Malware Analysis Sandbox - Complete isolation
+  malware-sandbox:
+    build:
+      context: .
+      dockerfile: Dockerfile.malware-sandbox
+    profiles: [malware]
+    network_mode: none
+    read_only: true
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: "1.0"
+    tmpfs:
+      - /tmp:size=50M,mode=1777
+      - /analysis/output:size=100M,mode=1777
+    volumes:
+      - ./sandbox-input:/analysis/input:ro
+
+  # Security Testing Redis
+  security-sandbox-redis:
+    image: redis:7-alpine
+    profiles: [security]
+    ports:
+      - "127.0.0.1:6390:6379"
+    networks:
+      - sandbox-network
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+          cpus: "0.5"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  # Security Testing QuestDB
+  security-sandbox-questdb:
+    image: questdb/questdb:7.3.10
+    profiles: [security]
+    ports:
+      - "127.0.0.1:9002:9000"
+    networks:
+      - sandbox-network
+    environment:
+      - QDB_HTTP_ENABLED=true
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: "1.0"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  # Security Testing Sandbox
+  security-sandbox:
+    build:
+      context: .
+      dockerfile: Dockerfile.sandbox
+    profiles: [security]
+    depends_on:
+      security-sandbox-redis:
+        condition: service_healthy
+      security-sandbox-questdb:
+        condition: service_healthy
+    networks:
+      - sandbox-network
+    environment:
+      - REDIS_HOST=security-sandbox-redis
+      - REDIS_PORT=6379
+      - QUESTDB_URL=http://security-sandbox-questdb:9000
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: "2.0"
+    volumes:
+      - ./security:/app/security:ro
+      - ./tests:/app/tests:ro
+
+  # General Purpose Docker Sandbox
+  docker-sandbox:
+    build:
+      context: .
+      dockerfile: Dockerfile.sandbox
+    profiles: [general]
+    networks:
+      - sandbox-isolated
+    read_only: true
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: "2.0"
+    tmpfs:
+      - /tmp:size=100M,mode=1777
+    volumes:
+      - ./sandbox-workspace:/workspace
+
+networks:
+  sandbox-network:
+    internal: true
+    driver: bridge
+  sandbox-isolated:
+    internal: true
+    driver: bridge

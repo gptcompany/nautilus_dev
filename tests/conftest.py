@@ -14,7 +14,15 @@ project_root = Path(__file__).parent.parent
 if str(project_root) not in sys.path:
     sys.path.insert(0, str(project_root))
 
-from datetime import UTC
+
+
+import datetime as dt
+
+# Python 3.10 compatibility
+try:
+    from datetime import UTC
+except ImportError:
+    UTC = dt.timezone.utc
 from typing import TYPE_CHECKING
 from unittest.mock import MagicMock
 
