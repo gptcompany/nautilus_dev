@@ -118,7 +118,7 @@ services:
       - "3001:3000"  # Different port from production
     environment:
       - GF_SECURITY_ADMIN_USER=admin
-      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_STAGING_PASSWORD:-staging123}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_STAGING_PASSWORD:?Error: GRAFANA_STAGING_PASSWORD required}
       - GF_USERS_ALLOW_SIGN_UP=false
       - GF_SERVER_ROOT_URL=http://localhost:3001
       - GF_INSTALL_PLUGINS=questdb-questdb-datasource
@@ -149,7 +149,7 @@ services:
       - "7475:7474"  # Browser (different from prod)
       - "7688:7687"  # Bolt
     environment:
-      - NEO4J_AUTH=neo4j/${NEO4J_STAGING_PASSWORD:-staging123}
+      - NEO4J_AUTH=neo4j/${NEO4J_STAGING_PASSWORD:?Error: NEO4J_STAGING_PASSWORD required}
       - NEO4J_PLUGINS=["apoc"]
       - NEO4J_dbms_memory_heap_initial__size=256m
       - NEO4J_dbms_memory_heap_max__size=512m
