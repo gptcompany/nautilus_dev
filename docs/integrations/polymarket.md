@@ -516,6 +516,8 @@ The following limitations are currently known:
 | `generate_order_history_from_trades` | `False` | Generate synthetic order history from trade reports when `True` (experimental). |
 | `log_raw_ws_messages`            | `False`      | Log raw WebSocket payloads at INFO level when `True`. |
 
+## Contributing
+
 :::info
 For additional features or to contribute to the Polymarket adapter, please see our
 [contributing guide](https://github.com/nautechsystems/nautilus_trader/blob/develop/CONTRIBUTING.md).
