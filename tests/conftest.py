@@ -19,7 +19,6 @@ if str(project_root) not in sys.path:
 try:
     from datetime import UTC
 except ImportError:
-
     UTC = UTC  # noqa: N806
 from typing import TYPE_CHECKING
 from unittest.mock import MagicMock
