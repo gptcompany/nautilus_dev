@@ -67,8 +67,8 @@ Kelly Criterion requires estimates of μ (expected return) and σ² (variance). 
 **Acceptance Scenarios**:
 
 1. **Given** strategy with 180 days of returns, **When** Kelly fraction is calculated, **Then** full fractional Kelly is applied (high confidence)
-2. **Given** strategy with 30 days of returns, **When** Kelly fraction is calculated, **Then** Kelly fraction is reduced by uncertainty factor (e.g., 50% reduction)
-3. **Given** strategy with <20 days of returns, **When** Kelly fraction is requested, **Then** system returns conservative default allocation (not Kelly-based)
+2. **Given** strategy with 30 days of returns (= min_samples), **When** Kelly fraction is calculated, **Then** Kelly fraction is reduced by uncertainty factor: confidence = 0.5 (min_confidence), so f_adjusted = f_fractional × 0.5
+3. **Given** strategy with < min_samples (default 30) days of returns, **When** Kelly fraction is requested, **Then** system returns conservative default allocation (not Kelly-based)
 
 ---
 
@@ -76,7 +76,7 @@ Kelly Criterion requires estimates of μ (expected return) and σ² (variance). 
 
 - **What happens when μ estimate is negative?** Kelly fraction is 0 (don't allocate to losing strategies)
 - **What happens when σ² estimate is near zero?** Cap Kelly fraction to prevent division instability (max f* = 2.0)
-- **What happens when all strategies have negative μ?** System warns operator and uses minimum allocation (1% per strategy) to maintain diversification
+- **What happens when all strategies have negative μ?** System warns operator and uses minimum allocation (min_allocation, default 1% per strategy) to maintain diversification
 - **How does Kelly interact with existing risk limits?** Kelly allocations are capped by risk limits (Kelly suggests, limits enforce)
 - **What happens during regime changes when μ/σ² shift rapidly?** Use exponential weighting on historical returns (decay similar to ADTS)
 
@@ -103,7 +103,7 @@ Kelly Criterion requires estimates of μ (expected return) and σ² (variance). 
 
 - **EstimationUncertainty**: Quantifies confidence in μ/σ² estimates based on sample size and return stability. Higher uncertainty → more conservative Kelly fractions.
 
-- **KellyConfig**: Configuration dataclass with: enabled (bool), beta (float, default 0.25), min_samples (int, default 30), max_fraction (float, default 2.0), decay (float, default 0.99).
+- **KellyConfig**: Configuration dataclass with: enabled (bool), beta (float, default 0.25), min_samples (int, default 30), max_fraction (float, default 2.0), decay (float, default 0.99), min_allocation (float, default 0.01), uncertainty_adjustment (bool, default True).
 
 ---
 
