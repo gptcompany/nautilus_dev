@@ -1,0 +1,115 @@
+# Trading Service Canary Rollout
+# Progressive deployment: 5% → 25% → 100% with automatic analysis
+#
+# Prerequisites:
+#   kubectl create namespace argo-rollouts
+#   kubectl apply -n argo-rollouts -f https://github.com/argoproj/argo-rollouts/releases/latest/download/install.yaml
+#
+# Deploy with: kubectl apply -f k8s/rollouts/trading-service.yaml
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: trading-service
+  namespace: trading
+  labels:
+    app: trading-service
+spec:
+  replicas: 3
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app: trading-service
+  template:
+    metadata:
+      labels:
+        app: trading-service
+    spec:
+      containers:
+        - name: trading-service
+          image: ghcr.io/gptcompany/nautilus:latest
+          ports:
+            - containerPort: 8080
+              name: http
+          resources:
+            requests:
+              cpu: "500m"
+              memory: "1Gi"
+            limits:
+              cpu: "2"
+              memory: "4Gi"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          env:
+            - name: ENV
+              value: "prod"
+            - name: QUESTDB_HOST
+              value: "questdb.monitoring.svc.cluster.local"
+            - name: REDIS_HOST
+              value: "redis.cache.svc.cluster.local"
+
+  strategy:
+    canary:
+      # Step 1: 5% traffic for 10 minutes
+      # Step 2: 25% traffic for 10 minutes
+      # Step 3: 100% traffic (full promotion)
+      steps:
+        - setWeight: 5
+        - pause: {duration: 10m}
+        - setWeight: 25
+        - pause: {duration: 10m}
+        - setWeight: 100
+
+      # Automatic analysis at each step
+      analysis:
+        templates:
+          - templateName: trading-success-rate
+        startingStep: 1  # Start analysis after first weight increase
+        args:
+          - name: service-name
+            value: trading-service
+
+      # Traffic management (requires Istio, Nginx, or similar)
+      # Uncomment for Istio:
+      # trafficRouting:
+      #   istio:
+      #     virtualService:
+      #       name: trading-service
+      #     destinationRule:
+      #       name: trading-service
+      #       canarySubsetName: canary
+      #       stableSubsetName: stable
+
+      # Anti-affinity: don't schedule canary and stable on same node
+      antiAffinity:
+        preferredDuringSchedulingIgnoredDuringExecution:
+          weight: 100
+
+      # Rollback configuration
+      maxSurge: "25%"
+      maxUnavailable: 0
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: trading-service
+  namespace: trading
+spec:
+  selector:
+    app: trading-service
+  ports:
+    - port: 80
+      targetPort: 8080
+      name: http
+  type: ClusterIP

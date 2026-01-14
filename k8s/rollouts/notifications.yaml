@@ -1,0 +1,141 @@
+# Argo Rollouts Notification Configuration
+# Sends Discord alerts on deployment events
+#
+# Prerequisites:
+#   - DISCORD_WEBHOOK secret must be created
+#   kubectl create secret generic discord-webhook \
+#     --from-literal=url=https://discord.com/api/webhooks/... \
+#     -n argo-rollouts
+#
+# Deploy with: kubectl apply -f k8s/rollouts/notifications.yaml
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argo-rollouts-notification-configmap
+  namespace: argo-rollouts
+data:
+  # Discord webhook service configuration
+  service.webhook.discord: |
+    url: $discord-webhook-url
+    headers:
+      - name: Content-Type
+        value: application/json
+
+  # Notification triggers
+  trigger.on-rollout-completed: |
+    - send: [discord-rollout-completed]
+
+  trigger.on-rollout-step-completed: |
+    - send: [discord-step-completed]
+
+  trigger.on-rollout-aborted: |
+    - send: [discord-rollout-aborted]
+
+  trigger.on-analysis-run-error: |
+    - send: [discord-analysis-error]
+
+  trigger.on-analysis-run-failed: |
+    - send: [discord-analysis-failed]
+
+  # Message templates
+  template.discord-rollout-completed: |
+    webhook:
+      discord:
+        method: POST
+        body: |
+          {
+            "embeds": [{
+              "title": "✅ Deployment Complete",
+              "description": "Rollout **{{.rollout.metadata.name}}** completed successfully",
+              "color": 3066993,
+              "fields": [
+                {"name": "Namespace", "value": "{{.rollout.metadata.namespace}}", "inline": true},
+                {"name": "Revision", "value": "{{.rollout.status.currentPodHash}}", "inline": true},
+                {"name": "Replicas", "value": "{{.rollout.spec.replicas}}", "inline": true}
+              ],
+              "footer": {"text": "Argo Rollouts | Nautilus Trading"}
+            }]
+          }
+
+  template.discord-step-completed: |
+    webhook:
+      discord:
+        method: POST
+        body: |
+          {
+            "embeds": [{
+              "title": "📊 Canary Step Completed",
+              "description": "Rollout **{{.rollout.metadata.name}}** advanced to next step",
+              "color": 16776960,
+              "fields": [
+                {"name": "Current Step", "value": "{{.rollout.status.currentStepIndex}}", "inline": true},
+                {"name": "Traffic Weight", "value": "{{.rollout.status.canary.weight}}%", "inline": true}
+              ],
+              "footer": {"text": "Argo Rollouts | Nautilus Trading"}
+            }]
+          }
+
+  template.discord-rollout-aborted: |
+    webhook:
+      discord:
+        method: POST
+        body: |
+          {
+            "embeds": [{
+              "title": "🔴 Deployment ABORTED",
+              "description": "Rollout **{{.rollout.metadata.name}}** was aborted!",
+              "color": 15158332,
+              "fields": [
+                {"name": "Namespace", "value": "{{.rollout.metadata.namespace}}", "inline": true},
+                {"name": "Reason", "value": "Analysis failed or manual abort", "inline": false}
+              ],
+              "footer": {"text": "Argo Rollouts | Nautilus Trading"}
+            }]
+          }
+
+  template.discord-analysis-error: |
+    webhook:
+      discord:
+        method: POST
+        body: |
+          {
+            "embeds": [{
+              "title": "⚠️ Analysis Error",
+              "description": "Analysis run encountered an error",
+              "color": 16744448,
+              "fields": [
+                {"name": "Rollout", "value": "{{.rollout.metadata.name}}", "inline": true},
+                {"name": "Status", "value": "Error", "inline": true}
+              ],
+              "footer": {"text": "Argo Rollouts | Nautilus Trading"}
+            }]
+          }
+
+  template.discord-analysis-failed: |
+    webhook:
+      discord:
+        method: POST
+        body: |
+          {
+            "embeds": [{
+              "title": "❌ Analysis FAILED - Auto-Rollback",
+              "description": "Analysis metrics exceeded thresholds. Initiating rollback.",
+              "color": 15158332,
+              "fields": [
+                {"name": "Rollout", "value": "{{.rollout.metadata.name}}", "inline": true},
+                {"name": "Action", "value": "Automatic Rollback", "inline": true}
+              ],
+              "footer": {"text": "Argo Rollouts | Nautilus Trading"}
+            }]
+          }
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: argo-rollouts-notification-secret
+  namespace: argo-rollouts
+stringData:
+  # Replace with actual Discord webhook URL
+  discord-webhook-url: "https://discord.com/api/webhooks/YOUR_WEBHOOK_ID/YOUR_WEBHOOK_TOKEN"

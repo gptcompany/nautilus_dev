@@ -278,3 +278,40 @@ Concise | Skeptical | Direct | Ask questions when unclear
 - [ ] Integration tests passano
 - [ ] E2E tests con dati reali (se applicabile)
 - [ ] Coverage adeguata per codice critico
+
+---
+
+## FAANG Enterprise Stack (2026-01)
+
+### Observability
+
+| Component | Tool | Location |
+|-----------|------|----------|
+| **SLO/SLI** | Pyrra + OpenSLO | `slo/*.yaml` |
+| **Canary Deploy** | Argo Rollouts | `k8s/rollouts/*.yaml` |
+| **Latency** | P50/P95/P99 panels | `monitoring/grafana/dashboards/exchange.json` |
+| **VaR/CVaR** | risk/var_calculator.py | `config/monitoring/grafana/dashboards/trading-drawdown.json` |
+| **Risk Heatmap** | Grafana native | `config/monitoring/grafana/dashboards/trading-risk-heatmap.json` |
+| **Correlation** | risk/correlation.py | Python + optional Grafana |
+
+### Versioning
+
+```bash
+# Conventional commits required
+git commit -m "feat(trading): add VaR panel"
+git commit -m "fix(risk): correct threshold"
+
+# Auto-release on merge to main
+npx semantic-release --dry-run
+```
+
+### Backstage Integration
+
+Catalog: `catalog-info.yaml` - Registra tutti i servizi/risorse.
+
+**Plugins attivi**:
+- `@backstage/plugin-grafana` - Dashboard embedding
+- `@backstage/plugin-prometheus` - SLO/SLI status
+- `roadie-backstage-plugins/argo-cd` - Canary status
+
+**Ref**: `docs/ARCHITECTURE.md` § "FAANG Enterprise Observability Stack"

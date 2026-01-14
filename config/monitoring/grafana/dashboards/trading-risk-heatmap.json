@@ -1,0 +1,350 @@
+{
+  "annotations": { "list": [] },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [
+    {
+      "asDropdown": false,
+      "icon": "external link",
+      "includeVars": true,
+      "keepTime": true,
+      "tags": ["trading", "risk"],
+      "targetBlank": true,
+      "title": "Related Dashboards",
+      "type": "dashboards"
+    }
+  ],
+  "liveNow": true,
+  "panels": [
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 },
+      "id": 1,
+      "panels": [],
+      "title": "Position Risk Heatmap",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "questdb-questdb-datasource", "uid": "questdb" },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "hideFrom": { "legend": false, "tooltip": false, "viz": false },
+            "scaleDistribution": { "type": "linear" }
+          }
+        }
+      },
+      "gridPos": { "h": 12, "w": 24, "x": 0, "y": 1 },
+      "id": 2,
+      "options": {
+        "calculate": false,
+        "cellGap": 2,
+        "color": {
+          "exponent": 0.5,
+          "fill": "dark-orange",
+          "mode": "scheme",
+          "reverse": true,
+          "scale": "exponential",
+          "scheme": "RdYlGn",
+          "steps": 128
+        },
+        "exemplars": { "color": "rgba(255,0,255,0.7)" },
+        "filterValues": { "le": 1e-9 },
+        "legend": { "show": true },
+        "rowsFrame": { "layout": "auto" },
+        "showValue": "auto",
+        "tooltip": { "mode": "single", "showColorScale": true, "yHistogram": false },
+        "yAxis": { "axisPlacement": "left", "reverse": false }
+      },
+      "targets": [
+        {
+          "rawSql": "SELECT timestamp, symbol, drawdown_pct as value FROM trading_risk WHERE timestamp > $__timeFrom AND timestamp < $__timeTo AND env = 'prod' ORDER BY timestamp",
+          "refId": "A",
+          "format": "table"
+        }
+      ],
+      "title": "Position Drawdown Heatmap",
+      "description": "Color intensity shows drawdown severity per symbol over time. Red = high drawdown, Green = healthy.",
+      "type": "heatmap"
+    },
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 13 },
+      "id": 3,
+      "panels": [],
+      "title": "VaR Risk Heatmap",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "questdb-questdb-datasource", "uid": "questdb" },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "hideFrom": { "legend": false, "tooltip": false, "viz": false },
+            "scaleDistribution": { "type": "linear" }
+          }
+        }
+      },
+      "gridPos": { "h": 12, "w": 24, "x": 0, "y": 14 },
+      "id": 4,
+      "options": {
+        "calculate": false,
+        "cellGap": 2,
+        "color": {
+          "exponent": 0.5,
+          "fill": "dark-orange",
+          "mode": "scheme",
+          "reverse": true,
+          "scale": "exponential",
+          "scheme": "RdYlGn",
+          "steps": 128
+        },
+        "exemplars": { "color": "rgba(255,0,255,0.7)" },
+        "filterValues": { "le": 1e-9 },
+        "legend": { "show": true },
+        "rowsFrame": { "layout": "auto" },
+        "showValue": "auto",
+        "tooltip": { "mode": "single", "showColorScale": true, "yHistogram": false },
+        "yAxis": { "axisPlacement": "left", "reverse": false }
+      },
+      "targets": [
+        {
+          "rawSql": "SELECT timestamp, symbol, var_pct as value FROM trading_risk WHERE timestamp > $__timeFrom AND timestamp < $__timeTo AND env = 'prod' ORDER BY timestamp",
+          "refId": "A",
+          "format": "table"
+        }
+      ],
+      "title": "VaR by Symbol Heatmap",
+      "description": "Value at Risk distribution across symbols. Red = high VaR, Green = low risk.",
+      "type": "heatmap"
+    },
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 26 },
+      "id": 5,
+      "panels": [],
+      "title": "Strategy Risk Matrix",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "questdb-questdb-datasource", "uid": "questdb" },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "cellOptions": { "type": "color-background", "mode": "gradient" },
+            "filterable": true,
+            "inspect": true
+          },
+          "color": { "mode": "thresholds" },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 3 },
+              { "color": "orange", "value": 5 },
+              { "color": "red", "value": 8 }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": { "id": "byName", "options": "strategy_id" },
+            "properties": [
+              { "id": "custom.width", "value": 150 },
+              { "id": "custom.cellOptions", "value": { "type": "auto" } }
+            ]
+          },
+          {
+            "matcher": { "id": "byName", "options": "symbol" },
+            "properties": [
+              { "id": "custom.width", "value": 100 },
+              { "id": "custom.cellOptions", "value": { "type": "auto" } }
+            ]
+          }
+        ]
+      },
+      "gridPos": { "h": 10, "w": 24, "x": 0, "y": 27 },
+      "id": 6,
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm",
+        "footer": {
+          "show": true,
+          "reducer": ["max"],
+          "countRows": false,
+          "fields": ["drawdown_pct", "var_pct", "exposure_pct"]
+        },
+        "sortBy": [{ "displayName": "var_pct", "desc": true }]
+      },
+      "targets": [
+        {
+          "rawSql": "SELECT strategy_id, symbol, last(drawdown_pct) as drawdown_pct, last(var_pct) as var_pct, last(position_exposure_pct) as exposure_pct, last(leverage) as leverage FROM trading_risk WHERE timestamp > now() - 1h AND env = 'prod' GROUP BY strategy_id, symbol ORDER BY var_pct DESC",
+          "refId": "A",
+          "format": "table"
+        }
+      ],
+      "title": "Current Risk by Strategy & Symbol",
+      "description": "Live risk metrics per strategy/symbol. Sorted by highest VaR.",
+      "type": "table"
+    },
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 37 },
+      "id": 7,
+      "panels": [],
+      "title": "Exposure Concentration",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "questdb-questdb-datasource", "uid": "questdb" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "hideFrom": { "legend": false, "tooltip": false, "viz": false } },
+          "mappings": [],
+          "unit": "percent"
+        }
+      },
+      "gridPos": { "h": 10, "w": 12, "x": 0, "y": 38 },
+      "id": 8,
+      "options": {
+        "legend": { "displayMode": "table", "placement": "right", "showLegend": true, "values": ["percent", "value"] },
+        "pieType": "donut",
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "tooltip": { "mode": "multi", "sort": "desc" }
+      },
+      "targets": [
+        {
+          "rawSql": "SELECT symbol, last(position_exposure_pct) as exposure FROM trading_risk WHERE timestamp > now() - 5m AND env = 'prod' GROUP BY symbol ORDER BY exposure DESC LIMIT 10",
+          "refId": "A",
+          "format": "table"
+        }
+      ],
+      "title": "Exposure by Symbol (Top 10)",
+      "description": "Portfolio concentration risk. High concentration = higher idiosyncratic risk.",
+      "type": "piechart"
+    },
+    {
+      "datasource": { "type": "questdb-questdb-datasource", "uid": "questdb" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "hideFrom": { "legend": false, "tooltip": false, "viz": false } },
+          "mappings": [],
+          "unit": "percent"
+        }
+      },
+      "gridPos": { "h": 10, "w": 12, "x": 12, "y": 38 },
+      "id": 9,
+      "options": {
+        "legend": { "displayMode": "table", "placement": "right", "showLegend": true, "values": ["percent", "value"] },
+        "pieType": "donut",
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "tooltip": { "mode": "multi", "sort": "desc" }
+      },
+      "targets": [
+        {
+          "rawSql": "SELECT strategy_id, sum(position_exposure_pct) as exposure FROM trading_risk WHERE timestamp > now() - 5m AND env = 'prod' GROUP BY strategy_id ORDER BY exposure DESC",
+          "refId": "A",
+          "format": "table"
+        }
+      ],
+      "title": "Exposure by Strategy",
+      "description": "Strategy-level concentration. Diversification across strategies.",
+      "type": "piechart"
+    },
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 48 },
+      "id": 10,
+      "panels": [],
+      "title": "Risk Alerts",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "questdb-questdb-datasource", "uid": "questdb" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "custom": {
+            "align": "auto",
+            "cellOptions": { "type": "auto" },
+            "filterable": true,
+            "inspect": true
+          },
+          "mappings": [
+            { "type": "value", "options": { "WARNING": { "text": "⚠️ WARNING", "color": "yellow" } } },
+            { "type": "value", "options": { "CRITICAL": { "text": "🔴 CRITICAL", "color": "red" } } }
+          ],
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "text", "value": null }] }
+        },
+        "overrides": [
+          {
+            "matcher": { "id": "byName", "options": "alert_level" },
+            "properties": [
+              { "id": "custom.width", "value": 120 },
+              { "id": "custom.cellOptions", "value": { "type": "color-text" } }
+            ]
+          },
+          {
+            "matcher": { "id": "byName", "options": "timestamp" },
+            "properties": [{ "id": "custom.width", "value": 180 }]
+          }
+        ]
+      },
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 49 },
+      "id": 11,
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm",
+        "footer": { "show": false, "reducer": ["sum"], "countRows": false, "fields": "" },
+        "sortBy": [{ "displayName": "timestamp", "desc": true }]
+      },
+      "targets": [
+        {
+          "rawSql": "SELECT timestamp, strategy_id, symbol, CASE WHEN var_pct > 5 THEN 'CRITICAL' WHEN var_pct > 3 OR drawdown_pct > 8 THEN 'WARNING' END as alert_level, var_pct, drawdown_pct, position_exposure_pct as exposure FROM trading_risk WHERE timestamp > now() - 1h AND env = 'prod' AND (var_pct > 3 OR drawdown_pct > 8) ORDER BY timestamp DESC LIMIT 50",
+          "refId": "A",
+          "format": "table"
+        }
+      ],
+      "title": "Recent Risk Alerts",
+      "description": "Positions that breached warning or critical thresholds in the last hour.",
+      "type": "table"
+    }
+  ],
+  "refresh": "10s",
+  "schemaVersion": 39,
+  "tags": ["trading", "risk", "heatmap", "var"],
+  "templating": {
+    "list": [
+      {
+        "current": { "selected": false, "text": "prod", "value": "prod" },
+        "hide": 0,
+        "includeAll": false,
+        "multi": false,
+        "name": "env",
+        "options": [
+          { "selected": true, "text": "prod", "value": "prod" },
+          { "selected": false, "text": "staging", "value": "staging" },
+          { "selected": false, "text": "dev", "value": "dev" }
+        ],
+        "query": "prod,staging,dev",
+        "type": "custom"
+      }
+    ]
+  },
+  "time": { "from": "now-6h", "to": "now" },
+  "timepicker": {
+    "refresh_intervals": ["5s", "10s", "30s", "1m", "5m"],
+    "time_options": ["5m", "15m", "1h", "6h", "12h", "24h", "2d", "7d"]
+  },
+  "timezone": "browser",
+  "title": "Trading Risk Heatmap",
+  "uid": "trading-risk-heatmap",
+  "version": 1,
+  "weekStart": ""
+}

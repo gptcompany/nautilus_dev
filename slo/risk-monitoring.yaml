@@ -1,0 +1,44 @@
+# Risk Monitoring SLO
+# Target: Risk metrics updated within 5 seconds 99.9% of the time
+#
+# Deploy with: kubectl apply -f slo/risk-monitoring.yaml
+---
+apiVersion: pyrra.dev/v1alpha1
+kind: ServiceLevelObjective
+metadata:
+  name: risk-monitoring-freshness
+  namespace: trading
+  labels:
+    team: trading
+    service: nautilus-risk
+spec:
+  # 99.9% of risk metrics must be updated within 5 seconds
+  target: "99.9"
+  window: 7d
+  description: |
+    Risk monitoring data must be fresh within 5 seconds.
+    Stale risk data can lead to incorrect position sizing.
+
+  indicator:
+    latency:
+      success:
+        metric: risk_metric_age_seconds_bucket{le="5", env="prod"}
+      total:
+        metric: risk_metric_age_seconds_count{env="prod"}
+
+  alerting:
+    name: RiskMonitoringFreshnessBreach
+    annotations:
+      summary: "Risk monitoring data freshness SLO breach"
+      description: |
+        Risk metrics are becoming stale (>5 seconds old).
+        This impacts real-time risk management.
+
+        Actions:
+        1. Check QuestDB ingestion pipeline
+        2. Verify metrics collector is running
+        3. Check for circuit breaker triggers
+      runbook_url: "https://github.com/gptcompany/nautilus_dev/wiki/runbooks/risk-freshness"
+    labels:
+      severity: critical
+      team: trading

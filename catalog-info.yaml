@@ -1,20 +1,154 @@
 apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
-  name: nautilus-dev
-  description: Nautilus development infrastructure and automation
+  name: nautilus-trading
+  title: Nautilus Trading System
+  description: High-performance algorithmic trading platform built on NautilusTrader (Python + Rust core)
   annotations:
-    github.com/project-slug: gptprojectmanager/nautilus_dev
+    # GitHub Integration
+    github.com/project-slug: gptcompany/nautilus_dev
     backstage.io/techdocs-ref: dir:.
-    grafana/dashboard-selector: "uid in (nautilus-health, alpha-evolve-evolution)"
-    grafana/alert-label-selector: "category in (trading, ml_security)"
+
+    # Grafana Integration (FAANG Stack)
+    grafana/dashboard-selector: "tag:trading OR tag:risk OR tag:var"
+    grafana/alert-label-selector: "category in (trading, ml_security, risk)"
+
+    # Prometheus/Pyrra SLO Integration
+    prometheus.io/rule: "trading-availability"
     backstage.io/slo-template: slo-template-trading
+
+    # ArgoCD/Argo Rollouts (Canary Deployment)
+    argocd/app-name: nautilus-trading
+
+    # Sentry Error Tracking
+    sentry.io/project-slug: nautilus-trading
+
+    # Docker Registry
+    container-image: ghcr.io/gptcompany/nautilus
+
   tags:
     - python
-    - infrastructure
-    - automation
+    - rust
+    - trading
+    - algorithmic-trading
+    - nautilus-trader
+    - risk-management
+    - var
+  links:
+    - url: https://github.com/gptcompany/nautilus_dev
+      title: GitHub Repository
+      icon: github
+    - url: http://localhost:3000/d/trading-drawdown
+      title: Risk & VaR Dashboard
+      icon: dashboard
+    - url: http://localhost:3000/d/trading-risk-heatmap
+      title: Risk Heatmap
+      icon: dashboard
+    - url: http://localhost:3000/d/exchange
+      title: Exchange Connectivity
+      icon: dashboard
 spec:
   type: service
   lifecycle: production
   owner: user:default/sam
-  system: claude-infrastructure
+  system: trading-platform
+  providesApis:
+    - trading-metrics-api
+  dependsOn:
+    - resource:default/questdb
+    - resource:default/redis
+    - resource:default/grafana
+---
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: questdb
+  title: QuestDB Time-Series Database
+  description: High-performance time-series database for trading metrics (ILP protocol)
+  annotations:
+    prometheus.io/scrape: "true"
+  tags:
+    - database
+    - time-series
+spec:
+  type: database
+  owner: user:default/sam
+  system: trading-platform
+---
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: redis
+  title: Redis Cache
+  description: In-memory cache for trading state persistence and recovery
+  tags:
+    - cache
+    - state-management
+spec:
+  type: cache
+  owner: user:default/sam
+  system: trading-platform
+---
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: grafana
+  title: Grafana Dashboards
+  description: Observability dashboards for trading metrics, risk, and VaR
+  annotations:
+    grafana/dashboard-selector: "tag:trading OR tag:risk"
+  tags:
+    - observability
+    - dashboards
+spec:
+  type: dashboard
+  owner: user:default/sam
+  system: trading-platform
+---
+apiVersion: backstage.io/v1alpha1
+kind: System
+metadata:
+  name: trading-platform
+  title: Nautilus Trading Platform
+  description: |
+    Complete algorithmic trading infrastructure including:
+    - NautilusTrader execution engine
+    - Risk management (VaR, CVaR, drawdown limits)
+    - Observability (Grafana, QuestDB, Sentry)
+    - FAANG-level deployment (semantic versioning, canary rollouts, SLOs)
+  tags:
+    - trading
+    - faang
+spec:
+  owner: user:default/sam
+---
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: trading-metrics-api
+  title: Trading Metrics API
+  description: QuestDB HTTP API for trading metrics queries
+  tags:
+    - metrics
+    - time-series
+spec:
+  type: openapi
+  lifecycle: production
+  owner: user:default/sam
+  system: trading-platform
+  definition: |
+    openapi: 3.0.0
+    info:
+      title: Trading Metrics API
+      version: 1.0.0
+    servers:
+      - url: http://localhost:9000
+    paths:
+      /exec:
+        get:
+          summary: Execute SQL query
+          parameters:
+            - name: query
+              in: query
+              schema:
+                type: string

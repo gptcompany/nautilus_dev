@@ -348,11 +348,201 @@
       ],
       "title": "Leverage vs Limit",
       "type": "timeseries"
+    },
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 31 },
+      "id": 11,
+      "panels": [],
+      "title": "Value at Risk (VaR)",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "questdb-questdb-datasource", "uid": "questdb" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 3 },
+              { "color": "red", "value": 5 }
+            ]
+          },
+          "unit": "percent",
+          "decimals": 2
+        }
+      },
+      "gridPos": { "h": 6, "w": 8, "x": 0, "y": 32 },
+      "id": 12,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "rawSql": "SELECT last(var_pct) as var FROM trading_risk WHERE timestamp > now() - 5m AND env = 'prod'",
+          "refId": "A"
+        }
+      ],
+      "title": "Current VaR (95%)",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "questdb-questdb-datasource", "uid": "questdb" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 4 },
+              { "color": "red", "value": 7 }
+            ]
+          },
+          "unit": "percent",
+          "decimals": 2
+        }
+      },
+      "gridPos": { "h": 6, "w": 8, "x": 8, "y": 32 },
+      "id": 13,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "rawSql": "SELECT last(cvar_pct) as cvar FROM trading_risk WHERE timestamp > now() - 5m AND env = 'prod'",
+          "refId": "A"
+        }
+      ],
+      "title": "CVaR / Expected Shortfall (95%)",
+      "description": "Expected loss when VaR is breached. Always >= VaR.",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "questdb-questdb-datasource", "uid": "questdb" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 2.5 },
+              { "color": "red", "value": 4 }
+            ]
+          },
+          "unit": "percent",
+          "decimals": 2
+        }
+      },
+      "gridPos": { "h": 6, "w": 8, "x": 16, "y": 32 },
+      "id": 14,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "rawSql": "SELECT last(marginal_var_pct) as mvar FROM trading_risk WHERE timestamp > now() - 5m AND env = 'prod'",
+          "refId": "A"
+        }
+      ],
+      "title": "Marginal VaR",
+      "description": "Incremental VaR contribution from most recent position change.",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "questdb-questdb-datasource", "uid": "questdb" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "VaR %",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 20,
+            "gradientMode": "opacity",
+            "hideFrom": { "legend": false, "tooltip": false, "viz": false },
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": { "type": "linear" },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": { "group": "A", "mode": "none" },
+            "thresholdsStyle": { "mode": "dashed+area" }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "transparent", "value": null },
+              { "color": "yellow", "value": 3 },
+              { "color": "red", "value": 5 }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": [
+          {
+            "matcher": { "id": "byName", "options": "var_pct" },
+            "properties": [
+              { "id": "displayName", "value": "VaR (95%)" },
+              { "id": "color", "value": { "fixedColor": "blue", "mode": "fixed" } }
+            ]
+          },
+          {
+            "matcher": { "id": "byName", "options": "cvar_pct" },
+            "properties": [
+              { "id": "displayName", "value": "CVaR (95%)" },
+              { "id": "color", "value": { "fixedColor": "purple", "mode": "fixed" } },
+              { "id": "custom.lineStyle", "value": { "dash": [5, 5], "fill": "dash" } }
+            ]
+          }
+        ]
+      },
+      "gridPos": { "h": 10, "w": 24, "x": 0, "y": 38 },
+      "id": 15,
+      "options": {
+        "legend": { "calcs": ["lastNotNull", "max", "mean"], "displayMode": "table", "placement": "right", "showLegend": true },
+        "tooltip": { "mode": "multi", "sort": "desc" }
+      },
+      "targets": [
+        {
+          "rawSql": "SELECT timestamp, var_pct, cvar_pct FROM trading_risk WHERE timestamp > $__timeFrom AND timestamp < $__timeTo AND env = 'prod' ORDER BY timestamp",
+          "refId": "A"
+        }
+      ],
+      "title": "VaR & CVaR Over Time",
+      "type": "timeseries"
     }
   ],
   "refresh": "5s",
   "schemaVersion": 39,
-  "tags": ["trading", "risk", "drawdown"],
+  "tags": ["trading", "risk", "drawdown", "var"],
   "templating": { "list": [] },
   "time": { "from": "now-24h", "to": "now" },
   "timepicker": {},
