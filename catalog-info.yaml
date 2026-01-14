@@ -1,0 +1,18 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: nautilus-dev
+  description: Nautilus development infrastructure and automation
+  annotations:
+    github.com/project-slug: gptprojectmanager/nautilus_dev
+    backstage.io/techdocs-ref: dir:.
+    grafana/dashboard-selector: "uid in (nautilus-health, alpha-evolve-evolution)"
+  tags:
+    - python
+    - infrastructure
+    - automation
+spec:
+  type: service
+  lifecycle: production
+  owner: user:default/sam
+  system: claude-infrastructure

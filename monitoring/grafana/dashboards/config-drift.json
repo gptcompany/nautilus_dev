@@ -1,0 +1,181 @@
+{
+  "uid": "config-drift",
+  "title": "Config Drift Monitor",
+  "description": "Monitor configuration drift across repositories using drift-detector.py",
+  "tags": ["config", "drift", "ssot", "enterprise"],
+  "timezone": "browser",
+  "refresh": "5m",
+  "time": {"from": "now-24h", "to": "now"},
+  "schemaVersion": 39,
+  "panels": [
+    {
+      "id": 1,
+      "title": "Config Drift Score",
+      "type": "stat",
+      "gridPos": {"x": 0, "y": 0, "w": 8, "h": 6},
+      "datasource": {"type": "questdb-questdb-datasource", "uid": "P2596F1C8E12435D2"},
+      "targets": [
+        {
+          "rawSql": "SELECT score FROM config_drift ORDER BY timestamp DESC LIMIT 1",
+          "refId": "A",
+          "format": "table"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "min": 0,
+          "max": 100,
+          "color": {"mode": "thresholds"},
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"color": "red", "value": null},
+              {"color": "orange", "value": 50},
+              {"color": "yellow", "value": 80},
+              {"color": "green", "value": 100}
+            ]
+          },
+          "mappings": [
+            {"type": "value", "options": {"100": {"text": "No Issues", "color": "green"}}}
+          ]
+        }
+      },
+      "options": {
+        "graphMode": "none",
+        "colorMode": "background",
+        "justifyMode": "center",
+        "textMode": "value_and_name"
+      }
+    },
+    {
+      "id": 2,
+      "title": "Repositories Checked",
+      "type": "stat",
+      "gridPos": {"x": 8, "y": 0, "w": 8, "h": 6},
+      "datasource": {"type": "questdb-questdb-datasource", "uid": "P2596F1C8E12435D2"},
+      "targets": [
+        {
+          "rawSql": "SELECT repos_checked FROM config_drift ORDER BY timestamp DESC LIMIT 1",
+          "refId": "A",
+          "format": "table"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "color": {"mode": "fixed", "fixedColor": "blue"}
+        }
+      },
+      "options": {
+        "graphMode": "none",
+        "colorMode": "value",
+        "justifyMode": "center"
+      }
+    },
+    {
+      "id": 3,
+      "title": "Active Issues",
+      "type": "stat",
+      "gridPos": {"x": 16, "y": 0, "w": 8, "h": 6},
+      "datasource": {"type": "questdb-questdb-datasource", "uid": "P2596F1C8E12435D2"},
+      "targets": [
+        {
+          "rawSql": "SELECT issues_count FROM config_drift ORDER BY timestamp DESC LIMIT 1",
+          "refId": "A",
+          "format": "table"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "color": {"mode": "thresholds"},
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"color": "green", "value": null},
+              {"color": "yellow", "value": 1},
+              {"color": "orange", "value": 3},
+              {"color": "red", "value": 5}
+            ]
+          }
+        }
+      },
+      "options": {
+        "graphMode": "none",
+        "colorMode": "background",
+        "justifyMode": "center"
+      }
+    },
+    {
+      "id": 4,
+      "title": "Drift Score Over Time",
+      "type": "timeseries",
+      "gridPos": {"x": 0, "y": 6, "w": 24, "h": 10},
+      "datasource": {"type": "questdb-questdb-datasource", "uid": "P2596F1C8E12435D2"},
+      "targets": [
+        {
+          "rawSql": "SELECT timestamp, score FROM config_drift WHERE $__timeFilter(timestamp) ORDER BY timestamp",
+          "refId": "A",
+          "format": "time_series"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "min": 0,
+          "max": 100,
+          "color": {"mode": "palette-classic"},
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 20,
+            "gradientMode": "scheme",
+            "spanNulls": true
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"color": "red", "value": null},
+              {"color": "yellow", "value": 80},
+              {"color": "green", "value": 100}
+            ]
+          }
+        }
+      },
+      "options": {
+        "legend": {"displayMode": "list", "placement": "bottom"},
+        "tooltip": {"mode": "single"}
+      }
+    },
+    {
+      "id": 5,
+      "title": "Issues Over Time",
+      "type": "timeseries",
+      "gridPos": {"x": 0, "y": 16, "w": 24, "h": 8},
+      "datasource": {"type": "questdb-questdb-datasource", "uid": "P2596F1C8E12435D2"},
+      "targets": [
+        {
+          "rawSql": "SELECT timestamp, issues_count FROM config_drift WHERE $__timeFilter(timestamp) ORDER BY timestamp",
+          "refId": "A",
+          "format": "time_series"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "min": 0,
+          "color": {"mode": "palette-classic"},
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 10,
+            "stacking": {"mode": "none"}
+          }
+        }
+      },
+      "options": {
+        "legend": {"displayMode": "list", "placement": "bottom"},
+        "tooltip": {"mode": "single"}
+      }
+    }
+  ]
+}
