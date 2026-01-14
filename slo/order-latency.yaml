@@ -1,0 +1,44 @@
+# Order Latency SLO
+# Target: P99 latency < 100ms over 7-day rolling window
+#
+# Deploy with: kubectl apply -f slo/order-latency.yaml
+---
+apiVersion: pyrra.dev/v1alpha1
+kind: ServiceLevelObjective
+metadata:
+  name: order-latency
+  namespace: trading
+  labels:
+    team: trading
+    service: nautilus-trading
+spec:
+  # 99.5% of orders must complete within 100ms
+  target: "99.5"
+  window: 7d
+  description: |
+    Order execution latency P99 must stay under 100ms.
+    High-frequency trading requires low-latency execution.
+
+  indicator:
+    latency:
+      success:
+        metric: order_latency_ms_bucket{le="100", env="prod"}
+      total:
+        metric: order_latency_ms_count{env="prod"}
+
+  alerting:
+    name: OrderLatencySLOBreach
+    annotations:
+      summary: "Order latency SLO breach"
+      description: |
+        Order execution latency P99 has exceeded 100ms.
+        This impacts trading strategy performance.
+
+        Actions:
+        1. Check exchange connectivity dashboard
+        2. Review network latency metrics
+        3. Check for exchange rate limiting
+      runbook_url: "https://github.com/gptcompany/nautilus_dev/wiki/runbooks/latency"
+    labels:
+      severity: warning
+      team: trading

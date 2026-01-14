@@ -259,6 +259,165 @@
       "options": {
         "legend": {"showLegend": true, "placement": "bottom"}
       }
+    },
+    {
+      "id": 8,
+      "title": "Latency Percentiles",
+      "type": "row",
+      "gridPos": {"x": 0, "y": 20, "w": 24, "h": 1},
+      "collapsed": false
+    },
+    {
+      "id": 9,
+      "title": "P50 Latency (Median)",
+      "type": "stat",
+      "gridPos": {"x": 0, "y": 21, "w": 8, "h": 5},
+      "datasource": "QuestDB",
+      "targets": [
+        {
+          "rawSql": "SELECT exchange, percentile_approx(latency_ms, 0.50) as p50 FROM exchange_status WHERE timestamp > now() - interval '1h' AND exchange LIKE '${exchange}' AND env = '${env}' GROUP BY exchange",
+          "format": "table"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms",
+          "decimals": 1,
+          "color": {"mode": "thresholds"},
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"color": "green", "value": null},
+              {"color": "yellow", "value": 50},
+              {"color": "orange", "value": 100},
+              {"color": "red", "value": 200}
+            ]
+          }
+        }
+      },
+      "options": {
+        "reduceOptions": {"calcs": ["lastNotNull"]},
+        "colorMode": "value",
+        "graphMode": "none"
+      }
+    },
+    {
+      "id": 10,
+      "title": "P95 Latency",
+      "type": "stat",
+      "gridPos": {"x": 8, "y": 21, "w": 8, "h": 5},
+      "datasource": "QuestDB",
+      "targets": [
+        {
+          "rawSql": "SELECT exchange, percentile_approx(latency_ms, 0.95) as p95 FROM exchange_status WHERE timestamp > now() - interval '1h' AND exchange LIKE '${exchange}' AND env = '${env}' GROUP BY exchange",
+          "format": "table"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms",
+          "decimals": 1,
+          "color": {"mode": "thresholds"},
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"color": "green", "value": null},
+              {"color": "yellow", "value": 100},
+              {"color": "orange", "value": 200},
+              {"color": "red", "value": 300}
+            ]
+          }
+        }
+      },
+      "options": {
+        "reduceOptions": {"calcs": ["lastNotNull"]},
+        "colorMode": "value",
+        "graphMode": "none"
+      }
+    },
+    {
+      "id": 11,
+      "title": "P99 Latency",
+      "type": "stat",
+      "gridPos": {"x": 16, "y": 21, "w": 8, "h": 5},
+      "datasource": "QuestDB",
+      "targets": [
+        {
+          "rawSql": "SELECT exchange, percentile_approx(latency_ms, 0.99) as p99 FROM exchange_status WHERE timestamp > now() - interval '1h' AND exchange LIKE '${exchange}' AND env = '${env}' GROUP BY exchange",
+          "format": "table"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms",
+          "decimals": 1,
+          "color": {"mode": "thresholds"},
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"color": "green", "value": null},
+              {"color": "yellow", "value": 150},
+              {"color": "orange", "value": 300},
+              {"color": "red", "value": 500}
+            ]
+          }
+        }
+      },
+      "options": {
+        "reduceOptions": {"calcs": ["lastNotNull"]},
+        "colorMode": "value",
+        "graphMode": "none"
+      }
+    },
+    {
+      "id": 12,
+      "title": "Latency Percentiles Over Time",
+      "type": "timeseries",
+      "gridPos": {"x": 0, "y": 26, "w": 24, "h": 8},
+      "datasource": "QuestDB",
+      "targets": [
+        {
+          "rawSql": "SELECT timestamp, exchange, avg(latency_ms) as avg, percentile_approx(latency_ms, 0.50) as p50, percentile_approx(latency_ms, 0.95) as p95, percentile_approx(latency_ms, 0.99) as p99 FROM exchange_status WHERE timestamp > now() - interval '6h' AND exchange LIKE '${exchange}' AND env = '${env}' SAMPLE BY 5m ALIGN TO CALENDAR",
+          "format": "time_series"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms",
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "smooth",
+            "fillOpacity": 0,
+            "pointSize": 4
+          },
+          "color": {"mode": "palette-classic"}
+        },
+        "overrides": [
+          {
+            "matcher": {"id": "byName", "options": "p99"},
+            "properties": [
+              {"id": "color", "value": {"fixedColor": "red", "mode": "fixed"}},
+              {"id": "custom.lineStyle", "value": {"dash": [10, 5], "fill": "dash"}}
+            ]
+          },
+          {
+            "matcher": {"id": "byName", "options": "p95"},
+            "properties": [
+              {"id": "color", "value": {"fixedColor": "orange", "mode": "fixed"}}
+            ]
+          },
+          {
+            "matcher": {"id": "byName", "options": "p50"},
+            "properties": [
+              {"id": "color", "value": {"fixedColor": "green", "mode": "fixed"}}
+            ]
+          }
+        ]
+      },
+      "options": {
+        "legend": {"showLegend": true, "placement": "bottom", "displayMode": "table"},
+        "tooltip": {"mode": "multi"}
+      }
     }
   ],
   "schemaVersion": 39,
