@@ -189,7 +189,7 @@ class Spec040Verifier:
 
         try:
             # Check if sentry-sdk is installed
-            import sentry_sdk
+            import sentry_sdk  # noqa: F401
 
             self.add_result("sentry", "OK", "Sentry SDK installed, DSN configured")
         except ImportError:
@@ -272,7 +272,7 @@ class Spec040Verifier:
                     self.add_result(
                         "ralph_state", "OK", f"Ralph state: active={active}, iteration={iteration}"
                     )
-                except:
+                except (json.JSONDecodeError, OSError):
                     self.add_result("ralph_state", "WARN", "Ralph state file exists but unreadable")
             else:
                 self.add_result("ralph_state", "OK", "Ralph directory exists (no active session)")

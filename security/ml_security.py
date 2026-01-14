@@ -182,8 +182,8 @@ class ModelEncryption:
         """
         try:
             from cryptography.hazmat.primitives.ciphers.aead import AESGCM
-        except ImportError:
-            raise ImportError("cryptography package required: pip install cryptography")
+        except ImportError as err:
+            raise ImportError("cryptography package required: pip install cryptography") from err
 
         input_path = Path(input_path)
         output_path = Path(output_path)
@@ -220,8 +220,8 @@ class ModelEncryption:
         """
         try:
             from cryptography.hazmat.primitives.ciphers.aead import AESGCM
-        except ImportError:
-            raise ImportError("cryptography package required: pip install cryptography")
+        except ImportError as err:
+            raise ImportError("cryptography package required: pip install cryptography") from err
 
         input_path = Path(input_path)
         output_path = Path(output_path)
@@ -242,8 +242,8 @@ class ModelEncryption:
         """Decrypt file and return bytes (for in-memory loading)."""
         try:
             from cryptography.hazmat.primitives.ciphers.aead import AESGCM
-        except ImportError:
-            raise ImportError("cryptography package required: pip install cryptography")
+        except ImportError as err:
+            raise ImportError("cryptography package required: pip install cryptography") from err
 
         with open(input_path, "rb") as f:
             nonce = f.read(12)
@@ -278,8 +278,8 @@ class ModelSigner:
         """Load private key from file."""
         try:
             from cryptography.hazmat.primitives.serialization import load_pem_private_key
-        except ImportError:
-            raise ImportError("cryptography package required")
+        except ImportError as err:
+            raise ImportError("cryptography package required") from err
 
         with open(self._private_key_path, "rb") as f:
             self._private_key = load_pem_private_key(f.read(), password=None)
@@ -295,8 +295,8 @@ class ModelSigner:
         try:
             from cryptography.hazmat.primitives import serialization
             from cryptography.hazmat.primitives.asymmetric import ec
-        except ImportError:
-            raise ImportError("cryptography package required")
+        except ImportError as err:
+            raise ImportError("cryptography package required") from err
 
         # Generate private key (SECP256R1 = P-256)
         private_key = ec.generate_private_key(ec.SECP256R1())
@@ -349,8 +349,8 @@ class ModelSigner:
         try:
             from cryptography.hazmat.primitives import hashes
             from cryptography.hazmat.primitives.asymmetric import ec
-        except ImportError:
-            raise ImportError("cryptography package required")
+        except ImportError as err:
+            raise ImportError("cryptography package required") from err
 
         model_path = Path(model_path)
         signature_path = Path(signature_path) if signature_path else model_path.with_suffix(".sig")
