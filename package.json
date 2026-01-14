@@ -1,0 +1,30 @@
+{
+  "name": "nautilus-dev",
+  "version": "0.1.0",
+  "private": true,
+  "description": "NautilusTrader Development Environment",
+  "scripts": {
+    "commit": "cz",
+    "release": "semantic-release",
+    "lint:commits": "commitlint --from=HEAD~1"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^19.0.0",
+    "@commitlint/config-conventional": "^19.0.0",
+    "@semantic-release/changelog": "^6.0.0",
+    "@semantic-release/exec": "^6.0.0",
+    "@semantic-release/git": "^10.0.0",
+    "commitizen": "^4.3.0",
+    "cz-conventional-changelog": "^3.3.0",
+    "semantic-release": "^23.0.0"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gptcompany/nautilus_dev.git"
+  }
+}
