@@ -4,8 +4,15 @@ Core types for the Pipeline Framework.
 Defines enums, dataclasses, and type aliases used across the pipeline.
 """
 
+# Python 3.10 compatibility
+import datetime as _dt
 from dataclasses import dataclass, field
-from datetime import UTC, datetime
+from datetime import datetime
+
+if hasattr(_dt, "UTC"):
+    UTC = _dt.UTC
+else:
+    UTC = _dt.timezone.utc
 from enum import Enum, auto
 from typing import Any
 

@@ -1310,3 +1310,9 @@ margin_model=MarginModelConfig(
 ```
 
 The margin model will be automatically applied to the simulated exchange during backtest execution.
+
+## Related guides
+
+- [Strategies](strategies.md) - Develop strategies to backtest.
+- [Visualization](visualization.md) - Generate tearsheets from backtest results.
+- [Reports](reports.md) - Analyze backtest performance data.

@@ -335,3 +335,7 @@ interpreter shutdown has begun, this join may not complete, resulting in truncat
 
 This issue is tracked in GitHub [issue #3027](https://github.com/nautechsystems/nautilus_trader/issues/3027).
 A more deterministic shutdown mechanism is under consideration.
+
+## Related guides
+
+- [Architecture](architecture.md) - System architecture including logging infrastructure.

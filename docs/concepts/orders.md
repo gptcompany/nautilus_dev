@@ -858,3 +858,9 @@ When working with emulated orders, consider the following best practices:
 Order emulation allows you to use advanced order types even on venues that don't natively support them,
 making your trading strategies more portable across different venues.
 :::
+
+## Related guides
+
+- [Execution](execution.md) - Order execution and fill handling.
+- [Positions](positions.md) - Positions created from order fills.
+- [Strategies](strategies.md) - Order management from strategies.

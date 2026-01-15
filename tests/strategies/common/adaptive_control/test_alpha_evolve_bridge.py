@@ -7,9 +7,16 @@ Missing lines: 119-129, 141, 162-227, 236-261, 265-280, 285-292, 297, 301, 317-3
 
 from __future__ import annotations
 
+# Python 3.10 compatibility
+import datetime as _dt
 import sys
 from dataclasses import dataclass, field
-from datetime import UTC, datetime
+from datetime import datetime
+
+if hasattr(_dt, "UTC"):
+    UTC = _dt.UTC
+else:
+    UTC = _dt.timezone.utc
 from enum import Enum
 from unittest.mock import MagicMock, Mock, patch
 

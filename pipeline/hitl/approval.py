@@ -6,9 +6,17 @@ when pipeline stages produce low-confidence results.
 """
 
 import asyncio
+
+# Python 3.10 compatibility
+import datetime as _dt
 import json
 from dataclasses import dataclass, field
-from datetime import UTC, datetime
+from datetime import datetime
+
+if hasattr(_dt, "UTC"):
+    UTC = _dt.UTC
+else:
+    UTC = _dt.timezone.utc
 from pathlib import Path
 from typing import Any, Protocol
 

@@ -1,0 +1,105 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "description": "Renovate config template for Python projects with breaking change awareness",
+  "extends": [
+    "config:base",
+    ":semanticCommits",
+    "schedule:weekends"
+  ],
+  "labels": ["dependencies"],
+  "prBodyNotes": [
+    "**Review changelog for BREAKING CHANGES before merging**",
+    "Run `python scripts/check_breaking_changes.py` locally if unsure"
+  ],
+  "prBodyColumns": ["Package", "Type", "Update", "Change"],
+  "packageRules": [
+    {
+      "description": "Trading/Finance core - requires manual review",
+      "matchPackagePatterns": [
+        "nautilus",
+        "ccxt",
+        "ta-lib",
+        "pandas",
+        "numpy"
+      ],
+      "labels": ["trading-core", "needs-review"],
+      "automerge": false,
+      "prPriority": 10
+    },
+    {
+      "description": "AI/ML packages - requires review",
+      "matchPackagePatterns": [
+        "anthropic",
+        "openai",
+        "langchain",
+        "transformers",
+        "torch"
+      ],
+      "labels": ["ai-ml", "needs-review"],
+      "automerge": false,
+      "prPriority": 8
+    },
+    {
+      "description": "Database packages - requires review",
+      "matchPackagePatterns": [
+        "sqlalchemy",
+        "psycopg",
+        "redis",
+        "mongodb",
+        "questdb"
+      ],
+      "labels": ["database", "needs-review"],
+      "automerge": false
+    },
+    {
+      "description": "Security updates - auto-merge patches",
+      "matchUpdateTypes": ["patch"],
+      "matchPackagePatterns": ["*"],
+      "excludePackagePatterns": [
+        "nautilus",
+        "ccxt",
+        "pandas",
+        "numpy",
+        "anthropic",
+        "openai"
+      ],
+      "automerge": true,
+      "automergeType": "pr"
+    },
+    {
+      "description": "Major versions - always manual",
+      "matchUpdateTypes": ["major"],
+      "labels": ["breaking-change-risk", "needs-review"],
+      "automerge": false,
+      "prPriority": 15
+    },
+    {
+      "description": "Dev dependencies - more relaxed",
+      "matchDepTypes": ["devDependencies"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "automerge": true,
+      "automergeType": "pr"
+    },
+    {
+      "description": "Type stubs - auto-merge",
+      "matchPackagePatterns": ["types-*", "*-stubs"],
+      "automerge": true
+    },
+    {
+      "description": "Test frameworks - auto-merge minor",
+      "matchPackagePatterns": ["pytest*", "coverage", "hypothesis"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "automerge": true
+    }
+  ],
+  "vulnerabilityAlerts": {
+    "enabled": true,
+    "labels": ["security", "urgent"]
+  },
+  "pip_requirements": {
+    "fileMatch": ["requirements.*\\.txt$"]
+  },
+  "pip_setup": {
+    "fileMatch": ["setup.py$", "pyproject.toml$"]
+  }
+}

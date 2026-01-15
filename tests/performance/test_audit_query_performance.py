@@ -11,9 +11,16 @@ Requirements:
 
 from __future__ import annotations
 
+# Python 3.10 compatibility
+import datetime as _dt
 import tempfile
 import time
-from datetime import UTC, datetime, timedelta
+from datetime import datetime, timedelta
+
+if hasattr(_dt, "UTC"):
+    UTC = _dt.UTC
+else:
+    UTC = _dt.timezone.utc
 from pathlib import Path
 
 import duckdb
@@ -392,9 +399,9 @@ def test_concurrent_write_performance(audit_dir):
     print(f"\n  Events written to file: {len(lines):,} (expected: {total_expected:,})")
 
     # Allow some tolerance for concurrent writes
-    assert len(lines) >= total_expected * 0.95, (
-        f"Too few events written: {len(lines)} < {total_expected}"
-    )
+    assert (
+        len(lines) >= total_expected * 0.95
+    ), f"Too few events written: {len(lines)} < {total_expected}"
 
 
 if __name__ == "__main__":

@@ -6,7 +6,14 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-from datetime import UTC, datetime
+# Python 3.10 compatibility
+import datetime as _dt
+from datetime import datetime
+
+if hasattr(_dt, "UTC"):
+    UTC = _dt.UTC
+else:
+    UTC = _dt.timezone.utc
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest

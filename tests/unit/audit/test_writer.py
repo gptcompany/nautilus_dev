@@ -7,9 +7,16 @@ Tests:
 - Crash recovery (partial write handling)
 """
 
+# Python 3.10 compatibility
+import datetime as _dt
 import json
 import threading
-from datetime import UTC, datetime
+from datetime import datetime
+
+if hasattr(_dt, "UTC"):
+    UTC = _dt.UTC
+else:
+    UTC = _dt.timezone.utc
 from unittest.mock import patch
 
 from strategies.common.audit.events import AuditEvent, AuditEventType

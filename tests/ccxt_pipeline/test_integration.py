@@ -4,8 +4,15 @@ These tests validate end-to-end workflows including multi-exchange
 concurrent fetching and storage operations.
 """
 
+# Python 3.10 compatibility
+import datetime as _dt
 import tempfile
-from datetime import UTC, datetime, timedelta
+from datetime import datetime, timedelta
+
+if hasattr(_dt, "UTC"):
+    UTC = _dt.UTC
+else:
+    UTC = _dt.timezone.utc
 from pathlib import Path
 from unittest.mock import AsyncMock, patch
 

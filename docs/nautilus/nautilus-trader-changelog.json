@@ -1,21 +1,26 @@
 {
-  "timestamp": "2026-01-11T00:00:14.013Z",
+  "timestamp": "2026-01-15T00:00:36.188Z",
   "stable_version": "v1.222.0",
   "nightly_commits": 50,
-  "breaking_changes": [
-    {
-      "title": "Refactor TearsheetConfig.charts to chart objects (drop chart_args) (#3398)",
-      "message": "Refactor TearsheetConfig.charts to chart objects (drop chart_args) (#3398)\n\nBREAKING: `TearsheetConfig.charts` now takes chart objects instead of strings; `chart_args` removed.",
-      "sha": "66a77d3",
-      "date": "2026-01-07T22:12:09Z",
-      "url": "https://github.com/nautechsystems/nautilus_trader/commit/66a77d3db30aa1730642cb48ee2d27ee7e7accf6"
-    }
-  ],
+  "breaking_changes": [],
   "open_issues": {
     "total": 64,
-    "bugs": 2,
-    "features": 62,
+    "bugs": 3,
+    "features": 61,
     "issues_list": [
+      {
+        "number": 3413,
+        "title": "[Interactive Brokers] Subscribing to index does not produce expected price updates",
+        "state": "open",
+        "labels": [
+          "bug"
+        ],
+        "created_at": "2026-01-11T06:34:45Z",
+        "updated_at": "2026-01-11T21:13:31Z",
+        "author": "Murph24",
+        "url": "https://github.com/nautechsystems/nautilus_trader/issues/3413",
+        "comments": 2
+      },
       {
         "number": 3374,
         "title": "RFC: Alpaca Markets Integration",
@@ -24,10 +29,10 @@
           "RFC"
         ],
         "created_at": "2026-01-01T15:40:49Z",
-        "updated_at": "2026-01-06T04:53:31Z",
+        "updated_at": "2026-01-12T19:17:17Z",
         "author": "agcrum",
         "url": "https://github.com/nautechsystems/nautilus_trader/issues/3374",
-        "comments": 2
+        "comments": 4
       },
       {
         "number": 3359,
@@ -139,22 +144,22 @@
         "author": "cjdsellers",
         "url": "https://github.com/nautechsystems/nautilus_trader/issues/3150",
         "comments": 0
-      },
-      {
-        "number": 3149,
-        "title": "[BitMEX] Pegged orders (BBO) and advanced execution instructions",
-        "state": "open",
-        "labels": [
-          "enhancement"
-        ],
-        "created_at": "2025-11-04T04:45:40Z",
-        "updated_at": "2025-11-04T04:46:01Z",
-        "author": "cjdsellers",
-        "url": "https://github.com/nautechsystems/nautilus_trader/issues/3149",
-        "comments": 0
       }
     ],
     "bug_list": [
+      {
+        "number": 3413,
+        "title": "[Interactive Brokers] Subscribing to index does not produce expected price updates",
+        "state": "open",
+        "labels": [
+          "bug"
+        ],
+        "created_at": "2026-01-11T06:34:45Z",
+        "updated_at": "2026-01-11T21:13:31Z",
+        "author": "Murph24",
+        "url": "https://github.com/nautechsystems/nautilus_trader/issues/3413",
+        "comments": 2
+      },
       {
         "number": 3104,
         "title": "[Reconciliation] LiveExecEngine fails to reconcile long-lived Binance Futures positions for HEDGING",

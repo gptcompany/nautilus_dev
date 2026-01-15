@@ -66,6 +66,10 @@ Thumbs.db
 config/credentials.json
 data/
 
+# Node.js (for commitlint/semantic-release)
+node_modules/
+package-lock.json
+
 # Docker
 logs/
 data/catalog/
@@ -74,3 +78,10 @@ data/catalog/
 config/ci/.env
 config/ci/runner.env
 config/ci/.env
+
+# Cache directories
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+htmlcov/
+.coverage

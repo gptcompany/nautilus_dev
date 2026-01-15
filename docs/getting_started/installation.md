@@ -87,8 +87,8 @@ allowing users to test features and fixes ahead of stable releases.
 This process also helps preserve compute resources and provides easy access to the exact binaries tested in CI pipelines,
 while adhering to [PEP-440](https://peps.python.org/pep-0440/) versioning standards:
 
-- `develop` wheels use the version format `dev{date}+{build_number}` (e.g., `1.222.0.dev20250112+7001`).
-- `nightly` wheels use the version format `a{date}` (alpha) (e.g., `1.222.0a20250112`).
+- `develop` wheels use the version format `dev{date}+{build_number}` (e.g., `1.208.0.dev20241212+7001`).
+- `nightly` wheels use the version format `a{date}` (alpha) (e.g., `1.208.0a20241212`).
 
 | Platform           | Nightly | Develop |
 | :----------------- | :------ | :------ |
@@ -114,10 +114,10 @@ To install the latest available pre-release (including development wheels):
 uv pip install nautilus_trader --pre --index-url=https://packages.nautechsystems.io/simple
 ```
 
-To install a specific development wheel (e.g., `1.222.0a20250112` for January 12, 2025):
+To install a specific development wheel (e.g., `1.221.0a20250912` for September 12, 2025):
 
 ```bash
-uv pip install nautilus_trader==1.222.0a20250112 --index-url=https://packages.nautechsystems.io/simple
+uv pip install nautilus_trader==1.221.0a20250912 --index-url=https://packages.nautechsystems.io/simple
 ```
 
 ### Available versions
@@ -154,7 +154,7 @@ These attestations are generated automatically during the CI/CD pipeline using [
 To verify a wheel file using the GitHub CLI:
 
 ```bash
-gh attestation verify nautilus_trader-1.222.0-*.whl --owner nautechsystems
+gh attestation verify nautilus_trader-1.220.0-*.whl --owner nautechsystems
 ```
 
 This provides supply chain security by allowing you to cryptographically verify that the installed package came from the official NautilusTrader build process.

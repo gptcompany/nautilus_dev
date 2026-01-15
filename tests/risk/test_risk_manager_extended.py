@@ -9,7 +9,13 @@ Focus on untested methods and edge cases:
 5. Edge cases: zero positions, limit breaches, rapid updates, error handling
 """
 
-from datetime import UTC
+# Python 3.10 compatibility
+import datetime as _dt
+
+if hasattr(_dt, "UTC"):
+    UTC = _dt.UTC
+else:
+    UTC = _dt.timezone.utc
 from decimal import Decimal
 from unittest.mock import MagicMock
 

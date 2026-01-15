@@ -15,11 +15,13 @@ if str(project_root) not in sys.path:
     sys.path.insert(0, str(project_root))
 
 
-# Python 3.10 compatibility
-try:
-    from datetime import UTC
-except ImportError:
-    UTC = UTC  # noqa: N806
+# Python 3.10 compatibility - UTC was added in 3.11
+import datetime as _dt
+
+if hasattr(_dt, "UTC"):
+    UTC = _dt.UTC
+else:
+    UTC = _dt.timezone.utc
 from typing import TYPE_CHECKING
 from unittest.mock import MagicMock
 

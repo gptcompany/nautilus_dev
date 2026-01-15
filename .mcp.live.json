@@ -19,6 +19,15 @@
       "description": "Production error tracking and monitoring",
       "enabled": true
     },
+    "linear": {
+      "command": "npx",
+      "args": ["-y", "linear-mcp"],
+      "env": {
+        "LINEAR_API_KEY": "${LINEAR_API_KEY}"
+      },
+      "description": "Issue tracking and project management (Linear API)",
+      "enabled": true
+    },
     "wolframalpha": {
       "command": "node",
       "args": ["/media/sam/1TB/mcpservers/wolframalpha-llm-mcp/build/index.js"],
@@ -37,6 +46,17 @@
       },
       "description": "MATLAB execution",
       "enabled": true
+    },
+    "claude-flow": {
+      "command": "npx",
+      "args": ["-y", "claude-flow@alpha", "mcp", "start", "--transport", "http", "--port", "3001"],
+      "env": {
+        "AGENTDB_ENABLED": "false",
+        "CLAUDE_FLOW_MODE": "legacy"
+      },
+      "description": "AI orchestration (HTTP transport, safe mode - avoids stdio conflict)",
+      "enabled": true,
+      "autoApprove": []
     }
   }
 }

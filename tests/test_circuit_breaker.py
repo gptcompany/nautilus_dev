@@ -13,7 +13,13 @@ Tests cover:
 - T011b: Edge cases (startup, rapid drawdown, oscillation, division by zero)
 """
 
-from datetime import UTC
+# Python 3.10 compatibility
+import datetime as _dt
+
+if hasattr(_dt, "UTC"):
+    UTC = _dt.UTC
+else:
+    UTC = _dt.timezone.utc
 from decimal import Decimal
 
 import pytest

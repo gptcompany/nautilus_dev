@@ -1,0 +1,165 @@
+name: Dependency Safety Check
+
+on:
+  pull_request:
+    paths:
+      - 'pyproject.toml'
+      - 'requirements*.txt'
+      - 'poetry.lock'
+      - 'uv.lock'
+  workflow_dispatch:
+    inputs:
+      package_owner:
+        description: 'GitHub owner (e.g., nautechsystems)'
+        required: true
+      package_repo:
+        description: 'GitHub repo (e.g., nautilus_trader)'
+        required: true
+      current_version:
+        description: 'Current version'
+        required: true
+      target_version:
+        description: 'Target version (optional)'
+        required: false
+
+env:
+  PYTHON_VERSION: '3.12'
+
+jobs:
+  check-breaking-changes:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install dependencies
+        run: |
+          pip install requests packaging
+
+      - name: Get changed dependencies
+        id: deps
+        if: github.event_name == 'pull_request'
+        run: |
+          # Extract dependency changes from pyproject.toml diff
+          git diff HEAD~1 HEAD -- pyproject.toml > deps_diff.txt || true
+          if [ -s deps_diff.txt ]; then
+            echo "deps_changed=true" >> $GITHUB_OUTPUT
+          else
+            echo "deps_changed=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Check breaking changes (PR)
+        id: breaking_check
+        if: github.event_name == 'pull_request' && steps.deps.outputs.deps_changed == 'true'
+        run: |
+          # Run breaking change checker
+          python scripts/check_breaking_changes.py \
+            --owner nautechsystems \
+            --repo nautilus_trader \
+            --current "1.200.0" \
+            --token ${{ secrets.GITHUB_TOKEN }} \
+            --output json > breaking_report.json || true
+
+          # Parse results
+          BREAKING_COUNT=$(cat breaking_report.json | python -c "import sys,json; print(json.load(sys.stdin).get('breaking_count', 0))" 2>/dev/null || echo "0")
+          echo "breaking_count=$BREAKING_COUNT" >> $GITHUB_OUTPUT
+
+      - name: Check breaking changes (Manual)
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          python scripts/check_breaking_changes.py \
+            --owner ${{ github.event.inputs.package_owner }} \
+            --repo ${{ github.event.inputs.package_repo }} \
+            --current "${{ github.event.inputs.current_version }}" \
+            --target "${{ github.event.inputs.target_version }}" \
+            --token ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Run type check
+        if: github.event_name == 'pull_request'
+        continue-on-error: true
+        run: |
+          pip install mypy types-requests
+          mypy . --ignore-missing-imports --no-error-summary 2>&1 | head -50 || true
+
+      - name: Run tests
+        if: github.event_name == 'pull_request'
+        continue-on-error: true
+        run: |
+          if [ -f "pyproject.toml" ]; then
+            pip install -e ".[dev]" 2>/dev/null || pip install -e . 2>/dev/null || true
+          fi
+          pip install pytest
+          pytest tests/ -x --tb=short -q 2>&1 | head -100 || true
+
+      - name: Comment on PR
+        if: github.event_name == 'pull_request' && steps.deps.outputs.deps_changed == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            let report = {};
+            try {
+              report = JSON.parse(fs.readFileSync('breaking_report.json', 'utf8'));
+            } catch (e) {
+              report = { breaking_count: 0, error: 'Could not parse report' };
+            }
+
+            const breakingCount = report.breaking_count || 0;
+            const emoji = breakingCount > 0 ? '⚠️' : '✅';
+            const status = breakingCount > 0
+              ? `**${breakingCount} breaking change(s) detected!**`
+              : 'No breaking changes detected';
+
+            let breakingDetails = '';
+            if (report.breaking_changes && report.breaking_changes.length > 0) {
+              breakingDetails = '\n\n### Breaking Changes:\n' +
+                report.breaking_changes.map(bc =>
+                  `- **${bc.version}**: [${bc.name}](${bc.url})`
+                ).join('\n');
+            }
+
+            const body = `## ${emoji} Dependency Check Results
+
+            ${status}
+            ${breakingDetails}
+
+            **Package**: \`${report.package || 'N/A'}\`
+            **Current**: \`${report.current || 'N/A'}\`
+            **Target**: \`${report.target || 'latest'}\`
+            **Releases checked**: ${report.total_releases || 0}
+
+            ---
+            <details>
+            <summary>What to do?</summary>
+
+            1. Review the changelog for each breaking change
+            2. Check if your code is affected
+            3. Update code if necessary before merging
+            4. Run tests locally: \`pytest tests/\`
+
+            </details>`;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: body
+            });
+
+      - name: Fail if breaking changes
+        if: github.event_name == 'pull_request' && steps.breaking_check.outputs.breaking_count > 0
+        run: |
+          echo "::warning::Breaking changes detected! Please review before merging."
+          # Uncomment to fail the build:
+          # exit 1

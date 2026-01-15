@@ -14,8 +14,16 @@ Example cron entry (daily at 3 AM):
 """
 
 import argparse
+
+# Python 3.10 compatibility
+import datetime as _dt
 import logging
-from datetime import UTC, datetime, timedelta
+from datetime import datetime, timedelta
+
+if hasattr(_dt, "UTC"):
+    UTC = _dt.UTC
+else:
+    UTC = _dt.timezone.utc
 from typing import cast
 
 import httpx
