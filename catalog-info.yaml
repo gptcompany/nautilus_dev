@@ -15,6 +15,7 @@ metadata:
 
     # Prometheus/Pyrra SLO Integration
     prometheus.io/rule: "trading-availability"
+    prometheus.io/alert: "all"
     backstage.io/slo-template: slo-template-trading
 
     # ArgoCD/Argo Rollouts (Canary Deployment)
