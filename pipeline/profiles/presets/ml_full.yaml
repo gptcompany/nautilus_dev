@@ -1,0 +1,72 @@
+# Pipeline Profile: ML_FULL
+# Full ML pipeline with Walk-Forward + Triple Barrier + Meta-Labeling
+#
+# Features:
+#   - Everything in ML_LITE
+#   - Walk-Forward Validation (prevents overfitting)
+#   - Triple Barrier Labeling (AFML-style)
+#   - Meta-Labeling (bet sizing based on confidence)
+#   - Embargo/Purging for proper validation
+#
+# Requirements:
+#   - Sufficient historical data (2+ years recommended)
+#   - Compute resources for model training
+#   - Understanding of ML trading concepts
+#
+# Use for:
+#   - ML-based strategies (Random Forest, XGBoost, etc.)
+#   - Research and strategy development
+#   - When rigorous validation is required
+#
+# References:
+#   - Lopez de Prado "Advances in Financial Machine Learning"
+#   - Jansen "Machine Learning for Algorithmic Trading"
+
+profile: ML_FULL
+
+regime:
+  enabled: true
+  hmm_n_regimes: 3
+  gmm_n_clusters: 3
+  lookback_bars: 252
+  refit_interval: 20
+
+sizing:
+  method: integrated       # Combines all factors
+  giller_exponent: 0.5
+  max_position_pct: 10.0
+  regime_weight_enabled: true
+
+walk_forward:
+  enabled: true
+  train_window: 252        # ~1 year training
+  test_window: 63          # ~3 months test
+  step_size: 21            # ~1 month step
+  embargo_size: 5          # 5-bar embargo gap
+  min_windows: 4           # Minimum 4 windows required
+
+triple_barrier:
+  enabled: true
+  take_profit_atr: 2.0     # TP at 2x ATR
+  stop_loss_atr: 2.0       # SL at 2x ATR
+  max_holding_bars: 20     # Max 20 bars holding
+  atr_period: 14           # 14-bar ATR
+
+meta_label:
+  enabled: true
+  model_type: random_forest  # or xgboost, lightgbm
+  min_confidence: 0.5        # Skip trades below 50% confidence
+  retrain_interval: 100      # Retrain every 100 bars
+
+custom:
+  # Walk-forward robustness thresholds
+  min_sharpe_per_window: 0.5
+  min_profitable_windows_pct: 0.75
+
+  # Meta-model features
+  meta_features:
+    - regime_state
+    - volatility_cluster
+    - signal_strength
+    - time_of_day
+    - day_of_week

@@ -1,0 +1,50 @@
+# Pipeline Profile: BASIC
+# Standard orchestration pipeline for rule-based strategies
+#
+# Features:
+#   - DATA → ALPHA → RISK → EXECUTION → MONITORING
+#   - Standard linear position sizing
+#   - No ML features
+#
+# Use for:
+#   - Simple momentum strategies
+#   - Mean-reversion strategies
+#   - Any rule-based trading logic
+
+profile: BASIC
+
+regime:
+  enabled: false
+  hmm_n_regimes: 3
+  gmm_n_clusters: 3
+  lookback_bars: 252
+  refit_interval: 20
+
+sizing:
+  method: linear
+  giller_exponent: 0.5
+  max_position_pct: 10.0
+  regime_weight_enabled: false
+
+walk_forward:
+  enabled: false
+  train_window: 252
+  test_window: 63
+  step_size: 21
+  embargo_size: 5
+  min_windows: 4
+
+triple_barrier:
+  enabled: false
+  take_profit_atr: 2.0
+  stop_loss_atr: 2.0
+  max_holding_bars: 20
+  atr_period: 14
+
+meta_label:
+  enabled: false
+  model_type: random_forest
+  min_confidence: 0.5
+  retrain_interval: 100
+
+custom: {}

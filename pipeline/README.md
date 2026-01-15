@@ -81,6 +81,24 @@ async def main():
 asyncio.run(main())
 ```
 
+## Profiles
+
+Three complexity levels integrating ML modules from `strategies/common/`:
+
+| Profile | Features | Use Case |
+|---------|----------|----------|
+| **BASIC** | Standard orchestration | Rule-based strategies |
+| **ML_LITE** | + Regime Detection + Giller Sizing | Hybrid strategies |
+| **ML_FULL** | + Walk-Forward + Triple Barrier + Meta-Labeling | ML strategies |
+
+```python
+from pipeline.profiles import PipelineProfile, create_pipeline
+
+pipeline = create_pipeline(PipelineProfile.ML_LITE)
+```
+
+See `pipeline/profiles/README.md` for full documentation.
+
 ## Architecture
 
 ### Core Components

@@ -106,6 +106,16 @@ if isinstance(data[0], NAUTILUS_PYO3_DATA_TYPES):
 └─────────────────────────────────────────────────────────────────────────┘
 ```
 
+### Pipeline Profiles
+
+Profile-based ML feature integration (see `pipeline/profiles/`):
+
+- **BASIC**: Standard orchestration, linear sizing
+- **ML_LITE**: + HMM Regime Detection + Giller sub-linear sizing
+- **ML_FULL**: + Walk-Forward + Triple Barrier + Meta-Labeling
+
+Integrates with `strategies/common/` modules (regime_detection, meta_learning, labeling, position_sizing).
+
 ---
 
 ## Key Technical Decisions
