@@ -75,3 +75,9 @@ statistic in turn. Any output is then displayed in the tear sheet under the `Por
 - Realized PnL statistics (per currency)
 - Returns statistics (for the entire portfolio)
 - General statistics derived from position and order data (for the entire portfolio)
+
+## Related guides
+
+- [Positions](positions.md) - Position tracking within portfolios.
+- [Reports](reports.md) - Generate portfolio analysis reports.
+- [Visualization](visualization.md) - Visualize portfolio performance.

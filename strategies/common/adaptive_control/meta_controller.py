@@ -21,10 +21,17 @@ This is NOT a strategy - it's the brain that manages strategies.
 
 from __future__ import annotations
 
+# Python 3.10 compatibility
+import datetime as _dt
 import logging
 from collections.abc import Callable
 from dataclasses import dataclass, field
-from datetime import UTC, datetime
+from datetime import datetime
+
+if hasattr(_dt, "UTC"):
+    UTC = _dt.UTC
+else:
+    UTC = _dt.timezone.utc
 from enum import Enum
 from typing import TYPE_CHECKING
 

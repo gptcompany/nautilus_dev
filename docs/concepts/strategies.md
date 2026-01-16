@@ -657,3 +657,9 @@ example the above config would result in a strategy ID of `MyStrategy-001`.
 :::note
 See the `StrategyId` [API Reference](../api_reference/model/identifiers.md) for further details.
 :::
+
+## Related guides
+
+- [Actors](actors.md) - Base class that strategies extend.
+- [Orders](orders.md) - Order types and management from strategies.
+- [Backtesting](backtesting.md) - Test strategies with historical data.

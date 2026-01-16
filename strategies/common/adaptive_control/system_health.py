@@ -7,11 +7,18 @@ No metaphors - just practical metrics and thresholds.
 
 from __future__ import annotations
 
+# Python 3.10 compatibility
+import datetime as _dt
 import logging
 from collections import deque
 from collections.abc import Callable
 from dataclasses import dataclass
-from datetime import UTC, datetime, timedelta
+from datetime import datetime, timedelta
+
+if hasattr(_dt, "UTC"):
+    UTC = _dt.UTC
+else:
+    UTC = _dt.timezone.utc
 from enum import Enum
 
 import numpy as np

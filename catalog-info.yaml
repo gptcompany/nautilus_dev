@@ -1,0 +1,13 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: nautilus-dev
+  description: nautilus_dev repository
+  annotations:
+    backstage.io/techdocs-ref: dir:.
+  tags: []
+spec:
+  type: service
+  lifecycle: production
+  owner: user:default/sam
+  system: claude-infrastructure

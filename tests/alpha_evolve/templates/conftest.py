@@ -3,10 +3,16 @@
 from decimal import Decimal
 
 import pytest
-from nautilus_trader.model.data import BarType
-from nautilus_trader.model.identifiers import InstrumentId
-from nautilus_trader.test_kit.stubs.data import TestDataStubs
-from nautilus_trader.test_kit.stubs.identifiers import TestIdStubs
+
+# Skip all tests in this directory if nautilus_trader not available
+try:
+    from nautilus_trader.model.data import BarType
+    from nautilus_trader.model.identifiers import InstrumentId
+    from nautilus_trader.test_kit.stubs.data import TestDataStubs
+    from nautilus_trader.test_kit.stubs.identifiers import TestIdStubs
+except ImportError:
+    pytest.skip("nautilus_trader not installed", allow_module_level=True)
+
 
 # === NAUTILUS FIXTURES ===
 

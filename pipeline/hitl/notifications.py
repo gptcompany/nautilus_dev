@@ -4,9 +4,16 @@ Notification services for HITL pipeline.
 Supports Discord webhooks and console output.
 """
 
+# Python 3.10 compatibility
+import datetime as _dt
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from datetime import UTC, datetime
+from datetime import datetime
+
+if hasattr(_dt, "UTC"):
+    UTC = _dt.UTC
+else:
+    UTC = _dt.timezone.utc
 from typing import Any
 
 import httpx

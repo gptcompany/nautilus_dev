@@ -1,0 +1,46 @@
+# PR Labeler Configuration
+# Automatically labels PRs based on file paths
+
+strategies:
+  - path: 'strategies/**/*'
+    label: 'strategies'
+
+tests:
+  - path: 'tests/**/*'
+    label: 'tests'
+
+ci:
+  - path: '.github/**/*'
+    label: 'ci/cd'
+
+docs:
+  - path: '**/*.md'
+    label: 'documentation'
+
+specs:
+  - path: 'specs/**/*'
+    label: 'specs'
+
+scripts:
+  - path: 'scripts/**/*'
+    label: 'scripts'
+
+config:
+  - path: '*.toml'
+    label: 'config'
+  - path: '*.yaml'
+    label: 'config'
+  - path: '*.yml'
+    label: 'config'
+
+recovery:
+  - path: 'strategies/common/recovery/**/*'
+    label: 'recovery'
+
+meta-learning:
+  - path: 'strategies/common/meta_learning/**/*'
+    label: 'meta-learning'
+
+labeling:
+  - path: 'strategies/common/labeling/**/*'
+    label: 'labeling'

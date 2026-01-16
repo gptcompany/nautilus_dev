@@ -439,3 +439,17 @@ class BOCD(BaseBOCD):
             argmax_r P(r_t = r | x_{1:t})
         """
         return int(np.argmax(self._run_length_dist[: self._active_len]))
+
+    def is_warmed_up(self, min_observations: int = 20) -> bool:
+        """Check if detector has completed warmup (FR-007).
+
+        The BOCD detector needs a minimum number of observations
+        before its changepoint probability estimates are reliable.
+
+        Args:
+            min_observations: Minimum observations required (default: 20).
+
+        Returns:
+            True if detector has processed >= min_observations.
+        """
+        return self._t >= min_observations

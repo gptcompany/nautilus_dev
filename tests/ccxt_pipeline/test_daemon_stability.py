@@ -11,11 +11,18 @@ Runtime: ~90 seconds (automated version of 24-hour manual test)
 """
 
 import asyncio
+
+# Python 3.10 compatibility
+import datetime as _dt
 import gc
 import tempfile
 import time
 import tracemalloc
-from datetime import UTC
+
+if hasattr(_dt, "UTC"):
+    UTC = _dt.UTC
+else:
+    UTC = _dt.timezone.utc
 from pathlib import Path
 from unittest.mock import AsyncMock, patch
 
@@ -233,9 +240,9 @@ class TestDaemonStabilityAutomated:
             shutdown_duration = time.time() - start_shutdown
 
             assert runner._running is False
-            assert shutdown_duration < 10.0, (
-                f"Shutdown took {shutdown_duration:.2f}s, exceeds 10s limit"
-            )
+            assert (
+                shutdown_duration < 10.0
+            ), f"Shutdown took {shutdown_duration:.2f}s, exceeds 10s limit"
 
     @pytest.mark.asyncio
     @pytest.mark.timeout(60)

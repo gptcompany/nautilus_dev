@@ -42,14 +42,13 @@ completing a backtest run and provide immediate visual feedback on strategy perf
 Generate a tearsheet with default settings:
 
 ```python
+from nautilus_trader.analysis import create_tearsheet
 from nautilus_trader.backtest.engine import BacktestEngine
 
 # After running your backtest
 engine.run()
 
 # Generate tearsheet
-from nautilus_trader.analysis.tearsheet import create_tearsheet
-
 create_tearsheet(
     engine=engine,
     output_path="backtest_results.html",
@@ -118,7 +117,7 @@ The tearsheet can include any combination of the following built-in charts:
 | `distribution`     | Histogram    | Distribution of individual return values.                |
 | `rolling_sharpe`   | Line         | 60-day rolling Sharpe ratio.                             |
 | `yearly_returns`   | Bar          | Annual return percentages.                               |
-| `bars_with_fills`  | Candlestick  | Price bars (OHLC) with order fills overlaid as bars.     |
+| `bars_with_fills`  | Candlestick  | Price bars (OHLC) with order fills overlaid as markers.  |
 
 All charts are registered in the chart registry and are configured via chart objects in
 `TearsheetConfig.charts` (each chart object maps to a built-in chart name).
@@ -193,7 +192,7 @@ create_tearsheet(engine=engine, config=config)
 Register a custom theme for consistent branding across all visualizations:
 
 ```python
-from nautilus_trader.analysis.themes import register_theme
+from nautilus_trader.analysis import register_theme
 
 register_theme(
     name="corporate",
@@ -319,7 +318,13 @@ register_chart("my_custom", my_custom_chart)
 
 ### Tearsheet integration
 
-For full tearsheet integration with proper grid placement, use the lower-level registration:
+For full tearsheet integration with proper grid placement, use the lower-level registration.
+
+:::warning
+The `_register_tearsheet_chart` function is internal API and may change between releases.
+For most use cases, prefer `register_chart` for standalone charts or contribute new built-in
+charts upstream.
+:::
 
 ```python
 from nautilus_trader.analysis import TearsheetConfig
@@ -503,12 +508,12 @@ useful for visually analyzing strategy execution within price action. It can be 
 or included in tearsheets:
 
 ```python
+from nautilus_trader.analysis import create_bars_with_fills
+from nautilus_trader.analysis import create_tearsheet
 from nautilus_trader.analysis import TearsheetBarsWithFillsChart
 from nautilus_trader.analysis import TearsheetConfig
 from nautilus_trader.analysis import TearsheetEquityChart
 from nautilus_trader.analysis import TearsheetStatsTableChart
-from nautilus_trader.analysis.tearsheet import create_bars_with_fills
-from nautilus_trader.analysis.tearsheet import create_tearsheet
 from nautilus_trader.model.data import BarType
 
 # Standalone usage
@@ -552,9 +557,10 @@ config = TearsheetConfig(
 create_tearsheet(engine=engine, config=config)
 ```
 
-The visualization shows candlesticks for OHLC price action with vertical bars representing order fills
-(colored by buy/sell side). Charts that need extra configuration (like `bar_type`) take those
-parameters directly on the chart object (e.g. `TearsheetBarsWithFillsChart(bar_type=...)`).
+The visualization shows candlesticks for OHLC price action with triangle markers representing order
+fills (green up-triangles for buys, red down-triangles for sells). Charts that need extra
+configuration (like `bar_type`) take those parameters directly on the chart object
+(e.g. `TearsheetBarsWithFillsChart(bar_type=...)`).
 
 Other individual chart functions include `create_equity_curve`, `create_drawdown_chart`,
 `create_monthly_returns_heatmap`, and more. See the API reference for the complete list.

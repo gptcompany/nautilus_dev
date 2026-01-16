@@ -3,7 +3,14 @@
 TDD Approach: Tests written FIRST before implementation.
 """
 
-from datetime import UTC, datetime, timedelta
+# Python 3.10 compatibility
+import datetime as _dt
+from datetime import datetime, timedelta
+
+if hasattr(_dt, "UTC"):
+    UTC = _dt.UTC
+else:
+    UTC = _dt.timezone.utc
 from decimal import Decimal
 from unittest.mock import MagicMock
 

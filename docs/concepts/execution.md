@@ -502,3 +502,9 @@ When `allow_overfills=False` (the default), rejected fills may cause position di
 between the system and the venue. Use the [reconciliation](live.md#execution-reconciliation)
 features to detect and resolve such discrepancies.
 :::
+
+## Related guides
+
+- [Orders](orders.md) - Order types and management.
+- [Positions](positions.md) - Position tracking from executions.
+- [Strategies](strategies.md) - Order submission from strategies.

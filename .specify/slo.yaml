@@ -1,0 +1,94 @@
+# Service Level Objectives - nautilus_dev Trading System
+# Based on industry standards for algorithmic trading platforms
+
+apiVersion: backstage.io/v1alpha1
+kind: SLO
+metadata:
+  name: nautilus-trading-slo
+  description: SLOs for Nautilus algorithmic trading system
+
+spec:
+  # Latency Objectives
+  latency:
+    - name: order_execution_p99
+      target: 100ms
+      description: "99th percentile order execution latency"
+      measurement: "grafana:nautilus-health:order_latency_p99"
+
+    - name: market_data_p95
+      target: 50ms
+      description: "95th percentile market data ingestion latency"
+      measurement: "grafana:nautilus-health:market_data_latency_p95"
+
+  # Availability Objectives
+  availability:
+    - name: trading_system_uptime
+      target: 99.9%
+      description: "Trading system availability during market hours"
+      window: "30d"
+      exclusions:
+        - "scheduled_maintenance"
+        - "market_closed"
+
+    - name: data_feed_uptime
+      target: 99.5%
+      description: "Market data feed availability"
+      window: "7d"
+
+  # Accuracy Objectives
+  accuracy:
+    - name: position_sync
+      target: 99.99%
+      description: "Position reconciliation accuracy vs exchange"
+      measurement: "grafana:nautilus-health:position_sync_accuracy"
+
+    - name: order_fill_accuracy
+      target: 99.9%
+      description: "Order fill price within expected slippage"
+      measurement: "grafana:nautilus-health:fill_accuracy"
+
+  # Risk Objectives (Trading specific)
+  risk:
+    - name: max_drawdown_alert
+      threshold: 5%
+      description: "Alert when daily drawdown exceeds threshold"
+      action: "pause_trading"
+
+    - name: position_limit_check
+      threshold: 100%
+      description: "Position size vs configured limits"
+      action: "reject_new_orders"
+
+  # Error Budget
+  error_budget:
+    - name: monthly_error_budget
+      target: 99.9%
+      window: "30d"
+      burn_rate_alerts:
+        - severity: warning
+          threshold: 2x  # 2x burn rate
+        - severity: critical
+          threshold: 10x  # 10x burn rate
+
+# Grafana Alert Rules derived from SLOs
+grafana_alerts:
+  - name: "Order Latency SLO Breach"
+    condition: "order_latency_p99 > 100"
+    severity: warning
+    labels:
+      category: trading
+      slo: order_execution_p99
+
+  - name: "Position Sync SLO Breach"
+    condition: "position_sync_accuracy < 99.99"
+    severity: critical
+    labels:
+      category: trading
+      slo: position_sync
+
+  - name: "Drawdown Limit Exceeded"
+    condition: "daily_drawdown > 5"
+    severity: critical
+    labels:
+      category: trading
+      slo: max_drawdown_alert

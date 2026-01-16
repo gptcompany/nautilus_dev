@@ -2,6 +2,7 @@
 Risk assessment stage implementation.
 
 Handles position sizing, risk limits, and portfolio constraints.
+Integrates with meta-learning pipeline for confidence-based sizing.
 """
 
 from dataclasses import dataclass, field
@@ -191,16 +192,84 @@ class RiskStage(AbstractStage):
         alpha_output: dict[str, Any],
         config: RiskConfig,
     ) -> list[dict[str, Any]]:
-        """Calculate position sizes."""
-        # Placeholder implementation
-        return [
-            {
-                "symbol": "BTCUSDT",
-                "size_pct": min(config.max_position_pct, 5.0),
-                "leverage": 1.0,
-                "stop_loss_pct": config.stop_loss_pct,
-            }
-        ]
+        """Calculate position sizes using IntegratedSizer with meta-learning.
+
+        Integrates:
+        - Signal strength from alpha stage
+        - Meta-confidence from MetaModel (if available)
+        - Toxicity from VPIN (if available)
+        - Regime weight (if available)
+
+        Args:
+            alpha_output: Output from ALPHA stage with signals and metadata
+            config: Risk configuration with limits
+
+        Returns:
+            List of position dicts with size_pct, leverage, stop_loss
+        """
+        from strategies.common.position_sizing.config import IntegratedSizingConfig
+        from strategies.common.position_sizing.integrated_sizing import IntegratedSizer
+
+        # Extract signals from alpha output
+        signals = alpha_output.get("signals", [])
+        if not signals:
+            # Fallback: single signal from metrics
+            signal_value = alpha_output.get("metrics", {}).get("signal", 0.0)
+            signals = [{"symbol": "BTCUSDT", "signal": signal_value}]
+
+        # Extract meta-learning outputs (if available)
+        meta_output = alpha_output.get("meta_output", {})
+        meta_confidence = meta_output.get("confidence", None)  # P(correct) from MetaModel
+        regime_weight = meta_output.get("regime_weight", None)  # From RegimeManager
+        toxicity = meta_output.get("toxicity", None)  # From VPIN
+
+        # Create IntegratedSizer with config
+        sizing_config = IntegratedSizingConfig(
+            giller_exponent=config.custom_params.get("giller_exponent", 0.5),
+            fractional_kelly=config.custom_params.get("fractional_kelly", 0.5),
+            max_size=config.max_position_pct / 100.0,  # Convert to fraction
+            min_size=config.custom_params.get("min_size", 0.01),
+        )
+        sizer = IntegratedSizer(sizing_config)
+
+        positions = []
+        for sig in signals:
+            symbol = sig.get("symbol", "UNKNOWN")
+            signal_value = sig.get("signal", 0.0)
+
+            # Calculate integrated size
+            result = sizer.calculate(
+                signal=signal_value,
+                meta_confidence=meta_confidence,
+                regime_weight=regime_weight,
+                toxicity=toxicity,
+            )
+
+            if result.final_size != 0:
+                positions.append(
+                    {
+                        "symbol": symbol,
+                        "size_pct": abs(result.final_size) * 100.0,  # Convert to pct
+                        "direction": result.direction,
+                        "leverage": min(config.max_leverage, 1.0),
+                        "stop_loss_pct": config.stop_loss_pct,
+                        "factors": result.factors,  # Debug info
+                    }
+                )
+
+        return (
+            positions
+            if positions
+            else [
+                {
+                    "symbol": "NONE",
+                    "size_pct": 0.0,
+                    "direction": 0,
+                    "leverage": 0.0,
+                    "stop_loss_pct": 0.0,
+                }
+            ]
+        )
 
     def _validate_risk(
         self,

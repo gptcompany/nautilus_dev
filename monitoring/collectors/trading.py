@@ -3,10 +3,18 @@
 # T049-T052: Create TradingCollector with PnL, orders/minute, position exposure tracking
 
 import asyncio
+
+# Python 3.10 compatibility
+import datetime as _dt
 import logging
 import socket
 from collections.abc import Callable
-from datetime import UTC, datetime
+from datetime import datetime
+
+if hasattr(_dt, "UTC"):
+    UTC = _dt.UTC
+else:
+    UTC = _dt.timezone.utc
 
 from monitoring.collectors import BaseCollector
 from monitoring.config import MonitoringConfig

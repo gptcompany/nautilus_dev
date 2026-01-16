@@ -27,10 +27,17 @@ This is how we survive: by being water, not rock.
 
 from __future__ import annotations
 
+# Python 3.10 compatibility
+import datetime as _dt
 import logging
 from collections.abc import Callable
 from dataclasses import dataclass
-from datetime import UTC, datetime
+from datetime import datetime
+
+if hasattr(_dt, "UTC"):
+    UTC = _dt.UTC
+else:
+    UTC = _dt.timezone.utc
 from enum import Enum
 from typing import TYPE_CHECKING
 

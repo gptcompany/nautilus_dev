@@ -1,0 +1,62 @@
+{
+  "mcpServers": {
+    "context7": {
+      "command": "npx",
+      "args": ["-y", "@upstash/context7-mcp"],
+      "env": {},
+      "description": "Library documentation search",
+      "enabled": true
+    },
+    "serena": {
+      "command": "serena",
+      "args": ["start-mcp-server", "--context", "ide-assistant", "--project", "."],
+      "description": "Codebase navigation and semantic code search",
+      "enabled": true
+    },
+    "sentry": {
+      "command": "npx",
+      "args": ["-y", "@sentry/mcp-server"],
+      "description": "Production error tracking and monitoring",
+      "enabled": true
+    },
+    "linear": {
+      "command": "npx",
+      "args": ["-y", "linear-mcp"],
+      "env": {
+        "LINEAR_API_KEY": "${LINEAR_API_KEY}"
+      },
+      "description": "Issue tracking and project management (Linear API)",
+      "enabled": true
+    },
+    "wolframalpha": {
+      "command": "node",
+      "args": ["/media/sam/1TB/mcpservers/wolframalpha-llm-mcp/build/index.js"],
+      "env": {
+        "WOLFRAM_LLM_APP_ID": "VYR43J-GW3TWJ9G3K"
+      },
+      "description": "Mathematical computation",
+      "enabled": true,
+      "autoApprove": ["ask_llm", "get_simple_answer", "validate_key"]
+    },
+    "matlab-server": {
+      "command": "node",
+      "args": ["/media/sam/1TB1/mcpservers/matlab-mcp-server/build/index.js"],
+      "env": {
+        "MATLAB_PATH": "/media/sam/3TB-WDC/matlab2025/bin/matlab"
+      },
+      "description": "MATLAB execution",
+      "enabled": true
+    },
+    "claude-flow": {
+      "command": "npx",
+      "args": ["-y", "claude-flow@alpha", "mcp", "start", "--transport", "http", "--port", "3001"],
+      "env": {
+        "AGENTDB_ENABLED": "false",
+        "CLAUDE_FLOW_MODE": "legacy"
+      },
+      "description": "AI orchestration (HTTP transport, safe mode - avoids stdio conflict)",
+      "enabled": true,
+      "autoApprove": []
+    }
+  }
+}

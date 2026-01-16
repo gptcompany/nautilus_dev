@@ -570,3 +570,9 @@ the system analyzes position lifecycles from fills - and applies adjustments to 
 - **Lifecycle**: A sequence of fills between zero-crossings representing a continuous position open-close cycle.
 - **Synthetic fill**: A calculated fill report created by the system to represent missing trading activity, using reconciliation price calculations to achieve correct average positions.
 - **Tolerance**: Position matching uses configurable price tolerance (default: 0.0001 = 0.01% relative difference) to account for minor calculation differences.
+
+## Related guides
+
+- [Adapters](adapters.md) - Venue connectivity for live trading.
+- [Execution](execution.md) - Order execution in live environments.
+- [Backtesting](backtesting.md) - Test strategies before live deployment.

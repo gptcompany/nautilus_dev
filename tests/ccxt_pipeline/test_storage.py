@@ -1,6 +1,13 @@
 """Unit tests for storage."""
 
-from datetime import UTC, datetime, timedelta
+# Python 3.10 compatibility
+import datetime as _dt
+from datetime import datetime, timedelta
+
+if hasattr(_dt, "UTC"):
+    UTC = _dt.UTC
+else:
+    UTC = _dt.timezone.utc
 from pathlib import Path
 
 from scripts.ccxt_pipeline.models import OpenInterest, Venue

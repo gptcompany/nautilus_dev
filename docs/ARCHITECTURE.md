@@ -1098,3 +1098,294 @@ stop_loss_order = self.order_factory.stop_market(
 )
 self.submit_order(stop_loss_order)
 ```
+
+---
+
+## FAANG Enterprise Observability Stack (2026-01)
+
+### Overview
+
+Enterprise-grade observability following FAANG/Spotify engineering standards:
+- **SLO-driven operations** with Pyrra
+- **Progressive deployment** with Argo Rollouts
+- **Semantic versioning** with automatic releases
+- **Advanced risk analytics** with VaR/CVaR/Correlation
+
+### Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    FAANG ENTERPRISE OBSERVABILITY                            │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│  ┌──────────────────┐   ┌──────────────────┐   ┌──────────────────┐        │
+│  │   Pyrra SLO UI   │   │  Argo Rollouts   │   │  Risk Analytics  │        │
+│  │   + OpenSLO      │   │  Canary Mgmt     │   │  VaR/Heatmap     │        │
+│  └────────┬─────────┘   └────────┬─────────┘   └────────┬─────────┘        │
+│           │                      │                      │                   │
+│           ▼                      ▼                      ▼                   │
+│  ┌──────────────────────────────────────────────────────────────────┐      │
+│  │                        Prometheus + QuestDB                       │      │
+│  │  - SLO metrics (Prometheus)                                       │      │
+│  │  - Trading metrics (QuestDB)                                      │      │
+│  │  - Latency percentiles (P50/P95/P99)                             │      │
+│  └──────────────────────────────────────────────────────────────────┘      │
+│           │                      │                      │                   │
+│           ▼                      ▼                      ▼                   │
+│  ┌──────────────────────────────────────────────────────────────────┐      │
+│  │                     DEPLOYMENT PIPELINE                           │      │
+│  │  ┌─────────────┐  ┌─────────────┐  ┌──────────────────────┐     │      │
+│  │  │ commitlint  │  │ Docker Tags │  │ Canary Analysis      │     │      │
+│  │  │ + semantic  │  │ v1.2.3      │  │ 5% → 25% → 100%      │     │      │
+│  │  │ release     │  │             │  │ Auto-rollback on SLI │     │      │
+│  │  └─────────────┘  └─────────────┘  └──────────────────────┘     │      │
+│  └──────────────────────────────────────────────────────────────────┘      │
+│                                                                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+### 1. Semantic Versioning
+
+**Components**:
+- `commitlint.config.js` - Conventional commit enforcement
+- `.releaserc.json` - Semantic release configuration
+- `.github/workflows/release.yml` - Automatic releases on merge to main
+
+**Commit Types**:
+| Type | Version Bump | Example |
+|------|--------------|---------|
+| `feat:` | Minor (0.1.0 → 0.2.0) | New feature |
+| `fix:` | Patch (0.1.0 → 0.1.1) | Bug fix |
+| `feat!:` / `BREAKING CHANGE:` | Major (0.1.0 → 1.0.0) | Breaking change |
+
+**Usage**:
+```bash
+# Valid commits
+git commit -m "feat(trading): add VaR calculation"
+git commit -m "fix(risk): correct drawdown threshold"
+git commit -m "feat!: redesign API response format"
+
+# Dry run release
+npx semantic-release --dry-run
+```
+
+### 2. Docker Semantic Tags
+
+**Workflow**: `.github/workflows/docker-publish.yml`
+
+**Tag Strategy**:
+| Trigger | Tags |
+|---------|------|
+| Tag `v1.2.3` | `v1.2.3`, `v1.2`, `v1`, `latest` |
+| Push to `main` | `main-<sha>` |
+
+**Registry**: `ghcr.io/gptcompany/nautilus`
+
+### 3. SLO Management (Pyrra)
+
+**Installation**:
+```bash
+helm repo add pyrra https://pyrra-dev.github.io/pyrra
+helm install pyrra pyrra/pyrra --namespace monitoring
+```
+
+**OpenSLO Spec Example** (`slo/trading-availability.yaml`):
+```yaml
+apiVersion: pyrra.dev/v1alpha1
+kind: ServiceLevelObjective
+metadata:
+  name: trading-availability
+  namespace: trading
+spec:
+  target: "99.9"
+  window: 30d
+  indicator:
+    ratio:
+      errors:
+        metric: trading_errors_total{severity="critical"}
+      total:
+        metric: trading_requests_total
+  alerting:
+    name: TradingAvailabilitySLOBreach
+```
+
+**Key SLOs**:
+| SLO | Target | Window |
+|-----|--------|--------|
+| Trading Availability | 99.9% | 30d |
+| Order Latency P99 | < 100ms | 7d |
+| Error Rate | < 0.1% | 24h |
+
+### 4. Canary Deployment (Argo Rollouts)
+
+**Installation**:
+```bash
+kubectl create namespace argo-rollouts
+kubectl apply -n argo-rollouts -f https://github.com/argoproj/argo-rollouts/releases/latest/download/install.yaml
+```
+
+**Rollout Strategy** (`k8s/rollouts/trading-service.yaml`):
+```yaml
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: trading-service
+spec:
+  strategy:
+    canary:
+      steps:
+        - setWeight: 5
+        - pause: {duration: 10m}
+        - setWeight: 25
+        - pause: {duration: 10m}
+        - setWeight: 100
+      analysis:
+        templates:
+          - templateName: success-rate
+        startingStep: 1
+```
+
+**Auto-Rollback Triggers**:
+- Error rate > 5%
+- Latency P99 > 100ms
+- SLO breach detected
+
+### 5. Latency Percentiles
+
+**Dashboard**: `monitoring/grafana/dashboards/exchange.json`
+
+**Panels Added**:
+- P50 Latency (Median) - Green < 50ms, Yellow < 100ms, Red > 200ms
+- P95 Latency - Green < 100ms, Yellow < 200ms, Red > 300ms
+- P99 Latency - Green < 150ms, Yellow < 300ms, Red > 500ms
+- Latency Percentiles Over Time (timeseries)
+
+**QuestDB Query**:
+```sql
+SELECT
+    exchange,
+    percentile_approx(latency_ms, 0.50) as p50,
+    percentile_approx(latency_ms, 0.95) as p95,
+    percentile_approx(latency_ms, 0.99) as p99
+FROM exchange_status
+WHERE timestamp > now() - interval '1h'
+GROUP BY exchange
+```
+
+### 6. VaR Dashboard & Calculator
+
+**Calculator**: `risk/var_calculator.py`
+
+**Methods**:
+| Method | Description | Use Case |
+|--------|-------------|----------|
+| Historical VaR | Percentile-based | Conservative estimate |
+| Parametric VaR | Normal distribution | Quick approximation |
+| CVaR (Expected Shortfall) | Average loss beyond VaR | Tail risk |
+| Marginal VaR | Position contribution | Risk attribution |
+
+**Dashboard Panels** (`config/monitoring/grafana/dashboards/trading-drawdown.json`):
+- Current VaR (95%) - Thresholds: 3% yellow, 5% red
+- CVaR / Expected Shortfall (95%)
+- Marginal VaR
+- VaR & CVaR Over Time
+
+**Usage**:
+```python
+from risk.var_calculator import VaRCalculator
+import numpy as np
+
+returns = np.array([-0.02, 0.01, -0.03, 0.02, -0.01])
+calculator = VaRCalculator(returns, confidence=0.95)
+
+print(f"Historical VaR: {calculator.historical_var:.2%}")
+print(f"Parametric VaR: {calculator.parametric_var:.2%}")
+print(f"CVaR: {calculator.cvar:.2%}")
+```
+
+### 7. Risk Heatmap
+
+**Dashboard**: `config/monitoring/grafana/dashboards/trading-risk-heatmap.json`
+
+**Panels**:
+- Position Drawdown Heatmap (symbol × time)
+- VaR by Symbol Heatmap
+- Current Risk by Strategy & Symbol (table)
+- Exposure by Symbol (pie chart)
+- Exposure by Strategy (pie chart)
+- Recent Risk Alerts (table)
+
+**Color Scheme**: RdYlGn (Red = high risk, Green = healthy)
+
+### 8. Correlation Analysis
+
+**Calculator**: `risk/correlation.py`
+
+**Methods**:
+| Method | Description |
+|--------|-------------|
+| `calculate_correlation_matrix()` | Static correlation |
+| `calculate_rolling_correlation()` | Time-varying correlation |
+| `detect_correlation_regime_change()` | Stress detection |
+| `calculate_average_correlation()` | Diversification metric |
+
+**Diversification Score**:
+```python
+from risk.correlation import CorrelationAnalyzer
+
+analyzer = CorrelationAnalyzer(returns_df, window=30)
+print(f"Diversification Score: {analyzer.diversification_score:.0f}/100")
+# 100 = perfectly uncorrelated, 0 = perfectly correlated
+```
+
+### Key Files Summary
+
+| Component | Location |
+|-----------|----------|
+| Commit Lint | `commitlint.config.js` |
+| Semantic Release | `.releaserc.json` |
+| Release Workflow | `.github/workflows/release.yml` |
+| Docker Publish | `.github/workflows/docker-publish.yml` |
+| Latency Panels | `monitoring/grafana/dashboards/exchange.json` |
+| VaR Calculator | `risk/var_calculator.py` |
+| VaR Dashboard | `config/monitoring/grafana/dashboards/trading-drawdown.json` |
+| Risk Heatmap | `config/monitoring/grafana/dashboards/trading-risk-heatmap.json` |
+| Correlation | `risk/correlation.py` |
+
+### FAANG Comparison
+
+| Practice | Google | Netflix | Spotify | Nautilus |
+|----------|--------|---------|---------|----------|
+| SLO Framework | SLO Generator | Custom | Datadog | Pyrra ✅ |
+| Canary Deploy | Cloud Deploy | Spinnaker | ITIL+Agile | Argo Rollouts ✅ |
+| Auto-Rollback | Built-in | Kayenta | Manual | Argo Analysis ✅ |
+| Semantic Version | Internal | Internal | Internal | semantic-release ✅ |
+| VaR Dashboards | N/A | N/A | N/A | QuantLib + Grafana ✅ |
+| Error Budget | Built-in | Custom | Datadog | Pyrra ✅ |
+
+### Backstage Integration
+
+All components are surfaceable in Backstage IDP:
+
+```yaml
+# catalog-info.yaml
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: trading-service
+  annotations:
+    grafana/dashboard-selector: "tag:trading"
+    prometheus.io/rule: 'trading-availability'
+    argocd/app-name: trading-service
+    github.com/project-slug: gptcompany/nautilus_dev
+spec:
+  type: service
+  lifecycle: production
+  owner: trading-team
+```
+
+**Plugins Required**:
+- `@backstage/plugin-grafana` - Embedded dashboards
+- `@backstage/plugin-prometheus` - SLO/SLI metrics
+- `roadie-backstage-plugins/argo-cd` - Deployment status
+- `@backstage/plugin-github-actions` - CI status

@@ -1,0 +1,24 @@
+# Auto-assign Configuration
+# Automatically assigns reviewers to PRs
+
+addReviewers: true
+addAssignees: true
+
+# Reviewers to assign
+reviewers:
+  - gptcompany
+
+# Number of reviewers to assign
+numberOfReviewers: 1
+
+# Assign author as assignee
+assignees:
+  - author
+
+# Skip for draft PRs
+skipDraft: true
+
+# Skip for specific labels
+skipLabels:
+  - wip
+  - do-not-review

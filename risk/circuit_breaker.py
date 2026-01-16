@@ -5,7 +5,14 @@ Provides portfolio-level drawdown protection by monitoring equity and
 enforcing graduated risk reduction as drawdown increases.
 """
 
-from datetime import UTC, datetime
+# Python 3.10 compatibility
+import datetime as _dt
+from datetime import datetime
+
+if hasattr(_dt, "UTC"):
+    UTC = _dt.UTC
+else:
+    UTC = _dt.timezone.utc
 from decimal import Decimal
 from typing import TYPE_CHECKING
 
@@ -57,7 +64,7 @@ class CircuitBreaker:
         self._peak_equity = Decimal("0")
         self._current_equity = Decimal("0")
         self._current_drawdown = Decimal("0")
-        self._last_check = datetime.now(UTC)
+        self._last_check = datetime.now(tz=UTC)
 
     @property
     def config(self) -> CircuitBreakerConfig:
@@ -134,7 +141,7 @@ class CircuitBreaker:
         self._update_state(self._current_drawdown)
 
         # Update timestamp
-        self._last_check = datetime.now(UTC)
+        self._last_check = datetime.now(tz=UTC)
 
     def can_open_position(self) -> bool:
         """
@@ -190,7 +197,7 @@ class CircuitBreaker:
         if self._state != CircuitBreakerState.HALTED:
             raise ValueError(f"Cannot reset from state {self._state.value}, only from HALTED")
         self._state = CircuitBreakerState.ACTIVE
-        self._last_check = datetime.now(UTC)
+        self._last_check = datetime.now(tz=UTC)
 
     def _calculate_drawdown(self) -> Decimal:
         """

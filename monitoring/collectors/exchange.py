@@ -3,10 +3,18 @@
 # T029-T032: Create ExchangeCollector with WebSocket status, latency, reconnection tracking
 
 import asyncio
+
+# Python 3.10 compatibility
+import datetime as _dt
 import logging
 import socket
 from collections.abc import Callable
-from datetime import UTC, datetime
+from datetime import datetime
+
+if hasattr(_dt, "UTC"):
+    UTC = _dt.UTC
+else:
+    UTC = _dt.timezone.utc
 from typing import cast
 
 from monitoring.collectors import BaseCollector
