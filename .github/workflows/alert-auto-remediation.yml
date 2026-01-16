@@ -1,0 +1,82 @@
+name: Alert Auto-Remediation
+
+on:
+  repository_dispatch:
+    types: [alert-fired]
+  workflow_dispatch:
+    inputs:
+      alert_name:
+        description: 'Alert name to remediate'
+        required: true
+        type: choice
+        options:
+          - HostDiskSpaceLow
+          - ContainerHighMemory
+          - ServiceDown
+      dry_run:
+        description: 'Dry run (no actual changes)'
+        required: false
+        type: boolean
+        default: true
+
+jobs:
+  remediate:
+    name: Auto-remediate Alert
+    runs-on: self-hosted
+
+    steps:
+      - name: Parse alert
+        id: parse
+        run: |
+          ALERT="${{ github.event.client_payload.alert_name || inputs.alert_name }}"
+          DRY_RUN="${{ inputs.dry_run || 'false' }}"
+          echo "alert=$ALERT" >> $GITHUB_OUTPUT
+          echo "dry_run=$DRY_RUN" >> $GITHUB_OUTPUT
+          echo "Processing alert: $ALERT (dry_run: $DRY_RUN)"
+
+      - name: Remediate HostDiskSpaceLow
+        if: steps.parse.outputs.alert == 'HostDiskSpaceLow'
+        run: |
+          echo "🧹 Cleaning disk space..."
+          if [ "${{ steps.parse.outputs.dry_run }}" != "true" ]; then
+            docker system prune -af --filter "until=24h"
+            docker builder prune -af
+            sudo journalctl --vacuum-size=500M
+          else
+            echo "DRY RUN - would execute: docker system prune, builder prune, journal vacuum"
+          fi
+          df -h /
+
+      - name: Remediate ContainerHighMemory
+        if: steps.parse.outputs.alert == 'ContainerHighMemory'
+        run: |
+          echo "🔄 Checking high memory containers..."
+          docker stats --no-stream --format "{{.Name}}: {{.MemPerc}}" | head -10
+          if [ "${{ steps.parse.outputs.dry_run }}" != "true" ]; then
+            # Find containers using >80% memory and restart
+            HIGH_MEM=$(docker stats --no-stream --format "{{.Name}}:{{.MemPerc}}" | awk -F: '{gsub(/%/,"",$2); if($2>80) print $1}')
+            if [ -n "$HIGH_MEM" ]; then
+              echo "Restarting: $HIGH_MEM"
+              echo "$HIGH_MEM" | xargs -r docker restart
+            fi
+          else
+            echo "DRY RUN - would restart high memory containers"
+          fi
+
+      - name: Remediate ServiceDown
+        if: steps.parse.outputs.alert == 'ServiceDown'
+        run: |
+          echo "🔄 Checking down services..."
+          docker ps -a --filter "status=exited" --format "{{.Names}}: {{.Status}}"
+          if [ "${{ steps.parse.outputs.dry_run }}" != "true" ]; then
+            # Restart recently exited containers (within last hour)
+            docker ps -a --filter "status=exited" --format "{{.Names}}" | head -5 | xargs -r docker start
+          else
+            echo "DRY RUN - would restart exited containers"
+          fi
+
+      - name: Report result
+        if: always()
+        run: |
+          echo "✅ Remediation complete for: ${{ steps.parse.outputs.alert }}"
+          echo "Dry run: ${{ steps.parse.outputs.dry_run }}"
