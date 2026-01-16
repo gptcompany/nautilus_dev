@@ -53,7 +53,8 @@ class MetricsCollector:
                 return False
 
         try:
-            self._socket.sendall((line + "\n").encode())
+            if self._socket is not None:
+                self._socket.sendall((line + "\n").encode())
             return True
         except Exception as e:
             logger.error(f"Failed to send metric: {e}")

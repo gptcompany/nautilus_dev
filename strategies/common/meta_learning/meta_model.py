@@ -205,7 +205,7 @@ class MetaModel:
             # Edge case: only one class in training (should not happen after validation)
             result = np.full(n_samples, self._config.default_confidence, dtype=np.float64)
 
-        return result  # type: ignore[return-value]
+        return result  # type: ignore[no-any-return]
 
     def predict(
         self,

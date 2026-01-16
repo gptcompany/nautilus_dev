@@ -39,7 +39,7 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 
-class MetaLearningExampleConfig(StrategyConfig):
+class MetaLearningExampleConfig(StrategyConfig, frozen=True):  # type: ignore[call-arg]
     """Configuration for MetaLearningExampleStrategy."""
 
     instrument_id: str

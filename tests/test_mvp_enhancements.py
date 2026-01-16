@@ -350,7 +350,7 @@ class TestBacktestCostAdjuster:
         adjusted = adjuster.adjust_returns_batch(gross, notionals)
         assert len(adjusted) == 3
         # All returns should be reduced by costs
-        for g, a in zip(gross, adjusted):
+        for g, a in zip(gross, adjusted, strict=True):
             assert a < g
 
     def test_annual_drag_positive(self):
@@ -427,7 +427,7 @@ class TestMVPIntegration:
         model = TransactionCostModel(exchange=Exchange.BINANCE_FUTURES)
         trades_per_year = [1000, 500, 100]  # High, med, low freq
         adjusted_sharpes = []
-        for (name, data), tpy in zip(strategies.items(), trades_per_year):
+        for (name, data), tpy in zip(strategies.items(), trades_per_year, strict=True):
             net = model.adjust_sharpe(
                 gross_sharpe=data["sharpe"], avg_notional=10000, trades_per_year=tpy
             )

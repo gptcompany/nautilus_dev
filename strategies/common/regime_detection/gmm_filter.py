@@ -154,4 +154,4 @@ class GMMVolatilityFilter:
         probs = self.model.predict_proba(X)
         result = probs[0]
 
-        return result  # type: ignore[return-value]
+        return result  # type: ignore[no-any-return]

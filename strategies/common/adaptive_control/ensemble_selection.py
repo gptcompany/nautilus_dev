@@ -95,7 +95,7 @@ def select_ensemble(
         raise ValueError("correlation_matrix dimensions must match strategy count")
 
     # Create indexed list sorted by Sharpe (descending)
-    indexed = list(enumerate(zip(strategy_names, strategy_sharpes)))
+    indexed = list(enumerate(zip(strategy_names, strategy_sharpes, strict=True)))
     indexed.sort(key=lambda x: x[1][1], reverse=True)
 
     # Filter by minimum Sharpe

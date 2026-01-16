@@ -25,7 +25,7 @@ try:
     SENTRY_AVAILABLE = True
 except ImportError:
     SENTRY_AVAILABLE = False
-    sentry_sdk = None
+    sentry_sdk = None  # type: ignore[assignment]
 
 
 def init_sentry() -> bool:
@@ -57,7 +57,7 @@ def init_sentry() -> bool:
             ),
         ],
         # Filter out noisy errors
-        before_send=_before_send,
+        before_send=_before_send,  # type: ignore[arg-type]
     )
 
     return True
@@ -91,7 +91,7 @@ def capture_exception(error: Exception, **context: Any) -> str | None:
     with sentry_sdk.push_scope() as scope:
         for key, value in context.items():
             scope.set_extra(key, value)
-        return sentry_sdk.capture_exception(error)
+        return sentry_sdk.capture_exception(error)  # type: ignore[no-any-return]
 
 
 def capture_message(message: str, level: str = "info", **context: Any) -> str | None:
@@ -112,7 +112,7 @@ def capture_message(message: str, level: str = "info", **context: Any) -> str | 
     with sentry_sdk.push_scope() as scope:
         for key, value in context.items():
             scope.set_extra(key, value)
-        return sentry_sdk.capture_message(message, level=level)
+        return sentry_sdk.capture_message(message, level=level)  # type: ignore[arg-type, no-any-return]
 
 
 def set_trading_context(
