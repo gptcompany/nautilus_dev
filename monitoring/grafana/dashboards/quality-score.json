@@ -1,0 +1,377 @@
+{
+  "uid": "quality-score",
+  "title": "Quality Score Dashboard",
+  "description": "Quality metrics tracking: code, test, data, framework scores + ClaudeFlow strategy performance",
+  "tags": ["claude", "quality", "testing", "claudeflow"],
+  "timezone": "browser",
+  "refresh": "1m",
+  "time": {
+    "from": "now-7d",
+    "to": "now"
+  },
+  "templating": {
+    "list": [
+      {
+        "name": "project",
+        "type": "query",
+        "datasource": "QuestDB",
+        "query": "SELECT DISTINCT project FROM claude_quality_scores ORDER BY project",
+        "refresh": 1,
+        "multi": false,
+        "includeAll": true,
+        "allValue": "%"
+      }
+    ]
+  },
+  "panels": [
+    {
+      "id": 1,
+      "title": "Average Quality Score (7d)",
+      "type": "stat",
+      "gridPos": {"x": 0, "y": 0, "w": 4, "h": 4},
+      "datasource": "QuestDB",
+      "targets": [
+        {
+          "rawSql": "SELECT AVG(score_total) as avg_score FROM claude_quality_scores WHERE timestamp > now() - interval '7d' AND project LIKE '${project}'",
+          "format": "table"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "decimals": 1,
+          "color": {"mode": "thresholds"},
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"color": "red", "value": null},
+              {"color": "yellow", "value": 70},
+              {"color": "green", "value": 85}
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 2,
+      "title": "Code Score",
+      "type": "stat",
+      "gridPos": {"x": 4, "y": 0, "w": 3, "h": 4},
+      "datasource": "QuestDB",
+      "targets": [
+        {
+          "rawSql": "SELECT AVG(score_code) as code FROM claude_quality_scores WHERE timestamp > now() - interval '7d' AND score_code > 0 AND project LIKE '${project}'",
+          "format": "table"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "decimals": 1,
+          "color": {"mode": "thresholds"},
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"color": "red", "value": null},
+              {"color": "yellow", "value": 70},
+              {"color": "green", "value": 90}
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 3,
+      "title": "Test Score",
+      "type": "stat",
+      "gridPos": {"x": 7, "y": 0, "w": 3, "h": 4},
+      "datasource": "QuestDB",
+      "targets": [
+        {
+          "rawSql": "SELECT AVG(score_test) as test FROM claude_quality_scores WHERE timestamp > now() - interval '7d' AND score_test > 0 AND project LIKE '${project}'",
+          "format": "table"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "decimals": 1,
+          "color": {"mode": "thresholds"},
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"color": "red", "value": null},
+              {"color": "yellow", "value": 70},
+              {"color": "green", "value": 85}
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 4,
+      "title": "Data Score",
+      "type": "stat",
+      "gridPos": {"x": 10, "y": 0, "w": 3, "h": 4},
+      "datasource": "QuestDB",
+      "targets": [
+        {
+          "rawSql": "SELECT AVG(score_data) as data FROM claude_quality_scores WHERE timestamp > now() - interval '7d' AND score_data > 0 AND project LIKE '${project}'",
+          "format": "table"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "decimals": 1,
+          "color": {"mode": "thresholds"},
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"color": "red", "value": null},
+              {"color": "yellow", "value": 70},
+              {"color": "green", "value": 90}
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 5,
+      "title": "Framework Score",
+      "type": "stat",
+      "gridPos": {"x": 13, "y": 0, "w": 3, "h": 4},
+      "datasource": "QuestDB",
+      "targets": [
+        {
+          "rawSql": "SELECT AVG(score_framework) as framework FROM claude_quality_scores WHERE timestamp > now() - interval '7d' AND score_framework > 0 AND project LIKE '${project}'",
+          "format": "table"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "decimals": 1,
+          "color": {"mode": "thresholds"},
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"color": "red", "value": null},
+              {"color": "yellow", "value": 70},
+              {"color": "green", "value": 90}
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 6,
+      "title": "Measurements (7d)",
+      "type": "stat",
+      "gridPos": {"x": 16, "y": 0, "w": 4, "h": 4},
+      "datasource": "QuestDB",
+      "targets": [
+        {
+          "rawSql": "SELECT COUNT(*) as count FROM claude_quality_scores WHERE timestamp > now() - interval '7d' AND project LIKE '${project}'",
+          "format": "table"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "thresholds"},
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"color": "blue", "value": null}
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 7,
+      "title": "Quality Score Trend",
+      "type": "timeseries",
+      "gridPos": {"x": 0, "y": 4, "w": 12, "h": 8},
+      "datasource": "QuestDB",
+      "targets": [
+        {
+          "rawSql": "SELECT timestamp, score_total, project FROM claude_quality_scores WHERE timestamp > now() - interval '7d' AND project LIKE '${project}' ORDER BY timestamp",
+          "format": "time_series"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 10,
+            "pointSize": 5
+          }
+        }
+      },
+      "options": {
+        "legend": {"displayMode": "table", "placement": "right"}
+      }
+    },
+    {
+      "id": 8,
+      "title": "Score Breakdown",
+      "type": "timeseries",
+      "gridPos": {"x": 12, "y": 4, "w": 12, "h": 8},
+      "datasource": "QuestDB",
+      "targets": [
+        {
+          "rawSql": "SELECT timestamp, score_code as 'Code', score_test as 'Test', score_data as 'Data', score_framework as 'Framework' FROM claude_quality_scores WHERE timestamp > now() - interval '7d' AND project LIKE '${project}' ORDER BY timestamp",
+          "format": "time_series"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 5
+          }
+        }
+      }
+    },
+    {
+      "id": 9,
+      "title": "ClaudeFlow Strategy Performance",
+      "type": "bargauge",
+      "gridPos": {"x": 0, "y": 12, "w": 8, "h": 6},
+      "datasource": "QuestDB",
+      "targets": [
+        {
+          "rawSql": "SELECT strategy, AVG(avg_score) as score FROM claude_strategy_metrics WHERE timestamp > now() - interval '7d' GROUP BY strategy ORDER BY score DESC",
+          "format": "table"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "color": {"mode": "thresholds"},
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"color": "red", "value": null},
+              {"color": "yellow", "value": 50},
+              {"color": "green", "value": 70}
+            ]
+          }
+        }
+      },
+      "options": {
+        "orientation": "horizontal",
+        "displayMode": "gradient"
+      }
+    },
+    {
+      "id": 10,
+      "title": "Strategy Success Rate",
+      "type": "bargauge",
+      "gridPos": {"x": 8, "y": 12, "w": 8, "h": 6},
+      "datasource": "QuestDB",
+      "targets": [
+        {
+          "rawSql": "SELECT strategy, AVG(success_rate) * 100 as rate FROM claude_strategy_metrics WHERE timestamp > now() - interval '7d' GROUP BY strategy ORDER BY rate DESC",
+          "format": "table"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "color": {"mode": "thresholds"},
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"color": "red", "value": null},
+              {"color": "yellow", "value": 50},
+              {"color": "green", "value": 70}
+            ]
+          }
+        }
+      },
+      "options": {
+        "orientation": "horizontal",
+        "displayMode": "gradient"
+      }
+    },
+    {
+      "id": 11,
+      "title": "Strategy Trend",
+      "type": "timeseries",
+      "gridPos": {"x": 16, "y": 12, "w": 8, "h": 6},
+      "datasource": "QuestDB",
+      "targets": [
+        {
+          "rawSql": "SELECT timestamp, score, strategy FROM claude_strategy_trends WHERE timestamp > now() - interval '30d' AND is_real = true ORDER BY timestamp",
+          "format": "time_series"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "max": 100
+        }
+      }
+    },
+    {
+      "id": 12,
+      "title": "Neural Patterns",
+      "type": "table",
+      "gridPos": {"x": 0, "y": 18, "w": 12, "h": 6},
+      "datasource": "QuestDB",
+      "targets": [
+        {
+          "rawSql": "SELECT swarm_id, pattern_type, confidence, usage_count, success_rate FROM claude_neural_patterns ORDER BY timestamp DESC LIMIT 20",
+          "format": "table"
+        }
+      ],
+      "fieldConfig": {
+        "overrides": [
+          {
+            "matcher": {"id": "byName", "options": "confidence"},
+            "properties": [{"id": "unit", "value": "percentunit"}]
+          },
+          {
+            "matcher": {"id": "byName", "options": "success_rate"},
+            "properties": [{"id": "unit", "value": "percentunit"}]
+          }
+        ]
+      }
+    },
+    {
+      "id": 13,
+      "title": "Recent Quality Scores",
+      "type": "table",
+      "gridPos": {"x": 12, "y": 18, "w": 12, "h": 6},
+      "datasource": "QuestDB",
+      "targets": [
+        {
+          "rawSql": "SELECT timestamp, project, block, score_total, score_code, score_test FROM claude_quality_scores WHERE project LIKE '${project}' ORDER BY timestamp DESC LIMIT 20",
+          "format": "table"
+        }
+      ],
+      "fieldConfig": {
+        "overrides": [
+          {
+            "matcher": {"id": "byName", "options": "score_total"},
+            "properties": [{"id": "unit", "value": "percent"}, {"id": "decimals", "value": 1}]
+          }
+        ]
+      }
+    }
+  ],
+  "schemaVersion": 38
+}

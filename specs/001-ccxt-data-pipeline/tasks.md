@@ -225,6 +225,60 @@
 
 ---
 
+## Phase 10: User Story 7 - Tick-by-Tick Trades Collection (Priority: P2)
+
+**Goal**: Collect tick-by-tick trades from Hyperliquid via WebSocket for VPIN validation
+
+**Independent Test**: Run `ccxt-cli collect-trades BTC-USD-PERP --duration 5m` and verify trades stored with side classification
+
+**Reference Implementation**: `/media/sam/1TB/epic-hyperliquid-l2-cli-enhancements/examples/trades_collector_prototype.py`
+
+### Data Model for User Story 7
+
+- [ ] T075 [P] [US7] Create Trade model in `scripts/ccxt_pipeline/models/trade.py`:
+  - timestamp_ns: int (nanoseconds)
+  - symbol: str
+  - venue: str = "HYPERLIQUID"
+  - trade_id: str
+  - price: float
+  - quantity: float
+  - side: Literal["BUY", "SELL"]
+  - is_buyer_maker: bool
+
+### Tests for User Story 7
+
+- [ ] T076 [P] [US7] Unit test for TradesCollector in `tests/ccxt_pipeline/test_trades_collector.py::test_collect_trades`
+- [ ] T077 [P] [US7] Unit test for side classification in `tests/ccxt_pipeline/test_trades_collector.py::test_side_classification`
+- [ ] T078 [P] [US7] Unit test for reconnection handling in `tests/ccxt_pipeline/test_trades_collector.py::test_reconnection`
+- [ ] T079 [US7] Integration test for trades storage in `tests/ccxt_pipeline/test_integration.py::test_trades_storage`
+
+### Implementation for User Story 7
+
+- [ ] T080 [US7] Create HyperliquidTradesCollector in `scripts/ccxt_pipeline/collectors/hyperliquid_trades.py`:
+  - WebSocket connection to Hyperliquid trades stream
+  - Parse trade messages: {time, px, sz, side, hash}
+  - Map side field to BUY/SELL (Hyperliquid provides direction)
+  - Convert timestamp to nanoseconds
+- [ ] T081 [US7] Add side classification fallback using L2 orderbook inference in `scripts/ccxt_pipeline/collectors/hyperliquid_trades.py`:
+  - If trade price <= best_bid: SELL (aggressor hit bid)
+  - If trade price >= best_ask: BUY (aggressor lifted offer)
+  - Log classification confidence
+- [ ] T082 [US7] Add Trade storage support to ParquetStore in `scripts/ccxt_pipeline/storage/parquet_store.py`:
+  - Schema: timestamp_ns, symbol, venue, trade_id, price, quantity, side, is_buyer_maker
+  - Partitioning by date for efficient queries
+- [ ] T083 [US7] Add collect-trades CLI command in `scripts/ccxt_pipeline/cli.py`:
+  - `ccxt-cli collect-trades SYMBOL [--duration DURATION]`
+  - Default duration: continuous (Ctrl+C to stop)
+  - Support multiple symbols
+- [ ] T084 [US7] Integrate trades collector with daemon mode in `scripts/ccxt_pipeline/scheduler/daemon.py`:
+  - Start trades collector alongside liquidation stream
+  - Graceful shutdown: flush pending trades
+- [ ] T085 [US7] Create collectors __init__.py in `scripts/ccxt_pipeline/collectors/__init__.py`
+
+**Checkpoint**: User Story 7 complete - trades collection for VPIN validation
+
+---
+
 ## Dependencies & Execution Order
 
 ### Phase Dependencies
@@ -262,6 +316,7 @@ Phase 2: Foundational ◄──────────────────�
 | US3 (Funding) | Foundational | US2 |
 | US4 (Liquidations) | Foundational | US2, US3 |
 | US6 (Daemon) | US1-5 | - |
+| US7 (Trades) | US5 (Storage) | US3, US4, US6 |
 
 ### Parallel Opportunities
 
@@ -309,7 +364,7 @@ Task: T022 [P] Implement HyperliquidFetcher
 
 | Metric | Count |
 |--------|-------|
-| **Total Tasks** | 77 |
+| **Total Tasks** | 88 |
 | **Phase 1 (Setup)** | 5 |
 | **Phase 2 (Foundational)** | 11 |
 | **US1 (Current OI)** | 10 |
@@ -319,12 +374,15 @@ Task: T022 [P] Implement HyperliquidFetcher
 | **US4 (Liquidations)** | 9 |
 | **US6 (Daemon)** | 10 |
 | **Polish** | 7 |
-| **Parallelizable [P]** | 32 |
+| **US7 (Trades)** | 11 |
+| **Parallelizable [P]** | 36 |
 | **Alpha-Evolve [E]** | 2 |
 
 **MVP Scope**: Phases 1-3 (Setup + Foundational + US1) = 25 tasks
 
-**Completed**: Phases 1-9 (121 tests passing) - ALL TASKS COMPLETE. T074 automated with 8 stability tests covering crash resistance, memory stability, error recovery, and graceful shutdown.
+**Completed**: Phases 1-9 (121 tests passing). T074 automated with 8 stability tests covering crash resistance, memory stability, error recovery, and graceful shutdown.
+
+**Next Implementation**: Phase 10 (US7 - Trades Collection) - 11 tasks for VPIN validation support.
 
 ---
 

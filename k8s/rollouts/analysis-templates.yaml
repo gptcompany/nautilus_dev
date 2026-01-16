@@ -1,0 +1,118 @@
+# Analysis Templates for Argo Rollouts Canary Deployment
+# Auto-rollback triggers based on SLI metrics
+#
+# Deploy with: kubectl apply -f k8s/rollouts/analysis-templates.yaml
+---
+apiVersion: argoproj.io/v1alpha1
+kind: AnalysisTemplate
+metadata:
+  name: trading-success-rate
+  namespace: trading
+spec:
+  args:
+    - name: service-name
+  metrics:
+    # Error rate must stay below 5%
+    - name: error-rate
+      interval: 1m
+      count: 10  # Run 10 times
+      successCondition: result[0] < 0.05
+      failureLimit: 3  # Rollback after 3 failures
+      provider:
+        prometheus:
+          address: http://prometheus.monitoring.svc.cluster.local:9090
+          query: |
+            sum(rate(trading_errors_total{service="{{args.service-name}}", env="prod"}[5m]))
+            /
+            sum(rate(trading_requests_total{service="{{args.service-name}}", env="prod"}[5m]))
+
+    # Latency P99 must stay below 100ms
+    - name: latency-p99
+      interval: 1m
+      count: 10
+      successCondition: result[0] < 100
+      failureLimit: 3
+      provider:
+        prometheus:
+          address: http://prometheus.monitoring.svc.cluster.local:9090
+          query: |
+            histogram_quantile(0.99,
+              sum(rate(order_latency_ms_bucket{service="{{args.service-name}}", env="prod"}[5m]))
+              by (le)
+            )
+
+    # VaR must stay below 5%
+    - name: var-threshold
+      interval: 2m
+      count: 5
+      successCondition: result[0] < 5
+      failureLimit: 2  # Stricter - rollback after 2 failures
+      provider:
+        prometheus:
+          address: http://prometheus.monitoring.svc.cluster.local:9090
+          query: |
+            max(trading_risk_var_pct{service="{{args.service-name}}", env="prod"})
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: AnalysisTemplate
+metadata:
+  name: trading-risk-analysis
+  namespace: trading
+spec:
+  metrics:
+    # Drawdown must stay below 10%
+    - name: drawdown-check
+      interval: 1m
+      count: 10
+      successCondition: result[0] < 10
+      failureLimit: 2  # Strict - financial risk
+      provider:
+        prometheus:
+          address: http://prometheus.monitoring.svc.cluster.local:9090
+          query: |
+            max(trading_risk_drawdown_pct{env="prod"})
+
+    # Circuit breaker must not be HALTED
+    - name: circuit-breaker-state
+      interval: 1m
+      count: 10
+      successCondition: result[0] == 0  # 0 = not halted
+      failureLimit: 1  # Immediate rollback if halted
+      provider:
+        prometheus:
+          address: http://prometheus.monitoring.svc.cluster.local:9090
+          query: |
+            max(circuit_breaker_halted{env="prod"})
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: AnalysisTemplate
+metadata:
+  name: exchange-connectivity
+  namespace: trading
+spec:
+  metrics:
+    # All exchanges must be connected
+    - name: exchange-connected
+      interval: 30s
+      count: 20
+      successCondition: result[0] == 1  # All connected
+      failureLimit: 5
+      provider:
+        prometheus:
+          address: http://prometheus.monitoring.svc.cluster.local:9090
+          query: |
+            min(exchange_status_connected{env="prod"})
+
+    # Exchange latency must be reasonable (<500ms)
+    - name: exchange-latency
+      interval: 1m
+      count: 10
+      successCondition: result[0] < 500
+      failureLimit: 3
+      provider:
+        prometheus:
+          address: http://prometheus.monitoring.svc.cluster.local:9090
+          query: |
+            max(exchange_status_latency_ms{env="prod"})

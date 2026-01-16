@@ -99,7 +99,7 @@ def extract_meta_features(
     # Replace NaN/Inf with 0 for warmup period
     features = np.nan_to_num(features, nan=0.0, posinf=0.0, neginf=0.0)
 
-    return features.astype(np.float64)
+    return features.astype(np.float64)  # type: ignore[no-any-return]
 
 
 def _rolling_std(arr: NDArray[np.floating], window: int) -> NDArray[np.floating]:

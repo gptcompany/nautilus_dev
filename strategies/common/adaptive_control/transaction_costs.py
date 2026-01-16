@@ -380,7 +380,10 @@ class BacktestCostAdjuster:
         if len(gross_returns) != len(notionals):
             raise ValueError("gross_returns and notionals must have same length")
 
-        return [self.adjust_return(r, n, volatility) for r, n in zip(gross_returns, notionals)]
+        return [
+            self.adjust_return(r, n, volatility)
+            for r, n in zip(gross_returns, notionals, strict=True)
+        ]
 
     def estimate_annual_drag(
         self,

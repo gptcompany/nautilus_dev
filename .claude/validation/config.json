@@ -1,0 +1,39 @@
+{
+  "$schema": "validation-config-v1",
+  "domain": "trading",
+  "description": "NautilusTrader validation - NT nightly compatibility",
+
+  "validators": ["/validate-plan"],
+
+  "specialist_agent": "nautilus-docs-specialist",
+
+  "anti_patterns": [
+    {"pattern": "df\\.iterrows", "severity": "high", "fix": "Use vectorized operations or apply()"},
+    {"pattern": "for.*in.*df", "severity": "medium", "fix": "Use DataFrame.apply() or vectorized ops"},
+    {"pattern": "pd\\.read_csv.*\\.csv", "severity": "medium", "fix": "Use ParquetDataCatalog for large data"},
+    {"pattern": "time\\.sleep", "severity": "medium", "fix": "Use asyncio.sleep for async code"},
+    {"pattern": "import requests", "severity": "low", "fix": "Use httpx for async support"},
+    {"pattern": "strategies/deployed", "severity": "high", "fix": "Use strategies/production/"}
+  ],
+
+  "research_keywords": {
+    "trigger": ["adaptive", "regime", "sizing", "indicator", "signal", "threshold", "optimization",
+               "sharpe", "drawdown", "walk-forward", "backtest", "thompson", "bayesian",
+               "momentum", "mean reversion", "arbitrage", "market making"],
+    "skip": ["config", "logging", "cli", "cache", "redis", "monitoring", "docker", "deployment",
+             "testing", "dashboard", "chart", "visualization"]
+  },
+
+  "compatibility_check": {
+    "library": "nautilustrader",
+    "version_source": "context7",
+    "deprecated_apis": ["BacktestNode.run", "Strategy.on_start"],
+    "required_patterns": ["async def", "msgspec"]
+  },
+
+  "file_patterns": {
+    "source": ["strategies/**/*.py", "adapters/**/*.py", "models/**/*.py"],
+    "tests": ["tests/**/*.py"],
+    "config": ["config/**/*.toml", "config/**/*.yaml"]
+  }
+}

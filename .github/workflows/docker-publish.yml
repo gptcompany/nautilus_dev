@@ -1,0 +1,99 @@
+# Docker Image Publishing with Semantic Tags
+# Publishes Docker images to GitHub Container Registry (ghcr.io)
+#
+# Tags:
+# - On release tag (v1.2.3): ghcr.io/gptcompany/nautilus:v1.2.3, :latest
+# - On main push: ghcr.io/gptcompany/nautilus:main-<sha>
+#
+# Images include:
+# - Semantic version tags
+# - Git SHA for traceability
+# - Build timestamp
+
+name: Docker Publish
+
+on:
+  push:
+    tags:
+      - 'v*'
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to build (e.g., v1.0.0)'
+        required: false
+        type: string
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: gptcompany/nautilus
+
+jobs:
+  build-and-push:
+    name: "Build & Push Docker Image"
+    runs-on: [self-hosted, shared]
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            # Tag: v1.2.3 → v1.2.3, v1.2, v1, latest
+            type=semver,pattern=v{{version}}
+            type=semver,pattern=v{{major}}.{{minor}}
+            type=semver,pattern=v{{major}}
+            # Branch: main → main-abc1234
+            type=ref,event=branch,suffix=-{{sha}}
+            # Always tag latest on release
+            type=raw,value=latest,enable=${{ startsWith(github.ref, 'refs/tags/v') }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          build-args: |
+            GIT_SHA=${{ github.sha }}
+            BUILD_DATE=${{ github.event.repository.updated_at }}
+            VERSION=${{ steps.meta.outputs.version }}
+
+      - name: Generate SBOM
+        uses: anchore/sbom-action@v0
+        if: startsWith(github.ref, 'refs/tags/v')
+        with:
+          image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.version }}
+          artifact-name: sbom-${{ steps.meta.outputs.version }}.spdx.json
+
+      - name: Summary
+        run: |
+          echo "## Docker Image Published" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Registry:** ${{ env.REGISTRY }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Image:** ${{ env.IMAGE_NAME }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Tags:**" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "${{ steps.meta.outputs.tags }}" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY

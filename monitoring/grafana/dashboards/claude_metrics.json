@@ -551,6 +551,169 @@
           {"matcher": {"id": "byName", "options": "success_pct"}, "properties": [{"id": "unit", "value": "percent"}]}
         ]
       }
+    },
+    {
+      "id": 200,
+      "title": "Spec Pipeline Metrics",
+      "type": "row",
+      "gridPos": {"x": 0, "y": 45, "w": 24, "h": 1},
+      "collapsed": false
+    },
+    {
+      "id": 201,
+      "title": "Pipeline Runs (24h)",
+      "type": "stat",
+      "gridPos": {"x": 0, "y": 46, "w": 4, "h": 4},
+      "datasource": "QuestDB",
+      "targets": [
+        {
+          "rawSql": "SELECT COUNT(DISTINCT run_id) as runs FROM spec_pipeline_metrics WHERE timestamp > now() - interval '24h'",
+          "format": "table"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "thresholds"},
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [{"color": "blue", "value": null}]
+          }
+        }
+      }
+    },
+    {
+      "id": 202,
+      "title": "Pipeline Success Rate",
+      "type": "gauge",
+      "gridPos": {"x": 4, "y": 46, "w": 4, "h": 4},
+      "datasource": "QuestDB",
+      "targets": [
+        {
+          "rawSql": "SELECT (SUM(CASE WHEN status = 'success' THEN 1 ELSE 0 END) * 100.0 / COUNT(*)) as rate FROM spec_pipeline_metrics WHERE timestamp > now() - interval '7d'",
+          "format": "table"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"color": "red", "value": null},
+              {"color": "yellow", "value": 70},
+              {"color": "green", "value": 90}
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 203,
+      "title": "Avg Step Duration",
+      "type": "stat",
+      "gridPos": {"x": 8, "y": 46, "w": 4, "h": 4},
+      "datasource": "QuestDB",
+      "targets": [
+        {
+          "rawSql": "SELECT avg(duration_ms) as avg_ms FROM spec_pipeline_metrics WHERE timestamp > now() - interval '24h'",
+          "format": "table"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms",
+          "color": {"mode": "thresholds"},
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"color": "green", "value": null},
+              {"color": "yellow", "value": 30000},
+              {"color": "red", "value": 60000}
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 204,
+      "title": "Retry Count",
+      "type": "stat",
+      "gridPos": {"x": 12, "y": 46, "w": 4, "h": 4},
+      "datasource": "QuestDB",
+      "targets": [
+        {
+          "rawSql": "SELECT SUM(retry_count) as retries FROM spec_pipeline_metrics WHERE timestamp > now() - interval '24h'",
+          "format": "table"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "thresholds"},
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"color": "green", "value": null},
+              {"color": "yellow", "value": 5},
+              {"color": "red", "value": 10}
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 205,
+      "title": "Steps by Status",
+      "type": "piechart",
+      "gridPos": {"x": 16, "y": 46, "w": 8, "h": 4},
+      "datasource": "QuestDB",
+      "targets": [
+        {
+          "rawSql": "SELECT status, COUNT(*) as count FROM spec_pipeline_metrics WHERE timestamp > now() - interval '7d' GROUP BY status",
+          "format": "table"
+        }
+      ],
+      "options": {
+        "legend": {"displayMode": "table", "placement": "right"}
+      }
+    },
+    {
+      "id": 206,
+      "title": "Pipeline Steps Over Time",
+      "type": "timeseries",
+      "gridPos": {"x": 0, "y": 50, "w": 12, "h": 8},
+      "datasource": "QuestDB",
+      "targets": [
+        {
+          "rawSql": "SELECT timestamp, duration_ms, step_name FROM spec_pipeline_metrics WHERE timestamp > now() - interval '24h' ORDER BY timestamp",
+          "format": "time_series"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms",
+          "custom": {"drawStyle": "bars", "fillOpacity": 80}
+        }
+      }
+    },
+    {
+      "id": 207,
+      "title": "Recent Pipeline Runs",
+      "type": "table",
+      "gridPos": {"x": 12, "y": 50, "w": 12, "h": 8},
+      "datasource": "QuestDB",
+      "targets": [
+        {
+          "rawSql": "SELECT run_id, project, step_name, status, duration_ms, retry_count, timestamp FROM spec_pipeline_metrics WHERE timestamp > now() - interval '7d' ORDER BY timestamp DESC LIMIT 20",
+          "format": "table"
+        }
+      ],
+      "fieldConfig": {
+        "overrides": [
+          {"matcher": {"id": "byName", "options": "duration_ms"}, "properties": [{"id": "unit", "value": "ms"}]}
+        ]
+      }
     }
   ]
 }

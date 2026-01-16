@@ -1,0 +1,47 @@
+# Trading Service Availability SLO
+# Target: 99.9% availability over 30-day rolling window
+#
+# Deploy with: kubectl apply -f slo/trading-availability.yaml
+# Requires Pyrra: helm install pyrra pyrra/pyrra --namespace monitoring
+---
+apiVersion: pyrra.dev/v1alpha1
+kind: ServiceLevelObjective
+metadata:
+  name: trading-availability
+  namespace: trading
+  labels:
+    team: trading
+    service: nautilus-trading
+spec:
+  # 99.9% availability = 43.2 minutes downtime allowed per month
+  target: "99.9"
+  window: 30d
+  description: |
+    Trading service must be available 99.9% of the time.
+    Error budget: 43.2 minutes per 30-day window.
+
+    Breach triggers immediate page to on-call.
+
+  indicator:
+    ratio:
+      errors:
+        metric: trading_errors_total{severity="critical", env="prod"}
+      total:
+        metric: trading_requests_total{env="prod"}
+
+  alerting:
+    name: TradingAvailabilitySLOBreach
+    annotations:
+      summary: "Trading availability SLO breach"
+      description: |
+        Trading service availability has dropped below 99.9%.
+        Current error budget consumption rate is critical.
+
+        Actions:
+        1. Check Grafana dashboard: trading-drawdown
+        2. Review recent deployments in Argo Rollouts
+        3. Check exchange connectivity status
+      runbook_url: "https://github.com/gptcompany/nautilus_dev/wiki/runbooks/availability"
+    labels:
+      severity: critical
+      team: trading

@@ -85,7 +85,7 @@ def init_sentry(
             # Don't send PII
             send_default_pii=False,
             # Filter out sensitive data
-            before_send=_filter_sensitive_data,
+            before_send=_filter_sensitive_data,  # type: ignore[arg-type]
         )
 
         _sentry_sdk = sentry_sdk
@@ -142,7 +142,7 @@ def capture_exception(error: Exception, **context) -> str | None:
     with _sentry_sdk.push_scope() as scope:
         for key, value in context.items():
             scope.set_extra(key, value)
-        return _sentry_sdk.capture_exception(error)
+        return _sentry_sdk.capture_exception(error)  # type: ignore[no-any-return]
 
 
 def capture_message(message: str, level: str = "info", **context) -> str | None:
@@ -163,7 +163,7 @@ def capture_message(message: str, level: str = "info", **context) -> str | None:
     with _sentry_sdk.push_scope() as scope:
         for key, value in context.items():
             scope.set_extra(key, value)
-        return _sentry_sdk.capture_message(message, level=level)
+        return _sentry_sdk.capture_message(message, level=level)  # type: ignore[no-any-return, arg-type]
 
 
 def set_user(user_id: str, **extra) -> None:

@@ -40,7 +40,7 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 
-class AuditObserverConfig(ActorConfig):
+class AuditObserverConfig(ActorConfig, frozen=True):  # type: ignore[call-arg]
     """Configuration for AuditObserver actor."""
 
     trader_id: str = "TRADER-001"

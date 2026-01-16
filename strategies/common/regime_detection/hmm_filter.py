@@ -208,4 +208,4 @@ class HMMRegimeFilter:
         _, posteriors = self.model.score_samples(features_scaled)
         result = posteriors[0]
 
-        return result  # type: ignore[return-value]
+        return result  # type: ignore[no-any-return]

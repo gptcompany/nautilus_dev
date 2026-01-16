@@ -353,7 +353,9 @@ class MetaController:
 
         # Calculate risk multiplier
         pid_multiplier = (
-            self._pid_controller.update(drawdown) if self._pid_controller is not None else 1.0
+            self._pid_controller.update(drawdown)  # type: ignore[attr-defined]
+            if self._pid_controller is not None
+            else 1.0
         )
         state_multiplier = {
             SystemState.VENTRAL: 1.0,

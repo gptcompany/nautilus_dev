@@ -67,3 +67,45 @@ class BOCDConfig(BaseModel):
     )
 
     model_config = {"frozen": True}
+
+
+class EnsembleConfig(BaseModel):
+    """Configuration for RegimeEnsemble voting system.
+
+    Configures ensemble voting behavior including threshold,
+    minimum detectors, and voting strategy.
+
+    Attributes:
+        voting_threshold: Threshold for regime change confirmation (0.0-1.0).
+                         For majority voting: fraction of detectors that must agree.
+                         For weighted voting: minimum weighted confidence.
+        min_detectors: Minimum number of warmed-up detectors required for voting.
+        use_weighted_voting: If True, use confidence-weighted voting.
+                            If False, use simple majority voting.
+        data_gap_threshold_seconds: Threshold in seconds for detecting data gaps.
+                                   If gap > threshold, reset BOCD priors (FR-012).
+        default_weights: Default weights for each detector type.
+
+    Example:
+        >>> config = EnsembleConfig(
+        ...     voting_threshold=0.6,
+        ...     min_detectors=2,
+        ...     use_weighted_voting=True,
+        ...     default_weights={"bocd": 0.5, "hmm": 0.3, "gmm": 0.2},
+        ... )
+    """
+
+    voting_threshold: float = Field(
+        default=0.5, ge=0.0, le=1.0, description="Threshold for regime change confirmation"
+    )
+    min_detectors: int = Field(default=2, ge=1, description="Minimum detectors required for voting")
+    use_weighted_voting: bool = Field(default=True, description="Use weighted vs majority voting")
+    data_gap_threshold_seconds: int = Field(
+        default=3600, ge=60, description="Gap threshold for BOCD prior reset (seconds)"
+    )
+    default_weights: dict[str, float] = Field(
+        default_factory=lambda: {"bocd": 0.4, "hmm": 0.35, "gmm": 0.25},
+        description="Default detector weights",
+    )
+
+    model_config = {"frozen": True}
